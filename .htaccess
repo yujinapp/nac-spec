@@ -1,0 +1,29 @@
+# NAC3 spec subfolder -- public-facing.
+#
+# GoDaddy's default config blocks .md (and similar "raw source")
+# extensions with HTTP 403. We allow them explicitly and serve as
+# UTF-8 plain text so people sharing yujin.app/nac-spec/SPEC.md
+# URLs (from GitHub, launch posts, cross-posts) see the raw spec
+# instead of a 403.
+#
+# .html versions of every doc are also rendered (preferred for
+# humans). The .md route is for tooling, cat, curl, fetch.
+
+<FilesMatch "\.(md|markdown)$">
+    Require all granted
+</FilesMatch>
+
+AddType "text/plain; charset=UTF-8" .md .markdown
+
+# Standard mime for other text files served raw.
+AddType "application/javascript; charset=UTF-8" .mjs
+AddType "application/json; charset=UTF-8"       .json
+
+# Cache headers: the spec rarely changes -- 5 min freshness for docs,
+# 1 day for images / 3D model assets in ads-demo.
+<FilesMatch "\.(md|markdown|html|json)$">
+    Header set Cache-Control "public, max-age=300"
+</FilesMatch>
+<FilesMatch "\.(jpg|jpeg|png|gif|gltf|bin|svg)$">
+    Header set Cache-Control "public, max-age=86400"
+</FilesMatch>

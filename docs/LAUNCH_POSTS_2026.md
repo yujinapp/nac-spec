@@ -155,7 +155,7 @@ Try the demo, read the spec, install the runtime:
   yujin.app/nac-spec/ads-demo/atlas-pro/     -- voice ad demo
   npm i @nac3/runtime                        -- runtime
   github.com/yujinapp/nac-spec               -- source + governance
-  discord.gg/yujin                           -- community
+  discord.gg/FH3xEmGm                           -- community
 
 Fork it, break it, improve it. AMA in the comments.
 ```
@@ -357,7 +357,7 @@ The runtime: @nac3/runtime on npm.
 The spec: yujin.app/nac-spec
 The source: github.com/yujinapp/nac-spec
 Live demo: yujin.app/nac-spec/ads-demo/atlas-pro/
-Community: discord.gg/yujin
+Community: discord.gg/FH3xEmGm
 
 Apache 2.0. ~20kb gzipped. No deps. (9/12)
 ```
@@ -399,7 +399,7 @@ ship next.
 
 For now: try the demo. Fork the spec. Join the Discord.
 
-discord.gg/yujin (12/12)
+discord.gg/FH3xEmGm (12/12)
 ```
 
 ---
@@ -495,7 +495,7 @@ Source + governance:
 github.com/yujinapp/nac-spec
 
 Join the community:
-discord.gg/yujin
+discord.gg/FH3xEmGm
 
 The reader verifies, does not trust. The code is open. The demo is
 live. Try it. Break it. Improve it.
@@ -526,7 +526,7 @@ standard, the runtime is convenience).
 Spec: yujin.app/nac-spec
 Source: github.com/yujinapp/nac-spec
 Runtime: npm i @nac3/runtime
-Discord: discord.gg/yujin
+Discord: discord.gg/FH3xEmGm
 
 The most visceral demo:
 yujin.app/nac-spec/ads-demo/atlas-pro/?lang=es
@@ -728,7 +728,7 @@ reader + agent + Playwright + RPA.
 - yujin.app/nac-spec/ads-demo/atlas-pro/ -- live voice ad.
 - github.com/yujinapp/nac-spec -- source.
 - @nac3/runtime on npm -- runtime.
-- discord.gg/yujin -- community (Pablo creates day-of).
+- discord.gg/FH3xEmGm -- community (Pablo creates day-of).
 
 ---
 

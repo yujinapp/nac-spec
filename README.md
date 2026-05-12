@@ -149,4 +149,5 @@ Bounty program for adopters:
 - Live spec: https://yujin.app/nac-spec/
 - npm: https://www.npmjs.com/package/@nac3/runtime
 - GitHub: https://github.com/yujinapp/nac-spec
+- Discord: https://discord.gg/FH3xEmGm
 - Status page: https://yujin.app/nac-spec/docs/COVERAGE_REPORT_2026_05_10.md

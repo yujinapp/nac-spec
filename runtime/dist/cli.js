@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// NAC CLI v2.2.0
+// NAC CLI v2.2.1
 // Usage:
 //   nac validate <url-or-dir> [--severity=error|warn|info]
 //   nac --version
@@ -18,7 +18,7 @@ const args = process.argv.slice(2);
 const cmd = args[0];
 
 function showHelp() {
-  console.log('NAC CLI v2.2.0');
+  console.log('NAC CLI v2.2.1');
   console.log('');
   console.log('Usage:');
   console.log('  nac validate <url-or-dir> [--severity=error|warn|info]');

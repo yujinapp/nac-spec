@@ -173,7 +173,7 @@ loadRuntime();
 const NAC = globalThis.NAC;
 
 assert('NAC installed',                typeof NAC === 'object');
-assert('NAC.version v2.2',             NAC.version === '2.2.0');
+assert('NAC.version v2.2.x',           /^2\.2\.\d+$/.test(NAC.version));
 assert('NAC.bindAction exists',        typeof NAC.bindAction === 'function');
 assert('NAC.STRICT_VALIDATION default false', NAC.STRICT_VALIDATION === false);
 

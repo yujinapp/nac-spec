@@ -57,7 +57,7 @@ La double licence Apache 2.0 + MIT garantit que la spec et le runtime survivent 
 
 ## Paternité
 
-NAC3 est rédigé et maintenu par Yujin (rpaforce.com). Apache-2.0. Contributions bienvenues -- voir `CONTRIBUTING.md`.
+NAC3 est rédigé et maintenu par Yujin (yujin.app). Apache-2.0. Contributions bienvenues -- voir `CONTRIBUTING.md`.
 
 ---
 

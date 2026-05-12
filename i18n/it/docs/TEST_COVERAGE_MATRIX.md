@@ -11,7 +11,7 @@ translation_date: 2026-05-11T14:32:13.636094+00:00
 **Versione spec:** 2.2 + anteprima v2.3.
 **Generato il:** 2026-05-11.
 **Riferimento autorevole per:** il repository di riferimento Yujin
-`pkuschnirof/rpaforce-crm` su `main`.
+`yujinapp/nac-spec` su `main`.
 
 Questa matrice elenca OGNI artefatto dell'ecosistema NAC3 e
 riporta la sua copertura tramite test automatizzati + il gate di

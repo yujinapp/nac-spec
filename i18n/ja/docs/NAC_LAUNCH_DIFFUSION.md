@@ -85,7 +85,7 @@ NAC3 を使うべき人々に届けるための実践的なプレイブック。
 3. 「どれだけ小さいか: 要素ごとに HTML 属性 3 つ。（コードのスクリーンショット）」
 4. 「得られるもの: 安定した名前、決定論的な完了イベント、10 ロケール対応 i18n、HMAC + isTrusted によるプロベナンス、自動バリデーション。」
 5. 「yujin.app/nac-spec にライブデモあり。4 本のデモのうち 1 本は Claude Sonnet チャットバックエンドに接続済み。今すぐ話しかけてみてください。」
-6. 「React + Angular 導入ガイドと動作するスタディケースは github.com/pkuschnirof/rpaforce-crm に。仕様は yujin.app/nac-spec/SPEC.md に。」
+6. 「React + Angular 導入ガイドと動作するスタディケースは github.com/yujinapp/nac-spec に。仕様は yujin.app/nac-spec/SPEC.md に。」
 
 ### LinkedIn
 
@@ -131,7 +131,7 @@ YouTube + Vimeo に投稿。
 ## 追跡指標
 
 - `@nac3/runtime` の週次 npm ダウンロード数。
-- `pkuschnirof/rpaforce-crm` と `pkuschnirof/yujin` の GitHub スター数・フォーク数。
+- `yujinapp/nac-spec` と `pkuschnirof/yujin` の GitHub スター数・フォーク数。
 - yujin.app/nac-spec/ のデモページビュー数（サーバーアクセスログ）。
 - 開設された GitHub issues 数（エンゲージメントの代理指標）。
 - 上記チャネル全体のユニークコメント投稿者数。

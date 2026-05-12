@@ -57,7 +57,7 @@ La doppia licenza Apache 2.0 + MIT garantisce che la specifica e il runtime sopr
 
 ## Autori
 
-NAC3 è scritto e mantenuto da Yujin (rpaforce.com). Apache-2.0. I contributi sono benvenuti -- vedi `CONTRIBUTING.md`.
+NAC3 è scritto e mantenuto da Yujin (yujin.app). Apache-2.0. I contributi sono benvenuti -- vedi `CONTRIBUTING.md`.
 
 ---
 

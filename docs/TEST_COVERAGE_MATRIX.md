@@ -3,7 +3,7 @@
 **Spec version:** 2.2 + v2.3 preview.
 **Generated:** 2026-05-11.
 **Authoritative for:** the Yujin reference repository
-`pkuschnirof/rpaforce-crm` on `main`.
+`yujinapp/nac-spec` on `main`.
 
 This matrix lists EVERY artifact in the NAC3 ecosystem and
 reports its coverage by automated tests + the manual

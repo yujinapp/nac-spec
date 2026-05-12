@@ -464,33 +464,33 @@ GitHub.
 
 | Suite | Fuente | Tests | Tiempo |
 |-------|--------|-------|------|
-| smoke | [packages/nac/test/smoke.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/smoke.mjs) | 36 | < 1s |
-| v22 | [packages/nac/test/v22.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/v22.mjs) | 14 | < 1s |
-| v23-interop | [packages/nac/test/v23-interop.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/v23-interop.mjs) | 14 | < 2s |
-| stage1-audio | [packages/nac/test/stage1-audio.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage1-audio.mjs) | 33 | < 1s |
-| stage2-disambiguation | [packages/nac/test/stage2-disambiguation.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage2-disambiguation.mjs) | 31 | < 1s |
-| stage3-backend (live) | [packages/nac/test/stage3-backend.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage3-backend.mjs) | ~150 (10 locales x 3 prompts) | ~120s |
-| stage4-calls | [packages/nac/test/stage4-calls.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage4-calls.mjs) | 31 | ~2s |
-| stage6-ack | [packages/nac/test/stage6-ack.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage6-ack.mjs) | 16 | < 1s |
-| stage6b-longtail | [packages/nac/test/stage6b-longtail.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage6b-longtail.mjs) | 14 | < 1s |
-| Generador de corpus TTS | [packages/nac/test/fixtures/voice/generate.mjs](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/fixtures/voice/generate.mjs) | -- | one-shot |
-| Catálogo de corpus TTS | [packages/nac/test/fixtures/voice/corpus.json](https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/fixtures/voice/corpus.json) | 30 prompts | -- |
-| Harness | [tools/nac/test-launch.sh](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tools/nac/test-launch.sh) | 5 capas | ~10s |
+| smoke | [packages/nac/test/smoke.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/smoke.mjs) | 36 | < 1s |
+| v22 | [packages/nac/test/v22.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/v22.mjs) | 14 | < 1s |
+| v23-interop | [packages/nac/test/v23-interop.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/v23-interop.mjs) | 14 | < 2s |
+| stage1-audio | [packages/nac/test/stage1-audio.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage1-audio.mjs) | 33 | < 1s |
+| stage2-disambiguation | [packages/nac/test/stage2-disambiguation.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage2-disambiguation.mjs) | 31 | < 1s |
+| stage3-backend (live) | [packages/nac/test/stage3-backend.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage3-backend.mjs) | ~150 (10 locales x 3 prompts) | ~120s |
+| stage4-calls | [packages/nac/test/stage4-calls.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage4-calls.mjs) | 31 | ~2s |
+| stage6-ack | [packages/nac/test/stage6-ack.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage6-ack.mjs) | 16 | < 1s |
+| stage6b-longtail | [packages/nac/test/stage6b-longtail.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/stage6b-longtail.mjs) | 14 | < 1s |
+| Generador de corpus TTS | [packages/nac/test/fixtures/voice/generate.mjs](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/fixtures/voice/generate.mjs) | -- | one-shot |
+| Catálogo de corpus TTS | [packages/nac/test/fixtures/voice/corpus.json](https://github.com/yujinapp/nac-spec/blob/main/runtime/test/fixtures/voice/corpus.json) | 30 prompts | -- |
+| Harness | [tools/nac/test-launch.sh](https://github.com/yujinapp/nac-spec/blob/main/tools/nac/test-launch.sh) | 5 capas | ~10s |
 | **Total lado Node** | | **259+** | **~10s + 120s opt-in** |
 
 Más 16 specs e2e de Playwright (~54s):
 
 | Spec | Fuente | Tests | Tag |
 |------|--------|-------|-----|
-| 01-landing | [tests/e2e-nac/specs/01-landing.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/01-landing.spec.ts) | 2 | @demos |
-| 02-demo-v19 | [tests/e2e-nac/specs/02-demo-v19.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/02-demo-v19.spec.ts) | 1 | @demos |
-| 03-demo-v20 | [tests/e2e-nac/specs/03-demo-v20.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/03-demo-v20.spec.ts) | 2 | @demos |
-| 04-demo-v21-datatable | [tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts) | 3 | @demos |
-| 05-demo-v22-interop | [tests/e2e-nac/specs/05-demo-v22-interop.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/05-demo-v22-interop.spec.ts) | 1 | @demos |
-| 06-demo-react-study-case | [tests/e2e-nac/specs/06-demo-react-study-case.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/06-demo-react-study-case.spec.ts) | 2 | @study |
-| 07-demo-angular-study-case | [tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts) | 2 | @study |
-| 08-pipeline-end-to-end | [tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts) | 3 | @e2e |
-| Config | [tests/e2e-nac/playwright.config.ts](https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/playwright.config.ts) | -- | -- |
+| 01-landing | [tests/e2e-nac/specs/01-landing.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/01-landing.spec.ts) | 2 | @demos |
+| 02-demo-v19 | [tests/e2e-nac/specs/02-demo-v19.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/02-demo-v19.spec.ts) | 1 | @demos |
+| 03-demo-v20 | [tests/e2e-nac/specs/03-demo-v20.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/03-demo-v20.spec.ts) | 2 | @demos |
+| 04-demo-v21-datatable | [tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts) | 3 | @demos |
+| 05-demo-v22-interop | [tests/e2e-nac/specs/05-demo-v22-interop.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/05-demo-v22-interop.spec.ts) | 1 | @demos |
+| 06-demo-react-study-case | [tests/e2e-nac/specs/06-demo-react-study-case.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/06-demo-react-study-case.spec.ts) | 2 | @study |
+| 07-demo-angular-study-case | [tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts) | 2 | @study |
+| 08-pipeline-end-to-end | [tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts) | 3 | @e2e |
+| Config | [tests/e2e-nac/playwright.config.ts](https://github.com/yujinapp/nac-spec/blob/main/tests/e2e-nac/playwright.config.ts) | -- | -- |
 | **Total Playwright** | | **16** | |
 
 **Gran total: 205+ tests** que cubren el pipeline completo desde

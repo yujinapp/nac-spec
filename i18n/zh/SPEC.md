@@ -11,7 +11,7 @@ translation_date: 2026-05-11T13:07:28.549236+00:00
 **版本：** 2.2.0
 **状态：** 稳定
 **许可证：** Apache-2.0
-**编辑：** Yujin (rpaforce.com)
+**编辑：** Yujin (yujin.app)
 
 ---
 

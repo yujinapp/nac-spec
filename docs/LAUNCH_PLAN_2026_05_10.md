@@ -209,7 +209,7 @@ cancel further wakeups until told otherwise.
 
 Every commit during the session lands on `main` and triggers the
 deploy.yml pipeline -- the public yujin.app/nac-spec/ updates
-automatically. The repository at github.com/pkuschnirof/rpaforce-crm
+automatically. The repository at github.com/yujinapp/nac-spec
 is the single source of truth.
 
 Time-stamps and commit SHAs are this doc's job. Update it

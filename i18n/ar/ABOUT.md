@@ -57,7 +57,7 @@ translation_date: 2026-05-11T13:18:07.467238+00:00
 
 ## التأليف
 
-NAC3 من تأليف وصيانة Yujin (rpaforce.com). مرخّص بـ Apache-2.0. المساهمات مرحّب بها -- راجع `CONTRIBUTING.md`.
+NAC3 من تأليف وصيانة Yujin (yujin.app). مرخّص بـ Apache-2.0. المساهمات مرحّب بها -- راجع `CONTRIBUTING.md`.
 
 ---
 

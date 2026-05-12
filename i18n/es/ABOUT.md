@@ -57,7 +57,7 @@ Las licencias Apache 2.0 + MIT garantizan que la especificación y el runtime so
 
 ## Autoría
 
-NAC3 es desarrollado y mantenido por Yujin (rpaforce.com). Apache-2.0. Se aceptan contribuciones -- ver `CONTRIBUTING.md`.
+NAC3 es desarrollado y mantenido por Yujin (yujin.app). Apache-2.0. Se aceptan contribuciones -- ver `CONTRIBUTING.md`.
 
 ---
 

@@ -85,7 +85,7 @@ translation_date: 2026-05-11T15:23:23.559860+00:00
 3. "有多小：每个元素只需 3 个 HTML 属性。（代码截图）"
 4. "你能得到什么：稳定的名称、确定性的完成事件、开箱即用的 10 语言 i18n、通过 HMAC + isTrusted 实现的来源证明、自动校验。"
 5. "在线演示：yujin.app/nac-spec —— 四个演示，其中一个接入了 Claude Sonnet 聊天后端，现在就可以与之对话。"
-6. "React + Angular 采用指南 + 可运行案例研究：github.com/pkuschnirof/rpaforce-crm。规范：yujin.app/nac-spec/SPEC.md。"
+6. "React + Angular 采用指南 + 可运行案例研究：github.com/yujinapp/nac-spec。规范：yujin.app/nac-spec/SPEC.md。"
 
 ### LinkedIn
 
@@ -132,7 +132,7 @@ translation_date: 2026-05-11T15:23:23.559860+00:00
 ## 需要追踪的指标
 
 - `@nac3/runtime` 的每周 npm 下载量。
-- `pkuschnirof/rpaforce-crm` 和 `pkuschnirof/yujin` 的 GitHub star 数与 fork 数。
+- `yujinapp/nac-spec` 和 `pkuschnirof/yujin` 的 GitHub star 数与 fork 数。
 - yujin.app/nac-spec/ 演示页面的访问量（服务器访问日志）。
 - 提交的 GitHub issue 数量（参与度的代理指标）。
 - 上述各渠道的独立评论者数量。

@@ -11,7 +11,7 @@ translation_date: 2026-05-11T12:52:03.130346+00:00
 **Version:** 2.2.0
 **Statut :** Stable
 **Licence :** Apache-2.0
-**Éditeur :** Yujin (rpaforce.com)
+**Éditeur :** Yujin (yujin.app)
 
 ---
 

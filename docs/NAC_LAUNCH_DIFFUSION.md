@@ -97,7 +97,7 @@ A 6-tweet thread:
 3. "How small: 3 HTML attributes per element. (code screenshot)"
 4. "What you get: stable names, deterministic completion events, 10-locale i18n out of the box, provenance via HMAC + isTrusted, auto-validation."
 5. "Live demo at yujin.app/nac-spec -- four demos, one wired to a Claude Sonnet chat backend. Talk to it."
-6. "React + Angular adoption guides + working study cases at github.com/pkuschnirof/rpaforce-crm. Spec at yujin.app/nac-spec/SPEC.md."
+6. "React + Angular adoption guides + working study cases at github.com/yujinapp/nac-spec. Spec at yujin.app/nac-spec/SPEC.md."
 
 ### LinkedIn
 
@@ -149,7 +149,7 @@ Posted to YouTube + Vimeo.
 ## Metrics to track
 
 - npm downloads of `@nac3/runtime` weekly.
-- GitHub stars + forks on `pkuschnirof/rpaforce-crm` and
+- GitHub stars + forks on `yujinapp/nac-spec` and
   `pkuschnirof/yujin`.
 - Demo page views at yujin.app/nac-spec/ (server access logs).
 - Number of GitHub issues opened (proxy for engagement).

@@ -101,5 +101,5 @@ and after Yujin no longer exists.
 
 ## Authorship
 
-NAC3 is authored and maintained by Yujin (rpaforce.com).
+NAC3 is authored and maintained by Yujin (yujin.app).
 Apache-2.0. Contributions welcome -- see `CONTRIBUTING.md`.

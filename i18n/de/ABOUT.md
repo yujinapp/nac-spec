@@ -66,7 +66,7 @@ Die Apache-2.0- und MIT-Lizenzierung stellt sicher, dass Spec und Runtime jede �
 
 ## Autorenschaft
 
-NAC3 wurde von Yujin (rpaforce.com) verfasst und wird dort gepflegt.
+NAC3 wurde von Yujin (yujin.app) verfasst und wird dort gepflegt.
 Apache-2.0. Beiträge sind willkommen – siehe `CONTRIBUTING.md`.
 
 ---

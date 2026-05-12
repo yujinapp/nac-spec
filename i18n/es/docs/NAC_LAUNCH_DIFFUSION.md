@@ -105,7 +105,7 @@ Un hilo de 6 tweets:
 3. "Qué tan pequeño: 3 atributos HTML por elemento. (captura de código)"
 4. "Qué obtienes: nombres estables, eventos de finalización deterministas, i18n en 10 locales de fábrica, procedencia vía HMAC + isTrusted, validación automática."
 5. "Demo en vivo en yujin.app/nac-spec -- cuatro demos, uno conectado a un backend de chat con Claude Sonnet. Habla con él."
-6. "Guías de adopción para React + Angular + casos de estudio funcionales en github.com/pkuschnirof/rpaforce-crm. Spec en yujin.app/nac-spec/SPEC.md."
+6. "Guías de adopción para React + Angular + casos de estudio funcionales en github.com/yujinapp/nac-spec. Spec en yujin.app/nac-spec/SPEC.md."
 
 ### LinkedIn
 
@@ -157,7 +157,7 @@ Publicado en YouTube + Vimeo.
 ## Métricas a seguir
 
 - Descargas semanales de `@nac3/runtime` en npm.
-- Estrellas + forks en GitHub en `pkuschnirof/rpaforce-crm` y
+- Estrellas + forks en GitHub en `yujinapp/nac-spec` y
   `pkuschnirof/yujin`.
 - Vistas de la página del demo en yujin.app/nac-spec/ (logs de acceso del servidor).
 - Número de issues abiertos en GitHub (indicador de participación).

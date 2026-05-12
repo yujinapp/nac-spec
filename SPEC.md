@@ -3,7 +3,7 @@
 **Version:** 2.2.0
 **Status:** Stable
 **License:** Apache-2.0
-**Editor:** Yujin (rpaforce.com)
+**Editor:** Yujin (yujin.app)
 
 ---
 

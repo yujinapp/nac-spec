@@ -17,11 +17,11 @@
   "homepage": "https://yujin.app/nac-spec/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pkuschnirof/rpaforce-crm.git",
-    "directory": "packages/nac"
+    "url": "https://github.com/yujinapp/nac-spec.git",
+    "directory": "runtime"
   },
-  "bugs": "https://github.com/pkuschnirof/rpaforce-crm/issues",
-  "author": "Yujin (https://rpaforce.com)",
+  "bugs": "https://github.com/yujinapp/nac-spec/issues",
+  "author": "Yujin (https://yujin.app)",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/nac.cjs",

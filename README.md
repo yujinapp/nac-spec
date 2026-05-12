@@ -47,7 +47,7 @@ await NAC.click('invoice.save');
 
 [**Atlas Pro voice ad demo**](https://yujin.app/nac-spec/ads-demo/atlas-pro/?lang=es) -- an ad that closes its own sale by voice. The visitor speaks, the agent listens in 10 languages, fills the form against a NAC3 manifest, submits the lead to a CRM. Zero clicks. Three seconds.
 
-The voice ad is the visceral case. The same five attributes also drive Cal.com bookings, ERP forms, dashboards, admin panels, RPA bots, and Playwright specs -- one contract, every caller.
+The voice ad is the visceral case. The same five attributes also drive meeting schedulers, ERP forms, dashboards, admin panels, RPA bots, and Playwright specs -- one contract, every caller.
 
 ## Why NAC3
 
@@ -64,8 +64,8 @@ The voice ad is the visceral case. The same five attributes also drive Cal.com b
 | App | Type | NAC3 version |
 |-----|------|--------------|
 | [Yujin CRM](https://yujin.app) | Production reference | v2.2 |
-| [Reference demos](https://yujin.app/nac-spec/) | Live, 8 examples (vanilla, React, Angular, data-table, interop) | v2.2 |
-| Cal.com (coming) | First third-party adopter | v2.2 fork |
+| [Reference demos](https://yujin.app/nac-spec/) | Live, 8 examples (vanilla, React, Angular, data-table, interop, voice ad) | v2.2 |
+| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.2 |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
 ## Status: stable
@@ -148,5 +148,5 @@ Bounty program for adopters:
 
 - Live spec: https://yujin.app/nac-spec/
 - npm: https://www.npmjs.com/package/@nac3/runtime
-- GitHub: https://github.com/pkuschnirof/rpaforce-crm
+- GitHub: https://github.com/yujinapp/nac-spec
 - Status page: https://yujin.app/nac-spec/docs/COVERAGE_REPORT_2026_05_10.md

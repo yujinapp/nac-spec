@@ -49,7 +49,7 @@ Comments: _______________________________
 a) Close the developer tools (F12 again).
 b) Scroll down the page until you see a section titled "Made with NAC3".
 c) Look at the cards in that section.
-d) **Expected result:** You see at least 4 cards in a grid: "Yujin CRM", "Reference demos", "Cal.com (coming)", and "Your app". Each card has a Japanese character symbol on top, a title, a short description, and a link with an arrow `->`.
+d) **Expected result:** You see at least 4 cards in a grid: "Yujin CRM", "Reference demos", "Atlas Pro voice ad", and "Your app". Each card has a Japanese character symbol on top, a title, a short description, and a link with an arrow `->`.
 
 - [ ] OK
 - [ ] ERROR

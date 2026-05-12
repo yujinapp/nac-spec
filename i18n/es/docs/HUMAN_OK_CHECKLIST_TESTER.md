@@ -101,7 +101,7 @@ Resultado esperado:
 
 - Encontras la seccion "Made with NAC3" en la pagina.
 - Adentro hay al menos 4 tarjetas en una grilla.
-- Las tarjetas son: "Yujin CRM", "Reference demos", "Cal.com (coming)", y "Your app".
+- Las tarjetas son: "Yujin CRM", "Reference demos", "Atlas Pro voice ad", y "Your app".
 - Cada tarjeta tiene arriba un caracter japones, un titulo, una descripcion corta, y un link con una flecha `->`.
 
 - [ ] OK

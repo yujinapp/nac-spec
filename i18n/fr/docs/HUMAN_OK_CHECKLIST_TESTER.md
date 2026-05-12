@@ -57,7 +57,7 @@ Commentaires : _______________________________
 a) Fermer les outils de développement (F12 à nouveau).
 b) Faire défiler la page vers le bas jusqu'à voir une section intitulée « Made with NAC3 ».
 c) Observer les cartes dans cette section.
-d) **Résultat attendu :** Vous voyez au moins 4 cartes en grille : « Yujin CRM », « Reference demos », « Cal.com (coming) » et « Your app ». Chaque carte comporte un symbole de caractère japonais en haut, un titre, une courte description et un lien avec une flèche `->`.
+d) **Résultat attendu :** Vous voyez au moins 4 cartes en grille : « Yujin CRM », « Reference demos », « Atlas Pro voice ad » et « Your app ». Chaque carte comporte un symbole de caractère japonais en haut, un titre, une courte description et un lien avec une flèche `->`.
 
 - [ ] OK
 - [ ] ERREUR

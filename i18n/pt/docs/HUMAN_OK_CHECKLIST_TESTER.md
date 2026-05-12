@@ -57,7 +57,7 @@ Comentários: _______________________________
 a) Feche as ferramentas de desenvolvedor (F12 novamente).
 b) Role a página para baixo até encontrar uma seção intitulada "Made with NAC3".
 c) Observe os cards nessa seção.
-d) **Resultado esperado:** Você vê pelo menos 4 cards em uma grade: "Yujin CRM", "Reference demos", "Cal.com (coming)" e "Your app". Cada card possui um símbolo de caractere japonês no topo, um título, uma descrição curta e um link com uma seta `->`.
+d) **Resultado esperado:** Você vê pelo menos 4 cards em uma grade: "Yujin CRM", "Reference demos", "Atlas Pro voice ad" e "Your app". Cada card possui um símbolo de caractere japonês no topo, um título, uma descrição curta e um link com uma seta `->`.
 
 - [ ] OK
 - [ ] ERRO

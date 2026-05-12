@@ -18,8 +18,9 @@
    Star Trek (which is most of HN and LinkedIn).
 3. **Demo first, primer within 60 seconds, breadth within 90.**
    Code shows up by paragraph 3-4. Use cases beyond the ad show up
-   by paragraph 4-5: Cal.com, ERP forms, dashboards, accessibility,
-   RPA. HN crucifies narrow demos pretending to be standards.
+   by paragraph 4-5: meeting schedulers, ERP forms, dashboards,
+   accessibility, RPA. HN crucifies narrow demos pretending to be
+   standards.
 4. **No false claims.** No "8 months in production", "extensively
    tested", "battle tested", customer numbers, third-party traction.
    Only verifiable: tests pass, code open, demos live, npm published,
@@ -100,8 +101,8 @@ Zero typing, zero clicking.
 But the voice ad is just the smallest, most visceral demo. The
 same five attributes work for:
 
-  - Cal.com booking flow (a fork with NAC3 ships alongside this
-    launch -- one commit, full agent dispatch).
+  - A meeting scheduler -- an LLM books the slot while the user
+    listens hands-free.
   - An ERP invoicing form -- an agent issues an invoice the same
     way a human clicks "Save".
   - A dashboard with filters -- an LLM asks for "last quarter,
@@ -201,10 +202,12 @@ Fork it, break it, improve it. AMA in the comments.
 
 **"Show me a real adopter."**
 
-> Live demos run from the landing. The runtime is on npm. The
-> Cal.com fork commit is published. If those are not enough
-> proof, the standard is not for you yet. Come back in six
-> months. Or, better, fork it now and become the first
+> Live demos run from the landing. The runtime is on npm. Eight
+> reference examples (React, Angular, server-rendered PHP, vanilla,
+> data-tables, cross-page interop, voice ad, editor widget) ship
+> with the repo and are live at yujin.app/nac-spec/. If those are
+> not enough proof, the standard is not for you yet. Come back in
+> six months. Or, better, fork the demos and become the first
 > non-trivial adopter on the registry.
 
 **"Voice in browsers is unreliable."**
@@ -283,7 +286,7 @@ Atlas Pro is one ad. Easy demo.
 
 The same five attributes work for:
 
-- Cal.com booking flow (we shipped a fork)
+- Meeting schedulers + booking flows
 - ERP invoicing forms
 - Dashboards with filters
 - Multi-step checkouts
@@ -447,8 +450,8 @@ implementations are at yujin.app/nac-spec.
 The voice ad is the visible case. The bigger story is everything
 else NAC3 unlocks:
 
-  - Cal.com booking flows where the AI books for you while you
-    listen with your hands full.
+  - Meeting schedulers where the AI books the slot for you while
+    you listen with your hands full.
   - ERP invoicing where the agent issues the invoice the same way
     a human clicks "Save".
   - Dashboards where an LLM filters the view by speaking, not by
@@ -536,8 +539,7 @@ lead to a CRM. Three seconds. Ten languages. Live.
 But the voice ad is just one use case. Same five attributes also
 work for:
 
-- Cal.com booking flows (NAC3-ified fork shipped alongside the
-  launch)
+- Meeting schedulers + booking flows
 - ERP forms an agent can issue invoices through
 - Dashboards an LLM can filter by speaking
 - Multi-step checkouts with full voice walkthrough
@@ -615,9 +617,10 @@ it's not a JSON schema. What got cut on the way to v2.2.]
 
 ## Part 5 -- Adopting NAC3 in a real app
 
-[Walk through the Cal.com fork commit. Show the diff. Show the
-manifest that emerges. Show an LLM driving the booking flow
-end to end.]
+[Walk through retrofit on a typical SaaS form (any chosen
+reference example -- v23 editor, v22 interop, or v21 data-table).
+Show the diff before/after. Show the manifest that emerges. Show
+an LLM driving the flow end to end.]
 
 ## Part 6 -- Accessibility, the free win
 
@@ -731,12 +734,15 @@ reader + agent + Playwright + RPA.
 
 ## Changelog
 
+- v3.1 (2026-05-11): Cal.com adopter claim removed from every
+  channel (migration cancelled / postponed). Use cases now: meeting
+  schedulers (generic), ERP forms, dashboards, multi-step
+  checkouts, admin panels, field-service forms, screen readers.
 - v3 (2026-05-11): rewritten demo-first while preserving Captain
   Picard sci-fi anchor + the breadth message (NAC3 is much more
   than the voice ad). Voice ad video is the hook in every channel;
-  each post pivots within 60 seconds to the bigger story: Cal.com,
-  ERP, dashboards, RPA, Playwright, screen readers. Updated all
-  URLs to github.com/yujinapp + Discord.
+  each post pivots within 60 seconds to the bigger story. Updated
+  all URLs to github.com/yujinapp + Discord.
 - v2 (2026-05-10): vision-first rewrite (Captain Picard anchor).
   Removed false-claims, social-proof apologetics, "battle tested"
   language.

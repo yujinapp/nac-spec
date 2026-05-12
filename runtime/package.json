@@ -1,6 +1,6 @@
 {
   "name": "@nac3/runtime",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Native Agent Contract -- spec + reference runtime that lets web UIs be driven by AI agents, voice runners, and accessibility tools.",
   "keywords": [
     "nac",

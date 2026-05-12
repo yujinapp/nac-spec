@@ -5191,17 +5191,19 @@
     },
     /* errors */
     NacError:        NacError,
-  };
+  };  /* v2.2.1: guard browser-only init so this module is importable in
+     Node / SSR / test contexts without crashing. */
+  if (typeof document !== 'undefined') {
+    document.dispatchEvent(new CustomEvent('nac:installed', {
+      detail: { version: global.NAC.version, spec: global.NAC.spec_version },
+    }));
 
-  document.dispatchEvent(new CustomEvent('nac:installed', {
-    detail: { version: global.NAC.version, spec: global.NAC.spec_version },
-  }));
-
-  /* v1.9.0: install the ARIA bridge for data-nac-a11y-hint so
-     screen readers actually consume the hints today (sec 3.1).
-     Runs after install so existing host-level aria-describedby
-     values are preserved (we append, not overwrite). */
-  _installA11yHintBridge();
+    /* v1.9.0: install the ARIA bridge for data-nac-a11y-hint so
+       screen readers actually consume the hints today (sec 3.1).
+       Runs after install so existing host-level aria-describedby
+       values are preserved (we append, not overwrite). */
+    _installA11yHintBridge();
+  }
 
   /* v1.9.0: auto-replay any window.__NAC_PENDING__ buffer the
      host staged before the runtime loaded (sec 13.11). The host

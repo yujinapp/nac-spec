@@ -214,19 +214,23 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
     botSpeak(isYes ? 'Confirmado.' : 'Cancelado.', { skipBubble: true });
     return true;
   }
-  document.addEventListener('nac:confirm:requested', function (e) {
-    try {
-      var prompt = (e && e.detail && e.detail.prompt) || '';
-      if (!prompt) return;
-      var hints = {
-        es: 'Decime si o no.', en: 'Say yes or no.', pt: 'Diga sim ou nao.',
-        fr: 'Dites oui ou non.', it: 'Dimmi si o no.', de: 'Sag ja oder nein.',
-        ja: 'はい か いいえ で答えて。', zh: '请说 是 或 否。',
-        hi: 'haan ya nahin.', ar: 'قل نعم او لا.'
-      };
-      botSpeak(prompt + ' ' + (hints[NacChat._lang] || hints.es), { skipBubble: true });
-    } catch (_) {}
-  }, true);
+  /* v2.2.1: guard browser-only listener so this bundle is importable in
+     Node / SSR / test contexts without crashing. */
+  if (typeof document !== 'undefined') {
+    document.addEventListener('nac:confirm:requested', function (e) {
+      try {
+        var prompt = (e && e.detail && e.detail.prompt) || '';
+        if (!prompt) return;
+        var hints = {
+          es: 'Decime si o no.', en: 'Say yes or no.', pt: 'Diga sim ou nao.',
+          fr: 'Dites oui ou non.', it: 'Dimmi si o no.', de: 'Sag ja oder nein.',
+          ja: 'はい か いいえ で答えて。', zh: '请说 是 或 否。',
+          hi: 'haan ya nahin.', ar: 'قل نعم او لا.'
+        };
+        botSpeak(prompt + ' ' + (hints[NacChat._lang] || hints.es), { skipBubble: true });
+      } catch (_) {}
+    }, true);
+  }
 
   /* ---------- Locale switch (fix C7-bis) ---------- */
   function _maybeChangeLocaleLocally(text) {

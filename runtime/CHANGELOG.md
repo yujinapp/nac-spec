@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.2.1 -- 2026-05-12
+
+### Bug fix: importable in Node / SSR / test contexts
+
+Pre-launch smoke test caught that `import '@nac3/runtime'` and
+`import '@nac3/runtime/chat-client'` crashed in Node.js with
+`ReferenceError: document is not defined`. The bundles had
+top-level `document.dispatchEvent` and `document.addEventListener`
+calls firing at module-evaluation time.
+
+Fix: wrap browser-only init in `typeof document !== 'undefined'`
+guards. In the browser the behaviour is unchanged (the events
+still fire on install + the confirm listener still attaches). In
+Node / SSR / Vitest / Jest the bundles now import as no-ops
+instead of crashing.
+
+Files patched (no API change):
+- `dist/nac.{mjs,cjs,browser.js}` -- guarded `nac:installed`
+  dispatch + `_installA11yHintBridge()` call.
+- `dist/nac-chat-client.{mjs,cjs,browser.js}` -- guarded
+  `nac:confirm:requested` listener attach.
+- `dist/nac-v2-extensions.*` -- unchanged (it already early-bails
+  when the main runtime is not present).
+
+Verified: all three entry points (`@nac3/runtime`,
+`@nac3/runtime/extensions`, `@nac3/runtime/chat-client`) now
+import cleanly under Node 22 ESM + CommonJS `require`.
+
 ## 2.2.0 -- 2026-05-10
 
 Same-day v2.2 ships the constructor-strict validator + action-ack

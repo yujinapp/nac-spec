@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NAC3 voice-driven ads -- demo gallery</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;
+        --border:#e6e3da;--text:#1a1a1a;--text-2:#555;--text-3:#888;
+        --serif:"Noto Serif JP",Georgia,serif;
+        --sans:"DM Sans",system-ui,-apple-system,sans-serif;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);background:var(--bg);
+       color:var(--text);line-height:1.6;}
+  .container{max-width:880px;margin:0 auto;padding:60px 24px;}
+  header{display:flex;align-items:baseline;gap:14px;margin-bottom:28px;}
+  header .kanji{font-family:var(--serif);color:var(--gold);font-size:36px;}
+  header h1{font-size:32px;margin:0;}
+  .lede{color:var(--text-2);font-size:17px;max-width:62ch;margin:0 0 36px;
+        line-height:1.55;}
+  .lede strong{color:var(--text);}
+  .demo-grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+  .demo-card{background:var(--surface);border:1px solid var(--border);
+             border-radius:12px;padding:24px;text-decoration:none;color:inherit;
+             transition:all 0.2s;}
+  .demo-card:hover{border-color:var(--accent);
+                   box-shadow:0 12px 32px rgba(79,91,135,0.12);transform:translateY(-2px);}
+  .demo-kanji{font-family:var(--serif);color:var(--gold);font-size:42px;}
+  .demo-card h3{margin:10px 0 6px;font-size:20px;}
+  .demo-card p{margin:0 0 14px;color:var(--text-2);font-size:14px;}
+  .demo-card .meta{font-size:12px;color:var(--text-3);}
+  .demo-card .cta{display:inline-block;margin-top:12px;padding:8px 16px;
+                  background:var(--accent);color:#fff;border-radius:6px;
+                  font-weight:600;font-size:13px;}
+  .pitch{background:var(--surface);border:1px solid var(--border);
+         border-radius:12px;padding:24px;margin-bottom:32px;}
+  .pitch h2{margin:0 0 12px;font-size:20px;color:var(--accent);}
+  .pitch p{margin:8px 0;color:var(--text-2);font-size:14.5px;}
+  .pitch code{background:var(--bg);padding:1px 6px;border-radius:3px;font-size:13px;}
+  .back{display:inline-block;margin-top:30px;color:var(--accent);font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <span class="kanji" aria-hidden="true">&#36275;</span>
+  <h1>NAC3 voice-driven ads</h1>
+</header>
+
+<p class="lede">
+  An ad that speaks to you, listens, fills the form against a NAC3
+  contract, and closes the sale to a CRM. Zero typing, zero clicking
+  required. The lead lands as a record + a testimonial email at the
+  seller within seconds.
+</p>
+
+<div class="pitch">
+  <h2>What changes about advertising</h2>
+  <p>For 40 years, ads have been one-way: the brand shows you something,
+  you click, you read, you fill a form, maybe you buy.</p>
+  <p>These ads talk back. They propose a product, hear what you say,
+  match it against the seller's data model (declared as a NAC3 manifest),
+  fill the order, and submit it. The lead arrives at the CRM the instant
+  you say "yes".</p>
+  <p>Under the hood: each ad is a NAC3 plugin. The fields, the verbs,
+  the submit action -- all dispatchable by a human voice, by a screen
+  reader, by an LLM agent, by a Playwright spec. Same contract, same
+  surface.</p>
+</div>
+
+<div class="demo-grid">
+
+  <a class="demo-card" href="atlas-pro/">
+    <span class="demo-kanji" aria-hidden="true">&#38772;</span>
+    <h3>Atlas Pro running shoes</h3>
+    <p>Tap the mic, say "size 43, beige, two pairs, deliver to home",
+    watch the order confirm itself. 10 languages supported.</p>
+    <div class="meta">en, es, pt, fr, it, de, ja, zh, hi, ar</div>
+    <span class="cta">Try the ad &rarr;</span>
+  </a>
+
+</div>
+
+<p>
+  <a class="back" href="/nac-spec/">&larr; Back to NAC3 spec</a>
+</p>
+
+</div>
+
+</body>
+</html>

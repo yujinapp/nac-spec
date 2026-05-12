@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- テストカバレッジマトリクス（自動 + 手動） -- NAC3</title>
+<meta name="nac3-doc-slug" content="test_coverage_matrix" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="test_coverage_matrix" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="test_coverage_matrix.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="test_coverage_matrix.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/test_coverage_matrix.mp3" data-nac-id="test_coverage_matrix.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="test_coverage_matrix.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="test_coverage_matrix.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="test_coverage_matrix.main" data-nac-role="region">
+<hr />
+<p data-nac-id="test_coverage_matrix.p.1" data-nac-role="paragraph">translation_source: docs/TEST_COVERAGE_MATRIX.md translation_source_hash: 378d7bf89e65b07e54f5d5dc1c62938accfe383e903468a4df028a3e2936f48d translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T15:02:34.783823+00:00</p>
+<hr />
+<h1 data-nac-id="test_coverage_matrix.h1.nac3-テストカバレッジマトリクス自動-手動" data-nac-role="heading" data-nac-level="1" id="nac3-テストカバレッジマトリクス自動-手動">NAC3 -- テストカバレッジマトリクス（自動 + 手動）</h1>
+<p data-nac-id="test_coverage_matrix.p.4" data-nac-role="paragraph"><strong>仕様バージョン:</strong> 2.2 + v2.3 プレビュー。 <strong>生成日:</strong> 2026-05-11。 <strong>対象リポジトリ:</strong> Yujin リファレンスリポジトリ <code data-nac-role="code-inline">pkuschnirof/rpaforce-crm</code> の <code data-nac-role="code-inline">main</code> ブランチ。</p>
+<p data-nac-id="test_coverage_matrix.p.5" data-nac-role="paragraph">このマトリクスは NAC3 エコシステムのすべての成果物を列挙し、 自動テストおよび手動検証ゲート（「Human OK」チェックリスト）によるカバレッジを報告します。</p>
+<p data-nac-id="test_coverage_matrix.p.6" data-nac-role="paragraph">採用者へ: このマトリクス構造を自分のアプリ用にコピーしてください。列を自分の成果物に置き換え、行の深さは同じに保ってください。</p>
+<hr />
+<h2 data-nac-id="test_coverage_matrix.h2.凡例" data-nac-role="heading" data-nac-level="2" id="凡例">凡例</h2>
+<p data-nac-id="test_coverage_matrix.p.9" data-nac-role="paragraph">| シンボル | 意味 | |--------|---------| | AUTO | 自動テストでカバー済み（Playwright / Node サイドスイート） | | MAN  | 手動検証が必要（ブラウザ目視、音声ジェスチャー、主観的 UX） | | BOTH | 不変条件は自動カバー + UX は人間が検証 | | --   | カバレッジなし（意図的） | | TBD  | カバレッジ予定だが未実装 |</p>
+<hr />
+<h2 data-nac-id="test_coverage_matrix.h2.1-ランタイム成果物" data-nac-role="heading" data-nac-level="2" id="1-ランタイム成果物">1. ランタイム成果物</h2>
+<p data-nac-id="test_coverage_matrix.p.12" data-nac-role="paragraph">| 成果物 | 自動カバレッジ | 手動ゲート | 備考 | |----------|---------------|-------------|-------| | <code data-nac-role="code-inline">js/nac.js</code>（v1.9 ベース + v2.0 + v2.1） | AUTO 95% | MAN（クロスブラウザスモーク） | smoke + v22 + stage4 が write API をカバー；手動 = リリースごとに最低 Firefox + Safari で開いて確認 | | <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> | AUTO 90% | MAN（新規 DOM での autoRegister.watch） | stage4 dt_* + v22 一部；手動 = autoRegister 経由でランタイムに新しいプラグインをマウント | | <code data-nac-role="code-inline">js/nac-chat-client.js</code> | AUTO 95% | MAN（実マイクによる STT） | stage1-audio が SpeechRecognition をモック；手動 = ライブデモでマイクを押してロケールごとに 1 プロンプト発話 | | <code data-nac-role="code-inline">js/nac-mcp-interop.js</code>（v2.3 プレビュー） | AUTO 100% | MAN（クロスオリジンピアのラウンドトリップ） | v23-interop がローカルページシナリオをカバー；手動 = HTTPS 経由で実際のリモート NAC3 ピアに対してテスト |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.2-npm-パッケージ" data-nac-role="heading" data-nac-level="2" id="2-npm-パッケージ">2. NPM パッケージ</h2>
+<p data-nac-id="test_coverage_matrix.p.14" data-nac-role="paragraph">| 成果物 | 自動カバレッジ | 手動ゲート | 備考 | |----------|---------------|-------------|-------| | <code data-nac-role="code-inline">@nac3/runtime</code> ビルド（dist/ ESM + CJS + d.ts + CLI） | AUTO 100% | MAN（新規ディレクトリへの <code data-nac-role="code-inline">npm install</code>） | smoke.mjs 36 チェック；手動 = npm pack + install + 空の Node プロジェクトで import して確認 | | <code data-nac-role="code-inline">@nac3/runtime/extensions</code> サブパス | AUTO 100% | -- | smoke がファイル + d.ts の存在を確認 | | <code data-nac-role="code-inline">@nac3/runtime/chat-client</code> サブパス | AUTO 100% | -- | smoke がファイル + d.ts の存在を確認 | | CLI <code data-nac-role="code-inline">npx @nac3/runtime validate</code> | AUTO 100% | MAN（チームが外部で構築したプロジェクトに対して実行） | smoke が demos ディレクトリに対して CLI を実行；手動 = 顧客のリポジトリに対してリリース前に実行 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.3-デモyujinappnac-spec-でライブ公開" data-nac-role="heading" data-nac-level="2" id="3-デモyujinappnac-spec-でライブ公開">3. デモ（yujin.app/nac-spec/ でライブ公開）</h2>
+<p data-nac-id="test_coverage_matrix.p.16" data-nac-role="paragraph">| デモ | 自動カバレッジ | 手動ゲート | 備考 | |------|---------------|-------------|-------| | <code data-nac-role="code-inline">index.html</code>（ランディング） | BOTH | MAN（オートパイロットツアー + チャット送信） | Playwright 01-landing.spec.ts が表面を検証；手動 = 実ブラウザでオートパイロットを実行し、ナレーションが聞こえることを確認 | | <code data-nac-role="code-inline">example.php</code>（v1.9 リファレンス） | AUTO | MAN（27 ウィジェットのクリックスルー） | Playwright 02-demo-v19 が起動チェック；手動 = 27 ウィジェットをすべて操作し、コンソールエラーがないことを確認 | | <code data-nac-role="code-inline">example-v20-full.php</code>（ブラウンフィールド） | AUTO | MAN（v20 パネルの describe_v2 / validate_global_v2 ボタン） | Playwright 03-demo-v20 がパネル + bindAction ack をカバー；手動 = 各パネルボタンをクリックして出力を確認 | | <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code> | -- | MAN（プリミティブごとの教育的ウォーク） | 純粋な教育用デモ；手動 = 8 プリミティブツアー | | <code data-nac-role="code-inline">example-v21-data-table.php</code> | AUTO | MAN（マイクを使った音声チャット） | Playwright 04-demo-v21 が dt_state + tab.permissions をカバー；手動 = 音声マイクを使用し、LLM が正しくディスパッチすることを確認 | | <code data-nac-role="code-inline">example-v22-interop.php</code>（v2.3 プレビュー） | AUTO | MAN（4 つの CTA を順番に使用） | Playwright 05-demo-v22-interop がエンドツーエンドをカバー；手動 = 画面を目視しながら 4 ボタンフローを実行 | | <code data-nac-role="code-inline">demos/react/</code>（コンパイル済みスタディケース） | AUTO | MAN（チャット駆動の追加/削除） | Playwright 06-demo-react がマウント + 追加をカバー；手動 = 実マイクで「agrega leche」とチャット送信し、React の状態更新を確認 | | <code data-nac-role="code-inline">demos/angular/</code>（コンパイル済みスタディケース） | AUTO | MAN（チャット駆動の追加/削除） | Playwright 07-demo-angular がマウント + 追加をカバー；手動 = React と同様 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.4-ドキュメント" data-nac-role="heading" data-nac-level="2" id="4-ドキュメント">4. ドキュメント</h2>
+<p data-nac-id="test_coverage_matrix.p.18" data-nac-role="paragraph">| ドキュメント | 自動カバレッジ | 手動ゲート | 備考 | |-----|---------------|-------------|-------| | <code data-nac-role="code-inline">SPEC.md</code>（v2.2 正規版） | -- | MAN（メンテナーによる PR レビュー） | 仕様は散文；自動テスト不可。人間がすべての文言をレビュー | | <code data-nac-role="code-inline">ABOUT.md</code> | -- | MAN（PR レビュー） | 同上 | | <code data-nac-role="code-inline">CONTRIBUTING.md</code> | -- | MAN（PR レビュー） | 同上 | | <code data-nac-role="code-inline">SECURITY.md</code> | -- | MAN（PR レビュー） | 同上。加えて四半期ごとの脅威モデル再読 | | <code data-nac-role="code-inline">README_DEMOS.md</code> | -- | MAN | 手動リンクチェック | | <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code> | -- | MAN | リリースごとに更新・レビュー | | <code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code> | AUTO（リンク） | MAN（PR レビュー） | test-launch.sh レイヤー 3 が 11 ドキュメントすべての存在を確認；手動 = 正確性を確認するために通読 | | <code data-nac-role="code-inline">docs/COVERAGE_REPORT_2026_05_10.md</code> | -- | MAN（リリースごとに再生成） | これ自体がカバレッジ記録；人間がリリースごとに作成 | | <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code> | -- | MAN | 仕様提案、人間がレビュー | | <code data-nac-role="code-inline">docs/NAC_LAUNCH_DIFFUSION.md</code> | -- | MAN | 内部プレイブック | | <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code> | -- | MAN | バグポストモーテム；人間がキュレーション | | <code data-nac-role="code-inline">docs/LAUNCH_PLAN_2026_05_10.md</code> | -- | MAN（履歴） | 履歴記録 | | <code data-nac-role="code-inline">docs/TEST_COVERAGE_MATRIX.md</code>（本ファイル） | AUTO（リンク） | MAN | リリースごとに更新 | | <code data-nac-role="code-inline">docs/VOICE_CHAT_ERROR_ANALYSIS_2026_05_09.md</code> | -- | MAN | 履歴バグ分析 | | <code data-nac-role="code-inline">docs/HUMAN_OK_CHECKLIST.md</code> | -- | MAN（Pablo が実施） | チェックリスト本体；Pablo が実行 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.5-採用ガイド" data-nac-role="heading" data-nac-level="2" id="5-採用ガイド">5. 採用ガイド</h2>
+<p data-nac-id="test_coverage_matrix.p.20" data-nac-role="paragraph">| ガイド | 自動カバレッジ | 手動ゲート | 備考 | |-------|---------------|-------------|-------| | <code data-nac-role="code-inline">guides/REACT.md</code> | -- | MAN（PR レビュー + 採用者フィードバック） | Hello-world スニペットが引き続きコンパイルできること；手動 = 年次リビルドチェック | | <code data-nac-role="code-inline">guides/ANGULAR.md</code> | -- | MAN（PR レビュー） | 同上 | | <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> | -- | MAN（PR レビュー） | リファレンス Node バックエンドが動作すること；手動 = ライブ仕様に対して実行 | | <code data-nac-role="code-inline">guides/AI_PLAYBOOK_NEW_PROJECT.md</code> | -- | MAN（PR レビュー） | ステップのアサーションが引き続き実行可能であること | | <code data-nac-role="code-inline">guides/AI_PLAYBOOK_MIGRATION.md</code> | -- | MAN（PR レビュー） | 同上 | | <code data-nac-role="code-inline">guides/IMPACT_TESTING.md</code> | -- | MAN（PR レビュー） | インパクトの主張；四半期ごとに数値を更新 | | <code data-nac-role="code-inline">guides/IMPACT_RPA.md</code> | -- | MAN（PR レビュー） | 同上 | | <code data-nac-role="code-inline">guides/RPA_UIPATH.md</code> | -- | MAN（リリースごとにサンプルワークフローを 1 回実行） | 手動 = InvoiceFromCSV.xaml を実行 | | <code data-nac-role="code-inline">guides/RPA_AUTOMATION_ANYWHERE.md</code> | -- | MAN | 同様の形式 | | <code data-nac-role="code-inline">guides/RPA_BLUE_PRISM.md</code> | -- | MAN | 同様の形式 | | <code data-nac-role="code-inline">guides/RPA_PLAYWRIGHT.md</code> | AUTO（リファレンススイート） | MAN（PR レビュー） | パターンは <code data-nac-role="code-inline">tests/e2e-nac/specs/</code> で実行済み；手動 = リリースごとに 1 回通読 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.6-テストスイート" data-nac-role="heading" data-nac-level="2" id="6-テストスイート">6. テストスイート</h2>
+<p data-nac-id="test_coverage_matrix.p.22" data-nac-role="paragraph">| スイート | 自動カバレッジ | 手動ゲート | 備考 | |-------|---------------|-------------|-------| | <code data-nac-role="code-inline">packages/nac/test/smoke.mjs</code> | AUTO（自己） | MAN（合格率の確認） | 36 チェック；手動 = リリースごとにカウントを確認 | | <code data-nac-role="code-inline">packages/nac/test/v22.mjs</code> | AUTO（自己） | -- | 14 ユニットテスト | | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | AUTO（自己） | -- | 14 ユニットテスト | | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code> | AUTO（自己） | MAN（ロケールごとにコーパスを再生成） | 33 チェック；手動 = TTS コーパスのサンプルを聴いて音声が正常であることを確認 | | <code data-nac-role="code-inline">packages/nac/test/stage2-disambiguation.mjs</code> | AUTO（自己） | -- | 31 チェック | | <code data-nac-role="code-inline">packages/nac/test/stage3-backend.mjs</code> | AUTO（自己、ライブ） | MAN（LLM レスポンスの確認） | 45 プロンプト × 10 ロケール；手動 = ランダムな 2 プロンプトで LLM がドリフトしていないことをスポットチェック | | <code data-nac-role="code-inline">packages/nac/test/stage4-calls.mjs</code> | AUTO（自己） | -- | 31 チェック | | <code data-nac-role="code-inline">packages/nac/test/stage6-ack.mjs</code> | AUTO（自己） | -- | 16 チェック | | <code data-nac-role="code-inline">packages/nac/test/stage6b-longtail.mjs</code> | AUTO（自己） | -- | 14 チェック | | <code data-nac-role="code-inline">tests/e2e-nac/specs/*.spec.ts</code> | AUTO（自己） | MAN（リリースごとに headed 実行で目視確認） | 16 スペック；手動 = <code data-nac-role="code-inline">--headed</code> で 1 回実行して目視確認 | | TTS コーパス（MP3 ファイル 30 件） | AUTO（存在 + サイズ） | MAN（ロケールごとに 1 件を試聴） | 手動 = 10 ファイルをサンプリングし、音声が正常でゴミデータがないことを確認 | | <code data-nac-role="code-inline">tools/nac/test-launch.sh</code> | AUTO（自己） | -- | オーケストレーター | | <code data-nac-role="code-inline">tools/nac/discovery-loop.sh</code> | AUTO（自己） | -- | ディスカバリー + 修正ループ |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.7-スタディケースパッケージ" data-nac-role="heading" data-nac-level="2" id="7-スタディケースパッケージ">7. スタディケースパッケージ</h2>
+<p data-nac-id="test_coverage_matrix.p.24" data-nac-role="paragraph">| パッケージ | 自動カバレッジ | 手動ゲート | 備考 | |---------|---------------|-------------|-------| | <code data-nac-role="code-inline">packages/nac-react-demo/</code> ソース | AUTO（ビルド + Playwright） | MAN（デプロイ済み dist の目視確認） | Vite ビルドがクリーン；Playwright が todos + chat + autopilot をカバー | | <code data-nac-role="code-inline">packages/nac-react-demo/</code> デプロイ済み dist | AUTO | MAN（シークレットモードで開いて操作） | 手動 = /demos/react/ での人間によるウォークスルー | | <code data-nac-role="code-inline">packages/nac-angular-demo/</code> ソース | AUTO | MAN | 同様の形式 | | <code data-nac-role="code-inline">packages/nac-angular-demo/</code> デプロイ済み dist | AUTO | MAN | 同上 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.8-クロスカッティング" data-nac-role="heading" data-nac-level="2" id="8-クロスカッティング">8. クロスカッティング</h2>
+<p data-nac-id="test_coverage_matrix.p.26" data-nac-role="paragraph">| 懸念事項 | 自動カバレッジ | 手動ゲート | 備考 | |---------|---------------|-------------|-------| | i18n カタログの完全性 | AUTO（バリデーター） | MAN（ロケールごとにネイティブスピーカーがレビュー） | Strict モードバリデーターが欠落キーを検出；ネイティブスピーカーが文字列の文化的妥当性をスポットチェック | | HMAC マニフェスト署名 | AUTO（ユニット） | MAN（マルチテナントデプロイのスモーク） | ユニットテストが署名 + 検証；手動 = シークレット配布フローに対して本番スモーク | | isTrusted ゲーティング | AUTO（ユニット） | MAN（実クリックと合成クリックの並列確認） | v22 ユニットがフラグをカバー；手動 = example-v20-full.php の istrusted_real / istrusted_fake ボタンペア | | クロスオリジン相互運用（v2.3） | AUTO（モック） | MAN（実ベアラートークンを使った実ピア） | v23-interop がページ内モックを使用；手動 = v2.3 GA 宣言前に少なくとも 1 回クロスオリジンテストを実施 | | yujin.app へのデプロイ | AUTO（push → 自動デプロイ） | MAN（URL が 200 + 正しいコンテンツを返すことを確認） | GoDaddy が自動デプロイ；手動 = main への push ごとに重要な URL を curl で確認 | | 実ブラウザでの音声再生 | -- | MAN（マイク + スピーカーテスト） | Web Speech API は実ハードウェアが必要；手動 = ライブ v21 デモでマイクを押してロケールごとに 1 プロンプト発話 |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.サマリー-カテゴリ別の重み付きカバレッジ" data-nac-role="heading" data-nac-level="2" id="サマリー-カテゴリ別の重み付きカバレッジ">サマリー -- カテゴリ別の重み付きカバレッジ</h2>
+<p data-nac-id="test_coverage_matrix.p.28" data-nac-role="paragraph">| カテゴリ | AUTO | MAN | BOTH | カバレッジ健全性 | |----------|------|-----|------|-----------------| | ランタイム成果物 | 4 | 0 | 0 | 優秀（平均自動 95%） | | NPM パッケージ | 4 | 0 | 0 | 優秀（自動 100%） | | デモ | 6 | 1 | 1 | 良好（不変条件は自動、UX は手動） | | ドキュメント | 1 | 14 | 0 | 想定内（ドキュメントはレビュー対象、ユニットテスト不可） | | 採用ガイド | 0 | 10 | 0 | 想定内 | | テストスイート | 13 | 4 | 0 | 優秀 | | スタディケースパッケージ | 2 | 2 | 0 | 良好（自動 + 手動目視） | | クロスカッティング | 4 | 2 | 0 | 良好 | | <strong>合計</strong> | <strong>34</strong> | <strong>33</strong> | <strong>1</strong> | <strong>優秀</strong> |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.このマトリクスの使い方" data-nac-role="heading" data-nac-level="2" id="このマトリクスの使い方">このマトリクスの使い方</h2>
+<h3 data-nac-id="test_coverage_matrix.h3.リリースごと" data-nac-role="heading" data-nac-level="3" id="リリースごと">リリースごと</h3>
+<ol data-nac-id="test_coverage_matrix.list.31" data-nac-role="list"><li data-nac-id="test_coverage_matrix.list.31.item.1" data-nac-role="list-item">仕様バージョン + リファレンススイートバージョンにタグを付ける。</li><li data-nac-id="test_coverage_matrix.list.31.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> を実行 -- すべての AUTO 行がゲートとなる。</li><li data-nac-id="test_coverage_matrix.list.31.item.3" data-nac-role="list-item">MAN 列を実施 -- <a href="HUMAN_OK_CHECKLIST.md" data-nac-id="test_coverage_matrix.link.1" data-nac-role="action" data-nac-action="open">Human OK チェックリスト</a> が実行可能な形式。</li><li data-nac-id="test_coverage_matrix.list.31.item.4" data-nac-role="list-item">実行結果を COVERAGE_REPORT_&lt;date&gt;.md に更新する。</li><li data-nac-id="test_coverage_matrix.list.31.item.5" data-nac-role="list-item">成果物の状況が変わった場合はこのマトリクスを修正する。</li></ol>
+<h3 data-nac-id="test_coverage_matrix.h3.採用者ごと" data-nac-role="heading" data-nac-level="3" id="採用者ごと">採用者ごと</h3>
+<p data-nac-id="test_coverage_matrix.p.33" data-nac-role="paragraph">このマトリクス構造を自分のアプリ用にコピーしてください。成果物名を置き換え、同じ形式を維持してください。規律は同じです：すべての成果物に明示的な自動 + 手動ゲートを設けること。</p>
+<h3 data-nac-id="test_coverage_matrix.h3.アンチパターン" data-nac-role="heading" data-nac-level="3" id="アンチパターン">アンチパターン</h3>
+<p data-nac-id="test_coverage_matrix.p.35" data-nac-role="paragraph">テストがファイルの存在確認のみを行う場合、成果物を「AUTO」とマークしないでください。AUTO はテストが動作を検証することを意味します。ファイル存在チェックはハーネス（test-launch.sh）に属し、成果物マトリクスには含めません。</p>
+<h2 data-nac-id="test_coverage_matrix.h2.関連情報" data-nac-role="heading" data-nac-level="2" id="関連情報">関連情報</h2>
+<p data-nac-id="test_coverage_matrix.p.37" data-nac-role="paragraph">-- 現在のリリースの実際の実行結果。</p>
+<ul data-nac-id="test_coverage_matrix.list.38" data-nac-role="list"><li data-nac-id="test_coverage_matrix.list.38.item.1" data-nac-role="list-item"><a href="NAC_TEST_MANUAL.md" data-nac-id="test_coverage_matrix.link.2" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- このマトリクスの元となるプレイブック。</li><li data-nac-id="test_coverage_matrix.list.38.item.2" data-nac-role="list-item"><a href="HUMAN_OK_CHECKLIST.md" data-nac-id="test_coverage_matrix.link.3" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST.md</a> -- MAN 列の実行可能な形式。</li><li data-nac-id="test_coverage_matrix.list.38.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="test_coverage_matrix.link.4" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a></li></ul>
+<h2 data-nac-id="test_coverage_matrix.h2.ライセンス" data-nac-role="heading" data-nac-level="2" id="ライセンス">ライセンス</h2>
+<p data-nac-id="test_coverage_matrix.p.40" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="test_coverage_matrix.p.42" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/TEST_COVERAGE_MATRIX.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "test_coverage_matrix",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "test_coverage_matrix.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "test_coverage_matrix.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "test_coverage_matrix.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "test_coverage_matrix.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

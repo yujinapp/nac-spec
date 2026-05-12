@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guide d&#x27;adoption NAC3 + React -- NAC3</title>
+<meta name="nac3-doc-slug" content="react" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="react" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="react.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="react.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/react.mp3" data-nac-id="react.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="react.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="react.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="react.main" data-nac-role="region">
+<hr />
+<p data-nac-id="react.p.1" data-nac-role="paragraph">translation_source: guides/REACT.md translation_source_hash: 9026b361e9e072347481a1f4492eea6f306e77cbbdb53b0d1a40d25008dbecdd translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T13:40:11.082156+00:00</p>
+<hr />
+<h1 data-nac-id="react.h1.guide-dadoption-nac3-react" data-nac-role="heading" data-nac-level="1" id="guide-dadoption-nac3-react">Guide d'adoption NAC3 + React</h1>
+<p data-nac-id="react.p.4" data-nac-role="paragraph">Ce guide permet de piloter une application React via NAC selon deux approches :</p>
+<ul data-nac-id="react.list.5" data-nac-role="list"><li data-nac-id="react.list.5.item.1" data-nac-role="list-item"><strong>Greenfield :</strong> nouveau projet, NAC3 dès le départ.</li><li data-nac-id="react.list.5.item.2" data-nac-role="list-item"><strong>Brownfield :</strong> application existante, NAC3 ajouté progressivement sans réécriture.</li></ul>
+<p data-nac-id="react.p.6" data-nac-role="paragraph">Les deux utilisent <code data-nac-role="code-inline">@nac3/runtime</code> depuis npm. Aucune hypothèse sur l'outil de build ; cela fonctionne avec Vite, Next.js, Create React App, Remix, ou tout autre bundler standard.</p>
+<hr />
+<h2 data-nac-id="react.h2.1-installation" data-nac-role="heading" data-nac-level="2" id="1-installation">1. Installation</h2>
+<pre data-nac-id="react.code.1" data-nac-role="code" data-nac-lang="text"><code>npm install @nac3/runtime</code></pre>
+<p data-nac-id="react.p.10" data-nac-role="paragraph">Le package expose le runtime via <code data-nac-role="code-inline">window.NAC</code> dès le premier import. Le runtime est indépendant du framework ; React se contente de décorer le JSX avec des attributs <code data-nac-role="code-inline">data-nac-*</code> et d'enregistrer les manifestes via <code data-nac-role="code-inline">useEffect</code>.</p>
+<hr />
+<h2 data-nac-id="react.h2.2-greenfield-nouveau-projet" data-nac-role="heading" data-nac-level="2" id="2-greenfield-nouveau-projet">2. Greenfield -- nouveau projet</h2>
+<h3 data-nac-id="react.h3.21-monter-le-runtime-une-seule-fois" data-nac-role="heading" data-nac-level="3" id="21-monter-le-runtime-une-seule-fois">2.1 Monter le runtime une seule fois</h3>
+<p data-nac-id="react.p.14" data-nac-role="paragraph">Dans votre composant racine (ou <code data-nac-role="code-inline">main.tsx</code> / <code data-nac-role="code-inline">_app.tsx</code>) :</p>
+<pre data-nac-id="react.code.2" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;   // v2.0 brownfield primitives + HMAC
+// optionnel : &#x27;@nac3/runtime/chat-client&#x27; pour la voix + le chat
+
+export function App() {
+  useEffect(() =&gt; {
+    // Préfixe tenant (pattern SaaS multi-tenant). À ignorer en mono-tenant.
+    if (window.NAC?.setTenantPrefix) {
+      window.NAC.setTenantPrefix(&#x27;demo&#x27;);
+    }
+    // Secret HMAC si vous distribuez des manifestes signés. À récupérer depuis votre API d&#x27;auth.
+    // window.NAC.set_provenance_secret(secret);
+  }, []);
+
+  return &lt;YourAppShell /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.22-décorer-les-composants" data-nac-role="heading" data-nac-level="3" id="22-décorer-les-composants">2.2 Décorer les composants</h3>
+<p data-nac-id="react.p.17" data-nac-role="paragraph">Chaque élément cliquable / saisissable / commutable reçoit :</p>
+<ul data-nac-id="react.list.18" data-nac-role="list"><li data-nac-id="react.list.18.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-id</code> -- un chemin pointé stable.</li><li data-nac-id="react.list.18.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role</code> -- l'un des rôles canoniques (voir SPEC sec 1).</li><li data-nac-id="react.list.18.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-action="&lt;verbe&gt;"</code> -- uniquement pour <code data-nac-role="code-inline">role="action"</code>.</li></ul>
+<pre data-nac-id="react.code.3" data-nac-role="code" data-nac-lang="tsx"><code>function InvoiceForm({ invoice, onSave, onCancel }) {
+  return (
+    &lt;article data-nac-plugin=&quot;invoice&quot;&gt;
+      &lt;input
+        type=&quot;text&quot;
+        data-nac-id=&quot;invoice.client_name&quot;
+        data-nac-role=&quot;field&quot;
+        value={invoice.clientName}
+        onChange={(e) =&gt; /* ... */}
+      /&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.save&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;save&quot;
+        onClick={onSave}
+      &gt;
+        Save
+      &lt;/button&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.cancel&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;cancel&quot;
+        onClick={onCancel}
+      &gt;
+        Cancel
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.23-enregistrer-un-manifeste" data-nac-role="heading" data-nac-level="3" id="23-enregistrer-un-manifeste">2.3 Enregistrer un manifeste</h3>
+<p data-nac-id="react.p.21" data-nac-role="paragraph">Le manifeste est la source de vérité côté agent. Un LLM qui résout « guardar » y trouve le verbe <code data-nac-role="code-inline">save</code> :</p>
+<pre data-nac-id="react.code.4" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+
+const INVOICE_MANIFEST = {
+  plugin_slug: &#x27;invoice&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.1&#x27;,
+  elements: [
+    {
+      id: &#x27;invoice.client_name&#x27;,
+      role: &#x27;field&#x27;,
+      label_i18n: {
+        es: &#x27;Nombre del cliente&#x27;, en: &#x27;Customer name&#x27;,
+        pt: &#x27;Nome do cliente&#x27;, fr: &#x27;Nom du client&#x27;,
+        it: &#x27;Nome del cliente&#x27;, de: &#x27;Kundenname&#x27;,
+        ja: &#x27;顧客名&#x27;, zh: &#x27;客户名称&#x27;,
+        hi: &#x27;ग्राहक का नाम&#x27;, ar: &#x27;اسم العميل&#x27;
+      }
+    },
+    {
+      id: &#x27;invoice.save&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: { /* 10 locales */ }
+      }],
+      label_i18n: { /* 10 locales */ }
+    },
+    {
+      id: &#x27;invoice.cancel&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;cancel&#x27;,
+        label_i18n: { /* 10 locales */ }
+      }],
+      label_i18n: { /* 10 locales */ }
+    }
+  ]
+};
+
+export function InvoiceForm(props) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(INVOICE_MANIFEST);
+  }, []);
+  // ... JSX de la section 2.2 ...
+}</code></pre>
+<p data-nac-id="react.p.23" data-nac-role="paragraph">Règles essentielles :</p>
+<ul data-nac-id="react.list.24" data-nac-role="list"><li data-nac-id="react.list.24.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">useEffect</code> avec <code data-nac-role="code-inline">[]</code> en dépendances : enregistrement unique au montage.</li><li data-nac-id="react.list.24.item.2" data-nac-role="list-item">Le manifeste est un objet statique ; ne le reconstruisez pas à chaque rendu (le runtime traite <code data-nac-role="code-inline">register</code> comme idempotent, mais vous gaspillez des cycles).</li><li data-nac-id="react.list.24.item.3" data-nac-role="list-item">Le mode Strict de React double-invoque les effets en développement. <code data-nac-role="code-inline">register</code> est idempotent ; aucun risque.</li></ul>
+<h3 data-nac-id="react.h3.24-émettre-des-événements-de-succès-depuis-les-handlers" data-nac-role="heading" data-nac-level="3" id="24-émettre-des-événements-de-succès-depuis-les-handlers">2.4 Émettre des événements de succès depuis les handlers</h3>
+<p data-nac-id="react.p.26" data-nac-role="paragraph">Si le runtime doit être piloté par un agent qui attend <code data-nac-role="code-inline">NAC.click()</code>, vos handlers doivent émettre <code data-nac-role="code-inline">nac:action:succeeded</code> après leur effet de bord :</p>
+<pre data-nac-id="react.code.5" data-nac-role="code" data-nac-lang="tsx"><code>function onSave() {
+  await api.saveInvoice(/* ... */);
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+  }));
+}</code></pre>
+<p data-nac-id="react.p.28" data-nac-role="paragraph">C'est le contrat v2.1. La v2.2 fournit un hook <code data-nac-role="code-inline">useNACAction</code> qui s'en charge automatiquement (voir la section Hooks ci-dessous).</p>
+<h3 data-nac-id="react.h3.25-piloter-linterface" data-nac-role="heading" data-nac-level="3" id="25-piloter-linterface">2.5 Piloter l'interface</h3>
+<p data-nac-id="react.p.30" data-nac-role="paragraph">Depuis n'importe quel agent, runner vocal ou test :</p>
+<pre data-nac-id="react.code.6" data-nac-role="code" data-nac-lang="tsx"><code>await window.NAC.click(&#x27;invoice.save&#x27;);
+// ou par verbe :
+await window.NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;save&#x27;);
+// ou remplir un champ :
+await window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme Corp&#x27;);</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.3-brownfield-application-react-existante" data-nac-role="heading" data-nac-level="2" id="3-brownfield-application-react-existante">3. Brownfield -- application React existante</h2>
+<p data-nac-id="react.p.34" data-nac-role="paragraph">Le principe : ne pas tout refactoriser d'un coup. Ajoutez NAC3 à un composant, validez, répétez.</p>
+<h3 data-nac-id="react.h3.31-ordre-dintervention" data-nac-role="heading" data-nac-level="3" id="31-ordre-dintervention">3.1 Ordre d'intervention</h3>
+<ol data-nac-id="react.list.36" data-nac-role="list"><li data-nac-id="react.list.36.item.1" data-nac-role="list-item"><strong>Le wrapper de plus haut niveau en premier.</strong> Ajoutez <code data-nac-role="code-inline">data-nac-plugin="&lt;votre-slug&gt;"</code> à votre <code data-nac-role="code-inline">&lt;div&gt;</code> ou <code data-nac-role="code-inline">&lt;main&gt;</code> racine. L'arbre de portée du runtime le détecte automatiquement.</li><li data-nac-id="react.list.36.item.2" data-nac-role="list-item"><strong>Les boutons les plus utilisés ensuite.</strong> Enregistrer, annuler, soumettre, supprimer dans vos écrans les plus fréquentés. Ajoutez <code data-nac-role="code-inline">data-nac-id</code>, <code data-nac-role="code-inline">data-nac-role="action"</code>, <code data-nac-role="code-inline">data-nac-action="&lt;verbe&gt;"</code>. Pas de manifeste pour l'instant.</li><li data-nac-id="react.list.36.item.3" data-nac-role="list-item"><strong>Vérifiez que le runtime les détecte.</strong> Ouvrez les DevTools, exécutez <code data-nac-role="code-inline">NAC.describe()</code>. Les boutons doivent apparaître sous leur slug de plugin.</li><li data-nac-id="react.list.36.item.4" data-nac-role="list-item"><strong>Ajoutez un manifeste minimal.</strong> Uniquement les boutons de l'étape 2, avec leurs verbes. <code data-nac-role="code-inline">NAC.click_by_verb()</code> fonctionne désormais.</li><li data-nac-id="react.list.36.item.5" data-nac-role="list-item"><strong>Ajoutez les champs.</strong> Les inputs reçoivent <code data-nac-role="code-inline">data-nac-role="field"</code> + les entrées de manifeste correspondantes.</li><li data-nac-id="react.list.36.item.6" data-nac-role="list-item"><strong>Ajoutez les onglets.</strong> Les sélecteurs d'onglets reçoivent <code data-nac-role="code-inline">data-nac-role="tab"</code>. <strong>Point critique :</strong> les ids correspondant à <code data-nac-role="code-inline">^tab\.</code> DOIVENT avoir le rôle <code data-nac-role="code-inline">tab</code> (la requête <code data-nac-role="code-inline">NAC.tab()</code> du runtime est limitée aux rôles canoniques ; voir SPEC sec 1).</li></ol>
+<h3 data-nac-id="react.h3.32-ne-pas-lutter-contre-votre-bibliothèque-de-composants-exi" data-nac-role="heading" data-nac-level="3" id="32-ne-pas-lutter-contre-votre-bibliothèque-de-composants-exi">3.2 Ne pas lutter contre votre bibliothèque de composants existante</h3>
+<p data-nac-id="react.p.38" data-nac-role="paragraph">Vous utilisez probablement shadcn / Mantine / MUI / Chakra / votre système maison. La plupart génèrent leur propre DOM. Deux patterns fonctionnent :</p>
+<p data-nac-id="react.p.39" data-nac-role="paragraph"><strong>Pattern A : passer les attributs NAC3 en props.</strong> La plupart des bibliothèques bien conçues transmettent les props inconnues à l'élément DOM sous-jacent :</p>
+<pre data-nac-id="react.code.7" data-nac-role="code" data-nac-lang="tsx"><code>&lt;Button
+  data-nac-id=&quot;invoice.save&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;save&quot;
+  onClick={onSave}
+&gt;
+  Save
+&lt;/Button&gt;</code></pre>
+<p data-nac-id="react.p.41" data-nac-role="paragraph">Si votre bibliothèque transmet les attributs <code data-nac-role="code-inline">data-*</code>, c'est suffisant.</p>
+<p data-nac-id="react.p.42" data-nac-role="paragraph"><strong>Pattern B : composant wrapper.</strong> Si votre bibliothèque absorbe les props <code data-nac-role="code-inline">data-*</code>, écrivez un petit wrapper :</p>
+<pre data-nac-id="react.code.8" data-nac-role="code" data-nac-lang="tsx"><code>import { Button as MuiButton } from &#x27;@mui/material&#x27;;
+import { useEffect, useRef } from &#x27;react&#x27;;
+
+interface NACButtonProps {
+  nacId: string;
+  verb: string;
+  // ...autres props MUI
+}
+
+export function NACButton({ nacId, verb, ...rest }: NACButtonProps) {
+  const ref = useRef&lt;HTMLButtonElement&gt;(null);
+  useEffect(() =&gt; {
+    if (!ref.current) return;
+    ref.current.setAttribute(&#x27;data-nac-id&#x27;, nacId);
+    ref.current.setAttribute(&#x27;data-nac-role&#x27;, &#x27;action&#x27;);
+    ref.current.setAttribute(&#x27;data-nac-action&#x27;, verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest} /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.33-auto-enregistrement-depuis-le-dom" data-nac-role="heading" data-nac-level="3" id="33-auto-enregistrement-depuis-le-dom">3.3 Auto-enregistrement depuis le DOM</h3>
+<p data-nac-id="react.p.45" data-nac-role="paragraph">Si déclarer les manifestes à la main est fastidieux, l'extension v2.0 <code data-nac-role="code-inline">autoRegister.watch</code> parcourt le DOM et enregistre automatiquement tout élément portant <code data-nac-role="code-inline">data-nac-id</code> + <code data-nac-role="code-inline">data-nac-role</code> :</p>
+<pre data-nac-id="react.code.9" data-nac-role="code" data-nac-lang="tsx"><code>useEffect(() =&gt; {
+  if (!window.NAC?.autoRegister) return;
+  const root = document.querySelector(&#x27;[data-nac-plugin]&#x27;);
+  if (!root) return;
+  root.setAttribute(&#x27;data-nac-watch&#x27;, &#x27;1&#x27;);
+  window.NAC.autoRegister.watch(root, {
+    i18n_strict: &#x27;permissive&#x27;,  // accepte un catalogue i18n partiel pendant la migration
+    throttleMs: 100
+  });
+}, []);</code></pre>
+<p data-nac-id="react.p.47" data-nac-role="paragraph"><code data-nac-role="code-inline">i18n_strict: 'permissive'</code> est adapté au brownfield. En production, passez à <code data-nac-role="code-inline">'strict'</code> une fois votre catalogue i18n complet.</p>
+<hr />
+<h2 data-nac-id="react.h2.4-hooks-aperçu-v22" data-nac-role="heading" data-nac-level="2" id="4-hooks-aperçu-v22">4. Hooks (aperçu v2.2)</h2>
+<p data-nac-id="react.p.50" data-nac-role="paragraph">Ces hooks sont livrés avec la v2.2. Pour la v2.1, vous pouvez les copier dans votre projet dès maintenant ; ils encapsulent le runtime v2.1 et offrent une API React plus idiomatique.</p>
+<h3 data-nac-id="react.h3.41-usenacmanifest" data-nac-role="heading" data-nac-level="3" id="41-usenacmanifest">4.1 <code data-nac-role="code-inline">useNACManifest</code></h3>
+<pre data-nac-id="react.code.10" data-nac-role="code" data-nac-lang="tsx"><code>export function useNACManifest(manifest) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(manifest);
+  }, [manifest.plugin_slug]);  // ré-enregistrement uniquement si le slug change
+}</code></pre>
+<h3 data-nac-id="react.h3.42-usenacaction-émission-automatique-de-laccusé-de-réception" data-nac-role="heading" data-nac-level="3" id="42-usenacaction-émission-automatique-de-laccusé-de-réception">4.2 <code data-nac-role="code-inline">useNACAction</code> -- émission automatique de l'accusé de réception</h3>
+<pre data-nac-id="react.code.11" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect, useRef } from &#x27;react&#x27;;
+
+export function useNACAction(plugin: string, actionId: string) {
+  const ref = useRef&lt;HTMLElement&gt;(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    function onClick() {
+      // Émet l&#x27;événement du contrat v2.1 après l&#x27;exécution du onClick React.
+      // Délai via microtask pour laisser l&#x27;événement synthétique React se terminer.
+      queueMicrotask(() =&gt; {
+        document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+          detail: { plugin, action_id: actionId }
+        }));
+      });
+    }
+    el.addEventListener(&#x27;click&#x27;, onClick);
+    return () =&gt; el.removeEventListener(&#x27;click&#x27;, onClick);
+  }, [plugin, actionId]);
+  return ref;
+}</code></pre>
+<p data-nac-id="react.p.55" data-nac-role="paragraph">Utilisation :</p>
+<pre data-nac-id="react.code.12" data-nac-role="code" data-nac-lang="tsx"><code>function SaveButton({ onSave }) {
+  const ref = useNACAction(&#x27;invoice&#x27;, &#x27;invoice.save&#x27;);
+  return (
+    &lt;button
+      ref={ref}
+      data-nac-id=&quot;invoice.save&quot;
+      data-nac-role=&quot;action&quot;
+      data-nac-action=&quot;save&quot;
+      onClick={onSave}
+    &gt;
+      Save
+    &lt;/button&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.43-usenacdescribe-introspection-de-larbre-depuis-un-panneau" data-nac-role="heading" data-nac-level="3" id="43-usenacdescribe-introspection-de-larbre-depuis-un-panneau">4.3 <code data-nac-role="code-inline">useNACDescribe</code> -- introspection de l'arbre depuis un panneau</h3>
+<pre data-nac-id="react.code.13" data-nac-role="code" data-nac-lang="tsx"><code>import { useState, useEffect } from &#x27;react&#x27;;
+
+export function useNACDescribe() {
+  const [snap, setSnap] = useState(null);
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    setSnap(window.NAC.describe());
+    const tick = setInterval(() =&gt; setSnap(window.NAC.describe()), 1000);
+    return () =&gt; clearInterval(tick);
+  }, []);
+  return snap;
+}</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.5-tests" data-nac-role="heading" data-nac-level="2" id="5-tests">5. Tests</h2>
+<h3 data-nac-id="react.h3.51-tests-unitaires-et-dintégration" data-nac-role="heading" data-nac-level="3" id="51-tests-unitaires-et-dintégration">5.1 Tests unitaires et d'intégration</h3>
+<p data-nac-id="react.p.62" data-nac-role="paragraph">NAC3 s'intègre parfaitement avec React Testing Library :</p>
+<pre data-nac-id="react.code.14" data-nac-role="code" data-nac-lang="tsx"><code>import { render, fireEvent, waitFor } from &#x27;@testing-library/react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import { InvoiceForm } from &#x27;./InvoiceForm&#x27;;
+
+test(&#x27;save button drives via NAC&#x27;, async () =&gt; {
+  render(&lt;InvoiceForm /&gt;);
+
+  const saved = jest.fn();
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, saved);
+
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+
+  await waitFor(() =&gt; expect(saved).toHaveBeenCalled());
+});</code></pre>
+<h3 data-nac-id="react.h3.52-tests-de-bout-en-bout-playwright" data-nac-role="heading" data-nac-level="3" id="52-tests-de-bout-en-bout-playwright">5.2 Tests de bout en bout (Playwright)</h3>
+<pre data-nac-id="react.code.15" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;invoice save&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;/invoices/new&#x27;);
+  await page.evaluate(() =&gt; window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;));
+  await page.evaluate(() =&gt; window.NAC.click(&#x27;invoice.save&#x27;));
+  await expect(page.getByText(&#x27;Invoice saved&#x27;)).toBeVisible();
+});</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.6-pièges-courants" data-nac-role="heading" data-nac-level="2" id="6-pièges-courants">6. Pièges courants</h2>
+<ul data-nac-id="react.list.68" data-nac-role="list"><li data-nac-id="react.list.68.item.1" data-nac-role="list-item"><strong>Ids obsolètes dans les listes avec clés.</strong> Si vous construisez des ids à partir d'un index de ligne (<code data-nac-role="code-inline">data-nac-id={'row.' + i}</code>) et que les lignes se réordonnent, les agents qui ont mis l'id en cache se retrouvent en erreur. Utilisez des clés stables (ids de base de données).</li><li data-nac-id="react.list.68.item.2" data-nac-role="list-item"><strong>Rendu conditionnel.</strong> Un bouton qui monte/démonte selon <code data-nac-role="code-inline">if (loaded)</code> perturbe un LLM qui a pris un instantané de l'arbre avant le chargement. Informez le LLM : <code data-nac-role="code-inline">NAC.describe()</code> inclut un flag <code data-nac-role="code-inline">mounted</code> par élément (activé en permanence depuis la v2.1) ; votre consommateur d'instantané doit filtrer sur ce flag.</li><li data-nac-id="react.list.68.item.3" data-nac-role="list-item"><strong>React 18 Strict Mode.</strong> Les effets double-invoqués ré-enregistrent le manifeste. Le runtime est idempotent ; aucun risque, mais vous verrez des lignes de log en double en développement.</li><li data-nac-id="react.list.68.item.4" data-nac-role="list-item"><strong>Composants serveur / SSR.</strong> NAC3 est uniquement côté client. Marquez les composants utilisant NAC avec <code data-nac-role="code-inline">'use client'</code> (Next.js App Router) ou rendez-les de façon différée.</li></ul>
+<hr />
+<h2 data-nac-id="react.h2.7-mise-en-production" data-nac-role="heading" data-nac-level="2" id="7-mise-en-production">7. Mise en production</h2>
+<p data-nac-id="react.p.71" data-nac-role="paragraph">Avant de déployer :</p>
+<ol data-nac-id="react.list.72" data-nac-role="list"><li data-nac-id="react.list.72.item.1" data-nac-role="list-item">Remplacez <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> par <code data-nac-role="code-inline">'strict'</code>. La CI détecte les traductions manquantes.</li><li data-nac-id="react.list.72.item.2" data-nac-role="list-item">Exécutez <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> -- attendez zéro résultat de sévérité erreur.</li><li data-nac-id="react.list.72.item.3" data-nac-role="list-item">Exécutez <code data-nac-role="code-inline">NAC.validate_global()</code> depuis un test Playwright ; vérifiez qu'il retourne <code data-nac-role="code-inline">[]</code>.</li><li data-nac-id="react.list.72.item.4" data-nac-role="list-item">En mode multi-tenant, assurez-vous que les manifestes sont signés HMAC côté serveur et que <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> est appelé depuis du code authentifié.</li></ol>
+<hr />
+<h2 data-nac-id="react.h2.8-pour-aller-plus-loin" data-nac-role="heading" data-nac-level="2" id="8-pour-aller-plus-loin">8. Pour aller plus loin</h2>
+<ul data-nac-id="react.list.75" data-nac-role="list"><li data-nac-id="react.list.75.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">SPEC.md</code> pour le contrat complet.</li><li data-nac-id="react.list.75.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">guides/LLM_WIRING.md</code> pour le backend intermédiaire qui résout « guardar la factura » en <code data-nac-role="code-inline">NAC.click_by_verb('invoice','save')</code>.</li><li data-nac-id="react.list.75.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">SECURITY.md</code> pour le modèle de menace.</li><li data-nac-id="react.list.75.item.4" data-nac-role="list-item">Les démos sur yujin.app/nac-spec/ (<code data-nac-role="code-inline">example.php</code> est la référence v1.9 ; <code data-nac-role="code-inline">example-v20-full.php</code> illustre la migration brownfield).</li></ul>
+<hr />
+<p data-nac-id="react.p.77" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/REACT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "react",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "react.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "react.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "react.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "react.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

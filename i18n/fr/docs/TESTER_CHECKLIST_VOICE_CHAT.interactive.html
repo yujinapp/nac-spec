@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Liste de vérification testeur : voix + chat (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="tester_checklist_voice_chat" data-doc-lang="en" data-nac-plugin="tester_form">
+<p class="tr-intro">Complete each task + press Submit at the end. Your report reaches the Yujin team.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<hr />
+<p>translation_source: docs/TESTER_CHECKLIST_VOICE_CHAT.md translation_source_hash: 8a27543feff39f34b78b01fceec66d117fae27d4d9e6d4a8f74eef3c71e5982d translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T13:22:21.904315+00:00</p>
+<hr />
+<h1>NAC3 v2.2 -- Liste de vérification testeur : voix + chat</h1>
+<p><strong>Pour :</strong> le testeur humain chargé du comportement voix + chat. <strong>Durée :</strong> ~30-45 minutes. <strong>Prérequis :</strong> microphone fonctionnel + haut-parleurs/casque.</p>
+<h2>Instructions</h2>
+<p>Pour chaque tâche :</p>
+<p>1. Lire les étapes a, b, c, d dans l'ordre. 2. Effectuer exactement ce que décrit l'étape a, puis b, puis c. 3. Comparer ce que vous voyez/entendez avec le « Résultat attendu » en d. 4. Cocher <code>[X]</code> dans <strong>OK</strong> si cela correspond ; cocher <code>[X]</code> dans <strong>ERREUR</strong> + décrire ce qui s'est réellement passé. 5. Ne pas sauter d'étape. Si une tâche échoue, passer à la suivante.</p>
+<hr />
+<h2>Section A -- Bases du panneau de chat</h2>
+<p>### Tâche A1 -- Ouvrir le panneau de chat</p>
+<p>a) Ouvrir Chrome en navigation privée (Ctrl+Shift+N). b) Aller sur <code>https://yujin.app/nac-spec/</code>. c) Repérer le panneau de chat (généralement une bulle circulaire en bas à droite ; cliquer dessus pour l'agrandir). S'il est déjà ouvert, ignorer ce clic. d) <strong>Résultat attendu :</strong> Un panneau de chat s'ouvre sur le côté droit de l'écran. Il contient : un en-tête avec le texte « Yujin chat », un menu déroulant de sélection de langue, une zone de saisie de texte en bas, un bouton Envoyer, et un bouton microphone à côté de la saisie.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche A2 -- Envoyer une question par texte</p>
+<p>a) Cliquer dans la zone de saisie du chat. b) Taper : <code>que es NAC3?</code> c) Cliquer sur le bouton Envoyer (ou appuyer sur Entrée). d) <strong>Résultat attendu :</strong> En 5 à 15 secondes, le chat affiche une réponse en espagnol (car le message était en espagnol). La réponse explique ce qu'est NAC3. Elle comporte au moins 2 phrases. Aucun message d'erreur rouge n'apparaît.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche A3 -- Envoyer une autre question en anglais</p>
+<p>a) Dans le même chat, taper : <code>how do I install NAC3?</code> b) Appuyer sur Entrée. c) Attendre la réponse. d) <strong>Résultat attendu :</strong> La réponse revient en anglais. Elle mentionne <code>npm install @nac3/runtime</code> ou une commande d'installation similaire.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<hr />
+<h2>Section B -- Saisie vocale (microphone)</h2>
+<p>### Tâche B1 -- Première activation du micro (autorisation d'accès)</p>
+<p>a) Cliquer sur le bouton microphone à côté de la saisie du chat. b) Le navigateur demande l'autorisation d'accès au microphone. Cliquer sur « Autoriser ». c) Observer l'état visuel du bouton. d) <strong>Résultat attendu :</strong> Le bouton microphone change d'apparence (couleur, animation ou icône) pour indiquer qu'il est en écoute active. Un indicateur « enregistrement en cours » peut être visible.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche B2 -- Parler en espagnol</p>
+<p>a) Avec le microphone actif, prononcer clairement : <strong>« hola »</strong> (un seul mot). b) Après ~2 secondes de silence, l'enregistrement s'arrête automatiquement (ou cliquer à nouveau sur le bouton micro pour l'arrêter). c) Attendre 3 à 5 secondes. d) <strong>Résultat attendu :</strong> Le panneau de chat affiche le mot transcrit « hola » (ou proche). Une réponse du chat apparaît en espagnol dans les 10 secondes.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche B3 -- Voix en anglais</p>
+<p>a) Cliquer à nouveau sur le bouton microphone. b) Prononcer clairement : <strong>« what is NAC3 »</strong>. c) Attendre la réponse. d) <strong>Résultat attendu :</strong> La transcription affiche « what is NAC3 » (ou proche). Réponse en anglais.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche B4 -- TTS (synthèse vocale) lecture audio</p>
+<p>a) Après l'apparition de la réponse de la tâche B3, écouter attentivement vos haut-parleurs. b) Être attentif pendant les 5 secondes suivant l'affichage de la réponse dans le chat. d) <strong>Résultat attendu :</strong> Une voix anglaise claire lit la réponse à voix haute via vos haut-parleurs. La voix est naturelle (pas robotique ou hachée).</p>
+<p>- [ ] OK - [ ] ERREUR - [ ] Aucun son entendu Commentaires : _______________________________</p>
+<hr />
+<h2>Section C -- Dispatch vocal sur la démo data-table</h2>
+<p>### Tâche C1 -- Charger la démo data-table</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Attendre 5 secondes pour le chargement complet. c) Repérer le panneau de chat et les onglets en haut du tableau de données. d) <strong>Résultat attendu :</strong> La page affiche plusieurs onglets (au moins « Lines (collection) » et « Permissions »). Le panneau de chat est visible.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche C2 -- Changement d'onglet par la voix (espagnol)</p>
+<p>a) Cliquer sur le bouton microphone. b) Prononcer : <strong>« ve a permisos »</strong>. c) Attendre jusqu'à 5 secondes. d) <strong>Résultat attendu :</strong> L'onglet « Permisos » (ou « Permissions ») devient actif. Le contenu de la zone d'affichage change.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche C3 -- Changement d'onglet par la voix (anglais)</p>
+<p>a) Cliquer sur le microphone. b) Prononcer : <strong>« go to lines »</strong>. c) Attendre. d) <strong>Résultat attendu :</strong> L'onglet « Lines (collection) » s'active.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche C4 -- Ajouter une ligne par la voix</p>
+<p>a) Cliquer sur le microphone. b) Prononcer lentement : <strong>« agrega una linea con concepto leche cantidad dos precio cien »</strong>. c) Attendre jusqu'à 10 secondes. d) <strong>Résultat attendu :</strong> Une nouvelle ligne apparaît dans le tableau de données avec : concept = « leche » (ou « milk »), quantité = 2, prix = 100 (ou analyse similaire).</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche C5 -- Lire un agrégat par la voix</p>
+<p>a) Cliquer sur le microphone. b) Prononcer : <strong>« cuanto total hay? »</strong> (ou « what is the total? »). c) Attendre la réponse. d) <strong>Résultat attendu :</strong> Le chat répond avec une valeur numérique correspondant à la somme des lignes visibles. Le TTS lit le nombre à voix haute.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<hr />
+<h2>Section D -- Dispatch vocal sur les démos React + Angular</h2>
+<p>### Tâche D1 -- Démo React : ajout par la voix</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/demos/react/</code>. b) Attendre 5 secondes. c) Cliquer sur le microphone dans le panneau de chat. d) Prononcer : <strong>« agrega leche »</strong>. e) Attendre 5 secondes. d) <strong>Résultat attendu :</strong> Un élément todo « leche » (ou « milk ») apparaît dans la liste de tâches.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche D2 -- Démo React : suppression par la voix</p>
+<p>a) Dans la même démo, cliquer sur le microphone. b) Prononcer : <strong>« borra leche »</strong>. c) Attendre 5 secondes. d) <strong>Résultat attendu :</strong> L'élément « leche/milk » disparaît de la liste.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<p>### Tâche D3 -- Démo Angular : mêmes flux</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/demos/angular/</code>. b) Répéter les tâches D1 et D2 sur cette démo. c) Comparer le comportement avec la démo React. d) <strong>Résultat attendu :</strong> Comportement identique -- l'ajout par la voix fonctionne, la suppression par la voix fonctionne.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<hr />
+<h2>Section E -- Voix multilingue (tester uniquement les langues que vous parlez)</h2>
+<p>Pour chaque langue que vous parlez réellement, effectuer le test ci-dessous. Ignorer sinon.</p>
+<p>### Tâche E1 -- Portugais</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Changer la langue du chat en « pt » (portugais) via le menu déroulant. c) Cliquer sur le microphone, prononcer : <strong>« vai para permissoes »</strong>. d) <strong>Résultat attendu :</strong> L'onglet Permissions s'active. Réponse du chat en portugais.</p>
+<p>- [ ] OK - [ ] ERREUR - [ ] Ignoré (ne parle pas portugais) Commentaires : _______________________________</p>
+<p>### Tâche E2 -- Français</p>
+<p>a) Changer la langue en « fr ». b) Prononcer : <strong>« va aux permissions »</strong>. c) Observer. d) <strong>Résultat attendu :</strong> Permissions s'active. Réponse en français.</p>
+<p>- [ ] OK - [ ] ERREUR - [ ] Ignoré Commentaires : _______________________________</p>
+<p>### Tâche E3 -- Allemand</p>
+<p>a) Changer la langue en « de ». b) Prononcer : <strong>« gehe zu berechtigungen »</strong>. c) Observer. d) <strong>Résultat attendu :</strong> Permissions s'active. Réponse en allemand.</p>
+<p>- [ ] OK - [ ] ERREUR - [ ] Ignoré Commentaires : _______________________________</p>
+<p>### Tâche E4 -- Autre (it / ja / zh / hi / ar)</p>
+<p>Pour toute autre langue que vous parlez parmi {italien, japonais, chinois, hindi, arabe}, effectuer le même test avec la phrase équivalente à « aller aux permissions ».</p>
+<p>- [ ] OK - [ ] ERREUR - [ ] Ignoré Langue testée : ______________ Commentaires : _______________________________</p>
+<hr />
+<h2>Section F -- Piège de changement de locale (garde contre les régressions)</h2>
+<p>### Tâche F1 -- Le piège de la préposition « de » (espagnol)</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) S'assurer que le chat est en espagnol (« es ») dans le menu déroulant de langue. c) Cliquer sur le microphone, prononcer : <strong>« cambia de pestana »</strong> (espagnol pour « changer d'onglet » -- « de » est la préposition espagnole, PAS l'allemand). d) Attendre la réponse. d) <strong>Résultat attendu :</strong> Le chat ne passe PAS en allemand. Le menu déroulant de langue reste sur « es ». Le chat peut répondre en espagnol en demandant une clarification, ou changer d'onglet -- les deux sont acceptables. Le résultat interdit est « langue passée en allemand ».</p>
+<p>- [ ] OK (resté en espagnol) - [ ] ERREUR (passé en allemand -- régression !) Commentaires : _______________________________</p>
+<p>### Tâche F2 -- Changement de langue explicite (autorisé)</p>
+<p>a) Cliquer sur le microphone. b) Prononcer : <strong>« cambia el idioma a aleman »</strong> (explicitement « changer la langue en allemand »). c) Attendre. d) <strong>Résultat attendu :</strong> La langue du chat passe en « de » (allemand). Il s'agit du déclencheur légitime.</p>
+<p>- [ ] OK - [ ] ERREUR Commentaires : _______________________________</p>
+<hr />
+<h2>VALIDATION FINALE (voix + chat)</h2>
+<pre class="tr-code"><code>Tag de version :         v____._.___
+Nom du testeur :         ______________________________
+Date :                   ____-____-____
+Navigateur :             [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Micro + haut-parleurs :  [ ] oui  [ ] non
+Langues testées :        __ , __ , __ , __ , __ , __
+Tâches effectuées :      __ sur 23
+Tâches marquées OK :     __
+Tâches marquées ERREUR : __
+Verdict global :         [ ] prêt  [ ] corrections nécessaires  [ ] problèmes bloquants
+
+Top 3 des problèmes (le cas échéant) :
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+Signature : ______________________________</code></pre>
+<hr />
+<h2>Voir aussi</h2>
+<p>- <code>TESTER_CHECKLIST_VISUAL.md</code> -- évaluation de la mise en page visuelle. - <code>TESTER_CHECKLIST_VOICE_CHAT.es.md</code> -- version espagnole de ce fichier. - <code>HUMAN_OK_CHECKLIST_TESTER.md</code> -- liste de vérification fonctionnelle générale.</p>
+<hr />
+<p><em>This is a machine translation of the canonical English version at <code>/nac-spec/docs/TESTER_CHECKLIST_VOICE_CHAT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Submit report</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Auto-saved locally. Your progress restores if you close this tab.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

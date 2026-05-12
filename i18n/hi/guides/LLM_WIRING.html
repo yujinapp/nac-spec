@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + LLM intermediary -- NAC3</title>
+<meta name="nac3-doc-slug" content="llm_wiring" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="llm_wiring" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="llm_wiring.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="llm_wiring.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/llm_wiring.mp3" data-nac-id="llm_wiring.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="llm_wiring.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="llm_wiring.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="llm_wiring.main" data-nac-role="region">
+<hr />
+<p data-nac-id="llm_wiring.p.1" data-nac-role="paragraph">translation_source: guides/LLM_WIRING.md translation_source_hash: 746145f0be3bee6ca1e8d89095de3168e60f2d7c55bf1af78a0086203be97555 translation_quality: machine_v1 translation_lang: hi translation_date: 2026-05-11T14:59:06.901183+00:00</p>
+<hr />
+<h1 data-nac-id="llm_wiring.h1.nac3-llm-intermediary" data-nac-role="heading" data-nac-level="1" id="nac3-llm-intermediary">NAC3 + LLM intermediary</h1>
+<p data-nac-id="llm_wiring.p.4" data-nac-role="paragraph">यह गाइड वह backend बनाता है जो user के prompts ("guardar la factura", "ve a permisos", "borra el teclado") को NAC3 actions में बदलता है, जिन्हें chat client dispatch करता है।</p>
+<p data-nac-id="llm_wiring.p.5" data-nac-role="paragraph">NAC3 केवल इस backend के inputs और outputs को standardise करता है। आप कौन सा LLM चुनते हैं, prompt template, rate limits, और moderation — ये सब आपके निर्णय हैं। यह गाइड Claude के साथ सबसे सरल working shape दिखाता है; यही pattern OpenAI, Gemini, या किसी local model पर भी लागू होता है।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.1-contract" data-nac-role="heading" data-nac-level="2" id="1-contract">1. Contract</h2>
+<h3 data-nac-id="llm_wiring.h3.11-request-client-backend" data-nac-role="heading" data-nac-level="3" id="11-request-client-backend">1.1 Request: client -&gt; backend</h3>
+<p data-nac-id="llm_wiring.p.9" data-nac-role="paragraph">POST <code data-nac-role="code-inline">/your-endpoint</code>, JSON body:</p>
+<pre data-nac-id="llm_wiring.code.1" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;session_id&quot;: &quot;sess_abc123&quot;,
+  &quot;prompt&quot;:     &quot;ve a permisos&quot;,
+  &quot;lang&quot;:       &quot;es&quot;,
+  &quot;history&quot;:    [
+    { &quot;role&quot;: &quot;user&quot;,      &quot;text&quot;: &quot;muestra factura 1&quot; },
+    { &quot;role&quot;: &quot;assistant&quot;, &quot;text&quot;: &quot;Abriendo la factura #INV-001.&quot; }
+  ],
+  &quot;nac_tree&quot;: {
+    &quot;active&quot;:  &quot;invoice_edit_modal&quot;,
+    &quot;plugins&quot;: [
+      { &quot;plugin&quot;: &quot;invoice&quot;, &quot;state&quot;: &quot;idle&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} },
+      { &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;state&quot;: &quot;active&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} }
+    ],
+    &quot;v2_scope_entries&quot;: [...],
+    &quot;data_tables&quot;: [...]
+  }
+}</code></pre>
+<p data-nac-id="llm_wiring.p.11" data-nac-role="paragraph">Chat client <code data-nac-role="code-inline">nac_tree</code> snapshot <code data-nac-role="code-inline">NacChat.snapshotTree()</code> के ज़रिए प्रदान करता है; runtime का <code data-nac-role="code-inline">NAC.describe()</code> + <code data-nac-role="code-inline">NAC.describe_v2()</code> इसे generate करता है। यह LLM का page state देखने का एकमात्र तरीका है।</p>
+<h3 data-nac-id="llm_wiring.h3.12-response-backend-client" data-nac-role="heading" data-nac-level="3" id="12-response-backend-client">1.2 Response: backend -&gt; client</h3>
+<pre data-nac-id="llm_wiring.code.2" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;ok&quot;:      true,
+  &quot;message&quot;: &quot;Abriendo la pestana Permisos.&quot;,
+  &quot;actions&quot;: [
+    { &quot;kind&quot;: &quot;tab&quot;, &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;tab_key&quot;: &quot;tab.permissions&quot; }
+  ]
+}</code></pre>
+<p data-nac-id="llm_wiring.p.14" data-nac-role="paragraph"><code data-nac-role="code-inline">message</code> वह है जो chat दिखाता है और TTS के ज़रिए बोलता है। <code data-nac-role="code-inline">actions[]</code> structured dispatch list है। Chat client प्रत्येक action को उस snapshot के विरुद्ध validate करता है जो उसने भेजा था (क्या nac_id मौजूद है? क्या tab_key एक known tab है?) — इसके बाद ही <code data-nac-role="code-inline">NAC.click()</code> / <code data-nac-role="code-inline">NAC.tab()</code> / आदि call करता है।</p>
+<h3 data-nac-id="llm_wiring.h3.13-action-shapes" data-nac-role="heading" data-nac-level="3" id="13-action-shapes">1.3 Action shapes</h3>
+<p data-nac-id="llm_wiring.p.16" data-nac-role="paragraph">| <code data-nac-role="code-inline">kind</code> | आवश्यक fields | Maps to | |--------|---------------|---------| | <code data-nac-role="code-inline">click</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.click(nac_id)</code> | | <code data-nac-role="code-inline">click_by_verb</code> | <code data-nac-role="code-inline">verb</code>, optional <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> | | <code data-nac-role="code-inline">fill</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.fill(nac_id, value)</code> | | <code data-nac-role="code-inline">select</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.select(nac_id, value)</code> | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">plugin</code>, <code data-nac-role="code-inline">tab_key</code> | <code data-nac-role="code-inline">NAC.tab(plugin, tab_key)</code> | | <code data-nac-role="code-inline">tab_by_label</code> | <code data-nac-role="code-inline">label</code>, optional <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.tab_by_label(plugin, label)</code> | | <code data-nac-role="code-inline">go_to_section</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.go_to_section(nac_id)</code> | | <code data-nac-role="code-inline">drag_drop</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">target_nac_id</code>, optional <code data-nac-role="code-inline">to_index</code> | <code data-nac-role="code-inline">NAC.drag_drop(...)</code> | | <code data-nac-role="code-inline">say</code> | <code data-nac-role="code-inline">text</code> | केवल botSpeak, कोई DOM action नहीं | | <code data-nac-role="code-inline">change_locale</code> | <code data-nac-role="code-inline">locale</code> (2-letter) | <code data-nac-role="code-inline">NacChat.setLang(locale)</code> | | <code data-nac-role="code-inline">dt_add_row</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">values</code> | <code data-nac-role="code-inline">NAC.dt_add_row(...)</code> | | <code data-nac-role="code-inline">dt_remove_row</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">row_id</code> | <code data-nac-role="code-inline">NAC.dt_remove_row(...)</code> | | <code data-nac-role="code-inline">dt_edit_cell</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">row_id</code>, <code data-nac-role="code-inline">column</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.dt_edit_cell(...)</code> | | <code data-nac-role="code-inline">dt_commit</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_commit(...)</code> | | <code data-nac-role="code-inline">dt_discard</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_discard(...)</code> | | <code data-nac-role="code-inline">dt_read_aggregate</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">agg_key</code>, <code data-nac-role="code-inline">column</code> | <code data-nac-role="code-inline">NAC.dt_read_aggregate(...)</code> |</p>
+<p data-nac-id="llm_wiring.p.17" data-nac-role="paragraph">पूरी enumeration chat client के <code data-nac-role="code-inline">_dispatchAction()</code> switch (<code data-nac-role="code-inline">js/nac-chat-client.js</code>) में है।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.2-reference-backend-node-anthropic-sdk" data-nac-role="heading" data-nac-level="2" id="2-reference-backend-node-anthropic-sdk">2. Reference backend (Node + Anthropic SDK)</h2>
+<pre data-nac-id="llm_wiring.code.3" data-nac-role="code" data-nac-lang="js"><code>// nac-intermediary.mjs
+// Run: node nac-intermediary.mjs
+// Env: ANTHROPIC_API_KEY
+
+import http from &#x27;node:http&#x27;;
+import Anthropic from &#x27;@anthropic-ai/sdk&#x27;;
+
+const anthropic = new Anthropic();
+
+const MODEL = &#x27;claude-sonnet-4-6&#x27;;
+
+function systemPrompt(snapshot, lang) {
+  return `You drive a web UI by emitting structured NAC actions.
+
+Rules:
+1. Resolve the user&#x27;s intent against the NAC tree below. Prefer
+   click_by_verb when a verb matches; fall back to click(nac_id)
+   only if no verb fits.
+2. For tab switching, use tab() with the plugin + tab_key from
+   the manifest, NOT click().
+3. NEVER invent nac_ids. Every action MUST reference a name
+   present in the tree. If you cannot find a matching name, ask
+   the user a clarifying question via {message} with empty actions[].
+4. Reply in language: ${lang}.
+5. Output JSON only:
+   { &quot;message&quot;: &quot;...&quot;, &quot;actions&quot;: [...] }
+6. message is what the user sees + hears. Keep it short (one
+   sentence is ideal).
+7. If the user said &quot;cambia a &lt;language&gt;&quot; emit a single
+   change_locale action with the 2-letter code.
+8. For data-tables: use dt_add_row / dt_remove_row / dt_edit_cell /
+   dt_commit / dt_discard. Compute aggregates with dt_read_aggregate
+   then read in the message.
+9. Bare 2-letter locale codes (&#x27;de&#x27;,&#x27;es&#x27;,&#x27;en&#x27;) are language codes
+   ONLY when followed/preceded by an explicit language trigger word
+   (&#x27;idioma&#x27;, &#x27;language&#x27;, &#x27;sprache&#x27;). &#x27;cambia DE pestana&#x27; is NOT
+   German -- &#x27;de&#x27; here is the Spanish preposition.
+
+NAC tree snapshot (JSON):
+${JSON.stringify(snapshot, null, 2)}
+`;
+}
+
+const server = http.createServer(async (req, res) =&gt; {
+  if (req.method !== &#x27;POST&#x27;) { res.writeHead(405); res.end(); return; }
+
+  let raw = &#x27;&#x27;;
+  req.on(&#x27;data&#x27;, c =&gt; raw += c);
+  req.on(&#x27;end&#x27;, async () =&gt; {
+    let body;
+    try { body = JSON.parse(raw); }
+    catch (_) { res.writeHead(400); res.end(&#x27;bad json&#x27;); return; }
+
+    try {
+      const completion = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 1024,
+        temperature: 0.2,
+        system: systemPrompt(body.nac_tree, body.lang || &#x27;es&#x27;),
+        messages: [
+          ...body.history.map(h =&gt; ({
+            role: h.role === &#x27;assistant&#x27; ? &#x27;assistant&#x27; : &#x27;user&#x27;,
+            content: h.text
+          })),
+          { role: &#x27;user&#x27;, content: body.prompt }
+        ]
+      });
+
+      // Claude returns JSON inside a text block; parse it.
+      const text = completion.content[0].text.trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch (_) {
+        // Fallback: model returned prose. Wrap it.
+        parsed = { message: text, actions: [] };
+      }
+
+      res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({
+        ok: true,
+        message: parsed.message || &#x27;&#x27;,
+        actions: Array.isArray(parsed.actions) ? parsed.actions : []
+      }));
+    } catch (e) {
+      console.error(&#x27;intermediary error&#x27;, e.message);
+      res.writeHead(500, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+  });
+});
+
+server.listen(3000, () =&gt; {
+  console.log(&#x27;NAC intermediary listening on :3000&#x27;);
+});</code></pre>
+<p data-nac-id="llm_wiring.p.21" data-nac-role="paragraph">अपने chat client को इस पर point करें:</p>
+<pre data-nac-id="llm_wiring.code.4" data-nac-role="code" data-nac-lang="js"><code>NacChat._endpoint = &#x27;http://localhost:3000/&#x27;;</code></pre>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.3-validation-dispatch-स-पहल" data-nac-role="heading" data-nac-level="2" id="3-validation-dispatch-स-पहल">3. Validation — dispatch से पहले</h2>
+<p data-nac-id="llm_wiring.p.25" data-nac-role="paragraph">एक ज़रूरी सुरक्षा उपाय: LLM द्वारा लौटाए गए हर action को उस snapshot के विरुद्ध validate करें जो आपने भेजा था।</p>
+<pre data-nac-id="llm_wiring.code.5" data-nac-role="code" data-nac-lang="js"><code>function isActionSafe(action, snapshot) {
+  if (!action || !action.kind) return false;
+  switch (action.kind) {
+    case &#x27;click&#x27;:
+    case &#x27;fill&#x27;:
+    case &#x27;select&#x27;:
+    case &#x27;go_to_section&#x27;:
+      return snapshotHasId(snapshot, action.nac_id);
+    case &#x27;click_by_verb&#x27;:
+      return snapshotHasVerb(snapshot, action.plugin, action.verb);
+    case &#x27;tab&#x27;:
+      return snapshotHasTab(snapshot, action.plugin, action.tab_key);
+    case &#x27;tab_by_label&#x27;:
+      return snapshotHasTabLabel(snapshot, action.plugin, action.label);
+    case &#x27;say&#x27;:
+    case &#x27;change_locale&#x27;:
+      return true;
+    default:
+      // dt_* actions: validate table_id exists.
+      if (action.kind.startsWith(&#x27;dt_&#x27;)) {
+        return snapshotHasTable(snapshot, action.table_id);
+      }
+      return false;
+  }
+}
+
+// Reject the action if not safe; show the user a generic message.
+for (const a of response.actions) {
+  if (!isActionSafe(a, mySnapshot)) {
+    console.warn(&#x27;[nac] dropping unsafe action&#x27;, a);
+    botSpeak(&#x27;No pude resolver eso.&#x27;);
+    return;
+  }
+  await dispatchAction(a);
+}</code></pre>
+<p data-nac-id="llm_wiring.p.27" data-nac-role="paragraph">Reference client (<code data-nac-role="code-inline">js/nac-chat-client.js</code>) यह काम <code data-nac-role="code-inline">_dispatchAction</code> में करता है। इसे skip न करें — यह एकमात्र बचाव है उस LLM के खिलाफ जो ids hallucinate करे या prompt injection execute करे।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.4-locale-handling" data-nac-role="heading" data-nac-level="2" id="4-locale-handling">4. Locale handling</h2>
+<p data-nac-id="llm_wiring.p.30" data-nac-role="paragraph">User का <code data-nac-role="code-inline">lang</code> request पर एक explicit field है। System prompt model को उसी भाषा में जवाब देने का निर्देश देता है। दो अतिरिक्त बातें:</p>
+<p data-nac-id="llm_wiring.p.31" data-nac-role="paragraph"><code data-nac-role="code-inline">{ kind: 'change_locale', locale: 'en' }</code> लौटाता है। Client   <code data-nac-role="code-inline">NacChat.setLang('en')</code> call करता है और अगले request में   <code data-nac-role="code-inline">lang: 'en'</code> होता है।</p>
+<p data-nac-id="llm_wiring.p.32" data-nac-role="paragraph"><code data-nac-role="code-inline">_detectLangSwitch</code> LLM round-trip को short-circuit करता है जब   user का input किसी locale-switch pattern से match करे। यह fix   2026-05-09 को आई: bare 2-letter codes (<code data-nac-role="code-inline">de</code>, <code data-nac-role="code-inline">es</code>, <code data-nac-role="code-inline">en</code>) को   locale code तभी माना जाता है जब कोई explicit language trigger word   भी मौजूद हो। इस fix के बिना, "cambia DE pestana" चुपचाप German में   switch कर देता था।</p>
+<ul data-nac-id="llm_wiring.list.33" data-nac-role="list"><li data-nac-id="llm_wiring.list.33.item.1" data-nac-role="list-item">अगर user भाषा बदलने को कहे ("cambia a inglés"), तो model</li><li data-nac-id="llm_wiring.list.33.item.2" data-nac-role="list-item">2-letter code का false-positive: chat client का</li></ul>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.5-snapshot-क-आकर" data-nac-role="heading" data-nac-level="2" id="5-snapshot-क-आकर">5. Snapshot का आकार</h2>
+<p data-nac-id="llm_wiring.p.36" data-nac-role="paragraph">एक live page बड़ा snapshot produce कर सकता है (50+ plugins × 30 elements × 10 locales = 15000+ entries)। Claude Sonnet की pricing पर यह प्रति request वास्तविक खर्च है।</p>
+<p data-nac-id="llm_wiring.p.37" data-nac-role="paragraph">विकल्प:</p>
+<p data-nac-id="llm_wiring.p.38" data-nac-role="paragraph">parents भेजें। Chat client का <code data-nac-role="code-inline">snapshotTree()</code> पहले से केवल mounted   plugins शामिल करता है।</p>
+<p data-nac-id="llm_wiring.p.39" data-nac-role="paragraph"><code data-nac-role="code-inline">lang</code> तक सीमित करें। Client dispatch पर re-translate कर सकता है।</p>
+<p data-nac-id="llm_wiring.p.40" data-nac-role="paragraph"><code data-nac-role="code-inline">'option'</code> शामिल करें — <code data-nac-role="code-inline">'section'</code>, <code data-nac-role="code-inline">'region'</code>, decorative   elements छोड़ें। Agent शायद ही कभी उन्हें directly target करता है।</p>
+<ul data-nac-id="llm_wiring.list.41" data-nac-role="list"><li data-nac-id="llm_wiring.list.41.item.1" data-nac-role="list-item"><strong>Active-plugin filter।</strong> केवल active plugin और scope tree में उसके</li><li data-nac-id="llm_wiring.list.41.item.2" data-nac-role="list-item"><strong>Single-locale snapshot।</strong> <code data-nac-role="code-inline">label_i18n</code> को केवल user के current</li><li data-nac-id="llm_wiring.list.41.item.3" data-nac-role="list-item"><strong>Element pruning।</strong> केवल <code data-nac-role="code-inline">role: 'action'</code>, <code data-nac-role="code-inline">'tab'</code>, <code data-nac-role="code-inline">'field'</code>,</li></ul>
+<p data-nac-id="llm_wiring.p.42" data-nac-role="paragraph">Yujin के production deployment में pruning से snapshot का आकार ~10x कम हो जाता है, बिना resolution accuracy में कोई कमी के।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.6-streaming-और-latency" data-nac-role="heading" data-nac-level="2" id="6-streaming-और-latency">6. Streaming और latency</h2>
+<p data-nac-id="llm_wiring.p.45" data-nac-role="paragraph">ऊपर दिया गया reference backend non-streaming है। Voice flows के लिए (जहाँ user चाहता है कि TTS जल्द से जल्द शुरू हो), streaming उपयोग करें:</p>
+<p data-nac-id="llm_wiring.p.46" data-nac-role="paragraph">के भीतर), TTS शुरू करें।</p>
+<p data-nac-id="llm_wiring.p.47" data-nac-role="paragraph">dispatch करें।</p>
+<ul data-nac-id="llm_wiring.list.48" data-nac-role="list"><li data-nac-id="llm_wiring.list.48.item.1" data-nac-role="list-item">LLM response आते ही stream करें।</li><li data-nac-id="llm_wiring.list.48.item.2" data-nac-role="list-item">जैसे ही <code data-nac-role="code-inline">message</code> field parseable हो (आमतौर पर पहले 50 tokens</li><li data-nac-id="llm_wiring.list.48.item.3" data-nac-role="list-item">JSON पूरा होने तक <code data-nac-role="code-inline">actions[]</code> रोकें; <code data-nac-role="code-inline">message</code> बोलने के बाद</li></ul>
+<p data-nac-id="llm_wiring.p.49" data-nac-role="paragraph">Chat client आज streaming नहीं करता; यह v2.2 का candidate है।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.7-multi-llm" data-nac-role="heading" data-nac-level="2" id="7-multi-llm">7. Multi-LLM</h2>
+<p data-nac-id="llm_wiring.p.52" data-nac-role="paragraph">LLM बदलना मुख्यतः system prompt + SDK का मामला है। NAC3 का wire format नहीं बदलता।</p>
+<p data-nac-id="llm_wiring.p.53" data-nac-role="paragraph">JSON output enforce करने के लिए   <code data-nac-role="code-inline">response_format: { type: 'json_object' }</code> उपयोग करें   (parse-fallback branch समाप्त हो जाती है)।</p>
+<p data-nac-id="llm_wiring.p.54" data-nac-role="paragraph"><code data-nac-role="code-inline">responseMimeType: 'application/json'</code>।</p>
+<p data-nac-id="llm_wiring.p.55" data-nac-role="paragraph">संघर्ष करते हैं। Aggressively prune करें (sec 5) और एक छोटा   prompt template उपयोग करें जो केवल verbs list करे। Quality   कम होती है लेकिन offline काम करता है।</p>
+<ul data-nac-id="llm_wiring.list.56" data-nac-role="list"><li data-nac-id="llm_wiring.list.56.item.1" data-nac-role="list-item"><strong>OpenAI:</strong> <code data-nac-role="code-inline">gpt-4-turbo</code> या <code data-nac-role="code-inline">gpt-5</code> अच्छे काम करते हैं।</li><li data-nac-id="llm_wiring.list.56.item.2" data-nac-role="list-item"><strong>Gemini:</strong> <code data-nac-role="code-inline">gemini-1.5-pro</code>। Same shape; उपयोग करें</li><li data-nac-id="llm_wiring.list.56.item.3" data-nac-role="list-item"><strong>Local (Ollama, vLLM):</strong> छोटे models पूरे snapshot के साथ</li></ul>
+<p data-nac-id="llm_wiring.p.57" data-nac-role="paragraph">Yujin का production deployment cost + latency + tool-use accuracy के लिए Claude Sonnet उपयोग करता है। हमने GPT-4 Turbo और Gemini 1.5 Pro को benchmark किया है; दोनों काम करते हैं, दोनों हमारे prompt size पर प्रति request अधिक खर्च करते हैं।</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.8-production-hardening" data-nac-role="heading" data-nac-level="2" id="8-production-hardening">8. Production hardening</h2>
+<p data-nac-id="llm_wiring.p.60" data-nac-role="paragraph">Ship करने से पहले:</p>
+<p data-nac-id="llm_wiring.p.61" data-nac-role="paragraph">token की आवश्यकता होनी चाहिए। अन्यथा कोई attacker इसे directly    call करके मुफ्त Claude access पा सकता है।</p>
+<p data-nac-id="llm_wiring.p.62" data-nac-role="paragraph">reference <code data-nac-role="code-inline">core/Orchestrator.php</code> में एक <code data-nac-role="code-inline">TenantRateLimiter</code> है    जिसे आप adapt कर सकते हैं।</p>
+<p data-nac-id="llm_wiring.p.63" data-nac-role="paragraph">मानें: बिना sanitisation के logs में echo न करें; किसी action को    ऐसे id को reference न करने दें जो इस request के snapshot में    नहीं था।</p>
+<p data-nac-id="llm_wiring.p.64" data-nac-role="paragraph">Snapshots में user data (नाम, राशि) हो सकता है।</p>
+<ol data-nac-id="llm_wiring.list.65" data-nac-role="list"><li data-nac-id="llm_wiring.list.65.item.1" data-nac-role="list-item"><strong>Auth।</strong> Intermediary endpoint को आपके authed app के session</li><li data-nac-id="llm_wiring.list.65.item.2" data-nac-role="list-item"><strong>Rate limit।</strong> Per-session, per-tenant। Yujin codebase में</li><li data-nac-id="llm_wiring.list.65.item.3" data-nac-role="list-item"><strong>Snapshot trust।</strong> <code data-nac-role="code-inline">nac_tree</code> client से आता है। इसे untrusted</li><li data-nac-id="llm_wiring.list.65.item.4" data-nac-role="list-item"><strong>Logging।</strong> केवल prompt + chosen actions log करें, snapshot नहीं।</li><li data-nac-id="llm_wiring.list.65.item.5" data-nac-role="list-item"><strong>Cost guard।</strong> Per-tenant token counter। Plan limit पर hard-stop।</li></ol>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.9-reference-production-endpoint-shape" data-nac-role="heading" data-nac-level="2" id="9-reference-production-endpoint-shape">9. Reference: production endpoint shape</h2>
+<p data-nac-id="llm_wiring.p.68" data-nac-role="paragraph">Yujin का production endpoint <code data-nac-role="code-inline">/crm/api/v1/yujin/nac-demo</code> पर है। Source: <code data-nac-role="code-inline">yujin.app/crm/api/v1/yujin.php</code>। यह ऊपर की सभी बातें implement करता है, साथ ही per-tenant usage counters (F15) और audit log (<code data-nac-role="code-inline">yujin_assistant_log</code>) भी। एक battle-tested उदाहरण के लिए इसे पढ़ें; जो उपयुक्त लगे वह copy करें।</p>
+<hr />
+<p data-nac-id="llm_wiring.p.70" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/LLM_WIRING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "llm_wiring",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "llm_wiring.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "llm_wiring.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "llm_wiring.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "llm_wiring.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

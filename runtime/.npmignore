@@ -1,0 +1,6 @@
+# Don't ship build tooling or tests in the published tarball.
+build.mjs
+test/
+node_modules/
+*.tgz
+.git*

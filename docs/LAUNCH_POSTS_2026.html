@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 launch posts -- drafts (v2: vision-first) -- NAC3</title>
+<meta name="nac3-doc-slug" content="launch_posts_2026" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="launch_posts_2026" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="launch_posts_2026.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="launch_posts_2026.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/launch_posts_2026.mp3" data-nac-id="launch_posts_2026.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="launch_posts_2026.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="launch_posts_2026.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="launch_posts_2026.main" data-nac-role="region">
+<h1 data-nac-id="launch_posts_2026.h1.nac3-v22-launch-posts-drafts-v2-vision-first" data-nac-role="heading" data-nac-level="1" id="nac3-v22-launch-posts-drafts-v2-vision-first">NAC3 v2.2 launch posts -- drafts (v2: vision-first)</h1>
+<p data-nac-id="launch_posts_2026.p.1" data-nac-role="paragraph"><strong>Target launch date:</strong> TBD (within 2 weeks of HUMAN_OK_CHECKLIST sign-off). <strong>Time-of-day:</strong> 9:00 AM US East (peak HN traffic). <strong>Coordinate:</strong> HN -&gt; Twitter/X 30min -&gt; LinkedIn same time -&gt; Reddit 2hr after -&gt; dev.to/Hashnode day +1.</p>
+<p data-nac-id="launch_posts_2026.p.2" data-nac-role="paragraph"><strong>Editorial principles for this round (locked by Pablo 2026-05-11):</strong></p>
+<p data-nac-id="launch_posts_2026.p.3" data-nac-role="paragraph">the human-machine relationship. Code shows up by paragraph 3-4 max,    not paragraph 7. HN crucifies vision-without-substance.</p>
+<p data-nac-id="launch_posts_2026.p.4" data-nac-role="paragraph">recognizable. Captain talks to the ship. Ship executes. The ship has    a contract with the captain. NAC3 is that contract for web UIs.</p>
+<p data-nac-id="launch_posts_2026.p.5" data-nac-role="paragraph">not design for this but it falls out for free." Not the pitch.</p>
+<p data-nac-id="launch_posts_2026.p.6" data-nac-role="paragraph">tested". No "battle tested". No customer numbers. No claims of    existing adopters or third-party traction. Only verifiable: tests    pass, code open, demos live, npm published, MIT/Apache. Reader    verifies, does not trust.</p>
+<p data-nac-id="launch_posts_2026.p.7" data-nac-role="paragraph">a startup looking for validation. We do not need to defend who is    already using it. The visionaries will join. We do not chase the    late adopters.</p>
+<p data-nac-id="launch_posts_2026.p.8" data-nac-role="paragraph">reader to adopt, fork, improve. HN responds better to invitations.</p>
+<ol data-nac-id="launch_posts_2026.list.9" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.9.item.1" data-nac-role="list-item"><strong>Vision first, technique within reach.</strong> Hook with what changes about</li><li data-nac-id="launch_posts_2026.list.9.item.2" data-nac-role="list-item"><strong>Sci-fi anchor: Star Trek.</strong> Universal, non-dystopian, instantly</li><li data-nac-id="launch_posts_2026.list.9.item.3" data-nac-role="list-item"><strong>Accessibility as side effect.</strong> One paragraph, framed as "we did</li><li data-nac-id="launch_posts_2026.list.9.item.4" data-nac-role="list-item"><strong>No false claims.</strong> No "8 months in production". No "extensively</li><li data-nac-id="launch_posts_2026.list.9.item.5" data-nac-role="list-item"><strong>No social proof apologetics.</strong> This is a disruptive standard, not</li><li data-nac-id="launch_posts_2026.list.9.item.6" data-nac-role="list-item"><strong>Tone: invitation, not announcement.</strong> Last paragraph asks the</li></ol>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.1-show-hn" data-nac-role="heading" data-nac-level="2" id="1-show-hn">1. Show HN</h2>
+<h3 data-nac-id="launch_posts_2026.h3.title-max-80-chars" data-nac-role="heading" data-nac-level="3" id="title-max-80-chars">Title (max 80 chars)</h3>
+<pre data-nac-id="launch_posts_2026.code.1" data-nac-role="code" data-nac-lang="text"><code>Show HN: NAC3 -- web UIs that humans and AI agents see the same way</code></pre>
+<p data-nac-id="launch_posts_2026.p.14" data-nac-role="paragraph">Alternative if "AI" feels overused on the day:</p>
+<pre data-nac-id="launch_posts_2026.code.2" data-nac-role="code" data-nac-lang="text"><code>Show HN: NAC3 -- a contract between web UIs and the things that drive them</code></pre>
+<h3 data-nac-id="launch_posts_2026.h3.body" data-nac-role="heading" data-nac-level="3" id="body">Body</h3>
+<pre data-nac-id="launch_posts_2026.code.3" data-nac-role="code" data-nac-lang="text"><code>For 40 years we have built UIs assuming one species of operator:
+humans, with a mouse and a keyboard, looking at a screen. The
+metaphor has not changed since 1984.
+
+We are about to add a second species -- AI agents, voice runners,
+RPA bots, screen readers, every assistive tool you can name. Each
+one is currently guessing what the UI means from screenshots, raw
+DOM, accessibility trees, brittle selectors. They guess wrong,
+often, expensively.
+
+NAC3 (Native Agent Contract) is a small public spec that lets a
+web UI declare itself: &quot;this is the save button. This is the verb
+it accepts. This is the event it emits when finished.&quot; A human
+clicks it. An LLM calls it by name. A screen reader announces it.
+A Playwright spec dispatches it. All five see the same surface.
+
+It is what Captain Picard&#x27;s interface has that ours does not: a
+contract between the human and the machine, on shared ground. The
+captain says &quot;warp speed&quot; and the ship executes -- not because of
+voice magic, but because the ship&#x27;s surface is contractually
+addressable. NAC3 is that surface for web UIs.
+
+Why this is more than buzzwords:
+
+  &lt;button data-nac-id=&quot;invoice.save&quot;
+          data-nac-role=&quot;action&quot;
+          data-nac-action=&quot;save&quot;&gt;Save&lt;/button&gt;
+
+  // Any caller, any locale, any device:
+  await NAC.click(&#x27;invoice.save&#x27;)
+  // -&gt; emits &#x27;nac:action:succeeded&#x27; when the side effect completes.
+
+That is the entire surface. About 80 lines of HTML attributes for
+a typical mid-size app. ARIA still works. Frameworks still work.
+NAC3 is the missing layer underneath everything that wants to
+drive the page.
+
+Side effect we did not initially design for: the same contract
+also solves screen reader compatibility, switch access, voice
+control, and eye tracking with zero extra code. The first web
+spec built deliberately so that humans, AI, and assistive
+technology share the same operating surface.
+
+Spec + reference runtime are public today, Apache 2.0 (spec) +
+MIT (runtime). Eight live demos in any browser. The LLM
+intermediary in the demos is wired to real Claude Sonnet -- not a
+local pattern matcher pretending to be smart. Try it before
+believing anything we say.
+
+  npm install @nac3/runtime
+
+  Demos:    https://yujin.app/nac-spec/
+  Spec:     https://yujin.app/nac-spec/SPEC.md
+  GitHub:   https://github.com/pkuschnirof/rpaforce-crm
+
+Governance: currently stewarded by Yujin, committed in writing to
+moving to a neutral foundation (W3C community group, Linux
+Foundation, or equivalent) when adoption justifies neutral
+governance. Apache + MIT guarantee the spec survives whatever
+happens to us, separate from any promise we make.
+
+This launch is half announcement, half invitation. Star Trek
+interfaces require a contract. Here is one. Adopt it, fork it,
+improve it. Open issues, open PRs, open opinions.
+
+Happy to answer anything.</code></pre>
+<h3 data-nac-id="launch_posts_2026.h3.pre-emptive-reply-drafts-top-expected-hn-objections" data-nac-role="heading" data-nac-level="3" id="pre-emptive-reply-drafts-top-expected-hn-objections">Pre-emptive reply drafts (top expected HN objections)</h3>
+<p data-nac-id="launch_posts_2026.p.19" data-nac-role="paragraph"><strong>Objection: "This is just ARIA reinvented."</strong></p>
+<p data-nac-id="launch_posts_2026.p.20" data-nac-role="paragraph">&gt; NAC3 layers verbs + ack events + provenance on top of ARIA. ARIA &gt; tells the screen reader the element is a button; NAC3 tells the &gt; caller what verb the button accepts, what event it emits when the &gt; side effect completes, and whether the click came from a real &gt; user (via isTrusted). ARIA + NAC3 coexist on the same element. &gt; The two communities reuse each other's work, not compete. Many &gt; adopters end up with both <code data-nac-role="code-inline">role="button"</code> and &gt; <code data-nac-role="code-inline">data-nac-role="action"</code> on the same DOM node.</p>
+<p data-nac-id="launch_posts_2026.p.21" data-nac-role="paragraph"><strong>Objection: "Why would I add 80 lines of attributes when Claude will eventually figure out my page from a screenshot?"</strong></p>
+<p data-nac-id="launch_posts_2026.p.22" data-nac-role="paragraph">&gt; Two reasons. (a) Claude figuring out your page from screenshots &gt; costs serious tokens per describe; declaring the surface &gt; contractually costs zero tokens at runtime. The economics flip &gt; past one user. (b) "Eventually" means "after weeks of fixing &gt; wrong-element clicks in production." An explicit contract &gt; eliminates that class of bug categorically. Determinism beats &gt; intelligence when determinism is cheap.</p>
+<p data-nac-id="launch_posts_2026.p.23" data-nac-role="paragraph"><strong>Objection: "Yujin owns the standard, why should I bet on it?"</strong></p>
+<p data-nac-id="launch_posts_2026.p.24" data-nac-role="paragraph">&gt; Apache 2.0 spec + MIT runtime. You can fork either tomorrow. We &gt; stated in writing (SPEC.md section 13.5) that we will move &gt; governance to a neutral foundation when adoption justifies it. &gt; The license itself guarantees you survive us, separate from any &gt; promise we make. The standard outlives any single steward.</p>
+<p data-nac-id="launch_posts_2026.p.25" data-nac-role="paragraph"><strong>Objection: "How does this work with native iOS/Android?"</strong></p>
+<p data-nac-id="launch_posts_2026.p.26" data-nac-role="paragraph">&gt; v2.2 covers web + WebView (which includes a large share of &gt; mobile, since most apps that look native are actually WebView &gt; wrappers). Native UIKit / Jetpack Compose is on the v3.0 &gt; roadmap, mapping to accessibilityIdentifier (iOS) + &gt; contentDescription (Android). The OS accessibility APIs already &gt; give us 70% of what NAC3 needs natively.</p>
+<p data-nac-id="launch_posts_2026.p.27" data-nac-role="paragraph"><strong>Objection: "The Captain Picard analogy is cute, but where's the moat against Anthropic shipping a better DOM-reading agent?"</strong></p>
+<p data-nac-id="launch_posts_2026.p.28" data-nac-role="paragraph">&gt; NAC3 is not betting that DOM agents fail. We are betting they &gt; succeed AND that declaring the surface costs less than guessing &gt; it. ARIA did not lose to better screen readers; ARIA + better &gt; screen readers together work better than either alone. NAC3 &gt; plays the same role for agents. If Anthropic ships a 10x better &gt; agent tomorrow, that agent works 10x better on NAC3-compliant &gt; sites, not less.</p>
+<p data-nac-id="launch_posts_2026.p.29" data-nac-role="paragraph"><strong>Objection: "What about the accessibility angle? Is that the real pitch?"</strong></p>
+<p data-nac-id="launch_posts_2026.p.30" data-nac-role="paragraph">&gt; No. The accessibility win is a side effect we noticed midway &gt; through, not the pitch. NAC3 is a contract layer for any caller. &gt; Screen readers happen to be a caller. Voice control happens to &gt; be a caller. Switch access happens to be a caller. They all win &gt; because the contract is caller-agnostic. We mention &gt; accessibility because it is real and because it positions us &gt; well for EU EAA and US ADA Title III compliance scenarios, but &gt; the standard would exist even if assistive tech did not.</p>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.2-twitterx-thread-10-tweets" data-nac-role="heading" data-nac-level="2" id="2-twitterx-thread-10-tweets">2. Twitter/X thread (10 tweets)</h2>
+<pre data-nac-id="launch_posts_2026.code.4" data-nac-role="code" data-nac-lang="text"><code>1/ For 40 years we have built web UIs assuming one species of
+operator: humans with a mouse.
+
+We are about to add a second: AI agents, voice runners, RPA bots,
+screen readers. They are all currently guessing what the UI means.
+
+We need a contract.
+
+2/ NAC3 (Native Agent Contract) is that contract.
+
+A small public spec, Apache 2.0 + MIT, that lets a web UI declare
+itself: &quot;this is the save button, this is what it accepts, this
+is when it finished.&quot;
+
+A human clicks it. An LLM calls it by name. Same surface.
+
+3/ Star Trek captains do not click. They speak, and the ship
+executes -- because the ship&#x27;s surface is contractually
+addressable.
+
+We have been making more beautiful versions of mouse-and-keyboard
+since 1984. NAC3 is the next contract.
+
+4/ The contract is small:
+
+  &lt;button
+    data-nac-id=&quot;invoice.save&quot;
+    data-nac-role=&quot;action&quot;
+    data-nac-action=&quot;save&quot;&gt;Save&lt;/button&gt;
+
+Any caller, any locale:
+
+  await NAC.click(&#x27;invoice.save&#x27;)
+
+Emits a deterministic ack when done.
+
+5/ ~80 lines of HTML attributes for a typical mid-size app.
+
+ARIA still works. React + Angular + Vue + vanilla still work.
+NAC3 sits underneath, addressed by name not by selector.
+
+6/ Side effect we did not initially design for:
+
+The same contract solves screen readers, switch access, voice
+control, eye tracking. With zero extra code.
+
+The first web spec built so humans, AI, and assistive tech share
+the same operating surface.
+
+7/ v2.2 today, all open:
+
+  npm install @nac3/runtime
+
+  Spec:     yujin.app/nac-spec/SPEC.md
+  Demos:    yujin.app/nac-spec/ (8 live, real Claude in the chat)
+  GitHub:   github.com/pkuschnirof/rpaforce-crm
+
+Try it before believing anything we say.
+
+8/ v2.3 preview (in the same repo) adds cross-NAC3 interop via
+an MCP bridge. One controller, many apps, across origins. Bearer-
+token federated dispatch.
+
+9/ Governance: stewarded by Yujin today. Committed in writing to
+moving to a W3C community group / Linux Foundation when adoption
+justifies neutral governance.
+
+Apache + MIT guarantee the spec survives whatever happens to us.
+
+10/ This is half announcement, half invitation.
+
+Star Trek interfaces require a contract. Here is one. Adopt it,
+fork it, improve it. Issues + PRs welcome.
+
+Spec home: yujin.app/nac-spec/</code></pre>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.3-linkedin-400-500-words" data-nac-role="heading" data-nac-level="2" id="3-linkedin-400-500-words">3. LinkedIn (400-500 words)</h2>
+<pre data-nac-id="launch_posts_2026.code.5" data-nac-role="code" data-nac-lang="text"><code>For 40 years, we have built web interfaces assuming one species
+of operator: humans with a mouse and keyboard. The metaphor has
+not meaningfully changed since 1984.
+
+We are about to add a second species: AI agents, voice runners,
+RPA bots, screen readers, every assistive tool you can name. Each
+is currently guessing what every web UI means from screenshots,
+raw DOM, brittle selectors, accessibility trees. They guess
+wrong, often, at scale, expensively.
+
+Today we are publishing NAC3 -- the Native Agent Contract -- as a
+public, open standard for the next decade of human-computer
+interfaces.
+
+The premise: when Captain Picard says &quot;warp speed,&quot; the ship
+executes -- not because of voice magic, but because the ship&#x27;s
+surface is contractually addressable. NAC3 is that surface for
+web UIs. A button declares itself: &quot;this is the save action, this
+is the verb it accepts, this is the event it emits when the side
+effect completes.&quot; A human clicks it. An LLM calls it by name. A
+screen reader announces it. A Playwright spec dispatches it. All
+five see the same operating surface.
+
+Why this is more than a slogan: the technical change is small.
+About 80 lines of HTML attributes for a typical mid-size app.
+ARIA still works. React, Angular, Vue, vanilla still work. NAC3
+sits underneath, addressed by name rather than by selector or
+visual coordinate.
+
+Side effect we did not initially design for: the same contract
+solves screen reader compatibility, switch access, voice control,
+and eye tracking with zero extra code. The first web spec built
+deliberately so that humans, AI, and assistive technology share
+the same operating surface. For enterprises this materially
+changes the compliance posture for the EU Accessibility Act (June
+2025) and the rising tide of US ADA Title III web lawsuits.
+
+For RPA teams: automation no longer breaks every UI redesign.
+Selectors die; ids survive. Three integration guides for UiPath,
+Automation Anywhere, Blue Prism, and Playwright are published
+today.
+
+For accessibility advocates: this is the largest single expansion
+of accessibility-by-default we have seen since ARIA shipped. We
+owe the ARIA community everything. NAC3 layers on top, it does
+not replace.
+
+Specification + reference runtime are public today, Apache 2.0
+(spec) + MIT (runtime). Eight live demos in any browser:
+
+  Demos:    https://yujin.app/nac-spec/
+  Spec:     https://yujin.app/nac-spec/SPEC.md
+  npm:      npm install @nac3/runtime
+
+Governance: stewarded by Yujin today, committed in writing to
+moving to a neutral foundation (W3C community group, Linux
+Foundation, or equivalent) when adoption justifies it. The
+licensing guarantees the standard survives whatever happens to
+any single steward.
+
+This launch is half announcement, half invitation. Star Trek
+interfaces require a contract. Here is one. Adopt it, fork it,
+improve it.
+
+#OpenStandard #Accessibility #AI #DevTools</code></pre>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.4-reddit-rprogramming-rwebdev-rjavascript" data-nac-role="heading" data-nac-level="2" id="4-reddit-rprogramming-rwebdev-rjavascript">4. Reddit (r/programming + r/webdev + r/javascript)</h2>
+<h3 data-nac-id="launch_posts_2026.h3.title" data-nac-role="heading" data-nac-level="3" id="title">Title</h3>
+<pre data-nac-id="launch_posts_2026.code.6" data-nac-role="code" data-nac-lang="text"><code>Releasing NAC3: a public contract that lets humans, AI agents,
+voice control, screen readers, and Playwright all drive the same
+web UI without per-pair glue (Apache 2.0 spec + MIT runtime)</code></pre>
+<h3 data-nac-id="launch_posts_2026.h3.body" data-nac-role="heading" data-nac-level="3" id="body">Body</h3>
+<pre data-nac-id="launch_posts_2026.code.7" data-nac-role="code" data-nac-lang="text"><code>For 40 years web UIs assumed one operator: humans, mouse,
+keyboard.
+
+We are adding a second species -- AI agents, voice runners,
+screen readers, RPA bots -- and we are letting each one guess
+what the UI means. Each guesses differently. Each breaks for
+different reasons. UiPath uses brittle selectors. Playwright
+relies on CSS classes. Claude reads screenshots. NVDA walks the
+ARIA tree. Every integration is bespoke.
+
+NAC3 (Native Agent Contract) is one small public spec that
+unifies all five.
+
+  &lt;button data-nac-id=&quot;invoice.save&quot;
+          data-nac-role=&quot;action&quot;
+          data-nac-action=&quot;save&quot;&gt;Save&lt;/button&gt;
+
+  // Any caller, any locale:
+  await NAC.click(&#x27;invoice.save&#x27;)
+
+That is the entire surface. ~80 lines of HTML attributes for a
+typical app.
+
+The Captain Picard analogy from the Show HN post: when he says
+&quot;warp speed&quot;, the ship executes -- not because of voice magic
+but because the ship is contractually addressable. NAC3 is that
+contract layer for web UIs.
+
+Side effect we did not initially design for: the same contract
+solves screen reader compat, switch access, voice control, and
+eye tracking. Zero extra code.
+
+Released today, all open:
+
+- Spec: Apache 2.0 (yujin.app/nac-spec/SPEC.md)
+- Runtime: MIT (npm install @nac3/runtime)
+- 8 live demos in any browser (yujin.app/nac-spec/)
+- The LLM intermediary in the demos is real Claude, not a local
+  pattern matcher pretending to be smart.
+
+Governance: stewarded by Yujin today, committed to moving to
+W3C CG / Linux Foundation when adoption justifies.
+
+We are inviting adoption + RFC feedback. Issues + PRs welcome.
+
+Try it before believing anything we say.</code></pre>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.5-devto-hashnode-medium-long-form-1500-words" data-nac-role="heading" data-nac-level="2" id="5-devto-hashnode-medium-long-form-1500-words">5. dev.to / Hashnode / Medium (long-form, ~1500 words)</h2>
+<h3 data-nac-id="launch_posts_2026.h3.title" data-nac-role="heading" data-nac-level="3" id="title">Title</h3>
+<pre data-nac-id="launch_posts_2026.code.8" data-nac-role="code" data-nac-lang="text"><code>NAC3: A Public Contract Between Web UIs and Everything That Wants
+To Drive Them</code></pre>
+<h3 data-nac-id="launch_posts_2026.h3.body-skeleton-to-be-extended-day-of" data-nac-role="heading" data-nac-level="3" id="body-skeleton-to-be-extended-day-of">Body (skeleton -- to be extended day-of)</h3>
+<pre data-nac-id="launch_posts_2026.code.9" data-nac-role="code" data-nac-lang="text"><code># Section 1 -- The mouse paradigm is 40 years old (~300 words)
+
+The mouse + keyboard interface paradigm has not meaningfully
+changed since 1984. We have built more beautiful versions of the
+same metaphor. More fonts, more shadows, more animations. Same
+metaphor.
+
+Meanwhile we are adding a second species of operators to every
+web app on Earth: AI agents, voice runners, RPA bots, screen
+readers, switch access. Each is currently guessing what the UI
+means. Each guesses differently. Each is wrong sometimes. The
+collective cost across the industry is enormous.
+
+We need a contract.
+
+# Section 2 -- The Captain Picard analogy (~200 words)
+
+When Captain Picard says &quot;warp speed&quot;, the ship executes. Not
+because of voice magic. Because the ship&#x27;s operating surface is
+contractually addressable. There is a known set of verbs the ship
+accepts. There is a known set of events the ship emits when each
+verb completes. The captain does not need to navigate to a panel
+or grep for a UI element. He addresses the ship by name.
+
+That is the kind of interface we owe to every operator of every
+web UI -- whether the operator is a human, an LLM, or a switch
+device controlled by an eye blink. NAC3 is that contract.
+
+# Section 3 -- What changes for a developer (~400 words)
+
+[Code-heavy section. Before/after Playwright spec. Before:
+brittle CSS selector. After: NAC.click(&#x27;invoice.save&#x27;). Same
+pattern shows up for voice runners, RPA bots, screen readers.]
+
+[Walkthrough: the 4 HTML attributes, the manifest, the public
+API.]
+
+# Section 4 -- The side effect we did not design for (~250 words)
+
+[Accessibility falls out of the contract for free. Screen
+readers, switch access, voice control, eye tracking -- all
+operate on the same surface that AI agents do. We did not design
+for this; we noticed it midway through. The first web spec where
+humans, AI, and assistive tech share the same operating surface.]
+
+[EU EAA + ADA Title III implications, briefly.]
+
+# Section 5 -- Governance, ownership, longevity (~150 words)
+
+[Apache + MIT. Stewardship at Yujin today. Commitment to move to
+neutral foundation. Why this matters. The standard outlives any
+single steward.]
+
+# Section 6 -- What we ask of you (~200 words)
+
+[Try the demos. Read the spec. Run npm install. Fork. Open
+issues. Submit PRs. Adopt it, fork it, improve it.]
+
+[Closing line: Star Trek interfaces require a contract. Here is
+one.]</code></pre>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.6-assets-needed-pablo-to-produce-approve" data-nac-role="heading" data-nac-level="2" id="6-assets-needed-pablo-to-produce-approve">6. Assets needed (Pablo to produce / approve)</h2>
+<h3 data-nac-id="launch_posts_2026.h3.a-hero-gif-10-15-seconds" data-nac-role="heading" data-nac-level="3" id="a-hero-gif-10-15-seconds">a) Hero GIF (10-15 seconds)</h3>
+<p data-nac-id="launch_posts_2026.p.52" data-nac-role="paragraph">Already in production by marketing person. Two versions expected:</p>
+<ul data-nac-id="launch_posts_2026.list.53" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.53.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">nac3-hero-voice-en.gif</code> -- English voice for HN, X, Reddit, dev.to.</li><li data-nac-id="launch_posts_2026.list.53.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac3-hero-voice-es.gif</code> -- Spanish voice for LinkedIn latam.</li></ul>
+<p data-nac-id="launch_posts_2026.p.54" data-nac-role="paragraph">Both follow the same demo: open v21 data-table, click mic, say "Add a monitor, quantity one, price two hundred fifty" (or the Spanish equivalent), see a new row appear.</p>
+<h3 data-nac-id="launch_posts_2026.h3.b-architecture-diagram-1-svg" data-nac-role="heading" data-nac-level="3" id="b-architecture-diagram-1-svg">b) Architecture diagram (1 SVG)</h3>
+<p data-nac-id="launch_posts_2026.p.56" data-nac-role="paragraph">Simple visual: humans + AI agents + voice runners + RPA bots + screen readers all arrowing into the same NAC3 contract layer, which sits between them and the web UI. To be produced post-launch-prep (1 hr work) in Excalidraw or Figma.</p>
+<h3 data-nac-id="launch_posts_2026.h3.c-code-diff-before-after-carbonnowsh-screenshot" data-nac-role="heading" data-nac-level="3" id="c-code-diff-before-after-carbonnowsh-screenshot">c) Code diff "before / after" (Carbon.now.sh screenshot)</h3>
+<p data-nac-id="launch_posts_2026.p.58" data-nac-role="paragraph">LEFT (without NAC3):</p>
+<pre data-nac-id="launch_posts_2026.code.10" data-nac-role="code" data-nac-lang="js"><code>await page.click(&#x27;button[class*=&quot;save-btn&quot;]&#x27;);
+await page.waitForSelector(&#x27;.toast-success&#x27;, { timeout: 5000 });</code></pre>
+<p data-nac-id="launch_posts_2026.p.60" data-nac-role="paragraph">RIGHT (with NAC3):</p>
+<pre data-nac-id="launch_posts_2026.code.11" data-nac-role="code" data-nac-lang="js"><code>await page.evaluate(() =&gt; NAC.click(&#x27;invoice.save&#x27;));
+// ack fires deterministically when the side effect completes.</code></pre>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.7-post-launch-monitoring-first-72-hours" data-nac-role="heading" data-nac-level="2" id="7-post-launch-monitoring-first-72-hours">7. Post-launch monitoring (first 72 hours)</h2>
+<ul data-nac-id="launch_posts_2026.list.64" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.64.item.1" data-nac-role="list-item">Refresh HN thread hourly, reply to top objections (drafts above).</li><li data-nac-id="launch_posts_2026.list.64.item.2" data-nac-role="list-item">Monitor @nac3/runtime downloads (npmjs.com).</li><li data-nac-id="launch_posts_2026.list.64.item.3" data-nac-role="list-item">Watch waitlist signups (<code data-nac-role="code-inline">marketing_waitlist</code> table on yujin.app).</li><li data-nac-id="launch_posts_2026.list.64.item.4" data-nac-role="list-item">Track GitHub stars + issues + PRs.</li></ul>
+<p data-nac-id="launch_posts_2026.p.65" data-nac-role="paragraph">Success targets for week 1:</p>
+<ul data-nac-id="launch_posts_2026.list.66" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.66.item.1" data-nac-role="list-item">HN: 200+ comments, 500+ upvotes (front page peak).</li><li data-nac-id="launch_posts_2026.list.66.item.2" data-nac-role="list-item">npm: 1000+ weekly downloads by day 7.</li><li data-nac-id="launch_posts_2026.list.66.item.3" data-nac-role="list-item">waitlist: 200+ emails captured.</li><li data-nac-id="launch_posts_2026.list.66.item.4" data-nac-role="list-item">GitHub stars: 1000+ on the spec repo.</li></ul>
+<p data-nac-id="launch_posts_2026.p.67" data-nac-role="paragraph">If we miss all of these, do a quiet retro and re-launch with adjusted tone in 6-8 weeks. The launch is recoverable.</p>
+<hr />
+<h2 data-nac-id="launch_posts_2026.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
+<ul data-nac-id="launch_posts_2026.list.70" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.70.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC_LAUNCH_DIFFUSION.md</code> -- strategic background, channels, cadence.</li><li data-nac-id="launch_posts_2026.list.70.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">CASE_STUDIES_DISCOVERY.md</code> -- bug postmortems, usable as launch credibility material.</li><li data-nac-id="launch_posts_2026.list.70.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">TEST_COVERAGE_MATRIX.md</code> -- the rigor record, for skeptical reviewers.</li></ul>
+<h2 data-nac-id="launch_posts_2026.h2.changelog-of-this-document" data-nac-role="heading" data-nac-level="2" id="changelog-of-this-document">Changelog of this document</h2>
+<p data-nac-id="launch_posts_2026.p.72" data-nac-role="paragraph">direction. Removed false claims ("8 months in production",   vendor-talk of "extensively tested"). Star Trek anchor.   Accessibility framed as side effect, not pitch.</p>
+<ul data-nac-id="launch_posts_2026.list.73" data-nac-role="list"><li data-nac-id="launch_posts_2026.list.73.item.1" data-nac-role="list-item">2026-05-11 (v2): vision-first rewrite per Pablo's editorial</li><li data-nac-id="launch_posts_2026.list.73.item.2" data-nac-role="list-item">2026-05-11 (v1): initial drafts (technique-first, generic).</li></ul>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "launch_posts_2026",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "launch_posts_2026.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "launch_posts_2026.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "launch_posts_2026.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "launch_posts_2026.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

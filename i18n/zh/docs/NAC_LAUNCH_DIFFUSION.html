@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 发布扩散计划 -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_launch_diffusion" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_launch_diffusion" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_launch_diffusion.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_launch_diffusion.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_launch_diffusion.mp3" data-nac-id="nac_launch_diffusion.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_launch_diffusion.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.1" data-nac-role="paragraph">translation_source: docs/NAC_LAUNCH_DIFFUSION.md translation_source_hash: cbdf7b9e5ec3ed43a39111aab16fbe59c222a05a835429ea43148036320fc5cf translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:23:23.559860+00:00</p>
+<hr />
+<h1 data-nac-id="nac_launch_diffusion.h1.nac3-发布扩散计划" data-nac-role="heading" data-nac-level="1" id="nac3-发布扩散计划">NAC3 发布扩散计划</h1>
+<p data-nac-id="nac_launch_diffusion.p.4" data-nac-role="paragraph">面向应当使用 NAC3 的人群的实用推广手册。本文撰写于 2026-05-10，适用于 v2.2 / v2.3-preview 发布。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.我们发布了什么" data-nac-role="heading" data-nac-level="2" id="我们发布了什么">我们发布了什么</h2>
+<ul data-nac-id="nac_launch_diffusion.list.6" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.6.item.1" data-nac-role="list-item"><strong>规范：</strong> v2.2 稳定版，v2.3 预览版（字段编辑器原语）。</li><li data-nac-id="nac_launch_diffusion.list.6.item.2" data-nac-role="list-item"><strong>运行时：</strong> <code data-nac-role="code-inline">@nac3/runtime@2.2.0</code> 发布至 npm（ESM + CJS + d.ts + CLI）。</li><li data-nac-id="nac_launch_diffusion.list.6.item.3" data-nac-role="list-item"><strong>演示：</strong> yujin.app/nac-spec/ 上的四个在线演示。</li><li data-nac-id="nac_launch_diffusion.list.6.item.4" data-nac-role="list-item"><strong>采用指南：</strong> React + Angular + LLM 接入。</li><li data-nac-id="nac_launch_diffusion.list.6.item.5" data-nac-role="list-item"><strong>案例研究：</strong> <code data-nac-role="code-inline">packages/nac-react-demo</code> + <code data-nac-role="code-inline">packages/nac-angular-demo</code> 中可运行的 Vite + React 18 和 Angular 17 应用。</li><li data-nac-id="nac_launch_diffusion.list.6.item.6" data-nac-role="list-item"><strong>棕地迁移故事：</strong> Yujin CRM 本身，记录于 pkuschnirof/yujin docs/MIGRATION_FROM_RPAFORCE.md。</li><li data-nac-id="nac_launch_diffusion.list.6.item.7" data-nac-role="list-item"><strong>NAC-3 合规性：</strong> 落地页本身符合 NAC-3 规范（manifest + chat + autopilot + isTrusted 感知）。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.核心信息" data-nac-role="heading" data-nac-level="2" id="核心信息">核心信息</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.一句话介绍" data-nac-role="heading" data-nac-level="3" id="一句话介绍">一句话介绍</h3>
+<p data-nac-id="nac_launch_diffusion.p.9" data-nac-role="paragraph">&gt; <strong>NAC3 —— 一个小型公开规范，让 Web UI 无需为每个应用单独编写胶水代码，即可被 AI 智能体、语音运行器和无障碍工具驱动。</strong></p>
+<h3 data-nac-id="nac_launch_diffusion.h3.三句话介绍" data-nac-role="heading" data-nac-level="3" id="三句话介绍">三句话介绍</h3>
+<p data-nac-id="nac_launch_diffusion.p.11" data-nac-role="paragraph">&gt; NAC3 是 ARIA 在 2026 年以 LLM 为核心重新设计后本该有的样子。只需用三个 HTML 属性装饰你现有的 UI；运行时负责解析名称、分发点击、发出完成事件、处理本地化并提供来源证明。Apache-2.0 授权，npm install 即用，无需修改构建步骤。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.30-秒推介" data-nac-role="heading" data-nac-level="3" id="30-秒推介">30 秒推介</h3>
+<p data-nac-id="nac_launch_diffusion.p.13" data-nac-role="paragraph">&gt; 语音助手、LLM 聊天智能体和无障碍工具都面临同一个问题：它们需要稳定的名称来标识想要操作的元素。CSS 选择器会失效，ARIA 只能告诉你"这是一个按钮"，每个团队都在从头搭建同样的基础设施。 &gt; &gt; NAC3 就是解决这个问题的小型契约。你只需在智能体应驱动的元素上添加 <code data-nac-role="code-inline">data-nac-id</code>、<code data-nac-role="code-inline">data-nac-role</code>、<code data-nac-role="code-inline">data-nac-action</code>；运行时负责处理其余一切。目前已有可用的 v2.2 规范、稳定的 npm 包、React + Angular 指南，以及四个在线演示，其中一个端到端接入了 Claude Sonnet 聊天后端，现在就可以与之对话。 &gt; &gt; 采用 Apache-2.0 授权。我们是因为运营一个 CRM 需要它才做出来的，现在你也可以使用。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.目标受众" data-nac-role="heading" data-nac-level="2" id="目标受众">目标受众</h2>
+<p data-nac-id="nac_launch_diffusion.p.15" data-nac-role="paragraph">| 受众 | 渠道 | 切入点 | |------|------|--------| | React + Vue + Svelte + Angular 开发者 | dev.to、Hashnode、r/javascript、r/webdev | "用 80 行代码让你现有的 React 应用支持语音驱动" | | 语音与智能体构建者 | r/LocalLLaMA、r/ChatGPTCoding、智能体构建者 Discord 社区 | "语音应用用户侧一直缺失的那个标准" | | 无障碍倡导者 | r/Accessibility、a11y 邮件列表、A11y 线下活动演讲者 | "以 LLM 为核心、在 2026 年重新设计的 ARIA" | | 测试/QA 工程师 | r/qualityassurance、Selenium / Playwright 社区 | "能在 UI 重新设计后依然有效的稳定选择器" | | HN | news.ycombinator.com | 标准 Show HN 帖子 | | 技术负责人与 CTO | LinkedIn、Mastodon | "反正 12 个月后你也会加上它"的角度 | | Yujin CRM 用户 | 直接邮件 + 产品内横幅 | "你的 CRM 已支持 NAC3；这对你意味着什么" |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.渠道与示例帖子" data-nac-role="heading" data-nac-level="2" id="渠道与示例帖子">渠道与示例帖子</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.show-hn" data-nac-role="heading" data-nac-level="3" id="show-hn">Show HN</h3>
+<ul data-nac-id="nac_launch_diffusion.list.18" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.18.item.1" data-nac-role="list-item"><strong>标题：</strong> <code data-nac-role="code-inline">Show HN: NAC -- a small public spec that lets web UIs be driven by AI agents</code></li><li data-nac-id="nac_launch_diffusion.list.18.item.2" data-nac-role="list-item"><strong>首句：</strong> "We made this while building Yujin CRM and realised every team trying to ship voice/agent UI rebuilds the same plumbing."</li><li data-nac-id="nac_launch_diffusion.list.18.item.3" data-nac-role="list-item"><strong>正文：</strong> 解释契约（3 个属性 + manifest + 事件），链接在线演示、规范、npm 包和 React 案例研究。控制在 200 字以内。评论区带来的关注往往多于长帖子本身。</li><li data-nac-id="nac_launch_diffusion.list.18.item.4" data-nac-role="list-item"><strong>发布日：</strong> 美国时间周二或周三上午。避开周一和周五。</li><li data-nac-id="nac_launch_diffusion.list.18.item.5" data-nac-role="list-item"><strong>后续跟进：</strong> 在评论区至少活跃 4 小时；回应每一个技术问题；不回应无意义的争论。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.rjavascript" data-nac-role="heading" data-nac-level="3" id="rjavascript">r/javascript</h3>
+<ul data-nac-id="nac_launch_diffusion.list.20" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.20.item.1" data-nac-role="list-item"><strong>标题：</strong> <code data-nac-role="code-inline">[Showoff] NAC: drive your React app with voice + chat using 3 HTML attributes</code></li><li data-nac-id="nac_launch_diffusion.list.20.item.2" data-nac-role="list-item"><strong>正文：</strong> 聚焦"React 开发者需要做什么"——使用 <code data-nac-role="code-inline">guides/REACT.md</code> 中的代码示例，链接案例研究的 GitHub 目录。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.raccessibility" data-nac-role="heading" data-nac-level="3" id="raccessibility">r/Accessibility</h3>
+<ul data-nac-id="nac_launch_diffusion.list.22" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.22.item.1" data-nac-role="list-item"><strong>标题：</strong> <code data-nac-role="code-inline">NAC: a parallel layer to ARIA for AI-agent-driven UI</code></li><li data-nac-id="nac_launch_diffusion.list.22.item.2" data-nac-role="list-item"><strong>正文：</strong> 开门见山说明"这不是 ARIA 的替代品，而是它的兄弟"——无障碍社区对此有合理的保护意识。展示 <code data-nac-role="code-inline">data-nac-role="action"</code> 与 <code data-nac-role="code-inline">role="button"</code> 如何共存。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.devto" data-nac-role="heading" data-nac-level="3" id="devto">dev.to</h3>
+<ul data-nac-id="nac_launch_diffusion.list.24" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.24.item.1" data-nac-role="list-item"><strong>标题：</strong> <code data-nac-role="code-inline">Drive any web UI by voice with @nac3/runtime</code></li><li data-nac-id="nac_launch_diffusion.list.24.item.2" data-nac-role="list-item"><strong>切入点：</strong> React 案例研究仓库。内嵌聊天面板和 autopilot 导览的截图/GIF。</li><li data-nac-id="nac_launch_diffusion.list.24.item.3" data-nac-role="list-item"><strong>篇幅：</strong> 1500-2000 字，分步骤讲解。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.twitter-x" data-nac-role="heading" data-nac-level="3" id="twitter-x">Twitter / X</h3>
+<p data-nac-id="nac_launch_diffusion.p.26" data-nac-role="paragraph">6 条推文的线程：</p>
+<ol data-nac-id="nac_launch_diffusion.list.27" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.27.item.1" data-nac-role="list-item">"我们刚发布了 NAC3 v2.2 —— 一个让 Web UI 可被 AI 智能体驱动的公开规范 + npm 包。Apache-2.0。（演示 GIF）"</li><li data-nac-id="nac_launch_diffusion.list.27.item.2" data-nac-role="list-item">"为什么做：每个构建语音/智能体 UX 的团队都在重复搭建同样的基础设施。CSS 选择器会失效，ARIA 不是为智能体设计的。我们需要一个小型契约。"</li><li data-nac-id="nac_launch_diffusion.list.27.item.3" data-nac-role="list-item">"有多小：每个元素只需 3 个 HTML 属性。（代码截图）"</li><li data-nac-id="nac_launch_diffusion.list.27.item.4" data-nac-role="list-item">"你能得到什么：稳定的名称、确定性的完成事件、开箱即用的 10 语言 i18n、通过 HMAC + isTrusted 实现的来源证明、自动校验。"</li><li data-nac-id="nac_launch_diffusion.list.27.item.5" data-nac-role="list-item">"在线演示：yujin.app/nac-spec —— 四个演示，其中一个接入了 Claude Sonnet 聊天后端，现在就可以与之对话。"</li><li data-nac-id="nac_launch_diffusion.list.27.item.6" data-nac-role="list-item">"React + Angular 采用指南 + 可运行案例研究：github.com/pkuschnirof/rpaforce-crm。规范：yujin.app/nac-spec/SPEC.md。"</li></ol>
+<h3 data-nac-id="nac_launch_diffusion.h3.linkedin" data-nac-role="heading" data-nac-level="3" id="linkedin">LinkedIn</h3>
+<p data-nac-id="nac_launch_diffusion.p.29" data-nac-role="paragraph">长文帖子（约 600 字）。主打"反正 12 个月后你也会加上它"的角度，面向正在评估智能体策略的 CTO。附上 BPMN 风格 autopilot 导览的截图。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.mastodon" data-nac-role="heading" data-nac-level="3" id="mastodon">Mastodon</h3>
+<p data-nac-id="nac_launch_diffusion.p.31" data-nac-role="paragraph">转发 Twitter 线程，保持简洁。每张图片都附上 alt 文本（在这个平台上很重要）。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.演示-gif视频计划" data-nac-role="heading" data-nac-level="2" id="演示-gif视频计划">演示 GIF/视频计划</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.gif15-秒循环播放" data-nac-role="heading" data-nac-level="3" id="gif15-秒循环播放">GIF（15 秒，循环播放）</h3>
+<p data-nac-id="nac_launch_diffusion.p.34" data-nac-role="paragraph">场景 1（4 秒）：用户在 React 演示的聊天输入框中输入"agrega tomar agua"。 场景 2（3 秒）：LLM 解析完成；待办事项被添加，并带有闪光高亮效果。 场景 3（4 秒）：用户点击"tour"；autopilot 遍历页面并进行旁白说明。 场景 4（4 秒）：用户按住麦克风，说"remove all done"，待办事项清空。</p>
+<p data-nac-id="nac_launch_diffusion.p.35" data-nac-role="paragraph">以 8MB MP4 + 4MB WebP 备用格式托管于 <code data-nac-role="code-inline">yujin.app/nac-spec/assets/demo.{mp4,webp}</code>。用作 README 头图 GIF、OG 图片、Twitter 卡片和 dev.to 头图。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.视频90-秒配音旁白" data-nac-role="heading" data-nac-level="3" id="视频90-秒配音旁白">视频（90 秒，配音旁白）</h3>
+<p data-nac-id="nac_launch_diffusion.p.37" data-nac-role="paragraph">发布至 YouTube + Vimeo。</p>
+<ul data-nac-id="nac_launch_diffusion.list.38" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.38.item.1" data-nac-role="list-item">0:00-0:10 —— 问题陈述（"语音与智能体需要稳定的名称"）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.2" data-nac-role="list-item">0:10-0:25 —— 契约介绍（3 个属性）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.3" data-nac-role="list-item">0:25-0:45 —— 采用演示（React 案例研究，新增 5 行代码）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.4" data-nac-role="list-item">0:45-1:05 —— 通过聊天、语音和 autopilot 驱动。</li><li data-nac-id="nac_launch_diffusion.list.38.item.5" data-nac-role="list-item">1:05-1:20 —— Yujin CRM 棕地迁移示例。</li><li data-nac-id="nac_launch_diffusion.list.38.item.6" data-nac-role="list-item">1:20-1:30 —— "Apache-2.0，npm install @nac3/runtime，链接见下方。"</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.后续跟进节奏" data-nac-role="heading" data-nac-level="2" id="后续跟进节奏">后续跟进节奏</h2>
+<p data-nac-id="nac_launch_diffusion.p.40" data-nac-role="paragraph">| 时间 | 行动 | |------|------| | 第 0 天 | 发布 Show HN + r/javascript + Twitter 线程 + dev.to 文章。在评论区活跃 4-8 小时。 | | 第 1 天 | 发布 LinkedIn 帖子。回应 dev.to 评论。将收到的易于解决的问题添加到 GitHub 待办列表。 | | 第 3 天 | 发布 r/Accessibility 帖子 + Mastodon 转发。 | | 第 7 天 | 发布"第一周回顾"博客文章：收到了哪些反馈、做了哪些改动、提交了哪些热门 GitHub issue。 | | 第 14 天 | 向第 0 天参与互动的无障碍/智能体构建者发送私信："想聊聊吗？" | | 第 30 天 | 发布 v2.2.x 补丁，包含社区最多请求的修复。发布公告："30 天教会了我们关于 NAC3 的什么"。 | | 第 90 天 | NAC3 v2.3 发布（字段编辑器规范化，<code data-nac-role="code-inline">STRICT_VALIDATION</code> 默认为 true）。新一轮小规模发布推广。 |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.需要追踪的指标" data-nac-role="heading" data-nac-level="2" id="需要追踪的指标">需要追踪的指标</h2>
+<ul data-nac-id="nac_launch_diffusion.list.42" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.42.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">@nac3/runtime</code> 的每周 npm 下载量。</li><li data-nac-id="nac_launch_diffusion.list.42.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">pkuschnirof/rpaforce-crm</code> 和 <code data-nac-role="code-inline">pkuschnirof/yujin</code> 的 GitHub star 数与 fork 数。</li><li data-nac-id="nac_launch_diffusion.list.42.item.3" data-nac-role="list-item">yujin.app/nac-spec/ 演示页面的访问量（服务器访问日志）。</li><li data-nac-id="nac_launch_diffusion.list.42.item.4" data-nac-role="list-item">提交的 GitHub issue 数量（参与度的代理指标）。</li><li data-nac-id="nac_launch_diffusion.list.42.item.5" data-nac-role="list-item">上述各渠道的独立评论者数量。</li><li data-nac-id="nac_launch_diffusion.list.42.item.6" data-nac-role="list-item">"Native Agent Contract"的搜索趋势（Google Trends）。</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.43" data-nac-role="paragraph">第 1 周目标：</p>
+<ul data-nac-id="nac_launch_diffusion.list.44" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.44.item.1" data-nac-role="list-item">npm 下载量 200 次</li><li data-nac-id="nac_launch_diffusion.list.44.item.2" data-nac-role="list-item">两个仓库合计 GitHub star 100 个</li><li data-nac-id="nac_launch_diffusion.list.44.item.3" data-nac-role="list-item">演示页面访问量 5000 次</li><li data-nac-id="nac_launch_diffusion.list.44.item.4" data-nac-role="list-item">提交 issue / 讨论 10 条</li><li data-nac-id="nac_launch_diffusion.list.44.item.5" data-nac-role="list-item">1 篇外部人士自发撰写的博客文章</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.45" data-nac-role="paragraph">如果以上目标完成率低于 50%，说明信息传递需要改进；修改 LinkedIn + dev.to 帖子文案，在第 14 天再次尝试。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.发布前检查清单点击发布前" data-nac-role="heading" data-nac-level="2" id="发布前检查清单点击发布前">发布前检查清单（点击发布前）</h2>
+<ul data-nac-id="nac_launch_diffusion.list.47" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.47.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm publish @nac3/runtime@2.2.0</code> 完成（此步骤为<strong>手动操作</strong>，需要 owner 级别的 npm token）。</li><li data-nac-id="nac_launch_diffusion.list.47.item.2" data-nac-role="list-item">[ ] 在全新的临时目录中执行 <code data-nac-role="code-inline">npm install @nac3/runtime</code> 验证可用。</li><li data-nac-id="nac_launch_diffusion.list.47.item.3" data-nac-role="list-item">[ ] 在线演示在 Chrome + Firefox + Safari 中加载无控制台报错。</li><li data-nac-id="nac_launch_diffusion.list.47.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">validate_global({probe: true})</code> 在落地页返回 <code data-nac-role="code-inline">[]</code>。</li><li data-nac-id="nac_launch_diffusion.list.47.item.5" data-nac-role="list-item">[ ] 演示 GIF 在 dev.to + Twitter 预览卡片中正常渲染。</li><li data-nac-id="nac_launch_diffusion.list.47.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">LICENSE</code>、<code data-nac-role="code-inline">CONTRIBUTING</code>、<code data-nac-role="code-inline">SECURITY</code> 文件均已就位。</li><li data-nac-id="nac_launch_diffusion.list.47.item.7" data-nac-role="list-item">[ ] 至少有一个标记为"good first issue"的 GitHub issue，供第 1 天到来的贡献者有所参与。</li><li data-nac-id="nac_launch_diffusion.list.47.item.8" data-nac-role="list-item">[ ] Pablo 已就位，准备好回应评论 4 小时。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.非目标" data-nac-role="heading" data-nac-level="2" id="非目标">非目标</h2>
+<p data-nac-id="nac_launch_diffusion.p.49" data-nac-role="paragraph">我们<strong>不会</strong>做的事：</p>
+<ul data-nac-id="nac_launch_diffusion.list.50" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.50.item.1" data-nac-role="list-item">投放付费广告（至少等到第 4 周的指标出来之后再说）。</li><li data-nac-id="nac_launch_diffusion.list.50.item.2" data-nac-role="list-item">贬低 ARIA、Selenium、Playwright 或任何智能体厂商。NAC3 是补充性的，不是对抗性的。</li><li data-nac-id="nac_launch_diffusion.list.50.item.3" data-nac-role="list-item">在发布时承诺企业支持合同（等我们了解支持负载之后再说）。</li><li data-nac-id="nac_launch_diffusion.list.50.item.4" data-nac-role="list-item">开源洗白：代码确实是 Apache-2.0 授权，聊天后端参考实现也是。我们不把"核心"与"高级"功能分开作为护城河——我们的护城河是托管、LLM 额度和运维。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.发布当天操作手册" data-nac-role="heading" data-nac-level="2" id="发布当天操作手册">发布当天操作手册</h2>
+<p data-nac-id="nac_launch_diffusion.p.52" data-nac-role="paragraph">由于 Pablo 独自运营，以下操作均有时间限制：</p>
+<p data-nac-id="nac_launch_diffusion.p.53" data-nac-role="paragraph">| 时间 | 行动 | |------|------| | 06:00（美国东部时间）| 最终冒烟测试：<code data-nac-role="code-inline">npm test</code> + <code data-nac-role="code-inline">npx @nac3/runtime validate yujin.app/nac-spec/</code> + 在无痕模式下打开所有演示。修复发现的问题。 | | 09:00 | 发布 Show HN。 | | 09:05 | 发布 Twitter 线程。 | | 09:15 | 发布 r/javascript 帖子。 | | 09:30 | 发布 dev.to 文章。 | | 09:30-13:30 | 在 HN 评论区保持活跃。置顶一条包含快速链接的评论。 | | 14:00 | 发布 LinkedIn 帖子。 | | 14:00-18:00 | 在 dev.to 评论区和 Twitter 提及中保持活跃。 | | 18:00 | 收工。放松休息。 | | 第 1 天 09:00 | 发布 r/Accessibility + Mastodon 帖子。整理 GitHub issue。 |</p>
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.55" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_LAUNCH_DIFFUSION.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_launch_diffusion",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_launch_diffusion.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_launch_diffusion.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_launch_diffusion.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_launch_diffusion.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

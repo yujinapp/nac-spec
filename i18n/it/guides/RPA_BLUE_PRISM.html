@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guida all&#x27;integrazione NAC3 + Blue Prism -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_blue_prism" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_blue_prism" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_blue_prism.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_blue_prism.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_blue_prism.mp3" data-nac-id="rpa_blue_prism.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_blue_prism.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_blue_prism.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_blue_prism.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_blue_prism.p.1" data-nac-role="paragraph">translation_source: guides/RPA_BLUE_PRISM.md translation_source_hash: 7ab698b35a99ca25e77a07599f1aa733b4ba42eb08d0f3bce785a9b0c7f7e276 translation_quality: machine_v1 translation_lang: it translation_date: 2026-05-11T14:12:54.586494+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_blue_prism.h1.guida-allintegrazione-nac3-blue-prism" data-nac-role="heading" data-nac-level="1" id="guida-allintegrazione-nac3-blue-prism">Guida all'integrazione NAC3 + Blue Prism</h1>
+<p data-nac-id="rpa_blue_prism.p.4" data-nac-role="paragraph"><strong>Versione NAC3:</strong> 2.2 (con anteprima interop v2.3) <strong>Testato con:</strong> Blue Prism 7.1 + Browser Automation v7.1.</p>
+<p data-nac-id="rpa_blue_prism.p.5" data-nac-role="paragraph">Il business object <code data-nac-role="code-inline">Browser</code> di Blue Prism espone <code data-nac-role="code-inline">Inject JavaScript</code> nativamente. NAC3 + Blue Prism segue un pattern in 5 fasi.</p>
+<h2 data-nac-id="rpa_blue_prism.h2.flusso-delle-fasi" data-nac-role="heading" data-nac-level="2" id="flusso-delle-fasi">Flusso delle fasi</h2>
+<p data-nac-id="rpa_blue_prism.p.7" data-nac-role="paragraph">successiva iterazione del flusso dati.</p>
+<ol data-nac-id="rpa_blue_prism.list.8" data-nac-role="list"><li data-nac-id="rpa_blue_prism.list.8.item.1" data-nac-role="list-item"><strong>Login Agent</strong> -- standard.</li><li data-nac-id="rpa_blue_prism.list.8.item.2" data-nac-role="list-item"><strong>Navigate</strong> -- aprire l'applicazione conforme a NAC.</li><li data-nac-id="rpa_blue_prism.list.8.item.3" data-nac-role="list-item"><strong>JS: wait for window.NAC3</strong> -- polling fino a quando non è pronto.</li><li data-nac-id="rpa_blue_prism.list.8.item.4" data-nac-role="list-item"><strong>JS: NAC.click / fill / tab</strong> -- dispatch canonico.</li><li data-nac-id="rpa_blue_prism.list.8.item.5" data-nac-role="list-item"><strong>JS: read describe()</strong> -- introspezione del manifest per la</li></ol>
+<h2 data-nac-id="rpa_blue_prism.h2.esempio-di-vbo-visual-business-object" data-nac-role="heading" data-nac-level="2" id="esempio-di-vbo-visual-business-object">Esempio di VBO (Visual Business Object)</h2>
+<pre data-nac-id="rpa_blue_prism.code.1" data-nac-role="code" data-nac-lang="text"><code>Object: NAC Driver
+Action: Click NAC ID
+  Inputs:
+    - nacId (Text)
+  Code (Inject JavaScript):
+    (async () =&gt; {
+      try {
+        await window.NAC.click([nacId]);
+        return JSON.stringify({ok:true});
+      } catch (e) {
+        return JSON.stringify({ok:false, code:e.code, message:e.message});
+      }
+    })()
+  Outputs:
+    - resultJson (Text)</code></pre>
+<p data-nac-id="rpa_blue_prism.p.11" data-nac-role="paragraph">Azioni speculari: <code data-nac-role="code-inline">Click By Verb</code>, <code data-nac-role="code-inline">Fill</code>, <code data-nac-role="code-inline">Select</code>, <code data-nac-role="code-inline">Tab</code>, <code data-nac-role="code-inline">Describe</code>, <code data-nac-role="code-inline">WaitForAck</code>.</p>
+<h2 data-nac-id="rpa_blue_prism.h2.pattern-di-attesa-dellack" data-nac-role="heading" data-nac-level="2" id="pattern-di-attesa-dellack">Pattern di attesa dell'ack</h2>
+<p data-nac-id="rpa_blue_prism.p.13" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click()</code> attende già internamente l'evento <code data-nac-role="code-inline">nac:action:succeeded</code> (timeout di 5s). Blue Prism può aggiungere un'ulteriore attesa esplicita:</p>
+<pre data-nac-id="rpa_blue_prism.code.2" data-nac-role="code" data-nac-lang="js"><code>return new Promise(resolve =&gt; {
+  let acked = false;
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, function (e) {
+    if (e.detail.action_id === &#x27;[expectedId]&#x27;) {
+      acked = true;
+      resolve(&#x27;ok&#x27;);
+    }
+  }, { once: true });
+  setTimeout(() =&gt; { if (!acked) resolve(&#x27;timeout&#x27;); }, [timeoutMs]);
+});</code></pre>
+<p data-nac-id="rpa_blue_prism.p.15" data-nac-role="paragraph">Questo pattern espone la famiglia di eventi canonici NAC3 negli output delle stage di Blue Prism, utile per ramificare il flusso di processo.</p>
+<h2 data-nac-id="rpa_blue_prism.h2.discovery" data-nac-role="heading" data-nac-level="2" id="discovery">Discovery</h2>
+<p data-nac-id="rpa_blue_prism.p.17" data-nac-role="paragraph">Azione <code data-nac-role="code-inline">Read Manifest</code>:</p>
+<pre data-nac-id="rpa_blue_prism.code.3" data-nac-role="code" data-nac-lang="js"><code>return JSON.stringify(window.NAC.describe());</code></pre>
+<p data-nac-id="rpa_blue_prism.p.19" data-nac-role="paragraph">Convogliare il risultato in una Collection. Il processo può adattarsi alle modifiche dello schema del manifest senza ricompilare le stage.</p>
+<h2 data-nac-id="rpa_blue_prism.h2.licenza-e-riferimenti" data-nac-role="heading" data-nac-level="2" id="licenza-e-riferimenti">Licenza e riferimenti</h2>
+<p data-nac-id="rpa_blue_prism.p.21" data-nac-role="paragraph">Apache-2.0. Vedere <a href="RPA_UIPATH.md" data-nac-id="rpa_blue_prism.link.1" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a> per una trattazione più approfondita.</p>
+<hr />
+<p data-nac-id="rpa_blue_prism.p.23" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_BLUE_PRISM.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_blue_prism",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_blue_prism.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_blue_prism.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_blue_prism.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_blue_prism.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Tester checklist: visual / front-end layout (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="tester_checklist_visual" data-doc-lang="en" data-nac-plugin="tester_form">
+<p class="tr-intro">Complete each task + press Submit at the end. Your report reaches the Yujin team.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<h1>NAC3 v2.2 -- Tester checklist: visual / front-end layout</h1>
+<p><strong>For:</strong> the human tester evaluating the visual look + feel. <strong>Time:</strong> ~30 minutes. <strong>Pre-requisite:</strong> any modern browser (Chrome recommended).</p>
+<h2>How to use this checklist</h2>
+<p>For each task:</p>
+<p>1. Open the URL listed. 2. Look at the page calmly. Take 30-60 seconds before judging. 3. Compare with the "What to evaluate" list. 4. Mark <code>[X]</code> in <strong>OK</strong> if everything looks good. 5. Mark <code>[X]</code> in <strong>NEEDS FIX</strong> if something looks bad / broken / amateurish. 6. ALWAYS write at least 1 sentence in the Comments box, even if marking OK -- describe what you saw and how it felt. 7. If you notice anything not on the evaluation list, write it in Comments too. The Comments box is the most important part of this checklist.</p>
+<p>Be honest, not polite. A "needs fix" with a real comment is more useful than 10 reflexive "OK" boxes.</p>
+<hr />
+<h2>Section 1 -- Landing page (the front door)</h2>
+<fieldset class="tr-task" id="task-V1">
+<legend>Task V1 &mdash; First impression of the landing</legend>
+<p>a) Open Chrome incognito, go to <code>https://yujin.app/nac-spec/</code>. b) Look at the page for 30 seconds without scrolling. c) Imagine you arrived from Twitter for the first time. d) <strong>What to evaluate:</strong> - Does the hero area (top of the page) clearly say what NAC3 is in less than 10 seconds of reading? - Is the sumi-e Japanese branding visible without being overwhelming? - Is the font readable? Is the contrast good? - Are there obvious places to click next (Demo, Docs, etc.)? - Does it look professional or amateur?</p>
+<div class="tr-note">OK -- looks professional, message clear</div>
+<label class="tr-opt"><input type="radio" name="task-V1-status" value="error" id="task-V1-error" data-nac-id="tester_form.task-V1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V1-comments">Comments</label>
+<textarea name="task-V1-comments" id="task-V1-comments" rows="2" data-nac-id="tester_form.task-V1.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V2">
+<legend>Task V2 &mdash; Spacing and rhythm</legend>
+<p>a) Slowly scroll down the landing from top to bottom. b) Pay attention to vertical rhythm: are sections separated cleanly, or do they crash into each other? c) <strong>What to evaluate:</strong> - Adequate whitespace between sections (not too tight, not too sparse)? - Section headings stand out from body text? - Lines of text are comfortable to read (not too wide, not too narrow)? - No element looks like it "leaked" out of its container?</p>
+<label class="tr-opt"><input type="radio" name="task-V2-status" value="ok" id="task-V2-ok" data-nac-id="tester_form.task-V2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V2-status" value="error" id="task-V2-error" data-nac-id="tester_form.task-V2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V2-comments">Comments</label>
+<textarea name="task-V2-comments" id="task-V2-comments" rows="2" data-nac-id="tester_form.task-V2.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V3">
+<legend>Task V3 &mdash; Made with NAC3 section</legend>
+<p>a) Scroll until you reach the "Made with NAC3" section. b) Look at the 4 cards in the grid. c) <strong>What to evaluate:</strong> - Are all 4 cards the same visual size? - Do the Japanese characters at the top of each card look intentional or random? - Is each card readable -- title, description, link arrow all clear? - Does the section feel like prestigious adopters, or filler content?</p>
+<label class="tr-opt"><input type="radio" name="task-V3-status" value="ok" id="task-V3-ok" data-nac-id="tester_form.task-V3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V3-status" value="error" id="task-V3-error" data-nac-id="tester_form.task-V3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V3-comments">Comments</label>
+<textarea name="task-V3-comments" id="task-V3-comments" rows="2" data-nac-id="tester_form.task-V3.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V4">
+<legend>Task V4 &mdash; Forge + Pilot waitlist section</legend>
+<p>a) Scroll to "Coming Q3 2026: Yujin Forge + Pilot". b) Look at the 2 product cards + the email form below. c) <strong>What to evaluate:</strong> - The two pricing levels ($19 and $5) are visually distinct? - The product feature lists (bullets) are scannable? - The email form is clean -- not cluttered? - The disclaimer text about BYOK is readable but not screaming? - The "Notify me" button is obvious and looks clickable?</p>
+<label class="tr-opt"><input type="radio" name="task-V4-status" value="ok" id="task-V4-ok" data-nac-id="tester_form.task-V4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V4-status" value="error" id="task-V4-error" data-nac-id="tester_form.task-V4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V4-comments">Comments</label>
+<textarea name="task-V4-comments" id="task-V4-comments" rows="2" data-nac-id="tester_form.task-V4.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V5">
+<legend>Task V5 &mdash; Governance + footer</legend>
+<p>a) Scroll to the bottom of the page. b) Look at the "Open standard, open governance" section + the footer. c) <strong>What to evaluate:</strong> - The governance text is readable + reassuring? - The footer is minimal (kanji, license, GitHub link, Yujin link, version)? - Nothing in the footer looks broken or misaligned?</p>
+<label class="tr-opt"><input type="radio" name="task-V5-status" value="ok" id="task-V5-ok" data-nac-id="tester_form.task-V5.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V5-status" value="error" id="task-V5-error" data-nac-id="tester_form.task-V5.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V5-comments">Comments</label>
+<textarea name="task-V5-comments" id="task-V5-comments" rows="2" data-nac-id="tester_form.task-V5.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<hr />
+<h2>Section 2 -- Demos visual</h2>
+<fieldset class="tr-task" id="task-V6">
+<legend>Task V6 &mdash; Vanilla demo (example.php)</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example.php</code>. b) Look at the page without interacting. c) <strong>What to evaluate:</strong> - The 27 widgets fit together coherently or look thrown together? - Colors are consistent (sumi-e palette or chaotic)? - Buttons look clickable (raised, colored, well-spaced)? - Inputs look enterable (cursor would clearly land in them)? - Tabs (if any) look like tabs?</p>
+<label class="tr-opt"><input type="radio" name="task-V6-status" value="ok" id="task-V6-ok" data-nac-id="tester_form.task-V6.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V6-status" value="error" id="task-V6-error" data-nac-id="tester_form.task-V6.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V6-comments">Comments</label>
+<textarea name="task-V6-comments" id="task-V6-comments" rows="2" data-nac-id="tester_form.task-V6.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V7">
+<legend>Task V7 &mdash; v20-full demo</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v20-full.php</code>. b) Pay special attention to the "v20-panel" usually top-right. c) <strong>What to evaluate:</strong> - The v20-panel is visible right away (not hidden, not cut off)? - The panel's buttons (describe_v2, validate_global_v2, etc.) are readable + distinct? - The panel doesn't feel "bolted on" -- fits the page visually?</p>
+<label class="tr-opt"><input type="radio" name="task-V7-status" value="ok" id="task-V7-ok" data-nac-id="tester_form.task-V7.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V7-status" value="error" id="task-V7-error" data-nac-id="tester_form.task-V7.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V7-comments">Comments</label>
+<textarea name="task-V7-comments" id="task-V7-comments" rows="2" data-nac-id="tester_form.task-V7.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V8">
+<legend>Task V8 &mdash; Data-table demo (v21)</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Look at the tabs + the data table inside. c) <strong>What to evaluate:</strong> - The active tab is visually distinct from inactive tabs? - Table rows alternate color (zebra) for readability? - Column headers stand out from data rows? - The "add row" or similar action buttons are findable? - The chat panel does not overlap or hide the table?</p>
+<label class="tr-opt"><input type="radio" name="task-V8-status" value="ok" id="task-V8-ok" data-nac-id="tester_form.task-V8.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V8-status" value="error" id="task-V8-error" data-nac-id="tester_form.task-V8.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V8-comments">Comments</label>
+<textarea name="task-V8-comments" id="task-V8-comments" rows="2" data-nac-id="tester_form.task-V8.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V9">
+<legend>Task V9 &mdash; Interop demo (v22)</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v22-interop.php</code>. b) Observe the two side-by-side mini-apps. c) <strong>What to evaluate:</strong> - The two sides are clearly separated (border, color, or spacing)? - The 4 CTAs (Export tree, Import remote, etc) are visible at the top? - After clicking a CTA, the output panel shows feedback clearly? - The visual feels like "two apps" not "one confusing page"?</p>
+<label class="tr-opt"><input type="radio" name="task-V9-status" value="ok" id="task-V9-ok" data-nac-id="tester_form.task-V9.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V9-status" value="error" id="task-V9-error" data-nac-id="tester_form.task-V9.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V9-comments">Comments</label>
+<textarea name="task-V9-comments" id="task-V9-comments" rows="2" data-nac-id="tester_form.task-V9.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V10">
+<legend>Task V10 &mdash; React + Angular demos</legend>
+<p>a) Open <code>https://yujin.app/nac-spec/demos/react/</code> and <code>https://yujin.app/nac-spec/demos/angular/</code> in two tabs. b) Compare them side by side. c) <strong>What to evaluate:</strong> - They look like the same app implemented in 2 frameworks (consistency)? - Both have a clean Todos UI: input + button + list? - Both have a working chat panel? - Neither has obvious visual bugs (overlaps, cut text, wrong colors)?</p>
+<label class="tr-opt"><input type="radio" name="task-V10-status" value="ok" id="task-V10-ok" data-nac-id="tester_form.task-V10.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V10-status" value="error" id="task-V10-error" data-nac-id="tester_form.task-V10.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V10-comments">Comments</label>
+<textarea name="task-V10-comments" id="task-V10-comments" rows="2" data-nac-id="tester_form.task-V10.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<hr />
+<h2>Section 3 -- Chat panel visual</h2>
+<fieldset class="tr-task" id="task-V11">
+<legend>Task V11 &mdash; Chat panel layout</legend>
+<p>a) On the landing page, open the chat panel (click the bubble if collapsed). b) Resize your browser window: narrow (phone-like, ~400px wide) and wide (desktop, 1400px). c) <strong>What to evaluate:</strong> - On wide: chat panel is anchored right, doesn't squash the content? - On narrow: chat panel covers the whole width OR floats sensibly? - The microphone button is always visible (never cut off)? - The Send button is always clickable? - Message bubbles (when there are messages) are clearly user vs assistant?</p>
+<label class="tr-opt"><input type="radio" name="task-V11-status" value="ok" id="task-V11-ok" data-nac-id="tester_form.task-V11.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V11-status" value="error" id="task-V11-error" data-nac-id="tester_form.task-V11.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V11-comments">Comments</label>
+<textarea name="task-V11-comments" id="task-V11-comments" rows="2" data-nac-id="tester_form.task-V11.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V12">
+<legend>Task V12 &mdash; Chat readability</legend>
+<p>a) Type and send 3 messages. Wait for responses. b) Scroll through the conversation. c) <strong>What to evaluate:</strong> - User messages and assistant messages are visually distinct? - Long responses (multi-paragraph) are paginated / scrollable cleanly? - Code blocks in responses (if any) are formatted clearly? - The font size is comfortable (not tiny, not huge)?</p>
+<label class="tr-opt"><input type="radio" name="task-V12-status" value="ok" id="task-V12-ok" data-nac-id="tester_form.task-V12.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V12-status" value="error" id="task-V12-error" data-nac-id="tester_form.task-V12.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V12-comments">Comments</label>
+<textarea name="task-V12-comments" id="task-V12-comments" rows="2" data-nac-id="tester_form.task-V12.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<hr />
+<h2>Section 4 -- Mobile / responsive</h2>
+<fieldset class="tr-task" id="task-V13">
+<legend>Task V13 &mdash; Mobile portrait</legend>
+<p>a) On a phone (or browser DevTools mobile mode set to iPhone), open <code>https://yujin.app/nac-spec/</code>. b) Scroll the whole page. c) <strong>What to evaluate:</strong> - No horizontal scroll bar (the page width fits)? - All buttons are reachable with a thumb (not too small)? - Text is readable without zooming? - Images / GIFs (if any) don't break the layout?</p>
+<label class="tr-opt"><input type="radio" name="task-V13-status" value="ok" id="task-V13-ok" data-nac-id="tester_form.task-V13.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V13-status" value="error" id="task-V13-error" data-nac-id="tester_form.task-V13.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V13-comments">Comments</label>
+<textarea name="task-V13-comments" id="task-V13-comments" rows="2" data-nac-id="tester_form.task-V13.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V14">
+<legend>Task V14 &mdash; Tablet landscape</legend>
+<p>a) On a tablet (or DevTools iPad landscape), open the landing. b) Look at how the layout uses the wider width. c) <strong>What to evaluate:</strong> - Multi-column layouts kick in at wider sizes? - The page does NOT stay narrow (~600px) on a 1024px screen? - Whitespace is balanced, not awkward?</p>
+<label class="tr-opt"><input type="radio" name="task-V14-status" value="ok" id="task-V14-ok" data-nac-id="tester_form.task-V14.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-V14-status" value="error" id="task-V14-error" data-nac-id="tester_form.task-V14.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-V14-comments">Comments</label>
+<textarea name="task-V14-comments" id="task-V14-comments" rows="2" data-nac-id="tester_form.task-V14.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<hr />
+<h2>Section 5 -- Subjective feel</h2>
+<fieldset class="tr-task" id="task-V15">
+<legend>Task V15 &mdash; Overall aesthetic</legend>
+<p>a) Without thinking too hard, browse the landing + 2 demos. b) Rate the feel on these dimensions:</p>
+<p>| Dimension | 1 (bad) - 5 (great) | |-----------|---------------------| | Professional vs amateur | __ | | Sumi-e branding integrated naturally | __ | | Visual hierarchy clear | __ | | Color choices coherent | __ | | Typography readable + tasteful | __ | | Trust signal (would you take this product seriously?) | __ |</p>
+<label class="tr-comments-label" for="task-V15-comments">Comments</label>
+<textarea name="task-V15-comments" id="task-V15-comments" rows="2" data-nac-id="tester_form.task-V15.comments" data-nac-role="field"></textarea>
+<p>_______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V16">
+<legend>Task V16 &mdash; One thing to change</legend>
+<p>If you could change ONE visual thing across the whole site to most improve it, what would it be?</p>
+<p>Your answer (mandatory, 1-3 sentences): _______________________________ _______________________________ _______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V17">
+<legend>Task V17 &mdash; One thing to keep</legend>
+<p>What ONE visual choice on the site impresses you most and should stay?</p>
+<p>Your answer (mandatory): _______________________________ _______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V18">
+<legend>Task V18 &mdash; Trust judgment</legend>
+<p>a) Imagine you're a CTO seeing this for the first time. b) Would you trust the company behind this enough to consider adopting NAC3 in production? c) <strong>Why or why not?</strong></p>
+<div class="tr-note">Yes, would trust</div>
+<div class="tr-note">No, would not trust (yet)</div>
+<p>Why: _______________________________ _______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V19">
+<legend>Task V19 &mdash; Compared to peers</legend>
+<p>Compared to other open-standard / dev-tool landing pages (e.g. Anthropic, Vercel, Linear, Notion), the NAC3 site looks:</p>
+<div class="tr-note">Better</div>
+<div class="tr-note">On par</div>
+<div class="tr-note">Below</div>
+<div class="tr-note">Far below</div>
+<p>What specifically: _______________________________ _______________________________</p>
+</fieldset>
+<fieldset class="tr-task" id="task-V20">
+<legend>Task V20 &mdash; Free-form feedback box</legend>
+<p>Anything you noticed that did NOT fit any task above. Bugs, awkward copy, weird spacing, broken links, confusing flows, missed opportunities. Write everything.</p>
+<p>_______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________</p>
+</fieldset>
+<hr />
+<fieldset class="tr-signoff" id="tr-signoff">
+<legend>Sign-off</legend>
+<label for="sign-release-tag">Release tag tested</label>
+<input type="text" name="sign-release-tag" id="sign-release-tag" data-nac-id="tester_form.sign.release-tag" data-nac-role="field" />
+<label for="sign-tester-name">Tester name</label>
+<input type="text" name="sign-tester-name" id="sign-tester-name" data-nac-id="tester_form.sign.tester-name" data-nac-role="field" />
+<label for="sign-tester-email">Tester email</label>
+<input type="email" name="sign-tester-email" id="sign-tester-email" data-nac-id="tester_form.sign.tester-email" data-nac-role="field" />
+<label for="sign-browser">Browser</label>
+<input type="text" name="sign-browser" id="sign-browser" data-nac-id="tester_form.sign.browser" data-nac-role="field" />
+<label for="sign-os">Operating system</label>
+<input type="text" name="sign-os" id="sign-os" data-nac-id="tester_form.sign.os" data-nac-role="field" />
+<label for="sign-device">Device (laptop / mobile)</label>
+<input type="text" name="sign-device" id="sign-device" data-nac-id="tester_form.sign.device" data-nac-role="field" />
+<label for="sign-verdict">Verdict (ready / needs fixes / blocking)</label>
+<input type="text" name="sign-verdict" id="sign-verdict" data-nac-id="tester_form.sign.verdict" data-nac-role="field" />
+<label for="sign-rating">Overall rating 1-10</label>
+<input type="number" name="sign-rating" id="sign-rating" data-nac-id="tester_form.sign.rating" data-nac-role="field" />
+<label for="sign-top-issues">Top 3 issues found</label>
+<textarea name="sign-top-issues" id="sign-top-issues" rows="3" data-nac-id="tester_form.sign.top-issues" data-nac-role="field"></textarea>
+<label for="sign-free-form">Free-form comment / anything that did not fit a task</label>
+<textarea name="sign-free-form" id="sign-free-form" rows="3" data-nac-id="tester_form.sign.free-form" data-nac-role="field"></textarea>
+</fieldset>
+<pre class="tr-code"><code>Release tag:        v____._.___
+Tester name:        ______________________________
+Date:               ____-____-____
+Browser:            [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Device:             [ ] Desktop  [ ] Tablet  [ ] Phone
+
+Overall visual rating (1-10): __
+
+Top 3 visual issues to fix (priority order):
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+Verdict for launch:
+[ ] visual is ready to ship
+[ ] visual needs work but not a blocker
+[ ] visual is blocking -- do not launch yet
+
+Signature: ______________________________</code></pre>
+<hr />
+<h2>See also</h2>
+<p>- <code>TESTER_CHECKLIST_VOICE_CHAT.md</code> -- voice + chat specific evaluation. - <code>TESTER_CHECKLIST_VISUAL.es.md</code> -- Spanish version. - <code>HUMAN_OK_CHECKLIST_TESTER.md</code> -- general functional checklist.</p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Submit report</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Auto-saved locally. Your progress restores if you close this tab.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

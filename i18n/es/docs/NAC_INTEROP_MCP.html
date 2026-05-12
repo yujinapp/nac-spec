@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- interoperabilidad entre apps vía MCP -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_interop_mcp" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_interop_mcp" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_interop_mcp.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_interop_mcp.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_interop_mcp.mp3" data-nac-id="nac_interop_mcp.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_interop_mcp.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_interop_mcp.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_interop_mcp.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_interop_mcp.p.1" data-nac-role="paragraph">translation_source: docs/NAC_INTEROP_MCP.md translation_source_hash: 559b9c7f1d01da4f76e35b6e4f1fcb558f8f0bbca87f7cb4148738989b83b49c translation_quality: machine_v1 translation_lang: es translation_date: 2026-05-11T13:23:27.154683+00:00</p>
+<hr />
+<h1 data-nac-id="nac_interop_mcp.h1.nac3-interoperabilidad-entre-apps-vía-mcp" data-nac-role="heading" data-nac-level="1" id="nac3-interoperabilidad-entre-apps-vía-mcp">NAC3 -- interoperabilidad entre apps vía MCP</h1>
+<p data-nac-id="nac_interop_mcp.p.4" data-nac-role="paragraph"><strong>Estado:</strong> vista previa v2.3 (rama <code data-nac-role="code-inline">feat/nac-interop-mcp</code>, aún no fusionada a main). <strong>Sección de especificación:</strong> se insertará como sección 11 de SPEC.md cuando la funcionalidad salga de vista previa.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.por-qué" data-nac-role="heading" data-nac-level="2" id="por-qué">Por qué</h2>
+<p data-nac-id="nac_interop_mcp.p.6" data-nac-role="paragraph">NAC3 v1.9 + v2.0 + v2.1 + v2.2 estandarizan cómo <em>una</em> interfaz web es controlada por un agente de IA. v2.3 extiende el contrato para definir cómo <em>múltiples</em> apps NAC3 interoperan entre sí.</p>
+<p data-nac-id="nac_interop_mcp.p.7" data-nac-role="paragraph">El flujo de usuario que motivó esto:</p>
+<p data-nac-id="nac_interop_mcp.p.8" data-nac-role="paragraph">&gt; Pablo está en Yujin CRM dictando al chat. Dice: &gt; <em>"Yujin, cambia a Excel."</em> &gt; &gt; El cliente de chat de Yujin reconoce esto como una intención de interoperabilidad. &gt; Llama a la herramienta MCP <code data-nac-role="code-inline">nac.export_tree</code> contra la instancia de Excel &gt; que el usuario tiene abierta, recupera el árbol NAC3 completo de Excel &gt; (libro activo, hoja actual, rangos con nombre, botones de la cinta) y lo &gt; registra como plugin remoto bajo <code data-nac-role="code-inline">remote:excel:<em></code>. &gt; &gt; Ahora Pablo puede decir </em>"pon la celda A1 en 100"<em> y el intermediario de &gt; Yujin resuelve <code data-nac-role="code-inline">remote:excel:cell.A1</code> -&gt; <code data-nac-role="code-inline">NAC.fill('remote:excel:cell.A1', &gt; 100)</code>. El runtime detecta el prefijo <code data-nac-role="code-inline">remote:</code> y enruta el despacho vía &gt; MCP. Excel ejecuta el efecto secundario, emite su ack <code data-nac-role="code-inline">nac:field:changed</code>, &gt; el stream SSE lo devuelve al runtime de Yujin, la promesa local se resuelve. &gt; Pablo ve en el chat de Yujin: </em>"Celda A1 establecida en 100."* &gt; &gt; Lo más importante: <strong>el agente no necesitaba conocer el esquema de Excel &gt; de antemano</strong>. La llamada a export_tree le entregó el manifiesto en el &gt; momento en que lo necesitaba.</p>
+<p data-nac-id="nac_interop_mcp.p.9" data-nac-role="paragraph">Esta es la base del <strong>pool comercial de productos adjuntables</strong> que Yujin anunció en el lanzamiento de v2.3. Cualquier app de terceros que incluya un servidor MCP que exponga las cuatro herramientas de interoperabilidad descritas a continuación queda disponible como destino de navegación desde cualquier otro host NAC3.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.arquitectura" data-nac-role="heading" data-nac-level="2" id="arquitectura">Arquitectura</h2>
+<pre data-nac-id="nac_interop_mcp.code.1" data-nac-role="code" data-nac-lang="text"><code>+----------------+         +-----------------+         +----------------+
+|  Yujin (host)  |  call   |   MCP bridge    |  HTTP   |  Excel (peer)  |
+|   nac.export   | ------&gt; | (agent process) | ------&gt; |   nac.export   |
+|   nac.import   | &lt;------ |                 | &lt;------ |   nac.invoke   |
++----------------+         +-----------------+         +----------------+
+         ^                                                      |
+         |     ack events (SSE: nac:*:succeeded / :failed)     |
+         +------------------------------------------------------+</code></pre>
+<p data-nac-id="nac_interop_mcp.p.12" data-nac-role="paragraph">Tres actores:</p>
+<p data-nac-id="nac_interop_mcp.p.13" data-nac-role="paragraph">el ejemplo).</p>
+<p data-nac-id="nac_interop_mcp.p.14" data-nac-role="paragraph">(Excel en el ejemplo).</p>
+<p data-nac-id="nac_interop_mcp.p.15" data-nac-role="paragraph">tokens bearer de los peers conocidos y enruta las invocaciones.    El bridge NO suplanta al usuario ante el peer; usa sus propias credenciales.</p>
+<ol data-nac-id="nac_interop_mcp.list.16" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.16.item.1" data-nac-role="list-item"><strong>Host</strong> -- la app que el usuario está controlando actualmente (Yujin en</li><li data-nac-id="nac_interop_mcp.list.16.item.2" data-nac-role="list-item"><strong>Peer</strong> -- la app externa compatible con NAC-3 que se importa</li><li data-nac-id="nac_interop_mcp.list.16.item.3" data-nac-role="list-item"><strong>MCP bridge</strong> -- típicamente el proceso agente del host. Gestiona los</li></ol>
+<h2 data-nac-id="nac_interop_mcp.h2.superficie-de-herramientas-mcp" data-nac-role="heading" data-nac-level="2" id="superficie-de-herramientas-mcp">Superficie de herramientas MCP</h2>
+<p data-nac-id="nac_interop_mcp.p.18" data-nac-role="paragraph">Todo peer compatible con NAC-3 DEBE exponer estas cuatro herramientas en su endpoint MCP:</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nacexport_tree" data-nac-role="heading" data-nac-level="3" id="nacexport_tree"><code data-nac-role="code-inline">nac.export_tree</code></h3>
+<p data-nac-id="nac_interop_mcp.p.20" data-nac-role="paragraph">Entrante. Devuelve un payload autodescriptivo que otra app puede importar.</p>
+<p data-nac-id="nac_interop_mcp.p.21" data-nac-role="paragraph"><strong>Entrada:</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.2" data-nac-role="code" data-nac-lang="ts"><code>{
+  scope?: &#x27;full&#x27; | &#x27;active_plugin&#x27; | &#x27;plugin_slug:&lt;slug&gt;&#x27;,
+  include_dom_state?: boolean,    // default false (privacy)
+  include_locales?: string[],     // default all 10
+  bearer: string                  // peer&#x27;s per-tenant token
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.23" data-nac-role="paragraph"><strong>Salida:</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.3" data-nac-role="code" data-nac-lang="ts"><code>{
+  app_id: string,                 // &#x27;yujin-crm&#x27;, &#x27;excel-online&#x27;, etc.
+  app_version: string,            // semver of the app, NOT of NAC
+  nac_version: &#x27;2.3&#x27;,
+  exported_at: string,            // ISO8601
+  active_plugin: string | null,
+  manifests: Record&lt;string, Manifest&gt;,   // by plugin_slug
+  scope_tree: ScopeNode[],
+  data_tables: DataTableSnap[],   // v2.1 sec 18
+  state: {
+    url?: string,
+    title?: string,
+    user_lang: string,
+    tenant_id?: string
+  },
+  ack_endpoint: string            // SSE URL for subscribe_events
+}</code></pre>
+<h3 data-nac-id="nac_interop_mcp.h3.nacinvoke" data-nac-role="heading" data-nac-level="3" id="nacinvoke"><code data-nac-role="code-inline">nac.invoke</code></h3>
+<p data-nac-id="nac_interop_mcp.p.26" data-nac-role="paragraph">Entrante. Despacha una acción NAC3 en el peer.</p>
+<p data-nac-id="nac_interop_mcp.p.27" data-nac-role="paragraph"><strong>Entrada:</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.4" data-nac-role="code" data-nac-lang="ts"><code>{
+  bearer: string,
+  nac_id: string,                 // peer-local id, NOT prefixed
+  action: {
+    kind: &#x27;click&#x27; | &#x27;click_by_verb&#x27; | &#x27;fill&#x27; | &#x27;select&#x27;
+        | &#x27;tab&#x27; | &#x27;tab_by_label&#x27; | &#x27;go_to_section&#x27;
+        | &#x27;dt_add_row&#x27; | &#x27;dt_edit_cell&#x27; | &#x27;dt_remove_row&#x27;
+        | &#x27;dt_commit&#x27; | &#x27;dt_discard&#x27;
+        | &#x27;edit_field&#x27;,
+    args: Record&lt;string, unknown&gt;   // shape depends on kind
+  },
+  hmac?: string                   // optional HMAC-SHA256 of body
+                                  // for sensitive verbs
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.29" data-nac-role="paragraph"><strong>Salida:</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.5" data-nac-role="code" data-nac-lang="ts"><code>{
+  ok: boolean,
+  result?: { row_id?: string, value?: unknown, ... },
+  error?: { code: string, message: string }
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.31" data-nac-role="paragraph">El peer despacha la acción a través de su <code data-nac-role="code-inline">NAC.&lt;kind&gt;(...)</code> local, espera la familia de eventos ack canónicos con un timeout de 5s y devuelve el resultado. El ack TAMBIÉN se transmite por el canal SSE para que el host pueda correlacionarlo.</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nacsubscribe_events" data-nac-role="heading" data-nac-level="3" id="nacsubscribe_events"><code data-nac-role="code-inline">nac.subscribe_events</code></h3>
+<p data-nac-id="nac_interop_mcp.p.33" data-nac-role="paragraph">Streaming (SSE). Envía eventos ack del peer al host.</p>
+<p data-nac-id="nac_interop_mcp.p.34" data-nac-role="paragraph"><strong>Entrada (query string):</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.6" data-nac-role="code" data-nac-lang="text"><code>?bearer=&lt;token&gt;&amp;plugins=&lt;csv-of-plugin-slugs&gt;&amp;since=&lt;iso8601&gt;</code></pre>
+<p data-nac-id="nac_interop_mcp.p.36" data-nac-role="paragraph"><strong>Salida (cada evento):</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.7" data-nac-role="code" data-nac-lang="text"><code>event: nac:action:succeeded
+data: {&quot;plugin&quot;:&quot;excel&quot;,&quot;action_id&quot;:&quot;excel.cell.A1&quot;,&quot;is_trusted&quot;:false,
+       &quot;result&quot;:{&quot;value&quot;:100},&quot;ts&quot;:&quot;2026-05-10T18:30:01.234Z&quot;}
+
+event: nac:tab:activated
+data: {&quot;plugin&quot;:&quot;excel&quot;,&quot;tab_id&quot;:&quot;tab.sheet2&quot;,...}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.38" data-nac-role="paragraph">El runtime del host retransmite estos eventos al documento local, de modo que un agente que llame a <code data-nac-role="code-inline">NAC.click('remote:excel:cell.A1')</code> obtenga una promesa resuelta localmente impulsada por el evento remoto.</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nachealth" data-nac-role="heading" data-nac-level="3" id="nachealth"><code data-nac-role="code-inline">nac.health</code></h3>
+<p data-nac-id="nac_interop_mcp.p.40" data-nac-role="paragraph">Entrante, simple. Devuelve:</p>
+<pre data-nac-id="nac_interop_mcp.code.8" data-nac-role="code" data-nac-lang="ts"><code>{ ok: true, nac_version: &#x27;2.3&#x27;, app_id: &#x27;excel-online&#x27;,
+  uptime_ms: 12345 }</code></pre>
+<p data-nac-id="nac_interop_mcp.p.42" data-nac-role="paragraph">Los hosts lo usan para verificar que un peer es accesible antes de importarlo.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.api-del-runtime-en-el-host" data-nac-role="heading" data-nac-level="2" id="api-del-runtime-en-el-host">API del runtime en el host</h2>
+<p data-nac-id="nac_interop_mcp.p.44" data-nac-role="paragraph">Estas tres nuevas funciones viven en <code data-nac-role="code-inline">window.NAC</code> a partir de v2.3:</p>
+<pre data-nac-id="nac_interop_mcp.code.9" data-nac-role="code" data-nac-lang="ts"><code>NAC.export_tree(opts?: {
+  scope?: &#x27;full&#x27; | &#x27;active_plugin&#x27; | &#x27;plugin_slug:&lt;slug&gt;&#x27;,
+  include_dom_state?: boolean,
+  include_locales?: string[]
+}): Promise&lt;NACExportV1&gt;</code></pre>
+<p data-nac-id="nac_interop_mcp.p.46" data-nac-role="paragraph">Devuelve el payload definido anteriormente. Lectura puramente local, sin I/O.</p>
+<pre data-nac-id="nac_interop_mcp.code.10" data-nac-role="code" data-nac-lang="ts"><code>NAC.import_remote_tree(
+  payload: NACExportV1,
+  conn: {
+    transport: &#x27;http&#x27; | &#x27;stdio&#x27;,
+    endpoint: string,            // URL for http, command for stdio
+    bearer: string,
+    namespace?: string,          // defaults to payload.app_id
+    auto_subscribe?: boolean     // default true
+  }
+): RemoteHandle</code></pre>
+<p data-nac-id="nac_interop_mcp.p.48" data-nac-role="paragraph">Registra cada manifiesto de <code data-nac-role="code-inline">payload.manifests</code> bajo un slug de plugin con espacio de nombres:</p>
+<p data-nac-id="nac_interop_mcp.p.49" data-nac-role="paragraph"><code data-nac-role="code-inline">remote:&lt;namespace&gt;:invoice</code> en <code data-nac-role="code-inline">NAC.describe()</code>.</p>
+<p data-nac-id="nac_interop_mcp.p.50" data-nac-role="paragraph"><code data-nac-role="code-inline">remote:&lt;namespace&gt;:</code> cuando son resueltos por <code data-nac-role="code-inline">NAC.click()</code> /   <code data-nac-role="code-inline">NAC.fill()</code> / etc.</p>
+<p data-nac-id="nac_interop_mcp.p.51" data-nac-role="paragraph">coincide, enruta el despacho a través del transporte de la conexión en   lugar de consultar el DOM.</p>
+<ul data-nac-id="nac_interop_mcp.list.52" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.52.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">payload.manifests.invoice</code> pasa a ser</li><li data-nac-id="nac_interop_mcp.list.52.item.2" data-nac-role="list-item">Todos los nac_ids dentro de ese manifiesto reciben el prefijo</li><li data-nac-id="nac_interop_mcp.list.52.item.3" data-nac-role="list-item">El resolvedor de elementos del runtime verifica primero el prefijo; si</li></ul>
+<pre data-nac-id="nac_interop_mcp.code.11" data-nac-role="code" data-nac-lang="ts"><code>NAC.list_remote_apps(): RemoteHandle[]
+NAC.disconnect_remote(remote_id: string): void</code></pre>
+<p data-nac-id="nac_interop_mcp.p.54" data-nac-role="paragraph">Inspección y limpieza. Disconnect cierra el stream SSE y elimina el registro de los plugins con espacio de nombres.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.enrutamiento-del-despacho" data-nac-role="heading" data-nac-level="2" id="enrutamiento-del-despacho">Enrutamiento del despacho</h2>
+<p data-nac-id="nac_interop_mcp.p.56" data-nac-role="paragraph">Cuando se llama a <code data-nac-role="code-inline">NAC.click(id)</code> y <code data-nac-role="code-inline">id</code> comienza con <code data-nac-role="code-inline">remote:</code>:</p>
+<p data-nac-id="nac_interop_mcp.p.57" data-nac-role="paragraph">la importación.</p>
+<p data-nac-id="nac_interop_mcp.p.58" data-nac-role="paragraph">args: {} } }<code data-nac-role="code-inline"> a </code>handle.endpoint + '/nac.invoke'`.</p>
+<p data-nac-id="nac_interop_mcp.p.59" data-nac-role="paragraph">también despacha el <code data-nac-role="code-inline">nac:action:succeeded</code> local para que los awaiters    que no tienen la promesa igualmente reciban la notificación).</p>
+<ol data-nac-id="nac_interop_mcp.list.60" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.60.item.1" data-nac-role="list-item">Parsear <code data-nac-role="code-inline">remote:&lt;namespace&gt;:&lt;peer_local_id&gt;</code>.</li><li data-nac-id="nac_interop_mcp.list.60.item.2" data-nac-role="list-item">Buscar <code data-nac-role="code-inline">_remotes[namespace]</code> -- el RemoteHandle almacenado en</li><li data-nac-id="nac_interop_mcp.list.60.item.3" data-nac-role="list-item">POST `{ bearer, nac_id: peer_local_id, action: { kind:'click',</li><li data-nac-id="nac_interop_mcp.list.60.item.4" data-nac-role="list-item">Si <code data-nac-role="code-inline">ok: true</code>, resolver inmediatamente la promesa local (el stream SSE</li><li data-nac-id="nac_interop_mcp.list.60.item.5" data-nac-role="list-item">Si <code data-nac-role="code-inline">ok: false</code>, rechazar con el código de error del peer.</li></ol>
+<p data-nac-id="nac_interop_mcp.p.61" data-nac-role="paragraph">Los demás tipos de acción (<code data-nac-role="code-inline">fill</code>, <code data-nac-role="code-inline">tab</code>, <code data-nac-role="code-inline">tab_by_label</code>, <code data-nac-role="code-inline">dt_*</code>, <code data-nac-role="code-inline">edit_field</code>) siguen el mismo patrón.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.modelo-de-seguridad" data-nac-role="heading" data-nac-level="2" id="modelo-de-seguridad">Modelo de seguridad</h2>
+<h3 data-nac-id="nac_interop_mcp.h3.límites-de-confianza" data-nac-role="heading" data-nac-level="3" id="límites-de-confianza">Límites de confianza</h3>
+<p data-nac-id="nac_interop_mcp.p.64" data-nac-role="paragraph">administración del peer (su gestión de tenants). El bridge lo almacena   del lado del servidor; nunca se expone al prompt del intermediario LLM.</p>
+<p data-nac-id="nac_interop_mcp.p.65" data-nac-role="paragraph">el peer marca como sensibles (<code data-nac-role="code-inline">delete</code>, <code data-nac-role="code-inline">payment.*</code>, asignación de roles).   Cuerpo del HMAC = <code data-nac-role="code-inline">bearer + nac_id + kind + sorted(args)</code>, hash SHA-256.</p>
+<p data-nac-id="nac_interop_mcp.p.66" data-nac-role="paragraph">encabezado Origin (o su equivalente en el transporte MCP) contra una lista   registrada. Los hosts fuera de la lista reciben HTTP 403.</p>
+<ul data-nac-id="nac_interop_mcp.list.67" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.67.item.1" data-nac-role="list-item">El <strong>token bearer</strong> autentica al host ante el peer. Lo emite la capa de</li><li data-nac-id="nac_interop_mcp.list.67.item.2" data-nac-role="list-item">El <strong>HMAC</strong> por acción es opcional pero recomendado para los verbos que</li><li data-nac-id="nac_interop_mcp.list.67.item.3" data-nac-role="list-item"><strong>Lista blanca de orígenes</strong> -- el servidor MCP del peer verifica el</li></ul>
+<h3 data-nac-id="nac_interop_mcp.h3.propagación-de-is_trusted" data-nac-role="heading" data-nac-level="3" id="propagación-de-is_trusted">Propagación de is_trusted</h3>
+<p data-nac-id="nac_interop_mcp.p.69" data-nac-role="paragraph">Toda acción despachada a través del proxy lleva <code data-nac-role="code-inline">is_trusted: false</code> en el detalle de su evento ack. El código host del peer PUEDE rechazar la acción por ese motivo:</p>
+<pre data-nac-id="nac_interop_mcp.code.12" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, function (e) {
+  if (e.detail.action_id === &#x27;invoice.delete&#x27; &amp;&amp; !e.detail.is_trusted) {
+    console.warn(&#x27;[security] refused synthetic delete via interop&#x27;);
+    e.preventDefault();
+  }
+});</code></pre>
+<h3 data-nac-id="nac_interop_mcp.h3.rotación-de-tokens" data-nac-role="heading" data-nac-level="3" id="rotación-de-tokens">Rotación de tokens</h3>
+<p data-nac-id="nac_interop_mcp.p.72" data-nac-role="paragraph">Los tokens bearer se rotan del lado del servidor según el ciclo de sesión normal del peer (p. ej., cada 24h). El host detecta un 401 del peer y obtiene un token nuevo a través del flujo de autenticación del usuario. Las sesiones que no pueden reautenticarse se desconectan limpiamente.</p>
+<h2 data-nac-id="nac_interop_mcp.h2.diagrama-de-secuencia-texto" data-nac-role="heading" data-nac-level="2" id="diagrama-de-secuencia-texto">Diagrama de secuencia (texto)</h2>
+<pre data-nac-id="nac_interop_mcp.code.13" data-nac-role="code" data-nac-lang="text"><code>USER         YUJIN HOST              MCP BRIDGE              EXCEL PEER
+ |              |                       |                        |
+ |- &quot;jump      -&gt;| recognise intent     |                        |
+ |   to Excel&quot;  | ack=tts                                        |
+ |              |- nac.export_tree --&gt; | --- HTTP --------&gt; | export
+ |              |                       |                    | tree
+ |              |&lt;-- payload --------- | &lt;-- response ----- |
+ |              |  import_remote_tree(payload, conn)              |
+ |              |  remote plugins now in NAC.describe()           |
+ |              |- subscribe_events --&gt; | --- SSE open ----&gt; |
+ |              |&lt;------------------- ack stream live &lt;---- |
+ |- &quot;set A1    -&gt;| chat resolve to                                |
+ |   to 100&quot;    |  click_by_verb(&#x27;remote:excel&#x27;, &#x27;set_cell&#x27;, ...) |
+ |              |- detect remote: prefix                          |
+ |              |- proxy invoke -----&gt; | --- HTTP --------&gt; | NAC.fill
+ |              |                       |                    | side fx
+ |              |                       |                    | emit ack
+ |              |&lt;------------------- ack via SSE &lt;-------- |
+ |              |  local promise resolves                         |
+ |- ack tts &lt;--|  &quot;Cell A1 set to 100&quot;                            |
+ |              |                                                  |</code></pre>
+<h2 data-nac-id="nac_interop_mcp.h2.no-incluido-diferido" data-nac-role="heading" data-nac-level="2" id="no-incluido-diferido">No incluido (diferido)</h2>
+<p data-nac-id="nac_interop_mcp.p.76" data-nac-role="paragraph">El modelo v2.3 es navegación unidireccional host -&gt; peer. Las importaciones   cruzadas añaden complejidad de reentrada y detección de ciclos; diferido a v2.4.</p>
+<p data-nac-id="nac_interop_mcp.p.77" data-nac-role="paragraph">complejidad; v2.3 limita a un solo salto.</p>
+<p data-nac-id="nac_interop_mcp.p.78" data-nac-role="paragraph">requiere un canal tipo WebRTC más allá de lo que SSE puede ofrecer.</p>
+<ul data-nac-id="nac_interop_mcp.list.79" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.79.item.1" data-nac-role="list-item"><strong>Interoperabilidad bidireccional donde el peer también importa al host.</strong></li><li data-nac-id="nac_interop_mcp.list.79.item.2" data-nac-role="list-item"><strong>Cadenas de múltiples saltos</strong> (Yujin -&gt; Excel -&gt; Slack). Misma razón de</li><li data-nac-id="nac_interop_mcp.list.79.item.3" data-nac-role="list-item"><strong>Acciones en streaming</strong> (seguimiento de cursor en vivo). Aspiracional;</li></ul>
+<h2 data-nac-id="nac_interop_mcp.h2.presupuesto-de-rendimiento" data-nac-role="heading" data-nac-level="2" id="presupuesto-de-rendimiento">Presupuesto de rendimiento</h2>
+<p data-nac-id="nac_interop_mcp.p.81" data-nac-role="paragraph">en el peer): &lt; 100 ms p95.</p>
+<ul data-nac-id="nac_interop_mcp.list.82" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.82.item.1" data-nac-role="list-item">Round-trip de <code data-nac-role="code-inline">nac.export_tree</code>: &lt; 200 ms p95 en LAN.</li><li data-nac-id="nac_interop_mcp.list.82.item.2" data-nac-role="list-item">Round-trip de <code data-nac-role="code-inline">nac.invoke</code> (excluyendo el tiempo del efecto secundario</li><li data-nac-id="nac_interop_mcp.list.82.item.3" data-nac-role="list-item">Keepalive de <code data-nac-role="code-inline">nac.subscribe_events</code>: heartbeat cada 15s.</li></ul>
+<h2 data-nac-id="nac_interop_mcp.h2.archivos-de-implementación-esta-rama" data-nac-role="heading" data-nac-level="2" id="archivos-de-implementación-esta-rama">Archivos de implementación (esta rama)</h2>
+<p data-nac-id="nac_interop_mcp.p.84" data-nac-role="paragraph">| Archivo | Rol | |---------|-----| | <code data-nac-role="code-inline">yujin.app/nac-spec/js/nac-mcp-interop.js</code> | Runtime del host: export_tree + import + proxy | | <code data-nac-role="code-inline">agent/mcp_interop.py</code> | Implementaciones de herramientas del servidor MCP para Yujin como peer | | <code data-nac-role="code-inline">packages/nac/src/interop.ts</code> | Tipos TypeScript + helpers | | <code data-nac-role="code-inline">yujin.app/nac-spec/example-v22-interop.php</code> | Demo en vivo: dos mini-apps lado a lado que se importan mutuamente | | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | Pruebas unitarias para export + import + proxy | | <code data-nac-role="code-inline">tools/nac/test-launch.sh</code> | Extendido con capa 6 (interop) |</p>
+<h2 data-nac-id="nac_interop_mcp.h2.preguntas-abiertas-antes-del-ga-de-v23" data-nac-role="heading" data-nac-level="2" id="preguntas-abiertas-antes-del-ga-de-v23">Preguntas abiertas antes del GA de v2.3</h2>
+<p data-nac-id="nac_interop_mcp.p.86" data-nac-role="paragraph">secreto HMAC del peer para que el host pueda verificar el origen incluso   cuando se enruta a través de un bridge no confiable? (Probablemente sí;   candidato para v2.3.1.)</p>
+<p data-nac-id="nac_interop_mcp.p.87" data-nac-role="paragraph">en un chat? ¿Un emoji? ¿Una píldora? ¿Ícono por app desde el manifiesto?   (Candidato para sección 14 de la especificación.)</p>
+<p data-nac-id="nac_interop_mcp.p.88" data-nac-role="paragraph">host, o de solo lectura por defecto? (La tendencia es solo lectura; opt-in   explícito para escritura.)</p>
+<ul data-nac-id="nac_interop_mcp.list.89" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.89.item.1" data-nac-role="list-item">¿Debería el payload de exportación estar opcionalmente firmado con el</li><li data-nac-id="nac_interop_mcp.list.89.item.2" data-nac-role="list-item">¿Cuál es la affordance de UI canónica para "app remota disponible"</li><li data-nac-id="nac_interop_mcp.list.89.item.3" data-nac-role="list-item">¿Deberían los <code data-nac-role="code-inline">data_tables</code> de un peer ser editables desde el agente del</li></ul>
+<hr />
+<p data-nac-id="nac_interop_mcp.p.91" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_INTEROP_MCP.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_interop_mcp",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_interop_mcp.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_interop_mcp.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_interop_mcp.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_interop_mcp.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

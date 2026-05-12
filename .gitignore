@@ -1,0 +1,18 @@
+# Node
+node_modules/
+runtime/node_modules/
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build artifacts (runtime/dist/ is committed -- it's the published bundle)
+*.tsbuildinfo
+
+# Local config
+.env
+.env.local

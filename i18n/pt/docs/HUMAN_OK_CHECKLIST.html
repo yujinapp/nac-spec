@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- Checklist de aprovação humana (Human OK) -- NAC3</title>
+<meta name="nac3-doc-slug" content="human_ok_checklist" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="human_ok_checklist" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="human_ok_checklist.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="human_ok_checklist.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/human_ok_checklist.mp3" data-nac-id="human_ok_checklist.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="human_ok_checklist.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="human_ok_checklist.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="human_ok_checklist.main" data-nac-role="region">
+<hr />
+<p data-nac-id="human_ok_checklist.p.1" data-nac-role="paragraph">translation_source: docs/HUMAN_OK_CHECKLIST.md translation_source_hash: 2b87f1b0665762daf6be1ad520c7ba16f977d21771e6574ae60451039baada31 translation_quality: machine_v1 translation_lang: pt translation_date: 2026-05-11T13:41:47.884672+00:00</p>
+<hr />
+<h1 data-nac-id="human_ok_checklist.h1.nac3-checklist-de-aprovação-humana-human-ok" data-nac-role="heading" data-nac-level="1" id="nac3-checklist-de-aprovação-humana-human-ok">NAC3 -- Checklist de aprovação humana (Human OK)</h1>
+<p data-nac-id="human_ok_checklist.p.4" data-nac-role="paragraph"><strong>Versão da spec:</strong> 2.2 + prévia v2.3. <strong>Última execução:</strong> 2026-05-11 (atualizar a cada release). <strong>Objetivo:</strong> forma executável da coluna MAN em <a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.1" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a>. Um humano percorre cada item abaixo e marca a caixa. Se qualquer item falhar, o release NÃO é publicado -- registre um bug e corrija antes de tentar novamente.</p>
+<p data-nac-id="human_ok_checklist.p.5" data-nac-role="paragraph">Este documento NÃO substitui os testes automatizados. A suíte automática (<code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code>) DEVE estar verde antes de você iniciar este checklist. O checklist existe para tudo que a automação não consegue verificar: áudio real, sensação cross-browser, fraseado de falante nativo, handshake cross-origin com um peer real, polimento visual.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.como-usar-este-documento" data-nac-role="heading" data-nac-level="2" id="como-usar-este-documento">Como usar este documento</h2>
+<p data-nac-id="human_ok_checklist.p.8" data-nac-role="paragraph">ordem; repita as seções visuais para cada um).</p>
+<p data-nac-id="human_ok_checklist.p.9" data-nac-role="paragraph">seção anterior estar ativa (ex.: interop precisa que ambas as demos    tenham carregado).</p>
+<p data-nac-id="human_ok_checklist.p.10" data-nac-role="paragraph">delegue. Se tiver dúvida, marque <code data-nac-role="code-inline">[?]</code> e consulte o responsável pela spec.</p>
+<ol data-nac-id="human_ok_checklist.list.11" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.11.item.1" data-nac-role="list-item">Abra uma janela anônima (Chrome + Firefox + Safari, nessa</li><li data-nac-id="human_ok_checklist.list.11.item.2" data-nac-role="list-item">Percorra as seções em ordem -- algumas dependem de uma</li><li data-nac-id="human_ok_checklist.list.11.item.3" data-nac-role="list-item">Marque cada <code data-nac-role="code-inline">[ ]</code> somente quando você pessoalmente confirmar. Não</li><li data-nac-id="human_ok_checklist.list.11.item.4" data-nac-role="list-item">Ao final, assine e date o bloco SIGN-OFF.</li><li data-nac-id="human_ok_checklist.list.11.item.5" data-nac-role="list-item">Faça commit do arquivo com o novo carimbo de data da execução.</li></ol>
+<p data-nac-id="human_ok_checklist.p.12" data-nac-role="paragraph">Tempo estimado por passagem: <strong>45-60 minutos</strong>. Não se apresse; o objetivo deste gate é justamente cobrir o que a automação não alcança.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.1-artefatos-de-runtime" data-nac-role="heading" data-nac-level="2" id="1-artefatos-de-runtime">1. Artefatos de runtime</h2>
+<h3 data-nac-id="human_ok_checklist.h3.11-smoke-cross-browser-jsnacjs-nac-v2-extensionsjs" data-nac-role="heading" data-nac-level="3" id="11-smoke-cross-browser-jsnacjs-nac-v2-extensionsjs">1.1 Smoke cross-browser -- <code data-nac-role="code-inline">js/nac.js</code> + <code data-nac-role="code-inline">nac-v2-extensions.js</code></h3>
+<p data-nac-id="human_ok_checklist.p.16" data-nac-role="paragraph">Para cada navegador (Chrome, Firefox, Safari):</p>
+<p data-nac-id="human_ok_checklist.p.17" data-nac-role="paragraph">modo anônimo.</p>
+<p data-nac-id="human_ok_checklist.p.18" data-nac-role="paragraph">console.</p>
+<p data-nac-id="human_ok_checklist.p.19" data-nac-role="paragraph">slug.</p>
+<p data-nac-id="human_ok_checklist.p.20" data-nac-role="paragraph">-- ele funciona E um evento <code data-nac-role="code-inline">nac:action:succeeded</code> é disparado       (escute via <code data-nac-role="code-inline">document.addEventListener</code> no console).</p>
+<ul data-nac-id="human_ok_checklist.list.21" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.21.item.1" data-nac-role="list-item">[ ] Abra <code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code> em</li><li data-nac-id="human_ok_checklist.list.21.item.2" data-nac-role="list-item">[ ] O console não apresenta nenhum erro após 5 segundos.</li><li data-nac-id="human_ok_checklist.list.21.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.describe().plugins[0]</code> retorna um objeto no</li><li data-nac-id="human_ok_checklist.list.21.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.list_registered_plugins()</code> retorna pelo menos um</li><li data-nac-id="human_ok_checklist.list.21.item.5" data-nac-role="list-item">[ ] Clique em um botão decorado com <code data-nac-role="code-inline">data-nac-role="action"</code></li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.12-cliente-de-chat-ao-vivo-nac-chat-clientjs" data-nac-role="heading" data-nac-level="3" id="12-cliente-de-chat-ao-vivo-nac-chat-clientjs">1.2 Cliente de chat ao vivo -- <code data-nac-role="code-inline">nac-chat-client.js</code></h3>
+<p data-nac-id="human_ok_checklist.p.23" data-nac-role="paragraph">não uma resposta em texto livre.</p>
+<p data-nac-id="human_ok_checklist.p.24" data-nac-role="paragraph">("vai para permissoes") -- despacho correto.</p>
+<p data-nac-id="human_ok_checklist.p.25" data-nac-role="paragraph">alemão (guarda de regressão para V22-03).</p>
+<ul data-nac-id="human_ok_checklist.list.26" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.26.item.1" data-nac-role="list-item">[ ] Em <code data-nac-role="code-inline">example-v21-data-table.php</code>, pressione o botão do microfone.</li><li data-nac-id="human_ok_checklist.list.26.item.2" data-nac-role="list-item">[ ] Diga "ve a permisos" -- o chat despacha uma troca de aba,</li><li data-nac-id="human_ok_checklist.list.26.item.3" data-nac-role="list-item">[ ] Repita em inglês ("go to permissions") + português</li><li data-nac-id="human_ok_checklist.list.26.item.4" data-nac-role="list-item">[ ] Diga "cambia de pestaña" -- o locale NÃO muda para</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.13-runtime-de-interop-nac-mcp-interopjs" data-nac-role="heading" data-nac-level="3" id="13-runtime-de-interop-nac-mcp-interopjs">1.3 Runtime de interop -- <code data-nac-role="code-inline">nac-mcp-interop.js</code></h3>
+<p data-nac-id="human_ok_checklist.p.28" data-nac-role="paragraph">List remote apps -&gt; Disconnect remote.</p>
+<p data-nac-id="human_ok_checklist.p.29" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.list_remote_apps()</code>.</p>
+<ul data-nac-id="human_ok_checklist.list.30" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.30.item.1" data-nac-role="list-item">[ ] Abra <code data-nac-role="code-inline">example-v22-interop.php</code>.</li><li data-nac-id="human_ok_checklist.list.30.item.2" data-nac-role="list-item">[ ] Use os 4 CTAs em ordem: Export tree -&gt; Import remote -&gt;</li><li data-nac-id="human_ok_checklist.list.30.item.3" data-nac-role="list-item">[ ] Cada CTA registra sucesso no seu painel de saída.</li><li data-nac-id="human_ok_checklist.list.30.item.4" data-nac-role="list-item">[ ] Após Disconnect, o app remoto não aparece mais em</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.2-pacote-npm" data-nac-role="heading" data-nac-level="2" id="2-pacote-npm">2. Pacote NPM</h2>
+<h3 data-nac-id="human_ok_checklist.h3.21-smoke-de-instalação-limpa" data-nac-role="heading" data-nac-level="3" id="21-smoke-de-instalação-limpa">2.1 Smoke de instalação limpa</h3>
+<p data-nac-id="human_ok_checklist.p.34" data-nac-role="paragraph">``<code data-nac-role="code-inline">       mkdir /tmp/nac-smoke &amp;&amp; cd /tmp/nac-smoke       npm init -y       npm install @nac3/runtime       node -e "import('@nac3/runtime').then(m =&gt; console.log(Object.keys(m)))"       </code>``</p>
+<ul data-nac-id="human_ok_checklist.list.35" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.35.item.1" data-nac-role="list-item">[ ] Em um diretório temporário:</li><li data-nac-id="human_ok_checklist.list.35.item.2" data-nac-role="list-item">[ ] A saída inclui <code data-nac-role="code-inline">NAC</code>, <code data-nac-role="code-inline">registerPlugin</code>, validators.</li><li data-nac-id="human_ok_checklist.list.35.item.3" data-nac-role="list-item">[ ] Nenhum aviso de deprecação durante a instalação.</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.22-validador-cli-em-um-projeto-externo" data-nac-role="heading" data-nac-level="3" id="22-validador-cli-em-um-projeto-externo">2.2 Validador CLI em um projeto externo</h3>
+<p data-nac-id="human_ok_checklist.p.37" data-nac-role="paragraph">adoção, ou qualquer pasta).</p>
+<p data-nac-id="human_ok_checklist.p.38" data-nac-role="paragraph">projetos limpos / código diferente de zero quando há achados.</p>
+<ul data-nac-id="human_ok_checklist.list.39" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.39.item.1" data-nac-role="list-item">[ ] Escolha qualquer projeto não-Yujin que você tenha (uma demo de</li><li data-nac-id="human_ok_checklist.list.39.item.2" data-nac-role="list-item">[ ] Execute <code data-nac-role="code-inline">npx @nac3/runtime validate .</code> a partir da raiz do projeto.</li><li data-nac-id="human_ok_checklist.list.39.item.3" data-nac-role="list-item">[ ] A saída é legível por humanos, lista 0 BLOCKERS, encerra com código 0 em</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.3-demos" data-nac-role="heading" data-nac-level="2" id="3-demos">3. Demos</h2>
+<h3 data-nac-id="human_ok_checklist.h3.31-landing-indexhtml" data-nac-role="heading" data-nac-level="3" id="31-landing-indexhtml">3.1 Landing -- <code data-nac-role="code-inline">index.html</code></h3>
+<p data-nac-id="human_ok_checklist.p.43" data-nac-role="paragraph">audível (TTS, não silenciosa).</p>
+<p data-nac-id="human_ok_checklist.p.44" data-nac-role="paragraph">coerente, não um erro.</p>
+<ul data-nac-id="human_ok_checklist.list.45" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.45.item.1" data-nac-role="list-item">[ ] A página renderiza com a identidade visual sumi-e, sem FOUC.</li><li data-nac-id="human_ok_checklist.list.45.item.2" data-nac-role="list-item">[ ] Clique em "Autopilot" -- o tour de 5 segundos é executado, narração</li><li data-nac-id="human_ok_checklist.list.45.item.3" data-nac-role="list-item">[ ] Abra o chat -- digite "que es NAC3?" -- obtenha uma resposta</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.32-demo-de-referência-examplephp" data-nac-role="heading" data-nac-level="3" id="32-demo-de-referência-examplephp">3.2 Demo de referência -- <code data-nac-role="code-inline">example.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.47" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.47.item.1" data-nac-role="list-item">[ ] Percorra cada um dos 27 widgets visíveis na página.</li><li data-nac-id="human_ok_checklist.list.47.item.2" data-nac-role="list-item">[ ] Zero erros no console após a passagem completa.</li><li data-nac-id="human_ok_checklist.list.47.item.3" data-nac-role="list-item">[ ] Zero widgets sem resposta (nenhum clique que não faça nada).</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.33-demo-brownfield-example-v20-fullphp" data-nac-role="heading" data-nac-level="3" id="33-demo-brownfield-example-v20-fullphp">3.3 Demo brownfield -- <code data-nac-role="code-inline">example-v20-full.php</code></h3>
+<p data-nac-id="human_ok_checklist.p.49" data-nac-role="paragraph">(ou "0 findings, OK").</p>
+<p data-nac-id="human_ok_checklist.p.50" data-nac-role="paragraph">emitem <code data-nac-role="code-inline">nac:action:succeeded</code> (visível no console se o       listener estiver anexado).</p>
+<p data-nac-id="human_ok_checklist.p.51" data-nac-role="paragraph">runtime rejeita corretamente cliques sintéticos para       verbos com gate isTrusted).</p>
+<p data-nac-id="human_ok_checklist.p.52" data-nac-role="paragraph">disparado.</p>
+<ul data-nac-id="human_ok_checklist.list.53" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.53.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">v20-panel</code> está visível no canto superior direito após o carregamento da página.</li><li data-nac-id="human_ok_checklist.list.53.item.2" data-nac-role="list-item">[ ] Clique em "describe_v2" -- o painel exibe saída JSON válida.</li><li data-nac-id="human_ok_checklist.list.53.item.3" data-nac-role="list-item">[ ] Clique em "validate_global_v2" -- o painel exibe achados</li><li data-nac-id="human_ok_checklist.list.53.item.4" data-nac-role="list-item">[ ] Clique em cada um dos 6 botões no v20-panel -- todos</li><li data-nac-id="human_ok_checklist.list.53.item.5" data-nac-role="list-item">[ ] Botão istrusted_fake -- o ack NÃO é disparado (o</li><li data-nac-id="human_ok_checklist.list.53.item.6" data-nac-role="list-item">[ ] Botão istrusted_real (clique humano real) -- o ack É</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.34-showcase-de-primitivos-example-v20-primitives-showcasephp" data-nac-role="heading" data-nac-level="3" id="34-showcase-de-primitivos-example-v20-primitives-showcasephp">3.4 Showcase de primitivos -- <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code></h3>
+<p data-nac-id="human_ok_checklist.p.55" data-nac-role="paragraph">exemplo funcional.</p>
+<p data-nac-id="human_ok_checklist.p.56" data-nac-role="paragraph">(sem placeholders corrompidos).</p>
+<ul data-nac-id="human_ok_checklist.list.57" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.57.item.1" data-nac-role="list-item">[ ] Cada um dos 8 primitivos renderiza uma seção com um</li><li data-nac-id="human_ok_checklist.list.57.item.2" data-nac-role="list-item">[ ] O texto didático em cada seção está correto</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.35-demo-de-data-table-example-v21-data-tablephp" data-nac-role="heading" data-nac-level="3" id="35-demo-de-data-table-example-v21-data-tablephp">3.5 Demo de data-table -- <code data-nac-role="code-inline">example-v21-data-table.php</code></h3>
+<p data-nac-id="human_ok_checklist.p.59" data-nac-role="paragraph">cantidad 2 precio 100" -- uma linha aparece na       tabela de coleção.</p>
+<p data-nac-id="human_ok_checklist.p.60" data-nac-role="paragraph">número, não com a tabela bruta.</p>
+<ul data-nac-id="human_ok_checklist.list.61" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.61.item.1" data-nac-role="list-item">[ ] Pressione o microfone, diga "agrega una linea con concepto leche</li><li data-nac-id="human_ok_checklist.list.61.item.2" data-nac-role="list-item">[ ] Diga "cuanto total hay?" -- o chat responde com um</li><li data-nac-id="human_ok_checklist.list.61.item.3" data-nac-role="list-item">[ ] Diga "ve a permisos" -- a aba muda.</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.36-demo-de-interop-example-v22-interopphp" data-nac-role="heading" data-nac-level="3" id="36-demo-de-interop-example-v22-interopphp">3.6 Demo de interop -- <code data-nac-role="code-inline">example-v22-interop.php</code></h3>
+<p data-nac-id="human_ok_checklist.p.63" data-nac-role="paragraph">handshake -- deve funcionar entre abas (cada       aba é sua própria instância NAC, a camada de interop é a       ponte).</p>
+<ul data-nac-id="human_ok_checklist.list.64" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.64.item.1" data-nac-role="list-item">[ ] Já coberto no item 1.3 acima.</li><li data-nac-id="human_ok_checklist.list.64.item.2" data-nac-role="list-item">[ ] Bônus: abra a página em duas abas do navegador, repita o</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.37-estudo-de-caso-react-demosreact" data-nac-role="heading" data-nac-level="3" id="37-estudo-de-caso-react-demosreact">3.7 Estudo de caso React -- <code data-nac-role="code-inline">demos/react/</code></h3>
+<p data-nac-id="human_ok_checklist.p.66" data-nac-role="paragraph">aparece.</p>
+<p data-nac-id="human_ok_checklist.p.67" data-nac-role="paragraph">aparece pelo caminho acionado pelo chat. Este é o       guarda de regressão para o bug #2 do estudo de caso.</p>
+<ul data-nac-id="human_ok_checklist.list.68" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.68.item.1" data-nac-role="list-item">[ ] Abra <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code>.</li><li data-nac-id="human_ok_checklist.list.68.item.2" data-nac-role="list-item">[ ] Digite "leche" na caixa de texto, clique em "Add" -- o todo</li><li data-nac-id="human_ok_checklist.list.68.item.3" data-nac-role="list-item">[ ] Abra o chat, diga (via microfone) "agrega pan" -- o todo "pan"</li><li data-nac-id="human_ok_checklist.list.68.item.4" data-nac-role="list-item">[ ] Diga "borra leche" -- o todo "leche" desaparece.</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.38-estudo-de-caso-angular-demosangular" data-nac-role="heading" data-nac-level="3" id="38-estudo-de-caso-angular-demosangular">3.8 Estudo de caso Angular -- <code data-nac-role="code-inline">demos/angular/</code></h3>
+<p data-nac-id="human_ok_checklist.p.70" data-nac-role="paragraph"><code data-nac-role="code-inline">/nac-spec/demos/angular/</code>.</p>
+<ul data-nac-id="human_ok_checklist.list.71" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.71.item.1" data-nac-role="list-item">[ ] Mesmas 4 verificações do React, em</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.4-documentação" data-nac-role="heading" data-nac-level="2" id="4-documentação">4. Documentação</h2>
+<p data-nac-id="human_ok_checklist.p.74" data-nac-role="paragraph">Para cada um dos documentos abaixo, leia do início ao fim pelo menos uma vez por release trimestral. Verifique:</p>
+<ul data-nac-id="human_ok_checklist.list.75" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.75.item.1" data-nac-role="list-item">O carimbo de versão está atualizado (v2.2).</li><li data-nac-id="human_ok_checklist.list.75.item.2" data-nac-role="list-item">Nenhum link interno quebrado.</li><li data-nac-id="human_ok_checklist.list.75.item.3" data-nac-role="list-item">Nenhum TODO pendente.</li><li data-nac-id="human_ok_checklist.list.75.item.4" data-nac-role="list-item">Os trechos de código compilam / executam conforme mostrado.</li></ul>
+<ul data-nac-id="human_ok_checklist.list.76" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.76.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SPEC.md</code> (contrato canônico).</li><li data-nac-id="human_ok_checklist.list.76.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">ABOUT.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">CONTRIBUTING.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SECURITY.md</code> -- mais releitura trimestral do modelo de ameaças.</li><li data-nac-id="human_ok_checklist.list.76.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">README_DEMOS.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_LAUNCH_DIFFUSION.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code>.</li><li data-nac-id="human_ok_checklist.list.76.item.11" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/TEST_COVERAGE_MATRIX.md</code> (esta matriz é o documento irmão).</li><li data-nac-id="human_ok_checklist.list.76.item.12" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/VOICE_CHAT_ERROR_ANALYSIS_2026_05_09.md</code>.</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.5-guias-de-adoção" data-nac-role="heading" data-nac-level="2" id="5-guias-de-adoção">5. Guias de adoção</h2>
+<p data-nac-id="human_ok_checklist.p.79" data-nac-role="paragraph">Para cada guia, verifique se o trecho hello-world ainda compila e se os passos conduzem um leitor iniciante a uma instalação funcional:</p>
+<p data-nac-id="human_ok_checklist.p.80" data-nac-role="paragraph">standalone.</p>
+<p data-nac-id="human_ok_checklist.p.81" data-nac-role="paragraph">e o teste de contrato de exemplo passa.</p>
+<p data-nac-id="human_ok_checklist.p.82" data-nac-role="paragraph">ainda correspondem à API de runtime.</p>
+<p data-nac-id="human_ok_checklist.p.83" data-nac-role="paragraph">atualidade (verificar a cada trimestre).</p>
+<p data-nac-id="human_ok_checklist.p.84" data-nac-role="paragraph">uma vez (ou seu equivalente na versão mais recente do UiPath       Studio).</p>
+<p data-nac-id="human_ok_checklist.p.85" data-nac-role="paragraph">equivalente.</p>
+<p data-nac-id="human_ok_checklist.p.86" data-nac-role="paragraph">equivalente.</p>
+<ul data-nac-id="human_ok_checklist.list.87" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.87.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/REACT.md</code> -- trecho compila com Vite + React 18.</li><li data-nac-id="human_ok_checklist.list.87.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/ANGULAR.md</code> -- trecho compila com Angular 17</li><li data-nac-id="human_ok_checklist.list.87.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> -- o backend de referência Node inicializa</li><li data-nac-id="human_ok_checklist.list.87.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_NEW_PROJECT.md</code> -- as asserções dos passos</li><li data-nac-id="human_ok_checklist.list.87.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_MIGRATION.md</code> -- idem.</li><li data-nac-id="human_ok_checklist.list.87.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_TESTING.md</code> -- números revisados para</li><li data-nac-id="human_ok_checklist.list.87.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_RPA.md</code> -- idem.</li><li data-nac-id="human_ok_checklist.list.87.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_UIPATH.md</code> -- executar o exemplo <code data-nac-role="code-inline">InvoiceFromCSV.xaml</code></li><li data-nac-id="human_ok_checklist.list.87.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_AUTOMATION_ANYWHERE.md</code> -- workflow de exemplo</li><li data-nac-id="human_ok_checklist.list.87.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_BLUE_PRISM.md</code> -- estudo de objeto de exemplo</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.6-suítes-de-teste" data-nac-role="heading" data-nac-level="2" id="6-suítes-de-teste">6. Suítes de teste</h2>
+<p data-nac-id="human_ok_checklist.p.90" data-nac-role="paragraph">menos de 15s.</p>
+<p data-nac-id="human_ok_checklist.p.91" data-nac-role="paragraph">o total esperado.</p>
+<p data-nac-id="human_ok_checklist.p.92" data-nac-role="paragraph">arquivo por locale (10 arquivos no total) -- reproduzir no       player de áudio -- audível e inteligível.</p>
+<p data-nac-id="human_ok_checklist.p.93" data-nac-role="paragraph"><code data-nac-role="code-inline">stage3-backend.mjs</code> -- as respostas fazem sentido, sem       desvios.</p>
+<p data-nac-id="human_ok_checklist.p.94" data-nac-role="paragraph">(<code data-nac-role="code-inline">npx playwright test --headed</code>) -- observar visualmente a UI       de cada spec durante a execução.</p>
+<p data-nac-id="human_ok_checklist.p.95" data-nac-role="paragraph">completa com 0 ocorrências.</p>
+<ul data-nac-id="human_ok_checklist.list.96" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.96.item.1" data-nac-role="list-item">[ ] Executar <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> -- TODOS VERDES em</li><li data-nac-id="human_ok_checklist.list.96.item.2" data-nac-role="list-item">[ ] Inspecionar o contador de smoke (<code data-nac-role="code-inline">36 PASS</code>) -- confere com</li><li data-nac-id="human_ok_checklist.list.96.item.3" data-nac-role="list-item">[ ] Abrir <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/</code> -- selecionar 1</li><li data-nac-id="human_ok_checklist.list.96.item.4" data-nac-role="list-item">[ ] Verificar aleatoriamente 2 prompts LLM de</li><li data-nac-id="human_ok_checklist.list.96.item.5" data-nac-role="list-item">[ ] Executar a suíte Playwright com <code data-nac-role="code-inline">--headed</code> uma vez</li><li data-nac-id="human_ok_checklist.list.96.item.6" data-nac-role="list-item">[ ] Executar <code data-nac-role="code-inline">bash tools/nac/discovery-loop.sh 1</code> -- uma rodada</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.7-pacotes-de-casos-de-estudo" data-nac-role="heading" data-nac-level="2" id="7-pacotes-de-casos-de-estudo">7. Pacotes de casos de estudo</h2>
+<p data-nac-id="human_ok_checklist.p.99" data-nac-role="paragraph">(<code data-nac-role="code-inline">npm run build</code>).</p>
+<p data-nac-id="human_ok_checklist.p.100" data-nac-role="paragraph">build local.</p>
+<ul data-nac-id="human_ok_checklist.list.101" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.101.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-react-demo/</code> compila sem erros</li><li data-nac-id="human_ok_checklist.list.101.item.2" data-nac-role="list-item">[ ] O dist React implantado se comporta de forma idêntica ao</li><li data-nac-id="human_ok_checklist.list.101.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-angular-demo/</code> compila sem erros.</li><li data-nac-id="human_ok_checklist.list.101.item.4" data-nac-role="list-item">[ ] O dist Angular implantado se comporta de forma idêntica.</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.8-aspectos-transversais" data-nac-role="heading" data-nac-level="2" id="8-aspectos-transversais">8. Aspectos transversais</h2>
+<h3 data-nac-id="human_ok_checklist.h3.81-i18n" data-nac-role="heading" data-nac-level="3" id="81-i18n">8.1 i18n</h3>
+<p data-nac-id="human_ok_checklist.p.105" data-nac-role="paragraph">falante nativo para verificação pontual de 10 strings aleatórias.</p>
+<p data-nac-id="human_ok_checklist.p.106" data-nac-role="paragraph">locales (<code data-nac-role="code-inline">NAC.validate_global({locale: 'all'})</code>).</p>
+<ul data-nac-id="human_ok_checklist.list.107" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.107.item.1" data-nac-role="list-item">[ ] Escolher um locale (rotacionar a cada release) -- enviar para um</li><li data-nac-id="human_ok_checklist.list.107.item.2" data-nac-role="list-item">[ ] O validador confirma 0 chaves ausentes em todos os 10</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.82-hmac-proveniência" data-nac-role="heading" data-nac-level="3" id="82-hmac-proveniência">8.2 HMAC + proveniência</h3>
+<p data-nac-id="human_ok_checklist.p.109" data-nac-role="paragraph">a assinatura do manifesto é verificada, sem erros de       <code data-nac-role="code-inline">provenance_mismatch</code> nos logs.</p>
+<ul data-nac-id="human_ok_checklist.list.110" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.110.item.1" data-nac-role="list-item">[ ] Executar o smoke multi-tenant contra o tenant de staging --</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.83-controle-istrusted" data-nac-role="heading" data-nac-level="3" id="83-controle-istrusted">8.3 Controle isTrusted</h3>
+<p data-nac-id="human_ok_checklist.p.112" data-nac-role="paragraph">istrusted_fake (coberto em 3.3 acima) PASSA no diff visual:       o real dispara ack, o falso não dispara.</p>
+<ul data-nac-id="human_ok_checklist.list.113" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.113.item.1" data-nac-role="list-item">[ ] Em <code data-nac-role="code-inline">example-v20-full.php</code>, o teste lado a lado de istrusted_real vs</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.84-interoperabilidade-cross-origin-prévia-v23" data-nac-role="heading" data-nac-level="3" id="84-interoperabilidade-cross-origin-prévia-v23">8.4 Interoperabilidade cross-origin (prévia v2.3)</h3>
+<p data-nac-id="human_ok_checklist.p.115" data-nac-role="paragraph">GA: abrir a demo de interoperabilidade contra um peer NAC3 remoto       hospedado em uma origem diferente, bearer token real,       preflight CORS real. O roundtrip é concluído com sucesso.</p>
+<ul data-nac-id="human_ok_checklist.list.116" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.116.item.1" data-nac-role="list-item">[ ] Pelo menos UM teste cross-origin antes de declarar v2.3</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.85-implantação" data-nac-role="heading" data-nac-level="3" id="85-implantação">8.5 Implantação</h3>
+<p data-nac-id="human_ok_checklist.p.118" data-nac-role="paragraph">200 + conteúdo correto:</p>
+<ul data-nac-id="human_ok_checklist.list.119" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.119.item.1" data-nac-role="list-item">[ ] Após o push do release, executar curl nestas URLs e confirmar</li><li data-nac-id="human_ok_checklist.list.119.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code></li><li data-nac-id="human_ok_checklist.list.119.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/SPEC.md</code></li><li data-nac-id="human_ok_checklist.list.119.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac.js</code></li><li data-nac-id="human_ok_checklist.list.119.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac-chat-client.js</code></li><li data-nac-id="human_ok_checklist.list.119.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code></li><li data-nac-id="human_ok_checklist.list.119.item.7" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="human_ok_checklist.list.119.item.8" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v22-interop.php</code></li><li data-nac-id="human_ok_checklist.list.119.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code></li><li data-nac-id="human_ok_checklist.list.119.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code></li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.86-áudio-real" data-nac-role="heading" data-nac-level="3" id="86-áudio-real">8.6 Áudio real</h3>
+<p data-nac-id="human_ok_checklist.p.121" data-nac-role="paragraph">microfone no <code data-nac-role="code-inline">example-v21-data-table.php</code> ao vivo, falar um       prompt por locale (10 prompts no total) -- o despacho LLM       faz sentido em todos os locales.</p>
+<ul data-nac-id="human_ok_checklist.list.122" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.122.item.1" data-nac-role="list-item">[ ] Hardware real (microfone + alto-falante do laptop) -- pressionar o</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.9-verificação-com-leitor-de-tela-acessibilidade-track-g7" data-nac-role="heading" data-nac-level="2" id="9-verificação-com-leitor-de-tela-acessibilidade-track-g7">9. Verificação com leitor de tela (acessibilidade -- Track G7)</h2>
+<p data-nac-id="human_ok_checklist.p.125" data-nac-role="paragraph">Esta seção percorre as demos com um leitor de tela ativado + monitor desligado (ou olhos literalmente fechados). É o critério de aprovação para o compromisso de acessibilidade em <a href="ACCESSIBILITY.md" data-nac-id="human_ok_checklist.link.2" data-nac-role="action" data-nac-action="open">ACCESSIBILITY.md</a>.</p>
+<p data-nac-id="human_ok_checklist.p.126" data-nac-role="paragraph">Realize esta seção em pelo menos DOIS leitores de tela por release (NVDA é a entrada mais fácil no Windows; VoiceOver vem pré-instalado no macOS; JAWS se você tiver licença).</p>
+<h3 data-nac-id="human_ok_checklist.h3.91-nvda-windows" data-nac-role="heading" data-nac-level="3" id="91-nvda-windows">9.1 NVDA (Windows)</h3>
+<p data-nac-id="human_ok_checklist.p.128" data-nac-role="paragraph">Ctrl+Alt+N.</p>
+<p data-nac-id="human_ok_checklist.p.129" data-nac-role="paragraph">monitor desligado (ou olhos fechados).</p>
+<p data-nac-id="human_ok_checklist.p.130" data-nac-role="paragraph">de cabeçalhos (h1, h2, h3) ao navegar com a tecla H.</p>
+<p data-nac-id="human_ok_checklist.p.131" data-nac-role="paragraph">ordem lógica; cada controle anuncia claramente seu papel +       rótulo.</p>
+<p data-nac-id="human_ok_checklist.p.132" data-nac-role="paragraph">role=textbox com um rótulo claro).</p>
+<p data-nac-id="human_ok_checklist.p.133" data-nac-role="paragraph">completa quando ela chega.</p>
+<ul data-nac-id="human_ok_checklist.list.134" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.134.item.1" data-nac-role="list-item">[ ] Instalar o NVDA (gratuito, nvaccess.org). Iniciar com</li><li data-nac-id="human_ok_checklist.list.134.item.2" data-nac-role="list-item">[ ] Abrir <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code> com o</li><li data-nac-id="human_ok_checklist.list.134.item.3" data-nac-role="list-item">[ ] NVDA anuncia o título da página + um esboço estruturado</li><li data-nac-id="human_ok_checklist.list.134.item.4" data-nac-role="list-item">[ ] A tecla Tab alcança todos os controles interativos em uma</li><li data-nac-id="human_ok_checklist.list.134.item.5" data-nac-role="list-item">[ ] Abrir o painel de chat (NVDA lê que o campo de entrada do chat tem</li><li data-nac-id="human_ok_checklist.list.134.item.6" data-nac-role="list-item">[ ] Digitar "que es NAC3?" + enviar -- NVDA lê a resposta</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.92-nvda-em-example-v21-data-tablephp" data-nac-role="heading" data-nac-level="3" id="92-nvda-em-example-v21-data-tablephp">9.2 NVDA em <code data-nac-role="code-inline">example-v21-data-table.php</code></h3>
+<p data-nac-id="human_ok_checklist.p.136" data-nac-role="paragraph">na navegação por Tab.</p>
+<p data-nac-id="human_ok_checklist.p.137" data-nac-role="paragraph"><code data-nac-role="code-inline">nac:tab:activated</code>.</p>
+<p data-nac-id="human_ok_checklist.p.138" data-nac-role="paragraph">linha sem solicitação (ou com uma única seta para baixo).</p>
+<ul data-nac-id="human_ok_checklist.list.139" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.139.item.1" data-nac-role="list-item">[ ] NVDA anuncia "Lines (collection) tab" + a aba Permissions</li><li data-nac-id="human_ok_checklist.list.139.item.2" data-nac-role="list-item">[ ] Ativar uma aba anuncia o novo estado via o ack do evento</li><li data-nac-id="human_ok_checklist.list.139.item.3" data-nac-role="list-item">[ ] Quando o LLM adiciona uma linha, NVDA lê o conteúdo da nova</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.93-voiceover-macos" data-nac-role="heading" data-nac-level="3" id="93-voiceover-macos">9.3 VoiceOver (macOS)</h3>
+<p data-nac-id="human_ok_checklist.p.141" data-nac-role="paragraph">de formulário estão preenchidos.</p>
+<p data-nac-id="human_ok_checklist.p.142" data-nac-role="paragraph">semanticamente, não "div div div link link button".</p>
+<ul data-nac-id="human_ok_checklist.list.143" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.143.item.1" data-nac-role="list-item">[ ] Cmd+F5 para iniciar o VoiceOver.</li><li data-nac-id="human_ok_checklist.list.143.item.2" data-nac-role="list-item">[ ] Abrir <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code>.</li><li data-nac-id="human_ok_checklist.list.143.item.3" data-nac-role="list-item">[ ] VO+U abre o rotor; verificar se cabeçalhos, links e controles</li><li data-nac-id="human_ok_checklist.list.143.item.4" data-nac-role="list-item">[ ] VO+A lê a página inteira de cima a baixo -- faz sentido</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.94-voiceover-nos-casos-de-estudo-react-angular" data-nac-role="heading" data-nac-level="3" id="94-voiceover-nos-casos-de-estudo-react-angular">9.4 VoiceOver nos casos de estudo React + Angular</h3>
+<p data-nac-id="human_ok_checklist.p.145" data-nac-role="paragraph">usando apenas teclado + VoiceOver. O novo todo é       anunciado ao ser adicionado (o evento ack está conectado).</p>
+<ul data-nac-id="human_ok_checklist.list.146" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.146.item.1" data-nac-role="list-item">[ ] Em <code data-nac-role="code-inline">demos/react/</code>: adicionar um todo via campo de entrada</li><li data-nac-id="human_ok_checklist.list.146.item.2" data-nac-role="list-item">[ ] Em <code data-nac-role="code-inline">demos/angular/</code>: mesmo teste, mesma expectativa.</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.95-navegação-apenas-por-teclado-sem-leitor-de-tela-apenas-se" data-nac-role="heading" data-nac-level="3" id="95-navegação-apenas-por-teclado-sem-leitor-de-tela-apenas-se">9.5 Navegação apenas por teclado (sem leitor de tela, apenas sem</h3>
+<p data-nac-id="human_ok_checklist.p.148" data-nac-role="paragraph">mouse)</p>
+<p data-nac-id="human_ok_checklist.p.149" data-nac-role="paragraph">de foco é visível (anel de foco presente).</p>
+<p data-nac-id="human_ok_checklist.p.150" data-nac-role="paragraph">enviar. O resultado é narrado / exibido corretamente.</p>
+<p data-nac-id="human_ok_checklist.p.151" data-nac-role="paragraph">topo).</p>
+<ul data-nac-id="human_ok_checklist.list.152" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.152.item.1" data-nac-role="list-item">[ ] Desconectar/desabilitar o mouse.</li><li data-nac-id="human_ok_checklist.list.152.item.2" data-nac-role="list-item">[ ] Percorrer a página inicial usando apenas a tecla Tab. Cada ponto</li><li data-nac-id="human_ok_checklist.list.152.item.3" data-nac-role="list-item">[ ] Abrir o painel de chat via teclado, digitar um prompt,</li><li data-nac-id="human_ok_checklist.list.152.item.4" data-nac-role="list-item">[ ] Escape fecha qualquer modal que tenha sido aberto.</li><li data-nac-id="human_ok_checklist.list.152.item.5" data-nac-role="list-item">[ ] Sem armadilhas de teclado (Tab eventualmente cicla de volta ao</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.96-alto-contraste-zoom-a-200" data-nac-role="heading" data-nac-level="3" id="96-alto-contraste-zoom-a-200">9.6 Alto contraste + zoom a 200%</h3>
+<p data-nac-id="human_ok_checklist.p.154" data-nac-role="paragraph">quebra, sem rolagem horizontal, sem sobreposição de texto.</p>
+<p data-nac-id="human_ok_checklist.p.155" data-nac-role="paragraph">macOS). Botões, links e anéis de foco permanecem       visíveis.</p>
+<ul data-nac-id="human_ok_checklist.list.156" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.156.item.1" data-nac-role="list-item">[ ] Zoom do navegador a 200% na página inicial. O layout NÃO</li><li data-nac-id="human_ok_checklist.list.156.item.2" data-nac-role="list-item">[ ] Modo de alto contraste do Windows (ou Aumentar Contraste do</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.97-controle-por-voz-o-caso-recursivo" data-nac-role="heading" data-nac-level="3" id="97-controle-por-voz-o-caso-recursivo">9.7 Controle por voz (o caso recursivo)</h3>
+<p data-nac-id="human_ok_checklist.p.158" data-nac-role="paragraph">do <code data-nac-role="code-inline">nac-chat-client.js</code> de referência), controlar as demos       apenas por voz.</p>
+<p data-nac-id="human_ok_checklist.p.159" data-nac-role="paragraph">("gravação iniciada", "gravação encerrada").</p>
+<p data-nac-id="human_ok_checklist.p.160" data-nac-role="paragraph">ack é anunciado ao leitor de tela.</p>
+<ul data-nac-id="human_ok_checklist.list.161" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.161.item.1" data-nac-role="list-item">[ ] Em um navegador equipado com Pilot (ou usando o botão de microfone</li><li data-nac-id="human_ok_checklist.list.161.item.2" data-nac-role="list-item">[ ] O botão de microfone anuncia seu estado ao NVDA/VoiceOver</li><li data-nac-id="human_ok_checklist.list.161.item.3" data-nac-role="list-item">[ ] Comandos de voz despachados via NAC3 têm efeito; o</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.98-problemas-de-acessibilidade-encontrados" data-nac-role="heading" data-nac-level="3" id="98-problemas-de-acessibilidade-encontrados">9.8 Problemas de acessibilidade encontrados</h3>
+<p data-nac-id="human_ok_checklist.p.163" data-nac-role="paragraph">Liste aqui quaisquer problemas encontrados nesta seção, com severidade:</p>
+<pre data-nac-id="human_ok_checklist.code.1" data-nac-role="code" data-nac-lang="text"><code>-
+-
+-</code></pre>
+<p data-nac-id="human_ok_checklist.p.165" data-nac-role="paragraph">Se algum problema de severidade BLOQUEANTE estiver em aberto, o release NÃO é publicado até que seja resolvido.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.aprovação-final" data-nac-role="heading" data-nac-level="2" id="aprovação-final">APROVAÇÃO FINAL</h2>
+<pre data-nac-id="human_ok_checklist.code.2" data-nac-role="code" data-nac-lang="text"><code>Tag do release:         v____._.___
+Verificado por:         ______________________
+Verificado em:          ____-____-____
+Navegadores usados:     [ ] Chrome  [ ] Firefox  [ ] Safari
+Falantes nativos consultados (locale -&gt; nome):
+   ____________________________________________
+Total de itens verificados:  ___ / ___
+Itens com falha (listar com links de bugs):
+   ____________________________________________
+   ____________________________________________
+Assinatura:             ______________________</code></pre>
+<p data-nac-id="human_ok_checklist.p.169" data-nac-role="paragraph">Faça o commit deste arquivo com o bloco de APROVAÇÃO FINAL preenchido para marcar o release como "aprovado por humano".</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.veja-também" data-nac-role="heading" data-nac-level="2" id="veja-também">Veja também</h2>
+<p data-nac-id="human_ok_checklist.p.172" data-nac-role="paragraph">matriz da qual este checklist deriva.</p>
+<p data-nac-id="human_ok_checklist.p.173" data-nac-role="paragraph">para adotantes.</p>
+<p data-nac-id="human_ok_checklist.p.174" data-nac-role="paragraph">-- o registro de cobertura automática para o release atual.</p>
+<ul data-nac-id="human_ok_checklist.list.175" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.175.item.1" data-nac-role="list-item"><a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.3" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a> -- a</li><li data-nac-id="human_ok_checklist.list.175.item.2" data-nac-role="list-item"><a href="NAC_TEST_MANUAL.md" data-nac-id="human_ok_checklist.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- o playbook upstream</li><li data-nac-id="human_ok_checklist.list.175.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="human_ok_checklist.link.5" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a></li></ul>
+<h2 data-nac-id="human_ok_checklist.h2.licença" data-nac-role="heading" data-nac-level="2" id="licença">Licença</h2>
+<p data-nac-id="human_ok_checklist.p.177" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="human_ok_checklist.p.179" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/HUMAN_OK_CHECKLIST.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "human_ok_checklist",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "human_ok_checklist.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "human_ok_checklist.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "human_ok_checklist.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "human_ok_checklist.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>دليل تكامل NAC3 مع UiPath -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_uipath" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_uipath" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_uipath.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_uipath.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_uipath.mp3" data-nac-id="rpa_uipath.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_uipath.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_uipath.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_uipath.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_uipath.p.1" data-nac-role="paragraph">translation_source: guides/RPA_UIPATH.md translation_source_hash: 2dd66d68221f687237ac663fa2a360077a51b7cdf8ad74c16488a5934ee7927d translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T15:18:09.416277+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_uipath.h1.دليل-تكامل-nac3-مع-uipath" data-nac-role="heading" data-nac-level="1" id="دليل-تكامل-nac3-مع-uipath">دليل تكامل NAC3 مع UiPath</h1>
+<p data-nac-id="rpa_uipath.p.4" data-nac-role="paragraph"><strong>إصدار NAC3:</strong> 2.2 (مع معاينة التوافق مع v2.3) <strong>الحالة:</strong> مستقر. تم الاختبار مع UiPath Studio 23.10 + Web Automation v23.10.</p>
+<p data-nac-id="rpa_uipath.p.5" data-nac-role="paragraph">تعتمد أتمتة الويب في UiPath اليوم على استخراج DOM باستخدام محددات CSS، أو الاستهداف البصري، أو الإحداثيات المُضمَّنة. مع NAC3، يُعلن كل عنصر قابل للنقر في تطبيقك عن معرّف ثابت <code data-nac-role="code-inline">data-nac-id</code>؛ يستخدم UiPath هذا المعرّف للوصول إلى العناصر، مما يجعله متيناً أمام أي إعادة تصميم للواجهة.</p>
+<h2 data-nac-id="rpa_uipath.h2.لماذا-nac3-uipath" data-nac-role="heading" data-nac-level="2" id="لماذا-nac3-uipath">لماذا NAC3 + UiPath</h2>
+<p data-nac-id="rpa_uipath.p.7" data-nac-role="paragraph">| المشكلة الحالية | الحل مع NAC3 | |----------------|-------------| | تنكسر المحددات عند تغيير CSS | <code data-nac-role="code-inline">data-nac-id</code> ثابت عبر إعادة التصاميم البصرية | | يفشل الاستهداف بالإحداثيات بعد تحريك زر | نفس الحل | | هشاشة التعامل مع المستأجرين المتعددين (معرّفات مختلفة لكل عميل) | يُعلن المانيفست عن الفعل؛ يستدعي البوت بالفعل | | الانتظار حتى "يصبح العنصر جاهزاً" غير موثوق | حدث <code data-nac-role="code-inline">nac:action:succeeded</code> حتمي ودقيق | | واجهات متعددة اللغات تحتاج أتمتة لكل لغة | <code data-nac-role="code-inline">label_i18n</code> مستقل عن اللغة؛ يستخدم البوت المعرّفات لا التسميات |</p>
+<h2 data-nac-id="rpa_uipath.h2.مسارا-التكامل" data-nac-role="heading" data-nac-level="2" id="مسارا-التكامل">مسارا التكامل</h2>
+<h3 data-nac-id="rpa_uipath.h3.المسار-a-نشاط-المتصفح-حقن-js-موصى-به" data-nac-role="heading" data-nac-level="3" id="المسار-a-نشاط-المتصفح-حقن-js-موصى-به">المسار A -- نشاط المتصفح + حقن JS (موصى به)</h3>
+<p data-nac-id="rpa_uipath.p.10" data-nac-role="paragraph">يُشغّل نشاط <code data-nac-role="code-inline">Inject JavaScript</code> في UiPath الأمر <code data-nac-role="code-inline">window.NAC.click(...)</code> مباشرةً. لا محددات، لا هشاشة.</p>
+<pre data-nac-id="rpa_uipath.code.1" data-nac-role="code" data-nac-lang="vb"><code>&#x27; UiPath sequence pseudocode
+Open Browser https://your-app.example.com/
+Inject JS: window.NAC.click(&#x27;invoice.save&#x27;)
+Wait for Event: nac:action:succeeded</code></pre>
+<p data-nac-id="rpa_uipath.p.12" data-nac-role="paragraph">خطوات التنفيذ:</p>
+<p data-nac-id="rpa_uipath.p.13" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    return await (async () =&gt; {      const result = await window.NAC.click('@id@');      return JSON.stringify(result);    })();    </code>``</p>
+<ol data-nac-id="rpa_uipath.list.14" data-nac-role="list"><li data-nac-id="rpa_uipath.list.14.item.1" data-nac-role="list-item"><strong>نشاط المتصفح</strong> -- تدفق UiPath المعتاد.</li><li data-nac-id="rpa_uipath.list.14.item.2" data-nac-role="list-item"><strong>نشاط Inject JavaScript</strong> -- الحمولة:</li><li data-nac-id="rpa_uipath.list.14.item.3" data-nac-role="list-item"><strong>تعيين</strong> السلسلة المُعادة إلى متغير. تحليلها للتحقق من <code data-nac-role="code-inline">{ok: true}</code>.</li></ol>
+<p data-nac-id="rpa_uipath.p.15" data-nac-role="paragraph">للإرسال المبني على الأفعال:</p>
+<pre data-nac-id="rpa_uipath.code.2" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.click_by_verb(&#x27;@plugin@&#x27;, &#x27;@verb@&#x27;)</code></pre>
+<p data-nac-id="rpa_uipath.p.17" data-nac-role="paragraph">للتعبئة:</p>
+<pre data-nac-id="rpa_uipath.code.3" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.fill(&#x27;@id@&#x27;, &#x27;@value@&#x27;)</code></pre>
+<h3 data-nac-id="rpa_uipath.h3.المسار-b-مبني-على-المحددات-مع-xpath-يدرك-nac" data-nac-role="heading" data-nac-level="3" id="المسار-b-مبني-على-المحددات-مع-xpath-يدرك-nac">المسار B -- مبني على المحددات مع xpath يدرك NAC</h3>
+<p data-nac-id="rpa_uipath.p.20" data-nac-role="paragraph">إذا كان ملف تعريف UiPath لديك يُفضّل المحددات، استخدم السمة <code data-nac-role="code-inline">data-nac-id</code> مباشرةً:</p>
+<pre data-nac-id="rpa_uipath.code.4" data-nac-role="code" data-nac-lang="xml"><code>&lt;webctrl tag=&#x27;button&#x27; attr=&#x27;data-nac-id&#x27; value=&#x27;invoice.save&#x27; /&gt;</code></pre>
+<p data-nac-id="rpa_uipath.p.22" data-nac-role="paragraph">نفس المنطق لكنه يستهلك DOM المتصفح عبر مستكشف شجرة UiPath. أقل متانةً قليلاً (يعتمد على توقيت الشجرة) لكنه يحافظ على أسلوب UiPath المعتاد.</p>
+<h2 data-nac-id="rpa_uipath.h2.نموذج-سير-عمل-uipath" data-nac-role="heading" data-nac-level="2" id="نموذج-سير-عمل-uipath">نموذج سير عمل UiPath</h2>
+<p data-nac-id="rpa_uipath.p.24" data-nac-role="paragraph"><code data-nac-role="code-inline">Examples_NAC_Invoice.xaml</code> (للتنزيل من سوق Yujin عند النشر):</p>
+<p data-nac-id="rpa_uipath.p.25" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    return new Promise(r =&gt; {      const t = setInterval(() =&gt; {        if (window.NAC) { clearInterval(t); r('ready'); }      }, 100);    });    </code>``</p>
+<p data-nac-id="rpa_uipath.p.26" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    await window.NAC.click_by_verb('invoice', 'new');    await window.NAC.fill('invoice.client_name', @row("client")@);    await window.NAC.fill('invoice.amount', @row("amount")@);    await window.NAC.click_by_verb('invoice', 'save');    </code>``</p>
+<ol data-nac-id="rpa_uipath.list.27" data-nac-role="list"><li data-nac-id="rpa_uipath.list.27.item.1" data-nac-role="list-item"><strong>Open Browser</strong> -- وجّه التبويب إلى تطبيقك المتوافق مع NAC-3.</li><li data-nac-id="rpa_uipath.list.27.item.2" data-nac-role="list-item"><strong>انتظر window.NAC3</strong> -- احقن:</li><li data-nac-id="rpa_uipath.list.27.item.3" data-nac-role="list-item"><strong>For Each Row</strong> -- كرّر على جدول البيانات المصدر.</li><li data-nac-id="rpa_uipath.list.27.item.4" data-nac-role="list-item"><strong>Inject JS</strong> -- لكل صف:</li><li data-nac-id="rpa_uipath.list.27.item.5" data-nac-role="list-item"><strong>انتظر</strong> -- حدث nac:action:succeeded مع action_id='invoice.save'.</li><li data-nac-id="rpa_uipath.list.27.item.6" data-nac-role="list-item"><strong>تابع</strong> الحلقة.</li></ol>
+<p data-nac-id="rpa_uipath.p.28" data-nac-role="paragraph">يتكون التدفق بأكمله من 5 أنشطة بغض النظر عن مدى تعقيد التطبيق الأساسي. قارن ذلك بـ 30-50 نشاطاً نموذجياً لمكافئ مبني على محددات CSS.</p>
+<h2 data-nac-id="rpa_uipath.h2.الاستكشاف-قراءة-المانيفست" data-nac-role="heading" data-nac-level="2" id="الاستكشاف-قراءة-المانيفست">الاستكشاف: قراءة المانيفست</h2>
+<p data-nac-id="rpa_uipath.p.30" data-nac-role="paragraph">يستطيع UiPath استبطان المانيفست قبل بدء الأتمتة:</p>
+<pre data-nac-id="rpa_uipath.code.5" data-nac-role="code" data-nac-lang="js"><code>return window.NAC.describe();</code></pre>
+<p data-nac-id="rpa_uipath.p.32" data-nac-role="paragraph">يُعيد شجرة الإضافات كاملةً. استخدمها لبناء مخططات تدفق ديناميكية تتكيف مع تغييرات المانيفست دون إعادة نشر ملف .xaml.</p>
+<h2 data-nac-id="rpa_uipath.h2.الإثبات-nac-3" data-nac-role="heading" data-nac-level="2" id="الإثبات-nac-3">الإثبات (NAC-3)</h2>
+<p data-nac-id="rpa_uipath.p.34" data-nac-role="paragraph">يُرسل UiPath نقرات اصطناعية، لذا تكون قيمة <code data-nac-role="code-inline">event.isTrusted === false</code> في حدث إقرار NAC3. التطبيقات التي تشترط <code data-nac-role="code-inline">is_trusted</code> للأفعال الحساسة (الحذف، الدفع، الإدارة) ستُرفض افتراضياً عند إرسال UiPath.</p>
+<p data-nac-id="rpa_uipath.p.35" data-nac-role="paragraph">لتمكين RPA لتلك الأفعال، يجب على التطبيق المضيف إدراجها صراحةً في القائمة البيضاء:</p>
+<pre data-nac-id="rpa_uipath.code.6" data-nac-role="code" data-nac-lang="js"><code>// In the host app&#x27;s NAC bootstrap:
+window.__NAC_ALLOW_UNTRUSTED__ = [&#x27;invoice.save&#x27;, &#x27;invoice.send&#x27;];</code></pre>
+<p data-nac-id="rpa_uipath.p.37" data-nac-role="paragraph">ناقش نموذج التهديد مع مالك التطبيق -- تجاوز isTrusted يُبطل ضمان مكافحة الانتحال في المواصفة. يعمل UiPath في بيئة خاضعة للتحكم لذا تكون المقايضة مقبولة عادةً، لكن وثّق ذلك.</p>
+<h2 data-nac-id="rpa_uipath.h2.معالجة-الأخطاء" data-nac-role="heading" data-nac-level="2" id="معالجة-الأخطاء">معالجة الأخطاء</h2>
+<p data-nac-id="rpa_uipath.p.39" data-nac-role="paragraph">يُطلق NAC3 أخطاءً منظّمة يمكن لـ UiPath التفريع بناءً عليها:</p>
+<pre data-nac-id="rpa_uipath.code.7" data-nac-role="code" data-nac-lang="js"><code>try {
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+} catch (e) {
+  return JSON.stringify({ ok: false, code: e.code, message: e.message });
+}</code></pre>
+<p data-nac-id="rpa_uipath.p.41" data-nac-role="paragraph">| <code data-nac-role="code-inline">e.code</code> | المعنى | فرع UiPath | |----------|--------|------------| | <code data-nac-role="code-inline">not_found</code> | المعرّف غير موجود في DOM الحالي | أعد الاستكشاف عبر <code data-nac-role="code-inline">NAC.describe()</code> | | <code data-nac-role="code-inline">invalid</code> | شكل الوسيطة خاطئ | خطأ في منطق البوت، صعّده | | <code data-nac-role="code-inline">timeout</code> | لم يُقرّ التأثير الجانبي خلال 5 ثوانٍ | أعد المحاولة حتى N مرات |</p>
+<h2 data-nac-id="rpa_uipath.h2.مصفوفة-الاختبار" data-nac-role="heading" data-nac-level="2" id="مصفوفة-الاختبار">مصفوفة الاختبار</h2>
+<p data-nac-id="rpa_uipath.p.43" data-nac-role="paragraph">نختبر التكامل مقابل <a href="https://yujin.app/nac-spec/example-v21-data-table.php" data-nac-id="rpa_uipath.link.1" data-nac-role="action" data-nac-action="open">عرض جدول البيانات v21</a> عبر UiPath 23.10 في CI. سير العمل المرجعي موجود في <code data-nac-role="code-inline">tools/rpa/uipath/InvoiceFromCSV.xaml</code> من هذا المستودع (قريباً).</p>
+<h2 data-nac-id="rpa_uipath.h2.انظر-أيضا" data-nac-role="heading" data-nac-level="2" id="انظر-أيضا">انظر أيضاً</h2>
+<ul data-nac-id="rpa_uipath.list.45" data-nac-role="list"><li data-nac-id="rpa_uipath.list.45.item.1" data-nac-role="list-item"><a href="../SPEC.md#5-public-api" data-nac-id="rpa_uipath.link.2" data-nac-role="action" data-nac-action="open">SPEC.md القسم 5</a> -- واجهة NAC.* الكاملة.</li><li data-nac-id="rpa_uipath.list.45.item.2" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="rpa_uipath.link.3" data-nac-role="action" data-nac-action="open">SECURITY.md</a> -- نموذج تهديد isTrusted.</li><li data-nac-id="rpa_uipath.list.45.item.3" data-nac-role="list-item"><a href="LLM_WIRING.md" data-nac-id="rpa_uipath.link.4" data-nac-role="action" data-nac-action="open">LLM_WIRING.md</a> -- إذا كان تدفق RPA لديك يحتاج أيضاً إدخالاً صوتياً أو محادثةً، اربط وسيط LLM في المقدمة.</li><li data-nac-id="rpa_uipath.list.45.item.4" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="rpa_uipath.link.5" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- كيف تختبر Yujin هذا العقد من البداية إلى النهاية.</li></ul>
+<h2 data-nac-id="rpa_uipath.h2.الرخصة" data-nac-role="heading" data-nac-level="2" id="الرخصة">الرخصة</h2>
+<p data-nac-id="rpa_uipath.p.47" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="rpa_uipath.p.49" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_UIPATH.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_uipath",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_uipath.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_uipath.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_uipath.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_uipath.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

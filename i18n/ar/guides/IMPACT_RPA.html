@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تأثير NAC3 على أتمتة العمليات الروبوتية (RPA) -- NAC3</title>
+<meta name="nac3-doc-slug" content="impact_rpa" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="impact_rpa" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="impact_rpa.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="impact_rpa.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/impact_rpa.mp3" data-nac-id="impact_rpa.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="impact_rpa.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="impact_rpa.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="impact_rpa.main" data-nac-role="region">
+<hr />
+<p data-nac-id="impact_rpa.p.1" data-nac-role="paragraph">translation_source: guides/IMPACT_RPA.md translation_source_hash: d278c291a38100f66ef8ed5ae0030875b5e9eb4412db6edecf9b7db2794a16e2 translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T15:17:26.444284+00:00</p>
+<hr />
+<h1 data-nac-id="impact_rpa.h1.تأثير-nac3-على-أتمتة-العمليات-الروبوتية-rpa" data-nac-role="heading" data-nac-level="1" id="تأثير-nac3-على-أتمتة-العمليات-الروبوتية-rpa">تأثير NAC3 على أتمتة العمليات الروبوتية (RPA)</h1>
+<p data-nac-id="impact_rpa.p.4" data-nac-role="paragraph"><strong>إصدار NAC3:</strong> 2.2 مستقر. <strong>الجمهور المستهدف:</strong> مهندسو بنية RPA، قادة مراكز التميز في الأتمتة (CoE)، ومهندسو الأتمتة الذين يقيّمون تكاليف صيانة وتوسيع الأتمتة المبنية على NAC3.</p>
+<h2 data-nac-id="impact_rpa.h2.ملخص-سريع" data-nac-role="heading" data-nac-level="2" id="ملخص-سريع">ملخص سريع</h2>
+<p data-nac-id="impact_rpa.p.6" data-nac-role="paragraph">الأتمتة المبنية على محددات CSS هشّة بطبيعتها. والتعرف المبني على الصور هشّ بحسب طريقة العرض. يضع NAC3 مراسي مسمّاة وثابتة على الصفحة يمكن لأي منصة RPA استهدافها. تنخفض تكلفة كل عملية أتمتة بنسبة 60-90%، وتتراجع ديون صيانة المحددات ربع السنوية إلى ما يقارب الصفر.</p>
+<h2 data-nac-id="impact_rpa.h2.واقع-محددات-rpa-اليوم" data-nac-role="heading" data-nac-level="2" id="واقع-محددات-rpa-اليوم">واقع محددات RPA اليوم</h2>
+<p data-nac-id="impact_rpa.p.8" data-nac-role="paragraph">ثلاثة أساليب، وكلها معيبة:</p>
+<h3 data-nac-id="impact_rpa.h3.1-محددات-css-xpath" data-nac-role="heading" data-nac-level="3" id="1-محددات-css-xpath">1. محددات CSS / XPath</h3>
+<pre data-nac-id="impact_rpa.code.1" data-nac-role="code" data-nac-lang="xml"><code>&lt;webctrl tag=&#x27;button&#x27;
+         class=&#x27;btn-primary btn-lg invoice-save-btn&#x27;
+         text=&#x27;Save&#x27; /&gt;</code></pre>
+<p data-nac-id="impact_rpa.p.11" data-nac-role="paragraph">تنكسر عند: إعادة تسمية فئات CSS، وإعادة هيكلة التخطيط، وترجمة التسميات، وإضافة فئات حالة التمرير.</p>
+<h3 data-nac-id="impact_rpa.h3.2-مطابقة-الصور-ocr" data-nac-role="heading" data-nac-level="3" id="2-مطابقة-الصور-ocr">2. مطابقة الصور / OCR</h3>
+<p data-nac-id="impact_rpa.p.13" data-nac-role="paragraph">مقارنة بكسلية للزر المعروض. تنكسر عند: تغيير السمة، والوضع الداكن، وتغيير الدقة، واستبدال الخط، وتداخل حلقة التركيز.</p>
+<h3 data-nac-id="impact_rpa.h3.3-الاستهداف-بالمرساة-الإحداثيات-النسبية" data-nac-role="heading" data-nac-level="3" id="3-الاستهداف-بالمرساة-الإحداثيات-النسبية">3. الاستهداف بالمرساة (الإحداثيات النسبية)</h3>
+<p data-nac-id="impact_rpa.p.15" data-nac-role="paragraph">"الزر الموجود في الخليتين على يمين تسمية 'المجموع الفرعي'." ينكسر عند: إعادة تدفق التخطيط، وإعادة ترتيب الأعمدة، وتحولات نقاط التوقف المتجاوبة.</p>
+<p data-nac-id="impact_rpa.p.16" data-nac-role="paragraph">تستلزم الأساليب الثلاثة صيانة مستمرة من فريق CoE. يُنفق فريق CoE المؤسسي النموذجي 35-60% من وقته في تحديث المحددات المعطوبة بعد كل إعادة تصميم لواجهة المستخدم.</p>
+<h2 data-nac-id="impact_rpa.h2.الواقع-مع-nac3" data-nac-role="heading" data-nac-level="2" id="الواقع-مع-nac3">الواقع مع NAC3</h2>
+<p data-nac-id="impact_rpa.p.18" data-nac-role="paragraph">سطر واحد لكل عنصر:</p>
+<pre data-nac-id="impact_rpa.code.2" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.click(&#x27;invoice.save&#x27;);</code></pre>
+<p data-nac-id="impact_rpa.p.20" data-nac-role="paragraph">ينكسر عند: إعادة تسمية الفعل <code data-nac-role="code-inline">save</code> من قِبل فريق المنتج إلى شيء آخر. هذا تغيير دلالي حقيقي، ويجب تحديث الأتمتة للسبب ذاته الذي يستوجب إعادة تدريب البشر.</p>
+<h2 data-nac-id="impact_rpa.h2.مقاييس-الأثر-الملموس" data-nac-role="heading" data-nac-level="2" id="مقاييس-الأثر-الملموس">مقاييس الأثر الملموس</h2>
+<p data-nac-id="impact_rpa.p.22" data-nac-role="paragraph">من فريق CoE جرّب NAC3 عبر 14 عملية أتمتة:</p>
+<p data-nac-id="impact_rpa.p.23" data-nac-role="paragraph">| المقياس | مبني على المحددات | مبني على NAC3 | الفارق | |---------|------------------|--------------|--------| | متوسط الأنشطة لكل عملية أتمتة | 47 | 9 | ‎-81%‎ | | ساعات الصيانة لكل ربع سنة بعد إعادة تصميم الواجهة | 41 | 3 | ‎-93%‎ | | التشغيلات الفاشلة أسبوعياً (انجراف المحددات) | 18 | 0 | ‎-100%‎ | | الوقت اللازم لتأليف أتمتة جديدة | 12 ساعة | ساعتان | ‎-83%‎ | | تغطية سطح التطبيق (% من إجراءات التطبيق القابلة للوصول) | 38% | 95% | ‎+150%‎ |</p>
+<p data-nac-id="impact_rpa.p.24" data-nac-role="paragraph">رقم التغطية هو الأهم. <strong>تغطي RPA المبنية على المحددات عادةً 30-50% من إجراءات التطبيق</strong> لأن الـ50-70% المتبقية هشّة جداً بحيث لا يمكن أتمتتها بتكلفة معقولة. يرفع NAC3 ذلك إلى أكثر من 90% -- ويصبح الذيل الطويل قابلاً للمعالجة اقتصادياً.</p>
+<h2 data-nac-id="impact_rpa.h2.ما-يتيحه-nac3-لـ-rpa" data-nac-role="heading" data-nac-level="2" id="ما-يتيحه-nac3-لـ-rpa">ما يتيحه NAC3 لـ RPA</h2>
+<h3 data-nac-id="impact_rpa.h3.1-قابلية-النقل-عبر-المستأجرين" data-nac-role="heading" data-nac-level="3" id="1-قابلية-النقل-عبر-المستأجرين">1. قابلية النقل عبر المستأجرين</h3>
+<p data-nac-id="impact_rpa.p.27" data-nac-role="paragraph">اليوم: روبوت RPA مبني لمثيل Salesforce الخاص بالعميل A لا يعمل على مثيل العميل B لأن فئات CSS تختلف قليلاً. مع NAC3: يستهدف الروبوت <code data-nac-role="code-inline">invoice.save</code> الذي يظل ثابتاً عبر المستأجرين. نفس الروبوت، متعدد المستأجرين.</p>
+<h3 data-nac-id="impact_rpa.h3.2-قابلية-النقل-عبر-البائعين" data-nac-role="heading" data-nac-level="3" id="2-قابلية-النقل-عبر-البائعين">2. قابلية النقل عبر البائعين</h3>
+<p data-nac-id="impact_rpa.p.29" data-nac-role="paragraph">إذا شحن منتجان SaaS في نفس المجال (CRM، ERP، إدارة المشاريع) كلاهما مانيفستات NAC3 بأفعال متداخلة (<code data-nac-role="code-inline">create_invoice</code>، <code data-nac-role="code-inline">mark_paid</code>)، فإن منطق الروبوت ذاته يُوزَّع على أي منهما. يصبح روبوت RPA مستقلاً عن البائع.</p>
+<h3 data-nac-id="impact_rpa.h3.3-الأتمتة-التي-يؤلفها-llm" data-nac-role="heading" data-nac-level="3" id="3-الأتمتة-التي-يؤلفها-llm">3. الأتمتة التي يؤلفها LLM</h3>
+<p data-nac-id="impact_rpa.p.31" data-nac-role="paragraph">يصف مهندس CoE الأتمتة بالنثر:</p>
+<p data-nac-id="impact_rpa.p.32" data-nac-role="paragraph">&gt; "افتح Yujin CRM، ابحث عن جميع الفواتير غير المدفوعة التي تجاوزت 60 يوماً، ضعها في التحصيل، وأرسل بريداً إلكترونياً إلى المستشار المعيّن."</p>
+<p data-nac-id="impact_rpa.p.33" data-nac-role="paragraph">يُنتج LLM مع الوصول إلى <code data-nac-role="code-inline">NAC.describe()</code> تسلسل الأنشطة:</p>
+<pre data-nac-id="impact_rpa.code.3" data-nac-role="code" data-nac-lang="text"><code>1. NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;list_unpaid&#x27;)
+2. NAC.fill(&#x27;invoice.filter.age_days_min&#x27;, 60)
+3. NAC.click(&#x27;invoice.filter.apply&#x27;)
+4. For each row in NAC.dt_state(&#x27;invoice.list&#x27;):
+     - NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;mark_collections&#x27;, {row_id})
+     - NAC.click_by_verb(&#x27;email&#x27;, &#x27;send_advisor&#x27;, {row_id})</code></pre>
+<p data-nac-id="impact_rpa.p.35" data-nac-role="paragraph">يراجع مهندس CoE ويوافق. ساعات لا أسابيع.</p>
+<h3 data-nac-id="impact_rpa.h3.4-الاكتشاف-الذاتي-للتطبيقات-الجديدة" data-nac-role="heading" data-nac-level="3" id="4-الاكتشاف-الذاتي-للتطبيقات-الجديدة">4. الاكتشاف الذاتي للتطبيقات الجديدة</h3>
+<p data-nac-id="impact_rpa.p.37" data-nac-role="paragraph">تُعيد <code data-nac-role="code-inline">NAC.describe()</code> المانيفست الكامل. يمكن للروبوت فحص أي تطبيق متوافق مع NAC3 في وقت التشغيل. <strong>يصبح ممكناً إنشاء أتمتة تستهدف "كل تطبيق متوافق مع NAC3 مفتوح لدى المستخدم"</strong> (انظر Yujin Pilot على yujin.app/pilot للنسخة المنتجة).</p>
+<h3 data-nac-id="impact_rpa.h3.5-مسار-التدقيق-مع-الإسناد" data-nac-role="heading" data-nac-level="3" id="5-مسار-التدقيق-مع-الإسناد">5. مسار التدقيق مع الإسناد</h3>
+<p data-nac-id="impact_rpa.p.39" data-nac-role="paragraph">يُصدر كل إرسال حدث <code data-nac-role="code-inline">nac:action:succeeded</code> مع <code data-nac-role="code-inline">is_trusted: false</code> (يشير إلى مصدر RPA) + <code data-nac-role="code-inline">plugin</code> + <code data-nac-role="code-inline">action_id</code>. يمكن للتطبيق المضيف تسجيل هذا للامتثال:</p>
+<p data-nac-id="impact_rpa.p.40" data-nac-role="paragraph">&gt; أرسل الروبوت xyz الفعل <code data-nac-role="code-inline">invoice.delete</code> للفاتورة رقم INV-42 &gt; في 14:23 بتوقيت GMT-3، مع <code data-nac-role="code-inline">is_trusted=false</code>. اعتمده: &gt; rpa-coe-policy v1.4.</p>
+<p data-nac-id="impact_rpa.p.41" data-nac-role="paragraph">تحصل فرق GRC على سجل تدقيق حتمي لكل تشغيل روبوت. لا كشط DOM في السجلات، ولا تسرب للبيانات الشخصية من سلاسل المحددات.</p>
+<h3 data-nac-id="impact_rpa.h3.6-تحكم-في-الأفعال-الحساسة" data-nac-role="heading" data-nac-level="3" id="6-تحكم-في-الأفعال-الحساسة">6. تحكم في الأفعال الحساسة</h3>
+<p data-nac-id="impact_rpa.p.43" data-nac-role="paragraph">التطبيقات التي تُعلّم أفعالاً معينة (الحذف، الدفع، منح الأدوار) على أنها تتطلب <code data-nac-role="code-inline">isTrusted</code> سترفض إرسالات RPA افتراضياً. يُدرج فريق CoE صراحةً الأفعال التي يمكن لـ RPA استخدامها في القائمة البيضاء:</p>
+<pre data-nac-id="impact_rpa.code.4" data-nac-role="code" data-nac-lang="js"><code>window.__NAC_ALLOW_UNTRUSTED__ = [
+  &#x27;invoice.send&#x27;,
+  &#x27;invoice.save&#x27;,
+  &#x27;report.export&#x27;
+  // أفعال الحذف والدفع والإدارة غير موجودة هنا عمداً
+];</code></pre>
+<p data-nac-id="impact_rpa.p.45" data-nac-role="paragraph">تصبح حوكمة CoE إعداد JS وسجل تدقيق، لا جدول بيانات لأذونات الروبوت.</p>
+<h3 data-nac-id="impact_rpa.h3.7-الصوت-والدردشة-كواجهة-أمامية-لـ-rpa" data-nac-role="heading" data-nac-level="3" id="7-الصوت-والدردشة-كواجهة-أمامية-لـ-rpa">7. الصوت والدردشة كواجهة أمامية لـ RPA</h3>
+<p data-nac-id="impact_rpa.p.47" data-nac-role="paragraph">يمكن لطبقة RPA استخدام لوحة الدردشة كواجهة مستخدم: يقول مهندس CoE "شغّل مهمة الفواتير غير المدفوعة للمستأجر Acme" ويقوم خلفية متوافقة مع NAC3 بالحل والإرسال. يستخدم مسار الصوت نفس أوليات <code data-nac-role="code-inline">NAC.*</code> التي تستخدمها الدردشة.</p>
+<h2 data-nac-id="impact_rpa.h2.مصفوفة-التبني-حسب-منصة-rpa" data-nac-role="heading" data-nac-level="2" id="مصفوفة-التبني-حسب-منصة-rpa">مصفوفة التبني حسب منصة RPA</h2>
+<p data-nac-id="impact_rpa.p.49" data-nac-role="paragraph">| المنصة | المسار | تكلفة التكامل | المرجع | |--------|--------|--------------|--------| | UiPath | حقن JS عبر نشاط المتصفح | منخفضة (نشاط واحد لكل استدعاء) | <a href="RPA_UIPATH.md" data-nac-id="impact_rpa.link.1" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a> | | Automation Anywhere A360 | تشغيل دالة JavaScript | منخفضة | <a href="RPA_AUTOMATION_ANYWHERE.md" data-nac-id="impact_rpa.link.2" data-nac-role="action" data-nac-action="open">RPA_AUTOMATION_ANYWHERE.md</a> | | Blue Prism | حقن JavaScript (إجراء VBO) | منخفضة | <a href="RPA_BLUE_PRISM.md" data-nac-id="impact_rpa.link.3" data-nac-role="action" data-nac-action="open">RPA_BLUE_PRISM.md</a> | | Power Automate Desktop | تشغيل JavaScript على صفحة الويب | منخفضة | (قريباً) | | RPA المبني على Selenium | execute_script | منخفضة | -- | | المبني على الصور (TagUI، Sikuli) | مسار احتياطي؛ استخدمه كملاذ أخير فقط | مرتفعة | -- |</p>
+<h2 data-nac-id="impact_rpa.h2.دليل-الترحيل-لمجموعة-أتمتة-قائمة" data-nac-role="heading" data-nac-level="2" id="دليل-الترحيل-لمجموعة-أتمتة-قائمة">دليل الترحيل لمجموعة أتمتة قائمة</h2>
+<h3 data-nac-id="impact_rpa.h3.المرحلة-1-التدقيق-أسبوع-واحد" data-nac-role="heading" data-nac-level="3" id="المرحلة-1-التدقيق-أسبوع-واحد">المرحلة 1 -- التدقيق (أسبوع واحد)</h3>
+<ol data-nac-id="impact_rpa.list.52" data-nac-role="list"><li data-nac-id="impact_rpa.list.52.item.1" data-nac-role="list-item">جرّد كل محدد عبر كل عملية أتمتة.</li><li data-nac-id="impact_rpa.list.52.item.2" data-nac-role="list-item">لكل منها: صنّفها كـ"مستقرة-صيانة منخفضة" / "هشّة-صيانة مرتفعة".</li><li data-nac-id="impact_rpa.list.52.item.3" data-nac-role="list-item">الهشّة تصبح مرشحة لـ NAC3 أولاً.</li></ol>
+<h3 data-nac-id="impact_rpa.h3.المرحلة-2-تجهيز-التطبيق-المستهدف" data-nac-role="heading" data-nac-level="3" id="المرحلة-2-تجهيز-التطبيق-المستهدف">المرحلة 2 -- تجهيز التطبيق المستهدف</h3>
+<p data-nac-id="impact_rpa.p.54" data-nac-role="paragraph">يجب أن يتبنى تطبيق الويب الذي تستهدفه الأتمتة NAC3. إما:</p>
+<p data-nac-id="impact_rpa.p.55" data-nac-role="paragraph">(<a href="AI_PLAYBOOK_MIGRATION.md" data-nac-id="impact_rpa.link.4" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_MIGRATION.md</a>).</p>
+<ul data-nac-id="impact_rpa.list.56" data-nac-role="list"><li data-nac-id="impact_rpa.list.56.item.1" data-nac-role="list-item">يتبنى فريق التطبيق NAC3 عبر دليل الترحيل</li><li data-nac-id="impact_rpa.list.56.item.2" data-nac-role="list-item">أو: يحقن فريق CoE عميل NAC3 من جانب المتصفح عبر سكريبت مستخدم / امتداد متصفح إذا تعذّر على فريق التطبيق الترحيل. هذا يعمل لكنه هشّ؛ يُفضَّل التبني من الطرف الأول.</li></ul>
+<h3 data-nac-id="impact_rpa.h3.المرحلة-3-إعادة-كتابة-الأتمتة-1-2-أسبوع-لكل-أتمتة" data-nac-role="heading" data-nac-level="3" id="المرحلة-3-إعادة-كتابة-الأتمتة-1-2-أسبوع-لكل-أتمتة">المرحلة 3 -- إعادة كتابة الأتمتة (1-2 أسبوع لكل أتمتة)</h3>
+<p data-nac-id="impact_rpa.p.58" data-nac-role="paragraph">استبدل كل محدد باستدعاء <code data-nac-role="code-inline">NAC.*</code> المقابل. تبقى النسخة المبنية على المحددات في فرع احتياطي. تُشحن النسخة الجديدة مع سجل تدقيق NAC3 صريح.</p>
+<h3 data-nac-id="impact_rpa.h3.المرحلة-4-الحوكمة" data-nac-role="heading" data-nac-level="3" id="المرحلة-4-الحوكمة">المرحلة 4 -- الحوكمة</h3>
+<p data-nac-id="impact_rpa.p.60" data-nac-role="paragraph">يُحدّث CoE قائمة مراجعة مراجعة الروبوت:</p>
+<ul data-nac-id="impact_rpa.list.61" data-nac-role="list"><li data-nac-id="impact_rpa.list.61.item.1" data-nac-role="list-item">يستهدف الروبوت فقط معرّفات NAC الموجودة في المانيفستات الحالية.</li><li data-nac-id="impact_rpa.list.61.item.2" data-nac-role="list-item">يمتلك الروبوت قائمة بيضاء صريحة للأفعال للعمليات الحساسة.</li><li data-nac-id="impact_rpa.list.61.item.3" data-nac-role="list-item">يسجّل الروبوت كل إرسال في جدول التدقيق.</li></ul>
+<h2 data-nac-id="impact_rpa.h2.تكلفة-التبني" data-nac-role="heading" data-nac-level="2" id="تكلفة-التبني">تكلفة التبني</h2>
+<p data-nac-id="impact_rpa.p.63" data-nac-role="paragraph">لفريق CoE يُشغّل 50 عملية أتمتة على 10 تطبيقات مستهدفة:</p>
+<ul data-nac-id="impact_rpa.list.64" data-nac-role="list"><li data-nac-id="impact_rpa.list.64.item.1" data-nac-role="list-item">الترحيل من جانب التطبيق: 6-8 أسابيع (مهندس واحد لكل تطبيق).</li><li data-nac-id="impact_rpa.list.64.item.2" data-nac-role="list-item">إعادة كتابة الروبوت: 1-2 أسبوع لكل روبوت = 50-100 أسبوع مهندس.</li></ul>
+<p data-nac-id="impact_rpa.p.65" data-nac-role="paragraph">يبدو مكلفاً حتى تقارنه بالتكلفة الثابتة لصيانة 50 روبوتاً مبنياً على المحددات إلى أجل غير مسمى. عادةً ما يتحقق التعادل في 6-9 أشهر؛ وكل ما بعد ذلك توفير صافٍ في وقت مهندسي CoE.</p>
+<h2 data-nac-id="impact_rpa.h2.المخاطر-والتخفيف" data-nac-role="heading" data-nac-level="2" id="المخاطر-والتخفيف">المخاطر والتخفيف</h2>
+<h3 data-nac-id="impact_rpa.h3.الخطر-التطبيق-المستهدف-يرفض-تبني-nac3" data-nac-role="heading" data-nac-level="3" id="الخطر-التطبيق-المستهدف-يرفض-تبني-nac3">الخطر -- "التطبيق المستهدف يرفض تبني NAC3"</h3>
+<p data-nac-id="impact_rpa.p.68" data-nac-role="paragraph">شائع في برمجيات المؤسسات القديمة. خففه بـ:</p>
+<ul data-nac-id="impact_rpa.list.69" data-nac-role="list"><li data-nac-id="impact_rpa.list.69.item.1" data-nac-role="list-item">حقن <code data-nac-role="code-inline">nac.js</code> من جانب المتصفح عبر امتداد متصفح تديره CoE أو سكريبت مستخدم بأسلوب Tampermonkey.</li><li data-nac-id="impact_rpa.list.69.item.2" data-nac-role="list-item">تعريف المانيفستات من جانب CoE؛ يبقى التطبيق دون تعديل.</li><li data-nac-id="impact_rpa.list.69.item.3" data-nac-role="list-item">أقل متانة من التبني من الطرف الأول، لكنه قابل للتطبيق مرحلياً.</li></ul>
+<h3 data-nac-id="impact_rpa.h3.الخطر-rpa-تتجاوز-تحكم-istrusted" data-nac-role="heading" data-nac-level="3" id="الخطر-rpa-تتجاوز-تحكم-istrusted">الخطر -- "RPA تتجاوز تحكم isTrusted"</h3>
+<p data-nac-id="impact_rpa.p.71" data-nac-role="paragraph">هذه هي المقايضة الأمنية. ستُركّب RPA النقرات حتماً. يجب على التطبيق المضيف إدراج الأفعال التي يمكن لـ RPA تشغيلها في القائمة البيضاء. يتفاوض فريق CoE وفريق التطبيق على كل فعل. وثّق التفاوض؛ دقّق القائمة البيضاء بشكل دوري.</p>
+<h3 data-nac-id="impact_rpa.h3.الخطر-نفقد-الرؤية-في-تسلسل-إجراءات-rpa" data-nac-role="heading" data-nac-level="3" id="الخطر-نفقد-الرؤية-في-تسلسل-إجراءات-rpa">الخطر -- "نفقد الرؤية في تسلسل إجراءات RPA"</h3>
+<p data-nac-id="impact_rpa.p.73" data-nac-role="paragraph">العكس هو الصحيح: مع NAC3 تكتسب الرؤية. كل إرسال روبوت يُطلق حدث <code data-nac-role="code-inline">nac:action:succeeded</code> منظّماً مع <code data-nac-role="code-inline">{plugin, action_id, args, is_trusted}</code>. سجّل ذلك في SIEM الخاص بك وفق سياسة الاحتفاظ.</p>
+<h2 data-nac-id="impact_rpa.h2.المقارنة-بالصناعة" data-nac-role="heading" data-nac-level="2" id="المقارنة-بالصناعة">المقارنة بالصناعة</h2>
+<p data-nac-id="impact_rpa.p.75" data-nac-role="paragraph">ما فعله ARIA لتقنية المساعدة (منح قارئات الشاشة عقداً ثابتاً على الصفحة)، يفعله NAC3 لـ RPA والأتمتة الوكيلة. ينتقل فريق CoE من "حارس المحددات" إلى "مصمم الأتمتة".</p>
+<h2 data-nac-id="impact_rpa.h2.انظر-أيضا" data-nac-role="heading" data-nac-level="2" id="انظر-أيضا">انظر أيضاً</h2>
+<p data-nac-id="impact_rpa.p.77" data-nac-role="paragraph"><a href="RPA_BLUE_PRISM.md" data-nac-id="impact_rpa.link.5" data-nac-role="action" data-nac-action="open">RPA_BLUE_PRISM.md</a> -- أدلة التكامل لكل منصة.</p>
+<ul data-nac-id="impact_rpa.list.78" data-nac-role="list"><li data-nac-id="impact_rpa.list.78.item.1" data-nac-role="list-item"><a href="RPA_UIPATH.md" data-nac-id="impact_rpa.link.6" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a>، <a href="RPA_AUTOMATION_ANYWHERE.md" data-nac-id="impact_rpa.link.7" data-nac-role="action" data-nac-action="open">RPA_AUTOMATION_ANYWHERE.md</a>،</li><li data-nac-id="impact_rpa.list.78.item.2" data-nac-role="list-item"><a href="IMPACT_TESTING.md" data-nac-id="impact_rpa.link.8" data-nac-role="action" data-nac-action="open">IMPACT_TESTING.md</a> -- تحليل الأثر المصاحب لبُعد الاختبار/ضمان الجودة.</li><li data-nac-id="impact_rpa.list.78.item.3" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="impact_rpa.link.9" data-nac-role="action" data-nac-action="open">SECURITY.md</a> -- نموذج تهديد isTrusted الذي تعتمد عليه القائمة البيضاء لـ RPA.</li></ul>
+<h2 data-nac-id="impact_rpa.h2.الرخصة" data-nac-role="heading" data-nac-level="2" id="الرخصة">الرخصة</h2>
+<p data-nac-id="impact_rpa.p.80" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="impact_rpa.p.82" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/IMPACT_RPA.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "impact_rpa",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "impact_rpa.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "impact_rpa.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "impact_rpa.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "impact_rpa.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

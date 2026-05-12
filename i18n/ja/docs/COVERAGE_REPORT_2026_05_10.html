@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 カバレッジレポート -- 2026-05-10 / 11 夜間 -- NAC3</title>
+<meta name="nac3-doc-slug" content="coverage_report_2026_05_10" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="coverage_report_2026_05_10" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="coverage_report_2026_05_10.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="coverage_report_2026_05_10.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/coverage_report_2026_05_10.mp3" data-nac-id="coverage_report_2026_05_10.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="coverage_report_2026_05_10.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="coverage_report_2026_05_10.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="coverage_report_2026_05_10.main" data-nac-role="region">
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.1" data-nac-role="paragraph">translation_source: docs/COVERAGE_REPORT_2026_05_10.md translation_source_hash: 4da4311e057dd1c23dea9b23a506ada42741d28b05b94709cb5150b1686c51ac translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T15:06:22.808032+00:00</p>
+<hr />
+<h1 data-nac-id="coverage_report_2026_05_10.h1.nac3-カバレッジレポート-2026-05-10-11-夜間" data-nac-role="heading" data-nac-level="1" id="nac3-カバレッジレポート-2026-05-10-11-夜間">NAC3 カバレッジレポート -- 2026-05-10 / 11 夜間</h1>
+<p data-nac-id="coverage_report_2026_05_10.p.4" data-nac-role="paragraph">ブランチ <code data-nac-role="code-inline">feat/nac-interop-mcp</code> のカバレッジ夜間終了時点で生成。 テスト内容と深度をケースごとに正直に記録したものです。</p>
+<p data-nac-id="coverage_report_2026_05_10.p.5" data-nac-role="paragraph">以前の非公式な「50/50 PASS」「5/5 レイヤー GREEN」という表現に代わるものです。 あの数字は構造的には正確でしたが、深度にばらつきがありました。 本レポートではパイプラインステージ別に実態を整理します。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.パイプラインステージの確認" data-nac-role="heading" data-nac-level="2" id="パイプラインステージの確認">パイプラインステージの確認</h2>
+<pre data-nac-id="coverage_report_2026_05_10.code.1" data-nac-role="code" data-nac-lang="text"><code>Comunicacion -&gt; Desambiguacion -&gt; Intencion -&gt; Llamada -&gt; Resultado -&gt; Ack
+    (1)              (2)             (3)         (4)        (5)         (6)</code></pre>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.本ブランチに含まれるスイート" data-nac-role="heading" data-nac-level="2" id="本ブランチに含まれるスイート">本ブランチに含まれるスイート</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.9" data-nac-role="paragraph">| スイート | パス | テスト数 | |---------|------|---------| | smoke | <code data-nac-role="code-inline">packages/nac/test/smoke.mjs</code> | 36 | | v22 (コンストラクタ strict + bindAction) | <code data-nac-role="code-inline">packages/nac/test/v22.mjs</code> | 14 | | v23-interop (クロスアプリ MCP) | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | 14 | | stage1-audio (STT モック + TTS コーパス) | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code> | 33 | | stage2-disambiguation | <code data-nac-role="code-inline">packages/nac/test/stage2-disambiguation.mjs</code> | 31 | | stage3-backend (ライブ呼び出し) | <code data-nac-role="code-inline">packages/nac/test/stage3-backend.mjs</code> | ~80 | | stage4-calls | <code data-nac-role="code-inline">packages/nac/test/stage4-calls.mjs</code> | 31 | | stage6-ack | <code data-nac-role="code-inline">packages/nac/test/stage6-ack.mjs</code> | 16 | | <strong>ローカル合計</strong> | | <strong>175+</strong> |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.10" data-nac-role="paragraph">現在すべてローカルで PASS。GitHub Actions は未実行（クレジット残高ゼロのため、Pablo のラップトップ上でオンデマンド実行のみ）。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.パイプラインステージ別カバレッジマトリクス" data-nac-role="heading" data-nac-level="2" id="パイプラインステージ別カバレッジマトリクス">パイプラインステージ別カバレッジマトリクス</h2>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-1-comunicacionstt-生入力" data-nac-role="heading" data-nac-level="3" id="stage-1-comunicacionstt-生入力">Stage 1 -- Comunicacion（STT + 生入力）</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.13" data-nac-role="paragraph">| レイヤー | ステータス | 備考 | |---------|-----------|------| | <strong>CAPA A: STT モック + コーパス注入</strong> | PASS (30/30) | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code>。モック <code data-nac-role="code-inline">SpeechRecognition</code> が <code data-nac-role="code-inline">result</code> イベントを合成し、NacChat が正常に受信・ディスパッチ。言語トラップがロケール内に留まること、切り替えプロンプトで切り替わること、通常プロンプトがバックエンドをトリガーすることをアサート。 | | <strong>CAPA B: コーパス整合性</strong> | PASS (3/3) | <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/</code> に Google Cloud TTS で生成した MP3 ファイル 30 件。10 ロケール合計 365 KB。ファイル存在確認 + 最小サイズのサニティチェック。 | | ブラウザ SpeechRecognition 実音声再生 | DEFERRED | Web Speech API には実マイクストリーム + ブラウザが必要。Playwright e2e に委ねる（キュー済み）。 |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.14" data-nac-role="paragraph"><strong>Stage 1 カバレッジ: 約 85%</strong> -- テキスト・コーパス・STT モックのパスは完全カバー。残るのは実ブラウザ音声再生のみで、Playwright が必要。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-2-desambiguacion" data-nac-role="heading" data-nac-level="3" id="stage-2-desambiguacion">Stage 2 -- Desambiguacion</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.16" data-nac-role="paragraph">| 確認項目 | ケース数 | 結果 | |---------|---------|------| | <code data-nac-role="code-inline">_detectLangSwitch</code> 誤検知ガード（バグクラス f631d77a） | 12 | PASS -- <code data-nac-role="code-inline">cambia de pestana</code>、<code data-nac-role="code-inline">cambia precio de mouse 40</code>、<code data-nac-role="code-inline">borra de la lista</code>、<code data-nac-role="code-inline">pasa de A a B</code> はすべて正しくスペイン語に留まる。<code data-nac-role="code-inline">cambia a aleman</code>、<code data-nac-role="code-inline">switch to english</code>、<code data-nac-role="code-inline">use spanish</code>、<code data-nac-role="code-inline">cambia idioma a de</code> は正しく切り替わる。同一言語の no-op + 空入力でクラッシュしないことも確認。 | | <code data-nac-role="code-inline">tab_by_label</code> textContent 完全一致 | 1 | PASS | | <code data-nac-role="code-inline">tab_by_label</code> 括弧除去（<code data-nac-role="code-inline">"Lines (collection)"</code> が <code data-nac-role="code-inline">"Lines"</code> にマッチ） | 1 | PASS | | <code data-nac-role="code-inline">tab_by_label</code> i18n ロケールマッチ | 1 | PASS | | <code data-nac-role="code-inline">tab_by_label</code> 未知ラベル -&gt; not_found | 1 | PASS | | <code data-nac-role="code-inline">snapshotTree</code> が有効な形状を返す | 6 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.17" data-nac-role="paragraph"><strong>Stage 2 カバレッジ: 約 95%。</strong> マッチャーの厳格化（部分マッチに <code data-nac-role="code-inline">cand.length &gt;= 3</code> を要求）は同スイートのサイドフィックスとして導入済みで、1 文字フィラーラベルの誤検知を解消。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-3-intencion" data-nac-role="heading" data-nac-level="3" id="stage-3-intencion">Stage 3 -- Intencion</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.19" data-nac-role="paragraph">本番エンドポイント <code data-nac-role="code-inline">https://yujin.app/crm/api/v1/yujin/nac-demo</code> へのライブ呼び出し。Yujin チャットバックエンド（Claude Sonnet）が LLM 仲介役。</p>
+<p data-nac-id="coverage_report_2026_05_10.p.20" data-nac-role="paragraph">| 確認項目 | ケース数 | 結果 | |---------|---------|------| | プロンプトごとに HTTP 200 + JSON レスポンス | 7 ロケール（es/en/pt/fr/de/ja + スペイン語トラッププロンプト）で 15 プロンプト | すべて PASS | | レスポンスに <code data-nac-role="code-inline">ok</code> ブール値が含まれる | 15 | PASS | | <code data-nac-role="code-inline">ok</code> が真の場合、<code data-nac-role="code-inline">message</code> 文字列 + <code data-nac-role="code-inline">actions</code> 配列が存在する | 15 | PASS | | すべてのアクションに <code data-nac-role="code-inline">kind</code> 文字列が含まれる | 15 | PASS | | <strong>アンチバグガード</strong>: <code data-nac-role="code-inline">cambia de pestana</code> が <code data-nac-role="code-inline">change_locale: 'de'</code> を発行しない | 1 | PASS -- ライブ LLM が 2026-05-09 に導入したシステムプロンプトルールを遵守。 |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.21" data-nac-role="paragraph"><strong>Stage 3 カバレッジ: 約 85%</strong>（コントラクト形状）。LLM の具体的なアクション内容は非決定論的なため 100% には至らず、形状とアンチバグケースのみアサート。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-4-llamadanac-公開関数すべて" data-nac-role="heading" data-nac-level="3" id="stage-4-llamadanac-公開関数すべて">Stage 4 -- Llamada（NAC.* 公開関数すべて）</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.23" data-nac-role="paragraph">| 関数 | ケース数 | 結果 | |------|---------|------| | <code data-nac-role="code-inline">NAC.click</code> | happy / not_found / invalid | 3 PASS | | <code data-nac-role="code-inline">NAC.click_by_verb</code> | happy / 未知動詞 | 2 PASS | | <code data-nac-role="code-inline">NAC.fill</code> | happy / not_found / DOM への値適用 | 3 PASS | | <code data-nac-role="code-inline">NAC.select</code> | happy / not_found | 2 PASS | | <code data-nac-role="code-inline">NAC.tab</code> | happy / 未知キー / プラグイン未マウント | 3 PASS | | <code data-nac-role="code-inline">NAC.tab_by_label</code> | textContent / 括弧 / i18n / not_found | 4 PASS（Stage 2 と重複） | | <code data-nac-role="code-inline">NAC.go_to_section</code> | happy / section_not_found | 2 PASS | | <code data-nac-role="code-inline">NAC.set_mode</code> | 有効 / 無効 | 2 PASS | | <code data-nac-role="code-inline">NAC.screenshot</code> | データ URL を返す | 1 PASS | | <code data-nac-role="code-inline">NAC.edit_field</code>（v2.3 プレビュー） | 開く / not_found / invalid | 3 PASS | | <code data-nac-role="code-inline">NAC.dt_add_row</code> | row_id を返す | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_edit_cell</code> | happy / 無効値を拒否 | 2 PASS | | <code data-nac-role="code-inline">NAC.dt_remove_row</code> | 状態をデクリメント | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_commit</code> | final_state を返す | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_discard</code> | 未コミットをロールバック | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_read_aggregate</code> | sum 集計 | 1 PASS | | <code data-nac-role="code-inline">NAC.bindAction</code> | ハンドラ発火 + アンバインダー動作 | 2 PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.24" data-nac-role="paragraph"><strong>Stage 4 カバレッジ: 約 95%</strong>（公開書き込み API）。未カバー: <code data-nac-role="code-inline">drag_drop</code>（シム未対応）、v1.3 の toast / banner / confirm ダイアログプリミティブ（v2.x では低優先度）。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-5-resultadodom-副作用" data-nac-role="heading" data-nac-level="3" id="stage-5-resultadodom-副作用">Stage 5 -- Resultado（DOM 副作用）</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.26" data-nac-role="paragraph">| 確認項目 | ステータス | |---------|-----------| | <code data-nac-role="code-inline">fill</code> が input.value を更新する | PASS（Stage 4 T6 で確認） | | <code data-nac-role="code-inline">select</code> が select 要素を更新する | PASS（Stage 4 T8） | | <code data-nac-role="code-inline">dt_*</code> の変更が <code data-nac-role="code-inline">dt_state()</code> に反映される | PASS（Stage 4 T24-T30） | | <code data-nac-role="code-inline">edit_field</code> モーダルがマウントされる | PASS（Stage 4 T21） | | フルスクリーン Playwright DOM 検証 | DEFERRED -- 実ブラウザ + Vite/ng-build ステップが必要 |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.27" data-nac-role="paragraph"><strong>Stage 5 カバレッジ: 約 70%</strong>（ユニットレベル）。フルスクリーン DOM 検証はキュー済み。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.stage-6-ack-イベントファミリー" data-nac-role="heading" data-nac-level="3" id="stage-6-ack-イベントファミリー">Stage 6 -- Ack イベントファミリー</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.29" data-nac-role="paragraph">| ファミリー | ケース数 | 結果 | |----------|---------|------| | <code data-nac-role="code-inline">nac:action:succeeded</code> 形状（plugin + action_id + is_trusted） | 4 | PASS | | <code data-nac-role="code-inline">nac:field:changed</code> 形状 | 3 | PASS | | <code data-nac-role="code-inline">nac:tab:activated</code> 形状 | 2 | PASS | | ハンドラ例外時の <code data-nac-role="code-inline">nac:action:failed</code> | 2 | PASS | | <code data-nac-role="code-inline">bindAction</code> 非同期 resolve パス | 1 | PASS | | クリックから resolve までの時間 &lt; 200ms | 1 | PASS | | ファミリー横断の標準 detail 形状 | 3 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.30" data-nac-role="paragraph"><strong>Stage 6 カバレッジ: 約 95%。</strong> 未カバー: ロングテールのイベントファミリー（<code data-nac-role="code-inline">nac:breadcrumb:navigated</code>、<code data-nac-role="code-inline">nac:accordion:expanded</code>、<code data-nac-role="code-inline">nac:step:advanced</code>、<code data-nac-role="code-inline">nac:table:sort_changed</code>、<code data-nac-role="code-inline">nac:table:filter_changed</code>、<code data-nac-role="code-inline">nac:confirm:resolved</code>）。パターンは同じで、カバーは機械的な作業。</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.横断的関心事-interopv23-プレビュー" data-nac-role="heading" data-nac-level="3" id="横断的関心事-interopv23-プレビュー">横断的関心事: interop（v2.3 プレビュー）</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.32" data-nac-role="paragraph">| 確認項目 | ケース数 | 結果 | |---------|---------|------| | <code data-nac-role="code-inline">export_tree</code> 形状 + スコープ + ロケールフィルター | 7 | PASS | | <code data-nac-role="code-inline">import_remote_tree</code> が接続を検証し、名前空間付きプラグインを登録し、リストに反映される | 5 | PASS | | <code data-nac-role="code-inline">click</code> + <code data-nac-role="code-inline">fill</code> のプロキシディスパッチ | 4 | PASS | | <code data-nac-role="code-inline">via_interop:true</code> 付きのローカル ack ミラー | 1 | PASS | | ピアエラーコードのバブルアップ | 1 | PASS | | <code data-nac-role="code-inline">disconnect_remote</code> + 切断後の拒否 | 2 | PASS | | ローカルクリックがプロキシされないこと | 1 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.33" data-nac-role="paragraph"><strong>Interop カバレッジ: 100%</strong>（v2.3 プレビュー全面）。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.カバレッジサマリー-パイプライン加重平均" data-nac-role="heading" data-nac-level="2" id="カバレッジサマリー-パイプライン加重平均">カバレッジサマリー -- パイプライン加重平均</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.35" data-nac-role="paragraph">| ステージ | カバレッジ | 判定 | |---------|----------|------| | 1 Comunicacion | <strong>85%</strong> | STT モック + TTS コーパス PASS。実ブラウザ音声再生のみキュー済み。 | | 2 Desambiguacion | 95% | 良好。バグクラス検証済み。 | | 3 Intencion | 85% | ライブバックエンドの形状カバー済み。 | | 4 Llamada | 95% | 公開書き込み API すべてテスト済み。 | | 5 Resultado | 70% | ユニットレベルが主。Playwright キュー済み。 | | 6 Ack | 95% | コアファミリーカバー済み。ロングテールは機械的作業。 | | Interop | 100% | v2.3 プレビュー全面カバー。 | | <strong>加重平均</strong> | <strong>~90%</strong> | |</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.ランタイムへの変更内容" data-nac-role="heading" data-nac-level="2" id="ランタイムへの変更内容">ランタイムへの変更内容</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.37" data-nac-role="paragraph">テストにより実際の問題が 2 件発見され、同ブランチ内で修正済み:</p>
+<ol data-nac-id="coverage_report_2026_05_10.list.38" data-nac-role="list"><li data-nac-id="coverage_report_2026_05_10.list.38.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">tab_by_label</code> マッチャーが 1 文字ラベルに対して緩すぎた。</strong> <code data-nac-role="code-inline">js/nac.js</code> 2264 行目で双方向部分マッチに <code data-nac-role="code-inline">cand.length &gt;= 3</code> を要求するよう修正。完全一致は常に許可。Stage 2 テスト B4（未知ラベルが漏れ通過）で発見。</li></ol>
+<ol data-nac-id="coverage_report_2026_05_10.list.39" data-nac-role="list"><li data-nac-id="coverage_report_2026_05_10.list.39.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">NAC.list_registered_plugins()</code> イントロスペクションヘルパーが未実装。</strong> interop レイヤーの <code data-nac-role="code-inline">export_tree</code> が DOM マウント状態に関わらず登録済みマニフェストを反復できるよう <code data-nac-role="code-inline">js/nac.js</code> に追加。v23 interop スイート作成中に発見。</li></ol>
+<p data-nac-id="coverage_report_2026_05_10.p.40" data-nac-role="paragraph">いずれも価値ある発見です -- テストがランタイムから実際のバグを引き出した、まさにその目的通りの結果です。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.main-へのマージ前に必要な作業" data-nac-role="heading" data-nac-level="2" id="main-へのマージ前に必要な作業">main へのマージ前に必要な作業</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.42" data-nac-role="paragraph">| タスク | 優先度 | 工数 | |-------|--------|------| | 6 つのライブデモへの Playwright e2e | 高 | 1h | | React + Angular スタディケースへの Playwright（開発サーバー） | 高 | 30min | | TTS コーパス生成（Google Cloud、30 プロンプト） | 中 | 20min | | STT モック + コーパス注入テスト | 中 | 30min | | <code data-nac-role="code-inline">drag_drop</code> ユニットテスト | 低 | 10min | | ロングテール ack ファミリーテスト（breadcrumb、accordion、step 等） | 低 | 30min | | <code data-nac-role="code-inline">yujin.app/nac-spec/demos/</code> + ランディングを main へ cherry-pick | ゲーティング | 2min | | Pablo へのメール切り替え | ゲーティング | 5min |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.43" data-nac-role="paragraph">残り見積もり: <strong>Sumi-time 約 3h</strong> で加重平均 90% 以上 + main へのクリーンな cherry-pick 完了。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.テスト実行時間ラップトップコールド" data-nac-role="heading" data-nac-level="2" id="テスト実行時間ラップトップコールド">テスト実行時間（ラップトップ、コールド）</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.45" data-nac-role="paragraph">| スイート | 時間 | |---------|------| | smoke | &lt; 1s | | v22 | &lt; 1s | | v23-interop | &lt; 2s | | stage2 | &lt; 1s | | stage3（ライブバックエンド） | ~60s（15 プロンプト × 平均 ~4s + 500ms ペーシング） | | stage4 | ~2s（モーダル + dt セットアップ） | | stage6 | &lt; 1s | | <strong>合計</strong> | <strong>~75s</strong> |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.46" data-nac-role="paragraph"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code>（ハーネス）は stage 2-6 + interop を含むよう拡張が必要。対応待ち。</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.監査証跡" data-nac-role="heading" data-nac-level="2" id="監査証跡">監査証跡</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.48" data-nac-role="paragraph">| コミット | 内容 | |---------|------| | <code data-nac-role="code-inline">5b06ae3f</code> | デモのコンパイル + デプロイ + stage 2 | | <code data-nac-role="code-inline">632aa1f6</code> | stage 2+4 + ランディングユースケース | | （保留中） | stage 3+6 + 本レポート |</p>
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.50" data-nac-role="paragraph"><em>本ドキュメントは v2.3 interop ブランチおよび 2026-05-11 00:50 UTC-3 時点の v2.2 ランタイムに関する正式なカバレッジ記録です。新スイートが追加され次第、随時更新されます。</em></p>
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.52" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/COVERAGE_REPORT_2026_05_10.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "coverage_report_2026_05_10",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "coverage_report_2026_05_10.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "coverage_report_2026_05_10.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "coverage_report_2026_05_10.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "coverage_report_2026_05_10.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1567 @@
+/* NAC v1.0 demo -- Yujin look & feel.
+ * Tokens inlined here (not fetched from CRM) so the demo works as a
+ * self-contained landing under yujin.app/nac-spec/ without needing
+ * the CRM to be online. ASCII pure. */
+
+:root {
+  /* Yujin sumi-e palette */
+  --washi-50:   #FBF8F2;
+  --washi-100:  #F4EFE3;
+  --washi-200:  #E9DFC8;
+  --washi-300:  #D4C5A0;
+  --washi-400:  #B8A47D;
+  --ink-700:    #2B2620;
+  --ink-500:    #4A4138;
+  --ink-300:    #7A6E5F;
+  --ink-200:    #ABA194;
+  --rose-500:   #C24A4A;
+  --amber-400:  #D8932B;
+  --indigo-500: #4F5DAA;
+  --teal-400:   #4D9A8E;
+  --gold-300:   #C9A961;
+  --bg-paper:   #FBF8F2;
+  --bg-surface: #FFFFFF;
+  --bg-subtle:  #F4EFE3;
+  --border-subtle:  #E9DFC8;
+  --border-default: #D4C5A0;
+  --text-primary:   #2B2620;
+  --text-secondary: #4A4138;
+  --text-tertiary:  #7A6E5F;
+  --shadow-card:    0 1px 2px rgba(43,38,32,.06), 0 4px 12px rgba(43,38,32,.04);
+  --shadow-modal:   0 8px 32px rgba(43,38,32,.18), 0 2px 8px rgba(43,38,32,.10);
+
+  --font-sans:    "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Noto Serif JP", "DM Sans", serif;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", monospace;
+
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  14px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 18px;
+  --space-xl: 28px;
+  --space-2xl: 44px;
+
+  --topbar-h: 56px;
+  --side-w:   360px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-paper);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  /* Papiro background -- subtle SVG fractal noise. */
+  background-image:
+    radial-gradient(at 24% 18%, rgba(216, 147, 43, 0.04) 0, transparent 40%),
+    radial-gradient(at 76% 82%, rgba(79, 93, 170, 0.04) 0, transparent 40%);
+}
+
+a { color: var(--indigo-500); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Topbar */
+.ne-topbar {
+  position: sticky;
+  top: 0;
+  height: var(--topbar-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 50;
+  box-shadow: 0 1px 2px rgba(43,38,32,.04);
+}
+.ne-topbar-inner {
+  max-width: 1400px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+.ne-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.ne-kanji {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1;
+  color: var(--rose-500);
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.06));
+}
+.ne-brand-text { display: flex; flex-direction: column; }
+.ne-brand-line1 {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .01em;
+  color: var(--ink-700);
+}
+.ne-brand-line2 {
+  font-size: 11px;
+  color: var(--ink-300);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.ne-topbar-nav {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Layout grid: main + side */
+.ne-app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+  margin-right: calc(var(--side-w) + var(--space-xl));
+}
+.ne-side {
+  position: fixed;
+  top: var(--topbar-h);
+  right: 0;
+  width: var(--side-w);
+  height: calc(100vh - var(--topbar-h));
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  /* 2026-05-09 fix C3: keep the chat above any confirm-dialog
+     overlay (which uses z-index:9999). The chat stays
+     interactive while the rest of the page is shaded by the
+     overlay -- so the user can answer "si" / "no" by voice or
+     text to a pending confirmation. */
+  z-index: 10001;
+}
+
+@media (max-width: 1024px) {
+  .ne-app { margin-right: 0; padding: var(--space-lg); }
+  .ne-side {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid var(--border-subtle);
+  }
+}
+
+/* Intro */
+.ne-intro { margin-bottom: var(--space-2xl); max-width: 760px; }
+.ne-h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.2;
+  color: var(--ink-700);
+  margin: 0 0 var(--space-md);
+}
+.ne-lead {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+.ne-link-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  border-bottom: 1.5px solid var(--rose-500);
+  color: var(--rose-500);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  padding: 0 1px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.ne-link-btn:hover { background: rgba(194,74,74,.08); }
+.ne-link-btn:focus-visible { outline: 2px solid var(--rose-500); outline-offset: 2px; }
+
+/* Cards grid */
+.ne-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-xl);
+}
+.ne-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.ne-card::after {
+  /* Sumi-e accent -- soft gradient on the right edge. */
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 100%;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 60%, rgba(194,74,74,.04) 100%);
+}
+.ne-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+.ne-card-kanji {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--washi-300);
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  opacity: .5;
+  pointer-events: none;
+}
+.ne-h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  margin: 0;
+  color: var(--ink-700);
+}
+.ne-card-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-md);
+}
+
+/* Piano */
+/* v1.5.5: piano replaced by sumi-e gallery -- 3 icons, each
+   expands to a Japanese ink drawing on click; click again to
+   minimize back to icon. The audio path was unreliable on
+   mobile emulators (per user 2026-05-06); a visual demo of
+   expand/minimize state machine reads better and is fully
+   driveable by the same NAC.click contract. */
+.ne-art-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: var(--space-sm);
+}
+.ne-art-icon {
+  appearance: none;
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--washi-50) 100%);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 28px 8px;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1;
+  color: var(--ink-700);
+  cursor: pointer;
+  text-align: center;
+  transition: transform .12s ease, box-shadow .15s ease,
+              background .15s ease, border-color .15s ease;
+  position: relative;
+}
+.ne-art-icon:hover {
+  background: linear-gradient(180deg, var(--washi-50) 0%, var(--washi-100) 100%);
+  border-color: var(--ink-200);
+  transform: translateY(-2px);
+}
+.ne-art-icon:active,
+.ne-art-icon[data-nac-state="active"] {
+  transform: translateY(0);
+  background: linear-gradient(180deg, var(--washi-100) 0%, var(--washi-200) 100%);
+  box-shadow: inset 0 2px 4px rgba(43,38,32,.12);
+}
+.ne-art-icon[data-nac-state="expanded"] {
+  background: linear-gradient(180deg, var(--indigo-100, #E0E7FF) 0%, var(--indigo-50, #EEF2FF) 100%);
+  border-color: var(--indigo-500);
+  color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79,70,229,.18);
+}
+.ne-art-canvas[hidden] { display: none; }
+.ne-art-canvas {
+  margin-top: var(--space-md);
+  background: var(--washi-50);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .25s ease, transform .25s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+.ne-art-canvas[data-nac-state="empty"] {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+.ne-art-canvas-inner svg {
+  width: 100%;
+  height: auto;
+  max-width: 320px;
+  display: block;
+}
+
+/* Form */
+.ne-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: var(--space-sm) 0 4px;
+}
+.ne-input, .ne-select, .ne-chat-input {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: border-color .12s, box-shadow .12s;
+}
+.ne-input:focus, .ne-select:focus, .ne-chat-input:focus {
+  outline: none;
+  border-color: var(--indigo-500);
+  box-shadow: 0 0 0 3px rgba(79,93,170,.14);
+}
+.ne-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* Buttons */
+.ne-btn {
+  appearance: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.ne-btn:hover { background: var(--washi-50); border-color: var(--ink-200); }
+.ne-btn-primary {
+  background: var(--rose-500);
+  border-color: var(--rose-500);
+  color: #FFF;
+}
+.ne-btn-primary:hover { background: #A93E3E; border-color: #A93E3E; }
+.ne-btn-sm { padding: 6px 10px; font-size: 12px; }
+
+/* Events log */
+.ne-events-log {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-sm) 0 0;
+  max-height: 240px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.ne-events-log li {
+  padding: 3px 6px;
+  border-bottom: 1px dashed var(--border-subtle);
+  opacity: 0;
+  animation: ne-slide-in .25s ease forwards;
+}
+@keyframes ne-slide-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ne-evt-action  { color: var(--indigo-500); }
+.ne-evt-field   { color: var(--teal-400); }
+.ne-evt-plugin  { color: var(--rose-500); }
+.ne-evt-state   { color: var(--amber-400); }
+
+/* Side panel */
+.ne-side-section {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ne-side-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.ne-side-kanji {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--gold-300);
+}
+.ne-h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+  color: var(--ink-700);
+  flex: 1;
+}
+.ne-side-head-collapsible {
+  cursor: pointer;
+  user-select: none;
+}
+.ne-side-caret {
+  font-size: 11px;
+  color: var(--ink-300);
+  transition: transform .15s;
+}
+.ne-side-head-collapsible[aria-expanded="true"] .ne-side-caret { transform: rotate(90deg); }
+
+/* Chat */
+.ne-chat-status {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background: var(--washi-100);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.ne-chat-log {
+  list-style: none;
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.ne-chat-bubble {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+  font-size: 13px;
+  max-width: 88%;
+  line-height: 1.45;
+}
+.ne-chat-bubble.user {
+  background: var(--indigo-500);
+  color: #FFF;
+  margin-left: auto;
+  border-bottom-right-radius: 2px;
+}
+.ne-chat-bubble.bot {
+  background: var(--washi-100);
+  color: var(--ink-700);
+  border-bottom-left-radius: 2px;
+}
+.ne-chat-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ne-icon-btn {
+  appearance: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  cursor: pointer;
+  color: var(--ink-500);
+  transition: background .12s, color .12s;
+  flex-shrink: 0;
+}
+.ne-icon-btn:hover { background: var(--washi-50); color: var(--ink-700); }
+/* v1.5.2: bright red + pulse for the speak/listen buttons when
+   active. The previous palette used --rose-500 + --washi-100 which
+   was too subtle to read as "this is on". Both states share the
+   same red so users can tell at a glance which voice mode is
+   running. The pulse animation respects prefers-reduced-motion. */
+.ne-icon-btn[data-nac-state="active"],
+.ne-icon-btn[aria-pressed="true"] {
+  background: #DC2626;          /* red-600 */
+  border-color: #B91C1C;        /* red-700 */
+  color: #FFF;
+  box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5);
+  animation: ne-voice-pulse 1.4s ease-out infinite;
+}
+@keyframes ne-voice-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0.55); }
+  70%  { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ne-icon-btn[data-nac-state="active"],
+  .ne-icon-btn[aria-pressed="true"] {
+    animation: none;
+  }
+}
+.ne-icon-btn svg { display: block; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* v1.8.0: focus pulse + section-visited tokens are public CSS
+   custom properties per spec sec 7.6, so a host targeting users
+   with attention or cognitive needs can raise the pulse
+   thickness or duration without forking this stylesheet. */
+:root {
+  --nac-focus-pulse-color:    #DC2626;   /* red-600 */
+  --nac-focus-pulse-duration: 700ms;
+  --nac-focus-pulse-thickness: 3px;
+  --nac-focus-pulse-intensity: 1;        /* 0..1 opacity scale */
+  --nac-focus-pulse-glow-radius: 18px;
+  --nac-section-visited-color:    #f59e0b;  /* amber-400 */
+  --nac-section-visited-duration: 1500ms;
+}
+
+/* v1.6.5: visible feedback when ANY element is operated by NAC.
+   The runtime sets [data-nac-focus-pulse="1"] in _focusElement
+   after every NAC.click / fill / select / tab. v1.8.0 makes
+   every parameter overrideable via the custom properties above
+   so attention-sensitive populations can crank the cue up. */
+[data-nac-focus-pulse="1"] {
+  animation: ne-focus-pulse var(--nac-focus-pulse-duration) ease-out;
+  outline: var(--nac-focus-pulse-thickness) solid var(--nac-focus-pulse-color);
+  outline-offset: 2px;
+  opacity: var(--nac-focus-pulse-intensity);
+}
+@keyframes ne-focus-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+  70%  { box-shadow: 0 0 0 var(--nac-focus-pulse-glow-radius)
+                            rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-nac-focus-pulse="1"] {
+    animation: none;
+    outline: var(--nac-focus-pulse-thickness) solid var(--nac-focus-pulse-color);
+  }
+}
+
+/* v1.6.5: agent-tour section highlight. NAC.go_to_section sets
+   [data-nac-section-visited="1"] for ~1500ms on the section
+   landmark. Even when the section is already in viewport (so
+   smooth scroll has nothing to do), the highlight makes the
+   tour visible: the user sees WHERE the agent is currently
+   pointing. */
+[data-nac-section-visited="1"] {
+  animation: ne-section-highlight 1500ms ease-out;
+  outline: 3px solid #DC2626;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+@keyframes ne-section-highlight {
+  0%   { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0.5); }
+  60%  { box-shadow: 0 0 0 18px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-nac-section-visited="1"] { animation: none; }
+}
+
+/* v1.5.2: language selector. Compact dropdown styled like the rest
+   of the chat chrome. Native <select> keeps it accessible by
+   default; NAC-instrumented as a select field so the agentic chat
+   can drive it via voice ("switch to chinese"). */
+.ne-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 12px;
+  color: var(--ink-500);
+}
+.ne-lang-row label { color: var(--ink-500); }
+.ne-lang-row select {
+  background: var(--washi-50);
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-md);
+  color: var(--ink-700);
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.ne-lang-row select:hover  { background: var(--washi-100); }
+.ne-lang-row select:focus  { outline: 2px solid var(--indigo-500); outline-offset: 2px; }
+
+/* Manifest panel */
+.ne-manifest-body {
+  margin: var(--space-sm) 0 0;
+  background: var(--ink-700);
+  color: var(--washi-100);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Modal */
+.ne-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(43,38,32,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: ne-fade-in .18s ease;
+}
+@keyframes ne-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.ne-modal {
+  background: var(--bg-paper);
+  border-radius: var(--radius-lg);
+  width: min(90vw, 520px);
+  padding: var(--space-2xl);
+  position: relative;
+  box-shadow: var(--shadow-modal);
+  animation: ne-pop .22s cubic-bezier(.2,.9,.3,1.1);
+}
+@keyframes ne-pop {
+  from { transform: scale(.92); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.ne-modal-kanji {
+  position: absolute;
+  top: 12px; right: 18px;
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1;
+  color: var(--rose-500);
+  opacity: .14;
+  pointer-events: none;
+}
+.ne-modal h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin: 0 0 var(--space-md);
+  color: var(--ink-700);
+}
+.ne-modal p { margin: 0 0 var(--space-md); color: var(--text-secondary); }
+.ne-modal-close {
+  margin-top: var(--space-md);
+}
+
+/* ==================== v1.1 widgets ==================== */
+
+/* Tabs */
+.ne-tablist {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border-default);
+  margin-bottom: var(--space-md);
+}
+.ne-tab {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color .12s, border-color .12s;
+}
+.ne-tab:hover { color: var(--ink-500); }
+.ne-tab[data-nac-state="active"],
+.ne-tab[aria-selected="true"] {
+  color: var(--rose-500);
+  border-bottom-color: var(--rose-500);
+}
+.ne-tabpanel {
+  padding: var(--space-md);
+  background: var(--washi-50);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-height: 80px;
+}
+
+/* Accordion */
+.ne-accordion { margin-top: var(--space-md); }
+.ne-acc-section { margin-bottom: 6px; }
+.ne-acc-head {
+  width: 100%;
+  appearance: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-500);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ne-acc-head:hover { background: var(--washi-50); }
+.ne-acc-caret { transition: transform .15s; color: var(--ink-300); font-size: 11px; }
+.ne-acc-section[data-nac-state="expanded"] .ne-acc-caret { transform: rotate(90deg); }
+.ne-acc-body {
+  padding: var(--space-md);
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--washi-50);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  margin-top: -2px;
+}
+
+/* Combobox */
+.ne-combo-wrap { position: relative; }
+.ne-combo-list {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 20;
+}
+.ne-combo-list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.ne-combo-list li:hover,
+.ne-combo-list li[data-nac-state="active"] {
+  background: var(--washi-100);
+}
+
+/* Slider */
+.ne-slider {
+  width: 100%;
+  appearance: none;
+  height: 6px;
+  background: var(--washi-200);
+  border-radius: 3px;
+  outline: none;
+  margin-top: 6px;
+  cursor: pointer;
+}
+.ne-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px; height: 18px;
+  background: var(--rose-500);
+  border-radius: 50%;
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 1px 3px rgba(43,38,32,.25);
+  cursor: grab;
+}
+.ne-slider::-moz-range-thumb {
+  width: 18px; height: 18px;
+  background: var(--rose-500);
+  border-radius: 50%;
+  border: 2px solid var(--bg-surface);
+  cursor: grab;
+}
+
+/* Table */
+.ne-table-filter {
+  margin-bottom: var(--space-sm);
+  max-width: 240px;
+}
+.ne-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ne-table th, .ne-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ne-table th {
+  background: var(--washi-50);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .04em;
+  padding: 0;
+}
+.ne-th-btn {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ne-th-btn:hover { background: var(--washi-100); }
+.ne-th-caret { color: var(--ink-300); font-size: 10px; }
+.ne-th-btn[data-sort-dir="asc"] .ne-th-caret::before  { content: '\2191'; color: var(--rose-500); }
+.ne-th-btn[data-sort-dir="desc"] .ne-th-caret::before { content: '\2193'; color: var(--rose-500); }
+
+.ne-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.ne-page-label { font-family: var(--font-mono); }
+
+.ne-btn[data-nac-state="disabled"] {
+  opacity: .4;
+  pointer-events: none;
+}
+
+/* Drag board */
+.ne-drag-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+.ne-drag-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-sm);
+  min-height: 130px;
+  background: var(--washi-50);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+}
+.ne-drag-list[data-nac-state="drop-target-over"] {
+  background: rgba(77,154,142,.10);
+  border-color: var(--teal-400);
+}
+.ne-drag-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  cursor: grab;
+  user-select: none;
+  transition: opacity .12s, transform .12s;
+}
+.ne-drag-item:active { cursor: grabbing; }
+.ne-drag-item[data-nac-state="dragging"] {
+  opacity: .4;
+  transform: scale(.95);
+}
+.ne-drag-empty {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: var(--space-md);
+  font-style: italic;
+}
+
+/* Dropzone */
+.ne-dropzone {
+  margin-top: var(--space-md);
+  padding: var(--space-lg);
+  text-align: center;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--washi-50);
+  cursor: pointer;
+  position: relative;
+  transition: background .12s, border-color .12s;
+}
+.ne-dropzone:hover,
+.ne-dropzone[data-nac-state="drop-target-over"] {
+  background: rgba(77,154,142,.10);
+  border-color: var(--teal-400);
+}
+.ne-dropzone[data-nac-state="uploading"] {
+  background: rgba(216,147,43,.10);
+  border-color: var(--amber-400);
+}
+.ne-dropzone-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: block;
+}
+.ne-dropzone-text small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+.ne-dropzone-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* === v1.2: window chrome controls (min/max/restore) ============= */
+.ne-chrome {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 4px;
+}
+.ne-chrome-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  background: var(--washi-50);
+  color: var(--text-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.ne-chrome-btn:hover {
+  background: var(--ink-50);
+  color: var(--ink-700);
+  border-color: var(--rose-500);
+}
+.ne-chrome-btn:focus-visible {
+  outline: 2px solid var(--rose-500);
+  outline-offset: 2px;
+}
+
+/* Plugin geometry states applied to article[data-nac-plugin] */
+[data-nac-plugin][data-nac-state="minimized"] {
+  height: auto !important;
+  overflow: hidden !important;
+}
+[data-nac-plugin][data-nac-state="minimized"] > *:not(.ne-card-head) {
+  display: none !important;
+}
+[data-nac-plugin][data-nac-state="maximized"] {
+  position: fixed !important;
+  inset: 16px !important;
+  z-index: 1000 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4) !important;
+  overflow: auto !important;
+}
+
+/* === v1.2: remote autocomplete card ============================== */
+.ne-card-remote .ne-combobox-wrap {
+  position: relative;
+}
+.ne-remote-info {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ne-remote-info [data-nac-state="loading"] {
+  color: var(--rose-500);
+}
+.ne-remote-info [data-nac-state="error"] {
+  color: var(--rose-700, #b91c1c);
+}
+.ne-remote-pick strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* === v1.2: self-test + AI agent card ============================ */
+.ne-selftest-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.ne-selftest-row .ne-btn-primary {
+  background: var(--rose-500, #ec407a);
+  color: #fff;
+  border-color: var(--rose-500, #ec407a);
+}
+.ne-selftest-row .ne-btn-primary:hover {
+  filter: brightness(1.05);
+}
+.ne-selftest-output {
+  background: var(--washi-50);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre;
+  margin: 0 0 8px;
+}
+.ne-selftest-gaps[data-nac-state="expanded"] summary,
+.ne-selftest-gaps summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 4px 0;
+  user-select: none;
+}
+.ne-selftest-gap-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text-secondary);
+}
+.ne-selftest-gap-list li {
+  padding: 2px 0;
+}
+.ne-selftest-gap-list li.gap-fail {
+  color: var(--rose-700, #b91c1c);
+}
+.ne-selftest-gap-list li.gap-warn {
+  color: var(--rose-500, #ec407a);
+}
+
+/* === v1.2: system map card ======================================= */
+.ne-navmap-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.ne-navmap-pre {
+  background: var(--washi-50);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre;
+  margin: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =====================================================================
+   v1.7 widget showcase styling. Kept minimal -- inherits ne-card
+   tokens so the showcase blends with the rest of the demo. Adds
+   only the widget-specific bits (stepper canvas, drawer slide,
+   toast stack, tree nesting, breadcrumb separators, calendar list,
+   chart bars, map markers, carousel slide indicator).
+   ===================================================================== */
+
+.ne-v17 .ne-card-sub { color: var(--text-tertiary, #888); font-size: 13px; }
+.ne-v17 .ne-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+
+/* Stepper sumi-e cycler */
+.ne-stepper-canvas {
+  width: 100%; aspect-ratio: 200 / 140;
+  background: var(--bg-subtle, #faf7f2);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ne-stepper-canvas svg { width: 100%; height: 100%; }
+.ne-stepper-meta { font-size: 13px; color: var(--text-secondary, #555); margin-bottom: 4px; }
+
+/* Tree nesting */
+.ne-card-tree ul { list-style: none; padding-left: 0; margin: 0; }
+.ne-card-tree .ne-tree-children { padding-left: 18px; }
+.ne-card-tree li[data-nac-role="tree-node"] {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.ne-card-tree li[data-nac-role="tree-node"]:hover { background: var(--bg-subtle, #f6f3ee); }
+.ne-tree-toggle {
+  background: transparent; border: 1px solid var(--border-subtle, #ddd);
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  margin-right: 6px;
+  cursor: pointer; font-size: 14px; line-height: 1;
+}
+.ne-tree-label { font-weight: 500; }
+
+/* Toast stack */
+.ne-toast-host { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.ne-toast-item {
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default, #d4cfc6);
+  border-left: 4px solid var(--c-indigo-500, #4f46e5);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  animation: ne-toast-in 200ms ease-out;
+}
+@keyframes ne-toast-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Drawer */
+.ne-card-drawer aside[data-nac-role="drawer"] {
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--bg-subtle, #faf7f2);
+  border-left: 4px solid var(--c-amber-400, #FBBF24);
+  border-radius: 6px;
+  animation: ne-drawer-slide 220ms ease-out;
+}
+@keyframes ne-drawer-slide { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+.ne-card-drawer aside header { font-weight: 600; margin-bottom: 6px; }
+
+/* Calendar -- v1.8 mini week-grid */
+.ne-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 10px 0 4px;
+}
+.ne-cal-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 4px 18px;
+  background: var(--washi-50, #fff8ee);
+  border: 1px solid var(--washi-200, #ece4d4);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: default;
+  transition: background .15s ease;
+}
+.ne-cal-day-label {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-tertiary, #888);
+  font-size: 10px;
+}
+.ne-cal-day-num {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary, #222);
+  margin-top: 2px;
+}
+.ne-cal-day-today {
+  background: rgba(245, 158, 11, .12);
+  border-color: var(--gold-300, #f59e0b);
+}
+.ne-cal-event-dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--c-indigo-500, #4f46e5);
+  color: transparent;
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease;
+}
+.ne-cal-event-dot:hover {
+  transform: translateX(-50%) scale(1.4);
+}
+.ne-cal-event-dot[data-event-active="1"] {
+  background: var(--rose-500, #DC2626);
+  transform: translateX(-50%) scale(1.4);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, .25);
+}
+[data-cal-view="day"] .ne-cal-day { display: none; }
+[data-cal-view="day"] .ne-cal-day-today { display: flex; grid-column: 1 / -1; min-height: 100px; }
+[data-cal-view="month"] .ne-cal-grid { grid-template-columns: repeat(7, 1fr); grid-auto-rows: 38px; }
+.ne-cal-status { font-size: 11px; margin-top: 4px; }
+
+/* Tree -- v1.8 deeper hierarchy: keep nested children indented and
+   show a faint guide line so the 3-level structure is readable. */
+.ne-card-tree .ne-tree-children {
+  position: relative;
+  border-left: 1px dashed var(--washi-200, #ece4d4);
+  margin-left: 8px;
+}
+.ne-card-tree .ne-tree-children .ne-tree-children {
+  border-left-color: rgba(245, 158, 11, .35);
+}
+
+/* Breadcrumb -- v1.8: highlight aria-current item.
+   v1.9.4: this rule was conflicting with the .ne-crumb[aria-current]
+   rule lower in the file. Removed here; the consolidated rule is
+   under "Breadcrumb" section below. */
+
+/* Chart inline status */
+.ne-card-chart [data-nac-role="chart"] {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--bg-subtle, #faf7f2);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #555);
+}
+
+/* Map markers as compact pills */
+.ne-card-map [data-nac-role="map"] {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, var(--bg-subtle, #faf7f2) 0%, var(--c-teal-50, #eaf6f4) 100%);
+  border-radius: 6px;
+}
+
+/* Richtext content */
+.ne-card-richtext [contenteditable="true"] {
+  margin-top: 10px;
+  padding: 10px;
+  min-height: 60px;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default, #d4cfc6);
+  border-radius: 4px;
+  font-size: 14px;
+}
+.ne-card-richtext [contenteditable="true"]:focus { outline: 2px solid var(--c-indigo-500, #4f46e5); outline-offset: -1px; }
+
+/* Breadcrumb (v1.9.4: aria-current rule consolidated; CSS conflict
+   pre-fix made the current-page indicator invisible because two
+   rules collided and the duplicate without rose-500 won. Plus
+   added preview-row visual so the card matches the visual weight
+   of calendar/chart/map cards instead of looking anemic). */
+.ne-card-breadcrumb nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.ne-crumb {
+  background: transparent; border: none;
+  padding: 4px 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--c-indigo-500, #4f46e5);
+  border-radius: 4px;
+}
+.ne-crumb:hover { background: var(--bg-subtle, #faf7f2); }
+.ne-crumb-sep { color: var(--text-tertiary, #aaa); }
+/* aria-current="page" -- single source-of-truth rule (v1.9.4). */
+.ne-crumb[aria-current="page"] {
+  color: var(--c-rose-500, #DC2626);
+  font-weight: 600;
+  border-bottom: 2px solid var(--c-rose-500, #DC2626);
+  cursor: default;
+}
+.ne-crumb-preview {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--bg-subtle, #faf7f2) 0%, rgba(220, 38, 38, 0.04) 100%);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #555);
+  border-left: 3px solid var(--c-rose-500, #DC2626);
+}
+.ne-crumb-preview strong {
+  color: var(--text-primary, #222);
+  font-weight: 600;
+}
+
+/* Carousel display (v1.7 round 6: sumi-e slides) */
+.ne-card-carousel [data-nac-role="carousel"] {
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--bg-subtle, #faf7f2);
+  border-radius: 6px;
+}
+.ne-carousel-track {
+  position: relative;
+  height: 180px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--washi-50, #fffaf0);
+}
+.ne-carousel-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  text-align: center;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events: none;
+}
+.ne-carousel-slide[data-active="1"] {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.ne-carousel-art {
+  width: 86px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ne-carousel-art svg { width: 100%; height: 100%; }
+.ne-carousel-blurb {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  max-width: 240px;
+}
+.ne-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.ne-carousel-display {
+  font-size: 12px;
+  color: var(--text-tertiary, #888);
+  letter-spacing: .04em;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* v1.8 autopilot spotlight: the card the autopilot is about to
+   touch wears a red frame so the user's eye knows where to look
+   BEFORE the action settles. Removed automatically when the run
+   moves to the next card. */
+[data-nac-autopilot-spotlight="1"] {
+  position: relative;
+  outline: 3px solid #DC2626;          /* rose-600 */
+  outline-offset: 6px;
+  box-shadow: 0 0 0 8px rgba(220, 38, 38, .12),
+              0 4px 14px rgba(220, 38, 38, .15);
+  transition: outline-color .25s ease, box-shadow .25s ease;
+  border-radius: var(--radius-md, 8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-nac-autopilot-spotlight="1"] {
+    transition: none;
+  }
+}
+
+/* v1.8 live visuals: map + chart ------------------------------ */
+
+.ne-map-canvas {
+  margin: 8px 0;
+  padding: 8px;
+  background: linear-gradient(180deg,
+    rgba(99, 102, 241, .04) 0%,
+    rgba(245, 158, 11, .04) 100%);
+  border: 1px solid var(--washi-200, #ece4d4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.ne-map-svg { width: 100%; height: auto; display: block; }
+.ne-map-land path {
+  fill: rgba(60, 60, 60, .25);
+  stroke: rgba(60, 60, 60, .45);
+  stroke-width: .8;
+  stroke-linejoin: round;
+}
+.ne-map-markers circle {
+  fill: var(--rose-500, #DC2626);
+  stroke: white;
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: r .2s ease, fill .2s ease;
+}
+.ne-map-markers circle:hover { r: 7; }
+.ne-map-markers circle[data-marker-active="1"] {
+  fill: var(--gold-300, #f59e0b);
+  r: 8;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, .6));
+}
+.ne-map-markers text {
+  font-size: 9px;
+  fill: var(--text-secondary, #555);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  pointer-events: none;
+}
+.ne-map-status { font-size: 11px; margin-top: 4px; }
+
+.ne-chart-canvas {
+  margin: 8px 0;
+  padding: 6px;
+  background: var(--washi-50, #fffaf0);
+  border: 1px solid var(--washi-200, #ece4d4);
+  border-radius: 6px;
+}
+.ne-chart-svg { width: 100%; height: auto; display: block; }
+.ne-chart-axis line {
+  stroke: var(--text-tertiary, #aaa);
+  stroke-width: 1;
+}
+.ne-chart-bars {
+  transition: opacity .35s ease;
+}
+.ne-chart-bars:not([data-active="1"]) { opacity: .15; }
+.ne-chart-bars rect {
+  transition: y .45s ease, height .45s ease;
+  rx: 1;
+}
+.ne-chart-status { font-size: 11px; margin-top: 4px; }
+
+/* v1.8 cards -------------------------------------------------- */
+
+/* Skip-validate region card */
+.ne-card-skip .ne-skip-region {
+  margin-top: 8px;
+  padding: 14px;
+  border: 2px dashed var(--text-tertiary, #aaa);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--washi-100, #f3eee5),
+    var(--washi-100, #f3eee5) 8px,
+    var(--washi-50, #fff8ee) 8px,
+    var(--washi-50, #fff8ee) 16px
+  );
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ne-skip-label {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #888);
+  font-weight: 600;
+}
+.ne-feedback-inline {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  margin-left: 8px;
+}
+.ne-feedback-inline[data-nac-state="warning"] { color: #c2410c; }
+.ne-feedback-inline[data-nac-state="success"] { color: #15803d; }
+
+/* a11y-hint danger button */
+.ne-btn-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.ne-btn-danger:hover { background: #fecaca; }
+.ne-card-a11y .ne-card-foot {
+  font-size: 11px;
+  color: var(--text-tertiary, #888);
+  margin: 8px 0 0;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Drag-types card */
+.ne-dragtypes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 8px 0;
+}
+.ne-dragtypes-source {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: var(--washi-50, #fff8ee);
+  border: 1px solid var(--washi-200, #ece4d4);
+  border-radius: 6px;
+}
+.ne-dragtypes-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ne-dragtypes-card {
+  padding: 8px 10px;
+  background: white;
+  border: 1px solid var(--washi-200, #ece4d4);
+  border-radius: 4px;
+  cursor: grab;
+  font-size: 13px;
+  text-align: center;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.ne-dragtypes-card:active { cursor: grabbing; transform: scale(.98); }
+.ne-dragtypes-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  border: 2px dashed var(--washi-200, #ece4d4);
+  border-radius: 6px;
+  background: var(--bg-subtle, #faf7f2);
+  font-size: 12px;
+  color: var(--text-tertiary, #888);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: background .15s ease, border-color .15s ease;
+}
+.ne-dragtypes-zone[data-nac-state="drop-target-over"] {
+  background: rgba(245, 158, 11, .12);
+  border-color: var(--gold-300, #f59e0b);
+  color: var(--text-primary, #222);
+}
+
+/* Timeline list */
+.ne-card-timeline ul { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.ne-card-timeline li {
+  padding: 6px 10px;
+  background: var(--bg-subtle, #faf7f2);
+  border-left: 3px solid var(--c-violet-500, #8B5CF6);
+  border-radius: 4px;
+  font-size: 13px;
+}

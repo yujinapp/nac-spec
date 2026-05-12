@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + UiPath 集成指南 -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_uipath" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_uipath" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_uipath.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_uipath.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_uipath.mp3" data-nac-id="rpa_uipath.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_uipath.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_uipath.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_uipath.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_uipath.p.1" data-nac-role="paragraph">translation_source: guides/RPA_UIPATH.md translation_source_hash: 2dd66d68221f687237ac663fa2a360077a51b7cdf8ad74c16488a5934ee7927d translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T14:54:21.493044+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_uipath.h1.nac3-uipath-集成指南" data-nac-role="heading" data-nac-level="1" id="nac3-uipath-集成指南">NAC3 + UiPath 集成指南</h1>
+<p data-nac-id="rpa_uipath.p.4" data-nac-role="paragraph"><strong>NAC3 版本：</strong> 2.2（含 v2.3 互操作预览） <strong>状态：</strong> 稳定。已针对 UiPath Studio 23.10 + Web Automation v23.10 完成测试。</p>
+<p data-nac-id="rpa_uipath.p.5" data-nac-role="paragraph">UiPath 的 Web 自动化目前通过 CSS 选择器、视觉定位或硬编码坐标来抓取 DOM。接入 NAC3 后，应用中每个可点击的组件都会暴露一个稳定的 <code data-nac-role="code-inline">data-nac-id</code>；UiPath 通过该 id 定位元素，UI 重新设计后无需任何改动。</p>
+<h2 data-nac-id="rpa_uipath.h2.为什么选择-nac3-uipath" data-nac-role="heading" data-nac-level="2" id="为什么选择-nac3-uipath">为什么选择 NAC3 + UiPath</h2>
+<p data-nac-id="rpa_uipath.p.7" data-nac-role="paragraph">| 现有痛点 | NAC3 解决方案 | |--------------|---------| | CSS 变更导致选择器失效 | <code data-nac-role="code-inline">data-nac-id</code> 在视觉重设计后保持稳定 | | 按钮移位后锚点/坐标定位失败 | 同上 | | 跨租户脆弱性（不同客户 ID 不同） | Manifest 声明动作（verb），机器人按动作调用 | | 等待"元素就绪"的逻辑不稳定 | <code data-nac-role="code-inline">nac:action:succeeded</code> 事件是确定性的 | | 多语言 UI 需要针对每种语言单独编写自动化 | <code data-nac-role="code-inline">label_i18n</code> 与语言无关，机器人使用 id 而非标签 |</p>
+<h2 data-nac-id="rpa_uipath.h2.两种集成方式" data-nac-role="heading" data-nac-level="2" id="两种集成方式">两种集成方式</h2>
+<h3 data-nac-id="rpa_uipath.h3.方式-a-browser-activity-js-注入推荐" data-nac-role="heading" data-nac-level="3" id="方式-a-browser-activity-js-注入推荐">方式 A —— Browser activity + JS 注入（推荐）</h3>
+<p data-nac-id="rpa_uipath.p.10" data-nac-role="paragraph">UiPath 的 <code data-nac-role="code-inline">Inject JavaScript</code> activity 直接运行 <code data-nac-role="code-inline">window.NAC.click(...)</code>，无需选择器，稳定可靠。</p>
+<pre data-nac-id="rpa_uipath.code.1" data-nac-role="code" data-nac-lang="vb"><code>&#x27; UiPath sequence pseudocode
+Open Browser https://your-app.example.com/
+Inject JS: window.NAC.click(&#x27;invoice.save&#x27;)
+Wait for Event: nac:action:succeeded</code></pre>
+<p data-nac-id="rpa_uipath.p.12" data-nac-role="paragraph">实现步骤：</p>
+<p data-nac-id="rpa_uipath.p.13" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    return await (async () =&gt; {      const result = await window.NAC.click('@id@');      return JSON.stringify(result);    })();    </code>``</p>
+<ol data-nac-id="rpa_uipath.list.14" data-nac-role="list"><li data-nac-id="rpa_uipath.list.14.item.1" data-nac-role="list-item"><strong>Browser activity</strong> —— 标准 UiPath 流程。</li><li data-nac-id="rpa_uipath.list.14.item.2" data-nac-role="list-item"><strong>Inject JavaScript activity</strong> —— 注入内容：</li><li data-nac-id="rpa_uipath.list.14.item.3" data-nac-role="list-item"><strong>Assign</strong> 将返回的字符串赋值给变量，解析后检查 <code data-nac-role="code-inline">{ok: true}</code>。</li></ol>
+<p data-nac-id="rpa_uipath.p.15" data-nac-role="paragraph">基于动作（verb）的调度：</p>
+<pre data-nac-id="rpa_uipath.code.2" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.click_by_verb(&#x27;@plugin@&#x27;, &#x27;@verb@&#x27;)</code></pre>
+<p data-nac-id="rpa_uipath.p.17" data-nac-role="paragraph">填充字段：</p>
+<pre data-nac-id="rpa_uipath.code.3" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.fill(&#x27;@id@&#x27;, &#x27;@value@&#x27;)</code></pre>
+<h3 data-nac-id="rpa_uipath.h3.方式-b-基于选择器的-nac-感知-xpath" data-nac-role="heading" data-nac-level="3" id="方式-b-基于选择器的-nac-感知-xpath">方式 B —— 基于选择器的 NAC 感知 xpath</h3>
+<p data-nac-id="rpa_uipath.p.20" data-nac-role="paragraph">如果你的 UiPath 配置偏向使用选择器，可直接使用 <code data-nac-role="code-inline">data-nac-id</code> 属性：</p>
+<pre data-nac-id="rpa_uipath.code.4" data-nac-role="code" data-nac-lang="xml"><code>&lt;webctrl tag=&#x27;button&#x27; attr=&#x27;data-nac-id&#x27; value=&#x27;invoice.save&#x27; /&gt;</code></pre>
+<p data-nac-id="rpa_uipath.p.22" data-nac-role="paragraph">逻辑相同，但通过 UiPath 的树浏览器消费 Browser DOM。稳定性略低（依赖树的时序），但保留了 UiPath 的惯用方式。</p>
+<h2 data-nac-id="rpa_uipath.h2.uipath-示例工作流" data-nac-role="heading" data-nac-level="2" id="uipath-示例工作流">UiPath 示例工作流</h2>
+<p data-nac-id="rpa_uipath.p.24" data-nac-role="paragraph"><code data-nac-role="code-inline">Examples_NAC_Invoice.xaml</code>（发布后可从 Yujin marketplace 下载）：</p>
+<p data-nac-id="rpa_uipath.p.25" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    return new Promise(r =&gt; {      const t = setInterval(() =&gt; {        if (window.NAC) { clearInterval(t); r('ready'); }      }, 100);    });    </code>``</p>
+<p data-nac-id="rpa_uipath.p.26" data-nac-role="paragraph">``<code data-nac-role="code-inline">js    await window.NAC.click_by_verb('invoice', 'new');    await window.NAC.fill('invoice.client_name', @row("client")@);    await window.NAC.fill('invoice.amount', @row("amount")@);    await window.NAC.click_by_verb('invoice', 'save');    </code>``</p>
+<ol data-nac-id="rpa_uipath.list.27" data-nac-role="list"><li data-nac-id="rpa_uipath.list.27.item.1" data-nac-role="list-item"><strong>Open Browser</strong> —— 将目标标签页指向符合 NAC-3 规范的应用。</li><li data-nac-id="rpa_uipath.list.27.item.2" data-nac-role="list-item"><strong>Wait for window.NAC3</strong> —— 注入：</li><li data-nac-id="rpa_uipath.list.27.item.3" data-nac-role="list-item"><strong>For Each Row</strong> —— 遍历源数据表。</li><li data-nac-id="rpa_uipath.list.27.item.4" data-nac-role="list-item"><strong>Inject JS</strong> —— 每行执行：</li><li data-nac-id="rpa_uipath.list.27.item.5" data-nac-role="list-item"><strong>Wait for</strong> —— 等待 nac:action:succeeded，其中 action_id='invoice.save'。</li><li data-nac-id="rpa_uipath.list.27.item.6" data-nac-role="list-item"><strong>Continue</strong> 循环。</li></ol>
+<p data-nac-id="rpa_uipath.p.28" data-nac-role="paragraph">无论底层应用多复杂，整个流程只需 5 个 activity。相比之下，基于 CSS 选择器的等效实现通常需要 30～50 个 activity。</p>
+<h2 data-nac-id="rpa_uipath.h2.发现机制读取-manifest" data-nac-role="heading" data-nac-level="2" id="发现机制读取-manifest">发现机制：读取 manifest</h2>
+<p data-nac-id="rpa_uipath.p.30" data-nac-role="paragraph">UiPath 可在自动化前内省 manifest：</p>
+<pre data-nac-id="rpa_uipath.code.5" data-nac-role="code" data-nac-lang="js"><code>return window.NAC.describe();</code></pre>
+<p data-nac-id="rpa_uipath.p.32" data-nac-role="paragraph">返回完整的插件树。利用它可以构建动态流程图，在 manifest 变更后无需重新部署 .xaml 即可自动适应。</p>
+<h2 data-nac-id="rpa_uipath.h2.来源可信度nac-3" data-nac-role="heading" data-nac-level="2" id="来源可信度nac-3">来源可信度（NAC-3）</h2>
+<p data-nac-id="rpa_uipath.p.34" data-nac-role="paragraph">UiPath 派发的是合成点击，因此 NAC3 确认事件上的 <code data-nac-role="code-inline">event.isTrusted === false</code>。对敏感动作（删除、支付、管理员操作）设有 <code data-nac-role="code-inline">is_trusted</code> 校验的应用，默认情况下<strong>会拒绝</strong> UiPath 的调度。</p>
+<p data-nac-id="rpa_uipath.p.35" data-nac-role="paragraph">若要为这些动作启用 RPA，宿主应用必须显式加入白名单：</p>
+<pre data-nac-id="rpa_uipath.code.6" data-nac-role="code" data-nac-lang="js"><code>// In the host app&#x27;s NAC bootstrap:
+window.__NAC_ALLOW_UNTRUSTED__ = [&#x27;invoice.save&#x27;, &#x27;invoice.send&#x27;];</code></pre>
+<p data-nac-id="rpa_uipath.p.37" data-nac-role="paragraph">请与应用负责人讨论威胁模型——绕过 isTrusted 会破坏规范的防伪造保证。UiPath 运行在受控环境中，因此这种权衡通常是可接受的，但务必记录在案。</p>
+<h2 data-nac-id="rpa_uipath.h2.错误处理" data-nac-role="heading" data-nac-level="2" id="错误处理">错误处理</h2>
+<p data-nac-id="rpa_uipath.p.39" data-nac-role="paragraph">NAC3 抛出结构化错误，UiPath 可据此进行分支处理：</p>
+<pre data-nac-id="rpa_uipath.code.7" data-nac-role="code" data-nac-lang="js"><code>try {
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+} catch (e) {
+  return JSON.stringify({ ok: false, code: e.code, message: e.message });
+}</code></pre>
+<p data-nac-id="rpa_uipath.p.41" data-nac-role="paragraph">| <code data-nac-role="code-inline">e.code</code> | 含义 | UiPath 分支处理 | |----------|---------|---------------| | <code data-nac-role="code-inline">not_found</code> | 当前 DOM 中不存在该 id | 通过 <code data-nac-role="code-inline">NAC.describe()</code> 重新发现 | | <code data-nac-role="code-inline">invalid</code> | 参数格式错误 | 机器人逻辑 bug，上报处理 | | <code data-nac-role="code-inline">timeout</code> | 副作用在 5 秒内未确认 | 重试最多 N 次 |</p>
+<h2 data-nac-id="rpa_uipath.h2.测试矩阵" data-nac-role="heading" data-nac-level="2" id="测试矩阵">测试矩阵</h2>
+<p data-nac-id="rpa_uipath.p.43" data-nac-role="paragraph">我们在 CI 中使用 UiPath 23.10 针对 <a href="https://yujin.app/nac-spec/example-v21-data-table.php" data-nac-id="rpa_uipath.link.1" data-nac-role="action" data-nac-action="open">v21 数据表演示</a> 对集成进行验证。参考工作流位于本仓库的 <code data-nac-role="code-inline">tools/rpa/uipath/InvoiceFromCSV.xaml</code>（即将发布）。</p>
+<h2 data-nac-id="rpa_uipath.h2.参见" data-nac-role="heading" data-nac-level="2" id="参见">参见</h2>
+<ul data-nac-id="rpa_uipath.list.45" data-nac-role="list"><li data-nac-id="rpa_uipath.list.45.item.1" data-nac-role="list-item"><a href="../SPEC.md#5-public-api" data-nac-id="rpa_uipath.link.2" data-nac-role="action" data-nac-action="open">SPEC.md 第 5 节</a> —— 完整的 NAC.* 接口说明。</li><li data-nac-id="rpa_uipath.list.45.item.2" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="rpa_uipath.link.3" data-nac-role="action" data-nac-action="open">SECURITY.md</a> —— isTrusted 威胁模型。</li><li data-nac-id="rpa_uipath.list.45.item.3" data-nac-role="list-item"><a href="LLM_WIRING.md" data-nac-id="rpa_uipath.link.4" data-nac-role="action" data-nac-action="open">LLM_WIRING.md</a> —— 如果你的 RPA 流程还需要语音/对话输入，可在前端接入 LLM 中间层。</li><li data-nac-id="rpa_uipath.list.45.item.4" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="rpa_uipath.link.5" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> —— Yujin 端到端测试此契约的方式。</li></ul>
+<h2 data-nac-id="rpa_uipath.h2.许可证" data-nac-role="heading" data-nac-level="2" id="许可证">许可证</h2>
+<p data-nac-id="rpa_uipath.p.47" data-nac-role="paragraph">Apache-2.0。</p>
+<hr />
+<p data-nac-id="rpa_uipath.p.49" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_UIPATH.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_uipath",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_uipath.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_uipath.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_uipath.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_uipath.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

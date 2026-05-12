@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- 无障碍承诺 -- NAC3</title>
+<meta name="nac3-doc-slug" content="accessibility" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="accessibility" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="accessibility.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="accessibility.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/accessibility.mp3" data-nac-id="accessibility.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="accessibility.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="accessibility.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="accessibility.main" data-nac-role="region">
+<hr />
+<p data-nac-id="accessibility.p.1" data-nac-role="paragraph">translation_source: docs/ACCESSIBILITY.md translation_source_hash: 615f9c5a447d95c7aee985d926f7b29377bed44dc959fd07a966fd41fa86a03b translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:11:10.197122+00:00</p>
+<hr />
+<h1 data-nac-id="accessibility.h1.nac3-无障碍承诺" data-nac-role="heading" data-nac-level="1" id="nac3-无障碍承诺">NAC3 -- 无障碍承诺</h1>
+<p data-nac-id="accessibility.p.4" data-nac-role="paragraph"><strong>规范版本：</strong> 2.2 稳定版（+ v2.3 互操作预览）。 <strong>最后审阅：</strong> 2026-05-11。</p>
+<p data-nac-id="accessibility.p.5" data-nac-role="paragraph">NAC3 的设计目标是让 Web UI 可被机器寻址。使 UI 可被 AI 智能体导航的特性，同样使其可被屏幕阅读器、开关设备、眼动追踪仪和语音用户导航。NAC3 在构造上就是一个无障碍原语——Yujin 承诺始终保持这一特性。</p>
+<hr />
+<h2 data-nac-id="accessibility.h2.承诺内容" data-nac-role="heading" data-nac-level="2" id="承诺内容">承诺内容</h2>
+<ol data-nac-id="accessibility.list.8" data-nac-role="list"><li data-nac-id="accessibility.list.8.item.1" data-nac-role="list-item"><strong>WCAG 2.1 Level AA</strong> 合规是所有基于 NAC3 构建的 Yujin 产品的最低标准（<code data-nac-role="code-inline">yujin-pilot</code>、<code data-nac-role="code-inline">yujin-forge</code>、yujin.app/nac-spec/ 的参考演示，以及 yujin.app/registry）。</li><li data-nac-id="accessibility.list.8.item.2" data-nac-role="list-item"><strong>在可行的情况下达到 AAA 级</strong>，适用于无障碍访问最为关键的界面：聊天面板、语音激活、首次运行引导、错误提示。</li><li data-nac-id="accessibility.list.8.item.3" data-nac-role="list-item"><strong>不提供单独的"无障碍版本"</strong>。无障碍功能随主产品发布，价格相同，发布节奏相同。单独版本会给用户贴标签，且会逐渐腐化。</li><li data-nac-id="accessibility.list.8.item.4" data-nac-role="list-item"><strong>不存在"以后再做无障碍"</strong>。每次发布都以 <a href="HUMAN_OK_CHECKLIST.md" data-nac-id="accessibility.link.1" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST.md</a> 第 8.6 节中记录的无障碍检查项以及新增的屏幕阅读器冒烟测试章节（Track G7）作为发布门控。</li></ol>
+<hr />
+<h2 data-nac-id="accessibility.h2.支持的辅助技术" data-nac-role="heading" data-nac-level="2" id="支持的辅助技术">支持的辅助技术</h2>
+<p data-nac-id="accessibility.p.11" data-nac-role="paragraph">参考实现已针对以下辅助技术进行测试：</p>
+<p data-nac-id="accessibility.p.12" data-nac-role="paragraph">| AT 类别 | 已验证工具 | |---------|-----------| | 屏幕阅读器 | NVDA（Windows）、JAWS（Windows）、VoiceOver（macOS、iOS） | | 语音控制 | Yujin Pilot、Apple Voice Control、Windows Speech Recognition、Dragon NaturallySpeaking | | 开关访问 | iOS Switch Control、Android Switch Access | | 眼动追踪 | Tobii Dynavox | | 放大功能 | 浏览器缩放至 200%、ZoomText、macOS Zoom | | 纯键盘操作 | 完整键盘导航、可见焦点、无时间限制 |</p>
+<p data-nac-id="accessibility.p.13" data-nac-role="paragraph">任何使用标准无障碍树（ARIA、accessibilityRole、accessibilityLabel）的 AT 都能从 NAC3 中受益，因为 NAC3 元素携带了与 AT 层相同的语义信息。</p>
+<hr />
+<h2 data-nac-id="accessibility.h2.nac3-对无障碍的贡献机制说明" data-nac-role="heading" data-nac-level="2" id="nac3-对无障碍的贡献机制说明">NAC3 对无障碍的贡献（机制说明）</h2>
+<ul data-nac-id="accessibility.list.16" data-nac-role="list"><li data-nac-id="accessibility.list.16.item.1" data-nac-role="list-item"><strong>稳定标识符（<code data-nac-role="code-inline">data-nac-id</code>）</strong>：屏幕阅读器和开关访问不依赖视觉位置。该标识符在界面重新设计后仍然有效，AT 用户的操作习惯也因此得以保留。</li><li data-nac-id="accessibility.list.16.item.2" data-nac-role="list-item"><strong>规范角色（<code data-nac-role="code-inline">data-nac-role</code>）</strong>：角色枚举（action、field、tab 等）与 ARIA 角色一一对应。AT 用户能听到语义正确的播报。</li><li data-nac-id="accessibility.list.16.item.3" data-nac-role="list-item"><strong>清单动词（<code data-nac-role="code-inline">label_i18n</code>）</strong>：每个操作都有 10 种语言的本地化标签。语音控制用户说出动词，清单即可解析。</li><li data-nac-id="accessibility.list.16.item.4" data-nac-role="list-item"><strong>确定性确认事件（<code data-nac-role="code-inline">nac:action:succeeded</code>）</strong>：AT 用户能听到操作已完成的确认，而非依赖 UI 动画进行猜测。</li><li data-nac-id="accessibility.list.16.item.5" data-nac-role="list-item"><strong>严格验证（v2.2）</strong>：在清单与 DOM 之间的偏差到达 AT 用户之前即予以捕获。</li></ul>
+<hr />
+<h2 data-nac-id="accessibility.h2.nac3-不解决的问题" data-nac-role="heading" data-nac-level="2" id="nac3-不解决的问题">NAC3 不解决的问题</h2>
+<ul data-nac-id="accessibility.list.19" data-nac-role="list"><li data-nac-id="accessibility.list.19.item.1" data-nac-role="list-item"><strong>原生 iOS/Android 应用</strong>：v2.2 规范仅覆盖 Web + WebView。原生移动端已列入 v3.0 路线图。</li><li data-nac-id="accessibility.list.19.item.2" data-nac-role="list-item"><strong>视觉呈现</strong>：NAC3 是结构性的。对比度、字体大小、焦点指示器由具体实现负责（Yujin 的设计令牌在参考实现中已覆盖这些内容）。</li><li data-nac-id="accessibility.list.19.item.3" data-nac-role="list-item"><strong>复杂流程的认知负担</strong>：NAC3 的 id 无法让设计糟糕的工作流变得简单。良好的信息架构和简明的文案才能做到。</li><li data-nac-id="accessibility.list.19.item.4" data-nac-role="list-item"><strong>多媒体字幕</strong>：音视频资源的字幕须由发布者提供。NAC3 提供钩子，但不提供内容。</li></ul>
+<hr />
+<h2 data-nac-id="accessibility.h2.报告无障碍问题" data-nac-role="heading" data-nac-level="2" id="报告无障碍问题">报告无障碍问题</h2>
+<p data-nac-id="accessibility.p.22" data-nac-role="paragraph">发送邮件至 <code data-nac-role="code-inline">accessibility@yujin.app</code>（或转发至维护者的邮箱）。响应 SLA：5 个工作日内完成分类，修复时间不设 SLA，因为每个案例情况不同。问题在 <code data-nac-role="code-inline">nac-spec</code> 仓库中以 <code data-nac-role="code-inline">a11y</code> 标签公开追踪。</p>
+<p data-nac-id="accessibility.p.23" data-nac-role="paragraph">对于涉及安全的问题（例如 AT 绕过确认对话框），请遵循 <code data-nac-role="code-inline">SECURITY.md</code>。</p>
+<hr />
+<h2 data-nac-id="accessibility.h2.路线图" data-nac-role="heading" data-nac-level="2" id="路线图">路线图</h2>
+<p data-nac-id="accessibility.p.26" data-nac-role="paragraph">| Track | 描述 | 目标节点 | |-------|------|---------| | G1 | WCAG 2.1 AA 审计 + 修复（Forge + Pilot UI） | Forge/Pilot v1 发布前 | | G2 | 语音优先设置向导（Forge + Pilot 首次运行） | Forge/Pilot v1 | | G3 | 每个文档页面符合 NAC3 规范 | NAC3 v2.2 发布 | | G4 | 每篇指南的音频版本（.mp3） | NAC3 v2.3 | | G5 | yujin.app/learn 的对话式教程 | NAC3 v2.3 | | G6 | 关键指南的简明语言平行版本 | NAC3 v2.3 | | G7 | HUMAN_OK_CHECKLIST 中的屏幕阅读器冒烟测试 | NAC3 v2.2 发布 | | G8 | 真实残障用户 Beta 计划 | Forge/Pilot v1 发布前 | | G9 | 本声明公开发布并在每个页面添加链接 | NAC3 v2.2 发布 | | G10 | 外部认证审计 | Forge/Pilot 1.0 商业版发布前 |</p>
+<hr />
+<h2 data-nac-id="accessibility.h2.为何公开发布本声明" data-nac-role="heading" data-nac-level="2" id="为何公开发布本声明">为何公开发布本声明</h2>
+<p data-nac-id="accessibility.p.29" data-nac-role="paragraph">除道德层面外，还有两个实际原因：</p>
+<ol data-nac-id="accessibility.list.30" data-nac-role="list"><li data-nac-id="accessibility.list.30.item.1" data-nac-role="list-item"><strong>欧盟无障碍法案（EAA）</strong> 已于 2025 年 6 月对 B2C 服务正式生效。使用 Forge 构建的应用默认符合 NAC3 规范，在 EAA 合规方面比竞争对手更具优势。</li><li data-nac-id="accessibility.list.30.item.2" data-nac-role="list-item"><strong>美国 ADA 第三章针对 Web 应用的诉讼</strong>同比增长 320%。企业买家对此高度关注。NAC3 + Yujin 的合规态势有助于降低其法律风险。</li></ol>
+<p data-nac-id="accessibility.p.31" data-nac-role="paragraph">NAC3 不是"将无障碍作为附加功能的开放标准"。NAC3 是"唯一在构造上原生支持无障碍的通用 Web 自动化契约"。我们将始终坚守这一定位。</p>
+<hr />
+<h2 data-nac-id="accessibility.h2.另请参阅" data-nac-role="heading" data-nac-level="2" id="另请参阅">另请参阅</h2>
+<ul data-nac-id="accessibility.list.34" data-nac-role="list"><li data-nac-id="accessibility.list.34.item.1" data-nac-role="list-item"><a href="../SPEC.md" data-nac-id="accessibility.link.2" data-nac-role="action" data-nac-action="open">SPEC.md</a> -- 规范契约。</li><li data-nac-id="accessibility.list.34.item.2" data-nac-role="list-item"><a href="HUMAN_OK_CHECKLIST.md" data-nac-id="accessibility.link.3" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST.md</a> -- 包含屏幕阅读器冒烟测试章节。</li><li data-nac-id="accessibility.list.34.item.3" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="accessibility.link.4" data-nac-role="action" data-nac-action="open">SECURITY.md</a> -- 安全模型，包含 AT 相关内容。</li></ul>
+<h2 data-nac-id="accessibility.h2.许可证" data-nac-role="heading" data-nac-level="2" id="许可证">许可证</h2>
+<p data-nac-id="accessibility.p.36" data-nac-role="paragraph">本文档采用 Apache-2.0 许可证。其所承诺的实现分别采用 MIT（运行时）/ Apache-2.0（规范）/ 专有许可证（Forge、Pilot）。</p>
+<hr />
+<p data-nac-id="accessibility.p.38" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/ACCESSIBILITY.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "accessibility",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "accessibility.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "accessibility.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "accessibility.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "accessibility.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

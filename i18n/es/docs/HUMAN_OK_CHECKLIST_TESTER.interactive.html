@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Test smoke general (tester checklist en castellano) (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="human_ok_checklist_tester" data-doc-lang="es" data-nac-plugin="tester_form">
+<p class="tr-intro">Completá cada tarea + apretá Enviar al final. Tu reporte llegará al equipo Yujin.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<hr />
+<p>translation_source: docs/HUMAN_OK_CHECKLIST_TESTER.md translation_source_hash: rewrite-2026-05-11-v2 translation_quality: human_rewrite_v2 translation_lang: es translation_date: 2026-05-11T14:45:00+00:00</p>
+<hr />
+<h1>NAC3 v2.2 -- Test smoke general (tester checklist en castellano)</h1>
+<p><strong>Para:</strong> el tester hispanohablante que va a hacer la pasada general. <strong>Tiempo estimado:</strong> 60 a 90 minutos. <strong>Necesitas:</strong></p>
+<p>- Chrome instalado y actualizado (obligatorio para la primera mitad). - Firefox instalado (para una seccion mas adelante). - Una computadora con microfono y parlantes/auriculares. - Si tenes acceso a Safari (Mac) o Edge (Windows), mejor.</p>
+<h2>Como usar esta lista</h2>
+<p>Cada tarea tiene una lista de pasos numerados (1, 2, 3, ...). Hay que hacerlos <strong>en orden</strong> sin saltar ninguno.</p>
+<p>Despues de los pasos, mira el bloque <strong>"Resultado esperado"</strong>. Si lo que ves coincide: marca <strong>OK</strong>.</p>
+<p>Si algo es distinto, no funciona o aparece un error: marca <strong>ERROR</strong> y escribi en <strong>Comentarios</strong> que viste exactamente. Despues segui con la tarea siguiente -- no te traves.</p>
+<p>Al final del formulario, completa la firma final y apreta <strong>Enviar reporte</strong>.</p>
+<hr />
+<fieldset class="tr-task" id="task-1">
+<legend>Tarea 1 &mdash; Abrir la pagina principal (Chrome)</legend>
+<p>Pasos:</p>
+<p>1. Abri Chrome. 2. Presiona Ctrl+Shift+N para abrir una ventana de incognito. 3. En la barra de direcciones, escribi: <code>https://yujin.app/nac-spec/</code> 4. Presiona Enter. 5. Espera 5 segundos sin hacer click en nada.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Arriba a la izquierda ves un dibujo sumi-e + el texto "NAC". - Arriba a la derecha hay una fila de botones que incluye "tour" y "chat". - En el centro hay un titulo grande "Drive web UIs by voice, chat, AI". - No hay ningun mensaje rojo de error en la pantalla.</p>
+<label class="tr-opt"><input type="radio" name="task-1-status" value="ok" id="task-1-ok" data-nac-id="tester_form.task-1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-1-status" value="error" id="task-1-error" data-nac-id="tester_form.task-1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-1-comments">Comentarios</label>
+<textarea name="task-1-comments" id="task-1-comments" rows="2" data-nac-id="tester_form.task-1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-2">
+<legend>Tarea 2 &mdash; Consola de desarrollador sin errores</legend>
+<p>Pasos:</p>
+<p>1. Estas en la pagina del paso 1. 2. Presiona la tecla F12 para abrir las herramientas de desarrollador del navegador. 3. En la barra de tabs de las herramientas, hace click en <strong>"Console"</strong>. 4. Espera 3 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el panel Console no hay lineas rojas de error. - Puede haber lineas amarillas (warnings) -- esas no son problema.</p>
+<label class="tr-opt"><input type="radio" name="task-2-status" value="ok" id="task-2-ok" data-nac-id="tester_form.task-2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-2-status" value="error" id="task-2-error" data-nac-id="tester_form.task-2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-2-comments">Comentarios</label>
+<textarea name="task-2-comments" id="task-2-comments" rows="2" data-nac-id="tester_form.task-2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-3">
+<legend>Tarea 3 &mdash; Cerrar la consola</legend>
+<p>Pasos:</p>
+<p>1. Presiona F12 otra vez para cerrar las herramientas de desarrollador.</p>
+<p>Resultado esperado:</p>
+<p>- Las herramientas de desarrollador se cierran. La pagina queda visible al 100%.</p>
+<label class="tr-opt"><input type="radio" name="task-3-status" value="ok" id="task-3-ok" data-nac-id="tester_form.task-3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-3-status" value="error" id="task-3-error" data-nac-id="tester_form.task-3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-3-comments">Comentarios</label>
+<textarea name="task-3-comments" id="task-3-comments" rows="2" data-nac-id="tester_form.task-3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-4">
+<legend>Tarea 4 &mdash; Seccion "Made with NAC3"</legend>
+<p>Pasos:</p>
+<p>1. En la pagina principal, baja con la rueda del mouse o con la barra de desplazamiento. 2. Buscá una seccion que tiene como titulo <strong>"Made with NAC3"</strong>. 3. Mira las tarjetas adentro de esa seccion.</p>
+<p>Resultado esperado:</p>
+<p>- Encontras la seccion "Made with NAC3" en la pagina. - Adentro hay al menos 4 tarjetas en una grilla. - Las tarjetas son: "Yujin CRM", "Reference demos", "Cal.com (coming)", y "Your app". - Cada tarjeta tiene arriba un caracter japones, un titulo, una descripcion corta, y un link con una flecha <code>-&gt;</code>.</p>
+<label class="tr-opt"><input type="radio" name="task-4-status" value="ok" id="task-4-ok" data-nac-id="tester_form.task-4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-4-status" value="error" id="task-4-error" data-nac-id="tester_form.task-4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-4-comments">Comentarios</label>
+<textarea name="task-4-comments" id="task-4-comments" rows="2" data-nac-id="tester_form.task-4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-5">
+<legend>Tarea 5 &mdash; Seccion waitlist Forge/Pilot</legend>
+<p>Pasos:</p>
+<p>1. Sigue bajando en la pagina principal. 2. Buscá una seccion con titulo <strong>"Coming Q3 2026: Yujin Forge + Pilot"</strong>. 3. Adentro hay un formulario con un campo de email.</p>
+<p>Resultado esperado:</p>
+<p>- Encontras la seccion. - El campo de email dice "you@example.com" como placeholder. - Debajo hay dos casillas marcadas "Forge ($19)" y "Pilot ($5)". - Hay un boton azul que dice "Notify me".</p>
+<label class="tr-opt"><input type="radio" name="task-5-status" value="ok" id="task-5-ok" data-nac-id="tester_form.task-5.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-5-status" value="error" id="task-5-error" data-nac-id="tester_form.task-5.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-5-comments">Comentarios</label>
+<textarea name="task-5-comments" id="task-5-comments" rows="2" data-nac-id="tester_form.task-5.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-6">
+<legend>Tarea 6 &mdash; Probar el formulario de waitlist</legend>
+<p>Pasos:</p>
+<p>1. En el campo de email del formulario waitlist, escribi tu email <strong>o</strong> un email de prueba (<code>test@example.com</code> esta bien). 2. Verifica que las dos casillas "Forge" y "Pilot" estan marcadas. 3. Hace click en el boton <strong>"Notify me"</strong>. 4. Espera 5 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- Aparece un mensaje al lado del boton, alguno de estos dos:   1. <strong>"Got it. You will hear from us when Forge + Pilot launch."</strong> (significa que se mando bien)   2. <strong>"Submission failed -- email hello@yujin.app instead."</strong> (significa que el servidor no respondio pero el fallback funciono) - Cualquiera de los dos mensajes es aceptable -- ambos indican que el formulario esta cableado.</p>
+<label class="tr-opt"><input type="radio" name="task-6-status" value="ok" id="task-6-ok" data-nac-id="tester_form.task-6.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-6-status" value="error" id="task-6-error" data-nac-id="tester_form.task-6.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-6-comments">Comentarios</label>
+<textarea name="task-6-comments" id="task-6-comments" rows="2" data-nac-id="tester_form.task-6.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-7">
+<legend>Tarea 7 &mdash; Abrir el demo data-table</legend>
+<p>Pasos:</p>
+<p>1. En la barra de direcciones del navegador, escribi: <code>https://yujin.app/nac-spec/example-v21-data-table.php</code> 2. Presiona Enter. 3. Espera 5 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Ves un titulo "NAC v2.1 -- data-table primitive (live)". - En el centro hay un cuadrado blanco con texto + un boton azul <strong>"Edit invoice #INV-001"</strong>. - En el lado derecho hay un panel de chat (si no esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo).</p>
+<label class="tr-opt"><input type="radio" name="task-7-status" value="ok" id="task-7-ok" data-nac-id="tester_form.task-7.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-7-status" value="error" id="task-7-error" data-nac-id="tester_form.task-7.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-7-comments">Comentarios</label>
+<textarea name="task-7-comments" id="task-7-comments" rows="2" data-nac-id="tester_form.task-7.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-8">
+<legend>Tarea 8 &mdash; Elegir castellano en el chat del demo</legend>
+<p>Pasos:</p>
+<p>1. Estas en el demo v21 (paso 7). 2. Localiza el dropdown de idioma en la parte de arriba del panel de chat (lado derecho). 3. Hace click sobre el dropdown. 4. Elegi <strong>"es"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- El dropdown muestra "es".</p>
+<label class="tr-opt"><input type="radio" name="task-8-status" value="ok" id="task-8-ok" data-nac-id="tester_form.task-8.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-8-status" value="error" id="task-8-error" data-nac-id="tester_form.task-8.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-8-comments">Comentarios</label>
+<textarea name="task-8-comments" id="task-8-comments" rows="2" data-nac-id="tester_form.task-8.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-9">
+<legend>Tarea 9 &mdash; Abrir el modal de la factura</legend>
+<p>Pasos:</p>
+<p>1. Hace click sobre el boton azul <strong>"Edit invoice #INV-001"</strong> en el centro de la pagina. 2. Espera 1 segundo.</p>
+<p>Resultado esperado:</p>
+<p>- Aparece un modal grande que cubre la mayor parte de la pantalla. - Tiene titulo "Edit invoice #INV-001". - Adentro ves pestanas: <strong>"Lines (collection)"</strong> y <strong>"Permissions (matrix)"</strong>. - Adentro hay una tabla con filas (productos con cantidad y precio). - En la esquina del modal hay botones "Cancel" y "Save".</p>
+<label class="tr-opt"><input type="radio" name="task-9-status" value="ok" id="task-9-ok" data-nac-id="tester_form.task-9.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-9-status" value="error" id="task-9-error" data-nac-id="tester_form.task-9.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-9-comments">Comentarios</label>
+<textarea name="task-9-comments" id="task-9-comments" rows="2" data-nac-id="tester_form.task-9.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-10">
+<legend>Tarea 10 &mdash; Cambiar pestanas con el mouse</legend>
+<p>Pasos:</p>
+<p>1. El modal "Edit invoice" sigue abierto. 2. La pestana activa es "Lines (collection)" (resaltada con fondo gris claro). 3. Hace click sobre la pestana <strong>"Permissions (matrix)"</strong>. 4. Espera 1 segundo. 5. Hace click sobre <strong>"Lines (collection)"</strong> para volver.</p>
+<p>Resultado esperado:</p>
+<p>- Cuando hiciste click en "Permissions", la pestana resaltada cambio + el contenido del modal cambio (ahora se ve una grilla de permisos). - Cuando hiciste click de vuelta en "Lines", volvio a verse la tabla original. - Ninguna pestana se "trabo".</p>
+<label class="tr-opt"><input type="radio" name="task-10-status" value="ok" id="task-10-ok" data-nac-id="tester_form.task-10.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-10-status" value="error" id="task-10-error" data-nac-id="tester_form.task-10.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-10-comments">Comentarios</label>
+<textarea name="task-10-comments" id="task-10-comments" rows="2" data-nac-id="tester_form.task-10.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-11">
+<legend>Tarea 11 &mdash; Cerrar el modal</legend>
+<p>Pasos:</p>
+<p>1. Hace click sobre el boton <strong>"Cancel"</strong> del modal (esquina superior derecha del modal). 2. Espera 1 segundo.</p>
+<p>Resultado esperado:</p>
+<p>- El modal se cierra. - Volves a ver la pagina del demo con el boton "Edit invoice #INV-001" en el centro.</p>
+<label class="tr-opt"><input type="radio" name="task-11-status" value="ok" id="task-11-ok" data-nac-id="tester_form.task-11.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-11-status" value="error" id="task-11-error" data-nac-id="tester_form.task-11.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-11-comments">Comentarios</label>
+<textarea name="task-11-comments" id="task-11-comments" rows="2" data-nac-id="tester_form.task-11.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-12">
+<legend>Tarea 12 &mdash; Abrir el demo React</legend>
+<p>Pasos:</p>
+<p>1. En la barra de direcciones del navegador, escribi: <code>https://yujin.app/nac-spec/demos/react/</code> 2. Presiona Enter. 3. Espera 5 segundos. 4. Si el panel de chat NO esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Ves una app "Todos" simple: un campo de texto, un boton "Add", y un area abajo (lista de todos vacia). - En el lado derecho aparece el panel de chat (despues del click en "chat" si no estaba abierto).</p>
+<label class="tr-opt"><input type="radio" name="task-12-status" value="ok" id="task-12-ok" data-nac-id="tester_form.task-12.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-12-status" value="error" id="task-12-error" data-nac-id="tester_form.task-12.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-12-comments">Comentarios</label>
+<textarea name="task-12-comments" id="task-12-comments" rows="2" data-nac-id="tester_form.task-12.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-13">
+<legend>Tarea 13 &mdash; Elegir castellano en el chat del demo React</legend>
+<p>Pasos:</p>
+<p>1. Localiza el dropdown de idioma del panel de chat del demo React. 2. Hace click. 3. Elegi <strong>"es"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- El dropdown muestra "es".</p>
+<label class="tr-opt"><input type="radio" name="task-13-status" value="ok" id="task-13-ok" data-nac-id="tester_form.task-13.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-13-status" value="error" id="task-13-error" data-nac-id="tester_form.task-13.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-13-comments">Comentarios</label>
+<textarea name="task-13-comments" id="task-13-comments" rows="2" data-nac-id="tester_form.task-13.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-14">
+<legend>Tarea 14 &mdash; Agregar un todo a mano</legend>
+<p>Pasos:</p>
+<p>1. En el demo React, hace click adentro del campo de texto del demo (no el del chat -- el campo principal del demo que dice algo como "Add a todo"). 2. Escribi: <code>leche</code> 3. Hace click en el boton <strong>"Add"</strong> del demo.</p>
+<p>Resultado esperado:</p>
+<p>- En la lista de todos aparece un item nuevo: <strong>"leche"</strong> con una casilla de seleccion al lado. - El campo de texto se vacio.</p>
+<label class="tr-opt"><input type="radio" name="task-14-status" value="ok" id="task-14-ok" data-nac-id="tester_form.task-14.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-14-status" value="error" id="task-14-error" data-nac-id="tester_form.task-14.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-14-comments">Comentarios</label>
+<textarea name="task-14-comments" id="task-14-comments" rows="2" data-nac-id="tester_form.task-14.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-15">
+<legend>Tarea 15 &mdash; Abrir el demo Angular</legend>
+<p>Pasos:</p>
+<p>1. En la barra de direcciones, escribi: <code>https://yujin.app/nac-spec/demos/angular/</code> 2. Presiona Enter. 3. Espera 5 segundos. 4. Si el panel de chat NO esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Ves la misma estructura que el demo React: app Todos + chat panel (despues del click en "chat" si no estaba abierto).</p>
+<label class="tr-opt"><input type="radio" name="task-15-status" value="ok" id="task-15-ok" data-nac-id="tester_form.task-15.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-15-status" value="error" id="task-15-error" data-nac-id="tester_form.task-15.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-15-comments">Comentarios</label>
+<textarea name="task-15-comments" id="task-15-comments" rows="2" data-nac-id="tester_form.task-15.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-16">
+<legend>Tarea 16 &mdash; Repetir agregar todo a mano en Angular</legend>
+<p>Pasos:</p>
+<p>1. Localiza el dropdown de idioma del chat de Angular y elegi <strong>"es"</strong>. 2. Hace click en el campo de texto del demo Angular. 3. Escribi: <code>manzana</code> 4. Hace click en <strong>"Add"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- En la lista aparece <strong>"manzana"</strong>. - El campo se vacio. - La operacion funciona identicamente al demo React.</p>
+<label class="tr-opt"><input type="radio" name="task-16-status" value="ok" id="task-16-ok" data-nac-id="tester_form.task-16.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-16-status" value="error" id="task-16-error" data-nac-id="tester_form.task-16.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-16-comments">Comentarios</label>
+<textarea name="task-16-comments" id="task-16-comments" rows="2" data-nac-id="tester_form.task-16.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-17">
+<legend>Tarea 17 &mdash; Probar Firefox (cross-browser smoke)</legend>
+<p>Pasos:</p>
+<p>1. Abri Firefox (si no lo tenes, descargalo de https://www.mozilla.org/firefox). 2. Abri una pestana de Navegacion Privada (Ctrl+Shift+P). 3. En la barra de direcciones, escribi: <code>https://yujin.app/nac-spec/</code> 4. Presiona Enter. 5. Espera 5 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error igual que en Chrome. - Se ve practicamente identica.</p>
+<label class="tr-opt"><input type="radio" name="task-17-status" value="ok" id="task-17-ok" data-nac-id="tester_form.task-17.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-17-status" value="error" id="task-17-error" data-nac-id="tester_form.task-17.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-17-comments">Comentarios</label>
+<textarea name="task-17-comments" id="task-17-comments" rows="2" data-nac-id="tester_form.task-17.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-18">
+<legend>Tarea 18 &mdash; Firefox: data-table demo</legend>
+<p>Pasos:</p>
+<p>1. En Firefox, escribi: <code>https://yujin.app/nac-spec/example-v21-data-table.php</code> 2. Presiona Enter. 3. Espera 5 segundos. 4. Hace click en <strong>"Edit invoice #INV-001"</strong> para abrir el modal. 5. Hace click sobre cada una de las pestanas que ves arriba ("Lines (collection)" + "Permissions (matrix)").</p>
+<p>Resultado esperado:</p>
+<p>- Cada click cambia el contenido del modal. - No aparecen errores. - Ninguna pestana se "traba".</p>
+<label class="tr-opt"><input type="radio" name="task-18-status" value="ok" id="task-18-ok" data-nac-id="tester_form.task-18.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-18-status" value="error" id="task-18-error" data-nac-id="tester_form.task-18.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-18-comments">Comentarios</label>
+<textarea name="task-18-comments" id="task-18-comments" rows="2" data-nac-id="tester_form.task-18.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-19">
+<legend>Tarea 19 &mdash; Safari o Edge (un tercer navegador)</legend>
+<p>Pasos:</p>
+<p>1. Abri Safari (en Mac) o Edge (en Windows). 2. Si no tenes ninguno de los dos, marca "Skipped" y pasa a la siguiente tarea. 3. Andate a <code>https://yujin.app/nac-spec/</code> 4. Espera 5 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error igual que en Chrome y Firefox.</p>
+<label class="tr-opt"><input type="radio" name="task-19-status" value="ok" id="task-19-ok" data-nac-id="tester_form.task-19.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-19-status" value="error" id="task-19-error" data-nac-id="tester_form.task-19.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-19-status" value="skipped" id="task-19-skipped" data-nac-id="tester_form.task-19.status_skipped" data-nac-role="option" /> <span>Omitido</span></label>
+<label class="tr-comments-label" for="task-19-comments">Comentarios</label>
+<textarea name="task-19-comments" id="task-19-comments" rows="2" data-nac-id="tester_form.task-19.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-20">
+<legend>Tarea 20 &mdash; Navegacion solo con teclado (sin mouse)</legend>
+<p>Pasos:</p>
+<p>1. Volve a Chrome o Firefox, abrí <code>https://yujin.app/nac-spec/</code>. 2. <strong>Desconecta o ignora el mouse</strong> -- no lo uses para esta tarea. 3. Presiona la tecla Tab repetidamente, al menos 15 veces.</p>
+<p>Resultado esperado:</p>
+<p>- Con cada Tab, ves un "anillo de foco" (focus ring) azul o de color visible saltando por la pagina entre botones y enlaces. - El foco siempre es visible -- nunca desaparece en una zona invisible.</p>
+<label class="tr-opt"><input type="radio" name="task-20-status" value="ok" id="task-20-ok" data-nac-id="tester_form.task-20.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-20-status" value="error" id="task-20-error" data-nac-id="tester_form.task-20.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-20-comments">Comentarios</label>
+<textarea name="task-20-comments" id="task-20-comments" rows="2" data-nac-id="tester_form.task-20.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-21">
+<legend>Tarea 21 &mdash; Zoom 200%</legend>
+<p>Pasos:</p>
+<p>1. En la misma pestana del paso 20, presiona Ctrl+= (Ctrl y el signo igual) repetidamente hasta que el indicador de zoom del navegador llegue a 200%. 2. Hace scroll por toda la pagina de arriba a abajo.</p>
+<p>Resultado esperado:</p>
+<p>- Todo el texto se lee sin problemas. - Los botones siguen siendo clickeables. - Ningun texto queda cortado o superpuesto con otros elementos. - No aparece una barra de scroll horizontal.</p>
+<label class="tr-opt"><input type="radio" name="task-21-status" value="ok" id="task-21-ok" data-nac-id="tester_form.task-21.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-21-status" value="error" id="task-21-error" data-nac-id="tester_form.task-21.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-21-comments">Comentarios</label>
+<textarea name="task-21-comments" id="task-21-comments" rows="2" data-nac-id="tester_form.task-21.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-22">
+<legend>Tarea 22 &mdash; Restaurar zoom</legend>
+<p>Pasos:</p>
+<p>1. Presiona Ctrl+0 (Ctrl y cero) para restaurar el zoom al 100%.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina vuelve a su tamano normal.</p>
+<label class="tr-opt"><input type="radio" name="task-22-status" value="ok" id="task-22-ok" data-nac-id="tester_form.task-22.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-22-status" value="error" id="task-22-error" data-nac-id="tester_form.task-22.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-22-comments">Comentarios</label>
+<textarea name="task-22-comments" id="task-22-comments" rows="2" data-nac-id="tester_form.task-22.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-23">
+<legend>Tarea 23 &mdash; URLs criticas: chequeo de "no 404"</legend>
+<p>Pasos:</p>
+<p>Para cada URL de la tabla siguiente: copiala y pegala en la barra de direcciones del navegador, presiona Enter y verifica que <strong>no da error 404 ni pagina en blanco</strong>.</p>
+<p>| URL | OK? (escribi "ok" o "error") | |-----|-----| | https://yujin.app/nac-spec/ | __ | | https://yujin.app/nac-spec/SPEC.md | __ | | https://yujin.app/nac-spec/js/nac.js | __ | | https://yujin.app/nac-spec/example.php | __ | | https://yujin.app/nac-spec/example-v21-data-table.php | __ | | https://yujin.app/nac-spec/example-v22-interop.php | __ | | https://yujin.app/nac-spec/demos/react/ | __ | | https://yujin.app/nac-spec/demos/angular/ | __ |</p>
+<div class="tr-note">Todas OK</div>
+<div class="tr-note">Al menos una fallo (especificá en Comentarios cual fallo)</div>
+<label class="tr-comments-label" for="task-23-comments">Comentarios</label>
+<textarea name="task-23-comments" id="task-23-comments" rows="2" data-nac-id="tester_form.task-23.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-signoff" id="tr-signoff">
+<legend>Firma final</legend>
+<label for="sign-release-tag">Etiqueta de release probado</label>
+<input type="text" name="sign-release-tag" id="sign-release-tag" data-nac-id="tester_form.sign.release-tag" data-nac-role="field" />
+<label for="sign-tester-name">Nombre del tester</label>
+<input type="text" name="sign-tester-name" id="sign-tester-name" data-nac-id="tester_form.sign.tester-name" data-nac-role="field" />
+<label for="sign-tester-email">Email del tester</label>
+<input type="email" name="sign-tester-email" id="sign-tester-email" data-nac-id="tester_form.sign.tester-email" data-nac-role="field" />
+<label for="sign-browser">Navegador</label>
+<input type="text" name="sign-browser" id="sign-browser" data-nac-id="tester_form.sign.browser" data-nac-role="field" />
+<label for="sign-os">Sistema operativo</label>
+<input type="text" name="sign-os" id="sign-os" data-nac-id="tester_form.sign.os" data-nac-role="field" />
+<label for="sign-device">Dispositivo (laptop / mobile)</label>
+<input type="text" name="sign-device" id="sign-device" data-nac-id="tester_form.sign.device" data-nac-role="field" />
+<label for="sign-verdict">Veredicto (ready / needs fixes / blocking)</label>
+<input type="text" name="sign-verdict" id="sign-verdict" data-nac-id="tester_form.sign.verdict" data-nac-role="field" />
+<label for="sign-rating">Calificacion general 1-10</label>
+<input type="number" name="sign-rating" id="sign-rating" data-nac-id="tester_form.sign.rating" data-nac-role="field" />
+<label for="sign-top-issues">Top 3 issues encontrados</label>
+<textarea name="sign-top-issues" id="sign-top-issues" rows="3" data-nac-id="tester_form.sign.top-issues" data-nac-role="field"></textarea>
+<label for="sign-free-form">Comentario libre / cosas que no entraron en ningun task</label>
+<textarea name="sign-free-form" id="sign-free-form" rows="3" data-nac-id="tester_form.sign.free-form" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Que pasa cuando aprietas "Enviar reporte"</h2>
+<p>- Tu reporte se manda automaticamente a los maintainers de Yujin. - Vas a ver un mensaje "Gracias. Tu reporte fue enviado (ID #N)". - Si el servidor no responde, el formulario abre tu cliente de email con todo el reporte ya pre-llenado.</p>
+<p>Gracias por testear.</p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Enviar reporte</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Borrador guardado automáticamente. Tu progreso se restaura si cerrás esta pestaña.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

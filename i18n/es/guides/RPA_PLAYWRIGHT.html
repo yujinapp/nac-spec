@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guía de integración NAC3 + Playwright -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_playwright" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_playwright" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_playwright.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_playwright.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_playwright.mp3" data-nac-id="rpa_playwright.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_playwright.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_playwright.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_playwright.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_playwright.p.1" data-nac-role="paragraph">translation_source: guides/RPA_PLAYWRIGHT.md translation_source_hash: c90a4cc097a692f6fd51ae96eed88a67cadbd94b52bed4bba18af184a4b915bf translation_quality: machine_v1 translation_lang: es translation_date: 2026-05-11T13:29:31.624803+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_playwright.h1.guía-de-integración-nac3-playwright" data-nac-role="heading" data-nac-level="1" id="guía-de-integración-nac3-playwright">Guía de integración NAC3 + Playwright</h1>
+<p data-nac-id="rpa_playwright.p.4" data-nac-role="paragraph"><strong>Versión de NAC3:</strong> 2.2 (con vista previa de interoperabilidad v2.3) <strong>Estado:</strong> Estable. Probado con Playwright 1.47 + chromium / firefox / webkit.</p>
+<p data-nac-id="rpa_playwright.p.5" data-nac-role="paragraph">Playwright es el estándar de facto para la automatización de navegadores hoy en día, utilizado tanto por equipos de QA (pruebas end-to-end) como por flujos ligeros de RPA que se ejecutan de forma desatendida. Con NAC3, tus scripts de Playwright dejan de apuntar a selectores CSS o XPath y comienzan a despachar a través del contrato NAC3 de la página — el mismo contrato que utilizan los ejecutores de voz, las herramientas de accesibilidad, los flujos de trabajo LLM agénticos y las demás plataformas RPA de esta serie de guías.</p>
+<p data-nac-id="rpa_playwright.p.6" data-nac-role="paragraph">La propia suite de pruebas de referencia de Yujin (<code data-nac-role="code-inline">tests/e2e-nac/specs/*.spec.ts</code>) es el ejemplo canónico.</p>
+<h2 data-nac-id="rpa_playwright.h2.por-qué-nac3-playwright" data-nac-role="heading" data-nac-level="2" id="por-qué-nac3-playwright">Por qué NAC3 + Playwright</h2>
+<p data-nac-id="rpa_playwright.p.8" data-nac-role="paragraph">| Problema actual | Solución con NAC3 | |----------------|-------------------| | <code data-nac-role="code-inline">page.click('button.save')</code> se rompe cuando se renombra la clase CSS | <code data-nac-role="code-inline">page.evaluate(() =&gt; window.NAC.click('invoice.save'))</code> es estable | | <code data-nac-role="code-inline">page.getByRole('button', {name: 'Save'})</code> se rompe al localizar | Se despacha por id, no por etiqueta; label_i18n es responsabilidad del LLM | | <code data-nac-role="code-inline">waitForSelector</code> hace polling al DOM; es inestable en UIs asíncronas | <code data-nac-role="code-inline">nac:action:succeeded</code> es un evento determinístico | | El patrón page-object duplica la estructura de UI de la aplicación | El manifiesto NAC3 ES el page object — compartido entre pruebas y app | | Las pruebas visuales se degradan con rediseños cosméticos | Las pruebas de comportamiento mediante ids de NAC3 sobreviven a los rediseños |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.dos-caminos-de-integración" data-nac-role="heading" data-nac-level="2" id="dos-caminos-de-integración">Dos caminos de integración</h2>
+<h3 data-nac-id="rpa_playwright.h3.camino-a-inyección-con-pageevaluate-recomendado" data-nac-role="heading" data-nac-level="3" id="camino-a-inyección-con-pageevaluate-recomendado">Camino A — inyección con <code data-nac-role="code-inline">page.evaluate</code> (recomendado)</h3>
+<p data-nac-id="rpa_playwright.p.12" data-nac-role="paragraph">El patrón más simple: toda interacción pasa por <code data-nac-role="code-inline">window.NAC</code> evaluado en el contexto de la página.</p>
+<pre data-nac-id="rpa_playwright.code.1" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;save an invoice&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+
+  // Wait for NAC3 to mount.
+  await page.waitForFunction(() =&gt; window.NAC?.describe);
+
+  // Fill a field.
+  await page.evaluate(() =&gt;
+    window.NAC.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;)
+  );
+
+  // Click an action + wait for its ack.
+  const ackPromise = page.evaluate(() =&gt;
+    new Promise(resolve =&gt; {
+      document.addEventListener(
+        &#x27;nac:action:succeeded&#x27;,
+        e =&gt; resolve(e.detail),
+        { once: true }
+      );
+    })
+  );
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;invoice.save&#x27;)
+  );
+  const ack = await ackPromise;
+
+  expect(ack).toMatchObject({
+    plugin: &#x27;invoice&#x27;,
+    action_id: &#x27;invoice.save&#x27;
+  });
+});</code></pre>
+<h3 data-nac-id="rpa_playwright.h3.camino-b-fixtures-personalizados-que-envuelven-nac" data-nac-role="heading" data-nac-level="3" id="camino-b-fixtures-personalizados-que-envuelven-nac">Camino B — Fixtures personalizados que envuelven NAC</h3>
+<p data-nac-id="rpa_playwright.p.15" data-nac-role="paragraph">Encapsula el código repetitivo en un fixture de Playwright:</p>
+<pre data-nac-id="rpa_playwright.code.2" data-nac-role="code" data-nac-lang="ts"><code>// tests/fixtures/nac.ts
+import { test as base, Page } from &#x27;@playwright/test&#x27;;
+
+type NacApi = {
+  click: (id: string) =&gt; Promise&lt;void&gt;;
+  fill:  (id: string, value: string) =&gt; Promise&lt;void&gt;;
+  tab:   (plugin: string, tabKey: string) =&gt; Promise&lt;void&gt;;
+  describe: () =&gt; Promise&lt;any&gt;;
+  waitForAck: () =&gt; Promise&lt;any&gt;;
+};
+
+export const test = base.extend&lt;{ nac: NacApi }&gt;({
+  nac: async ({ page }, use) =&gt; {
+    await page.waitForFunction(() =&gt; window.NAC?.describe);
+    const api: NacApi = {
+      click:  id =&gt; page.evaluate(i =&gt; window.NAC.click(i), id),
+      fill:   (id, v) =&gt; page.evaluate(
+        ([i, val]) =&gt; window.NAC.fill(i, val), [id, v]
+      ),
+      tab:    (p, k) =&gt; page.evaluate(
+        ([pl, key]) =&gt; window.NAC.tab(pl, key), [p, k]
+      ),
+      describe: () =&gt; page.evaluate(() =&gt; window.NAC.describe()),
+      waitForAck: () =&gt; page.evaluate(() =&gt;
+        new Promise(resolve =&gt; {
+          document.addEventListener(
+            &#x27;nac:action:succeeded&#x27;,
+            e =&gt; resolve(e.detail),
+            { once: true }
+          );
+        })
+      )
+    };
+    await use(api);
+  }
+});
+
+export { expect } from &#x27;@playwright/test&#x27;;</code></pre>
+<p data-nac-id="rpa_playwright.p.17" data-nac-role="paragraph">Ahora tus pruebas se leen como habla la aplicación:</p>
+<pre data-nac-id="rpa_playwright.code.3" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;./fixtures/nac&#x27;;
+
+test(&#x27;save flow&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+
+  const ackPromise = nac.waitForAck();
+  await nac.click(&#x27;invoice.save&#x27;);
+  const ack = await ackPromise;
+
+  expect(ack.action_id).toBe(&#x27;invoice.save&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.19" data-nac-role="paragraph">La referencia de Yujin usa el Camino B (ver <code data-nac-role="code-inline">tests/e2e-nac/specs/01-landing.spec.ts</code>).</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.despacho-basado-en-verbos-preferido-para-reutilización-entre" data-nac-role="heading" data-nac-level="2" id="despacho-basado-en-verbos-preferido-para-reutilización-entre">Despacho basado en verbos (preferido para reutilización entre aplicaciones)</h2>
+<p data-nac-id="rpa_playwright.p.22" data-nac-role="paragraph">Cuando la misma suite de Playwright debe ejecutarse contra varios despliegues (distintos tenants, distintas marcas, mismo contrato), se prefieren los verbos sobre los ids:</p>
+<pre data-nac-id="rpa_playwright.code.4" data-nac-role="code" data-nac-lang="ts"><code>await nac.clickByVerb(&#x27;invoice&#x27;, &#x27;save&#x27;);</code></pre>
+<p data-nac-id="rpa_playwright.p.24" data-nac-role="paragraph">Helper:</p>
+<pre data-nac-id="rpa_playwright.code.5" data-nac-role="code" data-nac-lang="ts"><code>clickByVerb: (plugin: string, verb: string) =&gt;
+  page.evaluate(
+    ([p, v]) =&gt; window.NAC.click_by_verb(p, v),
+    [plugin, verb]
+  )</code></pre>
+<p data-nac-id="rpa_playwright.p.26" data-nac-role="paragraph">Contrato del manifiesto: cada tenant mapea <code data-nac-role="code-inline">invoice.save</code> (o el id local que elija) al verbo <code data-nac-role="code-inline">save</code>. La prueba NO necesita conocer el id local.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.esperar-el-ack-la-alternativa-determinística-a" data-nac-role="heading" data-nac-level="2" id="esperar-el-ack-la-alternativa-determinística-a">Esperar el ack (la alternativa determinística a</h2>
+<p data-nac-id="rpa_playwright.p.29" data-nac-role="paragraph"><code data-nac-role="code-inline">waitForSelector</code>)</p>
+<p data-nac-id="rpa_playwright.p.30" data-nac-role="paragraph">Playwright tradicional:</p>
+<pre data-nac-id="rpa_playwright.code.6" data-nac-role="code" data-nac-lang="ts"><code>await page.click(&#x27;button.save&#x27;);
+await page.waitForSelector(&#x27;.toast-success&#x27;, { timeout: 5000 });</code></pre>
+<p data-nac-id="rpa_playwright.p.32" data-nac-role="paragraph">Esto es frágil: cualquier cambio en la UI del toast lo rompe.</p>
+<p data-nac-id="rpa_playwright.p.33" data-nac-role="paragraph">Con NAC3:</p>
+<pre data-nac-id="rpa_playwright.code.7" data-nac-role="code" data-nac-lang="ts"><code>const ack = await new Promise(resolve =&gt; {
+  page.on(&#x27;console&#x27;, msg =&gt; { /* optional log */ });
+  page.evaluate(() =&gt; new Promise(r =&gt;
+    document.addEventListener(&#x27;nac:action:succeeded&#x27;,
+      e =&gt; r(e.detail), { once: true }
+    )));
+}).then(...);
+
+// O con el fixture:
+const ackPromise = nac.waitForAck();
+await nac.click(&#x27;invoice.save&#x27;);
+const ack = await ackPromise;</code></pre>
+<p data-nac-id="rpa_playwright.p.35" data-nac-role="paragraph">El evento es parte del contrato. Se dispara cuando el efecto secundario se completó, no cuando se renderizó un toast arbitrario.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.autodescubrimiento-de-casos-de-prueba" data-nac-role="heading" data-nac-level="2" id="autodescubrimiento-de-casos-de-prueba">Autodescubrimiento de casos de prueba</h2>
+<p data-nac-id="rpa_playwright.p.38" data-nac-role="paragraph">El método <code data-nac-role="code-inline">describe()</code> de NAC3 devuelve el catálogo completo de elementos. Úsalo para generar scaffolding de pruebas para cada acción de forma automática:</p>
+<pre data-nac-id="rpa_playwright.code.8" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;smoke -- click every action&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+
+  for (const plugin of tree.plugins) {
+    for (const el of plugin.elements) {
+      if (el.role !== &#x27;action&#x27;) continue;
+      console.log(&#x27;smoke clicking&#x27;, el.id);
+      await page.evaluate(id =&gt;
+        window.NAC.click(id), el.id
+      );
+    }
+  }
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.40" data-nac-role="paragraph">Una prueba, cada acción, cero mantenimiento por acción. Se combina perfectamente con <code data-nac-role="code-inline">validate_global({probe: true})</code> de la especificación.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ejecuciones-multi-locale" data-nac-role="heading" data-nac-level="2" id="ejecuciones-multi-locale">Ejecuciones multi-locale</h2>
+<p data-nac-id="rpa_playwright.p.43" data-nac-role="paragraph">Las ejecuciones en matriz de Playwright son triviales: el contrato es agnóstico al locale.</p>
+<pre data-nac-id="rpa_playwright.code.9" data-nac-role="code" data-nac-lang="ts"><code>const locales = [&#x27;es&#x27;, &#x27;en&#x27;, &#x27;pt&#x27;, &#x27;fr&#x27;, &#x27;de&#x27;, &#x27;ja&#x27;,
+                 &#x27;zh&#x27;, &#x27;hi&#x27;, &#x27;ar&#x27;, &#x27;it&#x27;];
+
+for (const lang of locales) {
+  test(`save invoice -- ${lang}`, async ({ page, nac }) =&gt; {
+    await page.goto(`https://your-app.example.com/?lang=${lang}`);
+    await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+    const ack = nac.waitForAck();
+    await nac.click(&#x27;invoice.save&#x27;);
+    expect((await ack).action_id).toBe(&#x27;invoice.save&#x27;);
+  });
+}</code></pre>
+<p data-nac-id="rpa_playwright.p.45" data-nac-role="paragraph">La misma prueba, 10 locales. El label_i18n dentro de la página cambió; el contrato no.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.snapshot-para-regresión-visual" data-nac-role="heading" data-nac-level="2" id="snapshot-para-regresión-visual">Snapshot para regresión visual</h2>
+<p data-nac-id="rpa_playwright.p.48" data-nac-role="paragraph">El árbol NAC3 ES el snapshot estructural. Compara entre versiones:</p>
+<pre data-nac-id="rpa_playwright.code.10" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;structural snapshot&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+  expect(tree).toMatchSnapshot(&#x27;app-tree.json&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.50" data-nac-role="paragraph">Un rediseño que mueve un botón 200px NO genera diferencias en el snapshot. Un rediseño que ELIMINA el botón sí lo hace. Esa es la granularidad correcta para regresión a nivel de comportamiento.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.pruebas-de-origen-cruzado-interoperabilidad-vista-previa-v23" data-nac-role="heading" data-nac-level="2" id="pruebas-de-origen-cruzado-interoperabilidad-vista-previa-v23">Pruebas de origen cruzado / interoperabilidad (vista previa v2.3)</h2>
+<pre data-nac-id="rpa_playwright.code.11" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;interop import remote app&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://app-a.example.com/&#x27;);
+  await page.evaluate(() =&gt; window.NAC.import_remote_tree({
+    url: &#x27;https://app-b.example.com/nac/export&#x27;,
+    bearer: &#x27;TEST_TOKEN&#x27;,
+    namespace: &#x27;b&#x27;
+  }));
+  const remotes = await page.evaluate(() =&gt;
+    window.NAC.list_remote_apps()
+  );
+  expect(remotes).toContainEqual(
+    expect.objectContaining({ namespace: &#x27;b&#x27; })
+  );
+
+  // Now dispatch into the remote app via the local NAC:
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;remote:b:invoice.save&#x27;)
+  );
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.54" data-nac-role="paragraph">El prefijo <code data-nac-role="code-inline">remote:</code> enruta a través de la capa de interoperabilidad documentada en <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code>.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.modos-de-fallo-y-depuración" data-nac-role="heading" data-nac-level="2" id="modos-de-fallo-y-depuración">Modos de fallo y depuración</h2>
+<p data-nac-id="rpa_playwright.p.57" data-nac-role="paragraph">| Síntoma | Diagnóstico | |---------|-------------| | <code data-nac-role="code-inline">window.NAC is undefined</code> | La página no incluye nac.js — verificar la etiqueta <code data-nac-role="code-inline">&lt;script&gt;</code> | | <code data-nac-role="code-inline">NAC.click(...)</code> devuelve <code data-nac-role="code-inline">{ok: false, error: 'not_found'}</code> | El id no está en el manifiesto; ejecutar <code data-nac-role="code-inline">NAC.validate_global()</code> para encontrar errores tipográficos | | El ack nunca se dispara (la prueba se cuelga en waitForAck) | Al handler le falta <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded',...))</code> — migrar a <code data-nac-role="code-inline">NAC.bindAction()</code> (V22-02) | | La prueba de etiqueta dependiente del locale falla para un locale | label_i18n no tiene ese locale — el validador de la especificación lo detecta | | La prueba de origen cruzado falla en el preflight CORS | El peer remoto debe permitir <code data-nac-role="code-inline">Origin: &lt;your-test-host&gt;</code> en su configuración CORS |</p>
+<p data-nac-id="rpa_playwright.p.58" data-nac-role="paragraph">Para depuración más profunda, agrega:</p>
+<pre data-nac-id="rpa_playwright.code.12" data-nac-role="code" data-nac-lang="ts"><code>await page.evaluate(() =&gt; {
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt;
+    console.log(&#x27;[ACK]&#x27;, e.detail));
+  document.addEventListener(&#x27;nac:action:failed&#x27;, e =&gt;
+    console.warn(&#x27;[ACK-FAIL]&#x27;, e.detail));
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.60" data-nac-role="paragraph">Luego ejecuta con <code data-nac-role="code-inline">--headed</code> y observa la consola.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.suite-de-referencia-de-yujin" data-nac-role="heading" data-nac-level="2" id="suite-de-referencia-de-yujin">Suite de referencia de Yujin</h2>
+<p data-nac-id="rpa_playwright.p.63" data-nac-role="paragraph">Las demos de Yujin incluyen una suite completa de Playwright en <code data-nac-role="code-inline">tests/e2e-nac/specs/</code>. Lee estos archivos en orden para aprender los patrones:</p>
+<p data-nac-id="rpa_playwright.p.64" data-nac-role="paragraph">| Spec | Patrón | |------|--------| | <code data-nac-role="code-inline">01-landing.spec.ts</code> | carga básica de página + inicio de autopilot | | <code data-nac-role="code-inline">02-demo-v19.spec.ts</code> | smoke recorriendo cada widget | | <code data-nac-role="code-inline">03-demo-v20.spec.ts</code> | botones del panel v20 + ack con bindAction | | <code data-nac-role="code-inline">04-demo-v21.spec.ts</code> | despachos dt_* de la tabla de datos | | <code data-nac-role="code-inline">05-demo-v22-interop.spec.ts</code> | handshake completo de interoperabilidad v2.3 | | <code data-nac-role="code-inline">06-demo-react.spec.ts</code> | caso de estudio React vía chat | | <code data-nac-role="code-inline">07-demo-angular.spec.ts</code> | caso de estudio Angular vía chat | | <code data-nac-role="code-inline">08-pipeline-end-to-end.spec.ts</code> | chat -&gt; LLM -&gt; despacho -&gt; ack | | <code data-nac-role="code-inline">09-diagnostic.spec.ts</code> | inyección de fallos + recuperación | | <code data-nac-role="code-inline">10-deep-discovery.spec.ts</code> | bucle de descubrimiento autónomo |</p>
+<p data-nac-id="rpa_playwright.p.65" data-nac-role="paragraph">Los 16 specs se ejecutan con <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> en menos de 15 segundos en un checkout limpio.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.integración-con-ci" data-nac-role="heading" data-nac-level="2" id="integración-con-ci">Integración con CI</h2>
+<p data-nac-id="rpa_playwright.p.68" data-nac-role="paragraph">Agrega esto en <code data-nac-role="code-inline">.github/workflows/e2e.yml</code>:</p>
+<pre data-nac-id="rpa_playwright.code.13" data-nac-role="code" data-nac-lang="yaml"><code>name: e2e
+on: [push, pull_request]
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          BASE_URL: https://staging.your-app.example.com</code></pre>
+<p data-nac-id="rpa_playwright.p.70" data-nac-role="paragraph">Para ejecuciones en matriz por locales / navegadores / tenants:</p>
+<pre data-nac-id="rpa_playwright.code.14" data-nac-role="code" data-nac-lang="yaml"><code>strategy:
+  matrix:
+    locale: [es, en, pt, fr, de, ja, zh, hi, ar, it]
+    browser: [chromium, firefox, webkit]</code></pre>
+<p data-nac-id="rpa_playwright.p.72" data-nac-role="paragraph">10 locales x 3 navegadores = 30 jobs, todos reutilizando el mismo código de prueba despachado por NAC3.</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.comparación-con-pruebas-tradicionales-de-playwright" data-nac-role="heading" data-nac-level="2" id="comparación-con-pruebas-tradicionales-de-playwright">Comparación con pruebas tradicionales de Playwright</h2>
+<p data-nac-id="rpa_playwright.p.75" data-nac-role="paragraph">Una aplicación empresarial típica de 100 páginas mantiene ~500-800 pruebas de Playwright, con una tasa de inestabilidad de ~20% tras un rediseño de UI. Con NAC3:</p>
+<p data-nac-id="rpa_playwright.p.76" data-nac-role="paragraph">| Métrica | Tradicional | Respaldado por NAC3 | |---------|-------------|---------------------| | Cantidad de pruebas para la misma cobertura | ~500 | ~100 (basado en verbos) | | Tasa de inestabilidad post-rediseño | ~20% | ~2% (solo cuando el contrato realmente cambia) | | Mantenimiento tras cambio <code data-nac-role="code-inline">&lt;button&gt;</code> -&gt; <code data-nac-role="code-inline">&lt;a&gt;</code> | reescribir selector | ninguno — el id es estable | | Soporte de nuevo locale | reescribir todos los selectores basados en etiquetas | ninguno — agnóstico al locale | | Reutilización entre tenants | imposible (los selectores difieren) | trivial (basado en verbos) |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ver-también" data-nac-role="heading" data-nac-level="2" id="ver-también">Ver también</h2>
+<p data-nac-id="rpa_playwright.p.79" data-nac-role="paragraph">para equipos de QA.</p>
+<p data-nac-id="rpa_playwright.p.80" data-nac-role="paragraph">utilizado por agentes LLM.</p>
+<ul data-nac-id="rpa_playwright.list.81" data-nac-role="list"><li data-nac-id="rpa_playwright.list.81.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">tests/e2e-nac/specs/</code> — suite de referencia.</li><li data-nac-id="rpa_playwright.list.81.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code> — orquestador.</li><li data-nac-id="rpa_playwright.list.81.item.3" data-nac-role="list-item"><a href="IMPACT_TESTING.md" data-nac-id="rpa_playwright.link.1" data-nac-role="action" data-nac-action="open">IMPACT_TESTING.md</a> — el análisis de impacto más amplio</li><li data-nac-id="rpa_playwright.list.81.item.4" data-nac-role="list-item"><a href="LLM_WIRING.md" data-nac-id="rpa_playwright.link.2" data-nac-role="action" data-nac-action="open">LLM_WIRING.md</a> — el mismo contrato de despacho</li><li data-nac-id="rpa_playwright.list.81.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code> — manual de pruebas estandarizado.</li></ul>
+<h2 data-nac-id="rpa_playwright.h2.licencia" data-nac-role="heading" data-nac-level="2" id="licencia">Licencia</h2>
+<p data-nac-id="rpa_playwright.p.83" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="rpa_playwright.p.85" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_PLAYWRIGHT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_playwright",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_playwright.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_playwright.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_playwright.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_playwright.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

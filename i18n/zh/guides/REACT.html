@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + React 集成指南 -- NAC3</title>
+<meta name="nac3-doc-slug" content="react" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="react" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="react.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="react.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/react.mp3" data-nac-id="react.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="react.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="react.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="react.main" data-nac-role="region">
+<hr />
+<p data-nac-id="react.p.1" data-nac-role="paragraph">translation_source: guides/REACT.md translation_source_hash: 9026b361e9e072347481a1f4492eea6f306e77cbbdb53b0d1a40d25008dbecdd translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T14:47:42.879498+00:00</p>
+<hr />
+<h1 data-nac-id="react.h1.nac3-react-集成指南" data-nac-role="heading" data-nac-level="1" id="nac3-react-集成指南">NAC3 + React 集成指南</h1>
+<p data-nac-id="react.p.4" data-nac-role="paragraph">本指南通过两种路径将 React 应用接入 NAC 驱动：</p>
+<ul data-nac-id="react.list.5" data-nac-role="list"><li data-nac-id="react.list.5.item.1" data-nac-role="list-item"><strong>Greenfield：</strong> 全新项目，从第一天起就使用 NAC3。</li><li data-nac-id="react.list.5.item.2" data-nac-role="list-item"><strong>Brownfield：</strong> 现有应用，渐进式引入 NAC3，无需重写。</li></ul>
+<p data-nac-id="react.p.6" data-nac-role="paragraph">两种路径均使用 npm 上的 <code data-nac-role="code-inline">@nac3/runtime</code>。不依赖特定构建工具；兼容 Vite、Next.js、Create React App、Remix 或任何能打包普通 npm 包的工具链。</p>
+<hr />
+<h2 data-nac-id="react.h2.1-安装" data-nac-role="heading" data-nac-level="2" id="1-安装">1. 安装</h2>
+<pre data-nac-id="react.code.1" data-nac-role="code" data-nac-lang="text"><code>npm install @nac3/runtime</code></pre>
+<p data-nac-id="react.p.10" data-nac-role="paragraph">首次导入后，该包会将运行时挂载为 <code data-nac-role="code-inline">window.NAC</code>。运行时与框架无关；React 只需在 JSX 上添加 <code data-nac-role="code-inline">data-nac-*</code> 属性，并通过 <code data-nac-role="code-inline">useEffect</code> 注册 manifest。</p>
+<hr />
+<h2 data-nac-id="react.h2.2-greenfield-新项目" data-nac-role="heading" data-nac-level="2" id="2-greenfield-新项目">2. Greenfield —— 新项目</h2>
+<h3 data-nac-id="react.h3.21-挂载运行时仅一次" data-nac-role="heading" data-nac-level="3" id="21-挂载运行时仅一次">2.1 挂载运行时（仅一次）</h3>
+<p data-nac-id="react.p.14" data-nac-role="paragraph">在根组件（或 <code data-nac-role="code-inline">main.tsx</code> / <code data-nac-role="code-inline">_app.tsx</code>）中：</p>
+<pre data-nac-id="react.code.2" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;   // v2.0 brownfield 原语 + HMAC
+// 可选：&#x27;@nac3/runtime/chat-client&#x27; 用于语音 + 聊天
+
+export function App() {
+  useEffect(() =&gt; {
+    // 租户前缀（多租户 SaaS 模式）。单租户可跳过。
+    if (window.NAC?.setTenantPrefix) {
+      window.NAC.setTenantPrefix(&#x27;demo&#x27;);
+    }
+    // 如果你下发签名 manifest，需要设置 HMAC 密钥，从认证 API 获取。
+    // window.NAC.set_provenance_secret(secret);
+  }, []);
+
+  return &lt;YourAppShell /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.22-为组件添加标注" data-nac-role="heading" data-nac-level="3" id="22-为组件添加标注">2.2 为组件添加标注</h3>
+<p data-nac-id="react.p.17" data-nac-role="paragraph">每个可点击 / 可填写 / 可切换的元素都需要：</p>
+<ul data-nac-id="react.list.18" data-nac-role="list"><li data-nac-id="react.list.18.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-id</code> —— 稳定的点分路径。</li><li data-nac-id="react.list.18.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role</code> —— 规范角色之一（参见 SPEC 第 1 节）。</li><li data-nac-id="react.list.18.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-action="&lt;动词&gt;"</code> —— 仅用于 <code data-nac-role="code-inline">role="action"</code>。</li></ul>
+<pre data-nac-id="react.code.3" data-nac-role="code" data-nac-lang="tsx"><code>function InvoiceForm({ invoice, onSave, onCancel }) {
+  return (
+    &lt;article data-nac-plugin=&quot;invoice&quot;&gt;
+      &lt;input
+        type=&quot;text&quot;
+        data-nac-id=&quot;invoice.client_name&quot;
+        data-nac-role=&quot;field&quot;
+        value={invoice.clientName}
+        onChange={(e) =&gt; /* ... */}
+      /&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.save&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;save&quot;
+        onClick={onSave}
+      &gt;
+        Save
+      &lt;/button&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.cancel&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;cancel&quot;
+        onClick={onCancel}
+      &gt;
+        Cancel
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.23-注册-manifest" data-nac-role="heading" data-nac-level="3" id="23-注册-manifest">2.3 注册 manifest</h3>
+<p data-nac-id="react.p.21" data-nac-role="paragraph">manifest 是面向 Agent 的权威数据源。LLM 解析"guardar"时，会在此处找到动词 <code data-nac-role="code-inline">save</code>：</p>
+<pre data-nac-id="react.code.4" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+
+const INVOICE_MANIFEST = {
+  plugin_slug: &#x27;invoice&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.1&#x27;,
+  elements: [
+    {
+      id: &#x27;invoice.client_name&#x27;,
+      role: &#x27;field&#x27;,
+      label_i18n: {
+        es: &#x27;Nombre del cliente&#x27;, en: &#x27;Customer name&#x27;,
+        pt: &#x27;Nome do cliente&#x27;, fr: &#x27;Nom du client&#x27;,
+        it: &#x27;Nome del cliente&#x27;, de: &#x27;Kundenname&#x27;,
+        ja: &#x27;顧客名&#x27;, zh: &#x27;客户名称&#x27;,
+        hi: &#x27;ग्राहक का नाम&#x27;, ar: &#x27;اسم العميل&#x27;
+      }
+    },
+    {
+      id: &#x27;invoice.save&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: { /* 10 个语言区域 */ }
+      }],
+      label_i18n: { /* 10 个语言区域 */ }
+    },
+    {
+      id: &#x27;invoice.cancel&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;cancel&#x27;,
+        label_i18n: { /* 10 个语言区域 */ }
+      }],
+      label_i18n: { /* 10 个语言区域 */ }
+    }
+  ]
+};
+
+export function InvoiceForm(props) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(INVOICE_MANIFEST);
+  }, []);
+  // ... 来自 2.2 的 JSX ...
+}</code></pre>
+<p data-nac-id="react.p.23" data-nac-role="paragraph">关键规则：</p>
+<ul data-nac-id="react.list.24" data-nac-role="list"><li data-nac-id="react.list.24.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">useEffect</code> 使用 <code data-nac-role="code-inline">[]</code> 依赖：仅在挂载时注册一次。</li><li data-nac-id="react.list.24.item.2" data-nac-role="list-item">manifest 是静态对象；不要在每次渲染时重新构建（运行时将 <code data-nac-role="code-inline">register</code> 视为幂等操作，但会浪费计算资源）。</li><li data-nac-id="react.list.24.item.3" data-nac-role="list-item">React Strict Mode 在开发环境下会双重调用 effect。运行时的 <code data-nac-role="code-inline">register</code> 是幂等的，安全无虞。</li></ul>
+<h3 data-nac-id="react.h3.24-在处理函数中发出成功事件" data-nac-role="heading" data-nac-level="3" id="24-在处理函数中发出成功事件">2.4 在处理函数中发出成功事件</h3>
+<p data-nac-id="react.p.26" data-nac-role="paragraph">如果运行时将由等待 <code data-nac-role="code-inline">NAC.click()</code> 的 Agent 驱动，你的处理函数必须在副作用完成后发出 <code data-nac-role="code-inline">nac:action:succeeded</code>：</p>
+<pre data-nac-id="react.code.5" data-nac-role="code" data-nac-lang="tsx"><code>function onSave() {
+  await api.saveInvoice(/* ... */);
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+  }));
+}</code></pre>
+<p data-nac-id="react.p.28" data-nac-role="paragraph">这是 v2.1 的契约。v2.2 将提供 <code data-nac-role="code-inline">useNACAction</code> hook 自动完成此操作（见下方 Hooks 章节）。</p>
+<h3 data-nac-id="react.h3.25-驱动它" data-nac-role="heading" data-nac-level="3" id="25-驱动它">2.5 驱动它</h3>
+<p data-nac-id="react.p.30" data-nac-role="paragraph">从任意 Agent、语音运行器或测试中调用：</p>
+<pre data-nac-id="react.code.6" data-nac-role="code" data-nac-lang="tsx"><code>await window.NAC.click(&#x27;invoice.save&#x27;);
+// 或通过动词：
+await window.NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;save&#x27;);
+// 或填写字段：
+await window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme Corp&#x27;);</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.3-brownfield-现有-react-应用" data-nac-role="heading" data-nac-level="2" id="3-brownfield-现有-react-应用">3. Brownfield —— 现有 React 应用</h2>
+<p data-nac-id="react.p.34" data-nac-role="paragraph">核心原则：不要一次性重构所有内容。先为一个组件添加 NAC3，验证通过后再推进。</p>
+<h3 data-nac-id="react.h3.31-推进顺序" data-nac-role="heading" data-nac-level="3" id="31-推进顺序">3.1 推进顺序</h3>
+<ol data-nac-id="react.list.36" data-nac-role="list"><li data-nac-id="react.list.36.item.1" data-nac-role="list-item"><strong>先处理顶层包装元素。</strong> 在根 <code data-nac-role="code-inline">&lt;div&gt;</code> 或 <code data-nac-role="code-inline">&lt;main&gt;</code> 上添加 <code data-nac-role="code-inline">data-nac-plugin="&lt;你的应用标识&gt;"</code>。运行时的作用域树会自动识别。</li><li data-nac-id="react.list.36.item.2" data-nac-role="list-item"><strong>接着处理最常用的按钮。</strong> 在最繁忙的页面中，为保存、取消、提交、删除按钮添加 <code data-nac-role="code-inline">data-nac-id</code>、<code data-nac-role="code-inline">data-nac-role="action"</code>、<code data-nac-role="code-inline">data-nac-action="&lt;动词&gt;"</code>。暂时不需要添加 manifest。</li><li data-nac-id="react.list.36.item.3" data-nac-role="list-item"><strong>验证运行时能识别它们。</strong> 打开 DevTools，运行 <code data-nac-role="code-inline">NAC.describe()</code>。这些按钮应出现在对应的 plugin slug 下。</li><li data-nac-id="react.list.36.item.4" data-nac-role="list-item"><strong>添加最小化 manifest。</strong> 仅包含第 2 步中的按钮及其动词。此时 <code data-nac-role="code-inline">NAC.click_by_verb()</code> 即可使用。</li><li data-nac-id="react.list.36.item.5" data-nac-role="list-item"><strong>添加字段。</strong> 为输入框添加 <code data-nac-role="code-inline">data-nac-role="field"</code> 及对应的 manifest 条目。</li><li data-nac-id="react.list.36.item.6" data-nac-role="list-item"><strong>添加标签页。</strong> 标签切换器添加 <code data-nac-role="code-inline">data-nac-role="tab"</code>。<strong>重要：</strong> id 匹配 <code data-nac-role="code-inline">^tab\.</code> 的元素必须使用 <code data-nac-role="code-inline">tab</code> 角色（运行时的 <code data-nac-role="code-inline">NAC.tab()</code> 查询仅针对规范角色；参见 SPEC 第 1 节）。</li></ol>
+<h3 data-nac-id="react.h3.32-不要与现有组件库对抗" data-nac-role="heading" data-nac-level="3" id="32-不要与现有组件库对抗">3.2 不要与现有组件库对抗</h3>
+<p data-nac-id="react.p.38" data-nac-role="paragraph">你可能使用了 shadcn / Mantine / MUI / Chakra 或自定义组件系统。这些库大多会渲染自己的 DOM。以下两种模式可行：</p>
+<p data-nac-id="react.p.39" data-nac-role="paragraph"><strong>模式 A：透传 NAC3 属性。</strong> 大多数构建良好的库会将未知 props 转发到底层 DOM 元素：</p>
+<pre data-nac-id="react.code.7" data-nac-role="code" data-nac-lang="tsx"><code>&lt;Button
+  data-nac-id=&quot;invoice.save&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;save&quot;
+  onClick={onSave}
+&gt;
+  Save
+&lt;/Button&gt;</code></pre>
+<p data-nac-id="react.p.41" data-nac-role="paragraph">如果你的库能转发 <code data-nac-role="code-inline">data-*</code> 属性，这样就足够了。</p>
+<p data-nac-id="react.p.42" data-nac-role="paragraph"><strong>模式 B：包装组件。</strong> 如果你的库会吞掉 <code data-nac-role="code-inline">data-*</code> props，写一个轻量包装器：</p>
+<pre data-nac-id="react.code.8" data-nac-role="code" data-nac-lang="tsx"><code>import { Button as MuiButton } from &#x27;@mui/material&#x27;;
+import { useEffect, useRef } from &#x27;react&#x27;;
+
+interface NACButtonProps {
+  nacId: string;
+  verb: string;
+  // ...其他 MUI props
+}
+
+export function NACButton({ nacId, verb, ...rest }: NACButtonProps) {
+  const ref = useRef&lt;HTMLButtonElement&gt;(null);
+  useEffect(() =&gt; {
+    if (!ref.current) return;
+    ref.current.setAttribute(&#x27;data-nac-id&#x27;, nacId);
+    ref.current.setAttribute(&#x27;data-nac-role&#x27;, &#x27;action&#x27;);
+    ref.current.setAttribute(&#x27;data-nac-action&#x27;, verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest} /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.33-从-dom-自动注册" data-nac-role="heading" data-nac-level="3" id="33-从-dom-自动注册">3.3 从 DOM 自动注册</h3>
+<p data-nac-id="react.p.45" data-nac-role="paragraph">如果手动声明 manifest 过于繁琐，v2.0 扩展 <code data-nac-role="code-inline">autoRegister.watch</code> 可以遍历 DOM，自动注册所有带有 <code data-nac-role="code-inline">data-nac-id</code> + <code data-nac-role="code-inline">data-nac-role</code> 的元素：</p>
+<pre data-nac-id="react.code.9" data-nac-role="code" data-nac-lang="tsx"><code>useEffect(() =&gt; {
+  if (!window.NAC?.autoRegister) return;
+  const root = document.querySelector(&#x27;[data-nac-plugin]&#x27;);
+  if (!root) return;
+  root.setAttribute(&#x27;data-nac-watch&#x27;, &#x27;1&#x27;);
+  window.NAC.autoRegister.watch(root, {
+    i18n_strict: &#x27;permissive&#x27;,  // 迁移期间接受不完整的 10 语言区域
+    throttleMs: 100
+  });
+}, []);</code></pre>
+<p data-nac-id="react.p.47" data-nac-role="paragraph">Brownfield 场景适合使用 <code data-nac-role="code-inline">i18n_strict: 'permissive'</code>。待 i18n 目录完善后，切换为 <code data-nac-role="code-inline">'strict'</code> 用于生产环境。</p>
+<hr />
+<h2 data-nac-id="react.h2.4-hooksv22-预览" data-nac-role="heading" data-nac-level="2" id="4-hooksv22-预览">4. Hooks（v2.2 预览）</h2>
+<p data-nac-id="react.p.50" data-nac-role="paragraph">以下 hooks 将在 v2.2 中发布。对于 v2.1，你可以直接将它们复制到项目中使用；它们封装了 v2.1 运行时，提供更符合 React 惯用风格的 API。</p>
+<h3 data-nac-id="react.h3.41-usenacmanifest" data-nac-role="heading" data-nac-level="3" id="41-usenacmanifest">4.1 <code data-nac-role="code-inline">useNACManifest</code></h3>
+<pre data-nac-id="react.code.10" data-nac-role="code" data-nac-lang="tsx"><code>export function useNACManifest(manifest) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(manifest);
+  }, [manifest.plugin_slug]);  // 仅在 slug 变更时重新注册
+}</code></pre>
+<h3 data-nac-id="react.h3.42-usenacaction-自动发出确认事件" data-nac-role="heading" data-nac-level="3" id="42-usenacaction-自动发出确认事件">4.2 <code data-nac-role="code-inline">useNACAction</code> —— 自动发出确认事件</h3>
+<pre data-nac-id="react.code.11" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect, useRef } from &#x27;react&#x27;;
+
+export function useNACAction(plugin: string, actionId: string) {
+  const ref = useRef&lt;HTMLElement&gt;(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    function onClick() {
+      // 在 React 的 onClick 执行后发出 v2.1 契约事件。
+      // 使用微任务延迟，确保 React 合成事件先完成。
+      queueMicrotask(() =&gt; {
+        document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+          detail: { plugin, action_id: actionId }
+        }));
+      });
+    }
+    el.addEventListener(&#x27;click&#x27;, onClick);
+    return () =&gt; el.removeEventListener(&#x27;click&#x27;, onClick);
+  }, [plugin, actionId]);
+  return ref;
+}</code></pre>
+<p data-nac-id="react.p.55" data-nac-role="paragraph">用法：</p>
+<pre data-nac-id="react.code.12" data-nac-role="code" data-nac-lang="tsx"><code>function SaveButton({ onSave }) {
+  const ref = useNACAction(&#x27;invoice&#x27;, &#x27;invoice.save&#x27;);
+  return (
+    &lt;button
+      ref={ref}
+      data-nac-id=&quot;invoice.save&quot;
+      data-nac-role=&quot;action&quot;
+      data-nac-action=&quot;save&quot;
+      onClick={onSave}
+    &gt;
+      Save
+    &lt;/button&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.43-usenacdescribe-从面板内省树结构" data-nac-role="heading" data-nac-level="3" id="43-usenacdescribe-从面板内省树结构">4.3 <code data-nac-role="code-inline">useNACDescribe</code> —— 从面板内省树结构</h3>
+<pre data-nac-id="react.code.13" data-nac-role="code" data-nac-lang="tsx"><code>import { useState, useEffect } from &#x27;react&#x27;;
+
+export function useNACDescribe() {
+  const [snap, setSnap] = useState(null);
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    setSnap(window.NAC.describe());
+    const tick = setInterval(() =&gt; setSnap(window.NAC.describe()), 1000);
+    return () =&gt; clearInterval(tick);
+  }, []);
+  return snap;
+}</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.5-测试" data-nac-role="heading" data-nac-level="2" id="5-测试">5. 测试</h2>
+<h3 data-nac-id="react.h3.51-单元测试-集成测试" data-nac-role="heading" data-nac-level="3" id="51-单元测试-集成测试">5.1 单元测试 + 集成测试</h3>
+<p data-nac-id="react.p.62" data-nac-role="paragraph">NAC3 与 React Testing Library 配合良好：</p>
+<pre data-nac-id="react.code.14" data-nac-role="code" data-nac-lang="tsx"><code>import { render, fireEvent, waitFor } from &#x27;@testing-library/react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import { InvoiceForm } from &#x27;./InvoiceForm&#x27;;
+
+test(&#x27;save button drives via NAC&#x27;, async () =&gt; {
+  render(&lt;InvoiceForm /&gt;);
+
+  const saved = jest.fn();
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, saved);
+
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+
+  await waitFor(() =&gt; expect(saved).toHaveBeenCalled());
+});</code></pre>
+<h3 data-nac-id="react.h3.52-端到端测试playwright" data-nac-role="heading" data-nac-level="3" id="52-端到端测试playwright">5.2 端到端测试（Playwright）</h3>
+<pre data-nac-id="react.code.15" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;invoice save&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;/invoices/new&#x27;);
+  await page.evaluate(() =&gt; window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;));
+  await page.evaluate(() =&gt; window.NAC.click(&#x27;invoice.save&#x27;));
+  await expect(page.getByText(&#x27;Invoice saved&#x27;)).toBeVisible();
+});</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.6-常见陷阱" data-nac-role="heading" data-nac-level="2" id="6-常见陷阱">6. 常见陷阱</h2>
+<ul data-nac-id="react.list.68" data-nac-role="list"><li data-nac-id="react.list.68.item.1" data-nac-role="list-item"><strong>键控列表中的 id 失效。</strong> 如果你用行索引构建 id（<code data-nac-role="code-inline">data-nac-id={'row.' + i}</code>），行顺序变化后，缓存了该 id 的 Agent 会失效。请使用稳定的键（如数据库 id）。</li><li data-nac-id="react.list.68.item.2" data-nac-role="list-item"><strong>条件渲染。</strong> 基于 <code data-nac-role="code-inline">if (loaded)</code> 挂载/卸载的按钮，会让在加载前已快照树结构的 LLM 感到困惑。告知 LLM：<code data-nac-role="code-inline">NAC.describe()</code> 为每个元素包含 <code data-nac-role="code-inline">mounted</code> 标志（v2.1 默认开启）；快照消费方应按此字段过滤。</li><li data-nac-id="react.list.68.item.3" data-nac-role="list-item"><strong>React 18 Strict Mode。</strong> 双重调用 effect 会重复注册 manifest。运行时是幂等的，安全无虞，但开发环境下会看到重复的日志行。</li><li data-nac-id="react.list.68.item.4" data-nac-role="list-item"><strong>Server Components / SSR。</strong> NAC3 仅在客户端运行。将使用 NAC 的组件标记为 <code data-nac-role="code-inline">'use client'</code>（Next.js App Router），或采用懒加载渲染。</li></ul>
+<hr />
+<h2 data-nac-id="react.h2.7-上线前准备" data-nac-role="heading" data-nac-level="2" id="7-上线前准备">7. 上线前准备</h2>
+<p data-nac-id="react.p.71" data-nac-role="paragraph">发布前请确认：</p>
+<ol data-nac-id="react.list.72" data-nac-role="list"><li data-nac-id="react.list.72.item.1" data-nac-role="list-item">将 <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> 替换为 <code data-nac-role="code-inline">'strict'</code>。CI 会捕获缺失的翻译。</li><li data-nac-id="react.list.72.item.2" data-nac-role="list-item">运行 <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> —— 期望零个 error 级别的问题。</li><li data-nac-id="react.list.72.item.3" data-nac-role="list-item">在 Playwright 测试中运行 <code data-nac-role="code-inline">NAC.validate_global()</code>，断言其返回 <code data-nac-role="code-inline">[]</code>。</li><li data-nac-id="react.list.72.item.4" data-nac-role="list-item">如果是多租户场景，确保 manifest 在服务端经过 HMAC 签名，并在已认证的代码中调用 <code data-nac-role="code-inline">NAC.set_provenance_secret()</code>。</li></ol>
+<hr />
+<h2 data-nac-id="react.h2.8-延伸阅读" data-nac-role="heading" data-nac-level="2" id="8-延伸阅读">8. 延伸阅读</h2>
+<ul data-nac-id="react.list.75" data-nac-role="list"><li data-nac-id="react.list.75.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">SPEC.md</code> —— 完整契约说明。</li><li data-nac-id="react.list.75.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">guides/LLM_WIRING.md</code> —— 将"guardar la factura"解析为 <code data-nac-role="code-inline">NAC.click_by_verb('invoice','save')</code> 的中间层后端实现。</li><li data-nac-id="react.list.75.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">SECURITY.md</code> —— 威胁模型。</li><li data-nac-id="react.list.75.item.4" data-nac-role="list-item">yujin.app/nac-spec/ 上的示例（<code data-nac-role="code-inline">example.php</code> 是 v1.9 参考实现；<code data-nac-role="code-inline">example-v20-full.php</code> 是 Brownfield 迁移示例）。</li></ul>
+<hr />
+<p data-nac-id="react.p.77" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/REACT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "react",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "react.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "react.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "react.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "react.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

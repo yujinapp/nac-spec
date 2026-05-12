@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guida all&#x27;adozione di NAC3 con Angular -- NAC3</title>
+<meta name="nac3-doc-slug" content="angular" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="angular" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="angular.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="angular.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/angular.mp3" data-nac-id="angular.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="angular.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="angular.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="angular.main" data-nac-role="region">
+<hr />
+<p data-nac-id="angular.p.1" data-nac-role="paragraph">translation_source: guides/ANGULAR.md translation_source_hash: db5a73d8ddcd813e9bac7918d3e48e9834f98d5f60e855ace8c2f9df7cc0f0af translation_quality: machine_v1 translation_lang: it translation_date: 2026-05-11T13:50:31.860401+00:00</p>
+<hr />
+<h1 data-nac-id="angular.h1.guida-alladozione-di-nac3-con-angular" data-nac-role="heading" data-nac-level="1" id="guida-alladozione-di-nac3-con-angular">Guida all'adozione di NAC3 con Angular</h1>
+<p data-nac-id="angular.p.4" data-nac-role="paragraph">Questa guida illustra due percorsi per integrare NAC in un'app Angular:</p>
+<ul data-nac-id="angular.list.5" data-nac-role="list"><li data-nac-id="angular.list.5.item.1" data-nac-role="list-item"><strong>Greenfield:</strong> nuovo progetto, NAC3 integrato fin da <code data-nac-role="code-inline">ng new</code>.</li><li data-nac-id="angular.list.5.item.2" data-nac-role="list-item"><strong>Brownfield:</strong> app esistente, NAC3 aggiunto progressivamente, senza riscrittura.</li></ul>
+<p data-nac-id="angular.p.6" data-nac-role="paragraph">Testato con Angular 17+ (componenti standalone, signals, inject). È coperta anche la struttura con Angular precedente (NgModules). Stesso pacchetto <code data-nac-role="code-inline">@nac3/runtime</code> di React; la differenza sta in quanto risulta idiomatico il codice di collegamento in Angular.</p>
+<hr />
+<h2 data-nac-id="angular.h2.1-installazione" data-nac-role="heading" data-nac-level="2" id="1-installazione">1. Installazione</h2>
+<pre data-nac-id="angular.code.1" data-nac-role="code" data-nac-lang="text"><code>npm install @nac3/runtime</code></pre>
+<p data-nac-id="angular.p.10" data-nac-role="paragraph">Angular include il pacchetto tramite la sua pipeline di build standard (esbuild in 17+, webpack nelle versioni precedenti). Nessuna configurazione aggiuntiva in <code data-nac-role="code-inline">angular.json</code>.</p>
+<hr />
+<h2 data-nac-id="angular.h2.2-greenfield-nuovo-progetto" data-nac-role="heading" data-nac-level="2" id="2-greenfield-nuovo-progetto">2. Greenfield -- nuovo progetto</h2>
+<h3 data-nac-id="angular.h3.21-avvio-del-runtime-una-sola-volta" data-nac-role="heading" data-nac-level="3" id="21-avvio-del-runtime-una-sola-volta">2.1 Avvio del runtime una sola volta</h3>
+<p data-nac-id="angular.p.14" data-nac-role="paragraph">In <code data-nac-role="code-inline">main.ts</code>:</p>
+<pre data-nac-id="angular.code.2" data-nac-role="code" data-nac-lang="ts"><code>import { bootstrapApplication } from &#x27;@angular/platform-browser&#x27;;
+import { provideRouter } from &#x27;@angular/router&#x27;;
+import { AppComponent } from &#x27;./app/app.component&#x27;;
+import { routes } from &#x27;./app/app.routes&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+// optional: import &#x27;@nac3/runtime/chat-client&#x27;;
+
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+}).then(() =&gt; {
+  // window.NAC è ora pronto. Configura tenant e provenienza una sola volta.
+  if ((window as any).NAC?.setTenantPrefix) {
+    (window as any).NAC.setTenantPrefix(&#x27;demo&#x27;);
+  }
+});</code></pre>
+<p data-nac-id="angular.p.16" data-nac-role="paragraph">Per il vecchio <code data-nac-role="code-inline">app.module.ts</code> (NgModule), gli stessi import vanno inseriti nel file del modulo prima di <code data-nac-role="code-inline">platformBrowserDynamic().bootstrapModule(...)</code>.</p>
+<h3 data-nac-id="angular.h3.22-service-nac3-centralizzare-la-registrazione" data-nac-role="heading" data-nac-level="3" id="22-service-nac3-centralizzare-la-registrazione">2.2 Service NAC3 -- centralizzare la registrazione</h3>
+<pre data-nac-id="angular.code.3" data-nac-role="code" data-nac-lang="ts"><code>// nac.service.ts
+import { Injectable, OnDestroy } from &#x27;@angular/core&#x27;;
+
+declare global {
+  interface Window { NAC?: any; }
+}
+
+export interface NACManifest {
+  plugin_slug: string;
+  nac_version?: string;
+  elements?: Array&lt;{
+    id: string; role: string;
+    label_i18n?: Record&lt;string, string&gt;;
+    actions?: Array&lt;{ verb: string; label_i18n?: Record&lt;string, string&gt; }&gt;;
+  }&gt;;
+  tabs?: Array&lt;{ nac_id: string; label_i18n?: Record&lt;string, string&gt; }&gt;;
+}
+
+@Injectable({ providedIn: &#x27;root&#x27; })
+export class NacService {
+  get runtime() { return window.NAC; }
+
+  register(manifest: NACManifest) {
+    if (!this.runtime) {
+      console.warn(&#x27;NAC runtime not ready, skipping register for&#x27;, manifest.plugin_slug);
+      return;
+    }
+    this.runtime.register(manifest);
+  }
+
+  click(id: string)                       { return this.runtime?.click(id); }
+  click_by_verb(plugin: string|null, verb: string) { return this.runtime?.click_by_verb(plugin, verb); }
+  fill(id: string, value: any)            { return this.runtime?.fill(id, value); }
+  tab(plugin: string, tab_key: string)    { return this.runtime?.tab(plugin, tab_key); }
+  describe()                              { return this.runtime?.describe(); }
+  validate_global()                       { return this.runtime?.validate_global(); }
+
+  /* v2.2 helper. */
+  bindAction(el: HTMLElement, handler: (ev: Event) =&gt; void | Promise&lt;unknown&gt;,
+             ctx: { plugin: string; action_id: string }) {
+    return this.runtime?.bindAction(el, handler, ctx);
+  }
+}</code></pre>
+<h3 data-nac-id="angular.h3.23-decorare-i-componenti" data-nac-role="heading" data-nac-level="3" id="23-decorare-i-componenti">2.3 Decorare i componenti</h3>
+<pre data-nac-id="angular.code.4" data-nac-role="code" data-nac-lang="ts"><code>import { Component, OnInit, ElementRef, inject, ViewChild, AfterViewInit, OnDestroy } from &#x27;@angular/core&#x27;;
+import { NacService } from &#x27;./nac.service&#x27;;
+
+const INVOICE_MANIFEST = {
+  plugin_slug: &#x27;invoice&#x27;,
+  nac_version: &#x27;2.2&#x27;,
+  elements: [
+    {
+      id: &#x27;invoice.client_name&#x27;, role: &#x27;field&#x27;,
+      label_i18n: { es:&#x27;Nombre&#x27;,en:&#x27;Name&#x27;,pt:&#x27;Nome&#x27;,fr:&#x27;Nom&#x27;,
+                    it:&#x27;Nome&#x27;,de:&#x27;Name&#x27;,ja:&#x27;名前&#x27;,zh:&#x27;姓名&#x27;,
+                    hi:&#x27;naam&#x27;,ar:&#x27;الاسم&#x27; }
+    },
+    {
+      id: &#x27;invoice.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{ verb: &#x27;save&#x27;, label_i18n: { es:&#x27;Guardar&#x27;,en:&#x27;Save&#x27;,
+                  pt:&#x27;Salvar&#x27;,fr:&#x27;Sauver&#x27;,it:&#x27;Salva&#x27;,de:&#x27;Speichern&#x27;,
+                  ja:&#x27;保存&#x27;,zh:&#x27;保存&#x27;,hi:&#x27;sahejna&#x27;,ar:&#x27;حفظ&#x27; } }],
+      label_i18n: { es:&#x27;Guardar factura&#x27;,en:&#x27;Save invoice&#x27;,
+                    pt:&#x27;Salvar fatura&#x27;,fr:&#x27;Sauver facture&#x27;,
+                    it:&#x27;Salva fattura&#x27;,de:&#x27;Rechnung speichern&#x27;,
+                    ja:&#x27;請求書保存&#x27;,zh:&#x27;保存发票&#x27;,
+                    hi:&#x27;invoice sahejen&#x27;,ar:&#x27;حفظ الفاتورة&#x27; }
+    }
+  ]
+};
+
+@Component({
+  selector: &#x27;app-invoice-form&#x27;,
+  standalone: true,
+  template: `
+    &lt;article data-nac-plugin=&quot;invoice&quot;&gt;
+      &lt;input type=&quot;text&quot;
+             data-nac-id=&quot;invoice.client_name&quot;
+             data-nac-role=&quot;field&quot;
+             [(ngModel)]=&quot;clientName&quot;&gt;
+
+      &lt;button #saveBtn
+              data-nac-id=&quot;invoice.save&quot;
+              data-nac-role=&quot;action&quot;
+              data-nac-action=&quot;save&quot;
+              (click)=&quot;onSave()&quot;&gt;
+        Save
+      &lt;/button&gt;
+    &lt;/article&gt;
+  `
+})
+export class InvoiceFormComponent implements OnInit, AfterViewInit, OnDestroy {
+  private nac = inject(NacService);
+  @ViewChild(&#x27;saveBtn&#x27;, { static: true }) saveBtn!: ElementRef&lt;HTMLButtonElement&gt;;
+
+  clientName = &#x27;&#x27;;
+  private unbind: (() =&gt; void) | undefined;
+
+  ngOnInit() {
+    this.nac.register(INVOICE_MANIFEST);
+  }
+
+  ngAfterViewInit() {
+    /* v2.2: bindAction avvolge il click ed emette l&#x27;ack affinché
+       qualsiasi agent in attesa di NAC.click(&#x27;invoice.save&#x27;) si risolva correttamente. */
+    this.unbind = this.nac.bindAction(
+      this.saveBtn.nativeElement,
+      () =&gt; this.onSave(),
+      { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+    );
+  }
+
+  ngOnDestroy() {
+    this.unbind?.();
+  }
+
+  async onSave() {
+    // ... logica di salvataggio ...
+  }
+}</code></pre>
+<h3 data-nac-id="angular.h3.24-naciddirective-la-scorciatoia-adatta-al-brownfield" data-nac-role="heading" data-nac-level="3" id="24-naciddirective-la-scorciatoia-adatta-al-brownfield">2.4 NacIdDirective -- la scorciatoia adatta al brownfield</h3>
+<p data-nac-id="angular.p.22" data-nac-role="paragraph">Per la decorazione ripetitiva, una directive ad attributo risulta più idiomatica in Angular rispetto al triplo <code data-nac-role="code-inline">data-nac-*</code> grezzo. Si applica una volta sola e la directive imposta tutti e tre gli attributi:</p>
+<pre data-nac-id="angular.code.5" data-nac-role="code" data-nac-lang="ts"><code>// nac-id.directive.ts
+import { Directive, ElementRef, Input, OnInit } from &#x27;@angular/core&#x27;;
+
+@Directive({
+  selector: &#x27;[nacId]&#x27;,
+  standalone: true
+})
+export class NacIdDirective implements OnInit {
+  @Input({ required: true }) nacId!: string;
+  @Input() nacRole: &#x27;action&#x27; | &#x27;field&#x27; | &#x27;tab&#x27; | &#x27;option&#x27; | &#x27;data-table&#x27; | string = &#x27;action&#x27;;
+  @Input() nacAction?: string;
+
+  constructor(private el: ElementRef&lt;HTMLElement&gt;) {}
+
+  ngOnInit() {
+    const e = this.el.nativeElement;
+    e.setAttribute(&#x27;data-nac-id&#x27;, this.nacId);
+    e.setAttribute(&#x27;data-nac-role&#x27;, this.nacRole);
+    if (this.nacAction) {
+      e.setAttribute(&#x27;data-nac-action&#x27;, this.nacAction);
+    }
+  }
+}</code></pre>
+<p data-nac-id="angular.p.24" data-nac-role="paragraph">Utilizzo:</p>
+<pre data-nac-id="angular.code.6" data-nac-role="code" data-nac-lang="html"><code>&lt;button nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<h3 data-nac-id="angular.h3.25-nacactiondirective-bindaction-incluso" data-nac-role="heading" data-nac-level="3" id="25-nacactiondirective-bindaction-incluso">2.5 NacActionDirective -- bindAction incluso</h3>
+<p data-nac-id="angular.p.27" data-nac-role="paragraph">Avvolge <code data-nac-role="code-inline">bindAction</code> in modo che qualsiasi handler <code data-nac-role="code-inline">(click)</code> decorato con <code data-nac-role="code-inline">nacAction</code> emetta automaticamente il contratto ack della v2.2:</p>
+<pre data-nac-id="angular.code.7" data-nac-role="code" data-nac-lang="ts"><code>// nac-action.directive.ts
+import { Directive, ElementRef, Input, OnInit, OnDestroy, inject } from &#x27;@angular/core&#x27;;
+import { NacService } from &#x27;./nac.service&#x27;;
+
+@Directive({
+  selector: &#x27;[nacAction]&#x27;,
+  standalone: true
+})
+export class NacActionDirective implements OnInit, OnDestroy {
+  @Input({ required: true }) nacAction!: { plugin: string; actionId: string };
+  private nac = inject(NacService);
+  private unbind?: () =&gt; void;
+
+  constructor(private el: ElementRef&lt;HTMLElement&gt;) {}
+
+  ngOnInit() {
+    /* L&#x27;elemento DEVE avere già un handler (click) collegato da Angular
+       in questo momento. Il nostro viene aggiunto in parallelo; il runtime
+       v2.2 emette l&#x27;ack dopo che entrambi sono stati eseguiti. */
+    this.unbind = this.nac.bindAction(
+      this.el.nativeElement,
+      () =&gt; { /* solo evento contratto -- il (click) dell&#x27;utente viene eseguito separatamente */ },
+      { plugin: this.nacAction.plugin, action_id: this.nacAction.actionId }
+    );
+  }
+
+  ngOnDestroy() { this.unbind?.(); }
+}</code></pre>
+<p data-nac-id="angular.p.29" data-nac-role="paragraph">Utilizzo:</p>
+<pre data-nac-id="angular.code.8" data-nac-role="code" data-nac-lang="html"><code>&lt;button nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+        [nacAction]=&quot;{ plugin: &#x27;invoice&#x27;, actionId: &#x27;invoice.save&#x27; }&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<p data-nac-id="angular.p.31" data-nac-role="paragraph">(Sì, il selettore della directive <code data-nac-role="code-inline">nacAction</code> si sovrappone all'input abbreviato <code data-nac-role="code-inline">data-nac-action</code>. In pratica si sceglie uno dei due pattern per progetto; questa sezione è per chi vuole il wrapper bindAction.)</p>
+<h2 data-nac-id="angular.h2.3-brownfield-app-esistente" data-nac-role="heading" data-nac-level="2" id="3-brownfield-app-esistente">3. Brownfield -- app esistente</h2>
+<p data-nac-id="angular.p.33" data-nac-role="paragraph">Il principio (come in React): non refactorizzare tutto in una volta sola.</p>
+<h3 data-nac-id="angular.h3.31-ordine-di-intervento" data-nac-role="heading" data-nac-level="3" id="31-ordine-di-intervento">3.1 Ordine di intervento</h3>
+<p data-nac-id="angular.p.35" data-nac-role="paragraph">al wrapper più esterno del template <code data-nac-role="code-inline">&lt;app-root&gt;</code>. Il runtime    lo rileva immediatamente nell'albero degli scope.</p>
+<p data-nac-id="angular.p.36" data-nac-role="paragraph">nelle schermate più frequentate. Aggiungi i tre attributi <code data-nac-role="code-inline">data-nac-*</code>    direttamente nel template (oppure tramite <code data-nac-role="code-inline">NacIdDirective</code>).</p>
+<p data-nac-id="angular.p.37" data-nac-role="paragraph">console del browser. I pulsanti dovrebbero comparire sotto il tuo    plugin slug.</p>
+<p data-nac-id="angular.p.38" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb()</code> funzionerà da subito.</p>
+<p data-nac-id="angular.p.39" data-nac-role="paragraph"><code data-nac-role="code-inline">role="tab"</code> -- <strong>nota</strong>: gli id che corrispondono a <code data-nac-role="code-inline">^tab\.</code> DEVONO avere role    <code data-nac-role="code-inline">'tab'</code> secondo la spec sez. 1 + validatore strict V22-01.</p>
+<ol data-nac-id="angular.list.40" data-nac-role="list"><li data-nac-id="angular.list.40.item.1" data-nac-role="list-item"><strong>Prima la shell di primo livello.</strong> Aggiungi <code data-nac-role="code-inline">data-nac-plugin="&lt;your-app-slug&gt;"</code></li><li data-nac-id="angular.list.40.item.2" data-nac-role="list-item"><strong>Poi i pulsanti più usati.</strong> Salva / annulla / invia / elimina</li><li data-nac-id="angular.list.40.item.3" data-nac-role="list-item"><strong>Verifica in DevTools.</strong> Esegui <code data-nac-role="code-inline">window.NAC.describe()</code> dalla</li><li data-nac-id="angular.list.40.item.4" data-nac-role="list-item"><strong>Aggiungi un manifest.</strong> Solo i pulsanti del punto 2, con i verbi.</li><li data-nac-id="angular.list.40.item.5" data-nac-role="list-item"><strong>Aggiungi campi e tab.</strong> Gli input ricevono <code data-nac-role="code-inline">role="field"</code>. I tab ricevono</li></ol>
+<h3 data-nac-id="angular.h3.32-utilizzo-con-angular-material-primeng-taiga" data-nac-role="heading" data-nac-level="3" id="32-utilizzo-con-angular-material-primeng-taiga">3.2 Utilizzo con Angular Material / PrimeNG / Taiga</h3>
+<p data-nac-id="angular.p.42" data-nac-role="paragraph">La maggior parte delle librerie di componenti Angular espone binding di input in stile <code data-nac-role="code-inline">[attr.data-nac-*]</code> oppure propaga semplicemente gli attributi sconosciuti all'elemento host. Due pattern:</p>
+<p data-nac-id="angular.p.43" data-nac-role="paragraph"><strong>Pattern A: binding diretto degli attributi.</strong></p>
+<pre data-nac-id="angular.code.9" data-nac-role="code" data-nac-lang="html"><code>&lt;!-- Material --&gt;
+&lt;button mat-raised-button
+        [attr.data-nac-id]=&quot;&#x27;invoice.save&#x27;&quot;
+        [attr.data-nac-role]=&quot;&#x27;action&#x27;&quot;
+        [attr.data-nac-action]=&quot;&#x27;save&#x27;&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<p data-nac-id="angular.p.45" data-nac-role="paragraph"><strong>Pattern B: NacIdDirective sul wrapper.</strong></p>
+<p data-nac-id="angular.p.46" data-nac-role="paragraph">Se la libreria renderizza un elemento host e vuoi NAC3 sul pulsante interno, usa un wrapper:</p>
+<pre data-nac-id="angular.code.10" data-nac-role="code" data-nac-lang="html"><code>&lt;span nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+      (click)=&quot;onSave()&quot;&gt;
+  &lt;button mat-raised-button&gt;Save&lt;/button&gt;
+&lt;/span&gt;</code></pre>
+<p data-nac-id="angular.p.48" data-nac-role="paragraph">Il runtime NAC3 risolve tramite <code data-nac-role="code-inline">data-nac-id</code>, non per tag, quindi questo approccio funziona correttamente.</p>
+<h3 data-nac-id="angular.h3.33-auto-registrazione-dal-dom" data-nac-role="heading" data-nac-level="3" id="33-auto-registrazione-dal-dom">3.3 Auto-registrazione dal DOM</h3>
+<p data-nac-id="angular.p.50" data-nac-role="paragraph">Stesso pattern <code data-nac-role="code-inline">autoRegister.watch</code> di React:</p>
+<pre data-nac-id="angular.code.11" data-nac-role="code" data-nac-lang="ts"><code>// in your AppComponent ngAfterViewInit:
+const root = document.querySelector(&#x27;[data-nac-plugin]&#x27;) as HTMLElement;
+if (root &amp;&amp; (window as any).NAC?.autoRegister) {
+  root.setAttribute(&#x27;data-nac-watch&#x27;, &#x27;1&#x27;);
+  (window as any).NAC.autoRegister.watch(root, {
+    i18n_strict: &#x27;permissive&#x27;,
+    throttleMs: 100
+  });
+}</code></pre>
+<p data-nac-id="angular.p.52" data-nac-role="paragraph">Passa <code data-nac-role="code-inline">i18n_strict</code> a <code data-nac-role="code-inline">'strict'</code> non appena il tuo catalogo di traduzioni copre tutti i 10 locale NAC3.</p>
+<hr />
+<h2 data-nac-id="angular.h2.4-routing-ciclo-di-vita" data-nac-role="heading" data-nac-level="2" id="4-routing-ciclo-di-vita">4. Routing + ciclo di vita</h2>
+<p data-nac-id="angular.p.55" data-nac-role="paragraph">Lo snapshot di NAC3 riflette <strong>ciò che è attualmente montato</strong>. Con il router di Angular questo significa:</p>
+<p data-nac-id="angular.p.56" data-nac-role="paragraph">proprio manifest in <code data-nac-role="code-inline">ngOnInit</code>.</p>
+<p data-nac-id="angular.p.57" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.unregister(plugin_slug)</code> in <code data-nac-role="code-inline">ngOnDestroy</code>, così i plugin obsoleti   non compaiono nello snapshot dell'agente.</p>
+<ul data-nac-id="angular.list.58" data-nac-role="list"><li data-nac-id="angular.list.58.item.1" data-nac-role="list-item">Un componente che si monta alla navigazione di una route registra il</li><li data-nac-id="angular.list.58.item.2" data-nac-role="list-item">Un componente che si smonta alla navigazione dovrebbe chiamare</li></ul>
+<pre data-nac-id="angular.code.12" data-nac-role="code" data-nac-lang="ts"><code>ngOnDestroy() {
+  this.nac.runtime?.unregister?.(&#x27;invoice&#x27;);
+}</code></pre>
+<p data-nac-id="angular.p.60" data-nac-role="paragraph">Per i componenti shell a lunga vita (la topbar, la sidebar), NON eseguire l'unregister -- devono essere sempre presenti nell'albero.</p>
+<hr />
+<h2 data-nac-id="angular.h2.5-testing" data-nac-role="heading" data-nac-level="2" id="5-testing">5. Testing</h2>
+<h3 data-nac-id="angular.h3.51-testbed-karma" data-nac-role="heading" data-nac-level="3" id="51-testbed-karma">5.1 TestBed / Karma</h3>
+<pre data-nac-id="angular.code.13" data-nac-role="code" data-nac-lang="ts"><code>import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { InvoiceFormComponent } from &#x27;./invoice-form.component&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+
+describe(&#x27;InvoiceFormComponent&#x27;, () =&gt; {
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [InvoiceFormComponent]
+    });
+  });
+
+  it(&#x27;save button drives via NAC&#x27;, async () =&gt; {
+    const fixture = TestBed.createComponent(InvoiceFormComponent);
+    fixture.detectChanges();
+
+    let acked = false;
+    document.addEventListener(&#x27;nac:action:succeeded&#x27;, () =&gt; { acked = true; });
+
+    await (window as any).NAC.click(&#x27;invoice.save&#x27;);
+
+    expect(acked).toBe(true);
+  });
+});</code></pre>
+<h3 data-nac-id="angular.h3.52-playwright-e2e" data-nac-role="heading" data-nac-level="3" id="52-playwright-e2e">5.2 Playwright (e2e)</h3>
+<p data-nac-id="angular.p.66" data-nac-role="paragraph">Come nella guida React:</p>
+<pre data-nac-id="angular.code.14" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;invoice save&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;/invoices/new&#x27;);
+  await page.evaluate(() =&gt; (window as any).NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;));
+  await page.evaluate(() =&gt; (window as any).NAC.click(&#x27;invoice.save&#x27;));
+  await expect(page.getByText(&#x27;Invoice saved&#x27;)).toBeVisible();
+});</code></pre>
+<hr />
+<h2 data-nac-id="angular.h2.6-errori-comuni" data-nac-role="heading" data-nac-level="2" id="6-errori-comuni">6. Errori comuni</h2>
+<p data-nac-id="angular.p.70" data-nac-role="paragraph">(<code data-nac-role="code-inline">data-nac-id="row.{{i}}"</code>), gli agenti che hanno memorizzato un id   si rompono al riordinamento. Usa chiavi stabili (id del DB).</p>
+<p data-nac-id="angular.p.71" data-nac-role="paragraph">manifest in <code data-nac-role="code-inline">ngOnChanges</code> o in un getter che viene eseguito ad ogni   ciclo di CD. <code data-nac-role="code-inline">ngOnInit</code> una volta sola è il posto giusto.</p>
+<p data-nac-id="angular.p.72" data-nac-role="paragraph">documento globale; NON sono zone-aware per impostazione predefinita.   Se hai bisogno di gestione zone-aware, avvolgi il listener:   ``<code data-nac-role="code-inline">ts   this.zone.run(() =&gt; { /<em> respond to nac:action:succeeded </em>/ });   </code>``</p>
+<p data-nac-id="angular.p.73" data-nac-role="paragraph">servizio:   ``<code data-nac-role="code-inline">ts   if (isPlatformBrowser(this.platformId)) {     this.nac.register(...);   }   </code>``</p>
+<ul data-nac-id="angular.list.74" data-nac-role="list"><li data-nac-id="angular.list.74.item.1" data-nac-role="list-item">*<em>Id obsoleti in <code data-nac-role="code-inline"></em>ngFor</code>.** Se costruisci gli id dall'indice</li><li data-nac-id="angular.list.74.item.2" data-nac-role="list-item"><strong>Change detection + loop di registrazione.</strong> NON registrare il</li><li data-nac-id="angular.list.74.item.3" data-nac-role="list-item"><strong>Strict mode + zone.js.</strong> Gli eventi NAC3 transitano attraverso il</li><li data-nac-id="angular.list.74.item.4" data-nac-role="list-item"><strong>SSR (Angular Universal).</strong> NAC3 è solo per il browser. Proteggi il</li></ul>
+<hr />
+<h2 data-nac-id="angular.h2.7-checklist-per-la-produzione" data-nac-role="heading" data-nac-level="2" id="7-checklist-per-la-produzione">7. Checklist per la produzione</h2>
+<p data-nac-id="angular.p.77" data-nac-role="paragraph">Prima del rilascio:</p>
+<p data-nac-id="angular.p.78" data-nac-role="paragraph">intercetta le traduzioni mancanti.</p>
+<p data-nac-id="angular.p.79" data-nac-role="paragraph">con severità error.</p>
+<p data-nac-id="angular.p.80" data-nac-role="paragraph">produzione per far sì che i controlli v2.2 al momento della registrazione    (manifest_role_unknown ecc.) vengano lanciati come eccezioni.</p>
+<p data-nac-id="angular.p.81" data-nac-role="paragraph"><code data-nac-role="code-inline">[]</code>.</p>
+<p data-nac-id="angular.p.82" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.set_provenance_secret()</code> dal codice autenticato.</p>
+<ol data-nac-id="angular.list.83" data-nac-role="list"><li data-nac-id="angular.list.83.item.1" data-nac-role="list-item">Sostituisci <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> con <code data-nac-role="code-inline">'strict'</code>. La CI</li><li data-nac-id="angular.list.83.item.2" data-nac-role="list-item">Esegui <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> -- attendi zero risultati</li><li data-nac-id="angular.list.83.item.3" data-nac-role="list-item">Imposta <code data-nac-role="code-inline">(window as any).NAC.STRICT_VALIDATION = true</code> nel boot di</li><li data-nac-id="angular.list.83.item.4" data-nac-role="list-item">Da un test Playwright, verifica che <code data-nac-role="code-inline">NAC.validate_global()</code> restituisca</li><li data-nac-id="angular.list.83.item.5" data-nac-role="list-item">Multi-tenant: firma i manifest con HMAC lato server e chiama</li></ol>
+<hr />
+<h2 data-nac-id="angular.h2.8-passi-successivi" data-nac-role="heading" data-nac-level="2" id="8-passi-successivi">8. Passi successivi</h2>
+<p data-nac-id="angular.p.86" data-nac-role="paragraph"><code data-nac-role="code-inline">example-v20-full.php</code> migrazione brownfield; <code data-nac-role="code-inline">example-v21-data-table.php</code>   data-table + chat).</p>
+<ul data-nac-id="angular.list.87" data-nac-role="list"><li data-nac-id="angular.list.87.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">SPEC.md</code> per il contratto completo.</li><li data-nac-id="angular.list.87.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">guides/REACT.md</code> per il confronto cross-framework.</li><li data-nac-id="angular.list.87.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">guides/LLM_WIRING.md</code> per il backend intermediario.</li><li data-nac-id="angular.list.87.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">SECURITY.md</code> per il modello delle minacce.</li><li data-nac-id="angular.list.87.item.5" data-nac-role="list-item">Le demo su yujin.app/nac-spec/ (<code data-nac-role="code-inline">example.php</code> riferimento v1.9;</li></ul>
+<hr />
+<p data-nac-id="angular.p.89" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/ANGULAR.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "angular",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "angular.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "angular.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "angular.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "angular.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

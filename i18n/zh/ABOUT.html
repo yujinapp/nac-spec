@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>关于 NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="about" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="about" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="about.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="about.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/about.mp3" data-nac-id="about.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="about.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="about.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="about.main" data-nac-role="region">
+<hr />
+<p data-nac-id="about.p.1" data-nac-role="paragraph">translation_source: ABOUT.md translation_source_hash: 4ab5d9a2ad96ee42811299474895d9836adc1ca93ea37726806f190f59646484 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T13:07:51.099872+00:00</p>
+<hr />
+<h1 data-nac-id="about.h1.关于-nac3" data-nac-role="heading" data-nac-level="1" id="关于-nac3">关于 NAC3</h1>
+<p data-nac-id="about.p.4" data-nac-role="paragraph"><strong>规范版本：</strong> 2.2 稳定版（+ v2.3 互操作预览）。</p>
+<p data-nac-id="about.p.5" data-nac-role="paragraph"><strong>NAC3</strong> = <strong>Native Agent Contract</strong>。</p>
+<p data-nac-id="about.p.6" data-nac-role="paragraph">这是一个小型公开规范，让 Web UI 能够被 AI 智能体、语音运行器和无障碍工具以人类的方式驱动：点击、输入、读取——但使用机器可以解析的名称、机器可以等待的事件，以及能够区分真实用户与合成调用方的来源追踪机制。</p>
+<p data-nac-id="about.p.7" data-nac-role="paragraph">NAC3 与 ARIA 并列，而非建立在其之上。ARIA 标准化了<strong>无障碍树</strong>，使屏幕阅读器和开关设备能够操作视力正常用户所见的同一套 UI；NAC3 则标准化了<strong>智能体树</strong>，使语音命令、LLM 中间层或 RPA 机器人无需针对每个应用编写胶水代码，即可完成同样的操作。</p>
+<h2 data-nac-id="about.h2.你需要编写的内容" data-nac-role="heading" data-nac-level="2" id="你需要编写的内容">你需要编写的内容</h2>
+<p data-nac-id="about.p.9" data-nac-role="paragraph">少量 HTML 属性（<code data-nac-role="code-inline">data-nac-id</code>、<code data-nac-role="code-inline">data-nac-role</code>、<code data-nac-role="code-inline">data-nac-action</code>、<code data-nac-role="code-inline">data-nac-plugin</code>），以及一个可选的 JS 清单，用于声明页面上的元素及其支持的操作动词。运行时负责将名称解析为元素并向其分发指令。</p>
+<h2 data-nac-id="about.h2.你将获得的能力" data-nac-role="heading" data-nac-level="2" id="你将获得的能力">你将获得的能力</h2>
+<ul data-nac-id="about.list.11" data-nac-role="list"><li data-nac-id="about.list.11.item.1" data-nac-role="list-item">页面能够响应来自任意调用方的 <code data-nac-role="code-inline">NAC.click('deals.create')</code>——无论是语音运行器、Playwright 测试、LLM 中间层、键盘宏，还是无障碍工具。</li><li data-nac-id="about.list.11.item.2" data-nac-role="list-item">页面会发出确定性的事件族（<code data-nac-role="code-inline">nac:action:succeeded</code>、<code data-nac-role="code-inline">nac:tab:activated</code>、<code data-nac-role="code-inline">nac:field:changed</code> 等），让调用方知道每个步骤何时完成。</li><li data-nac-id="about.list.11.item.3" data-nac-role="list-item">页面以元素标识而非坐标驱动契约——因此 UI 重新设计不会破坏自动化流程。</li><li data-nac-id="about.list.11.item.4" data-nac-role="list-item">来源层（<code data-nac-role="code-inline">isTrusted</code>、HMAC 签名清单）可告知下游系统某次点击来自真实用户还是另一个智能体。</li></ul>
+<h2 data-nac-id="about.h2.nac3-不是什么" data-nac-role="heading" data-nac-level="2" id="nac3-不是什么">NAC3 不是什么</h2>
+<ul data-nac-id="about.list.13" data-nac-role="list"><li data-nac-id="about.list.13.item.1" data-nac-role="list-item">它不是 UI 框架。你可以继续使用 React / Vue / 原生 JS / PHP 或任何其他技术。NAC3 是叠加在你现有渲染层之上的薄契约层。</li><li data-nac-id="about.list.13.item.2" data-nac-role="list-item">它不是 LLM。将"点击保存按钮"解析为 <code data-nac-role="code-inline">NAC.click('deals.save')</code> 的 LLM 是你自己（或你的供应商）需要解决的问题；参见 <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> 中的参考实现。</li><li data-nac-id="about.list.13.item.3" data-nac-role="list-item">它不是无障碍功能的替代品。请保留你的 ARIA roles。NAC3 添加的是一个并行层；许多采用者最终会在同一元素上同时使用 <code data-nac-role="code-inline">role="button"</code> 和 <code data-nac-role="code-inline">data-nac-role="action"</code>。</li></ul>
+<h2 data-nac-id="about.h2.状态" data-nac-role="heading" data-nac-level="2" id="状态">状态</h2>
+<ul data-nac-id="about.list.15" data-nac-role="list"><li data-nac-id="about.list.15.item.1" data-nac-role="list-item"><strong>v1.9</strong> —— 稳定版。覆盖 27 个组件、9 个事件族，支持 HMAC + isTrusted、i18n 严格模式及验证器。生产参考实现为 <code data-nac-role="code-inline">example.php</code>。</li><li data-nac-id="about.list.15.item.2" data-nac-role="list-item"><strong>v2.0</strong> —— 提供棕地迁移方案（现有页面通过约 80 行配置即可接入 NAC 驱动）。参考实现：<code data-nac-role="code-inline">example-v20-full.php</code>。</li><li data-nac-id="about.list.15.item.3" data-nac-role="list-item"><strong>v2.1</strong> —— 新增数据表原语（<code data-nac-role="code-inline">collection</code>、<code data-nac-role="code-inline">matrix</code>、<code data-nac-role="code-inline">matrix-singletree</code> 子类型；<code data-nac-role="code-inline">dt_add_row</code>、<code data-nac-role="code-inline">dt_edit_cell</code>、聚合操作、事务提交）。参考实现：<code data-nac-role="code-inline">example-v21-data-table.php</code>。</li><li data-nac-id="about.list.15.item.4" data-nac-role="list-item"><strong>v2.2</strong> —— 已于 2026-05-10 发布。<code data-nac-role="code-inline">NAC.register</code> 现为严格验证器（<code data-nac-role="code-inline">manifest_role_unknown</code>、<code data-nac-role="code-inline">tab_id_manifest_role_drift</code>、<code data-nac-role="code-inline">manifest_dom_role_mismatch</code>）。新增 <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> 辅助方法，将 <code data-nac-role="code-inline">nac:action:succeeded</code> 契约内置于运行时。新增标志 <code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code>，可在仅警告模式（2.2 默认）与抛出异常模式（2.3 默认）之间切换。<strong>这是 <code data-nac-role="code-inline">npm install @nac3/runtime</code> 当前安装的版本。</strong> 完整变更日志见 <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code>。</li><li data-nac-id="about.list.15.item.5" data-nac-role="list-item"><strong>v2.3</strong> —— 规划中。<code data-nac-role="code-inline">STRICT_VALIDATION</code> 默认值将切换为 <code data-nac-role="code-inline">true</code>。新增 <code data-nac-role="code-inline">NAC.bindTab(el, handler, ctx)</code>，作为 tab 组件的配套方法。可选功能：流式聊天分发。</li></ul>
+<h2 data-nac-id="about.h2.从哪里开始" data-nac-role="heading" data-nac-level="2" id="从哪里开始">从哪里开始</h2>
+<ul data-nac-id="about.list.17" data-nac-role="list"><li data-nac-id="about.list.17.item.1" data-nac-role="list-item">在 <code data-nac-role="code-inline">yujin.app/nac-spec/</code> 运行演示（支持任意浏览器和设备）。</li><li data-nac-id="about.list.17.item.2" data-nac-role="list-item">阅读 <code data-nac-role="code-inline">SPEC.md</code> 了解完整契约。</li><li data-nac-id="about.list.17.item.3" data-nac-role="list-item">如果从 React 接入，请阅读 <code data-nac-role="code-inline">guides/REACT.md</code>。</li><li data-nac-id="about.list.17.item.4" data-nac-role="list-item">如果需要接入自己的 LLM 中间层，请阅读 <code data-nac-role="code-inline">guides/LLM_WIRING.md</code>。</li><li data-nac-id="about.list.17.item.5" data-nac-role="list-item">在租户环境中部署 NAC3 之前，请先阅读 <code data-nac-role="code-inline">SECURITY.md</code>。</li></ul>
+<h2 data-nac-id="about.h2.治理" data-nac-role="heading" data-nac-level="2" id="治理">治理</h2>
+<p data-nac-id="about.p.19" data-nac-role="paragraph">NAC3 目前由 Yujin 负责管理。规范采用 Apache 2.0 许可，参考运行时采用 MIT 许可。如果采用规模达到需要中立治理的程度，Yujin 承诺将 NAC3 移交至中立基金会（W3C 社区组、Linux Foundation 或同等行业机构）。在此之前，规范变更遵循 <code data-nac-role="code-inline">CONTRIBUTING.md</code> 中的 RFC 流程，任何涉及公开 API 或传输格式的变更均须经过至少 14 天的公开评论期。</p>
+<p data-nac-id="about.p.20" data-nac-role="paragraph">Apache 2.0 + MIT 的双重许可保证了规范和运行时不受 Yujin 公司状态变化的影响。无论现在还是 Yujin 不再存在之后，采用者均可自由 fork、运行和分发两者。</p>
+<h2 data-nac-id="about.h2.作者信息" data-nac-role="heading" data-nac-level="2" id="作者信息">作者信息</h2>
+<p data-nac-id="about.p.22" data-nac-role="paragraph">NAC3 由 Yujin（rpaforce.com）编写并维护。Apache-2.0 许可。欢迎贡献——详见 <code data-nac-role="code-inline">CONTRIBUTING.md</code>。</p>
+<hr />
+<p data-nac-id="about.p.24" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/ABOUT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "about",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "about.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "about.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "about.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "about.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

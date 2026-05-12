@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Impacto de NAC3 en Testing + QA -- NAC3</title>
+<meta name="nac3-doc-slug" content="impact_testing" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="impact_testing" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="impact_testing.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="impact_testing.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/impact_testing.mp3" data-nac-id="impact_testing.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="impact_testing.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="impact_testing.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="impact_testing.main" data-nac-role="region">
+<hr />
+<p data-nac-id="impact_testing.p.1" data-nac-role="paragraph">translation_source: guides/IMPACT_TESTING.md translation_source_hash: d69b8343b9c3e6a8ba3e22f198a9a6646d800f3f32a2f0446a506cb44f9e664b translation_quality: machine_v1 translation_lang: es translation_date: 2026-05-11T13:26:58.186559+00:00</p>
+<hr />
+<h1 data-nac-id="impact_testing.h1.impacto-de-nac3-en-testing-qa" data-nac-role="heading" data-nac-level="1" id="impacto-de-nac3-en-testing-qa">Impacto de NAC3 en Testing + QA</h1>
+<p data-nac-id="impact_testing.p.4" data-nac-role="paragraph"><strong>Versión de NAC3:</strong> 2.2 stable. <strong>Audiencia:</strong> Ingenieros de pruebas, líderes de QA, SDETs, CTOs que evalúan el costo de mantenimiento de pruebas a largo plazo al adoptar NAC3.</p>
+<h2 data-nac-id="impact_testing.h2.resumen" data-nac-role="heading" data-nac-level="2" id="resumen">Resumen</h2>
+<p data-nac-id="impact_testing.p.6" data-nac-role="paragraph">El código de pruebas que usa ids de NAC3 sobrevive a los rediseños de UI. El código que usa selectores CSS no. Esa única propiedad cambia la economía del mantenimiento de pruebas de "lineal con los cambios de UI" a "lineal con los cambios de funcionalidades" -- típicamente entre 5 y 10 veces menos trabajo.</p>
+<h2 data-nac-id="impact_testing.h2.la-matemática-del-mantenimiento-hoy" data-nac-role="heading" data-nac-level="2" id="la-matemática-del-mantenimiento-hoy">La matemática del mantenimiento hoy</h2>
+<p data-nac-id="impact_testing.p.8" data-nac-role="paragraph">Una suite típica de Selenium / Cypress / Playwright para una aplicación web no trivial contiene cientos de selectores:</p>
+<pre data-nac-id="impact_testing.code.1" data-nac-role="code" data-nac-lang="ts"><code>await page.locator(&#x27;button.btn-primary.btn-large:has-text(&quot;Save&quot;)&#x27;).click();
+await page.locator(&#x27;div.modal &gt; div.body &gt; input[type=&quot;text&quot;]:first-of-type&#x27;).fill(&#x27;Acme&#x27;);
+await page.locator(&#x27;table.invoice-grid &gt; tbody &gt; tr:nth-child(1) &gt; td:last-child &gt; button&#x27;).click();</code></pre>
+<p data-nac-id="impact_testing.p.10" data-nac-role="paragraph">Estos selectores se rompen cuando:</p>
+<p data-nac-id="impact_testing.p.11" data-nac-role="paragraph">"Guardar" en las pruebas del tenant en español.</p>
+<p data-nac-id="impact_testing.p.12" data-nac-role="paragraph">cambia.</p>
+<ul data-nac-id="impact_testing.list.13" data-nac-role="list"><li data-nac-id="impact_testing.list.13.item.1" data-nac-role="list-item">El equipo de diseño renombra <code data-nac-role="code-inline">.btn-primary</code> a <code data-nac-role="code-inline">.btn-cta</code>.</li><li data-nac-id="impact_testing.list.13.item.2" data-nac-role="list-item">Se agrega un div contenedor por accesibilidad.</li><li data-nac-id="impact_testing.list.13.item.3" data-nac-role="list-item">La etiqueta del botón se internacionaliza y "Save" se convierte en</li><li data-nac-id="impact_testing.list.13.item.4" data-nac-role="list-item">El layout de la grilla cambia a grid-template-rows.</li><li data-nac-id="impact_testing.list.13.item.5" data-nac-role="list-item">Cualquier cosa de la página que NO sea la intención semántica</li></ul>
+<p data-nac-id="impact_testing.p.14" data-nac-role="paragraph">Encuestas de la industria (2024-2025) estiman que <strong>el 30-50% del tiempo de los ingenieros de QA se destina al mantenimiento de selectores</strong>. El número empeora a medida que la aplicación crece.</p>
+<h2 data-nac-id="impact_testing.h2.la-matemática-del-mantenimiento-con-nac3" data-nac-role="heading" data-nac-level="2" id="la-matemática-del-mantenimiento-con-nac3">La matemática del mantenimiento con NAC3</h2>
+<pre data-nac-id="impact_testing.code.2" data-nac-role="code" data-nac-lang="ts"><code>await NAC.click(&#x27;invoice.save&#x27;);
+await NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;);
+await NAC.click(&#x27;invoice.line.42.delete&#x27;);</code></pre>
+<p data-nac-id="impact_testing.p.17" data-nac-role="paragraph">Estas llamadas sobreviven a:</p>
+<ul data-nac-id="impact_testing.list.18" data-nac-role="list"><li data-nac-id="impact_testing.list.18.item.1" data-nac-role="list-item">Renombrado de clases CSS (los selectores no referencian CSS).</li><li data-nac-id="impact_testing.list.18.item.2" data-nac-role="list-item">Reestructuración del árbol DOM (los selectores no referencian estructura).</li><li data-nac-id="impact_testing.list.18.item.3" data-nac-role="list-item">Cambios de etiquetas por I18n (los selectores no referencian texto).</li><li data-nac-id="impact_testing.list.18.item.4" data-nac-role="list-item">Migraciones de layout de grid a flex.</li><li data-nac-id="impact_testing.list.18.item.5" data-nac-role="list-item">Cambios de librería de componentes.</li></ul>
+<p data-nac-id="impact_testing.p.19" data-nac-role="paragraph">Se rompen ÚNICAMENTE cuando:</p>
+<ul data-nac-id="impact_testing.list.20" data-nac-role="list"><li data-nac-id="impact_testing.list.20.item.1" data-nac-role="list-item">El equipo de producto renombra un verbo (<code data-nac-role="code-inline">save</code> -&gt; <code data-nac-role="code-inline">commit</code>).</li><li data-nac-id="impact_testing.list.20.item.2" data-nac-role="list-item">Un botón se elimina por completo.</li></ul>
+<p data-nac-id="impact_testing.p.21" data-nac-role="paragraph">Estos son <strong>cambios a nivel de funcionalidad</strong>, no de UI. La prueba necesita actualizarse por la misma razón que el código de producción necesita actualizarse. Ese es el costo correcto.</p>
+<h2 data-nac-id="impact_testing.h2.métricas-de-impacto-concretas" data-nac-role="heading" data-nac-level="2" id="métricas-de-impacto-concretas">Métricas de impacto concretas</h2>
+<p data-nac-id="impact_testing.p.23" data-nac-role="paragraph">Datos internos de Yujin CRM (2025):</p>
+<p data-nac-id="impact_testing.p.24" data-nac-role="paragraph">| Métrica | Antes de NAC | Después de NAC | Delta | |--------|-----------|-----------|-------| | Líneas promedio por spec de Playwright | 187 | 64 | -66% | | Mantenimiento por spec tras un sprint de rediseño | 4.2 horas | 0.3 horas | -93% | | Fallos de pruebas por selectores por semana | 38 | 2 | -95% | | Tiempo de incorporación de un nuevo ingeniero de QA | 3 semanas | 1 semana | -67% | | Pruebas que pasan 6 meses después de escritas, sin ediciones | 31% | 89% | +180% |</p>
+<p data-nac-id="impact_testing.p.25" data-nac-role="paragraph">El 89% es el dato clave. <strong>La gran mayoría de las pruebas de NAC3 siguen funcionando durante la evolución normal del producto</strong>, mientras que sus equivalentes basadas en selectores se deterioran.</p>
+<h2 data-nac-id="impact_testing.h2.lo-que-nac3-habilita-para-la-automatización-de-pruebas" data-nac-role="heading" data-nac-level="2" id="lo-que-nac3-habilita-para-la-automatización-de-pruebas">Lo que NAC3 habilita para la automatización de pruebas</h2>
+<h3 data-nac-id="impact_testing.h3.1-corpus-de-pruebas-estable" data-nac-role="heading" data-nac-level="3" id="1-corpus-de-pruebas-estable">1. Corpus de pruebas estable</h3>
+<p data-nac-id="impact_testing.p.28" data-nac-role="paragraph">Una prueba escrita en 2024 contra <code data-nac-role="code-inline">NAC.click('invoice.save')</code> sigue ejecutándose en 2026 si el verbo <code data-nac-role="code-inline">save</code> sobrevive en el roadmap del producto. El DOM alrededor del botón puede haberse reconstruido tres veces.</p>
+<h3 data-nac-id="impact_testing.h3.2-pruebas-cross-browser-sin-cambios-de-modo-de-selectores" data-nac-role="heading" data-nac-level="3" id="2-pruebas-cross-browser-sin-cambios-de-modo-de-selectores">2. Pruebas cross-browser sin cambios de modo de selectores</h3>
+<p data-nac-id="impact_testing.p.30" data-nac-role="paragraph">Los selectores CSS se comportan de manera diferente entre Chromium / Firefox / WebKit en casos borde (pseudo-elementos, anillos de foco, shadow DOM). NAC3 despacha a través del resolver del runtime -- la misma ruta de código independientemente del navegador.</p>
+<h3 data-nac-id="impact_testing.h3.3-pruebas-agnósticas-a-i18n" data-nac-role="heading" data-nac-level="3" id="3-pruebas-agnósticas-a-i18n">3. Pruebas agnósticas a I18n</h3>
+<p data-nac-id="impact_testing.p.32" data-nac-role="paragraph">En una aplicación multi-locale: la suite de pruebas actual necesita ejecuciones por locale porque "Save" / "Guardar" / "Speichern" son el mismo botón. Con NAC3 la prueba llama al id; el runtime resuelve entre locales. <strong>Se escribe 1 prueba y corre en 10 locales</strong> (uno por ).</p>
+<h3 data-nac-id="impact_testing.h3.4-autoría-de-pruebas-asistida-por-llm" data-nac-role="heading" data-nac-level="3" id="4-autoría-de-pruebas-asistida-por-llm">4. Autoría de pruebas asistida por LLM</h3>
+<p data-nac-id="impact_testing.p.34" data-nac-role="paragraph">Un LLM que ve <code data-nac-role="code-inline">NAC.describe()</code> puede producir un spec de prueba completo a partir de una descripción en prosa: "Probar que agregar una fila y luego eliminarla devuelve la tabla al estado inicial." El LLM emite llamadas NAC.*; se revisan y se hace commit. Yujin CRM tiene ~250 specs que fueron creados de esta manera y revisados antes del merge.</p>
+<h3 data-nac-id="impact_testing.h3.5-pruebas-auto-reparables-mediante-descubrimiento" data-nac-role="heading" data-nac-level="3" id="5-pruebas-auto-reparables-mediante-descubrimiento">5. Pruebas auto-reparables mediante descubrimiento</h3>
+<p data-nac-id="impact_testing.p.36" data-nac-role="paragraph">Cuando una prueba falla porque un id fue renombrado:</p>
+<pre data-nac-id="impact_testing.code.3" data-nac-role="code" data-nac-lang="ts"><code>try {
+  await NAC.click(&#x27;invoice.save&#x27;);
+} catch (e) {
+  if (e.code === &#x27;not_found&#x27;) {
+    // Re-discover; the verb &#x27;save&#x27; may live under a new id.
+    const r = await NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;save&#x27;);
+    if (r.ok) console.warn(&#x27;id has changed; update test&#x27;);
+  }
+}</code></pre>
+<p data-nac-id="impact_testing.p.38" data-nac-role="paragraph">El <code data-nac-role="code-inline">click_by_verb</code> del runtime ofrece un fallback auto-reparable que indica "esta prueba necesita actualizarse, pero la acción sigue funcionando" -- un modo de fallo mucho mejor que "selector no encontrado, fin".</p>
+<h3 data-nac-id="impact_testing.h3.6-generación-de-pruebas-desde-manifiestos" data-nac-role="heading" data-nac-level="3" id="6-generación-de-pruebas-desde-manifiestos">6. Generación de pruebas desde manifiestos</h3>
+<p data-nac-id="impact_testing.p.40" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.validate_global({probe: true})</code> sintetiza un click en cada elemento <code data-nac-role="code-inline">role="action"</code> y verifica que emita el evento ack canónico en menos de 5s. <strong>Esto es una prueba de humo auto-generada para toda la superficie clickeable de la aplicación</strong>. Se ejecuta en CI; detecta cualquier botón que se monte sin la emisión correcta del ack.</p>
+<h3 data-nac-id="impact_testing.h3.7-cobertura-del-pipeline-por-etapa" data-nac-role="heading" data-nac-level="3" id="7-cobertura-del-pipeline-por-etapa">7. Cobertura del pipeline por etapa</h3>
+<p data-nac-id="impact_testing.p.42" data-nac-role="paragraph">La suite de pruebas de referencia de Yujin (NAC_TEST_MANUAL.md) organiza las pruebas por etapa del pipeline de NAC3:</p>
+<ul data-nac-id="impact_testing.list.43" data-nac-role="list"><li data-nac-id="impact_testing.list.43.item.1" data-nac-role="list-item">Etapa 1 (entrada STT)</li><li data-nac-id="impact_testing.list.43.item.2" data-nac-role="list-item">Etapa 2 (Desambiguación)</li><li data-nac-id="impact_testing.list.43.item.3" data-nac-role="list-item">Etapa 3 (intermediario LLM)</li><li data-nac-id="impact_testing.list.43.item.4" data-nac-role="list-item">Etapa 4 (llamadas NAC.*)</li><li data-nac-id="impact_testing.list.43.item.5" data-nac-role="list-item">Etapa 5 (efecto secundario en el DOM)</li><li data-nac-id="impact_testing.list.43.item.6" data-nac-role="list-item">Etapa 6 (evento Ack)</li></ul>
+<p data-nac-id="impact_testing.p.44" data-nac-role="paragraph">La cobertura se mide <strong>por etapa</strong>, no solo por línea de código. La referencia de Yujin reporta ~95% de promedio ponderado en todas las etapas. Adoptar ese esquema brinda un scorecard de cobertura que se mapea directamente sobre el contrato.</p>
+<h2 data-nac-id="impact_testing.h2.impacto-en-los-frameworks-de-pruebas-existentes" data-nac-role="heading" data-nac-level="2" id="impacto-en-los-frameworks-de-pruebas-existentes">Impacto en los frameworks de pruebas existentes</h2>
+<h3 data-nac-id="impact_testing.h3.playwright" data-nac-role="heading" data-nac-level="3" id="playwright">Playwright</h3>
+<p data-nac-id="impact_testing.p.47" data-nac-role="paragraph">Integración directa. <code data-nac-role="code-inline">page.evaluate()</code> invoca llamadas <code data-nac-role="code-inline">NAC.*</code>. Los selectores se mantienen como fallback para aserciones de layout. La referencia de Yujin incluye 16 specs de Playwright en <code data-nac-role="code-inline">tests/e2e-nac/specs/</code>.</p>
+<h3 data-nac-id="impact_testing.h3.cypress" data-nac-role="heading" data-nac-level="3" id="cypress">Cypress</h3>
+<p data-nac-id="impact_testing.p.49" data-nac-role="paragraph"><code data-nac-role="code-inline">cy.window().then(win =&gt; win.NAC.click(id))</code>. El mismo patrón. Los comandos personalizados envuelven las llamadas NAC: <code data-nac-role="code-inline">cy.nacClick('invoice.save')</code>.</p>
+<h3 data-nac-id="impact_testing.h3.selenium" data-nac-role="heading" data-nac-level="3" id="selenium">Selenium</h3>
+<p data-nac-id="impact_testing.p.51" data-nac-role="paragraph">Ejecutor de JavaScript: <code data-nac-role="code-inline">driver.execute_script('return window.NAC.click(arguments[0])', 'invoice.save')</code>.</p>
+<h3 data-nac-id="impact_testing.h3.jest-react-testing-library" data-nac-role="heading" data-nac-level="3" id="jest-react-testing-library">Jest + React Testing Library</h3>
+<pre data-nac-id="impact_testing.code.4" data-nac-role="code" data-nac-lang="ts"><code>import &#x27;@nac3/runtime&#x27;;
+import { render } from &#x27;@testing-library/react&#x27;;
+import { App } from &#x27;./App&#x27;;
+
+test(&#x27;save works&#x27;, async () =&gt; {
+  render(&lt;App /&gt;);
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+  expect(mockApi.save).toHaveBeenCalled();
+});</code></pre>
+<p data-nac-id="impact_testing.p.54" data-nac-role="paragraph">NAC3 convive con React Testing Library, no compite con ella.</p>
+<h3 data-nac-id="impact_testing.h3.karma-jasmine-runners-más-antiguos" data-nac-role="heading" data-nac-level="3" id="karma-jasmine-runners-más-antiguos">Karma / Jasmine / runners más antiguos</h3>
+<p data-nac-id="impact_testing.p.56" data-nac-role="paragraph">Inyección directa vía <code data-nac-role="code-inline">window.NAC</code>. Cualquier entorno que pueda ejecutar JavaScript en un contexto de navegador funciona.</p>
+<h2 data-nac-id="impact_testing.h2.costo-de-adopción" data-nac-role="heading" data-nac-level="2" id="costo-de-adopción">Costo de adopción</h2>
+<h3 data-nac-id="impact_testing.h3.aplicación-existente" data-nac-role="heading" data-nac-level="3" id="aplicación-existente">Aplicación existente</h3>
+<p data-nac-id="impact_testing.p.59" data-nac-role="paragraph">Según el <a href="AI_PLAYBOOK_MIGRATION.md" data-nac-id="impact_testing.link.1" data-nac-role="action" data-nac-action="open">playbook de migración</a>, se estima:</p>
+<p data-nac-id="impact_testing.p.60" data-nac-role="paragraph">recuperadas por el ahorro en mantenimiento en 3-4 meses.</p>
+<ul data-nac-id="impact_testing.list.61" data-nac-role="list"><li data-nac-id="impact_testing.list.61.item.1" data-nac-role="list-item">~1 día por pantalla para decoración + manifiesto.</li><li data-nac-id="impact_testing.list.61.item.2" data-nac-role="list-item">~1 día por pantalla para migración del corpus de pruebas.</li><li data-nac-id="impact_testing.list.61.item.3" data-nac-role="list-item">Total para una aplicación de 20 pantallas: ~6 semanas del tiempo de un ingeniero,</li></ul>
+<h3 data-nac-id="impact_testing.h3.aplicación-nueva" data-nac-role="heading" data-nac-level="3" id="aplicación-nueva">Aplicación nueva</h3>
+<p data-nac-id="impact_testing.p.63" data-nac-role="paragraph">Integrado desde el inicio. El playbook para proyectos greenfield trata los atributos de NAC3 como una preocupación de primera clase. Sin costo de adaptación posterior.</p>
+<h2 data-nac-id="impact_testing.h2.riesgos-mitigación" data-nac-role="heading" data-nac-level="2" id="riesgos-mitigación">Riesgos + mitigación</h2>
+<h3 data-nac-id="impact_testing.h3.riesgo-no-confiamos-en-las-pruebas-generadas-por-llm" data-nac-role="heading" data-nac-level="3" id="riesgo-no-confiamos-en-las-pruebas-generadas-por-llm">Riesgo -- "no confiamos en las pruebas generadas por LLM"</h3>
+<p data-nac-id="impact_testing.p.66" data-nac-role="paragraph">Válido. El LLM produce un candidato; un humano lo revisa y hace commit. El mismo flujo de trabajo que Copilot. El corpus que se entrega es exactamente lo que el equipo aprobó, no lo que el LLM escribió.</p>
+<h3 data-nac-id="impact_testing.h3.riesgo-los-ids-de-nac-se-convierten-en-deuda-técnica-con-el-" data-nac-role="heading" data-nac-level="3" id="riesgo-los-ids-de-nac-se-convierten-en-deuda-técnica-con-el-">Riesgo -- "los ids de NAC se convierten en deuda técnica con el tiempo"</h3>
+<p data-nac-id="impact_testing.p.68" data-nac-role="paragraph">Cierto si se los deja deteriorar. Trate los ids de NAC como nombres de columnas de base de datos: renombre mediante migración, nunca elimine en vuelo. El CLI de <code data-nac-role="code-inline">@nac3/runtime</code> detecta ids huérfanos mediante lint estático.</p>
+<h3 data-nac-id="impact_testing.h3.riesgo-qué-pasa-si-la-adopción-de-nac-se-estanca" data-nac-role="heading" data-nac-level="3" id="riesgo-qué-pasa-si-la-adopción-de-nac-se-estanca">Riesgo -- "¿qué pasa si la adopción de NAC se estanca?"</h3>
+<p data-nac-id="impact_testing.p.70" data-nac-role="paragraph">La especificación es Apache-2.0. El runtime pesa menos de 200KB. En el peor caso: usted es dueño del artefacto, los ids se mantienen estables. El peor caso sigue siendo mejor que los selectores CSS.</p>
+<h2 data-nac-id="impact_testing.h2.ver-también" data-nac-role="heading" data-nac-level="2" id="ver-también">Ver también</h2>
+<p data-nac-id="impact_testing.p.72" data-nac-role="paragraph">playbook de pruebas estandarizado que respalda este análisis de impacto.</p>
+<p data-nac-id="impact_testing.p.73" data-nac-role="paragraph"><a href="RPA_AUTOMATION_ANYWHERE.md" data-nac-id="impact_testing.link.2" data-nac-role="action" data-nac-action="open">RPA_AUTOMATION_ANYWHERE.md</a> /   <a href="RPA_BLUE_PRISM.md" data-nac-id="impact_testing.link.3" data-nac-role="action" data-nac-action="open">RPA_BLUE_PRISM.md</a> -- aplicaciones   adyacentes del mismo contrato.</p>
+<p data-nac-id="impact_testing.p.74" data-nac-role="paragraph">-- los números de cobertura propios de la referencia de Yujin.</p>
+<ul data-nac-id="impact_testing.list.75" data-nac-role="list"><li data-nac-id="impact_testing.list.75.item.1" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="impact_testing.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- el</li><li data-nac-id="impact_testing.list.75.item.2" data-nac-role="list-item"><a href="RPA_UIPATH.md" data-nac-id="impact_testing.link.5" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a> /</li><li data-nac-id="impact_testing.list.75.item.3" data-nac-role="list-item"><a href="../docs/COVERAGE_REPORT_2026_05_10.md" data-nac-id="impact_testing.link.6" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a></li></ul>
+<h2 data-nac-id="impact_testing.h2.licencia" data-nac-role="heading" data-nac-level="2" id="licencia">Licencia</h2>
+<p data-nac-id="impact_testing.p.77" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="impact_testing.p.79" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/IMPACT_TESTING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "impact_testing",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "impact_testing.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "impact_testing.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "impact_testing.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "impact_testing.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

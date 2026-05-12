@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plano de difusão do lançamento do NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_launch_diffusion" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_launch_diffusion" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_launch_diffusion.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_launch_diffusion.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_launch_diffusion.mp3" data-nac-id="nac_launch_diffusion.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_launch_diffusion.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.1" data-nac-role="paragraph">translation_source: docs/NAC_LAUNCH_DIFFUSION.md translation_source_hash: cbdf7b9e5ec3ed43a39111aab16fbe59c222a05a835429ea43148036320fc5cf translation_quality: machine_v1 translation_lang: pt translation_date: 2026-05-11T13:44:18.390375+00:00</p>
+<hr />
+<h1 data-nac-id="nac_launch_diffusion.h1.plano-de-difusão-do-lançamento-do-nac3" data-nac-role="heading" data-nac-level="1" id="plano-de-difusão-do-lançamento-do-nac3">Plano de difusão do lançamento do NAC3</h1>
+<p data-nac-id="nac_launch_diffusion.p.4" data-nac-role="paragraph">Um guia prático para colocar o NAC3 na frente das pessoas que deveriam estar usando-o. Escrito em 2026-05-10 para o lançamento da v2.2 / v2.3-preview.</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.o-que-estamos-lançando" data-nac-role="heading" data-nac-level="2" id="o-que-estamos-lançando">O que estamos lançando</h2>
+<p data-nac-id="nac_launch_diffusion.p.6" data-nac-role="paragraph"><code data-nac-role="code-inline">packages/nac-react-demo</code> + <code data-nac-role="code-inline">packages/nac-angular-demo</code>.</p>
+<p data-nac-id="nac_launch_diffusion.p.7" data-nac-role="paragraph">em pkuschnirof/yujin docs/MIGRATION_FROM_RPAFORCE.md.</p>
+<p data-nac-id="nac_launch_diffusion.p.8" data-nac-role="paragraph">(manifest + chat + autopilot + isTrusted-aware).</p>
+<ul data-nac-id="nac_launch_diffusion.list.9" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.9.item.1" data-nac-role="list-item"><strong>Spec:</strong> v2.2 estável, v2.3 preview (primitiva de editor de campo).</li><li data-nac-id="nac_launch_diffusion.list.9.item.2" data-nac-role="list-item"><strong>Runtime:</strong> <code data-nac-role="code-inline">@nac3/runtime@2.2.0</code> no npm (ESM + CJS + d.ts + CLI).</li><li data-nac-id="nac_launch_diffusion.list.9.item.3" data-nac-role="list-item"><strong>Demos:</strong> quatro demos ao vivo em yujin.app/nac-spec/.</li><li data-nac-id="nac_launch_diffusion.list.9.item.4" data-nac-role="list-item"><strong>Guias de adoção:</strong> React + Angular + integração com LLM.</li><li data-nac-id="nac_launch_diffusion.list.9.item.5" data-nac-role="list-item"><strong>Casos de estudo:</strong> apps funcionais com Vite + React 18 e Angular 17 em</li><li data-nac-id="nac_launch_diffusion.list.9.item.6" data-nac-role="list-item"><strong>História de migração brownfield:</strong> o próprio Yujin CRM, documentado</li><li data-nac-id="nac_launch_diffusion.list.9.item.7" data-nac-role="list-item"><strong>Conformidade NAC-3:</strong> a própria landing page é compatível com NAC-3</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.mensagens" data-nac-role="heading" data-nac-level="2" id="mensagens">Mensagens</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.frase-de-impacto" data-nac-role="heading" data-nac-level="3" id="frase-de-impacto">Frase de impacto</h3>
+<p data-nac-id="nac_launch_diffusion.p.12" data-nac-role="paragraph">&gt; <strong>NAC3 -- a pequena spec pública que permite que UIs web sejam controladas por agentes de IA, &gt; runners de voz e ferramentas de acessibilidade sem código de integração por app.</strong></p>
+<h3 data-nac-id="nac_launch_diffusion.h3.três-frases" data-nac-role="heading" data-nac-level="3" id="três-frases">Três frases</h3>
+<p data-nac-id="nac_launch_diffusion.p.14" data-nac-role="paragraph">&gt; NAC3 é o que ARIA teria sido se tivesse sido projetado em &gt; 2026 com LLMs em mente. Decore sua UI existente com três &gt; atributos HTML; o runtime resolve nomes + despacha cliques &gt; + emite eventos de conclusão + lida com localização + fornece &gt; proveniência. Apache-2.0, npm install, sem mudanças no processo de build.</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.pitch-de-30-segundos" data-nac-role="heading" data-nac-level="3" id="pitch-de-30-segundos">Pitch de 30 segundos</h3>
+<p data-nac-id="nac_launch_diffusion.p.16" data-nac-role="paragraph">&gt; Assistentes de voz, agentes de chat com LLM e ferramentas de acessibilidade enfrentam &gt; o mesmo problema: precisam de nomes estáveis para os elementos &gt; nos quais querem agir. Seletores CSS quebram. ARIA para em "isso &gt; é um botão". Cada equipe constrói a mesma infraestrutura do zero. &gt; &gt; NAC3 é o pequeno contrato que resolve isso. Você adiciona <code data-nac-role="code-inline">data-nac-id</code>, &gt; <code data-nac-role="code-inline">data-nac-role</code>, <code data-nac-role="code-inline">data-nac-action</code> aos elementos que um agente &gt; deve controlar; o runtime cuida do resto. Há uma &gt; spec v2.2 funcional, um pacote npm estável, guias para React + Angular, &gt; e quatro demos ao vivo, incluindo um integrado de ponta a ponta a &gt; um backend de chat Claude Sonnet com o qual você pode conversar agora mesmo. &gt; &gt; É Apache-2.0. Criamos porque rodamos um CRM que precisava &gt; disso. Agora você também pode usar.</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.públicos-alvo" data-nac-role="heading" data-nac-level="2" id="públicos-alvo">Públicos-alvo</h2>
+<p data-nac-id="nac_launch_diffusion.p.18" data-nac-role="paragraph">| Público | Canal | Gancho | |---------|-------|--------| | Devs de React + Vue + Svelte + Angular | dev.to, Hashnode, r/javascript, r/webdev | "Controle seu app React existente por voz em 80 linhas" | | Criadores de voz + agentes | r/LocalLLaMA, r/ChatGPTCoding, Discords de criadores de agentes | "Um padrão que faltava para o lado do usuário em apps de voz" | | Defensores de acessibilidade | r/Accessibility, listas de e-mail de a11y, palestrantes de meetups de A11y | "ARIA projetado em 2026 com LLMs em mente" | | Engenheiros de teste/QA | r/qualityassurance, comunidades de Selenium / Playwright | "Seletores estáveis que sobrevivem a redesigns de UI" | | HN | news.ycombinator.com | o Show HN canônico | | Tech leads + CTOs | LinkedIn, Mastodon | o ângulo "você vai adicionar isso em 12 meses de qualquer forma" | | Usuários do Yujin CRM | e-mail direto + banner no produto | "seu CRM fala NAC3; veja o que isso significa" |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.canais-exemplos-de-posts" data-nac-role="heading" data-nac-level="2" id="canais-exemplos-de-posts">Canais + exemplos de posts</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.show-hn" data-nac-role="heading" data-nac-level="3" id="show-hn">Show HN</h3>
+<ul data-nac-id="nac_launch_diffusion.list.21" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.21.item.1" data-nac-role="list-item"><strong>Título:</strong> <code data-nac-role="code-inline">Show HN: NAC -- a small public spec that lets web UIs be driven by AI agents</code></li><li data-nac-id="nac_launch_diffusion.list.21.item.2" data-nac-role="list-item"><strong>Primeira linha:</strong> "We made this while building Yujin CRM and realised every team trying to ship voice/agent UI rebuilds the same plumbing."</li><li data-nac-id="nac_launch_diffusion.list.21.item.3" data-nac-role="list-item"><strong>Corpo:</strong> explicar o contrato (3 atributos + manifest + eventos), linkar o demo ao vivo, linkar a spec, linkar o pacote npm, linkar o caso de estudo React. Manter abaixo de 200 palavras. Threads de comentários atraem mais atenção do que posts longos.</li><li data-nac-id="nac_launch_diffusion.list.21.item.4" data-nac-role="list-item"><strong>Dia:</strong> terça ou quarta de manhã (horário dos EUA). Evitar segundas + sextas.</li><li data-nac-id="nac_launch_diffusion.list.21.item.5" data-nac-role="list-item"><strong>Acompanhamento:</strong> estar nos comentários por pelo menos 4 horas; responder a todas as perguntas técnicas; não responder a provocações.</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.rjavascript" data-nac-role="heading" data-nac-level="3" id="rjavascript">r/javascript</h3>
+<ul data-nac-id="nac_launch_diffusion.list.23" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.23.item.1" data-nac-role="list-item"><strong>Título:</strong> <code data-nac-role="code-inline">[Showoff] NAC: drive your React app with voice + chat using 3 HTML attributes</code></li><li data-nac-id="nac_launch_diffusion.list.23.item.2" data-nac-role="list-item"><strong>Corpo:</strong> focar em "o que o desenvolvedor React faz" -- exemplos de código de <code data-nac-role="code-inline">guides/REACT.md</code>. Linkar o diretório do caso de estudo no GitHub.</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.raccessibility" data-nac-role="heading" data-nac-level="3" id="raccessibility">r/Accessibility</h3>
+<ul data-nac-id="nac_launch_diffusion.list.25" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.25.item.1" data-nac-role="list-item"><strong>Título:</strong> <code data-nac-role="code-inline">NAC: a parallel layer to ARIA for AI-agent-driven UI</code></li><li data-nac-id="nac_launch_diffusion.list.25.item.2" data-nac-role="list-item"><strong>Corpo:</strong> começar com "isso NÃO é um substituto para ARIA, é um complemento" -- a comunidade de acessibilidade é protetora, com razão. Mostrar como <code data-nac-role="code-inline">data-nac-role="action"</code> e <code data-nac-role="code-inline">role="button"</code> coexistem.</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.devto" data-nac-role="heading" data-nac-level="3" id="devto">dev.to</h3>
+<ul data-nac-id="nac_launch_diffusion.list.27" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.27.item.1" data-nac-role="list-item"><strong>Título:</strong> <code data-nac-role="code-inline">Drive any web UI by voice with @nac3/runtime</code></li><li data-nac-id="nac_launch_diffusion.list.27.item.2" data-nac-role="list-item"><strong>Gancho:</strong> o repositório do caso de estudo React. Screenshots/gifs inline do painel de chat + o tour de autopilot.</li><li data-nac-id="nac_launch_diffusion.list.27.item.3" data-nac-role="list-item"><strong>Tamanho:</strong> 1500-2000 palavras. Passo a passo.</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.twitter-x" data-nac-role="heading" data-nac-level="3" id="twitter-x">Twitter / X</h3>
+<p data-nac-id="nac_launch_diffusion.p.29" data-nac-role="paragraph">Uma thread de 6 tweets:</p>
+<ol data-nac-id="nac_launch_diffusion.list.30" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.30.item.1" data-nac-role="list-item">"Acabamos de lançar o NAC3 v2.2 -- uma spec pública + pacote npm que permite que UIs web sejam controladas por agentes de IA. Apache-2.0. (gif do demo)"</li><li data-nac-id="nac_launch_diffusion.list.30.item.2" data-nac-role="list-item">"Por quê: cada equipe que constrói UX de voz/agente reconstrói a mesma infraestrutura. Seletores CSS quebram. ARIA não foi feito para agentes. Precisávamos de um pequeno contrato."</li><li data-nac-id="nac_launch_diffusion.list.30.item.3" data-nac-role="list-item">"Quão pequeno: 3 atributos HTML por elemento. (screenshot de código)"</li><li data-nac-id="nac_launch_diffusion.list.30.item.4" data-nac-role="list-item">"O que você ganha: nomes estáveis, eventos de conclusão determinísticos, i18n para 10 locales de fábrica, proveniência via HMAC + isTrusted, validação automática."</li><li data-nac-id="nac_launch_diffusion.list.30.item.5" data-nac-role="list-item">"Demo ao vivo em yujin.app/nac-spec -- quatro demos, um integrado a um backend de chat Claude Sonnet. Converse com ele."</li><li data-nac-id="nac_launch_diffusion.list.30.item.6" data-nac-role="list-item">"Guias de adoção para React + Angular + casos de estudo funcionais em github.com/pkuschnirof/rpaforce-crm. Spec em yujin.app/nac-spec/SPEC.md."</li></ol>
+<h3 data-nac-id="nac_launch_diffusion.h3.linkedin" data-nac-role="heading" data-nac-level="3" id="linkedin">LinkedIn</h3>
+<p data-nac-id="nac_launch_diffusion.p.32" data-nac-role="paragraph">Post longo (~600 palavras). Apostar no ângulo "você vai adicionar isso em 12 meses de qualquer forma"; apelar para CTOs avaliando sua estratégia de agentes. Incluir um screenshot do tour de autopilot em formato BPMN.</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.mastodon" data-nac-role="heading" data-nac-level="3" id="mastodon">Mastodon</h3>
+<p data-nac-id="nac_launch_diffusion.p.34" data-nac-role="paragraph">Repostar a thread do Twitter, manter conciso. Incluir alt-text em todas as imagens (isso importa lá).</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.plano-de-gifvídeo-de-demo" data-nac-role="heading" data-nac-level="2" id="plano-de-gifvídeo-de-demo">Plano de gif/vídeo de demo</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.gif-15-segundos-em-loop" data-nac-role="heading" data-nac-level="3" id="gif-15-segundos-em-loop">Gif (15 segundos, em loop)</h3>
+<p data-nac-id="nac_launch_diffusion.p.37" data-nac-role="paragraph">Cena 1 (4s): usuário digita "agrega tomar agua" no campo de chat do demo React. Cena 2 (3s): o LLM resolve; o todo é adicionado com um destaque piscante. Cena 3 (4s): usuário clica em "tour"; o autopilot percorre a página, narrando. Cena 4 (4s): usuário segura o microfone, diz "remove all done", os todos são removidos.</p>
+<p data-nac-id="nac_launch_diffusion.p.38" data-nac-role="paragraph">Hospedado como MP4 de 8MB + fallback WebP de 4MB em <code data-nac-role="code-inline">yujin.app/nac-spec/assets/demo.{mp4,webp}</code>. Usado como gif hero do README, imagem OG, Twitter card, cabeçalho do dev.to.</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.vídeo-90-segundos-narração" data-nac-role="heading" data-nac-level="3" id="vídeo-90-segundos-narração">Vídeo (90 segundos, narração)</h3>
+<p data-nac-id="nac_launch_diffusion.p.40" data-nac-role="paragraph">Publicado no YouTube + Vimeo.</p>
+<ul data-nac-id="nac_launch_diffusion.list.41" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.41.item.1" data-nac-role="list-item">0:00-0:10 -- o problema ("voz + agentes precisam de nomes estáveis").</li><li data-nac-id="nac_launch_diffusion.list.41.item.2" data-nac-role="list-item">0:10-0:25 -- o contrato (3 atributos).</li><li data-nac-id="nac_launch_diffusion.list.41.item.3" data-nac-role="list-item">0:25-0:45 -- demo de adoção (caso de estudo React, 5 linhas adicionadas).</li><li data-nac-id="nac_launch_diffusion.list.41.item.4" data-nac-role="list-item">0:45-1:05 -- controle via chat + voz + autopilot.</li><li data-nac-id="nac_launch_diffusion.list.41.item.5" data-nac-role="list-item">1:05-1:20 -- exemplo brownfield do Yujin CRM.</li><li data-nac-id="nac_launch_diffusion.list.41.item.6" data-nac-role="list-item">1:20-1:30 -- "Apache-2.0, npm install @nac3/runtime, links abaixo."</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.cadência-de-acompanhamento" data-nac-role="heading" data-nac-level="2" id="cadência-de-acompanhamento">Cadência de acompanhamento</h2>
+<p data-nac-id="nac_launch_diffusion.p.43" data-nac-role="paragraph">| Tempo | Ação | |-------|------| | Dia 0 | Show HN + r/javascript + thread no Twitter + artigo no dev.to. Responder a comentários por 4-8 horas. | | Dia 1 | Post no LinkedIn. Responder a comentários no dev.to. Adicionar issues fáceis levantadas ao backlog do GitHub. | | Dia 3 | Post no r/Accessibility + repost no Mastodon. | | Dia 7 | Post de blog "Reflexão da semana 1": feedback recebido, o que mudamos, principais issues abertas no GitHub. | | Dia 14 | Entrar em contato com pessoas específicas de acessibilidade / criadores de agentes que engajaram no dia 0 com um DM "quer conversar?". | | Dia 30 | Lançar um patch v2.2.x com as correções mais solicitadas pela comunidade. Post de anúncio: "o que 30 dias nos ensinaram sobre o NAC3". | | Dia 90 | NAC3 v2.3 lançado (editor de campo canônico, STRICT_VALIDATION padrão true). Novo pulso de lançamento, menor alcance. |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.métricas-a-acompanhar" data-nac-role="heading" data-nac-level="2" id="métricas-a-acompanhar">Métricas a acompanhar</h2>
+<p data-nac-id="nac_launch_diffusion.p.45" data-nac-role="paragraph"><code data-nac-role="code-inline">pkuschnirof/yujin</code>.</p>
+<ul data-nac-id="nac_launch_diffusion.list.46" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.46.item.1" data-nac-role="list-item">Downloads semanais do <code data-nac-role="code-inline">@nac3/runtime</code> no npm.</li><li data-nac-id="nac_launch_diffusion.list.46.item.2" data-nac-role="list-item">Stars + forks no GitHub em <code data-nac-role="code-inline">pkuschnirof/rpaforce-crm</code> e</li><li data-nac-id="nac_launch_diffusion.list.46.item.3" data-nac-role="list-item">Visualizações da página de demo em yujin.app/nac-spec/ (logs de acesso do servidor).</li><li data-nac-id="nac_launch_diffusion.list.46.item.4" data-nac-role="list-item">Número de issues abertas no GitHub (proxy de engajamento).</li><li data-nac-id="nac_launch_diffusion.list.46.item.5" data-nac-role="list-item">Número de comentaristas únicos nos canais acima.</li><li data-nac-id="nac_launch_diffusion.list.46.item.6" data-nac-role="list-item">Tendência de busca por "Native Agent Contract" (Google Trends).</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.47" data-nac-role="paragraph">Metas para a semana 1:</p>
+<ul data-nac-id="nac_launch_diffusion.list.48" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.48.item.1" data-nac-role="list-item">200 downloads no npm</li><li data-nac-id="nac_launch_diffusion.list.48.item.2" data-nac-role="list-item">100 stars no GitHub entre os dois repositórios</li><li data-nac-id="nac_launch_diffusion.list.48.item.3" data-nac-role="list-item">5000 visualizações da página de demo</li><li data-nac-id="nac_launch_diffusion.list.48.item.4" data-nac-role="list-item">10 issues / discussões abertas</li><li data-nac-id="nac_launch_diffusion.list.48.item.5" data-nac-role="list-item">1 post de blog não solicitado por alguém de fora</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.49" data-nac-role="paragraph">Se ficarmos 50%+ abaixo dessas metas, as mensagens precisam de ajuste; iterar o texto do post no LinkedIn + dev.to e tentar novamente no dia 14.</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.checklist-pré-lançamento-antes-de-clicar-em-publicar" data-nac-role="heading" data-nac-level="2" id="checklist-pré-lançamento-antes-de-clicar-em-publicar">Checklist pré-lançamento (antes de clicar em publicar)</h2>
+<p data-nac-id="nac_launch_diffusion.p.51" data-nac-role="paragraph">requer token npm do proprietário).</p>
+<p data-nac-id="nac_launch_diffusion.p.52" data-nac-role="paragraph">para que contribuidores que chegarem no dia 1 tenham por onde começar.</p>
+<ul data-nac-id="nac_launch_diffusion.list.53" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.53.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm publish @nac3/runtime@2.2.0</code> concluído (isso é <strong>manual</strong>;</li><li data-nac-id="nac_launch_diffusion.list.53.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm install @nac3/runtime</code> funciona a partir de um diretório tmp limpo.</li><li data-nac-id="nac_launch_diffusion.list.53.item.3" data-nac-role="list-item">[ ] Demos ao vivo carregam sem erros de console no Chrome + Firefox + Safari.</li><li data-nac-id="nac_launch_diffusion.list.53.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">validate_global({probe: true})</code> retorna <code data-nac-role="code-inline">[]</code> na landing.</li><li data-nac-id="nac_launch_diffusion.list.53.item.5" data-nac-role="list-item">[ ] Gif de demo renderiza nos cards de preview do dev.to + Twitter.</li><li data-nac-id="nac_launch_diffusion.list.53.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">LICENSE</code>, <code data-nac-role="code-inline">CONTRIBUTING</code>, <code data-nac-role="code-inline">SECURITY</code> todos no lugar.</li><li data-nac-id="nac_launch_diffusion.list.53.item.7" data-nac-role="list-item">[ ] Pelo menos uma issue aberta no GitHub com o label "good first issue"</li><li data-nac-id="nac_launch_diffusion.list.53.item.8" data-nac-role="list-item">[ ] Pablo está acordado + pronto para responder comentários por 4 horas.</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.anti-objetivos" data-nac-role="heading" data-nac-level="2" id="anti-objetivos">Anti-objetivos</h2>
+<p data-nac-id="nac_launch_diffusion.p.55" data-nac-role="paragraph">O que NÃO faremos:</p>
+<p data-nac-id="nac_launch_diffusion.p.56" data-nac-role="paragraph">NAC3 é aditivo, não adversarial.</p>
+<p data-nac-id="nac_launch_diffusion.p.57" data-nac-role="paragraph">depois que soubermos a carga de suporte).</p>
+<p data-nac-id="nac_launch_diffusion.p.58" data-nac-role="paragraph">do backend de chat também é. Não separamos funcionalidades "core" de "premium"   como vantagem competitiva -- a vantagem é hospedagem + créditos de LLM + operações.</p>
+<ul data-nac-id="nac_launch_diffusion.list.59" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.59.item.1" data-nac-role="list-item">Pagar por anúncios (pelo menos até que as métricas da semana 4 estejam disponíveis).</li><li data-nac-id="nac_launch_diffusion.list.59.item.2" data-nac-role="list-item">Falar mal de ARIA, Selenium, Playwright ou qualquer fornecedor de agentes.</li><li data-nac-id="nac_launch_diffusion.list.59.item.3" data-nac-role="list-item">Prometer contratos de suporte enterprise no lançamento (esses vêm</li><li data-nac-id="nac_launch_diffusion.list.59.item.4" data-nac-role="list-item">Open-source-washing: o código É Apache-2.0, E a implementação de referência</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.playbook-do-dia-do-lançamento" data-nac-role="heading" data-nac-level="2" id="playbook-do-dia-do-lançamento">Playbook do dia do lançamento</h2>
+<p data-nac-id="nac_launch_diffusion.p.61" data-nac-role="paragraph">Com tempo limitado porque Pablo toca isso sozinho:</p>
+<p data-nac-id="nac_launch_diffusion.p.62" data-nac-role="paragraph">| Horário | Ação | |---------|------| | 06:00 (US ET) | Smoke final: <code data-nac-role="code-inline">npm test</code> + <code data-nac-role="code-inline">npx @nac3/runtime validate yujin.app/nac-spec/</code> + abrir todos os demos em modo anônimo. Corrigir o que estiver quebrado. | | 09:00 | Show HN publicado. | | 09:05 | Thread no Twitter publicada. | | 09:15 | Post no r/javascript publicado. | | 09:30 | Artigo no dev.to publicado. | | 09:30-13:30 | Ao vivo nos comentários do HN. Fixar um comentário no topo com links rápidos. | | 14:00 | Post no LinkedIn. | | 14:00-18:00 | Ao vivo nos comentários do dev.to + menções no Twitter. | | 18:00 | Parar. Descansar. | | Dia 1 09:00 | r/Accessibility + Mastodon. Triagem de issues no GitHub. |</p>
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.64" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_LAUNCH_DIFFUSION.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_launch_diffusion",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_launch_diffusion.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_launch_diffusion.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_launch_diffusion.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_launch_diffusion.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

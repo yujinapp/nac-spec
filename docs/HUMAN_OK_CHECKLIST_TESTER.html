@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Tester checklist (English) -- NAC3</title>
+<meta name="nac3-doc-slug" content="human_ok_checklist_tester" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="human_ok_checklist_tester" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="human_ok_checklist_tester.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="human_ok_checklist_tester.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/human_ok_checklist_tester.mp3" data-nac-id="human_ok_checklist_tester.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="human_ok_checklist_tester.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="human_ok_checklist_tester.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="human_ok_checklist_tester.main" data-nac-role="region">
+<h1 data-nac-id="human_ok_checklist_tester.h1.nac3-v22-tester-checklist-english" data-nac-role="heading" data-nac-level="1" id="nac3-v22-tester-checklist-english">NAC3 v2.2 -- Tester checklist (English)</h1>
+<p data-nac-id="human_ok_checklist_tester.p.1" data-nac-role="paragraph"><strong>For:</strong> the human tester walking through the release. <strong>Time:</strong> ~60-90 minutes for a full pass. <strong>Last updated:</strong> 2026-05-11.</p>
+<h2 data-nac-id="human_ok_checklist_tester.h2.instructions-for-the-tester" data-nac-role="heading" data-nac-level="2" id="instructions-for-the-tester">Instructions for the tester</h2>
+<p data-nac-id="human_ok_checklist_tester.p.3" data-nac-role="paragraph">For each task below:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.4" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.4.item.1" data-nac-role="list-item">Read step a, b, c, d in order.</li><li data-nac-id="human_ok_checklist_tester.list.4.item.2" data-nac-role="list-item">Do exactly what step a says, then b, then c.</li><li data-nac-id="human_ok_checklist_tester.list.4.item.3" data-nac-role="list-item">Compare what you see/hear with the "Expected result" in step d.</li><li data-nac-id="human_ok_checklist_tester.list.4.item.4" data-nac-role="list-item">If the result matches exactly: mark <code data-nac-role="code-inline">[X]</code> in the <strong>OK</strong> checkbox.</li><li data-nac-id="human_ok_checklist_tester.list.4.item.5" data-nac-role="list-item">If the result does NOT match: mark <code data-nac-role="code-inline">[X]</code> in the <strong>ERROR</strong> checkbox AND write what actually happened in the "Comments" line.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.5" data-nac-role="paragraph">Do not skip tasks. If a task fails, continue to the next one (do not stop). Failed tasks are fixed after the full walk.</p>
+<p data-nac-id="human_ok_checklist_tester.p.6" data-nac-role="paragraph">When done, sign at the bottom and send the file back.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-1-landing-page-smoke-chrome" data-nac-role="heading" data-nac-level="2" id="section-1-landing-page-smoke-chrome">Section 1 -- Landing page smoke (Chrome)</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-1" data-nac-role="heading" data-nac-level="3" id="task-1">Task 1</h3>
+<p data-nac-id="human_ok_checklist_tester.p.10" data-nac-role="paragraph">a) Open Chrome in incognito mode (Ctrl+Shift+N). b) Type in the address bar: <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> and press Enter. c) Wait 5 seconds without clicking anything. d) <strong>Expected result:</strong> The page loads. The top of the page shows a sumi-e (Japanese brush) icon and the title "NAC -- Native Agent Contract". No red error messages appear on the screen. The page is not blank.</p>
+<p data-nac-id="human_ok_checklist_tester.p.11" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.12" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.12.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.12.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-2" data-nac-role="heading" data-nac-level="3" id="task-2">Task 2</h3>
+<p data-nac-id="human_ok_checklist_tester.p.14" data-nac-role="paragraph">a) Press the F12 key to open the browser developer tools. b) Click on the "Console" tab inside the developer tools. c) Wait 3 seconds. d) <strong>Expected result:</strong> The Console area has no red error lines. (Yellow warnings are OK; only red lines indicate a failure.)</p>
+<p data-nac-id="human_ok_checklist_tester.p.15" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.16" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.16.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.16.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-3" data-nac-role="heading" data-nac-level="3" id="task-3">Task 3</h3>
+<p data-nac-id="human_ok_checklist_tester.p.18" data-nac-role="paragraph">a) Close the developer tools (F12 again). b) Scroll down the page until you see a section titled "Made with NAC3". c) Look at the cards in that section. d) <strong>Expected result:</strong> You see at least 4 cards in a grid: "Yujin CRM", "Reference demos", "Cal.com (coming)", and "Your app". Each card has a Japanese character symbol on top, a title, a short description, and a link with an arrow <code data-nac-role="code-inline">-&gt;</code>.</p>
+<p data-nac-id="human_ok_checklist_tester.p.19" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.20" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.20.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.20.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-4" data-nac-role="heading" data-nac-level="3" id="task-4">Task 4</h3>
+<p data-nac-id="human_ok_checklist_tester.p.22" data-nac-role="paragraph">a) Scroll down further until you see a section titled "Coming Q3 2026: Yujin Forge + Pilot". b) Find the email field that says "you@example.com". c) Type your real email there. d) <strong>Expected result:</strong> The two checkboxes "Forge ($19)" and "Pilot ($5)" are both checked by default. There is a blue button labeled "Notify me".</p>
+<p data-nac-id="human_ok_checklist_tester.p.23" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.24" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.24.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.24.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-5" data-nac-role="heading" data-nac-level="3" id="task-5">Task 5</h3>
+<p data-nac-id="human_ok_checklist_tester.p.26" data-nac-role="paragraph">a) Click the "Notify me" button. b) Wait 5 seconds. c) Read any message that appears next to the button. d) <strong>Expected result:</strong> A message appears saying either "Got it. You will hear from us when Forge + Pilot launch." OR "Submission failed -- email hello@yujin.app instead." Either message is acceptable; both indicate the form is wired up.</p>
+<p data-nac-id="human_ok_checklist_tester.p.27" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.28" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.28.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.28.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-2-voice-command-on-the-data-table-demo" data-nac-role="heading" data-nac-level="2" id="section-2-voice-command-on-the-data-table-demo">Section 2 -- Voice command on the data-table demo</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-6" data-nac-role="heading" data-nac-level="3" id="task-6">Task 6</h3>
+<p data-nac-id="human_ok_checklist_tester.p.32" data-nac-role="paragraph">a) In the same browser, navigate to: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code> b) Wait 5 seconds for the page to fully load. c) Look at the page. d) <strong>Expected result:</strong> You see a data-table demo with at least 3 tabs at the top: "Lines (collection)", "Permissions", and one more. There is a chat panel on the right side of the screen.</p>
+<p data-nac-id="human_ok_checklist_tester.p.33" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.34" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.34.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.34.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-7" data-nac-role="heading" data-nac-level="3" id="task-7">Task 7</h3>
+<p data-nac-id="human_ok_checklist_tester.p.36" data-nac-role="paragraph">a) Locate the microphone button at the bottom of the chat panel (usually a circular icon with a microphone symbol). b) Click it. Your browser may ask for permission to use the microphone; grant it. c) Speak clearly into your computer's microphone: <strong>"ve a permisos"</strong> (Spanish for "go to permissions"). d) <strong>Expected result:</strong> Within 3-5 seconds, the active tab changes from "Lines (collection)" to "Permisos" or "Permissions". The chat panel shows your transcribed words.</p>
+<p data-nac-id="human_ok_checklist_tester.p.37" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.38" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.38.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.38.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-8" data-nac-role="heading" data-nac-level="3" id="task-8">Task 8</h3>
+<p data-nac-id="human_ok_checklist_tester.p.40" data-nac-role="paragraph">a) Click the microphone button again. b) Speak clearly: <strong>"go to permissions"</strong> (in English this time). c) Wait for the system to respond. d) <strong>Expected result:</strong> The tab "Permissions" remains active or re-activates. The chat reflects the English input.</p>
+<p data-nac-id="human_ok_checklist_tester.p.41" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.42" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.42.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.42.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-9" data-nac-role="heading" data-nac-level="3" id="task-9">Task 9</h3>
+<p data-nac-id="human_ok_checklist_tester.p.44" data-nac-role="paragraph">a) Click the microphone button again. b) Speak clearly: <strong>"cambia de pestana"</strong> (Spanish for "switch tab" -- the word "de" is the Spanish preposition). c) Wait for the response. d) <strong>Expected result:</strong> The locale of the chat does NOT switch to German. The chat panel may switch tabs OR ask a clarification question, but the language stays in Spanish/English -- not German. (This is the regression guard for an older bug.)</p>
+<p data-nac-id="human_ok_checklist_tester.p.45" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.46" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.46.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.46.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-3-react-study-case" data-nac-role="heading" data-nac-level="2" id="section-3-react-study-case">Section 3 -- React study case</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-10" data-nac-role="heading" data-nac-level="3" id="task-10">Task 10</h3>
+<p data-nac-id="human_ok_checklist_tester.p.50" data-nac-role="paragraph">a) Navigate to: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code> b) Wait 5 seconds. c) Look at the page. d) <strong>Expected result:</strong> You see a "Todos" app: input field at top, "Add" button next to it, and an empty list area below. A chat panel exists on the right side.</p>
+<p data-nac-id="human_ok_checklist_tester.p.51" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.52" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.52.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.52.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-11" data-nac-role="heading" data-nac-level="3" id="task-11">Task 11</h3>
+<p data-nac-id="human_ok_checklist_tester.p.54" data-nac-role="paragraph">a) Click into the input field. b) Type the word <strong>"milk"</strong> (or any short word). c) Click the "Add" button. d) <strong>Expected result:</strong> A new todo item appears in the list area, showing "milk" with a checkbox next to it.</p>
+<p data-nac-id="human_ok_checklist_tester.p.55" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.56" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.56.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.56.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-12" data-nac-role="heading" data-nac-level="3" id="task-12">Task 12</h3>
+<p data-nac-id="human_ok_checklist_tester.p.58" data-nac-role="paragraph">a) In the chat panel, find the microphone button. b) Click it and speak: <strong>"agrega pan"</strong> (Spanish for "add bread"). c) Wait 5 seconds. d) <strong>Expected result:</strong> A new todo item appears in the list, showing "pan" or "bread". The list now contains at least 2 items.</p>
+<p data-nac-id="human_ok_checklist_tester.p.59" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.60" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.60.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.60.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-13" data-nac-role="heading" data-nac-level="3" id="task-13">Task 13</h3>
+<p data-nac-id="human_ok_checklist_tester.p.62" data-nac-role="paragraph">a) Click the microphone again. b) Speak: <strong>"borra leche"</strong> (Spanish for "delete milk"). c) Wait 5 seconds. d] <strong>Expected result:</strong> The "milk" item disappears from the list. Only "pan/bread" remains.</p>
+<p data-nac-id="human_ok_checklist_tester.p.63" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.64" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.64.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.64.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-4-angular-study-case" data-nac-role="heading" data-nac-level="2" id="section-4-angular-study-case">Section 4 -- Angular study case</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-14" data-nac-role="heading" data-nac-level="3" id="task-14">Task 14</h3>
+<p data-nac-id="human_ok_checklist_tester.p.68" data-nac-role="paragraph">a) Navigate to: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code> b) Wait 5 seconds. c) Look at the page. d) <strong>Expected result:</strong> Same as the React demo (Task 10): "Todos" app with input, Add button, empty list, chat panel.</p>
+<p data-nac-id="human_ok_checklist_tester.p.69" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.70" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.70.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.70.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-15" data-nac-role="heading" data-nac-level="3" id="task-15">Task 15</h3>
+<p data-nac-id="human_ok_checklist_tester.p.72" data-nac-role="paragraph">a) Repeat tasks 11, 12, 13 on this Angular demo (add "milk", then voice-add "pan", then voice-delete "milk"). b) Observe the result of all three actions. c) Compare with the React demo behavior. d) <strong>Expected result:</strong> All three actions work exactly the same as in the React demo.</p>
+<p data-nac-id="human_ok_checklist_tester.p.73" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.74" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.74.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.74.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-5-cross-browser-smoke" data-nac-role="heading" data-nac-level="2" id="section-5-cross-browser-smoke">Section 5 -- Cross-browser smoke</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-16" data-nac-role="heading" data-nac-level="3" id="task-16">Task 16</h3>
+<p data-nac-id="human_ok_checklist_tester.p.78" data-nac-role="paragraph">a) Open Firefox (or install it from mozilla.org if you do not have it). b) Navigate to <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> in Firefox. c) Wait 5 seconds. d) <strong>Expected result:</strong> Same as Task 1: page loads, sumi-e icon visible, no errors.</p>
+<p data-nac-id="human_ok_checklist_tester.p.79" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.80" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.80.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.80.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-17" data-nac-role="heading" data-nac-level="3" id="task-17">Task 17</h3>
+<p data-nac-id="human_ok_checklist_tester.p.82" data-nac-role="paragraph">a) In Firefox, navigate to <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code> b) Click each of the visible tabs in turn (Lines, Permissions, and any others). c) Watch the table content change. d) <strong>Expected result:</strong> Each tab click changes the content area below the tabs. No errors appear. No tab gets "stuck".</p>
+<p data-nac-id="human_ok_checklist_tester.p.83" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.84" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.84.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.84.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-18" data-nac-role="heading" data-nac-level="3" id="task-18">Task 18</h3>
+<p data-nac-id="human_ok_checklist_tester.p.86" data-nac-role="paragraph">a) Open Safari (Mac only) OR Edge (Windows). b) Navigate to <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> c) Wait 5 seconds. d) <strong>Expected result:</strong> Same as Task 1.</p>
+<p data-nac-id="human_ok_checklist_tester.p.87" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.88" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.88.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.88.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-6-keyboard-only-navigation-no-mouse" data-nac-role="heading" data-nac-level="2" id="section-6-keyboard-only-navigation-no-mouse">Section 6 -- Keyboard-only navigation (no mouse)</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-19" data-nac-role="heading" data-nac-level="3" id="task-19">Task 19</h3>
+<p data-nac-id="human_ok_checklist_tester.p.92" data-nac-role="paragraph">a) Open <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> in any browser. b) Set your mouse aside; do NOT touch it for this task. c) Press the Tab key repeatedly (about 15 times). d) <strong>Expected result:</strong> A visible blue/colored "focus ring" highlight moves through different elements on the page (links, buttons). The focus is always visible -- it never disappears or gets "stuck" in an invisible spot.</p>
+<p data-nac-id="human_ok_checklist_tester.p.93" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.94" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.94.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.94.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-20" data-nac-role="heading" data-nac-level="3" id="task-20">Task 20</h3>
+<p data-nac-id="human_ok_checklist_tester.p.96" data-nac-role="paragraph">a) Continue Tab navigation until you reach the chat panel area. b) Press Tab until you reach the chat input box (you should see a focus ring around it). c) Type "hello" with the keyboard. d) Press Enter. d) <strong>Expected result:</strong> The chat sends "hello" and shows a response within 5-10 seconds. No mouse was used at any point.</p>
+<p data-nac-id="human_ok_checklist_tester.p.97" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.98" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.98.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.98.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-7-screen-reader-nvda-on-windows-voiceover-on-mac" data-nac-role="heading" data-nac-level="2" id="section-7-screen-reader-nvda-on-windows-voiceover-on-mac">Section 7 -- Screen reader (NVDA on Windows, VoiceOver on Mac)</h2>
+<p data-nac-id="human_ok_checklist_tester.p.101" data-nac-role="paragraph">This section is optional if you don't have NVDA or VoiceOver. Skip to Section 8 if not available.</p>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-21-windows-only" data-nac-role="heading" data-nac-level="3" id="task-21-windows-only">Task 21 (Windows only)</h3>
+<p data-nac-id="human_ok_checklist_tester.p.103" data-nac-role="paragraph">a) Install NVDA from https://www.nvaccess.org/download/ (it's free). b) Start NVDA (Ctrl+Alt+N). c) Open <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> with your monitor turned OFF (or eyes closed). d) <strong>Expected result:</strong> NVDA reads the page title and announces a structured outline -- you can navigate by pressing the H key to jump between headings. You can hear what each heading says clearly.</p>
+<p data-nac-id="human_ok_checklist_tester.p.104" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.105" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.105.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.105.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-22-mac-only" data-nac-role="heading" data-nac-level="3" id="task-22-mac-only">Task 22 (Mac only)</h3>
+<p data-nac-id="human_ok_checklist_tester.p.107" data-nac-role="paragraph">a) Press Cmd+F5 to start VoiceOver. (Or System Settings -&gt; Accessibility -&gt; VoiceOver.) b) Open <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> c) Press VO+A (Ctrl+Alt+A) to read the page top-to-bottom. d) <strong>Expected result:</strong> VoiceOver reads the page in a logical order. The reading makes semantic sense (e.g., "heading level 1, NAC", "link, Open vanilla demo", "button, Notify me") -- not "div, div, div, link, link, button".</p>
+<p data-nac-id="human_ok_checklist_tester.p.108" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.109" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.109.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.109.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-8-multi-locale-chat-10-languages" data-nac-role="heading" data-nac-level="2" id="section-8-multi-locale-chat-10-languages">Section 8 -- Multi-locale chat (10 languages)</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-23" data-nac-role="heading" data-nac-level="3" id="task-23">Task 23</h3>
+<p data-nac-id="human_ok_checklist_tester.p.113" data-nac-role="paragraph">a) Navigate to <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code> b) In the chat panel, find the language dropdown (usually a small flag or "lang" indicator). Change it to Portuguese (pt). c) Click the microphone button and speak: <strong>"vai para permissoes"</strong> (Portuguese for "go to permissions"). d) <strong>Expected result:</strong> The Permissions tab activates. The chat responds in Portuguese.</p>
+<p data-nac-id="human_ok_checklist_tester.p.114" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.115" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.115.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.115.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-24" data-nac-role="heading" data-nac-level="3" id="task-24">Task 24</h3>
+<p data-nac-id="human_ok_checklist_tester.p.117" data-nac-role="paragraph">a) Change the chat language to French (fr). b) Click microphone and speak: <strong>"va aux permissions"</strong> (French for "go to permissions"). c) Wait for response. d) <strong>Expected result:</strong> The Permissions tab activates. Chat responds in French.</p>
+<p data-nac-id="human_ok_checklist_tester.p.118" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.119" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.119.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.119.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-25-optional-skip-if-you-do-not-speak-any-of-these" data-nac-role="heading" data-nac-level="3" id="task-25-optional-skip-if-you-do-not-speak-any-of-these">Task 25 (optional, skip if you do not speak any of these)</h3>
+<p data-nac-id="human_ok_checklist_tester.p.121" data-nac-role="paragraph">Repeat task 23/24 for any of: German (de), Italian (it), Japanese (ja), Chinese (zh), Hindi (hi), Arabic (ar). Use the equivalent phrase in that language.</p>
+<p data-nac-id="human_ok_checklist_tester.p.122" data-nac-role="paragraph">d) <strong>Expected result:</strong> Each language tested triggers the correct tab change.</p>
+<p data-nac-id="human_ok_checklist_tester.p.123" data-nac-role="paragraph">Comments: which language(s) tested + result _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.124" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.124.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.124.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="human_ok_checklist_tester.list.124.item.3" data-nac-role="list-item">[ ] Skipped (don't speak any of those languages)</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-9-high-contrast-zoom" data-nac-role="heading" data-nac-level="2" id="section-9-high-contrast-zoom">Section 9 -- High contrast + zoom</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-26" data-nac-role="heading" data-nac-level="3" id="task-26">Task 26</h3>
+<p data-nac-id="human_ok_checklist_tester.p.128" data-nac-role="paragraph">a) Open <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> b) Press Ctrl++ (Ctrl and plus key) until the zoom level reaches 200%. c) Scroll through the entire page. d) <strong>Expected result:</strong> All text is readable. Buttons remain clickable. No text gets cut off or overlaps with other elements. No horizontal scroll bar appears at any point.</p>
+<p data-nac-id="human_ok_checklist_tester.p.129" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.130" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.130.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.130.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-27-windows-only" data-nac-role="heading" data-nac-level="3" id="task-27-windows-only">Task 27 (Windows only)</h3>
+<p data-nac-id="human_ok_checklist_tester.p.132" data-nac-role="paragraph">a) Press Left Alt + Left Shift + Print Screen to turn on Windows High Contrast mode. b) Switch to your browser. c) Look at the page. d) <strong>Expected result:</strong> The page still works. Text is visible (white on black or similar high-contrast). Buttons have visible borders. Links are visible. Nothing becomes invisible.</p>
+<p data-nac-id="human_ok_checklist_tester.p.133" data-nac-role="paragraph">After this task, press the same keyboard shortcut to turn high contrast off.</p>
+<p data-nac-id="human_ok_checklist_tester.p.134" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.135" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.135.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.135.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.section-10-deploy-verification-urls-respond" data-nac-role="heading" data-nac-level="2" id="section-10-deploy-verification-urls-respond">Section 10 -- Deploy verification (URLs respond)</h2>
+<h3 data-nac-id="human_ok_checklist_tester.h3.task-28" data-nac-role="heading" data-nac-level="3" id="task-28">Task 28</h3>
+<p data-nac-id="human_ok_checklist_tester.p.139" data-nac-role="paragraph">For each URL below, open it in the browser. Check that it loads (no 404, no blank page).</p>
+<p data-nac-id="human_ok_checklist_tester.p.140" data-nac-role="paragraph">| URL | OK? | |-----|-----| | https://yujin.app/nac-spec/ | [ ] | | https://yujin.app/nac-spec/SPEC.md | [ ] | | https://yujin.app/nac-spec/js/nac.js | [ ] | | https://yujin.app/nac-spec/js/nac-chat-client.js | [ ] | | https://yujin.app/nac-spec/example.php | [ ] | | https://yujin.app/nac-spec/example-v21-data-table.php | [ ] | | https://yujin.app/nac-spec/example-v22-interop.php | [ ] | | https://yujin.app/nac-spec/demos/react/ | [ ] | | https://yujin.app/nac-spec/demos/angular/ | [ ] |</p>
+<p data-nac-id="human_ok_checklist_tester.p.141" data-nac-role="paragraph">If any URL fails: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.142" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.142.item.1" data-nac-role="list-item">[ ] All OK</li><li data-nac-id="human_ok_checklist_tester.list.142.item.2" data-nac-role="list-item">[ ] At least one ERROR (see notes above)</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.sign-off" data-nac-role="heading" data-nac-level="2" id="sign-off">SIGN-OFF</h2>
+<pre data-nac-id="human_ok_checklist_tester.code.1" data-nac-role="code" data-nac-lang="text"><code>Release tag tested:   v____._.___
+Tester name:          ______________________________
+Date tested:          ____-____-____
+Browsers used:        [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Operating system:     [ ] Windows  [ ] macOS  [ ] Linux
+Screen reader tested: [ ] NVDA  [ ] JAWS  [ ] VoiceOver  [ ] None
+Total tasks walked:   ___ of 28
+Tasks marked ERROR:   ___
+
+Signature: _______________________________</code></pre>
+<p data-nac-id="human_ok_checklist_tester.p.146" data-nac-role="paragraph">Send this completed file to the maintainer.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
+<ul data-nac-id="human_ok_checklist_tester.list.149" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.149.item.1" data-nac-role="list-item"><a href="HUMAN_OK_CHECKLIST.md" data-nac-id="human_ok_checklist_tester.link.1" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST.md</a> -- the technical version of this checklist for developers.</li><li data-nac-id="human_ok_checklist_tester.list.149.item.2" data-nac-role="list-item"><a href="HUMAN_OK_CHECKLIST_TESTER.es.md" data-nac-id="human_ok_checklist_tester.link.2" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST_TESTER.es.md</a> -- Spanish version.</li><li data-nac-id="human_ok_checklist_tester.list.149.item.3" data-nac-role="list-item"><a href="ACCESSIBILITY.md" data-nac-id="human_ok_checklist_tester.link.3" data-nac-role="action" data-nac-action="open">ACCESSIBILITY.md</a> -- the accessibility commitment.</li></ul>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "human_ok_checklist_tester",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "human_ok_checklist_tester.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "human_ok_checklist_tester.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "human_ok_checklist_tester.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "human_ok_checklist_tester.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

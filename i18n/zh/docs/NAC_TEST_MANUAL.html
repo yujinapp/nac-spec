@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 测试手册 -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_test_manual" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_test_manual" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_test_manual.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_test_manual.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_test_manual.mp3" data-nac-id="nac_test_manual.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_test_manual.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_test_manual.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_test_manual.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_test_manual.p.1" data-nac-role="paragraph">translation_source: docs/NAC_TEST_MANUAL.md translation_source_hash: 75c7b936593deacfec1dd9689f1093483363cc45f01514ff9c9d8d52e466c9a9 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:16:32.604938+00:00</p>
+<hr />
+<h1 data-nac-id="nac_test_manual.h1.nac3-测试手册" data-nac-role="heading" data-nac-level="1" id="nac3-测试手册">NAC3 测试手册</h1>
+<p data-nac-id="nac_test_manual.p.4" data-nac-role="paragraph"><strong>适用于任何 NAC-3 合规应用的标准化测试规范。</strong></p>
+<p data-nac-id="nac_test_manual.p.5" data-nac-role="paragraph">版本 1.0 -- 2026-05-11。适用于 NAC3 v2.2 + v2.3 预览接口。规范更新时同步更新本文档。</p>
+<p data-nac-id="nac_test_manual.p.6" data-nac-role="paragraph">本文档告知采用团队：测试什么、如何测试、断言什么、以及跳过什么。按 NAC3 流水线各阶段依次说明：</p>
+<pre data-nac-id="nac_test_manual.code.1" data-nac-role="code" data-nac-lang="text"><code>Comunicacion -&gt; Desambiguacion -&gt; Intencion -&gt; Llamada -&gt; Resultado -&gt; Ack
+    (1)             (2)             (3)         (4)         (5)        (6)</code></pre>
+<p data-nac-id="nac_test_manual.p.8" data-nac-role="paragraph">以及横切关注点：构造器（V22-01）、bindAction 契约（V22-02）、互操作（v2.3）、来源追踪与安全。</p>
+<p data-nac-id="nac_test_manual.p.9" data-nac-role="paragraph">Yujin 参考套件（本手册底部的案例研究）包含 <strong>175+ 个单元测试 + 16 个 Playwright e2e 测试</strong>，加权平均流水线覆盖率 <strong>95%</strong>。可按需参考。</p>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.0-本手册的目的" data-nac-role="heading" data-nac-level="2" id="0-本手册的目的">0. 本手册的目的</h2>
+<p data-nac-id="nac_test_manual.p.12" data-nac-role="paragraph">每个 NAC3 采用团队都要从零构建测试语料库，最终覆盖率参差不齐——有的团队 ack 事件测试完善，却忽略了 LLM 中间层；有的团队有端到端 Playwright 测试，却没有单元测试。本手册明确定义 NAC-3 应用"完整测试"的含义。</p>
+<p data-nac-id="nac_test_manual.p.13" data-nac-role="paragraph">NAC-3 认证应用的最低要求：</p>
+<p data-nac-id="nac_test_manual.p.14" data-nac-role="paragraph">| 阶段 | 必须具备 | 建议具备 | |-------|-----------|-------------| | 1 Comunicacion | 文本路径已覆盖。聊天客户端有 STT mock 测试。 | 真实 TTS 语料库 + 通过 Playwright 验证音频播放。 | | 2 Desambiguacion | 语言切换检测器的误报测试。snapshotTree 结构已验证。 | 已测试每个标签页/i18n 标签的容错性。 | | 3 Intencion | 针对 &gt;= 5 个提示词的实时（或 VCR 录制）后端冒烟测试。 | 针对应用历史 bug 的防御性测试。 | | 4 Llamada | 应用使用的每个公开 NAC.* 函数，包含正常路径和错误路径。 | 如已接入，则测试 drag_drop、edit_field。 | | 5 Resultado | 至少验证应用暴露的前 10 个动词的 DOM 副作用。 | 通过 Playwright 矩阵进行跨浏览器测试。 | | 6 Ack | 角色产生的每个事件族，并断言 detail 结构。 | 长尾事件族（breadcrumb、accordion、step）。 | | Interop | 如果发布 MCP 导出/导入：验证 export_tree 结构 + 导入 + 代理 + 断开连接。 | HMAC 签名 + 递归防护。 |</p>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.1-套件结构" data-nac-role="heading" data-nac-level="2" id="1-套件结构">1. 套件结构</h2>
+<p data-nac-id="nac_test_manual.p.17" data-nac-role="paragraph">推荐以下结构（与 Yujin 参考套件一致）：</p>
+<pre data-nac-id="nac_test_manual.code.2" data-nac-role="code" data-nac-lang="text"><code>packages/&lt;your-app&gt;/
+  test/
+    smoke.mjs                       artefact integrity + CLI
+    v22.mjs                         strict validator + bindAction
+    v23-interop.mjs                 cross-app MCP (if you implement)
+    stage1-audio.mjs                STT mock + TTS corpus integrity
+    stage2-disambiguation.mjs       _detectLangSwitch + tab_by_label + snapshotTree
+    stage3-backend.mjs              live (or recorded) backend smoke
+    stage4-calls.mjs                every public NAC.* write API
+    stage6-ack.mjs                  ack event families
+    stage6b-longtail.mjs            breadcrumb/accordion/step/sort/filter/confirm
+    fixtures/voice/                 TTS-generated MP3 corpus
+      corpus.json                   prompt -&gt; expected outcome
+      generate.mjs                  one-shot regen via Google/ElevenLabs
+      &lt;locale&gt;/&lt;id&gt;.mp3
+tests/
+  e2e-nac/
+    playwright.config.ts
+    specs/
+      01-landing.spec.ts            @demos
+      02-demo-&lt;name&gt;.spec.ts        @demos one per surface
+      08-pipeline-end-to-end.spec.ts @e2e full chat-to-ack
+tools/nac/
+  test-launch.sh                    orchestrates everything</code></pre>
+<p data-nac-id="nac_test_manual.p.19" data-nac-role="paragraph"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code> 执行：</p>
+<ul data-nac-id="nac_test_manual.list.20" data-nac-role="list"><li data-nac-id="nac_test_manual.list.20.item.1" data-nac-role="list-item">第 1 层：按顺序链式运行所有 node 端套件，遇到第一个 FAIL 即中止。</li><li data-nac-id="nac_test_manual.list.20.item.2" data-nac-role="list-item">第 1b 层（可选）：实时后端冒烟测试（约 60 秒）。</li><li data-nac-id="nac_test_manual.list.20.item.3" data-nac-role="list-item">第 2 层：通过 <code data-nac-role="code-inline">npx @nac3/runtime validate &lt;dir&gt;</code> 进行静态检查。</li><li data-nac-id="nac_test_manual.list.20.item.4" data-nac-role="list-item">第 3 层：文档链接完整性检查。</li><li data-nac-id="nac_test_manual.list.20.item.5" data-nac-role="list-item">第 4 层：演示产物完整性检查。</li><li data-nac-id="nac_test_manual.list.20.item.6" data-nac-role="list-item">第 5 层：案例研究包完整性检查。</li></ul>
+<p data-nac-id="nac_test_manual.p.21" data-nac-role="paragraph">目标：在笔记本电脑上，第 1 + 2 + 3 + 4 + 5 层总耗时不超过 10 秒。</p>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.2-各阶段测试内容" data-nac-role="heading" data-nac-level="2" id="2-各阶段测试内容">2. 各阶段测试内容</h2>
+<h3 data-nac-id="nac_test_manual.h3.阶段-1-comunicacionstt-原始输入" data-nac-role="heading" data-nac-level="3" id="阶段-1-comunicacionstt-原始输入">阶段 1 -- Comunicacion（STT + 原始输入）</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.26" data-nac-role="paragraph">音频采集、STT 转录、原始文本输入到聊天客户端。聊天客户端的 <code data-nac-role="code-inline">_sttBuffer</code> + <code data-nac-role="code-inline">_sttFlushTimer</code> 防抖逻辑属于本阶段。语言切换短路逻辑（<code data-nac-role="code-inline">_maybeChangeLocaleLocally</code>）也在此处。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<ol data-nac-id="nac_test_manual.list.28" data-nac-role="list"><li data-nac-id="nac_test_manual.list.28.item.1" data-nac-role="list-item"><strong>STT mock + 转录注入。</strong> 用伪造实现替换 <code data-nac-role="code-inline">window.SpeechRecognition</code>，触发携带预设转录文本的合成 <code data-nac-role="code-inline">result</code> 事件。验证 <code data-nac-role="code-inline">NacChat.send(transcript)</code> 将该文本原样传入调度器。</li><li data-nac-id="nac_test_manual.list.28.item.2" data-nac-role="list-item"><strong>TTS 语料库完整性。</strong> 通过 Google Cloud TTS / ElevenLabs 为 10 个支持的语言区域各生成约 30 条音频提示词。验证每个 MP3 文件存在且大小 &gt;= 1KB。用于检测语料库本身的回归问题。</li><li data-nac-id="nac_test_manual.list.28.item.3" data-nac-role="list-item"><strong>真实音频播放（Playwright）。</strong> 可选。通过 <code data-nac-role="code-inline">getUserMedia</code> mock 回放语料库中的某个 MP3，路由到浏览器的 SpeechRecognition。配置较复杂，v1 阶段可跳过。</li></ol>
+<h4 data-nac-id="nac_test_manual.h4.断言内容" data-nac-role="heading" data-nac-level="4" id="断言内容">断言内容</h4>
+<ul data-nac-id="nac_test_manual.list.30" data-nac-role="list"><li data-nac-id="nac_test_manual.list.30.item.1" data-nac-role="list-item">语料库中的每条提示词都以原始文本到达 <code data-nac-role="code-inline">NacChat.send()</code>。</li><li data-nac-id="nac_test_manual.list.30.item.2" data-nac-role="list-item">空输入和纯空白输入不会导致聊天客户端崩溃。</li><li data-nac-id="nac_test_manual.list.30.item.3" data-nac-role="list-item">对于匹配 <code data-nac-role="code-inline">_detectLangSwitch</code> 的提示词，语言切换短路逻辑正常触发（阶段 2 也有覆盖）。</li></ul>
+<h4 data-nac-id="nac_test_manual.h4.跳过内容" data-nac-role="heading" data-nac-level="4" id="跳过内容">跳过内容</h4>
+<ul data-nac-id="nac_test_manual.list.32" data-nac-role="list"><li data-nac-id="nac_test_manual.list.32.item.1" data-nac-role="list-item">麦克风权限流程。属于浏览器级 UI，不值得用 Playwright 测试。</li><li data-nac-id="nac_test_manual.list.32.item.2" data-nac-role="list-item">跨浏览器音频编解码器兼容性。语料库统一使用 MP3，只测一个浏览器。</li></ul>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.阶段-2-desambiguacion" data-nac-role="heading" data-nac-level="3" id="阶段-2-desambiguacion">阶段 2 -- Desambiguacion</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.36" data-nac-role="paragraph"><code data-nac-role="code-inline">_detectLangSwitch</code>。快照组合与清洗。<code data-nac-role="code-inline">tab_by_label</code> 匹配器容错性。将原始文本转化为"LLM 应看到的内容/本地触发的快捷操作"的所有逻辑。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<ol data-nac-id="nac_test_manual.list.38" data-nac-role="list"><li data-nac-id="nac_test_manual.list.38.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">_detectLangSwitch</code> 误报用例。</strong> 这是容易出 bug 的区域，需编写明确的反向测试：</li></ol>
+<ul data-nac-id="nac_test_manual.list.39" data-nac-role="list"><li data-nac-id="nac_test_manual.list.39.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">'cambia de pestana'</code> -&gt; 保持当前语言区域。</li><li data-nac-id="nac_test_manual.list.39.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">'cambia precio de mouse 40'</code> -&gt; 保持当前语言区域。</li><li data-nac-id="nac_test_manual.list.39.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">'borra de la lista'</code> -&gt; 保持。</li><li data-nac-id="nac_test_manual.list.39.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">'pasa de A a B'</code> -&gt; 保持。</li></ul>
+<ol data-nac-id="nac_test_manual.list.40" data-nac-role="list"><li data-nac-id="nac_test_manual.list.40.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">_detectLangSwitch</code> 正向用例。</strong> 跨支持的语言区域至少 12 个：</li></ol>
+<ul data-nac-id="nac_test_manual.list.41" data-nac-role="list"><li data-nac-id="nac_test_manual.list.41.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">'cambia a aleman'</code> -&gt; de</li><li data-nac-id="nac_test_manual.list.41.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">'switch to english'</code> -&gt; en</li><li data-nac-id="nac_test_manual.list.41.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">'use spanish'</code> -&gt; es</li><li data-nac-id="nac_test_manual.list.41.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">'cambia idioma a de'</code>（显式触发词 + 裸语言代码）-&gt; de</li><li data-nac-id="nac_test_manual.list.41.item.5" data-nac-role="list-item">相同语言的无操作情况。</li><li data-nac-id="nac_test_manual.list.41.item.6" data-nac-role="list-item">空输入 / 纯空白输入。</li></ul>
+<ol data-nac-id="nac_test_manual.list.42" data-nac-role="list"><li data-nac-id="nac_test_manual.list.42.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">tab_by_label</code></strong> 容错性：</li></ol>
+<ul data-nac-id="nac_test_manual.list.43" data-nac-role="list"><li data-nac-id="nac_test_manual.list.43.item.1" data-nac-role="list-item">精确 textContent 匹配。</li><li data-nac-id="nac_test_manual.list.43.item.2" data-nac-role="list-item">去括号匹配（<code data-nac-role="code-inline">"Lines (collection)"</code> 匹配 <code data-nac-role="code-inline">"Lines"</code>）。</li><li data-nac-id="nac_test_manual.list.43.item.3" data-nac-role="list-item">i18n 语言区域标签匹配。</li><li data-nac-id="nac_test_manual.list.43.item.4" data-nac-role="list-item">未知标签 -&gt; not_found。</li></ul>
+<ol data-nac-id="nac_test_manual.list.44" data-nac-role="list"><li data-nac-id="nac_test_manual.list.44.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">snapshotTree</code> 结构。</strong> 返回 <code data-nac-role="code-inline">{active, plugins[]}</code>。每个插件包含 manifest。包含活跃插件的数据表快照（如为 v2.1）。</li></ol>
+<h4 data-nac-id="nac_test_manual.h4.断言内容" data-nac-role="heading" data-nac-level="4" id="断言内容">断言内容</h4>
+<ul data-nac-id="nac_test_manual.list.46" data-nac-role="list"><li data-nac-id="nac_test_manual.list.46.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NacChat.send(text)</code> 后的最终语言与预期一致。</li><li data-nac-id="nac_test_manual.list.46.item.2" data-nac-role="list-item">后端是否被调用符合预期。</li><li data-nac-id="nac_test_manual.list.46.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">tab_by_label</code> 在各用例下正常返回或抛出异常。</li><li data-nac-id="nac_test_manual.list.46.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">snapshotTree()</code> 可 JSON 序列化且大小在合理范围内。</li></ul>
+<h4 data-nac-id="nac_test_manual.h4.常见陷阱" data-nac-role="heading" data-nac-level="4" id="常见陷阱">常见陷阱</h4>
+<ul data-nac-id="nac_test_manual.list.48" data-nac-role="list"><li data-nac-id="nac_test_manual.list.48.item.1" data-nac-role="list-item">裸 2 字母语言代码（<code data-nac-role="code-inline">'de'</code>、<code data-nac-role="code-inline">'es'</code>）与介词/冠词冲突。需明确测试这些陷阱用例。</li><li data-nac-id="nac_test_manual.list.48.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">label_i18n</code> 中 1-2 个字符的填充标签会导致部分匹配误报。使用真实字符串。</li></ul>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.阶段-3-intencionllm-中间层" data-nac-role="heading" data-nac-level="3" id="阶段-3-intencionllm-中间层">阶段 3 -- Intencion（LLM 中间层）</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.52" data-nac-role="paragraph">聊天客户端与 LLM 中间层之间的 HTTP 往返。后端职责：读取 <code data-nac-role="code-inline">nac_tree</code> 快照 + 提示词，返回 <code data-nac-role="code-inline">{message, actions[]}</code>。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<ol data-nac-id="nac_test_manual.list.54" data-nac-role="list"><li data-nac-id="nac_test_manual.list.54.item.1" data-nac-role="list-item"><strong>后端结构冒烟测试。</strong> 针对支持语言区域中的一组标准提示词（建议 &gt;= 15 个），POST 到端点并断言：</li></ol>
+<ul data-nac-id="nac_test_manual.list.55" data-nac-role="list"><li data-nac-id="nac_test_manual.list.55.item.1" data-nac-role="list-item">HTTP 200。</li><li data-nac-id="nac_test_manual.list.55.item.2" data-nac-role="list-item">JSON 响应包含 <code data-nac-role="code-inline">ok</code> 布尔值。</li><li data-nac-id="nac_test_manual.list.55.item.3" data-nac-role="list-item">当 ok 为 true 时：包含 <code data-nac-role="code-inline">message</code> 字符串 + <code data-nac-role="code-inline">actions</code> 数组。</li><li data-nac-id="nac_test_manual.list.55.item.4" data-nac-role="list-item">每个 <code data-nac-role="code-inline">action.kind</code> 属于标准类型之一。</li></ul>
+<ol data-nac-id="nac_test_manual.list.56" data-nac-role="list"><li data-nac-id="nac_test_manual.list.56.item.1" data-nac-role="list-item"><strong>防御性 bug 测试。</strong> 针对历史中每类已知 bug，编写明确的实时测试。示例：<code data-nac-role="code-inline">'cambia de pestana'</code> 绝对不能返回 <code data-nac-role="code-inline">change_locale: 'de'</code>。</li><li data-nac-id="nac_test_manual.list.56.item.2" data-nac-role="list-item"><strong>快照大小限制。</strong> 如果按 token 计费，不要向 LLM 发送超过 20KB 的快照；若树超出预算，测试应使构建失败。</li></ol>
+<h4 data-nac-id="nac_test_manual.h4.跳过内容" data-nac-role="heading" data-nac-level="4" id="跳过内容">跳过内容</h4>
+<ul data-nac-id="nac_test_manual.list.58" data-nac-role="list"><li data-nac-id="nac_test_manual.list.58.item.1" data-nac-role="list-item">LLM 具体的 action 内容。LLM 是非确定性的，不要断言"保存会触发 action_id = X"。只验证结构。</li><li data-nac-id="nac_test_manual.list.58.item.2" data-nac-role="list-item">网络韧性（超时、重试）。属于负载/可靠性测试，不属于单元/冒烟测试。</li></ul>
+<h4 data-nac-id="nac_test_manual.h4.实时测试-vs-vcr" data-nac-role="heading" data-nac-level="4" id="实时测试-vs-vcr">实时测试 vs VCR</h4>
+<p data-nac-id="nac_test_manual.p.60" data-nac-role="paragraph">实时测试受 LLM 费用和速率限制影响较脆弱。提示词语料库稳定后，将响应录制为 VCR cassette（JSON 文件，映射提示词到响应），在 CI 中回放。Yujin 参考套件使用实时测试，因为预算允许约 60 秒/次；如果 CI 运行频繁，请切换为 cassette。</p>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.阶段-4-llamadanac-写入-api" data-nac-role="heading" data-nac-level="3" id="阶段-4-llamadanac-写入-api">阶段 4 -- Llamada（NAC.* 写入 API）</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.64" data-nac-role="paragraph"><code data-nac-role="code-inline">window.NAC</code> 上的所有公开函数：click、click_by_verb、fill、select、tab、tab_by_label、go_to_section、drag_drop、edit_field、dt_*、bindAction。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<p data-nac-id="nac_test_manual.p.66" data-nac-role="paragraph">对于每个使用的函数，测试三种情况：</p>
+<ol data-nac-id="nac_test_manual.list.67" data-nac-role="list"><li data-nac-id="nac_test_manual.list.67.item.1" data-nac-role="list-item"><strong>正常路径。</strong> 挂载一个匹配 manifest id 的 DOM 元素；将其处理器接入以触发标准 ack 事件；调用 <code data-nac-role="code-inline">NAC.&lt;func&gt;(...)</code> 并断言其 resolve。</li><li data-nac-id="nac_test_manual.list.67.item.2" data-nac-role="list-item"><strong>not_found。</strong> 使用不存在的 id 调用；断言抛出 code 为 <code data-nac-role="code-inline">'not_found'</code> 的异常（<code data-nac-role="code-inline">go_to_section</code> 为 <code data-nac-role="code-inline">'section_not_found'</code>）。</li><li data-nac-id="nac_test_manual.list.67.item.3" data-nac-role="list-item"><strong>无效输入。</strong> 使用空值或错误结构的参数调用；断言抛出 code 为 <code data-nac-role="code-inline">'invalid'</code> 的异常。</li></ol>
+<p data-nac-id="nac_test_manual.p.68" data-nac-role="paragraph">对于 <code data-nac-role="code-inline">dt_*</code> 系列，额外测试：</p>
+<ul data-nac-id="nac_test_manual.list.69" data-nac-role="list"><li data-nac-id="nac_test_manual.list.69.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">dt_add_row</code> 返回 <code data-nac-role="code-inline">{ok, row_id}</code>。</li><li data-nac-id="nac_test_manual.list.69.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">dt_edit_cell</code> 正常路径 + 无效值被拒绝（例如 <code data-nac-role="code-inline">qty &lt; min</code>）。</li><li data-nac-id="nac_test_manual.list.69.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">dt_remove_row</code> 使 <code data-nac-role="code-inline">dt_state().rows.length</code> 减少。</li><li data-nac-id="nac_test_manual.list.69.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">dt_commit</code> 返回 <code data-nac-role="code-inline">{ok, final_state}</code>。</li><li data-nac-id="nac_test_manual.list.69.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">dt_discard</code> 回滚未提交的变更。</li></ul>
+<h4 data-nac-id="nac_test_manual.h4.实现说明" data-nac-role="heading" data-nac-level="4" id="实现说明">实现说明</h4>
+<p data-nac-id="nac_test_manual.p.71" data-nac-role="paragraph">在一个轻量的进程内 DOM shim（约 150-200 行 EventTarget 子类）中运行，无需 jsdom 或 Playwright。复合选择器匹配（<code data-nac-role="code-inline">[a="b"][c="d"]</code>）是唯一必须支持的特性。参见参考套件中的 <code data-nac-role="code-inline">stage4-calls.mjs</code>。</p>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.阶段-5-resultadodom-副作用" data-nac-role="heading" data-nac-level="3" id="阶段-5-resultadodom-副作用">阶段 5 -- Resultado（DOM 副作用）</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.75" data-nac-role="paragraph">NAC.* 调用后 DOM 的实际变化。与阶段 4（函数返回 ok）和阶段 6（ack 事件触发）相互独立。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<ol data-nac-id="nac_test_manual.list.77" data-nac-role="list"><li data-nac-id="nac_test_manual.list.77.item.1" data-nac-role="list-item"><strong>按动词验证 DOM 变更。</strong> 针对前 10 个动词：</li></ol>
+<ul data-nac-id="nac_test_manual.list.78" data-nac-role="list"><li data-nac-id="nac_test_manual.list.78.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">save</code> -&gt; 底层表单是否已提交？Toast 是否出现？</li><li data-nac-id="nac_test_manual.list.78.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">cancel</code> -&gt; 模态框是否关闭？表单值是否重置？</li><li data-nac-id="nac_test_manual.list.78.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">delete</code> -&gt; 行是否从列表中移除？</li><li data-nac-id="nac_test_manual.list.78.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">add_row</code> -&gt; 表格中是否出现新行？</li></ul>
+<ol data-nac-id="nac_test_manual.list.79" data-nac-role="list"><li data-nac-id="nac_test_manual.list.79.item.1" data-nac-role="list-item"><strong>每个界面的 Playwright e2e 测试。</strong> 每个顶层插件/页面一个 spec。在真实浏览器中挂载界面，执行标准用户流程，断言 DOM 状态。</li></ol>
+<h4 data-nac-id="nac_test_manual.h4.跳过内容" data-nac-role="heading" data-nac-level="4" id="跳过内容">跳过内容</h4>
+<ul data-nac-id="nac_test_manual.list.81" data-nac-role="list"><li data-nac-id="nac_test_manual.list.81.item.1" data-nac-role="list-item">像素级截图对比。视觉回归有专用工具。</li><li data-nac-id="nac_test_manual.list.81.item.2" data-nac-role="list-item">性能（帧率、布局偏移）。属于性能测试，预算独立。</li></ul>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.阶段-6-ack-事件族" data-nac-role="heading" data-nac-level="3" id="阶段-6-ack-事件族">阶段 6 -- Ack 事件族</h3>
+<h4 data-nac-id="nac_test_manual.h4.本阶段职责" data-nac-role="heading" data-nac-level="4" id="本阶段职责">本阶段职责</h4>
+<p data-nac-id="nac_test_manual.p.85" data-nac-role="paragraph">运行时监听的每个 <code data-nac-role="code-inline">nac:*</code> 事件。每个事件都有标准的 detail 结构（plugin + id-key + 可选附加字段）。</p>
+<h4 data-nac-id="nac_test_manual.h4.测试内容" data-nac-role="heading" data-nac-level="4" id="测试内容">测试内容</h4>
+<p data-nac-id="nac_test_manual.p.87" data-nac-role="paragraph">针对 <code data-nac-role="code-inline">_CLICK_EVENT_FAMILY</code> 中的每个事件族：</p>
+<ul data-nac-id="nac_test_manual.list.88" data-nac-role="list"><li data-nac-id="nac_test_manual.list.88.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">nac:action:succeeded</code> -- detail.plugin + detail.action_id + detail.is_trusted。</li><li data-nac-id="nac_test_manual.list.88.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac:action:failed</code> -- 同上 + detail.error。</li><li data-nac-id="nac_test_manual.list.88.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">nac:field:changed</code> -- detail.field_id + detail.value。</li><li data-nac-id="nac_test_manual.list.88.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">nac:tab:activated</code> -- detail.tab_id。</li><li data-nac-id="nac_test_manual.list.88.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">nac:breadcrumb:navigated</code> -- detail.breadcrumb_id。</li><li data-nac-id="nac_test_manual.list.88.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">nac:accordion:expanded</code> / <code data-nac-role="code-inline">:collapsed</code> -- detail.accordion_id。</li><li data-nac-id="nac_test_manual.list.88.item.7" data-nac-role="list-item"><code data-nac-role="code-inline">nac:step:advanced</code> -- detail.step_id。</li><li data-nac-id="nac_test_manual.list.88.item.8" data-nac-role="list-item"><code data-nac-role="code-inline">nac:table:page_changed</code> -- detail.page_index。</li><li data-nac-id="nac_test_manual.list.88.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">nac:confirm:resolved</code> / <code data-nac-role="code-inline">:cancelled</code> -- detail.confirm_id。</li><li data-nac-id="nac_test_manual.list.88.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">nac:table:sort_changed</code> -- detail.column_id。</li><li data-nac-id="nac_test_manual.list.88.item.11" data-nac-role="list-item"><code data-nac-role="code-inline">nac:table:filter_changed</code> -- detail.filter_id。</li></ul>
+<p data-nac-id="nac_test_manual.p.89" data-nac-role="paragraph">每个事件族：</p>
+<ol data-nac-id="nac_test_manual.list.90" data-nac-role="list"><li data-nac-id="nac_test_manual.list.90.item.1" data-nac-role="list-item">挂载一个具有标准 role 的 DOM 元素。</li><li data-nac-id="nac_test_manual.list.90.item.2" data-nac-role="list-item">将点击处理器接入以触发标准事件。</li><li data-nac-id="nac_test_manual.list.90.item.3" data-nac-role="list-item">调用 <code data-nac-role="code-inline">NAC.click(id)</code> 并监听事件。</li><li data-nac-id="nac_test_manual.list.90.item.4" data-nac-role="list-item">断言 detail 结构。</li></ol>
+<p data-nac-id="nac_test_manual.p.91" data-nac-role="paragraph">此外：</p>
+<ul data-nac-id="nac_test_manual.list.92" data-nac-role="list"><li data-nac-id="nac_test_manual.list.92.item.1" data-nac-role="list-item"><strong>点击到 resolve 的时序。</strong> 运行时监听器应在 ack 触发后 200ms 内 resolve。超时则为运行时 bug。</li><li data-nac-id="nac_test_manual.list.92.item.2" data-nac-role="list-item"><strong><code data-nac-role="code-inline">bindAction</code></strong> 在同步处理器执行后自动触发 ack。</li><li data-nac-id="nac_test_manual.list.92.item.3" data-nac-role="list-item"><strong><code data-nac-role="code-inline">bindAction</code> 异步 resolve</strong> 在 Promise resolve 后自动触发 ack。</li><li data-nac-id="nac_test_manual.list.92.item.4" data-nac-role="list-item"><strong><code data-nac-role="code-inline">bindAction</code> 抛出异常</strong> -&gt; 自动触发 <code data-nac-role="code-inline">nac:action:failed</code>，携带 detail.error。</li></ul>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.v22-01-严格构造器校验器" data-nac-role="heading" data-nac-level="3" id="v22-01-严格构造器校验器">V22-01 -- 严格构造器校验器</h3>
+<p data-nac-id="nac_test_manual.p.95" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.STRICT_VALIDATION = true</code> 使 <code data-nac-role="code-inline">NAC.register</code> 在以下情况抛出异常：</p>
+<ul data-nac-id="nac_test_manual.list.96" data-nac-role="list"><li data-nac-id="nac_test_manual.list.96.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- role 不在标准集合中。</li><li data-nac-id="nac_test_manual.list.96.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tab_id_manifest_role_drift</code> -- id 匹配 <code data-nac-role="code-inline">^tab\.</code> 但 role 不是 <code data-nac-role="code-inline">'tab'</code>。</li><li data-nac-id="nac_test_manual.list.96.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- 已挂载的 DOM 的 role 与 manifest 声明不一致。</li></ul>
+<p data-nac-id="nac_test_manual.p.97" data-nac-role="paragraph">每种情况的测试方法：</p>
+<ol data-nac-id="nac_test_manual.list.98" data-nac-role="list"><li data-nac-id="nac_test_manual.list.98.item.1" data-nac-role="list-item">设置 <code data-nac-role="code-inline">STRICT_VALIDATION = true</code>。</li><li data-nac-id="nac_test_manual.list.98.item.2" data-nac-role="list-item">使用专门违反该规则的 manifest 调用 <code data-nac-role="code-inline">register</code>。</li><li data-nac-id="nac_test_manual.list.98.item.3" data-nac-role="list-item">断言抛出 <code data-nac-role="code-inline">code: 'strict_validation'</code> 且包含 <code data-nac-role="code-inline">findings: [...]</code> 的异常。</li></ol>
+<p data-nac-id="nac_test_manual.p.99" data-nac-role="paragraph">非严格模式下：断言 <code data-nac-role="code-inline">console.error</code> 被调用（通过 spy 捕获 <code data-nac-role="code-inline">console.error</code>）。</p>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.v22-02-bindaction-辅助函数" data-nac-role="heading" data-nac-level="3" id="v22-02-bindaction-辅助函数">V22-02 -- bindAction 辅助函数</h3>
+<p data-nac-id="nac_test_manual.p.102" data-nac-role="paragraph">上文阶段 6 已有覆盖，但需额外编写至少 5 个明确测试：</p>
+<ol data-nac-id="nac_test_manual.list.103" data-nac-role="list"><li data-nac-id="nac_test_manual.list.103.item.1" data-nac-role="list-item">同步处理器 -&gt; ack 触发。</li><li data-nac-id="nac_test_manual.list.103.item.2" data-nac-role="list-item">抛出异常的处理器 -&gt; failed 事件触发 + 错误重新抛出。</li><li data-nac-id="nac_test_manual.list.103.item.3" data-nac-role="list-item">resolve 的异步处理器 -&gt; resolve 后 ack 触发。</li><li data-nac-id="nac_test_manual.list.103.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">bindAction</code> 返回解绑函数；调用后停止触发。</li><li data-nac-id="nac_test_manual.list.103.item.5" data-nac-role="list-item">缺少 ctx（无 plugin 或 action_id）-&gt; 抛出 <code data-nac-role="code-inline">code: 'invalid'</code> 的异常。</li></ol>
+<hr />
+<h3 data-nac-id="nac_test_manual.h3.interop-v23-预览" data-nac-role="heading" data-nac-level="3" id="interop-v23-预览">Interop -- v2.3 预览</h3>
+<p data-nac-id="nac_test_manual.p.106" data-nac-role="paragraph">如果应用通过 MCP 导出/导入 NAC3 树：</p>
+<ol data-nac-id="nac_test_manual.list.107" data-nac-role="list"><li data-nac-id="nac_test_manual.list.107.item.1" data-nac-role="list-item"><strong>export_tree 结构。</strong> 返回 <code data-nac-role="code-inline">{app_id, app_version, nac_version, exported_at, active_plugin, manifests, scope_tree, data_tables, state, ack_endpoint}</code>。</li><li data-nac-id="nac_test_manual.list.107.item.2" data-nac-role="list-item"><strong>export_tree 过滤。</strong> <code data-nac-role="code-inline">scope: 'plugin_slug:&lt;slug&gt;'</code> 只返回该插件。<code data-nac-role="code-inline">scope: 'active_plugin'</code> 只返回活跃插件。<code data-nac-role="code-inline">include_locales: ['en','es']</code> 只返回这些语言区域。</li><li data-nac-id="nac_test_manual.list.107.item.3" data-nac-role="list-item"><strong>import_remote_tree 校验。</strong> 缺少 bearer 或 endpoint 时抛出 <code data-nac-role="code-inline">invalid</code>。重复命名空间抛出 <code data-nac-role="code-inline">conflict</code>。</li><li data-nac-id="nac_test_manual.list.107.item.4" data-nac-role="list-item"><strong>命名空间插件注册。</strong> 导入后，<code data-nac-role="code-inline">NAC.list_registered_plugins()</code> 包含 <code data-nac-role="code-inline">remote:&lt;ns&gt;:&lt;slug&gt;</code>。</li><li data-nac-id="nac_test_manual.list.107.item.5" data-nac-role="list-item"><strong>代理调度。</strong> <code data-nac-role="code-inline">NAC.click('remote:&lt;ns&gt;:...')</code> 向对端端点发起 <code data-nac-role="code-inline">fetch</code>，携带 <code data-nac-role="code-inline">bearer</code> + <code data-nac-role="code-inline">nac_id</code>（对端本地 id，无前缀）+ <code data-nac-role="code-inline">action.kind</code>。</li><li data-nac-id="nac_test_manual.list.107.item.6" data-nac-role="list-item"><strong>本地 ack 镜像。</strong> 代理成功后，本地触发 <code data-nac-role="code-inline">nac:action:succeeded</code>，detail 包含 <code data-nac-role="code-inline">detail.via_interop: true</code> + <code data-nac-role="code-inline">detail.is_trusted: false</code>。</li><li data-nac-id="nac_test_manual.list.107.item.7" data-nac-role="list-item"><strong>对端错误冒泡。</strong> 对端返回 <code data-nac-role="code-inline">{ok: false, error: {code: '...', message: '...'}}</code> -&gt; 客户端以对端的 code 抛出异常。</li><li data-nac-id="nac_test_manual.list.107.item.8" data-nac-role="list-item"><strong>disconnect_remote。</strong> 清除命名空间；后续 <code data-nac-role="code-inline">NAC.click('remote:...')</code> 抛出 not_found。</li><li data-nac-id="nac_test_manual.list.107.item.9" data-nac-role="list-item"><strong>本地点击不走代理。</strong> 关键契约：安装互操作层后，对本地 id 调用 NAC.click 绝对不能发起 fetch。</li></ol>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.3-工具推荐" data-nac-role="heading" data-nac-level="2" id="3-工具推荐">3. 工具推荐</h2>
+<h3 data-nac-id="nac_test_manual.h3.测试运行器" data-nac-role="heading" data-nac-level="3" id="测试运行器">测试运行器</h3>
+<ul data-nac-id="nac_test_manual.list.111" data-nac-role="list"><li data-nac-id="nac_test_manual.list.111.item.1" data-nac-role="list-item"><strong>Node + 纯 ESM 模块</strong>用于第 2-6 阶段。不用 Jest，不用 Vitest——200 行 <code data-nac-role="code-inline">assert(name, ok)</code> 就够了，还能减少依赖。</li><li data-nac-id="nac_test_manual.list.111.item.2" data-nac-role="list-item"><strong>Playwright</strong> 用于第 5 阶段端到端测试，以及第 1 阶段音频播放测试（如果需要的话）。</li></ul>
+<h3 data-nac-id="nac_test_manual.h3.ci" data-nac-role="heading" data-nac-level="3" id="ci">CI</h3>
+<ul data-nac-id="nac_test_manual.list.113" data-nac-role="list"><li data-nac-id="nac_test_manual.list.113.item.1" data-nac-role="list-item">不要在每次推送时都运行实时后端冒烟测试（第 3 阶段）——每次约 60 秒 × 合并频率 = 真实成本。仅在以下情况运行：</li><li data-nac-id="nac_test_manual.list.113.item.2" data-nac-role="list-item">手动触发（<code data-nac-role="code-inline">gh workflow run</code>）。</li><li data-nac-id="nac_test_manual.list.113.item.3" data-nac-role="list-item">每夜定时任务。</li><li data-nac-id="nac_test_manual.list.113.item.4" data-nac-role="list-item">发布版本打标签前。</li><li data-nac-id="nac_test_manual.list.113.item.5" data-nac-role="list-item">每次推送时运行第 1、2、4、6 阶段及测试框架。总时间预算：15 秒以内。</li></ul>
+<h3 data-nac-id="nac_test_manual.h3.覆盖率报告" data-nac-role="heading" data-nac-level="3" id="覆盖率报告">覆盖率报告</h3>
+<p data-nac-id="nac_test_manual.p.115" data-nac-role="paragraph">每次发布维护一份 <code data-nac-role="code-inline">docs/COVERAGE_REPORT_&lt;date&gt;.md</code>。更新逐项用例表格，并包含加权流水线平均值。Yujin 参考报告位于 <code data-nac-role="code-inline">yujin.app/nac-spec/docs/COVERAGE_REPORT_2026_05_10.md</code>。</p>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.4-应避免的反模式" data-nac-role="heading" data-nac-level="2" id="4-应避免的反模式">4. 应避免的反模式</h2>
+<ol data-nac-id="nac_test_manual.list.118" data-nac-role="list"><li data-nac-id="nac_test_manual.list.118.item.1" data-nac-role="list-item"><strong>断言 LLM 动作的具体内容。</strong> 结果不确定。测试<strong>结构（SHAPE）</strong>，而非<strong>值（VALUES）</strong>。</li><li data-nac-id="nac_test_manual.list.118.item.2" data-nac-role="list-item"><strong>在第 5 阶段模拟 DOM。</strong> 第 5 阶段关注的是真实 DOM 变更，请使用 Playwright 而非 shim。</li><li data-nac-id="nac_test_manual.list.118.item.3" data-nac-role="list-item"><strong>按代码行数而非阶段统计覆盖率。</strong> 代码行覆盖率无法说明流水线是否正常工作。请使用阶段矩阵。</li><li data-nac-id="nac_test_manual.list.118.item.4" data-nac-role="list-item"><strong>第 4 阶段只测试正常路径。</strong> <code data-nac-role="code-inline">not_found</code> 和无效输入占合约的一半。</li><li data-nac-id="nac_test_manual.list.118.item.5" data-nac-role="list-item"><strong>跳过第 6 阶段。</strong> ack 事件是接入方代码中违反规范最多的部分。对每个你发出的事件族都要测试。</li><li data-nac-id="nac_test_manual.list.118.item.6" data-nac-role="list-item"><strong>没有防回归守卫。</strong> 应用修复的每个生产 bug 都要有永久性回归测试。<code data-nac-role="code-inline">cambia de pestana</code> 用例已永久纳入我们的第 2 阶段测试。</li><li data-nac-id="nac_test_manual.list.118.item.7" data-nac-role="list-item"><strong>每次推送都运行实时测试。</strong> 消耗预算，且因第三方不稳定性导致测试不可靠。</li></ol>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.5-案例研究yujin-参考测试套件" data-nac-role="heading" data-nac-level="2" id="5-案例研究yujin-参考测试套件">5. 案例研究——Yujin 参考测试套件</h2>
+<p data-nac-id="nac_test_manual.p.121" data-nac-role="paragraph">以下所有测试源文件链接均指向 GitHub 上的规范文件。</p>
+<p data-nac-id="nac_test_manual.p.122" data-nac-role="paragraph">| 套件 | 源文件 | 测试数 | 耗时 | |-------|--------|-------|------| | smoke | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/smoke.mjs" data-nac-id="nac_test_manual.link.1" data-nac-role="action" data-nac-action="open">packages/nac/test/smoke.mjs</a> | 36 | &lt; 1s | | v22 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/v22.mjs" data-nac-id="nac_test_manual.link.2" data-nac-role="action" data-nac-action="open">packages/nac/test/v22.mjs</a> | 14 | &lt; 1s | | v23-interop | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/v23-interop.mjs" data-nac-id="nac_test_manual.link.3" data-nac-role="action" data-nac-action="open">packages/nac/test/v23-interop.mjs</a> | 14 | &lt; 2s | | stage1-audio | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage1-audio.mjs" data-nac-id="nac_test_manual.link.4" data-nac-role="action" data-nac-action="open">packages/nac/test/stage1-audio.mjs</a> | 33 | &lt; 1s | | stage2-disambiguation | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage2-disambiguation.mjs" data-nac-id="nac_test_manual.link.5" data-nac-role="action" data-nac-action="open">packages/nac/test/stage2-disambiguation.mjs</a> | 31 | &lt; 1s | | stage3-backend（实时） | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage3-backend.mjs" data-nac-id="nac_test_manual.link.6" data-nac-role="action" data-nac-action="open">packages/nac/test/stage3-backend.mjs</a> | ~150（10 个语言区域 × 3 个提示词） | ~120s | | stage4-calls | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage4-calls.mjs" data-nac-id="nac_test_manual.link.7" data-nac-role="action" data-nac-action="open">packages/nac/test/stage4-calls.mjs</a> | 31 | ~2s | | stage6-ack | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage6-ack.mjs" data-nac-id="nac_test_manual.link.8" data-nac-role="action" data-nac-action="open">packages/nac/test/stage6-ack.mjs</a> | 16 | &lt; 1s | | stage6b-longtail | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/stage6b-longtail.mjs" data-nac-id="nac_test_manual.link.9" data-nac-role="action" data-nac-action="open">packages/nac/test/stage6b-longtail.mjs</a> | 14 | &lt; 1s | | TTS 语料生成器 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/fixtures/voice/generate.mjs" data-nac-id="nac_test_manual.link.10" data-nac-role="action" data-nac-action="open">packages/nac/test/fixtures/voice/generate.mjs</a> | -- | 一次性 | | TTS 语料目录 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/packages/nac/test/fixtures/voice/corpus.json" data-nac-id="nac_test_manual.link.11" data-nac-role="action" data-nac-action="open">packages/nac/test/fixtures/voice/corpus.json</a> | 30 个提示词 | -- | | 测试框架 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tools/nac/test-launch.sh" data-nac-id="nac_test_manual.link.12" data-nac-role="action" data-nac-action="open">tools/nac/test-launch.sh</a> | 5 层 | ~10s | | <strong>Node 端合计</strong> | | <strong>259+</strong> | <strong>~10s + 120s（可选）</strong> |</p>
+<p data-nac-id="nac_test_manual.p.123" data-nac-role="paragraph">另有 16 个 Playwright 端到端规格（约 54 秒）：</p>
+<p data-nac-id="nac_test_manual.p.124" data-nac-role="paragraph">| 规格 | 源文件 | 测试数 | 标签 | |------|--------|-------|-----| | 01-landing | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/01-landing.spec.ts" data-nac-id="nac_test_manual.link.13" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/01-landing.spec.ts</a> | 2 | @demos | | 02-demo-v19 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/02-demo-v19.spec.ts" data-nac-id="nac_test_manual.link.14" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/02-demo-v19.spec.ts</a> | 1 | @demos | | 03-demo-v20 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/03-demo-v20.spec.ts" data-nac-id="nac_test_manual.link.15" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/03-demo-v20.spec.ts</a> | 2 | @demos | | 04-demo-v21-datatable | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts" data-nac-id="nac_test_manual.link.16" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/04-demo-v21-datatable.spec.ts</a> | 3 | @demos | | 05-demo-v22-interop | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/05-demo-v22-interop.spec.ts" data-nac-id="nac_test_manual.link.17" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/05-demo-v22-interop.spec.ts</a> | 1 | @demos | | 06-demo-react-study-case | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/06-demo-react-study-case.spec.ts" data-nac-id="nac_test_manual.link.18" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/06-demo-react-study-case.spec.ts</a> | 2 | @study | | 07-demo-angular-study-case | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts" data-nac-id="nac_test_manual.link.19" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/07-demo-angular-study-case.spec.ts</a> | 2 | @study | | 08-pipeline-end-to-end | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts" data-nac-id="nac_test_manual.link.20" data-nac-role="action" data-nac-action="open">tests/e2e-nac/specs/08-pipeline-end-to-end.spec.ts</a> | 3 | @e2e | | 配置 | <a href="https://github.com/pkuschnirof/rpaforce-crm/blob/main/tests/e2e-nac/playwright.config.ts" data-nac-id="nac_test_manual.link.21" data-nac-role="action" data-nac-action="open">tests/e2e-nac/playwright.config.ts</a> | -- | -- | | <strong>Playwright 合计</strong> | | <strong>16</strong> | |</p>
+<p data-nac-id="nac_test_manual.p.125" data-nac-role="paragraph"><strong>总计：205+ 个测试</strong>，覆盖从聊天输入到 ack 事件的完整流水线，加权平均覆盖率 <strong>95%</strong>。</p>
+<h3 data-nac-id="nac_test_manual.h3.各阶段覆盖率yujin-参考2026-05-11" data-nac-role="heading" data-nac-level="3" id="各阶段覆盖率yujin-参考2026-05-11">各阶段覆盖率（Yujin 参考，2026-05-11）</h3>
+<p data-nac-id="nac_test_manual.p.127" data-nac-role="paragraph">| 阶段 | 覆盖套件 | 覆盖率 | |-------|---------------------|----------| | 1 Comunicacion | stage1-audio.mjs | 85% | | 2 Desambiguacion | stage2-disambiguation.mjs | 95% | | 3 Intencion | stage3-backend.mjs（实时 LLM） | 85% | | 4 Llamada | stage4-calls.mjs | 95% | | 5 Resultado | tests/e2e-nac/specs/*.spec.ts（Playwright） | 95% | | 6 Ack | stage6-ack.mjs + stage6b-longtail.mjs | 100% | | 互操作（v2.3） | v23-interop.mjs + 05-demo-v22-interop.spec.ts | 100% | | 构造函数（V22-01） | v22.mjs | 100% | | bindAction（V22-02） | v22.mjs | 100% | | <strong>加权平均</strong> | | <strong>~95%</strong> |</p>
+<h3 data-nac-id="nac_test_manual.h3.测试语料库发现的-bug" data-nac-role="heading" data-nac-level="3" id="测试语料库发现的-bug">测试语料库发现的 Bug</h3>
+<p data-nac-id="nac_test_manual.p.129" data-nac-role="paragraph">测试语料库在开发过程中发现了两个真实的运行时 Bug，并在同一分支中完成了修复：</p>
+<ol data-nac-id="nac_test_manual.list.130" data-nac-role="list"><li data-nac-id="nac_test_manual.list.130.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">tab_by_label</code> 匹配器过于宽松。</strong> 原始实现接受任意双向 <code data-nac-role="code-inline">indexOf</code> 匹配。<code data-nac-role="code-inline">label_i18n</code> 中一个单字符填充标签（<code data-nac-role="code-inline">'a'</code>）可以匹配任何长度大于等于 1 的查询字符串。第 2 阶段测试 B4 发现了此问题。修复方案：对于部分匹配，要求候选项和查询字符串均不少于 3 个字符；精确相等始终允许。</li></ol>
+<ol data-nac-id="nac_test_manual.list.131" data-nac-role="list"><li data-nac-id="nac_test_manual.list.131.item.1" data-nac-role="list-item"><strong>缺少 <code data-nac-role="code-inline">list_registered_plugins</code> 自省辅助方法。</strong> 互操作层的 <code data-nac-role="code-inline">export_tree</code> 通过遍历 manifest 注册表来生成其载荷。运行时没有公开 API 可以独立于 DOM 挂载状态列出已注册的插件。在编写 v23-interop 套件时发现了此问题。修复方案：新增 <code data-nac-role="code-inline">NAC.list_registered_plugins()</code>，返回 <code data-nac-role="code-inline">Object.keys(_manifests)</code>。</li></ol>
+<p data-nac-id="nac_test_manual.p.132" data-nac-role="paragraph">两处修复均在同一分支中发布至 <code data-nac-role="code-inline">js/nac.js</code>。</p>
+<h3 data-nac-id="nac_test_manual.h3.接入方使用手册采用本测试套件" data-nac-role="heading" data-nac-level="3" id="接入方使用手册采用本测试套件">接入方使用手册——采用本测试套件</h3>
+<ol data-nac-id="nac_test_manual.list.134" data-nac-role="list"><li data-nac-id="nac_test_manual.list.134.item.1" data-nac-role="list-item"><strong>首先复制测试基础设施。</strong> 复制 <code data-nac-role="code-inline">packages/nac/test/</code> 中的 shim、辅助工具和测试框架，运行现有测试以验证环境。</li><li data-nac-id="nac_test_manual.list.134.item.2" data-nac-role="list-item"><strong>用你的应用界面替换测试语料库。</strong> 替换为你的插件 slug、动词和数据表格，保持流水线阶段的组织结构不变。</li><li data-nac-id="nac_test_manual.list.134.item.3" data-nac-role="list-item"><strong>生成你的 TTS 语料库</strong>，使用 <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/generate.mjs</code>，通过环境变量提供你的 Google Cloud TTS 或 ElevenLabs 密钥。</li><li data-nac-id="nac_test_manual.list.134.item.4" data-nac-role="list-item"><strong>将 <code data-nac-role="code-inline">tools/nac/test-launch.sh</code> 接入你的 CI。</strong> 第 1-5 层在合并前运行；后端第 1b 层设为可选或每夜运行。</li><li data-nac-id="nac_test_manual.list.134.item.5" data-nac-role="list-item"><strong>维护覆盖率报告。</strong> 每次发布时更新。</li></ol>
+<h3 data-nac-id="nac_test_manual.h3.许可证" data-nac-role="heading" data-nac-level="3" id="许可证">许可证</h3>
+<p data-nac-id="nac_test_manual.p.136" data-nac-role="paragraph">本手册与 NAC3 规范其余部分同为 Apache-2.0 许可。可自由复制、分叉和再分发。</p>
+<hr />
+<h2 data-nac-id="nac_test_manual.h2.6-后续资源" data-nac-role="heading" data-nac-level="2" id="6-后续资源">6. 后续资源</h2>
+<ul data-nac-id="nac_test_manual.list.139" data-nac-role="list"><li data-nac-id="nac_test_manual.list.139.item.1" data-nac-role="list-item"><a href="../SPEC.md" data-nac-id="nac_test_manual.link.22" data-nac-role="action" data-nac-action="open">SPEC.md</a>——Yujin 测试所依据的规范合约。</li><li data-nac-id="nac_test_manual.list.139.item.2" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="nac_test_manual.link.23" data-nac-role="action" data-nac-action="open">SECURITY.md</a>——威胁模型与来源说明。</li><li data-nac-id="nac_test_manual.list.139.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="nac_test_manual.link.24" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a>——实时参考报告。</li><li data-nac-id="nac_test_manual.list.139.item.4" data-nac-role="list-item"><a href="LAUNCH_PLAN_2026_05_10.md" data-nac-id="nac_test_manual.link.25" data-nac-role="action" data-nac-action="open">LAUNCH_PLAN_2026_05_10.md</a>——本测试语料库所依托的 autonomous-Sumi 发布手册。</li></ul>
+<p data-nac-id="nac_test_manual.p.140" data-nac-role="paragraph"><em>本文档随 NAC3 规范持续演进。请通过 PR 提交修改，目标文件为 <code data-nac-role="code-inline">yujin.app/nac-spec/docs/NAC_TEST_MANUAL.md</code>。</em></p>
+<hr />
+<p data-nac-id="nac_test_manual.p.142" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_TEST_MANUAL.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_test_manual",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_test_manual.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_test_manual.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_test_manual.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_test_manual.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Playbook -- Start a new NAC-3 project -- NAC3</title>
+<meta name="nac3-doc-slug" content="ai_playbook_new_project" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="ai_playbook_new_project" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="ai_playbook_new_project.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="ai_playbook_new_project.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/ai_playbook_new_project.mp3" data-nac-id="ai_playbook_new_project.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="ai_playbook_new_project.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="ai_playbook_new_project.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="ai_playbook_new_project.main" data-nac-role="region">
+<h1 data-nac-id="ai_playbook_new_project.h1.ai-playbook-start-a-new-nac-3-project" data-nac-role="heading" data-nac-level="1" id="ai-playbook-start-a-new-nac-3-project">AI Playbook -- Start a new NAC-3 project</h1>
+<p data-nac-id="ai_playbook_new_project.p.1" data-nac-role="paragraph"><strong>NAC3 version:</strong> 2.2 stable + v2.3 interop preview. <strong>Audience:</strong> Any AI agent (Claude, GPT, Gemini, local LLM) tasked with bootstrapping a NAC-3 conformant project from scratch. <strong>Format:</strong> Step-by-step runbook. Each step has WHAT, HOW, ASSERT. No ambiguity.</p>
+<p data-nac-id="ai_playbook_new_project.p.2" data-nac-role="paragraph">When a human says <strong>"let's start a new NAC-3 project"</strong> or similar, an AI agent reading this file MUST execute the steps below in order, asserting each gate before advancing.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-0-confirm-scope-with-the-human" data-nac-role="heading" data-nac-level="2" id="step-0-confirm-scope-with-the-human">Step 0 -- Confirm scope with the human</h2>
+<p data-nac-id="ai_playbook_new_project.p.5" data-nac-role="paragraph">Ask exactly these questions before writing any code:</p>
+<p data-nac-id="ai_playbook_new_project.p.6" data-nac-role="paragraph">server-rendered (PHP/Rails/Django)?</p>
+<p data-nac-id="ai_playbook_new_project.p.7" data-nac-role="paragraph">support at launch? (es, en, pt, fr, it, de, ja, zh, hi, ar)</p>
+<p data-nac-id="ai_playbook_new_project.p.8" data-nac-role="paragraph">intermediary (provide endpoint) or use a hosted Yujin chat?</p>
+<p data-nac-id="ai_playbook_new_project.p.9" data-nac-role="paragraph">signing.</p>
+<p data-nac-id="ai_playbook_new_project.p.10" data-nac-role="paragraph">other NAC3 hosts (Yujin Pilot, peer apps)? Yes -&gt; expose    MCP server tools.</p>
+<ol data-nac-id="ai_playbook_new_project.list.11" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.11.item.1" data-nac-role="list-item"><strong>Framework</strong>: React, Angular, Vue, Svelte, vanilla, or</li><li data-nac-id="ai_playbook_new_project.list.11.item.2" data-nac-role="list-item"><strong>Languages</strong>: Which of the 10 NAC3 locales must the app</li><li data-nac-id="ai_playbook_new_project.list.11.item.3" data-nac-role="list-item"><strong>Chat backend</strong>: Will the app expose its own LLM</li><li data-nac-id="ai_playbook_new_project.list.11.item.4" data-nac-role="list-item"><strong>Provenance</strong>: Multi-tenant? If yes, plan for HMAC manifest</li><li data-nac-id="ai_playbook_new_project.list.11.item.5" data-nac-role="list-item"><strong>Voice</strong>: Push-to-talk only, hands-free, or both?</li><li data-nac-id="ai_playbook_new_project.list.11.item.6" data-nac-role="list-item"><strong>Interop (v2.3 preview)</strong>: Will this app be importable by</li></ol>
+<p data-nac-id="ai_playbook_new_project.p.12" data-nac-role="paragraph">Park each answer. They drive every subsequent decision.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-1-scaffold-the-project" data-nac-role="heading" data-nac-level="2" id="step-1-scaffold-the-project">Step 1 -- Scaffold the project</h2>
+<h3 data-nac-id="ai_playbook_new_project.h3.react-vite" data-nac-role="heading" data-nac-level="3" id="react-vite">React (Vite)</h3>
+<pre data-nac-id="ai_playbook_new_project.code.1" data-nac-role="code" data-nac-lang="bash"><code>npm create vite@latest &lt;slug&gt; -- --template react-ts
+cd &lt;slug&gt;
+npm install
+npm install @nac3/runtime@^2.2.0</code></pre>
+<h3 data-nac-id="ai_playbook_new_project.h3.angular" data-nac-role="heading" data-nac-level="3" id="angular">Angular</h3>
+<pre data-nac-id="ai_playbook_new_project.code.2" data-nac-role="code" data-nac-lang="bash"><code>npx -p @angular/cli ng new &lt;slug&gt; --style=css --routing=true --strict
+cd &lt;slug&gt;
+npm install @nac3/runtime@^2.2.0</code></pre>
+<h3 data-nac-id="ai_playbook_new_project.h3.vanilla-html-js-php-no-framework" data-nac-role="heading" data-nac-level="3" id="vanilla-html-js-php-no-framework">Vanilla (HTML + JS + PHP, no framework)</h3>
+<p data-nac-id="ai_playbook_new_project.p.20" data-nac-role="paragraph">Create:</p>
+<ul data-nac-id="ai_playbook_new_project.list.21" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.21.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">index.html</code> with <code data-nac-role="code-inline">&lt;body data-nac-plugin="app"&gt;</code>.</li><li data-nac-id="ai_playbook_new_project.list.21.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">js/app.js</code> with imports.</li></ul>
+<h3 data-nac-id="ai_playbook_new_project.h3.server-rendered" data-nac-role="heading" data-nac-level="3" id="server-rendered">Server-rendered</h3>
+<p data-nac-id="ai_playbook_new_project.p.23" data-nac-role="paragraph">Embed <code data-nac-role="code-inline">@nac3/runtime</code> via CDN:</p>
+<pre data-nac-id="ai_playbook_new_project.code.3" data-nac-role="code" data-nac-lang="html"><code>&lt;script src=&quot;https://yujin.app/nac-spec/js/nac.js?v=v22&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://yujin.app/nac-spec/js/nac-v2-extensions.js?v=v22&quot;&gt;&lt;/script&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.25" data-nac-role="paragraph"><strong>Assert:</strong> <code data-nac-role="code-inline">npm run build</code> (or framework equivalent) succeeds without error. Open in browser; <code data-nac-role="code-inline">window.NAC</code> is defined.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-2-decorate-the-shell" data-nac-role="heading" data-nac-level="2" id="step-2-decorate-the-shell">Step 2 -- Decorate the shell</h2>
+<p data-nac-id="ai_playbook_new_project.p.28" data-nac-role="paragraph">Add to your <strong>root container</strong> in the template:</p>
+<pre data-nac-id="ai_playbook_new_project.code.4" data-nac-role="code" data-nac-lang="html"><code>&lt;div data-nac-plugin=&quot;&lt;your-app-slug&gt;&quot; class=&quot;app&quot;&gt;
+  ...
+&lt;/div&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.30" data-nac-role="paragraph">Add to <strong>every clickable widget</strong> (buttons, links-as-buttons):</p>
+<pre data-nac-id="ai_playbook_new_project.code.5" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;&lt;slug&gt;.&lt;verb&gt;&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;&lt;verb&gt;&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.32" data-nac-role="paragraph">Add to <strong>every form field</strong> (input, textarea, select):</p>
+<pre data-nac-id="ai_playbook_new_project.code.6" data-nac-role="code" data-nac-lang="html"><code>&lt;input
+  data-nac-id=&quot;&lt;slug&gt;.&lt;field-name&gt;&quot;
+  data-nac-role=&quot;field&quot;
+  ... /&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.34" data-nac-role="paragraph">Add to <strong>every tab button</strong> (the spec is strict: <code data-nac-role="code-inline">^tab\.</code> id MUST have role <code data-nac-role="code-inline">tab</code>):</p>
+<pre data-nac-id="ai_playbook_new_project.code.7" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;tab.&lt;key&gt;&quot;
+  data-nac-role=&quot;tab&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.36" data-nac-role="paragraph"><strong>Assert:</strong> <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> reports zero error- severity findings. <code data-nac-role="code-inline">NAC.describe()</code> from the browser console returns a tree with <code data-nac-role="code-inline">data-nac-plugin</code> matches.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-3-write-the-manifest" data-nac-role="heading" data-nac-level="2" id="step-3-write-the-manifest">Step 3 -- Write the manifest</h2>
+<p data-nac-id="ai_playbook_new_project.p.39" data-nac-role="paragraph">Create <code data-nac-role="code-inline">src/nac/manifest.ts</code> (or equivalent):</p>
+<pre data-nac-id="ai_playbook_new_project.code.8" data-nac-role="code" data-nac-lang="ts"><code>const li = (es:string,en:string,pt:string,fr:string,it:string,
+            de:string,ja:string,zh:string,hi:string,ar:string) =&gt;
+  ({ es, en, pt, fr, it, de, ja, zh, hi, ar });
+
+export const APP_MANIFEST = {
+  plugin_slug: &#x27;&lt;your-app-slug&gt;&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.2&#x27;,
+  elements: [
+    {
+      id: &#x27;&lt;slug&gt;.save&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: li(&#x27;Guardar&#x27;,&#x27;Save&#x27;,&#x27;Salvar&#x27;,&#x27;Sauver&#x27;,&#x27;Salva&#x27;,
+                       &#x27;Speichern&#x27;,&#x27;保存&#x27;,&#x27;保存&#x27;,&#x27;sahejna&#x27;,&#x27;حفظ&#x27;)
+      }],
+      label_i18n: li(/* same 10 */)
+    },
+    // ... every other element ...
+  ]
+};</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.41" data-nac-role="paragraph"><strong>Critical rules:</strong></p>
+<p data-nac-id="ai_playbook_new_project.p.42" data-nac-role="paragraph">populated is a v2.2 strict-validator finding.</p>
+<p data-nac-id="ai_playbook_new_project.p.43" data-nac-role="paragraph">not <code data-nac-role="code-inline">save</code>).</p>
+<ul data-nac-id="ai_playbook_new_project.list.44" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.44.item.1" data-nac-role="list-item">Every <code data-nac-role="code-inline">label_i18n</code> MUST cover all 10 supported locales. Half-</li><li data-nac-id="ai_playbook_new_project.list.44.item.2" data-nac-role="list-item">Every <code data-nac-role="code-inline">id</code> matching <code data-nac-role="code-inline">^tab\.</code> MUST have <code data-nac-role="code-inline">role: 'tab'</code>.</li><li data-nac-id="ai_playbook_new_project.list.44.item.3" data-nac-role="list-item">Every <code data-nac-role="code-inline">id</code> MUST be plugin-namespaced (e.g. <code data-nac-role="code-inline">invoice.save</code>,</li><li data-nac-id="ai_playbook_new_project.list.44.item.4" data-nac-role="list-item">IDs MUST be stable across UI redesigns.</li></ul>
+<p data-nac-id="ai_playbook_new_project.p.45" data-nac-role="paragraph"><strong>Assert:</strong> <code data-nac-role="code-inline">NAC.validate_global({probe: false})</code> returns 0 error-severity findings.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-4-register-the-manifest-at-boot" data-nac-role="heading" data-nac-level="2" id="step-4-register-the-manifest-at-boot">Step 4 -- Register the manifest at boot</h2>
+<h3 data-nac-id="ai_playbook_new_project.h3.react" data-nac-role="heading" data-nac-level="3" id="react">React</h3>
+<pre data-nac-id="ai_playbook_new_project.code.9" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+import { APP_MANIFEST } from &#x27;./nac/manifest&#x27;;
+
+export function App() {
+  useEffect(() =&gt; {
+    window.NAC?.register(APP_MANIFEST);
+  }, []);
+  // ...
+}</code></pre>
+<h3 data-nac-id="ai_playbook_new_project.h3.angular" data-nac-role="heading" data-nac-level="3" id="angular">Angular</h3>
+<pre data-nac-id="ai_playbook_new_project.code.10" data-nac-role="code" data-nac-lang="ts"><code>import { Injectable } from &#x27;@angular/core&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+import { APP_MANIFEST } from &#x27;./nac/manifest&#x27;;
+
+@Injectable({ providedIn: &#x27;root&#x27; })
+export class NacBoot {
+  constructor() {
+    (window as any).NAC?.register(APP_MANIFEST);
+  }
+}</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.52" data-nac-role="paragraph">Inject <code data-nac-role="code-inline">NacBoot</code> into your <code data-nac-role="code-inline">AppComponent</code>.</p>
+<h3 data-nac-id="ai_playbook_new_project.h3.vanilla" data-nac-role="heading" data-nac-level="3" id="vanilla">Vanilla</h3>
+<pre data-nac-id="ai_playbook_new_project.code.11" data-nac-role="code" data-nac-lang="html"><code>&lt;script type=&quot;module&quot;&gt;
+import { APP_MANIFEST } from &#x27;./nac/manifest.js&#x27;;
+window.NAC.register(APP_MANIFEST);
+&lt;/script&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.55" data-nac-role="paragraph"><strong>Assert:</strong> <code data-nac-role="code-inline">NAC.list_registered_plugins()</code> returns <code data-nac-role="code-inline">['&lt;your-app-slug&gt;']</code>.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-5-emit-the-ack-contract-from-every-click-handler" data-nac-role="heading" data-nac-level="2" id="step-5-emit-the-ack-contract-from-every-click-handler">Step 5 -- Emit the ack contract from every click handler</h2>
+<p data-nac-id="ai_playbook_new_project.p.58" data-nac-role="paragraph">For each button decorated with <code data-nac-role="code-inline">data-nac-role="action"</code>, your click handler MUST emit <code data-nac-role="code-inline">nac:action:succeeded</code> after its synchronous side effect.</p>
+<h3 data-nac-id="ai_playbook_new_project.h3.pattern-a-via-nacbindaction-v22-helper-recommended" data-nac-role="heading" data-nac-level="3" id="pattern-a-via-nacbindaction-v22-helper-recommended">Pattern A -- via <code data-nac-role="code-inline">NAC.bindAction</code> (v2.2 helper, recommended)</h3>
+<pre data-nac-id="ai_playbook_new_project.code.12" data-nac-role="code" data-nac-lang="ts"><code>const btn = document.querySelector(&#x27;[data-nac-id=&quot;&lt;slug&gt;.save&quot;]&#x27;);
+NAC.bindAction(btn, function (ev) {
+  saveInvoice();          // your side effect
+}, { plugin: &#x27;&lt;slug&gt;&#x27;, action_id: &#x27;&lt;slug&gt;.save&#x27; });</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.61" data-nac-role="paragraph"><code data-nac-role="code-inline">bindAction</code> handles sync, async (Promise), and throw cases automatically.</p>
+<h3 data-nac-id="ai_playbook_new_project.h3.pattern-b-manual-emission" data-nac-role="heading" data-nac-level="3" id="pattern-b-manual-emission">Pattern B -- manual emission</h3>
+<pre data-nac-id="ai_playbook_new_project.code.13" data-nac-role="code" data-nac-lang="ts"><code>button.addEventListener(&#x27;click&#x27;, function () {
+  saveInvoice();
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;&lt;slug&gt;&#x27;, action_id: &#x27;&lt;slug&gt;.save&#x27; }
+  }));
+});</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.64" data-nac-role="paragraph">For other roles emit the canonical event family:</p>
+<ul data-nac-id="ai_playbook_new_project.list.65" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.65.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">role="field"</code> -&gt; <code data-nac-role="code-inline">nac:field:changed</code> (detail: <code data-nac-role="code-inline">{plugin, field_id, value}</code>)</li><li data-nac-id="ai_playbook_new_project.list.65.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">role="tab"</code> -&gt; <code data-nac-role="code-inline">nac:tab:activated</code> (detail: <code data-nac-role="code-inline">{plugin, tab_id}</code>)</li><li data-nac-id="ai_playbook_new_project.list.65.item.3" data-nac-role="list-item">See SPEC.md section 6 for the full table.</li></ul>
+<p data-nac-id="ai_playbook_new_project.p.66" data-nac-role="paragraph"><strong>Assert:</strong> From the browser console:</p>
+<pre data-nac-id="ai_playbook_new_project.code.14" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt; console.log(e.detail));
+await NAC.click(&#x27;&lt;slug&gt;.save&#x27;);
+// Should print {plugin: &#x27;&lt;slug&gt;&#x27;, action_id: &#x27;&lt;slug&gt;.save&#x27;, ...}</code></pre>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-6-wire-the-chat-panel" data-nac-role="heading" data-nac-level="2" id="step-6-wire-the-chat-panel">Step 6 -- Wire the chat panel</h2>
+<p data-nac-id="ai_playbook_new_project.p.70" data-nac-role="paragraph">Drop in the reference chat client OR use Yujin Pilot (external).</p>
+<h3 data-nac-id="ai_playbook_new_project.h3.option-a-embed-nac-chat-clientjs" data-nac-role="heading" data-nac-level="3" id="option-a-embed-nac-chat-clientjs">Option A -- embed <code data-nac-role="code-inline">nac-chat-client.js</code></h3>
+<pre data-nac-id="ai_playbook_new_project.code.15" data-nac-role="code" data-nac-lang="html"><code>&lt;aside class=&quot;chat&quot; data-nac-plugin=&quot;chat&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;header class=&quot;chat-head&quot;&gt;...&lt;/header&gt;
+  &lt;div id=&quot;chat-log&quot; data-nac-id=&quot;chat.log&quot; data-nac-role=&quot;region&quot;&gt;&lt;/div&gt;
+  &lt;input id=&quot;chat-input&quot; data-nac-id=&quot;chat.input&quot; data-nac-role=&quot;field&quot;&gt;
+  &lt;button id=&quot;chat-send&quot; data-nac-id=&quot;chat.send&quot; data-nac-role=&quot;action&quot;&gt;send&lt;/button&gt;
+&lt;/aside&gt;
+
+&lt;script src=&quot;https://yujin.app/nac-spec/js/nac-chat-client.js?v=v22&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+  NacChat.init({
+    endpoint: &#x27;/api/your-llm-intermediary&#x27;,
+    chatLog: document.getElementById(&#x27;chat-log&#x27;),
+    input:   document.getElementById(&#x27;chat-input&#x27;),
+    sendBtn: document.getElementById(&#x27;chat-send&#x27;)
+  });
+&lt;/script&gt;</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.73" data-nac-role="paragraph">You provide the <code data-nac-role="code-inline">endpoint</code> -- the LLM intermediary backend that receives <code data-nac-role="code-inline">{prompt, lang, history, nac_tree}</code> and returns <code data-nac-role="code-inline">{message, actions[]}</code>. See <code data-nac-role="code-inline">LLM_WIRING.md</code>.</p>
+<h3 data-nac-id="ai_playbook_new_project.h3.option-b-defer-to-yujin-pilot" data-nac-role="heading" data-nac-level="3" id="option-b-defer-to-yujin-pilot">Option B -- defer to Yujin Pilot</h3>
+<p data-nac-id="ai_playbook_new_project.p.75" data-nac-role="paragraph">Don't embed chat at all. Tell users "install Yujin Pilot (yujin.app/pilot) for voice + chat on this app". Pilot's MCP scanner discovers your app + drives it from its central cockpit.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-7-run-the-test-corpus" data-nac-role="heading" data-nac-level="2" id="step-7-run-the-test-corpus">Step 7 -- Run the test corpus</h2>
+<p data-nac-id="ai_playbook_new_project.p.78" data-nac-role="paragraph">Copy the Yujin reference test infrastructure as your starting point:</p>
+<pre data-nac-id="ai_playbook_new_project.code.16" data-nac-role="code" data-nac-lang="bash"><code># From your project root
+cp -r /path/to/rpaforce-crm/packages/nac/test ./test
+cp -r /path/to/rpaforce-crm/tools/nac/test-launch.sh ./tools/test-launch.sh</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.80" data-nac-role="paragraph">Edit <code data-nac-role="code-inline">test/stage*.mjs</code> to reference your manifest + your plugin slug instead of the demo's. The skeleton stays identical.</p>
+<p data-nac-id="ai_playbook_new_project.p.81" data-nac-role="paragraph">Run:</p>
+<pre data-nac-id="ai_playbook_new_project.code.17" data-nac-role="code" data-nac-lang="bash"><code>bash ./tools/test-launch.sh</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.83" data-nac-role="paragraph"><strong>Assert:</strong> All node-side layers GREEN. Total time &lt; 15s.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-8-add-playwright-e2e" data-nac-role="heading" data-nac-level="2" id="step-8-add-playwright-e2e">Step 8 -- Add Playwright e2e</h2>
+<pre data-nac-id="ai_playbook_new_project.code.18" data-nac-role="code" data-nac-lang="bash"><code>mkdir -p tests/e2e-nac
+cd tests/e2e-nac
+npm init -y
+npm install --save-dev @playwright/test
+npx playwright install chromium</code></pre>
+<p data-nac-id="ai_playbook_new_project.p.87" data-nac-role="paragraph">Copy <code data-nac-role="code-inline">tests/e2e-nac/specs/01-landing.spec.ts</code> from the Yujin reference as a template; adapt to your app's URL + plugin slug.</p>
+<p data-nac-id="ai_playbook_new_project.p.88" data-nac-role="paragraph">For the <strong>full pipeline test</strong> (chat -&gt; LLM -&gt; dispatch -&gt; DOM -&gt; ack), see Yujin's <code data-nac-role="code-inline">08-pipeline-end-to-end.spec.ts</code>. Three tests exercise the entire flow against your live backend.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-9-production-checklist" data-nac-role="heading" data-nac-level="2" id="step-9-production-checklist">Step 9 -- Production checklist</h2>
+<p data-nac-id="ai_playbook_new_project.p.91" data-nac-role="paragraph">Before deploy:</p>
+<p data-nac-id="ai_playbook_new_project.p.92" data-nac-role="paragraph">role validation (throws on drift).</p>
+<p data-nac-id="ai_playbook_new_project.p.93" data-nac-role="paragraph">findings.</p>
+<p data-nac-id="ai_playbook_new_project.p.94" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.set_provenance_secret()</code> from authed code.</p>
+<p data-nac-id="ai_playbook_new_project.p.95" data-nac-role="paragraph">RPA bots / synthetic clicks should be allowed to trigger       (see SECURITY.md).</p>
+<p data-nac-id="ai_playbook_new_project.p.96" data-nac-role="paragraph"><code data-nac-role="code-inline">i18n_strict: 'permissive'</code> during migration).</p>
+<ul data-nac-id="ai_playbook_new_project.list.97" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.97.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.STRICT_VALIDATION = true</code> -- enforces register-time</li><li data-nac-id="ai_playbook_new_project.list.97.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> -- zero error-severity</li><li data-nac-id="ai_playbook_new_project.list.97.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm test</code> (your harness) -- 100% pass.</li><li data-nac-id="ai_playbook_new_project.list.97.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npx playwright test</code> -- all e2e green.</li><li data-nac-id="ai_playbook_new_project.list.97.item.5" data-nac-role="list-item">[ ] Multi-tenant: HMAC-sign manifests server-side; call</li><li data-nac-id="ai_playbook_new_project.list.97.item.6" data-nac-role="list-item">[ ] is_trusted-gated verbs: explicitly whitelist any verb that</li><li data-nac-id="ai_playbook_new_project.list.97.item.7" data-nac-role="list-item">[ ] i18n: every <code data-nac-role="code-inline">label_i18n</code> covers all 10 locales (or use</li></ul>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.step-10-promote-to-nac-3-conformance" data-nac-role="heading" data-nac-level="2" id="step-10-promote-to-nac-3-conformance">Step 10 -- Promote to NAC-3 conformance</h2>
+<p data-nac-id="ai_playbook_new_project.p.100" data-nac-role="paragraph">Run <code data-nac-role="code-inline">NAC.validate_global({probe: true})</code>. The runtime synthesises clicks against every <code data-nac-role="code-inline">role="action"</code> element to verify each emits its ack within 5s.</p>
+<p data-nac-id="ai_playbook_new_project.p.101" data-nac-role="paragraph"><strong>Assert:</strong> zero findings. You are NAC-3 conformant.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.common-ai-mistakes-and-how-to-avoid-them" data-nac-role="heading" data-nac-level="2" id="common-ai-mistakes-and-how-to-avoid-them">Common AI mistakes (and how to avoid them)</h2>
+<p data-nac-id="ai_playbook_new_project.p.104" data-nac-role="paragraph">The runtime's <code data-nac-role="code-inline">NAC.describe()</code> walks the DOM, not the    registry. Without the attribute, the LLM intermediary's    snapshot is empty for that plugin. ALWAYS pair the two.</p>
+<p data-nac-id="ai_playbook_new_project.p.105" data-nac-role="paragraph">functional setters. See CASE_STUDIES_DISCOVERY.md bug #2.</p>
+<p data-nac-id="ai_playbook_new_project.p.106" data-nac-role="paragraph">label_i18n maps. If you must ship partial, use    <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> and a TODO ticket; it's not a    forever shortcut.</p>
+<p data-nac-id="ai_playbook_new_project.p.107" data-nac-role="paragraph">semantic role MUST get a new id. Reusing breaks every    downstream agent script.</p>
+<p data-nac-id="ai_playbook_new_project.p.108" data-nac-role="paragraph">synchronously but doesn't emit <code data-nac-role="code-inline">nac:action:succeeded</code> will    time out NAC.click(). Use <code data-nac-role="code-inline">bindAction</code> to bake the    contract in.</p>
+<ol data-nac-id="ai_playbook_new_project.list.109" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.109.item.1" data-nac-role="list-item"><strong>Register manifest without <code data-nac-role="code-inline">data-nac-plugin</code> on the DOM.</strong></li><li data-nac-id="ai_playbook_new_project.list.109.item.2" data-nac-role="list-item"><strong>Closing chat handlers over React/Vue state.</strong> Use refs or</li><li data-nac-id="ai_playbook_new_project.list.109.item.3" data-nac-role="list-item"><strong>Partial i18n.</strong> v2.2 strict validator fails on incomplete</li><li data-nac-id="ai_playbook_new_project.list.109.item.4" data-nac-role="list-item"><strong>Reusing IDs after refactor.</strong> A button renamed to a new</li><li data-nac-id="ai_playbook_new_project.list.109.item.5" data-nac-role="list-item"><strong>Forgetting the ack event.</strong> A handler that does its work</li></ol>
+<hr />
+<h2 data-nac-id="ai_playbook_new_project.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
+<p data-nac-id="ai_playbook_new_project.p.112" data-nac-role="paragraph">brownfield projects.</p>
+<p data-nac-id="ai_playbook_new_project.p.113" data-nac-role="paragraph">playbook for any NAC-3 app.</p>
+<p data-nac-id="ai_playbook_new_project.p.114" data-nac-role="paragraph">deep dives.</p>
+<ul data-nac-id="ai_playbook_new_project.list.115" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.115.item.1" data-nac-role="list-item"><a href="../SPEC.md" data-nac-id="ai_playbook_new_project.link.1" data-nac-role="action" data-nac-action="open">SPEC.md</a> -- canonical contract.</li><li data-nac-id="ai_playbook_new_project.list.115.item.2" data-nac-role="list-item"><a href="AI_PLAYBOOK_MIGRATION.md" data-nac-id="ai_playbook_new_project.link.2" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_MIGRATION.md</a> -- for</li><li data-nac-id="ai_playbook_new_project.list.115.item.3" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="ai_playbook_new_project.link.3" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- test</li><li data-nac-id="ai_playbook_new_project.list.115.item.4" data-nac-role="list-item"><a href="REACT.md" data-nac-id="ai_playbook_new_project.link.4" data-nac-role="action" data-nac-action="open">REACT.md</a> / <a href="ANGULAR.md" data-nac-id="ai_playbook_new_project.link.5" data-nac-role="action" data-nac-action="open">ANGULAR.md</a> -- framework</li></ul>
+<h2 data-nac-id="ai_playbook_new_project.h2.license" data-nac-role="heading" data-nac-level="2" id="license">License</h2>
+<p data-nac-id="ai_playbook_new_project.p.117" data-nac-role="paragraph">Apache-2.0.</p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "ai_playbook_new_project",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "ai_playbook_new_project.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "ai_playbook_new_project.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "ai_playbook_new_project.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "ai_playbook_new_project.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Contributing to NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="contributing" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="contributing" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="contributing.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="contributing.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/contributing.mp3" data-nac-id="contributing.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="contributing.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="contributing.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="contributing.main" data-nac-role="region">
+<h1 data-nac-id="contributing.h1.contributing-to-nac3" data-nac-role="heading" data-nac-level="1" id="contributing-to-nac3">Contributing to NAC3</h1>
+<p data-nac-id="contributing.p.1" data-nac-role="paragraph"><strong>Spec version:</strong> 2.2 stable (+ v2.3 interop preview).</p>
+<h2 data-nac-id="contributing.h2.governance" data-nac-role="heading" data-nac-level="2" id="governance">Governance</h2>
+<p data-nac-id="contributing.p.3" data-nac-role="paragraph">NAC3 is currently stewarded by Yujin. The spec is Apache 2.0; the reference runtime is MIT. Yujin commits to moving NAC3 to a neutral foundation (W3C community group, Linux Foundation, or equivalent) if and when adoption justifies neutral governance. Until then, spec changes follow the RFC process below with at least 14 days of public comment for any change to the public API or wire formats.</p>
+<p data-nac-id="contributing.p.4" data-nac-role="paragraph">The Apache 2.0 + MIT licensing guarantees that the spec and runtime survive any change in Yujin's corporate status. Forks are explicitly welcomed under both licenses.</p>
+<hr />
+<p data-nac-id="contributing.p.6" data-nac-role="paragraph">Thanks for considering a contribution. NAC3 is a public spec plus a reference implementation; both accept contributions.</p>
+<h2 data-nac-id="contributing.h2.three-kinds-of-contribution" data-nac-role="heading" data-nac-level="2" id="three-kinds-of-contribution">Three kinds of contribution</h2>
+<h3 data-nac-id="contributing.h3.1-spec-change-rfc-required" data-nac-role="heading" data-nac-level="3" id="1-spec-change-rfc-required">1. Spec change (RFC required)</h3>
+<p data-nac-id="contributing.p.9" data-nac-role="paragraph">Edits to <code data-nac-role="code-inline">SPEC.md</code>, <code data-nac-role="code-inline">ABOUT.md</code>, or <code data-nac-role="code-inline">docs/NAC_V*_ROADMAP.md</code> are spec changes. Before opening a PR:</p>
+<p data-nac-id="contributing.p.10" data-nac-role="paragraph">ideally with a concrete reproduction).</p>
+<p data-nac-id="contributing.p.11" data-nac-role="paragraph">opening the PR.</p>
+<ol data-nac-id="contributing.list.12" data-nac-role="list"><li data-nac-id="contributing.list.12.item.1" data-nac-role="list-item">Open a GitHub issue titled <code data-nac-role="code-inline">RFC: &lt;one-line summary&gt;</code>.</li><li data-nac-id="contributing.list.12.item.2" data-nac-role="list-item">Describe the problem class (what bug or limitation it fixes,</li><li data-nac-id="contributing.list.12.item.3" data-nac-role="list-item">Describe the proposed contract change.</li><li data-nac-id="contributing.list.12.item.4" data-nac-role="list-item">Describe the migration path for existing adopters.</li><li data-nac-id="contributing.list.12.item.5" data-nac-role="list-item">Wait for at least one maintainer reply on the issue before</li></ol>
+<p data-nac-id="contributing.p.13" data-nac-role="paragraph">Spec PRs that arrive without a paired RFC issue will be closed with a pointer to this section.</p>
+<h3 data-nac-id="contributing.h3.2-reference-runtime-change" data-nac-role="heading" data-nac-level="3" id="2-reference-runtime-change">2. Reference runtime change</h3>
+<p data-nac-id="contributing.p.15" data-nac-role="paragraph">Edits to <code data-nac-role="code-inline">js/nac.js</code>, <code data-nac-role="code-inline">js/nac-v2-extensions.js</code>, or <code data-nac-role="code-inline">js/nac-chat-client.js</code>. PRs welcome without an RFC if:</p>
+<p data-nac-id="contributing.p.16" data-nac-role="paragraph">current spec.</p>
+<p data-nac-id="contributing.p.17" data-nac-role="paragraph">delta.</p>
+<ul data-nac-id="contributing.list.18" data-nac-role="list"><li data-nac-id="contributing.list.18.item.1" data-nac-role="list-item">The change is a bug fix that aligns the runtime with the</li><li data-nac-id="contributing.list.18.item.2" data-nac-role="list-item">The change is a performance improvement with no behavioural</li><li data-nac-id="contributing.list.18.item.3" data-nac-role="list-item">The change is documentation, types, or test coverage.</li></ul>
+<p data-nac-id="contributing.p.19" data-nac-role="paragraph">PRs that change runtime behaviour in a way that affects the spec contract MUST be paired with a spec RFC first.</p>
+<h3 data-nac-id="contributing.h3.3-demo-tooling-or-doc-improvement" data-nac-role="heading" data-nac-level="3" id="3-demo-tooling-or-doc-improvement">3. Demo, tooling, or doc improvement</h3>
+<p data-nac-id="contributing.p.21" data-nac-role="paragraph">Edits to <code data-nac-role="code-inline">example*.php</code>, <code data-nac-role="code-inline">tools/</code>, <code data-nac-role="code-inline">guides/</code>, or any non-spec markdown. PR directly. Keep changes minimal; we prefer ten small PRs to one big one.</p>
+<h2 data-nac-id="contributing.h2.code-style" data-nac-role="heading" data-nac-level="2" id="code-style">Code style</h2>
+<p data-nac-id="contributing.p.23" data-nac-role="paragraph">8.3 rejects non-ASCII even in comments). Use <code data-nac-role="code-inline">--</code> for em-dashes,   not <code data-nac-role="code-inline">--</code>.</p>
+<p data-nac-id="contributing.p.24" data-nac-role="paragraph">files. Plain ES2018+. The npm package adds an ESM/CJS wrapper   around the same source.</p>
+<p data-nac-id="contributing.p.25" data-nac-role="paragraph">before and passes after. Run <code data-nac-role="code-inline">make test-launch</code> from the repo   root before pushing.</p>
+<ul data-nac-id="contributing.list.26" data-nac-role="list"><li data-nac-id="contributing.list.26.item.1" data-nac-role="list-item">ASCII-only source files (the project is GoDaddy-deployed; PHP</li><li data-nac-id="contributing.list.26.item.2" data-nac-role="list-item">JS: no transpiler, no bundler, no build step on the runtime</li><li data-nac-id="contributing.list.26.item.3" data-nac-role="list-item">PHP: keep heredocs simple (<code data-nac-role="code-inline">{$var}</code> only, no expressions).</li><li data-nac-id="contributing.list.26.item.4" data-nac-role="list-item">Comments: explain WHY, not WHAT. The diff already shows the what.</li><li data-nac-id="contributing.list.26.item.5" data-nac-role="list-item">Tests: every behavioural change ships with a test that fails</li></ul>
+<h2 data-nac-id="contributing.h2.commit-style" data-nac-role="heading" data-nac-level="2" id="commit-style">Commit style</h2>
+<p data-nac-id="contributing.p.28" data-nac-role="paragraph">"fix(nac): treat tab role drift as register-time error", not   "Fixed tab thing".</p>
+<p data-nac-id="contributing.p.29" data-nac-role="paragraph">related commits by short SHA.</p>
+<p data-nac-id="contributing.p.30" data-nac-role="paragraph">hide tooling.</p>
+<ul data-nac-id="contributing.list.31" data-nac-role="list"><li data-nac-id="contributing.list.31.item.1" data-nac-role="list-item">Subject under 70 characters, present-tense imperative.</li><li data-nac-id="contributing.list.31.item.2" data-nac-role="list-item">Body explains the problem, the cause, and the fix. Cite</li><li data-nac-id="contributing.list.31.item.3" data-nac-role="list-item">Co-author trailer for AI-assisted commits is fine; we don't</li></ul>
+<h2 data-nac-id="contributing.h2.reviewing" data-nac-role="heading" data-nac-level="2" id="reviewing">Reviewing</h2>
+<ul data-nac-id="contributing.list.33" data-nac-role="list"><li data-nac-id="contributing.list.33.item.1" data-nac-role="list-item">Bugfix PRs: 1 approver, merge.</li><li data-nac-id="contributing.list.33.item.2" data-nac-role="list-item">Runtime/spec PRs: 1 approver + green CI, merge.</li><li data-nac-id="contributing.list.33.item.3" data-nac-role="list-item">Spec change PRs: paired RFC issue with discussion + 1 approver</li><li data-nac-id="contributing.list.33.item.4" data-nac-role="list-item">green CI + 7-day comment window after the PR opens.</li></ul>
+<h2 data-nac-id="contributing.h2.licensing" data-nac-role="heading" data-nac-level="2" id="licensing">Licensing</h2>
+<p data-nac-id="contributing.p.35" data-nac-role="paragraph">By submitting a PR you license your contribution under Apache-2.0 to match the project. The PR template includes a checkbox; tick it.</p>
+<h2 data-nac-id="contributing.h2.code-of-conduct" data-nac-role="heading" data-nac-level="2" id="code-of-conduct">Code of conduct</h2>
+<p data-nac-id="contributing.p.37" data-nac-role="paragraph">Be technically correct, brief, and kind. Disagreement is fine; ad hominem is not. Maintainers may close threads or revoke commit access for repeat violations.</p>
+<h2 data-nac-id="contributing.h2.where-to-ask-questions" data-nac-role="heading" data-nac-level="2" id="where-to-ask-questions">Where to ask questions</h2>
+<p data-nac-id="contributing.p.39" data-nac-role="paragraph">this?", and showcases.</p>
+<ul data-nac-id="contributing.list.40" data-nac-role="list"><li data-nac-id="contributing.list.40.item.1" data-nac-role="list-item">GitHub Discussions for design questions, "should I use NAC3 for</li><li data-nac-id="contributing.list.40.item.2" data-nac-role="list-item">GitHub Issues for bug reports.</li><li data-nac-id="contributing.list.40.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">nac@yujin.dev</code> for security disclosures (see <code data-nac-role="code-inline">SECURITY.md</code>).</li></ul>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "contributing",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "contributing.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "contributing.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "contributing.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "contributing.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- roadmap -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_v22_roadmap" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_v22_roadmap" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_v22_roadmap.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_v22_roadmap.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_v22_roadmap.mp3" data-nac-id="nac_v22_roadmap.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_v22_roadmap.main" data-nac-role="region">
+<h1 data-nac-id="nac_v22_roadmap.h1.nac3-v22-roadmap" data-nac-role="heading" data-nac-level="1" id="nac3-v22-roadmap">NAC3 v2.2 -- roadmap</h1>
+<p data-nac-id="nac_v22_roadmap.p.1" data-nac-role="paragraph">NAC3 = <strong>Native Agent Contract</strong>.</p>
+<p data-nac-id="nac_v22_roadmap.p.2" data-nac-role="paragraph">Started 2026-05-09. This file accumulates the evolution items for the next minor of the NAC3 spec. Each section is self-contained: a problem statement, the bug class it prevents, the proposed contract change, and the implementation notes.</p>
+<p data-nac-id="nac_v22_roadmap.p.3" data-nac-role="paragraph"><strong>Status as of 2026-05-10:</strong> v2.2 SHIPPED. Items V22-01 + V22-02 + V22-03 + V22-04 are all in <code data-nac-role="code-inline">js/nac.js</code> + the <code data-nac-role="code-inline">@nac3/runtime</code> 2.2.0 NPM package. This file is now the canonical changelog for the version.</p>
+<p data-nac-id="nac_v22_roadmap.p.4" data-nac-role="paragraph">| Item | Status | Commit | |------|--------|--------| | V22-01 strict validator | SHIPPED | 6c2b1866 | | V22-02 bindAction helper | SHIPPED | 6c2b1866 | | V22-03 locale detector hardening | SHIPPED 2026-05-09 | f631d77a | | V22-04 tab_by_label parens normalisation | SHIPPED 2026-05-09 | f631d77a |</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-01-constructor-nacregister-becomes-a-strict-validator" data-nac-role="heading" data-nac-level="2" id="v22-01-constructor-nacregister-becomes-a-strict-validator">V22-01 -- Constructor (<code data-nac-role="code-inline">NAC.register</code>) becomes a strict validator</h2>
+<p data-nac-id="nac_v22_roadmap.p.7" data-nac-role="paragraph"><strong>Problem class.</strong> Brownfield demos can declare manifest elements with non-canonical role values (<code data-nac-role="code-inline">role:'navigation'</code> on a tab, <code data-nac-role="code-inline">role:'button'</code> instead of <code data-nac-role="code-inline">'action'</code>, etc). The current constructor accepts whatever shape it receives and stores it as-is. The bug only surfaces in runtime when the API (<code data-nac-role="code-inline">NAC.tab()</code>, <code data-nac-role="code-inline">NAC.tab_by_label()</code>, <code data-nac-role="code-inline">NAC.click()</code>) cannot find the element, because the canonical DOM query (<code data-nac-role="code-inline">[data-nac-role="tab"]</code>) does not match. By then the demo is already deployed, the user already hit the broken voice command, and the runtime correctly throws <code data-nac-role="code-inline">tab X missing</code> -- a misleading error since the element IS in the DOM, just under the wrong role.</p>
+<p data-nac-id="nac_v22_roadmap.p.8" data-nac-role="paragraph"><strong>Concrete trigger (2026-05-09).</strong> Pablo dictates <code data-nac-role="code-inline">ve a pestana permisos</code> on <code data-nac-role="code-inline">example-v21-data-table.php</code>. The LLM resolves to <code data-nac-role="code-inline">NAC.tab('invoice_edit_modal','tab.permissions')</code>. The button exists in the DOM but with <code data-nac-role="code-inline">data-nac-role="navigation"</code> (set by the demo author on HTML-semantic grounds: tabs ARE navigation). The runtime throws "tab tab.permissions missing" even though the button is right there. Same root cause caused <code data-nac-role="code-inline">tab_by_label('Lines (collection)')</code> to miss earlier in the same session.</p>
+<p data-nac-id="nac_v22_roadmap.p.9" data-nac-role="paragraph"><strong>Why three guard layers should have caught it but didn't.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.10" data-nac-role="paragraph">| Layer | Should detect... | What it does today | |---|---|---| | Pre-commit lint | role drift in PHP/HTML demo files | does not exist | | <code data-nac-role="code-inline">NAC.register(manifest)</code> (register-time) | non-canonical roles, id/role mismatch | accepts everything silently | | <code data-nac-role="code-inline">NAC.validate_global()</code> (lint-time) | role drift inside <code data-nac-role="code-inline">m.elements[]</code> | only checks <code data-nac-role="code-inline">m.tabs[]</code> presence |</p>
+<p data-nac-id="nac_v22_roadmap.p.11" data-nac-role="paragraph">The runtime API layer (<code data-nac-role="code-inline">NAC.tab</code> etc.) is the <strong>fourth</strong> guard, and the only one that fires today -- as a runtime error to the end user. By then the cost is highest.</p>
+<p data-nac-id="nac_v22_roadmap.p.12" data-nac-role="paragraph"><strong>Proposed contract change for v2.2.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.13" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.register</code> MUST validate the manifest before storing it. Validation rules:</p>
+<p data-nac-id="nac_v22_roadmap.p.14" data-nac-role="paragraph">be a member of the canonical role set (extends    <code data-nac-role="code-inline">_CLICK_EVENT_FAMILY</code>):</p>
+<ol data-nac-id="nac_v22_roadmap.list.15" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.15.item.1" data-nac-role="list-item"><strong>Known role enumeration.</strong> Every <code data-nac-role="code-inline">m.elements[i].role</code> must</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.16" data-nac-role="paragraph">``<code data-nac-role="code-inline">    action, field, option, tab, breadcrumb-item, accordion-toggle,    step, pagination-item, confirm-button, sort-control,    filter-control, data-table, plugin, section, region,    navigation, banner, complementary, contentinfo, button    </code>``</p>
+<p data-nac-id="nac_v22_roadmap.p.17" data-nac-role="paragraph">Unknown roles -&gt; <code data-nac-role="code-inline">console.error</code> + reject the register call.    Landmark roles (<code data-nac-role="code-inline">navigation</code>, <code data-nac-role="code-inline">banner</code>, etc) are accepted but    only on elements whose corresponding DOM node is a region    container, not a clickable widget.</p>
+<p data-nac-id="nac_v22_roadmap.p.18" data-nac-role="paragraph"><code data-nac-role="code-inline">e.role === 'tab'</code> is required. If <code data-nac-role="code-inline">e.id</code> matches    <code data-nac-role="code-inline">^modal\.</code> then <code data-nac-role="code-inline">e.role === 'action'</code> (or the action's    sub-role) is required. Any mismatch -&gt; <code data-nac-role="code-inline">console.error</code> +    reject. The grammar of the id field is a contract too;    today it is implicit.</p>
+<ol data-nac-id="nac_v22_roadmap.list.19" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.19.item.1" data-nac-role="list-item"><strong>Id/role coherence.</strong> If <code data-nac-role="code-inline">e.id</code> matches <code data-nac-role="code-inline">^tab\.</code> then</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.20" data-nac-role="paragraph">after the DOM is parsed (the typical path), look up    <code data-nac-role="code-inline">[data-nac-id="&lt;e.id&gt;"]</code> in the DOM. If found and its    <code data-nac-role="code-inline">data-nac-role</code> differs from <code data-nac-role="code-inline">e.role</code>, <code data-nac-role="code-inline">console.error</code> +    reject. This catches the case Pablo hit on 2026-05-09: the    manifest says <code data-nac-role="code-inline">role:'tab'</code> but the HTML still says    <code data-nac-role="code-inline">data-nac-role="navigation"</code> (or vice versa). When called    before the DOM is ready, defer the check to a    <code data-nac-role="code-inline">DOMContentLoaded</code> post-pass.</p>
+<ol data-nac-id="nac_v22_roadmap.list.21" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.21.item.1" data-nac-role="list-item"><strong>DOM coherence (best effort).</strong> When <code data-nac-role="code-inline">register</code> is called</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.22" data-nac-role="paragraph">above produce <code data-nac-role="code-inline">console.error</code> but do NOT throw -- adopters    need a window to migrate. Starting v2.3.0 they throw a    <code data-nac-role="code-inline">RegisterError</code> and the manifest is rejected outright.    Tracked in the runtime via <code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> flag    defaulting to <code data-nac-role="code-inline">false</code> in v2.2 and <code data-nac-role="code-inline">true</code> in v2.3.</p>
+<ol data-nac-id="nac_v22_roadmap.list.23" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.23.item.1" data-nac-role="list-item"><strong>Migration helper (one release window).</strong> For v2.2.0 the</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.24" data-nac-role="paragraph"><strong><code data-nac-role="code-inline">NAC.validate_global()</code> extension.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.25" data-nac-role="paragraph">Add three new findings:</p>
+<p data-nac-id="nac_v22_roadmap.p.26" data-nac-role="paragraph">canonical set.</p>
+<p data-nac-id="nac_v22_roadmap.p.27" data-nac-role="paragraph"><code data-nac-role="code-inline">&lt;id&gt;</code> differs from the DOM's <code data-nac-role="code-inline">data-nac-role</code> attribute.</p>
+<p data-nac-id="nac_v22_roadmap.p.28" data-nac-role="paragraph">DOM has <code data-nac-role="code-inline">data-nac-id="tab.X"</code> but <code data-nac-role="code-inline">data-nac-role</code> is not   <code data-nac-role="code-inline">"tab"</code> -- regardless of whether a manifest entry exists.   Catches HTML-only drift that the manifest validator misses   by definition.</p>
+<ul data-nac-id="nac_v22_roadmap.list.29" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.29.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- an element's role is outside the</li><li data-nac-id="nac_v22_roadmap.list.29.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- the manifest's role for</li><li data-nac-id="nac_v22_roadmap.list.29.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">tab_role_drift</code> -- a <code data-nac-role="code-inline">&lt;button&gt;</code> (or any clickable) in the</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.30" data-nac-role="paragraph">Each finding carries severity <code data-nac-role="code-inline">error</code> by default; <code data-nac-role="code-inline">{ kind: 'warn' }</code> overridable per project.</p>
+<p data-nac-id="nac_v22_roadmap.p.31" data-nac-role="paragraph"><strong>Pre-commit lint (separate deliverable, blocks the same drift).</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.32" data-nac-role="paragraph">A new node script <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code> reads every <code data-nac-role="code-inline"><em>.php</code> and <code data-nac-role="code-inline"></em>.html</code> in <code data-nac-role="code-inline">yujin.app/nac-spec/</code>, builds a pseudo-DOM via cheerio (or regex for the lightweight path), extracts every <code data-nac-role="code-inline">NAC.register({...})</code> call from inline scripts, and cross-checks the same coherence rules. Hooked to GitHub Actions and to a local <code data-nac-role="code-inline">pre-commit</code> git hook. Blocks the commit if any rule fails.</p>
+<p data-nac-id="nac_v22_roadmap.p.33" data-nac-role="paragraph"><strong>Effort estimate.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.34" data-nac-role="paragraph">| Task | Where | Effort | |---|---|---| | <code data-nac-role="code-inline">NAC.register</code> strict mode | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | <code data-nac-role="code-inline">validate_global</code> new findings | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | Pre-commit lint script | <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code> | 4h | | Migration sweep over existing demos | <code data-nac-role="code-inline">example-v*.php</code> | 1h | | Doc updates in spec | <code data-nac-role="code-inline">docs/spec.md</code> etc. | 1h | | Tests + CI wiring | <code data-nac-role="code-inline">tests/</code> + <code data-nac-role="code-inline">.github/workflows/</code> | 2h |</p>
+<p data-nac-id="nac_v22_roadmap.p.35" data-nac-role="paragraph">Total: ~12h focused.</p>
+<p data-nac-id="nac_v22_roadmap.p.36" data-nac-role="paragraph"><strong>Backwards compatibility.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.37" data-nac-role="paragraph">v2.2 release notes must declare:</p>
+<p data-nac-id="nac_v22_roadmap.p.38" data-nac-role="paragraph">(non-throwing).</p>
+<ul data-nac-id="nac_v22_roadmap.list.39" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.39.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.register</code> now emits <code data-nac-role="code-inline">console.error</code> on role drift</li><li data-nac-id="nac_v22_roadmap.list.39.item.2" data-nac-role="list-item">v2.3 will start throwing <code data-nac-role="code-inline">RegisterError</code> on the same conditions.</li><li data-nac-id="nac_v22_roadmap.list.39.item.3" data-nac-role="list-item">Adopters should run <code data-nac-role="code-inline">NAC.validate_global()</code> before shipping.</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.40" data-nac-role="paragraph">The migration path for the existing 6 demos in this repo is already done as of commit <code data-nac-role="code-inline">0633e080</code> (2026-05-09): the v21 demo's tab buttons + manifest were corrected to <code data-nac-role="code-inline">role:'tab'</code>.</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-02-action-ack-contract-enforcement" data-nac-role="heading" data-nac-level="2" id="v22-02-action-ack-contract-enforcement">V22-02 -- Action-ack contract enforcement</h2>
+<p data-nac-id="nac_v22_roadmap.p.43" data-nac-role="paragraph"><strong>Problem class.</strong> Click handlers that do their work synchronously must <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded', {detail:{plugin,action_id}}))</code> after the side effect. Brownfield panels often forget. The runtime then times out the 5s ack-poll even though the side effect already happened, and the chat or agent reports <code data-nac-role="code-inline">No pude ejecutar X: timeout</code>.</p>
+<p data-nac-id="nac_v22_roadmap.p.44" data-nac-role="paragraph"><strong>Concrete trigger (2026-05-09).</strong> Pablo: <code data-nac-role="code-inline">hide</code> -&gt; panel hides correctly, chat says "No pude ejecutar v20_panel.toggle: timeout". Same for every button on the v20-panel.</p>
+<p data-nac-id="nac_v22_roadmap.p.45" data-nac-role="paragraph"><strong>The previous workaround was wrong.</strong> Commit <code data-nac-role="code-inline">ad200e4c</code> swallowed <code data-nac-role="code-inline">err.code === 'timeout'</code> as success in the chat agentic loop. Pablo correctly flagged that as masking real failures (handler hung, network race, unhandled exception) and breaking the runtime's only honest signal. Reverted in <code data-nac-role="code-inline">c9bf2bdb</code>.</p>
+<p data-nac-id="nac_v22_roadmap.p.46" data-nac-role="paragraph"><strong>The right fix shipped already.</strong> Wrap <code data-nac-role="code-inline">bind()</code> in <code data-nac-role="code-inline">example-v20-full.php</code> to auto-emit <code data-nac-role="code-inline">nac:action:succeeded</code>/<code data-nac-role="code-inline">nac:action:failed</code> after every handler. Done in <code data-nac-role="code-inline">c9bf2bdb</code>.</p>
+<p data-nac-id="nac_v22_roadmap.p.47" data-nac-role="paragraph"><strong>Proposed contract change for v2.2.</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.48" data-nac-role="paragraph">The runtime SHOULD provide a helper:</p>
+<pre data-nac-id="nac_v22_roadmap.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.bindAction(el, handler, { plugin, action_id })</code></pre>
+<p data-nac-id="nac_v22_roadmap.p.50" data-nac-role="paragraph">that takes care of the ack emission automatically. Same surface as <code data-nac-role="code-inline">addEventListener('click', handler)</code> but with the conformance contract baked in. Demos that adopt the helper cannot forget.</p>
+<p data-nac-id="nac_v22_roadmap.p.51" data-nac-role="paragraph"><code data-nac-role="code-inline">validate_global</code> adds a new finding:</p>
+<p data-nac-id="nac_v22_roadmap.p.52" data-nac-role="paragraph">during <code data-nac-role="code-inline">validate_global</code> the validator dispatches a synthetic   click on each <code data-nac-role="code-inline">data-nac-role="action"</code> element under a   controlled context, listens for <code data-nac-role="code-inline">nac:action:succeeded</code> for   500ms, and flags the ones that don't fire.</p>
+<ul data-nac-id="nac_v22_roadmap.list.53" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.53.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">action_handler_without_ack</code> -- detected via instrumentation:</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.54" data-nac-role="paragraph">This finding is opt-in (<code data-nac-role="code-inline">NAC.validate_global({ probe: true })</code>) because synthetic clicks have side effects.</p>
+<p data-nac-id="nac_v22_roadmap.p.55" data-nac-role="paragraph"><strong>Effort.</strong> ~3h for the helper + ~4h for the probe-based finding.</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-03-locale-switch-detector-hardening" data-nac-role="heading" data-nac-level="2" id="v22-03-locale-switch-detector-hardening">V22-03 -- Locale-switch detector hardening</h2>
+<p data-nac-id="nac_v22_roadmap.p.58" data-nac-role="paragraph"><strong>Problem class.</strong> Bare 2-letter locale codes in the chat client's language detector (<code data-nac-role="code-inline">'de'</code>, <code data-nac-role="code-inline">'es'</code>, <code data-nac-role="code-inline">'en'</code>) collide with prepositions and articles in several languages. <code data-nac-role="code-inline">cambia DE pestana</code> switched the chat to German.</p>
+<p data-nac-id="nac_v22_roadmap.p.59" data-nac-role="paragraph"><strong>The fix shipped already.</strong> <code data-nac-role="code-inline">nac-chat-client.js</code> <code data-nac-role="code-inline">_detectLangSwitch</code> now requires bare 2-letter codes to coexist with an explicit <code data-nac-role="code-inline">LOCALE_TRIGGER</code> (<code data-nac-role="code-inline">idioma</code>/<code data-nac-role="code-inline">language</code>/<code data-nac-role="code-inline">sprache</code>/...). Done in <code data-nac-role="code-inline">f631d77a</code>.</p>
+<p data-nac-id="nac_v22_roadmap.p.60" data-nac-role="paragraph"><strong>Proposed for v2.2.</strong> Move the locale detector out of the chat client into a NAC3 primitive, so every brownfield chat embed gets the same hardened detector. Document the false-positive class explicitly in the spec so future implementations don't reintroduce the bug.</p>
+<p data-nac-id="nac_v22_roadmap.p.61" data-nac-role="paragraph"><strong>Effort.</strong> ~2h.</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-04-tab_by_label-natural-language-tolerance" data-nac-role="heading" data-nac-level="2" id="v22-04-tab_by_label-natural-language-tolerance">V22-04 -- <code data-nac-role="code-inline">tab_by_label</code> natural-language tolerance</h2>
+<p data-nac-id="nac_v22_roadmap.p.64" data-nac-role="paragraph"><strong>Already in.</strong> Parens stripping (<code data-nac-role="code-inline">"Lines (collection)"</code> matches <code data-nac-role="code-inline">"Lines"</code> and <code data-nac-role="code-inline">"Lines tab"</code>) shipped in <code data-nac-role="code-inline">f631d77a</code>. This is <strong>not</strong> a legacy fallback -- it is legitimate normalisation of LLM-quoted button text. Document in the spec as the canonical matcher behaviour.</p>
+<p data-nac-id="nac_v22_roadmap.p.65" data-nac-role="paragraph"><strong>Effort.</strong> ~1h doc only.</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.out-of-scope-for-v22-deferred-to-v23" data-nac-role="heading" data-nac-level="2" id="out-of-scope-for-v22-deferred-to-v23">Out of scope for v2.2 (deferred to v2.3+)</h2>
+<p data-nac-id="nac_v22_roadmap.p.68" data-nac-role="paragraph"><code data-nac-role="code-inline">role:'tab.secondary'</code>): nice-to-have but no concrete trigger.</p>
+<p data-nac-id="nac_v22_roadmap.p.69" data-nac-role="paragraph">(today the matcher iterates them serially, which is fine for   ~20 tabs per plugin).</p>
+<ul data-nac-id="nac_v22_roadmap.list.70" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.70.item.1" data-nac-role="list-item">Composable role hierarchies (<code data-nac-role="code-inline">role:'tab.primary'</code> vs</li><li data-nac-id="nac_v22_roadmap.list.70.item.2" data-nac-role="list-item">Manifest hot-reload: still rare; current page reload is fine.</li><li data-nac-id="nac_v22_roadmap.list.70.item.3" data-nac-role="list-item">Multi-locale label search across all 10 locales simultaneously</li></ul>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.how-items-move-from-this-doc-to-the-spec" data-nac-role="heading" data-nac-level="2" id="how-items-move-from-this-doc-to-the-spec">How items move from this doc to the spec</h2>
+<p data-nac-id="nac_v22_roadmap.p.73" data-nac-role="paragraph">flag default to <code data-nac-role="code-inline">warn</code> (non-throwing).</p>
+<p data-nac-id="nac_v22_roadmap.p.74" data-nac-role="paragraph">(throwing) in the next minor.</p>
+<p data-nac-id="nac_v22_roadmap.p.75" data-nac-role="paragraph">to <code data-nac-role="code-inline">docs/CHANGELOG.md</code>.</p>
+<ol data-nac-id="nac_v22_roadmap.list.76" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.76.item.1" data-nac-role="list-item">Implement + ship the runtime change behind a feature flag.</li><li data-nac-id="nac_v22_roadmap.list.76.item.2" data-nac-role="list-item">Update demos so they pass the new strict validation.</li><li data-nac-id="nac_v22_roadmap.list.76.item.3" data-nac-role="list-item">Soak in production for at least one release cycle with the</li><li data-nac-id="nac_v22_roadmap.list.76.item.4" data-nac-role="list-item">Move the rule into <code data-nac-role="code-inline">docs/spec.md</code> and bump default to <code data-nac-role="code-inline">error</code></li><li data-nac-id="nac_v22_roadmap.list.76.item.5" data-nac-role="list-item">Strike the entry from this roadmap and add a one-line entry</li></ol>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_v22_roadmap",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_v22_roadmap.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_v22_roadmap.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_v22_roadmap.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_v22_roadmap.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

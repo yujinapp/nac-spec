@@ -1,0 +1,81 @@
+{
+  "name": "@nac3/runtime",
+  "version": "2.2.0",
+  "description": "Native Agent Contract -- spec + reference runtime that lets web UIs be driven by AI agents, voice runners, and accessibility tools.",
+  "keywords": [
+    "nac",
+    "native-agent-contract",
+    "agent",
+    "voice",
+    "llm",
+    "automation",
+    "accessibility",
+    "ai",
+    "ui-contract",
+    "yujin"
+  ],
+  "homepage": "https://yujin.app/nac-spec/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pkuschnirof/rpaforce-crm.git",
+    "directory": "packages/nac"
+  },
+  "bugs": "https://github.com/pkuschnirof/rpaforce-crm/issues",
+  "author": "Yujin (https://rpaforce.com)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/nac.cjs",
+  "module": "./dist/nac.mjs",
+  "types": "./dist/nac.d.ts",
+  "browser": "./dist/nac.browser.js",
+  "exports": {
+    ".": {
+      "types": "./dist/nac.d.ts",
+      "import": "./dist/nac.mjs",
+      "require": "./dist/nac.cjs",
+      "browser": "./dist/nac.browser.js",
+      "default": "./dist/nac.mjs"
+    },
+    "./extensions": {
+      "types": "./dist/nac-v2-extensions.d.ts",
+      "import": "./dist/nac-v2-extensions.mjs",
+      "require": "./dist/nac-v2-extensions.cjs",
+      "browser": "./dist/nac-v2-extensions.browser.js",
+      "default": "./dist/nac-v2-extensions.mjs"
+    },
+    "./chat-client": {
+      "types": "./dist/nac-chat-client.d.ts",
+      "import": "./dist/nac-chat-client.mjs",
+      "require": "./dist/nac-chat-client.cjs",
+      "browser": "./dist/nac-chat-client.browser.js",
+      "default": "./dist/nac-chat-client.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "nac3": "./dist/cli.js",
+    "nac": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md",
+    "LICENSE",
+    "SPEC.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build":   "node ./build.mjs",
+    "test":    "node ./test/smoke.mjs && node ./test/v22.mjs",
+    "test:smoke": "node ./test/smoke.mjs",
+    "test:v22":   "node ./test/v22.mjs",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en" data-nac-plugin="atlas_pro_ad">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Atlas Pro -- the ad that closes the sale by voice</title>
+<style>
+  :root{
+    --accent:#4f5b87;--gold:#c8a04d;
+    --bg-grad-1:#f5f0e6;--bg-grad-2:#e6dcc4;
+    --surface:#fff;--text:#1a1a1a;--text-2:#555;--text-3:#888;
+    --green:#2a6d2a;--red:#8a1f1f;
+    --serif:"Noto Serif JP",Georgia,serif;
+    --sans:"DM Sans",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);
+       background:linear-gradient(135deg,#f5f2ea,#e0d8c4);
+       color:var(--text);min-height:100vh;min-height:100dvh;
+       display:flex;align-items:center;justify-content:center;
+       padding:16px 14px;}
+  .ad-card{width:100%;max-width:540px;max-height:calc(100dvh - 32px);
+           background:var(--surface);border-radius:18px;overflow:hidden;
+           box-shadow:0 32px 80px rgba(0,0,0,.18);
+           display:flex;flex-direction:column;}
+  .ad-stage{position:relative;background:radial-gradient(circle at 50% 40%, #fafaf2 0%, #efe6d0 70%, #ddd0b0 100%);
+            flex:0 0 clamp(190px, 34vh, 280px);
+            display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  #three-canvas{width:100%;height:100%;display:block;}
+  .ad-kanji-bg{position:absolute;font-family:var(--serif);
+               color:rgba(200,160,77,.10);font-size:280px;line-height:1;
+               top:-40px;right:-40px;pointer-events:none;z-index:0;}
+  .ad-state-pill{position:absolute;top:14px;left:14px;padding:6px 12px;
+                 border-radius:14px;font-size:11px;font-weight:600;letter-spacing:0.8px;
+                 text-transform:uppercase;color:#1a1a1a;background:rgba(255,255,255,0.85);
+                 backdrop-filter:blur(8px);z-index:2;}
+  .ad-state-pill[data-state="idle"]{background:rgba(255,255,255,0.85);}
+  .ad-state-pill[data-state="listening"]{background:rgba(42,109,42,0.95);color:#fff;
+        animation:pulse 1.4s ease-in-out infinite;}
+  .ad-state-pill[data-state="thinking"]{background:rgba(200,160,77,0.95);color:#fff;}
+  .ad-state-pill[data-state="speaking"]{background:rgba(79,91,135,0.95);color:#fff;
+        animation:pulse 1.4s ease-in-out infinite;}
+  .ad-state-pill[data-state="confirmed"]{background:rgba(42,109,42,0.95);color:#fff;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+  .ad-lang-select{position:absolute;top:14px;right:14px;padding:6px 10px;
+                  border-radius:6px;border:0;font-size:11px;font-family:inherit;
+                  background:rgba(255,255,255,0.85);color:#1a1a1a;backdrop-filter:blur(8px);
+                  z-index:2;cursor:pointer;}
+  .ad-body{padding:18px 24px 14px;flex:1 1 auto;min-height:0;
+           overflow-y:auto;display:flex;flex-direction:column;}
+  .ad-product-title{font-size:22px;font-weight:700;margin:0 0 2px;color:var(--text);}
+  .ad-product-tag{font-size:10px;color:var(--text-3);margin:0 0 10px;
+                  letter-spacing:1.5px;text-transform:uppercase;}
+  .ad-narrator{min-height:42px;font-size:14px;color:var(--text);line-height:1.45;
+               margin:0 0 8px;font-style:italic;border-left:3px solid var(--gold);
+               padding-left:12px;}
+  .ad-narrator:empty{display:none;}
+  .ad-transcript{min-height:18px;font-size:12px;color:var(--accent);margin:0 0 10px;
+                 font-family:'Fira Code','SF Mono',monospace;}
+  .ad-transcript:empty{display:none;}
+  .ad-slots{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px;}
+  .ad-slot{padding:8px 12px;background:#fafaf7;border:1px solid #e6e3da;
+           border-radius:8px;transition:all 0.4s ease;}
+  .ad-slot.filled{background:#e9f4e6;border-color:#7eba74;
+                  transform:scale(1.02);}
+  .ad-slot.focus{border-color:var(--gold);
+                 box-shadow:0 0 0 3px rgba(200,160,77,0.18);}
+  .ad-slot-label{font-size:10px;color:var(--text-3);letter-spacing:0.8px;
+                 text-transform:uppercase;margin-bottom:2px;}
+  .ad-slot-value{font-size:14px;font-weight:600;color:var(--text);min-height:16px;}
+  .ad-slot-value:empty::before{content:"---";color:var(--text-3);font-weight:300;}
+  .ad-controls{display:flex;gap:8px;align-items:center;margin-top:auto;}
+  .ad-mic{flex:1;padding:11px 16px;border-radius:8px;border:0;
+          background:var(--accent);color:#fff;font-weight:600;font-family:inherit;
+          font-size:14px;cursor:pointer;transition:all 0.2s;
+          display:flex;align-items:center;justify-content:center;gap:8px;}
+  .ad-mic:hover{filter:brightness(1.1);}
+  .ad-mic:disabled{opacity:0.5;cursor:wait;}
+  .ad-mic[data-state="recording"]{background:var(--green);
+        animation:micpulse 1s ease-in-out infinite;}
+  @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(42,109,42,0.6);}
+                       50%{box-shadow:0 0 0 14px rgba(42,109,42,0);}}
+  .ad-submit{padding:12px 22px;border-radius:8px;border:0;
+             background:var(--gold);color:#fff;font-weight:700;font-family:inherit;
+             font-size:14px;cursor:pointer;transition:all 0.2s;display:none;}
+  .ad-submit.visible{display:block;}
+  .ad-submit:hover{filter:brightness(1.1);}
+  .ad-stop{width:40px;height:40px;border-radius:8px;border:0;
+           background:#999;color:#fff;font-size:13px;cursor:pointer;
+           transition:all 0.2s;display:flex;align-items:center;
+           justify-content:center;font-family:inherit;flex-shrink:0;}
+  .ad-stop:hover{background:#666;}
+  .ad-stop:disabled{opacity:0.4;cursor:default;}
+  .ad-footer{padding:8px 24px;background:#fafaf7;border-top:1px solid #e6e3da;
+             font-size:10px;color:var(--text-3);text-align:center;flex:0 0 auto;}
+  .ad-footer a{color:var(--accent);text-decoration:none;}
+  .ad-footer a:hover{text-decoration:underline;}
+  .ad-success{position:absolute;inset:0;background:rgba(42,109,42,0.97);
+              color:#fff;display:none;flex-direction:column;align-items:center;
+              justify-content:center;font-size:18px;font-weight:600;padding:30px;
+              text-align:center;line-height:1.5;z-index:5;}
+  .ad-success.visible{display:flex;}
+  .ad-success-check{font-size:72px;margin-bottom:14px;}
+
+  /* Smartphone -- portrait phones, narrow tablets. */
+  @media (max-width: 600px) {
+    body{padding:8px 8px;}
+    .ad-card{max-height:calc(100dvh - 16px);border-radius:14px;}
+    .ad-stage{flex:0 0 clamp(160px, 30dvh, 220px);}
+    .ad-kanji-bg{font-size:200px;top:-30px;right:-30px;}
+    .ad-body{padding:14px 16px 12px;}
+    .ad-product-title{font-size:19px;}
+    .ad-product-tag{font-size:9px;margin-bottom:8px;}
+    .ad-narrator{font-size:13px;min-height:36px;padding-left:10px;margin-bottom:6px;}
+    .ad-transcript{font-size:11px;margin-bottom:8px;}
+    .ad-slots{gap:6px;margin-bottom:10px;}
+    .ad-slot{padding:6px 10px;}
+    .ad-slot-label{font-size:9px;}
+    .ad-slot-value{font-size:13px;}
+    .ad-mic{padding:10px 14px;font-size:13px;}
+    .ad-stop{width:38px;height:38px;}
+    .ad-submit{padding:10px 18px;font-size:13px;}
+    .ad-footer{padding:6px 16px;font-size:9px;}
+    .ad-lang-select{top:10px;right:10px;font-size:10px;padding:4px 8px;}
+    .ad-state-pill{top:10px;left:10px;font-size:10px;padding:4px 10px;}
+  }
+
+  /* Very short screens (landscape phone, ~500px tall). */
+  @media (max-height: 560px) {
+    .ad-stage{flex:0 0 clamp(140px, 28dvh, 200px);}
+    .ad-narrator{min-height:30px;}
+    .ad-body{padding:10px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="ad-card" data-nac-id="atlas_pro_ad.card" data-nac-role="region">
+
+  <div class="ad-stage" data-nac-id="atlas_pro_ad.stage" data-nac-role="region">
+    <span class="ad-kanji-bg" aria-hidden="true">&#36275;</span>
+    <span class="ad-state-pill" id="state-pill" data-state="idle"
+          data-nac-id="atlas_pro_ad.state" data-nac-role="region">Ready</span>
+    <select class="ad-lang-select" id="lang-select"
+            data-nac-id="atlas_pro_ad.lang" data-nac-role="field"
+            aria-label="Language">
+      <option value="es">es</option>
+      <option value="en" selected>en</option>
+      <option value="pt">pt</option>
+      <option value="fr">fr</option>
+      <option value="it">it</option>
+      <option value="de">de</option>
+      <option value="ja">ja</option>
+      <option value="zh">zh</option>
+      <option value="hi">hi</option>
+      <option value="ar">ar</option>
+    </select>
+    <canvas id="three-canvas"></canvas>
+    <div class="ad-success" id="success-overlay">
+      <div class="ad-success-check">&#10003;</div>
+      <div id="success-text">Order confirmed</div>
+    </div>
+  </div>
+
+  <div class="ad-body">
+    <h2 class="ad-product-title" data-nac-id="atlas_pro_ad.product_title"
+        data-nac-role="region">Atlas Pro</h2>
+    <p class="ad-product-tag">PERFORMANCE RUNNING -- 2026</p>
+
+    <p class="ad-narrator" id="narrator"
+       data-nac-id="atlas_pro_ad.narrator" data-nac-role="region"
+       aria-live="polite"></p>
+
+    <p class="ad-transcript" id="transcript"
+       data-nac-id="atlas_pro_ad.transcript" data-nac-role="region"
+       aria-live="polite"></p>
+
+    <div class="ad-slots" id="slots">
+      <div class="ad-slot" id="slot-size">
+        <div class="ad-slot-label" id="label-size">Size</div>
+        <div class="ad-slot-value" id="value-size"
+             data-nac-id="atlas_pro_ad.size" data-nac-role="field"></div>
+      </div>
+      <div class="ad-slot" id="slot-color">
+        <div class="ad-slot-label" id="label-color">Color</div>
+        <div class="ad-slot-value" id="value-color"
+             data-nac-id="atlas_pro_ad.color" data-nac-role="field"></div>
+      </div>
+      <div class="ad-slot" id="slot-qty">
+        <div class="ad-slot-label" id="label-qty">Quantity</div>
+        <div class="ad-slot-value" id="value-qty"
+             data-nac-id="atlas_pro_ad.qty" data-nac-role="field"></div>
+      </div>
+      <div class="ad-slot" id="slot-delivery">
+        <div class="ad-slot-label" id="label-delivery">Delivery</div>
+        <div class="ad-slot-value" id="value-delivery"
+             data-nac-id="atlas_pro_ad.delivery" data-nac-role="field"></div>
+      </div>
+    </div>
+
+    <div class="ad-controls">
+      <button class="ad-mic" id="ad-mic"
+              data-nac-id="atlas_pro_ad.mic" data-nac-role="action"
+              data-nac-action="listen" data-state="idle">
+        <span>&#127908;</span>
+        <span id="mic-label">Talk</span>
+      </button>
+      <button class="ad-stop" id="ad-stop"
+              data-nac-id="atlas_pro_ad.stop" data-nac-role="action"
+              data-nac-action="stop" title="Stop / Detener"
+              aria-label="Stop">&#9632;</button>
+      <button class="ad-submit" id="ad-submit"
+              data-nac-id="atlas_pro_ad.submit" data-nac-role="action"
+              data-nac-action="submit">Confirm</button>
+    </div>
+
+    <input type="text" name="website" tabindex="-1" autocomplete="off"
+           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"
+           aria-hidden="true" />
+  </div>
+
+  <div class="ad-footer">
+    Powered by <a href="https://yujin.app/nac-spec/" target="_blank">NAC3</a>
+    -- ads that close sales by voice. Shoe model:
+    <a href="https://github.com/KhronosGroup/glTF-Sample-Assets" target="_blank">Khronos MaterialsVariantsShoe</a> (CC0).
+  </div>
+
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const I18N = {
+  es: { labels: ['Talle','Color','Cantidad','Entrega'],
+        states: { idle:'Listo', listening:'Escuchando', thinking:'Pensando', speaking:'Hablando', confirmed:'Confirmado' },
+        mic: { idle:'Hablar', recording:'Grabando' },
+        submit:'Confirmar pedido', success:'Pedido confirmado',
+        bcp:'es-ES' },
+  en: { labels: ['Size','Color','Quantity','Delivery'],
+        states: { idle:'Ready', listening:'Listening', thinking:'Thinking', speaking:'Speaking', confirmed:'Confirmed' },
+        mic: { idle:'Talk', recording:'Recording' },
+        submit:'Confirm order', success:'Order confirmed',
+        bcp:'en-US' },
+  pt: { labels: ['Tamanho','Cor','Quantidade','Entrega'],
+        states: { idle:'Pronto', listening:'Ouvindo', thinking:'Pensando', speaking:'Falando', confirmed:'Confirmado' },
+        mic: { idle:'Falar', recording:'Gravando' },
+        submit:'Confirmar pedido', success:'Pedido confirmado',
+        bcp:'pt-BR' },
+  fr: { labels: ['Taille','Couleur','Quantite','Livraison'],
+        states: { idle:'Pret', listening:'Ecoute', thinking:'Reflexion', speaking:'Parle', confirmed:'Confirme' },
+        mic: { idle:'Parler', recording:'Enregistrement' },
+        submit:'Confirmer la commande', success:'Commande confirmee',
+        bcp:'fr-FR' },
+  it: { labels: ['Taglia','Colore','Quantita','Consegna'],
+        states: { idle:'Pronto', listening:'In ascolto', thinking:'Pensando', speaking:'Parlando', confirmed:'Confermato' },
+        mic: { idle:'Parla', recording:'Registrazione' },
+        submit:'Conferma ordine', success:'Ordine confermato',
+        bcp:'it-IT' },
+  de: { labels: ['Groesse','Farbe','Anzahl','Lieferung'],
+        states: { idle:'Bereit', listening:'Hoert', thinking:'Denkt', speaking:'Spricht', confirmed:'Bestaetigt' },
+        mic: { idle:'Sprich', recording:'Aufnahme' },
+        submit:'Bestellung bestaetigen', success:'Bestellung bestaetigt',
+        bcp:'de-DE' },
+  ja: { labels: ['サイズ','色','数量','配送'],
+        states: { idle:'準備完了', listening:'聞いています', thinking:'考え中', speaking:'話す', confirmed:'確認済み' },
+        mic: { idle:'話す', recording:'録音中' },
+        submit:'注文を確認', success:'注文確認',
+        bcp:'ja-JP' },
+  zh: { labels: ['尺码','颜色','数量','配送'],
+        states: { idle:'准备好', listening:'正在听', thinking:'思考中', speaking:'说话', confirmed:'已确认' },
+        mic: { idle:'说话', recording:'录音中' },
+        submit:'确认订单', success:'订单已确认',
+        bcp:'zh-CN' },
+  hi: { labels: ['size','color','matra','delivery'],
+        states: { idle:'taiyar', listening:'sun raha', thinking:'soch raha', speaking:'bol raha', confirmed:'pushtikrit' },
+        mic: { idle:'bolo', recording:'recording' },
+        submit:'order pushtikrit karo', success:'order pushtikrit',
+        bcp:'hi-IN' },
+  ar: { labels: ['المقاس','اللون','الكمية','التوصيل'],
+        states: { idle:'جاهز', listening:'يستمع', thinking:'يفكر', speaking:'يتحدث', confirmed:'مؤكد' },
+        mic: { idle:'تحدث', recording:'تسجيل' },
+        submit:'تأكيد الطلب', success:'تم تأكيد الطلب',
+        bcp:'ar-SA' },
+};
+
+const ENDPOINT_PARSE  = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/parse';
+const ENDPOINT_SUBMIT = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/submit';
+const ENDPOINT_TTS    = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/tts';
+const ENDPOINT_STT    = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/stt';
+const AD_SLUG = 'atlas-pro';
+const PRODUCT_SKU = 'atlas-pro-2026';
+
+/* User context from URL query params (NAC marketing-targeting structure).
+   Example:
+   /ads-demo/atlas-pro/?name=Tamara&email=t@example.com&phone=...&lang=es&seller=...
+   Marketers embed these per-campaign so the ad addresses the visitor by name. */
+const URL_PARAMS = new URLSearchParams(window.location.search);
+const USER_CONTEXT = {
+  name:  URL_PARAMS.get('name')  || '',
+  email: URL_PARAMS.get('email') || '',
+  phone: URL_PARAMS.get('phone') || '',
+  loc:   URL_PARAMS.get('loc')   || URL_PARAMS.get('locale') || '',
+};
+const SELLER_EMAIL_OVERRIDE = URL_PARAMS.get('seller') || '';
+const TTS_DISABLE = URL_PARAMS.get('tts') === 'off';
+const DEBUG = URL_PARAMS.get('debug') === '1';
+const HEADSET_MODE = URL_PARAMS.get('mode') !== 'ptt'; /* default ON; ?mode=ptt = old behavior */
+function debugLog(msg, data) {
+  if (data !== undefined) console.warn('[ad]', msg, data); else console.warn('[ad]', msg);
+  if (DEBUG) showNarrator('[debug] ' + msg + (data !== undefined ? ' ' + JSON.stringify(data) : ''));
+}
+let micPermissionGranted = false;
+
+const COLOR_TEXTURE = {
+  beige:    'assets/diffuseBeach.jpg',
+  beach:    'assets/diffuseBeach.jpg',
+  cream:    'assets/diffuseBeach.jpg',
+  tan:      'assets/diffuseBeach.jpg',
+  black:    'assets/diffuseMidnight.jpg',
+  midnight: 'assets/diffuseMidnight.jpg',
+  navy:     'assets/diffuseMidnight.jpg',
+  street:   'assets/diffuseStreet.jpg',
+  grey:     'assets/diffuseStreet.jpg',
+  gray:     'assets/diffuseStreet.jpg',
+  stone:    'assets/diffuseStreet.jpg',
+  storm:    'assets/diffuseStreet.jpg',
+};
+
+let lang = (URL_PARAMS.get('lang') || navigator.language || 'en').slice(0,2);
+if (!I18N[lang]) lang = 'en';
+
+let ttsBudgetExhausted = false;
+let currentAudio = null;
+let turnId = 0; /* increments on every new turn; in-flight handlers compare to abort stale work */
+let autoListenDisabled = false; /* disables auto-mic-reopen after a fatal SR error (e.g. network) */
+let micWatchdog = null;          /* timeout to force-abort runaway SR sessions */
+const MIC_MAX_MS = 15000;        /* hard ceiling per recognition session */
+let networkRetryBudget = 1;      /* one auto-retry per user-initiated session; resets on click/result/lang switch */
+let sttBudgetExhausted = false;  /* server STT over budget OR key missing -- fall back to webkitSR permanently this session */
+let serverSttBroken = false;     /* server STT failed for a transient reason this session -- prefer webkitSR going forward */
+let mediaRecorderActive = null;  /* current MediaRecorder instance (if any) */
+let mediaStreamActive  = null;   /* current mic MediaStream (if any) */
+
+/* Headset mode: persistent mic stream, barge-in interrupt, no per-turn
+   open/close cycle. Default on; ?mode=ptt opts out to PTT behavior. */
+let headsetReady = false;
+let headsetStream = null;
+let headsetCtx = null;
+let headsetAnalyser = null;
+let headsetBuf = null;
+let headsetTickInterval = null;
+let headsetSliceMR = null;
+let headsetSliceChunks = [];
+let conversationState = 'idle'; /* idle | speaking | listening | user_speaking | thinking */
+const HEADSET_SPEECH_THRESH = 8;
+const HEADSET_BARGE_THRESH = 16;   /* higher: tolerate TTS bleed via speakers */
+const HEADSET_BARGE_DURATION = 350;
+const HEADSET_SILENCE_MS = 1200;
+const HEADSET_MAX_REC_MS = 12000;
+const HEADSET_IDLE_CAP_MS = 20000; /* discard MR session if user never speaks within this window */
+const HEADSET_TICK_MS = 30;        /* tick interval; snappier detection */
+
+let recording = false;
+let recognition = null;
+let speaking = false;
+let slots = { size:null, color:null, qty:null, delivery:null };
+let lastQuestionFocus = 'intro';
+let silenceCount = 0;
+let lastTranscript = '';
+let allTranscript = '';
+let lastConfidence = null;
+let conversationHistory = [];
+let scene, camera, renderer, shoeRoot, shoeMesh;
+let autoListenTimer = null;
+
+const $ = (id) => document.getElementById(id);
+
+function setLang(newLang) {
+  lang = newLang;
+  document.documentElement.lang = lang;
+  const t = I18N[lang];
+  $('label-size').textContent = t.labels[0];
+  $('label-color').textContent = t.labels[1];
+  $('label-qty').textContent = t.labels[2];
+  $('label-delivery').textContent = t.labels[3];
+  $('mic-label').textContent = recording ? t.mic.recording : t.mic.idle;
+  $('ad-submit').textContent = t.submit;
+  setState(recording ? 'listening' : 'idle');
+}
+
+function setState(s) {
+  const pill = $('state-pill');
+  const t = I18N[lang];
+  pill.setAttribute('data-state', s);
+  pill.textContent = t.states[s] || s;
+}
+
+function showNarrator(text) {
+  $('narrator').textContent = text;
+}
+
+function focusSlot(name) {
+  ['size','color','qty','delivery'].forEach(k => {
+    $('slot-' + k).classList.toggle('focus', k === name);
+  });
+}
+
+function speakWebSpeech(text) {
+  return new Promise((resolve) => {
+    if (!('speechSynthesis' in window) || !text) { resolve(); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = I18N[lang].bcp;
+    u.rate = 1.02; u.pitch = 1.0;
+    speaking = true;
+    u.onend = () => { speaking = false; resolve(); };
+    u.onerror = () => { speaking = false; resolve(); };
+    window.speechSynthesis.speak(u);
+  });
+}
+
+async function speakGoogleTTS(text) {
+  try {
+    const r = await fetch(ENDPOINT_TTS, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text, lang, website:'' }),
+      mode:'cors', credentials:'omit',
+    });
+    const j = await r.json();
+    if (!j || !j.ok || !j.audio_base64) {
+      debugLog('Google TTS fallback', { error: j && j.error, detail: j && j.detail, http: r.status });
+      if (j && j.error === 'over_budget') ttsBudgetExhausted = true;
+      if (j && j.error === 'tts_failed' && /key_missing/.test(j.detail || '')) {
+        /* permanent failure for this session -- stop hitting the endpoint */
+        ttsBudgetExhausted = true;
+      }
+      return false; /* signal caller to fallback */
+    }
+    return new Promise((resolve) => {
+      try { if (currentAudio) currentAudio.pause(); } catch (_) {}
+      const audio = new Audio('data:' + (j.mime || 'audio/mp3') + ';base64,' + j.audio_base64);
+      currentAudio = audio;
+      speaking = true;
+      audio.onended = () => { speaking = false; resolve(true); };
+      audio.onerror = (e) => { debugLog('audio play error', e && e.message); speaking = false; resolve(false); };
+      audio.play().catch((e) => { debugLog('audio play rejected', e && e.message); speaking = false; resolve(false); });
+    });
+  } catch (e) {
+    debugLog('Google TTS network error', e && e.message);
+    return false;
+  }
+}
+
+async function speak(text) {
+  if (!text) return;
+  setState('speaking');
+  if (HEADSET_MODE && headsetReady) conversationState = 'speaking';
+  if (!TTS_DISABLE && !ttsBudgetExhausted) {
+    const ok = await speakGoogleTTS(text);
+    if (ok) { afterSpeak(); return; }
+    /* fall through to web speech if Google TTS failed */
+  }
+  await speakWebSpeech(text);
+  afterSpeak();
+}
+
+function afterSpeak() {
+  /* In headset mode, transition into listening without closing the mic.
+     The persistent tick loop handles the rest. Pre-arm the MediaRecorder
+     RIGHT NOW so when the user starts to talk we are already capturing --
+     no 50ms MR startup latency, no clipped first word. */
+  if (HEADSET_MODE && headsetReady) {
+    conversationState = 'listening';
+    setState('listening');
+    $('ad-mic').setAttribute('data-state','recording');
+    $('mic-label').textContent = I18N[lang].mic.recording;
+    startHeadsetSlice(); /* pre-arms MR; idempotent if already running */
+  }
+}
+
+function startMicSoon(delay = 120) {
+  /* speak() already awaits the actual end of audio playback, so by the
+     time this is called the speakers are silent. The tiny delay just
+     lets the audio buffer flush so SpeechRecognition does not capture
+     the tail of the TTS as the visitor's first word. Short delay so the
+     visitor can answer immediately without waiting for a perceptible
+     pause -- people tend to interrupt the end of the assistant's
+     sentence. */
+  if (HEADSET_MODE && headsetReady) return; /* mic never closes in headset mode */
+  if (autoListenDisabled) { setState('idle'); return; }
+  clearTimeout(autoListenTimer);
+  autoListenTimer = setTimeout(() => {
+    if (!recording && !speaking && !autoListenDisabled) startMic();
+  }, delay);
+}
+
+/* =====================================================================
+   HEADSET MODE -- persistent mic + barge-in
+   Always-on mic across the whole conversation. While the assistant
+   speaks, the mic listens for the user starting to barge in (sustained
+   loud audio). While the assistant is silent, the mic listens for the
+   user to start talking; on detection it spins up a MediaRecorder slice
+   and submits it to /stt on silence-detected end.
+   ===================================================================== */
+
+async function bootHeadset() {
+  if (!HEADSET_MODE) return false;
+  if (!serverSttSupported()) return false;
+  if (headsetReady) return true;
+  try {
+    headsetStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
+  } catch (e) {
+    debugLog('headset boot getUserMedia failed', e && e.name);
+    return false;
+  }
+  micPermissionGranted = true;
+  try {
+    headsetCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (headsetCtx.state === 'suspended') {
+      try { await headsetCtx.resume(); } catch (_) {}
+    }
+    const src = headsetCtx.createMediaStreamSource(headsetStream);
+    headsetAnalyser = headsetCtx.createAnalyser();
+    headsetAnalyser.fftSize = 512;
+    headsetBuf = new Uint8Array(headsetAnalyser.fftSize);
+    src.connect(headsetAnalyser);
+  } catch (e) {
+    debugLog('headset audio init failed', e && e.message);
+    try { headsetStream.getTracks().forEach(t => t.stop()); } catch (_) {}
+    headsetStream = null;
+    return false;
+  }
+  headsetReady = true;
+  conversationState = 'idle';
+  startHeadsetTick();
+  debugLog('headset mode active');
+  return true;
+}
+
+function headsetReadRMS() {
+  if (!headsetAnalyser || !headsetBuf) return 0;
+  headsetAnalyser.getByteTimeDomainData(headsetBuf);
+  let sum = 0;
+  for (let i = 0; i < headsetBuf.length; i++) {
+    const v = headsetBuf[i] - 128;
+    sum += v * v;
+  }
+  return Math.sqrt(sum / headsetBuf.length);
+}
+
+function startHeadsetTick() {
+  clearInterval(headsetTickInterval);
+  let consecutiveLoudMs = 0;
+  let lastTickAt = performance.now();
+  let lastLoudInSlice = 0;
+  headsetTickInterval = setInterval(() => {
+    const now = performance.now();
+    const dt = now - lastTickAt;
+    lastTickAt = now;
+    const rms = headsetReadRMS();
+
+    if (conversationState === 'speaking') {
+      /* TTS playing. Watch for sustained loud audio = barge-in. */
+      if (rms > HEADSET_BARGE_THRESH) {
+        consecutiveLoudMs += dt;
+        if (consecutiveLoudMs >= HEADSET_BARGE_DURATION) {
+          debugLog('headset: barge-in detected, cutting TTS');
+          try { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } } catch (_) {}
+          try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+          speaking = false;
+          consecutiveLoudMs = 0;
+          conversationState = 'user_speaking';
+          lastLoudInSlice = now;
+          startHeadsetSlice();
+        }
+      } else {
+        consecutiveLoudMs = Math.max(0, consecutiveLoudMs - dt * 0.5);
+      }
+    } else if (conversationState === 'listening') {
+      /* MR is already pre-armed (started in afterSpeak). Watch for user
+         starting to talk -- just transition state, MR keeps capturing. */
+      if (rms > HEADSET_SPEECH_THRESH) {
+        debugLog('headset: user started speaking');
+        conversationState = 'user_speaking';
+        lastLoudInSlice = now;
+        startHeadsetSlice(); /* idempotent safety: ensures MR is up */
+      }
+    } else if (conversationState === 'user_speaking') {
+      /* Recording. Watch for silence to end the slice. */
+      if (rms > HEADSET_SPEECH_THRESH) {
+        lastLoudInSlice = now;
+      } else if (lastLoudInSlice && (now - lastLoudInSlice) >= HEADSET_SILENCE_MS) {
+        debugLog('headset: silence -> end slice');
+        stopHeadsetSlice();
+      }
+    }
+  }, HEADSET_TICK_MS);
+}
+
+function pickRecorderMime() {
+  const preferred = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/mp4',
+  ];
+  for (const t of preferred) {
+    if (window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(t)) {
+      return t;
+    }
+  }
+  return '';
+}
+
+function startHeadsetSlice() {
+  /* Idempotent: if MR is already running (pre-armed from afterSpeak),
+     don't create a new one. Caller likely transitioned conversationState
+     and just wants to ensure capture is active. */
+  if (headsetSliceMR && headsetSliceMR.state === 'recording') return;
+  if (!headsetStream) return;
+  const mimeType = pickRecorderMime();
+  let mr;
+  try { mr = new MediaRecorder(headsetStream, mimeType ? { mimeType } : {}); }
+  catch (e) { debugLog('headset slice ctor failed', e && e.message); return; }
+  headsetSliceMR = mr;
+  headsetSliceChunks = [];
+  mr.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) headsetSliceChunks.push(ev.data); };
+  mr.onstop = async () => {
+    const blob = new Blob(headsetSliceChunks, { type: mr.mimeType || mimeType || 'audio/webm' });
+    headsetSliceMR = null;
+    debugLog('headset slice ended', { size: blob.size, state: conversationState });
+    /* Idle-cap path: MR was stopped while still in 'listening' because
+       the user never spoke within the window. Discard the silence blob
+       and re-arm a fresh MR so we keep listening. */
+    if (conversationState === 'listening') {
+      startHeadsetSlice();
+      return;
+    }
+    if (blob.size < 4096) {
+      conversationState = 'listening';
+      startHeadsetSlice();
+      return;
+    }
+    conversationState = 'thinking';
+    setState('thinking');
+    let audio64;
+    try { audio64 = await blobToBase64(blob); }
+    catch (e) { conversationState = 'listening'; return; }
+    try {
+      const r = await fetch(ENDPOINT_STT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          audio_base64: audio64,
+          mime: (mr.mimeType || mimeType || 'audio/webm').split(';')[0],
+          lang: lang,
+          sample_rate: 48000,
+          website: '',
+        }),
+        mode:'cors', credentials:'omit',
+      });
+      const j = await r.json();
+      if (!j || !j.ok) {
+        debugLog('headset STT err', j);
+        const detail = (j && j.detail) || '';
+        if (j && j.error === 'over_budget') sttBudgetExhausted = true;
+        if (/key_missing|PERMISSION_DENIED|API_KEY_INVALID|API_NOT_ACTIVATED/i.test(detail)) {
+          sttBudgetExhausted = true;
+        }
+        /* If server STT is permanently broken, tear down headset and
+           fall back to PTT mode for the rest of the session. */
+        teardownHeadsetAndFallback();
+        return;
+      }
+      const txt = (j.transcript || '').trim();
+      lastConfidence = j.confidence || null;
+      if (!txt) {
+        silenceCount++;
+        conversationState = 'listening';
+        handleUtterance('');
+        return;
+      }
+      lastTranscript = txt;
+      allTranscript += (allTranscript ? ' / ' : '') + txt;
+      $('transcript').textContent = '"' + txt + '"';
+      silenceCount = 0;
+      /* handleUtterance will set state to thinking, call /parse, then
+         speak() the reply -- which flips conversationState back to
+         speaking. After speak finishes, afterSpeak() flips to listening. */
+      handleUtterance(txt);
+    } catch (e) {
+      debugLog('headset STT network err', e && e.message);
+      teardownHeadsetAndFallback();
+    }
+  };
+  try { mr.start(); }
+  catch (e) { debugLog('headset slice start failed', e && e.message); return; }
+  setState('listening');
+  $('ad-mic').setAttribute('data-state','recording');
+  /* Idle cap: if MR is still capturing in 'listening' state after
+     HEADSET_IDLE_CAP_MS, the user hasn't spoken. Stop the MR to discard
+     the accumulated silence; the onstop handler re-arms a fresh MR
+     so we keep listening without paying STT for silent seconds. */
+  setTimeout(() => {
+    if (headsetSliceMR === mr && mr.state === 'recording' && conversationState === 'listening') {
+      debugLog('headset MR idle cap -- discarding silence');
+      try { mr.stop(); } catch (_) {}
+    }
+  }, HEADSET_IDLE_CAP_MS);
+  /* Hard cap per slice (also covers user_speaking runaway). */
+  setTimeout(() => {
+    if (headsetSliceMR === mr && mr.state === 'recording') {
+      debugLog('headset slice hard cap');
+      stopHeadsetSlice();
+    }
+  }, HEADSET_MAX_REC_MS);
+}
+
+function stopHeadsetSlice() {
+  if (headsetSliceMR && headsetSliceMR.state === 'recording') {
+    try { headsetSliceMR.stop(); } catch (_) {}
+  }
+}
+
+function teardownHeadset() {
+  clearInterval(headsetTickInterval);
+  headsetTickInterval = null;
+  try { if (headsetSliceMR && headsetSliceMR.state === 'recording') headsetSliceMR.stop(); } catch (_) {}
+  headsetSliceMR = null;
+  try { headsetCtx && headsetCtx.close(); } catch (_) {}
+  headsetCtx = null;
+  headsetAnalyser = null;
+  headsetBuf = null;
+  try { if (headsetStream) headsetStream.getTracks().forEach(t => t.stop()); } catch (_) {}
+  headsetStream = null;
+  headsetReady = false;
+  conversationState = 'idle';
+}
+
+function teardownHeadsetAndFallback() {
+  teardownHeadset();
+  serverSttBroken = true;
+  /* Stay idle; user clicks mic to use PTT path. */
+  setState('idle');
+  showNarrator('Voice service unavailable. Tap the mic to try again.');
+}
+
+async function ensureMicPermission() {
+  if (micPermissionGranted) return true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    /* If getUserMedia isn't available, fall back -- SpeechRecognition might still
+       prompt natively (Chrome desktop). Don't block. */
+    return true;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    /* Release the stream immediately; SpeechRecognition manages its own. */
+    stream.getTracks().forEach(t => t.stop());
+    micPermissionGranted = true;
+    return true;
+  } catch (e) {
+    debugLog('mic permission denied', e && e.name);
+    showNarrator('Microphone blocked. Click the lock icon and allow mic, then retry.');
+    return false;
+  }
+}
+
+function serverSttSupported() {
+  /* Server STT path needs MediaRecorder + getUserMedia. */
+  return typeof window.MediaRecorder !== 'undefined'
+      && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+}
+
+async function startMic() {
+  if (recording) return;
+  /* Server STT is the primary path. Fall back to webkit if it is broken
+     for this session OR if the browser does not support MediaRecorder. */
+  if (!sttBudgetExhausted && !serverSttBroken && serverSttSupported()) {
+    return startMicServerSTT();
+  }
+  return startMicWebkitSR();
+}
+
+async function startMicServerSTT() {
+  if (recording) return;
+  const ok = await ensureMicPermission();
+  if (!ok) return;
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    debugLog('getUserMedia failed for server STT', e && e.name);
+    serverSttBroken = true;
+    return startMicWebkitSR();
+  }
+  mediaStreamActive = stream;
+
+  /* Pick a mime the MediaRecorder + Google STT both understand. */
+  const preferred = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/ogg;codecs=opus',
+    'audio/ogg',
+    'audio/mp4',
+  ];
+  let mimeType = '';
+  for (const t of preferred) {
+    if (window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(t)) {
+      mimeType = t; break;
+    }
+  }
+  let mr;
+  try { mr = new MediaRecorder(stream, mimeType ? { mimeType } : {}); }
+  catch (e) {
+    debugLog('MediaRecorder ctor failed', e && e.message);
+    stream.getTracks().forEach(t => t.stop());
+    mediaStreamActive = null;
+    serverSttBroken = true;
+    return startMicWebkitSR();
+  }
+  mediaRecorderActive = mr;
+  const chunks = [];
+  mr.ondataavailable = (ev) => { if (ev.data && ev.data.size > 0) chunks.push(ev.data); };
+
+  /* Voice activity detection via Web Audio AnalyserNode. Best-effort:
+     Chrome auto-suspends AudioContexts after the gesture window, which
+     leaves the analyser returning baseline (~128) and the VAD blind.
+     We explicitly resume() the context and DO NOT depend solely on the
+     VAD signal -- the onstop handler also submits the audio if the
+     blob size is non-trivial, regardless of VAD detection. */
+  let audioCtx, source, analyser, vadInterval;
+  let speechStartedAt = 0;
+  let lastLoudAt = 0;
+  let stoppedByVad = false;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') {
+      try { await audioCtx.resume(); } catch (_) {}
+    }
+    source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+  } catch (e) {
+    debugLog('Web Audio init failed', e && e.message);
+    /* VAD optional; recorder still works with watchdog cutoff. */
+  }
+  const buf = analyser ? new Uint8Array(analyser.fftSize) : null;
+  const THRESH = 6;        /* RMS-ish threshold (0..128). Lowered: soft speakers were being missed. */
+  const SILENCE_MS = 1400; /* stop after this much silence post-speech */
+  const PRE_SPEECH_MS = 6000; /* if no speech detected at all, stop and submit anyway */
+  const HARD_CAP_MS = 9000;   /* absolute ceiling per session */
+
+  const t0 = performance.now();
+  function tick() {
+    if (!recording) return;
+    const now = performance.now();
+    if (analyser && buf) {
+      analyser.getByteTimeDomainData(buf);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) { const v = buf[i] - 128; sum += v*v; }
+      const rms = Math.sqrt(sum / buf.length);
+      if (rms > THRESH) {
+        if (!speechStartedAt) { speechStartedAt = now; debugLog('speech detected (vad)'); }
+        lastLoudAt = now;
+      }
+    }
+    const elapsed = now - t0;
+    if (elapsed >= HARD_CAP_MS) { stoppedByVad = true; stopRecorder(); return; }
+    if (speechStartedAt && (now - lastLoudAt) >= SILENCE_MS) {
+      stoppedByVad = true; stopRecorder(); return;
+    }
+    if (!speechStartedAt && elapsed >= PRE_SPEECH_MS) {
+      stoppedByVad = true; stopRecorder(); return;
+    }
+  }
+
+  function stopRecorder() {
+    clearInterval(vadInterval);
+    try { mr.state === 'recording' && mr.stop(); } catch (_) {}
+  }
+
+  mr.onstop = async () => {
+    clearInterval(vadInterval);
+    try { source && source.disconnect(); } catch (_) {}
+    try { audioCtx && audioCtx.close(); } catch (_) {}
+    try { stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+    mediaStreamActive = null;
+    mediaRecorderActive = null;
+    recording = false;
+    $('ad-mic').setAttribute('data-state','idle');
+    $('mic-label').textContent = I18N[lang].mic.idle;
+    clearTimeout(micWatchdog); micWatchdog = null;
+
+    const blob = new Blob(chunks, { type: mr.mimeType || mimeType || 'audio/webm' });
+    debugLog('server STT blob', { size: blob.size, vadSpeech: !!speechStartedAt });
+
+    /* 4KB threshold: tiny blobs are almost certainly silence/noise; bigger
+       blobs probably contain speech even when our VAD missed it (Chrome
+       auto-suspended the AudioContext on this turn). Submit anyway and let
+       Google's STT decide. */
+    if (blob.size < 4096) {
+      silenceCount++;
+      debugLog('server STT: blob too small, treating as silence', blob.size);
+      handleUtterance('');
+      return;
+    }
+
+    setState('thinking');
+    let audio64;
+    try {
+      audio64 = await blobToBase64(blob);
+    } catch (e) {
+      debugLog('base64 encode failed', e && e.message);
+      serverSttBroken = true;
+      return startMicWebkitSR();
+    }
+    try {
+      const r = await fetch(ENDPOINT_STT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          audio_base64: audio64,
+          mime: (mr.mimeType || mimeType || 'audio/webm').split(';')[0],
+          lang: lang,
+          sample_rate: 48000,
+          website: '',
+        }),
+        mode:'cors', credentials:'omit',
+      });
+      const j = await r.json();
+      if (!j || !j.ok) {
+        debugLog('server STT fallback', { error: j && j.error, detail: j && j.detail });
+        const detail = (j && j.detail) || '';
+        if (j && j.error === 'over_budget') sttBudgetExhausted = true;
+        /* These are permanent for the session -- no point retrying the
+           server path until the operator fixes the config / GCP project. */
+        if (/key_missing|PERMISSION_DENIED|API_KEY_INVALID|API_NOT_ACTIVATED/i.test(detail)) {
+          sttBudgetExhausted = true;
+        }
+        serverSttBroken = true; /* this session uses webkit going forward */
+        return startMicWebkitSR();
+      }
+      const txt = (j.transcript || '').trim();
+      lastConfidence = j.confidence || null;
+      networkRetryBudget = 1;
+      if (!txt) {
+        silenceCount++;
+        handleUtterance('');
+        return;
+      }
+      lastTranscript = txt;
+      allTranscript += (allTranscript ? ' / ' : '') + txt;
+      $('transcript').textContent = '"' + txt + '"';
+      silenceCount = 0;
+      handleUtterance(txt);
+    } catch (e) {
+      debugLog('server STT network error', e && e.message);
+      serverSttBroken = true;
+      return startMicWebkitSR();
+    }
+  };
+
+  try { mr.start(); }
+  catch (e) {
+    debugLog('MediaRecorder.start failed', e && e.message);
+    try { stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+    mediaStreamActive = null;
+    mediaRecorderActive = null;
+    serverSttBroken = true;
+    return startMicWebkitSR();
+  }
+  recording = true;
+  setState('listening');
+  $('ad-mic').setAttribute('data-state','recording');
+  $('mic-label').textContent = I18N[lang].mic.recording;
+  vadInterval = setInterval(tick, 80);
+  /* Watchdog same as webkit path. */
+  clearTimeout(micWatchdog);
+  micWatchdog = setTimeout(() => {
+    if (recording) { debugLog('server STT watchdog fired'); stopRecorder(); }
+  }, MIC_MAX_MS);
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result || '';
+      const i = String(dataUrl).indexOf(',');
+      resolve(i >= 0 ? String(dataUrl).slice(i+1) : '');
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function startMicWebkitSR() {
+  if (recording) return;
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    showNarrator('Speech recognition not available. Try Chrome or Edge.');
+    return;
+  }
+  const ok = await ensureMicPermission();
+  if (!ok) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = I18N[lang].bcp;
+  recognition.maxAlternatives = 1;
+  let gotResult = false;
+  let heardAudio = false;
+  let fatalError = false; /* set on errors that should NOT auto-restart the mic */
+  recognition.onaudiostart  = () => { debugLog('audio captured'); };
+  recognition.onspeechstart = () => { heardAudio = true; debugLog('speech detected'); };
+  recognition.onresult = (ev) => {
+    gotResult = true;
+    networkRetryBudget = 1; /* success -- replenish the budget for future blips */
+    const txt = Array.from(ev.results).map(r => r[0].transcript).join(' ').trim();
+    lastConfidence = ev.results[0] ? ev.results[0][0].confidence : null;
+    lastTranscript = txt;
+    allTranscript += (allTranscript ? ' / ' : '') + txt;
+    $('transcript').textContent = '"' + txt + '"';
+    silenceCount = 0;
+    handleUtterance(txt);
+  };
+  recognition.onerror = (ev) => {
+    const err = ev && ev.error;
+    debugLog('mic error', err);
+    if (err === 'not-allowed') {
+      showNarrator('Microphone blocked. Allow mic in browser address bar and retry.');
+      fatalError = true;
+      autoListenDisabled = true;
+    } else if (err === 'no-speech') {
+      /* harmless: user was silent. Let onend handle the silence tick. */
+    } else if (err === 'network') {
+      /* Chrome's internal recognizer lost connection to Google's speech
+         backend. Most of these are transient. Spend the retry budget
+         once, then surface a clear "click to retry" message. */
+      fatalError = true;
+      if (networkRetryBudget > 0) {
+        networkRetryBudget--;
+        debugLog('mic network -- auto-retry in 500ms');
+        showNarrator('Reconnecting voice...');
+        stopMic();
+        setTimeout(() => {
+          if (!recording && !speaking && !autoListenDisabled) startMic();
+        }, 500);
+        return; /* skip the trailing stopMic() */
+      }
+      showNarrator('Voice service offline. Tap the mic to try again.');
+      autoListenDisabled = true;
+    } else if (err === 'aborted') {
+      /* user pressed stop, or watchdog killed us. No-op. */
+      fatalError = true;
+    } else if (err) {
+      showNarrator('Mic error: ' + err);
+      fatalError = true;
+    }
+    stopMic();
+  };
+  recognition.onend = () => {
+    clearTimeout(micWatchdog);
+    micWatchdog = null;
+    if (fatalError) {
+      /* error path already handled state; do not trigger silence loop */
+      return;
+    }
+    if (!gotResult) {
+      stopMic();
+      if (heardAudio) {
+        /* user spoke but recognition didn't parse it -- treat as utterance the LLM
+           can react to with "didn't catch that, can you repeat?" */
+        silenceCount++;
+        handleUtterance('');
+      } else {
+        /* dead silence -- still bump so the agent rephrases */
+        silenceCount++;
+        handleUtterance('');
+      }
+    }
+  };
+  try { recognition.start(); }
+  catch (e) { debugLog('recognition.start threw', e && e.message); stopMic(); return; }
+  recording = true;
+  setState('listening');
+  $('ad-mic').setAttribute('data-state','recording');
+  $('mic-label').textContent = I18N[lang].mic.recording;
+  /* Hard watchdog: a runaway SR session that never fires onresult/onend
+     (Chrome's recognizer occasionally hangs after a network blip)
+     gets force-killed after MIC_MAX_MS. */
+  clearTimeout(micWatchdog);
+  micWatchdog = setTimeout(() => {
+    if (recording) {
+      debugLog('mic watchdog fired -- forcing abort');
+      try { recognition.abort(); } catch (_) {}
+      stopMic();
+    }
+  }, MIC_MAX_MS);
+}
+
+function stopMic() {
+  recording = false;
+  $('ad-mic').setAttribute('data-state','idle');
+  $('mic-label').textContent = I18N[lang].mic.idle;
+  clearTimeout(micWatchdog);
+  micWatchdog = null;
+  /* webkit SR path */
+  try { if (recognition) recognition.stop(); } catch (_) {}
+  try { if (recognition) recognition.abort(); } catch (_) {}
+  /* server STT path */
+  try { if (mediaRecorderActive && mediaRecorderActive.state === 'recording') mediaRecorderActive.stop(); } catch (_) {}
+  try { if (mediaStreamActive) { mediaStreamActive.getTracks().forEach(t => t.stop()); mediaStreamActive = null; } } catch (_) {}
+}
+
+function stopAll() {
+  /* Stops every active output + cancels mic. Idle the UI. */
+  clearTimeout(autoListenTimer);
+  clearTimeout(micWatchdog);
+  micWatchdog = null;
+  try { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } } catch (_) {}
+  try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+  speaking = false;
+  if (recording) stopMic();
+  setState('idle');
+}
+
+async function handleUtterance(text) {
+  const myTurn = ++turnId;
+  const myLang = lang;
+  setState('thinking');
+  $('ad-mic').disabled = true;
+  const manifest = buildManifestForLLM();
+  conversationHistory.push({ role:'user', text });
+  let resp;
+  try {
+    const r = await fetch(ENDPOINT_PARSE, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        utterance: text,
+        manifest: manifest,
+        lang: myLang,
+        ad_slug: AD_SLUG,
+        silence_count: silenceCount,
+        last_question_focus: lastQuestionFocus,
+        history: conversationHistory.slice(-10),
+        user_context: USER_CONTEXT,
+        website: '',
+      }),
+      mode:'cors', credentials:'omit',
+    });
+    resp = await r.json();
+  } catch (e) {
+    if (myTurn !== turnId || myLang !== lang) { debugLog('stale turn discarded (net err)'); return; }
+    showNarrator('Network error.');
+    $('ad-mic').disabled = false;
+    setState('idle');
+    return;
+  }
+  /* If user switched language / fired a newer turn while this fetch was in flight,
+     discard the response entirely -- do NOT push to history, do NOT speak. */
+  if (myTurn !== turnId || myLang !== lang) {
+    debugLog('stale turn discarded', { myTurn, current: turnId, myLang, lang });
+    return;
+  }
+  if (!resp || !resp.ok) {
+    showNarrator('Error: ' + (resp && resp.error ? resp.error : 'unknown'));
+    $('ad-mic').disabled = false;
+    setState('idle');
+    return;
+  }
+
+  let shouldSubmit = false;
+  (resp.actions || []).forEach(a => {
+    if (a.verb === 'fill' && a.nac_id) applyFill(a.nac_id, a.value);
+    else if (a.verb === 'click' && a.nac_id === 'atlas_pro_ad.submit') shouldSubmit = true;
+  });
+
+  if (resp.next_question_focus) {
+    lastQuestionFocus = resp.next_question_focus;
+    if (['size','color','qty','delivery'].includes(resp.next_question_focus)) {
+      focusSlot(resp.next_question_focus);
+    }
+  }
+
+  if (resp.reply) {
+    conversationHistory.push({ role:'assistant', text: resp.reply });
+    showNarrator(resp.reply);
+    await speak(resp.reply);
+  }
+
+  $('ad-mic').disabled = false;
+  if (resp.complete && allRequiredSlotsFilled()) {
+    $('ad-submit').classList.add('visible');
+  }
+
+  if (shouldSubmit && allRequiredSlotsFilled()) {
+    await doSubmit();
+    return;
+  }
+
+  if (resp.auto_listen !== false) {
+    if (HEADSET_MODE && headsetReady) {
+      /* Headset mode: the mic is already open. Just flip state to
+         listening; the tick loop watches for the user to start talking. */
+      conversationState = 'listening';
+      setState('listening');
+      $('ad-mic').setAttribute('data-state','recording');
+      $('mic-label').textContent = I18N[lang].mic.recording;
+    } else {
+      /* PTT mode: reopen the mic immediately after the TTS audio ends.
+         Visitors tend to interrupt the tail; perceptible pause feels dead. */
+      startMicSoon(120);
+    }
+  } else {
+    setState('idle');
+  }
+}
+
+function applyFill(nacId, value) {
+  let key = null;
+  if (nacId === 'atlas_pro_ad.size')          key = 'size';
+  else if (nacId === 'atlas_pro_ad.color')    key = 'color';
+  else if (nacId === 'atlas_pro_ad.qty')      key = 'qty';
+  else if (nacId === 'atlas_pro_ad.delivery') key = 'delivery';
+  if (!key) return;
+  slots[key] = String(value);
+  $('value-' + key).textContent = slots[key];
+  $('slot-' + key).classList.add('filled');
+  if (key === 'color') applyColorTexture(slots[key]);
+  document.dispatchEvent(new CustomEvent('nac:field:changed', {
+    detail:{plugin:'atlas_pro_ad', field_id:nacId, value:slots[key]}
+  }));
+}
+
+function applyColorTexture(colorName) {
+  if (!shoeMesh) return;
+  const key = colorName.toLowerCase().trim();
+  const texPath = COLOR_TEXTURE[key] || COLOR_TEXTURE.beige;
+  const loader = new THREE.TextureLoader();
+  loader.load(texPath, (tex) => {
+    tex.flipY = false;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    shoeMesh.traverse(node => {
+      if (node.isMesh && node.material) {
+        node.material.map = tex;
+        node.material.needsUpdate = true;
+      }
+    });
+  });
+}
+
+function allRequiredSlotsFilled() {
+  return slots.size && slots.color && slots.qty && slots.delivery;
+}
+
+const PERSONA_BY_LANG = {
+  es: 'Sos vendedor/a experto/a de Atlas Pro, zapatillas premium de running. Hablas como una persona en un local de zapatillas: tono coloquial, calido, cercano. Tutaes (no formal). Conoces a fondo el producto: tres colores disponibles -- beige (crema calida), midnight (negro profundo), street (gris piedra). Moves la venta paso a paso, una pregunta por turno, siempre terminando con UNA pregunta clara que mueve la conversacion para adelante. NO uses jerga corporate ni emojis. Sos vendedor/a, no chatbot.',
+  en: "You are an expert Atlas Pro salesperson selling premium running shoes. Speak like a real person in a shoe shop: warm, casual, friendly. You know the product cold: three colors available -- beige (warm cream), midnight (deep black), street (stone grey). Move the sale forward one question at a time, always ending with ONE clear question. No corporate jargon, no emojis. You are a salesperson, not a chatbot.",
+};
+
+function buildPersona() {
+  const base = PERSONA_BY_LANG[lang] || PERSONA_BY_LANG.en;
+  const name = (USER_CONTEXT.name || '').trim();
+  if (!name) return base;
+  /* Inject the name into the persona itself so the model treats it as a hard
+     contextual fact, not an optional hint. */
+  const nameLine = lang === 'es'
+    ? ' EL VISITANTE SE LLAMA ' + name + '. Saludalo por su nombre en el primer mensaje y volve a usarlo una o dos veces mas en la conversacion (no en cada frase, no robotico). Nunca inventes apellido.'
+    : ' THE VISITOR IS NAMED ' + name + '. Greet them by name in your first message and use the name one or two more times across the conversation (not every sentence, not robotic). Never invent a last name.';
+  return base + nameLine;
+}
+
+function buildManifestForLLM() {
+  return {
+    plugin_slug:'atlas_pro_ad',
+    product:'Atlas Pro premium running shoes',
+    persona: buildPersona(),
+    required:['size','color','qty','delivery'],
+    slots:[
+      {nac_id:'atlas_pro_ad.size',     hint:'shoe size, integer 35-50, may include .5'},
+      {nac_id:'atlas_pro_ad.color',    hint:'must map to beige/midnight/street (3 available variants)'},
+      {nac_id:'atlas_pro_ad.qty',      hint:'integer pairs (1-10)'},
+      {nac_id:'atlas_pro_ad.delivery', hint:'home or pickup'},
+    ],
+    submit:{nac_id:'atlas_pro_ad.submit', verb:'submit'},
+    current_slots: slots,
+  };
+}
+
+async function doSubmit() {
+  setState('thinking');
+  try {
+    const r = await fetch(ENDPOINT_SUBMIT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        ad_slug: AD_SLUG, ad_lang: lang, product_sku: PRODUCT_SKU,
+        slots: slots, transcript: allTranscript,
+        confidence: lastConfidence,
+        seller_email: SELLER_EMAIL_OVERRIDE || 'pablo.kuschnirof@gmail.com',
+        website: '',
+      }),
+      mode:'cors', credentials:'omit',
+    });
+    const j = await r.json();
+    if (j && j.ok) {
+      setState('confirmed');
+      $('success-text').textContent = I18N[lang].success;
+      $('success-overlay').classList.add('visible');
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail:{plugin:'atlas_pro_ad', action_id:'atlas_pro_ad.submit', lead_id:j.lead_id}
+      }));
+      await speak(I18N[lang].success);
+    } else {
+      showNarrator('Submit error.');
+    }
+  } catch (_) {
+    showNarrator('Network error on submit.');
+  }
+}
+
+function registerNac3Manifest() {
+  if (!window.NAC || !window.NAC.register) return;
+  const li = (es,en,pt,fr,it,de,ja,zh,hi,ar) => ({es,en,pt,fr,it,de,ja,zh,hi,ar});
+  try {
+    window.NAC.register({
+      plugin_slug:'atlas_pro_ad', version:'2.0.0', nac_version:'2.2',
+      elements:[
+        {id:'atlas_pro_ad.mic',      role:'action',
+         actions:[{verb:'listen', label_i18n: li('Hablar','Talk','Falar','Parler','Parla','Sprich','話す','说话','bolo','تحدث')}],
+         label_i18n: li('Hablar','Talk','Falar','Parler','Parla','Sprich','話す','说话','bolo','تحدث')},
+        {id:'atlas_pro_ad.submit',   role:'action',
+         actions:[{verb:'submit', label_i18n: li('Confirmar pedido','Confirm order','Confirmar pedido','Confirmer la commande','Conferma ordine','Bestellung bestaetigen','注文を確認','确认订单','order pushtikrit karo','تأكيد الطلب')}],
+         label_i18n: li('Confirmar pedido','Confirm order','Confirmar pedido','Confirmer la commande','Conferma ordine','Bestellung bestaetigen','注文を確認','确认订单','order pushtikrit karo','تأكيد الطلب')},
+        {id:'atlas_pro_ad.size',     role:'field', label_i18n: li('Talle','Size','Tamanho','Taille','Taglia','Groesse','サイズ','尺码','size','المقاس')},
+        {id:'atlas_pro_ad.color',    role:'field', label_i18n: li('Color','Color','Cor','Couleur','Colore','Farbe','色','颜色','color','اللون')},
+        {id:'atlas_pro_ad.qty',      role:'field', label_i18n: li('Cantidad','Quantity','Quantidade','Quantite','Quantita','Anzahl','数量','数量','matra','الكمية')},
+        {id:'atlas_pro_ad.delivery', role:'field', label_i18n: li('Entrega','Delivery','Entrega','Livraison','Consegna','Lieferung','配送','配送','delivery','التوصيل')},
+        {id:'atlas_pro_ad.lang',     role:'field', label_i18n: li('Idioma','Language','Idioma','Langue','Lingua','Sprache','言語','语言','bhaasha','اللغة')},
+      ]
+    });
+  } catch (e) { console.warn('[atlas-pro-ad] NAC register failed', e); }
+}
+
+function initThree() {
+  const canvas = $('three-canvas');
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(35, w/h, 0.01, 100);
+  camera.position.set(0, 0.1, 0.55);
+  camera.lookAt(0, 0, 0);
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(w, h);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xc8a04d, 0.65));
+  const key = new THREE.DirectionalLight(0xffffff, 1.2);
+  key.position.set(2, 3, 2);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffd9aa, 0.4);
+  fill.position.set(-2, 1, -1);
+  scene.add(fill);
+
+  shoeRoot = new THREE.Group();
+  scene.add(shoeRoot);
+
+  const loader = new GLTFLoader();
+  loader.load('assets/MaterialsVariantsShoe.gltf', (gltf) => {
+    shoeMesh = gltf.scene;
+    shoeMesh.scale.setScalar(1.98); /* -10% per Tamara/Pablo feedback to fit stage */
+    shoeMesh.position.y = -0.05;
+    shoeRoot.add(shoeMesh);
+  }, undefined, (err) => {
+    console.warn('shoe load failed', err);
+  });
+
+  window.addEventListener('resize', () => {
+    const w2 = canvas.parentElement.clientWidth;
+    const h2 = canvas.parentElement.clientHeight;
+    camera.aspect = w2/h2;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w2, h2);
+  });
+
+  let lastT = 0;
+  function tick(t) {
+    const dt = Math.min(0.05, (t - lastT) / 1000 || 0);
+    lastT = t;
+    if (shoeRoot) shoeRoot.rotation.y += dt * 0.55;
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+$('ad-mic').addEventListener('click', async () => {
+  if (HEADSET_MODE && headsetReady) {
+    /* In headset mode the mic is always on. Click "force-submits" the
+       current slice if recording, or transitions to listening otherwise. */
+    if (conversationState === 'user_speaking') {
+      stopHeadsetSlice();
+    } else if (conversationState === 'speaking') {
+      /* user wants to interrupt the assistant */
+      try { if (currentAudio) currentAudio.pause(); } catch (_) {}
+      try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+      speaking = false;
+      conversationState = 'user_speaking';
+      startHeadsetSlice();
+    } else {
+      /* idle/thinking -- start a fresh slice */
+      conversationState = 'user_speaking';
+      startHeadsetSlice();
+    }
+    return;
+  }
+  /* PTT mode */
+  if (recording) {
+    stopMic();
+  } else {
+    autoListenDisabled = false;
+    networkRetryBudget = 1;
+    startMic();
+  }
+});
+$('ad-stop').addEventListener('click', () => {
+  if (HEADSET_MODE && headsetReady) {
+    /* In headset mode, stop = cut TTS and go idle (mic stays open). */
+    try { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } } catch (_) {}
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+    speaking = false;
+    stopHeadsetSlice();
+    conversationState = 'listening';
+    setState('idle');
+    return;
+  }
+  stopAll();
+});
+$('ad-submit').addEventListener('click', doSubmit);
+$('lang-select').addEventListener('change', async (e) => {
+  stopAll();
+  autoListenDisabled = false;
+  networkRetryBudget = 1;
+  serverSttBroken = false; /* give server STT another chance for the new lang */
+  lang = e.target.value;
+  setLang(lang);
+  conversationHistory = [];
+  silenceCount = 0;
+  lastQuestionFocus = 'intro';
+  /* Reset headset cleanly for the new language. */
+  if (HEADSET_MODE && headsetReady) {
+    teardownHeadset();
+    await bootHeadset();
+  }
+  handleUtterance('');
+});
+
+$('lang-select').value = lang;
+setLang(lang);
+registerNac3Manifest();
+initThree();
+
+/* Headset mode needs an explicit user gesture to obtain mic permission
+   without a confirm prompt. We attach a one-shot click on the card so the
+   first interaction (anywhere) wakes the mic. After it's wired, the rest
+   of the conversation runs hands-free. */
+async function tryBootHeadsetOnce() {
+  document.removeEventListener('click', tryBootHeadsetOnce);
+  document.removeEventListener('touchend', tryBootHeadsetOnce);
+  await bootHeadset();
+}
+if (HEADSET_MODE) {
+  document.addEventListener('click', tryBootHeadsetOnce, { once: false });
+  document.addEventListener('touchend', tryBootHeadsetOnce, { once: false });
+}
+
+/* =====================================================================
+   Lifecycle teardown -- prevents the mic + chat from staying alive in
+   background after the user closes the tab or navigates away. Without
+   this, Chrome's red microphone indicator can persist for tens of
+   seconds (perceived as "the ad is still listening"), and any in-flight
+   /stt / /parse fetches keep running silently.
+   ===================================================================== */
+function tearDownEverything() {
+  /* Stop any TTS audio. */
+  try { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } } catch (_) {}
+  try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+  speaking = false;
+  /* Stop PTT-side SpeechRecognition + watchdog. */
+  try { if (recognition) recognition.abort(); } catch (_) {}
+  clearTimeout(micWatchdog); micWatchdog = null;
+  clearTimeout(autoListenTimer); autoListenTimer = null;
+  /* Stop PTT-side MediaRecorder + release stream. */
+  try { if (mediaRecorderActive && mediaRecorderActive.state === 'recording') mediaRecorderActive.stop(); } catch (_) {}
+  mediaRecorderActive = null;
+  try { if (mediaStreamActive) mediaStreamActive.getTracks().forEach(t => t.stop()); } catch (_) {}
+  mediaStreamActive = null;
+  /* Stop headset MediaRecorder, AudioContext, persistent stream. */
+  try { teardownHeadset(); } catch (_) {}
+  recording = false;
+  setState('idle');
+}
+
+/* Fire on every signal the browser gives us that the page is going away
+   or being backgrounded. pagehide is the modern reliable hook
+   (beforeunload + unload are sketchy on mobile / bfcache). */
+window.addEventListener('pagehide', tearDownEverything);
+window.addEventListener('beforeunload', tearDownEverything);
+/* When the tab becomes hidden (user switches tabs, locks phone), pause
+   TTS + stop active recording. We DO NOT close the persistent stream
+   here so when the user comes back the conversation can resume. */
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) return;
+  try { if (currentAudio) currentAudio.pause(); } catch (_) {}
+  try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+  speaking = false;
+  if (recording) {
+    try { if (recognition) recognition.abort(); } catch (_) {}
+    try { if (mediaRecorderActive && mediaRecorderActive.state === 'recording') mediaRecorderActive.stop(); } catch (_) {}
+    try { if (headsetSliceMR && headsetSliceMR.state === 'recording') headsetSliceMR.stop(); } catch (_) {}
+    recording = false;
+    setState('idle');
+  }
+});
+
+setTimeout(() => {
+  if (window.speechSynthesis) {
+    handleUtterance('');
+  }
+}, 1200);
+
+</script>
+
+</body>
+</html>

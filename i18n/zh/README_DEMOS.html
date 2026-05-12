@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 在 yujin.app/nac-spec/ 上的实时演示 -- NAC3</title>
+<meta name="nac3-doc-slug" content="readme_demos" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="readme_demos" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="readme_demos.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="readme_demos.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/readme_demos.mp3" data-nac-id="readme_demos.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="readme_demos.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="readme_demos.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="readme_demos.main" data-nac-role="region">
+<hr />
+<p data-nac-id="readme_demos.p.1" data-nac-role="paragraph">translation_source: README_DEMOS.md translation_source_hash: 0f488dd749283f4f2e03f0e431de47d7007818c6745ce1ce993014bdf9839480 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T13:09:03.817124+00:00</p>
+<hr />
+<h1 data-nac-id="readme_demos.h1.nac3-在-yujinappnac-spec-上的实时演示" data-nac-role="heading" data-nac-level="1" id="nac3-在-yujinappnac-spec-上的实时演示">NAC3 在 yujin.app/nac-spec/ 上的实时演示</h1>
+<p data-nac-id="readme_demos.p.4" data-nac-role="paragraph"><strong>规范版本：</strong> 2.2 stable（+ v2.3 互操作预览）。</p>
+<p data-nac-id="readme_demos.p.5" data-nac-role="paragraph"><strong>NAC3</strong> = <strong>Native Agent Contract</strong>。该规范允许 Web UI 被 AI 助手、语音运行器和无障碍工具驱动，无需为每个应用编写胶水代码。</p>
+<p data-nac-id="readme_demos.p.6" data-nac-role="paragraph">三个演示并排展示，各有其独特用途，请勿混淆。</p>
+<p data-nac-id="readme_demos.p.7" data-nac-role="paragraph">| 文件 | 版本 | 用途 | |---|---|---| | <code data-nac-role="code-inline">example.php</code> | v1.9 stable | NAC3 v1.9 的标准演示。包含 27 个组件（聊天、日历、自动驾驶、模态框、标签页、图表等），以接近生产环境的 UI 展示 v1.9 的完整功能面貌。<strong>保持不变。</strong> | | <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code> | v2.0-rc4 | <strong>教学展示</strong>，涵盖 8 个 v2.0 原语 + HMAC + isTrusted + i18n 契约。共 8 个章节，每个原语对应一节。适合希望单独理解每个新原语的审阅者和采用者。<strong>并非对 example.php 的迁移。</strong> | | <code data-nac-role="code-inline">example-v20-full.php</code> | v2.0-rc4 | 将 <code data-nac-role="code-inline">example.php</code> <strong>棕地迁移</strong>至 NAC3 v2.0 strict。相同的 27 个组件、相同的 HTML、相同的处理器——通过约 80 行配置代码在顶层叠加 v2.0 层。演示真实场景下的采用<strong>无需重写每个组件</strong>。 |</p>
+<h2 data-nac-id="readme_demos.h2.并排对比" data-nac-role="heading" data-nac-level="2" id="并排对比">并排对比</h2>
+<p data-nac-id="readme_demos.p.9" data-nac-role="paragraph">在两个标签页中分别打开 <code data-nac-role="code-inline">example.php</code> 和 <code data-nac-role="code-inline">example-v20-full.php</code>。</p>
+<h3 data-nac-id="readme_demos.h3.完全相同的部分" data-nac-role="heading" data-nac-level="3" id="完全相同的部分">完全相同的部分</h3>
+<ul data-nac-id="readme_demos.list.11" data-nac-role="list"><li data-nac-id="readme_demos.list.11.item.1" data-nac-role="list-item">HTML 标记（每个 <code data-nac-role="code-inline">&lt;article data-nac-plugin="X"&gt;</code>、每个 <code data-nac-role="code-inline">data-nac-id</code>、每个 i18n 目录引用、每个处理器）</li><li data-nac-id="readme_demos.list.11.item.2" data-nac-role="list-item">视觉外观（相同的布局、相同的组件、相同的交互）</li><li data-nac-id="readme_demos.list.11.item.3" data-nac-role="list-item">v1.9 参考运行时（<code data-nac-role="code-inline">js/nac.js</code>）以相同方式加载</li><li data-nac-id="readme_demos.list.11.item.4" data-nac-role="list-item">现有的 <code data-nac-role="code-inline">data-i18n-key</code> 目录引用</li></ul>
+<h3 data-nac-id="readme_demos.h3.v20-full-版本的不同之处" data-nac-role="heading" data-nac-level="3" id="v20-full-版本的不同之处">v2.0-full 版本的不同之处</h3>
+<ol data-nac-id="readme_demos.list.13" data-nac-role="list"><li data-nac-id="readme_demos.list.13.item.1" data-nac-role="list-item"><strong>头部文档注释</strong>明确说明这是一个棕地迁移展示。</li><li data-nac-id="readme_demos.list.13.item.2" data-nac-role="list-item"><strong>新增一个 script 标签</strong>：在 <code data-nac-role="code-inline">nac.js</code> 之后、<code data-nac-role="code-inline">example.js</code> 之前加载 <code data-nac-role="code-inline">js/nac-v2-extensions.js</code>。</li><li data-nac-id="readme_demos.list.13.item.3" data-nac-role="list-item"><strong>新增一个配置块</strong>（页面底部约 80 行），其功能包括：</li></ol>
+<ul data-nac-id="readme_demos.list.14" data-nac-role="list"><li data-nac-id="readme_demos.list.14.item.1" data-nac-role="list-item">从现有 <code data-nac-role="code-inline">data-nac-plugin</code> 属性构建层级作用域树（每个插件成为 <code data-nac-role="code-inline">demo.shell</code> 下的一个作用域）。</li><li data-nac-id="readme_demos.list.14.item.2" data-nac-role="list-item">调用 <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> 以启用 HMAC 签名。</li><li data-nac-id="readme_demos.list.14.item.3" data-nac-role="list-item">调用 <code data-nac-role="code-inline">NAC.setTenantPrefix('demo')</code> 演示多租户。</li><li data-nac-id="readme_demos.list.14.item.4" data-nac-role="list-item">启动 <code data-nac-role="code-inline">NAC.captureEphemeral()</code> 环形缓冲区用于 toast 通知。</li><li data-nac-id="readme_demos.list.14.item.5" data-nac-role="list-item">对卡片容器调用 <code data-nac-role="code-inline">NAC.autoRegister.watch()</code>。</li></ul>
+<ol data-nac-id="readme_demos.list.15" data-nac-role="list"><li data-nac-id="readme_demos.list.15.item.1" data-nac-role="list-item"><strong>新增一个 UI 面板</strong>（<code data-nac-role="code-inline">#v20-panel</code>，固定在右下角），提供实时 <code data-nac-role="code-inline">describe_v2()</code>、<code data-nac-role="code-inline">validate_global_v2()</code>、HMAC 签名演示以及 isTrusted 区分按钮。</li></ol>
+<p data-nac-id="readme_demos.p.16" data-nac-role="paragraph">这就是全部差异。真实采用者可以直接复用此模式。</p>
+<h2 data-nac-id="readme_demos.h2.如何评估" data-nac-role="heading" data-nac-level="2" id="如何评估">如何评估</h2>
+<p data-nac-id="readme_demos.p.18" data-nac-role="paragraph">如果你是 NAC3 v2.0 的同行审阅者：</p>
+<ol data-nac-id="readme_demos.list.19" data-nac-role="list"><li data-nac-id="readme_demos.list.19.item.1" data-nac-role="list-item">首先打开 <code data-nac-role="code-inline">example.php</code>，确认 v1.9 演示如常运行。</li><li data-nac-id="readme_demos.list.19.item.2" data-nac-role="list-item">打开 <code data-nac-role="code-inline">example-v20-full.php</code>，确认 v1.9 功能（聊天、日历、自动驾驶等）运行<strong>完全一致</strong>。</li><li data-nac-id="readme_demos.list.19.item.3" data-nac-role="list-item">打开 v2.0 面板（右下角），依次点击每个按钮：</li></ol>
+<ul data-nac-id="readme_demos.list.20" data-nac-role="list"><li data-nac-id="readme_demos.list.20.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">describe_v2()</code> —— 查看从棕地插件属性构建的作用域树。</li><li data-nac-id="readme_demos.list.20.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global_v2()</code> —— 查看检测结果（若 i18n 目录存在缺口，通常仅为警告）。</li><li data-nac-id="readme_demos.list.20.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">sign as agent</code> —— 查看生成的 HMAC 签名。</li><li data-nac-id="readme_demos.list.20.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">click=trusted</code> / <code data-nac-role="code-inline">.click()=fake</code> —— 查看 isTrusted 区分的实际效果。</li></ul>
+<p data-nac-id="readme_demos.p.21" data-nac-role="paragraph">如果你是采用者：</p>
+<p data-nac-id="readme_demos.p.22" data-nac-role="paragraph">以 <code data-nac-role="code-inline">example-v20-full.php</code> 的配置块作为模板，将作用域树适配到你的应用插件结构。大部分工作在于梳理你的作用域层级，其余部分是机械性操作。</p>
+<h2 data-nac-id="readme_demos.h2.相关链接" data-nac-role="heading" data-nac-level="2" id="相关链接">相关链接</h2>
+<ul data-nac-id="readme_demos.list.24" data-nac-role="list"><li data-nac-id="readme_demos.list.24.item.1" data-nac-role="list-item">NAC3 规范：https://github.com/pkuschnirof/nac-spec</li><li data-nac-id="readme_demos.list.24.item.2" data-nac-role="list-item">v1.9 发布版：标签 <code data-nac-role="code-inline">v1.9.0</code></li><li data-nac-id="readme_demos.list.24.item.3" data-nac-role="list-item">v2.0 候选发布版：<code data-nac-role="code-inline">main</code> 分支上的 <code data-nac-role="code-inline">2.0.0-rc4</code></li><li data-nac-id="readme_demos.list.24.item.4" data-nac-role="list-item">第 3 轮同行审阅记录：<code data-nac-role="code-inline">docs/PEER_REVIEW.md</code></li></ul>
+<hr />
+<p data-nac-id="readme_demos.p.26" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/README_DEMOS.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "readme_demos",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "readme_demos.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "readme_demos.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "readme_demos.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "readme_demos.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

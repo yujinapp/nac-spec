@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tester reports -- admin dashboard</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;
+        --surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;
+        --text:#1a1a1a;--text-2:#555;--text-3:#888;
+        --green:#2a6d2a;--red:#8a1f1f;--amber:#a07015;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.5;padding:24px;}
+  h1{margin:0 0 6px;font-size:22px;}
+  .lede{color:var(--text-2);margin-bottom:18px;}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+            background:var(--surface);padding:12px;
+            border:1px solid var(--border);border-radius:6px;margin-bottom:14px;}
+  .controls input,.controls select{padding:6px 10px;font-family:inherit;
+            border:1px solid var(--border);border-radius:4px;background:var(--subtle);}
+  .controls button{padding:6px 14px;background:var(--accent);color:#fff;
+            border:0;border-radius:4px;cursor:pointer;font-weight:600;}
+  table{width:100%;border-collapse:collapse;background:var(--surface);
+        border:1px solid var(--border);font-size:13px;}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;}
+  th{background:var(--subtle);font-weight:600;}
+  tr:hover{background:var(--subtle);cursor:pointer;}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+  .pill-ok{background:#e6f4e6;color:var(--green);}
+  .pill-err{background:#fbe1e1;color:var(--red);}
+  .pill-skip{background:#fff3cd;color:var(--amber);}
+  .verdict-ready{color:var(--green);font-weight:600;}
+  .verdict-needs{color:var(--amber);font-weight:600;}
+  .verdict-blocking{color:var(--red);font-weight:600;}
+  #detail{margin-top:18px;padding:16px;background:var(--surface);
+          border:1px solid var(--border);border-radius:6px;display:none;}
+  #detail pre{white-space:pre-wrap;background:var(--subtle);padding:10px;
+              border-radius:4px;font-size:12px;max-height:480px;overflow:auto;}
+  .status-msg{padding:10px;background:var(--subtle);border-radius:4px;
+              margin-bottom:14px;color:var(--text-2);font-size:13px;}
+  .empty{padding:30px;text-align:center;color:var(--text-3);}
+</style>
+</head>
+<body>
+
+<h1>Tester reports -- admin dashboard</h1>
+<p class="lede">All submissions to /api/v1/tester-reports. Admin-key required to fetch. Click a row for full payload.</p>
+
+<div class="controls">
+  <label>Endpoint base:
+    <input id="endpoint" value="https://rpaforce.com/crm_desa" size="40" />
+  </label>
+  <label>Admin key:
+    <input id="adminkey" type="password" placeholder="X-Admin-Key" size="48" />
+  </label>
+  <label>Filter doc_slug:
+    <input id="slugFilter" placeholder="(empty = all)" size="22" />
+  </label>
+  <button id="loadBtn">Load reports</button>
+  <button id="clearBtn">Clear filter</button>
+</div>
+
+<div id="status" class="status-msg" style="display:none;"></div>
+
+<table id="reports" style="display:none;">
+  <thead><tr>
+    <th>ID</th><th>Date</th><th>Doc / lang</th><th>Tester</th>
+    <th>Browser / OS</th><th>Tasks (OK / ERR / skip)</th>
+    <th>Verdict</th><th>Rating</th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+
+<div id="empty" class="empty" style="display:none;">No reports yet.</div>
+
+<div id="detail"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+async function loadReports() {
+  const base = $('endpoint').value.replace(/\/$/, '');
+  const adminKey = $('adminkey').value.trim();
+  const slug = $('slugFilter').value.trim();
+  if (!adminKey) { showStatus('Admin key required', 'error'); return; }
+
+  const url = base + '/api/v1/tester-reports' + (slug ? '?doc_slug=' + encodeURIComponent(slug) : '');
+  showStatus('Loading...', 'info');
+  try {
+    const r = await fetch(url, {
+      method: 'GET',
+      headers: { 'X-Admin-Key': adminKey, 'X-API-Key': adminKey },
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      showStatus('Error: ' + (data.error || r.status), 'error');
+      return;
+    }
+    renderRows(data.items || data.data?.items || []);
+    showStatus('Loaded ' + (data.items?.length || 0) + ' reports.', 'info');
+    localStorage.setItem('trAdminKey', adminKey);
+    localStorage.setItem('trEndpoint', base);
+  } catch (e) {
+    showStatus('Fetch failed: ' + e.message + '. CORS? Endpoint reachable?', 'error');
+  }
+}
+
+function renderRows(items) {
+  const tbody = $('reports').querySelector('tbody');
+  tbody.innerHTML = '';
+  $('reports').style.display = items.length ? '' : 'none';
+  $('empty').style.display = items.length ? 'none' : '';
+  items.forEach(r => {
+    const tr = document.createElement('tr');
+    const verdictClass = r.overall_verdict === 'ready' ? 'verdict-ready'
+                       : r.overall_verdict === 'blocking' ? 'verdict-blocking'
+                       : r.overall_verdict ? 'verdict-needs' : '';
+    tr.innerHTML =
+        '<td>' + r.id + '</td>'
+      + '<td>' + (r.submitted_at || '-') + '</td>'
+      + '<td>' + (r.doc_slug || '-') + ' / ' + (r.doc_lang || '-') + '</td>'
+      + '<td>' + (r.tester_name || '-') + (r.tester_email ? '<br><span style="color:#888;font-size:11px">' + r.tester_email + '</span>' : '') + '</td>'
+      + '<td>' + (r.browser || '-') + ' / ' + (r.os || '-') + '</td>'
+      + '<td>'
+        + '<span class="pill pill-ok">' + (r.ok_count || 0) + '</span> '
+        + '<span class="pill pill-err">' + (r.error_count || 0) + '</span> '
+        + '<span class="pill pill-skip">' + (r.skipped_count || 0) + '</span>'
+      + '</td>'
+      + '<td class="' + verdictClass + '">' + (r.overall_verdict || '-') + '</td>'
+      + '<td>' + (r.overall_rating_num || '-') + '</td>';
+    tr.addEventListener('click', () => loadDetail(r.id));
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadDetail(id) {
+  const base = $('endpoint').value.replace(/\/$/, '');
+  const adminKey = $('adminkey').value.trim();
+  const url = base + '/api/v1/tester-reports/' + id;
+  try {
+    const r = await fetch(url, {
+      method: 'GET',
+      headers: { 'X-Admin-Key': adminKey, 'X-API-Key': adminKey },
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      showStatus('Detail error: ' + (data.error || r.status), 'error');
+      return;
+    }
+    const detail = data.data || data;
+    $('detail').style.display = '';
+    $('detail').innerHTML =
+      '<h3>Report #' + id + '</h3>'
+      + '<p><b>Top issues:</b> ' + (detail.top_issues_text || '(none)') + '</p>'
+      + '<p><b>Free-form feedback:</b> ' + (detail.free_form_feedback || '(none)') + '</p>'
+      + '<h4>Answers (' + (detail.answers_json?.length || 0) + ' tasks)</h4>'
+      + '<pre>' + JSON.stringify(detail.answers_json, null, 2) + '</pre>'
+      + '<h4>Full record</h4>'
+      + '<pre>' + JSON.stringify(detail, null, 2) + '</pre>';
+    $('detail').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    showStatus('Detail fetch failed: ' + e.message, 'error');
+  }
+}
+
+function showStatus(msg, kind) {
+  const el = $('status');
+  el.textContent = msg;
+  el.style.display = '';
+  el.style.color = kind === 'error' ? '#8a1f1f' : '#555';
+}
+
+$('loadBtn').addEventListener('click', loadReports);
+$('clearBtn').addEventListener('click', () => { $('slugFilter').value = ''; loadReports(); });
+
+const savedKey = localStorage.getItem('trAdminKey');
+const savedEndpoint = localStorage.getItem('trEndpoint');
+if (savedKey) $('adminkey').value = savedKey;
+if (savedEndpoint) $('endpoint').value = savedEndpoint;
+</script>
+
+</body>
+</html>

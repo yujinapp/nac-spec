@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- 路线图 -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_v22_roadmap" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_v22_roadmap" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_v22_roadmap.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_v22_roadmap.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_v22_roadmap.mp3" data-nac-id="nac_v22_roadmap.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_v22_roadmap.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_v22_roadmap.p.1" data-nac-role="paragraph">translation_source: docs/NAC_V22_ROADMAP.md translation_source_hash: 8d844659a0ed290a00c015c5b2e875d6d9b3d52b18f02f8c182169927d3d4750 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:12:34.797173+00:00</p>
+<hr />
+<h1 data-nac-id="nac_v22_roadmap.h1.nac3-v22-路线图" data-nac-role="heading" data-nac-level="1" id="nac3-v22-路线图">NAC3 v2.2 -- 路线图</h1>
+<p data-nac-id="nac_v22_roadmap.p.4" data-nac-role="paragraph">NAC3 = <strong>Native Agent Contract</strong>。</p>
+<p data-nac-id="nac_v22_roadmap.p.5" data-nac-role="paragraph">起始日期：2026-05-09。本文件记录 NAC3 规范下一个次要版本的演进事项。每个章节自成一体，包含：问题描述、所预防的缺陷类型、拟议的合约变更，以及实现说明。</p>
+<p data-nac-id="nac_v22_roadmap.p.6" data-nac-role="paragraph"><strong>截至 2026-05-10 的状态：</strong> v2.2 已发布。V22-01 + V22-02 + V22-03 + V22-04 均已合入 <code data-nac-role="code-inline">js/nac.js</code> 及 <code data-nac-role="code-inline">@nac3/runtime</code> 2.2.0 NPM 包。本文件现为该版本的权威变更日志。</p>
+<p data-nac-id="nac_v22_roadmap.p.7" data-nac-role="paragraph">| 事项 | 状态 | 提交 | |------|--------|--------| | V22-01 严格验证器 | 已发布 | 6c2b1866 | | V22-02 bindAction 辅助函数 | 已发布 | 6c2b1866 | | V22-03 locale 检测器加固 | 已发布 2026-05-09 | f631d77a | | V22-04 tab_by_label 括号规范化 | 已发布 2026-05-09 | f631d77a | | V23-01 字段编辑器原语（预览） | 演示已发布 2026-05-11 | (example-v23-editor.php + packages/nac/test/v23-editor.mjs 8/8 通过) |</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-01-构造函数nacregister升级为严格验证器" data-nac-role="heading" data-nac-level="2" id="v22-01-构造函数nacregister升级为严格验证器">V22-01 -- 构造函数（<code data-nac-role="code-inline">NAC.register</code>）升级为严格验证器</h2>
+<p data-nac-id="nac_v22_roadmap.p.10" data-nac-role="paragraph"><strong>缺陷类型。</strong> 棕地演示可能在 manifest 中声明非规范的 role 值（例如在 tab 上使用 <code data-nac-role="code-inline">role:'navigation'</code>，或用 <code data-nac-role="code-inline">role:'button'</code> 代替 <code data-nac-role="code-inline">'action'</code> 等）。当前构造函数对接收到的任何结构均原样接受并存储，缺陷只在运行时才会暴露——当 API（<code data-nac-role="code-inline">NAC.tab()</code>、<code data-nac-role="code-inline">NAC.tab_by_label()</code>、<code data-nac-role="code-inline">NAC.click()</code>）无法找到元素时，因为规范的 DOM 查询（<code data-nac-role="code-inline">[data-nac-role="tab"]</code>）无法匹配。此时演示已经部署，用户已经触发了失效的语音命令，运行时会正确抛出 <code data-nac-role="code-inline">tab X missing</code>——这是一个误导性错误，因为该元素确实存在于 DOM 中，只是使用了错误的 role。</p>
+<p data-nac-id="nac_v22_roadmap.p.11" data-nac-role="paragraph"><strong>具体触发场景（2026-05-09）。</strong> Pablo 在 <code data-nac-role="code-inline">example-v21-data-table.php</code> 上口述 <code data-nac-role="code-inline">ve a pestana permisos</code>。LLM 解析为 <code data-nac-role="code-inline">NAC.tab('invoice_edit_modal','tab.permissions')</code>。该按钮存在于 DOM 中，但其 <code data-nac-role="code-inline">data-nac-role="navigation"</code>（演示作者基于 HTML 语义设置：tab 本质上是导航）。运行时抛出 "tab tab.permissions missing"，尽管按钮就在那里。同一会话中，<code data-nac-role="code-inline">tab_by_label('Lines (collection)')</code> 未能匹配也源于同一根本原因。</p>
+<p data-nac-id="nac_v22_roadmap.p.12" data-nac-role="paragraph"><strong>为何三道防护层本应捕获却未能捕获。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.13" data-nac-role="paragraph">| 层级 | 应检测…… | 当前行为 | |---|---|---| | 提交前 lint | PHP/HTML 演示文件中的 role 偏移 | 不存在 | | <code data-nac-role="code-inline">NAC.register(manifest)</code>（注册时） | 非规范 role、id/role 不匹配 | 静默接受一切 | | <code data-nac-role="code-inline">NAC.validate_global()</code>（lint 时） | <code data-nac-role="code-inline">m.elements[]</code> 内的 role 偏移 | 仅检查 <code data-nac-role="code-inline">m.tabs[]</code> 是否存在 |</p>
+<p data-nac-id="nac_v22_roadmap.p.14" data-nac-role="paragraph">运行时 API 层（<code data-nac-role="code-inline">NAC.tab</code> 等）是<strong>第四道</strong>防护，也是目前唯一触发的一道——以运行时错误的形式呈现给终端用户，此时代价最高。</p>
+<p data-nac-id="nac_v22_roadmap.p.15" data-nac-role="paragraph"><strong>v2.2 拟议合约变更。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.16" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.register</code> 在存储 manifest 前<strong>必须</strong>对其进行验证。验证规则如下：</p>
+<ol data-nac-id="nac_v22_roadmap.list.17" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.17.item.1" data-nac-role="list-item"><strong>已知 role 枚举。</strong> 每个 <code data-nac-role="code-inline">m.elements[i].role</code> 必须属于规范 role 集合（扩展自 <code data-nac-role="code-inline">_CLICK_EVENT_FAMILY</code>）：</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.18" data-nac-role="paragraph">``<code data-nac-role="code-inline">    action, field, option, tab, breadcrumb-item, accordion-toggle,    step, pagination-item, confirm-button, sort-control,    filter-control, data-table, plugin, section, region,    navigation, banner, complementary, contentinfo, button    </code>``</p>
+<p data-nac-id="nac_v22_roadmap.p.19" data-nac-role="paragraph">未知 role -&gt; <code data-nac-role="code-inline">console.error</code> + 拒绝注册调用。地标 role（<code data-nac-role="code-inline">navigation</code>、<code data-nac-role="code-inline">banner</code> 等）可被接受，但仅限于对应 DOM 节点为区域容器而非可点击控件的元素。</p>
+<ol data-nac-id="nac_v22_roadmap.list.20" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.20.item.1" data-nac-role="list-item"><strong>Id/role 一致性。</strong> 若 <code data-nac-role="code-inline">e.id</code> 匹配 <code data-nac-role="code-inline">^tab\.</code>，则要求 <code data-nac-role="code-inline">e.role === 'tab'</code>；若 <code data-nac-role="code-inline">e.id</code> 匹配 <code data-nac-role="code-inline">^modal\.</code>，则要求 <code data-nac-role="code-inline">e.role === 'action'</code>（或 action 的子 role）。任何不匹配 -&gt; <code data-nac-role="code-inline">console.error</code> + 拒绝。id 字段的命名语法也是合约的一部分，目前仅为隐式约定。</li></ol>
+<ol data-nac-id="nac_v22_roadmap.list.21" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.21.item.1" data-nac-role="list-item"><strong>DOM 一致性（尽力而为）。</strong> 当 <code data-nac-role="code-inline">register</code> 在 DOM 解析完成后调用（典型路径）时，在 DOM 中查找 <code data-nac-role="code-inline">[data-nac-id="&lt;e.id&gt;"]</code>。若找到且其 <code data-nac-role="code-inline">data-nac-role</code> 与 <code data-nac-role="code-inline">e.role</code> 不同，则 <code data-nac-role="code-inline">console.error</code> + 拒绝。这可捕获 Pablo 于 2026-05-09 遇到的情况：manifest 声明 <code data-nac-role="code-inline">role:'tab'</code>，但 HTML 仍写着 <code data-nac-role="code-inline">data-nac-role="navigation"</code>（或反之）。若在 DOM 就绪前调用，则将检查推迟至 <code data-nac-role="code-inline">DOMContentLoaded</code> 后置处理。</li></ol>
+<ol data-nac-id="nac_v22_roadmap.list.22" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.22.item.1" data-nac-role="list-item"><strong>迁移辅助（一个发布窗口期）。</strong> v2.2.0 中上述规则产生 <code data-nac-role="code-inline">console.error</code> 但<strong>不抛出异常</strong>——采用者需要时间迁移。从 v2.3.0 起，将抛出 <code data-nac-role="code-inline">RegisterError</code> 并彻底拒绝 manifest。通过运行时标志 <code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> 追踪，v2.2 中默认为 <code data-nac-role="code-inline">false</code>，v2.3 中默认为 <code data-nac-role="code-inline">true</code>。</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.23" data-nac-role="paragraph"><strong><code data-nac-role="code-inline">NAC.validate_global()</code> 扩展。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.24" data-nac-role="paragraph">新增三项检测结果：</p>
+<ul data-nac-id="nac_v22_roadmap.list.25" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.25.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> —— 某元素的 role 不在规范集合内。</li><li data-nac-id="nac_v22_roadmap.list.25.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> —— <code data-nac-role="code-inline">&lt;id&gt;</code> 在 manifest 中的 role 与 DOM 中的 <code data-nac-role="code-inline">data-nac-role</code> 属性不符。</li><li data-nac-id="nac_v22_roadmap.list.25.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">tab_role_drift</code> —— DOM 中某个 <code data-nac-role="code-inline">&lt;button&gt;</code>（或任意可点击元素）的 <code data-nac-role="code-inline">data-nac-id="tab.X"</code>，但 <code data-nac-role="code-inline">data-nac-role</code> 不是 <code data-nac-role="code-inline">"tab"</code>——无论 manifest 中是否存在对应条目。可捕获 manifest 验证器定义上无法发现的纯 HTML 侧偏移。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.26" data-nac-role="paragraph">每项检测结果默认严重级别为 <code data-nac-role="code-inline">error</code>；可按项目覆盖为 <code data-nac-role="code-inline">{ kind: 'warn' }</code>。</p>
+<p data-nac-id="nac_v22_roadmap.p.27" data-nac-role="paragraph"><strong>提交前 lint（独立交付物，阻断同类偏移）。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.28" data-nac-role="paragraph">新增 Node 脚本 <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code>，读取 <code data-nac-role="code-inline">yujin.app/nac-spec/</code> 下所有 <code data-nac-role="code-inline"><em>.php</code> 和 <code data-nac-role="code-inline"></em>.html</code> 文件，通过 cheerio（或轻量路径下的正则）构建伪 DOM，从内联脚本中提取所有 <code data-nac-role="code-inline">NAC.register({...})</code> 调用，并交叉检验相同的一致性规则。已接入 GitHub Actions 及本地 <code data-nac-role="code-inline">pre-commit</code> git hook，任何规则失败均阻断提交。</p>
+<p data-nac-id="nac_v22_roadmap.p.29" data-nac-role="paragraph"><strong>工作量估算。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.30" data-nac-role="paragraph">| 任务 | 位置 | 工作量 | |---|---|---| | <code data-nac-role="code-inline">NAC.register</code> 严格模式 | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | <code data-nac-role="code-inline">validate_global</code> 新增检测项 | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | 提交前 lint 脚本 | <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code> | 4h | | 现有演示迁移扫描 | <code data-nac-role="code-inline">example-v*.php</code> | 1h | | 规范文档更新 | <code data-nac-role="code-inline">docs/spec.md</code> 等 | 1h | | 测试及 CI 接入 | <code data-nac-role="code-inline">tests/</code> + <code data-nac-role="code-inline">.github/workflows/</code> | 2h |</p>
+<p data-nac-id="nac_v22_roadmap.p.31" data-nac-role="paragraph">合计：约 12 小时专注工作。</p>
+<p data-nac-id="nac_v22_roadmap.p.32" data-nac-role="paragraph"><strong>向后兼容性。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.33" data-nac-role="paragraph">v2.2 发布说明须声明：</p>
+<ul data-nac-id="nac_v22_roadmap.list.34" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.34.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.register</code> 现在会在 role 偏移时输出 <code data-nac-role="code-inline">console.error</code>（不抛出异常）。</li><li data-nac-id="nac_v22_roadmap.list.34.item.2" data-nac-role="list-item">v2.3 将在相同条件下开始抛出 <code data-nac-role="code-inline">RegisterError</code>。</li><li data-nac-id="nac_v22_roadmap.list.34.item.3" data-nac-role="list-item">采用者应在发布前运行 <code data-nac-role="code-inline">NAC.validate_global()</code>。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.35" data-nac-role="paragraph">本仓库现有 6 个演示的迁移路径已于提交 <code data-nac-role="code-inline">0633e080</code>（2026-05-09）完成：v21 演示的 tab 按钮及 manifest 已更正为 <code data-nac-role="code-inline">role:'tab'</code>。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-02-action-ack-合约执行" data-nac-role="heading" data-nac-level="2" id="v22-02-action-ack-合约执行">V22-02 -- Action-ack 合约执行</h2>
+<p data-nac-id="nac_v22_roadmap.p.38" data-nac-role="paragraph"><strong>问题类型。</strong> 同步执行操作的点击处理器必须在副作用完成后调用 <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded', {detail:{plugin,action_id}}))</code> 。存量面板经常遗漏这一步。运行时随即对 5 秒 ack 轮询超时，即便副作用已经发生，聊天或 Agent 仍会报告 <code data-nac-role="code-inline">No pude ejecutar X: timeout</code>。</p>
+<p data-nac-id="nac_v22_roadmap.p.39" data-nac-role="paragraph"><strong>具体触发场景（2026-05-09）。</strong> Pablo：<code data-nac-role="code-inline">hide</code> -&gt; 面板正确隐藏，聊天却显示 "No pude ejecutar v20_panel.toggle: timeout"。v20-panel 上的每个按钮均有此问题。</p>
+<p data-nac-id="nac_v22_roadmap.p.40" data-nac-role="paragraph"><strong>之前的临时方案是错误的。</strong> 提交 <code data-nac-role="code-inline">ad200e4c</code> 在聊天 Agentic 循环中将 <code data-nac-role="code-inline">err.code === 'timeout'</code> 吞掉当作成功处理。Pablo 正确指出这会掩盖真实失败（处理器挂起、网络竞态、未捕获异常），破坏运行时唯一可信的信号。已在 <code data-nac-role="code-inline">c9bf2bdb</code> 中回滚。</p>
+<p data-nac-id="nac_v22_roadmap.p.41" data-nac-role="paragraph"><strong>正确修复已上线。</strong> 在 <code data-nac-role="code-inline">example-v20-full.php</code> 中包装 <code data-nac-role="code-inline">bind()</code>，使其在每个处理器执行后自动触发 <code data-nac-role="code-inline">nac:action:succeeded</code>/<code data-nac-role="code-inline">nac:action:failed</code>。已在 <code data-nac-role="code-inline">c9bf2bdb</code> 中完成。</p>
+<p data-nac-id="nac_v22_roadmap.p.42" data-nac-role="paragraph"><strong>v2.2 拟议合约变更。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.43" data-nac-role="paragraph">运行时 SHOULD 提供如下辅助方法：</p>
+<pre data-nac-id="nac_v22_roadmap.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.bindAction(el, handler, { plugin, action_id })</code></pre>
+<p data-nac-id="nac_v22_roadmap.p.45" data-nac-role="paragraph">该方法自动处理 ack 触发，接口与 <code data-nac-role="code-inline">addEventListener('click', handler)</code> 相同，但内置了合规合约。采用该辅助方法的 Demo 不会再遗漏 ack。</p>
+<p data-nac-id="nac_v22_roadmap.p.46" data-nac-role="paragraph"><code data-nac-role="code-inline">validate_global</code> 新增一项检测结果：</p>
+<ul data-nac-id="nac_v22_roadmap.list.47" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.47.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">action_handler_without_ack</code> —— 通过插桩检测：在 <code data-nac-role="code-inline">validate_global</code> 执行期间，验证器在受控上下文中对每个 <code data-nac-role="code-inline">data-nac-role="action"</code> 元素派发合成点击事件，监听 <code data-nac-role="code-inline">nac:action:succeeded</code> 500 毫秒，对未触发的元素进行标记。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.48" data-nac-role="paragraph">该检测项为可选启用（<code data-nac-role="code-inline">NAC.validate_global({ probe: true })</code>），因为合成点击会产生副作用。</p>
+<p data-nac-id="nac_v22_roadmap.p.49" data-nac-role="paragraph"><strong>工作量。</strong> 辅助方法约 3 小时 + 基于探针的检测项约 4 小时。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-03-语言切换检测器加固" data-nac-role="heading" data-nac-level="2" id="v22-03-语言切换检测器加固">V22-03 -- 语言切换检测器加固</h2>
+<p data-nac-id="nac_v22_roadmap.p.52" data-nac-role="paragraph"><strong>问题类型。</strong> 聊天客户端语言检测器中的纯 2 字母语言代码（<code data-nac-role="code-inline">'de'</code>、<code data-nac-role="code-inline">'es'</code>、<code data-nac-role="code-inline">'en'</code>）与多种语言中的介词和冠词发生冲突。<code data-nac-role="code-inline">cambia DE pestana</code> 会将聊天切换为德语。</p>
+<p data-nac-id="nac_v22_roadmap.p.53" data-nac-role="paragraph"><strong>修复已上线。</strong> <code data-nac-role="code-inline">nac-chat-client.js</code> 中的 <code data-nac-role="code-inline">_detectLangSwitch</code> 现在要求纯 2 字母代码必须与显式的 <code data-nac-role="code-inline">LOCALE_TRIGGER</code>（<code data-nac-role="code-inline">idioma</code>/<code data-nac-role="code-inline">language</code>/<code data-nac-role="code-inline">sprache</code>/...）共同出现。已在 <code data-nac-role="code-inline">f631d77a</code> 中完成。</p>
+<p data-nac-id="nac_v22_roadmap.p.54" data-nac-role="paragraph"><strong>v2.2 拟议内容。</strong> 将语言检测器从聊天客户端迁移为 NAC3 原语，使所有存量聊天嵌入都能使用同一个加固后的检测器。在规范中明确记录误报类型，避免未来实现重新引入该问题。</p>
+<p data-nac-id="nac_v22_roadmap.p.55" data-nac-role="paragraph"><strong>工作量。</strong> 约 2 小时。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-04-tab_by_label-自然语言容错" data-nac-role="heading" data-nac-level="2" id="v22-04-tab_by_label-自然语言容错">V22-04 -- <code data-nac-role="code-inline">tab_by_label</code> 自然语言容错</h2>
+<p data-nac-id="nac_v22_roadmap.p.58" data-nac-role="paragraph"><strong>已合入。</strong> 括号剥离（<code data-nac-role="code-inline">"Lines (collection)"</code> 可匹配 <code data-nac-role="code-inline">"Lines"</code> 和 <code data-nac-role="code-inline">"Lines tab"</code>）已在 <code data-nac-role="code-inline">f631d77a</code> 中上线。这<strong>不是</strong>兼容性降级方案，而是对 LLM 引用按钮文本的合理规范化处理。应在规范中将其记录为标准匹配器行为。</p>
+<p data-nac-id="nac_v22_roadmap.p.59" data-nac-role="paragraph"><strong>工作量。</strong> 仅文档，约 1 小时。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-范围外推迟至-v23" data-nac-role="heading" data-nac-level="2" id="v22-范围外推迟至-v23">v2.2 范围外（推迟至 v2.3+）</h2>
+<ul data-nac-id="nac_v22_roadmap.list.62" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.62.item.1" data-nac-role="list-item">可组合角色层级（<code data-nac-role="code-inline">role:'tab.primary'</code> 与 <code data-nac-role="code-inline">role:'tab.secondary'</code>）：有一定价值，但尚无具体触发场景。</li><li data-nac-id="nac_v22_roadmap.list.62.item.2" data-nac-role="list-item">Manifest 热重载：仍属罕见需求，当前页面刷新方案可满足需求。</li><li data-nac-id="nac_v22_roadmap.list.62.item.3" data-nac-role="list-item">跨全部 10 个语言区域同时搜索标签（当前匹配器串行遍历，对每个插件约 20 个标签的场景性能足够）。</li></ul>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v23-01-字段编辑器原语预览版已上线" data-nac-role="heading" data-nac-level="2" id="v23-01-字段编辑器原语预览版已上线">V23-01 -- 字段编辑器原语（预览版已上线）</h2>
+<p data-nac-id="nac_v22_roadmap.p.65" data-nac-role="paragraph"><strong>问题类型。</strong> 语音运行器和 Agent 没有通用方式对 <code data-nac-role="code-inline">&lt;input&gt;</code> 或 <code data-nac-role="code-inline">&lt;textarea&gt;</code> 内的文本进行精细操作——只能使用 <code data-nac-role="code-inline">NAC.fill(id, value)</code> 全量替换。实际任务（修正段落语法、仅替换选中内容、AI 优化句子）需要更细粒度的操作动词。目前每个有此需求的接入方都在自行实现。</p>
+<p data-nac-id="nac_v22_roadmap.p.66" data-nac-role="paragraph"><strong>解决方案。</strong> 新增运行时原语 <code data-nac-role="code-inline">NAC.edit_field(nac_id)</code>，打开一个模态框，该模态框拥有独立的编辑界面，并以插件名 <code data-nac-role="code-inline">nac_editor</code> 注册 8 个标准动词：</p>
+<p data-nac-id="nac_v22_roadmap.p.67" data-nac-role="paragraph">| 动词 | 说明 | |------|-------------| | <code data-nac-role="code-inline">select_word</code> | 选中光标处的单词 | | <code data-nac-role="code-inline">select_sentence</code> | 选中光标处的句子 | | <code data-nac-role="code-inline">select_all</code> | 选中全部文本 | | <code data-nac-role="code-inline">replace</code> | 用指定文本替换当前选中内容 | | <code data-nac-role="code-inline">delete_selection</code> | 删除当前选中内容 | | <code data-nac-role="code-inline">ai_correct_syntax</code> | 将当前值 POST 至聊天后端，用 AI 校正结果替换 | | <code data-nac-role="code-inline">save</code> | 写回源字段并关闭模态框 | | <code data-nac-role="code-inline">cancel</code> | 放弃更改并关闭模态框 |</p>
+<p data-nac-id="nac_v22_roadmap.p.68" data-nac-role="paragraph">模态框的 manifest 以幂等方式注册（多次调用 <code data-nac-role="code-inline">edit_field</code> 共享同一个 <code data-nac-role="code-inline">nac_editor</code> 插件）。所有动词均包含全部 10 个语言区域的 <code data-nac-role="code-inline">label_i18n</code>。</p>
+<p data-nac-id="nac_v22_roadmap.p.69" data-nac-role="paragraph"><strong>状态：</strong></p>
+<ul data-nac-id="nac_v22_roadmap.list.70" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.70.item.1" data-nac-role="list-item">运行时：已于 2026-05-10 在 <code data-nac-role="code-inline">js/nac.js</code> 中上线（函数 <code data-nac-role="code-inline">edit_field</code> + <code data-nac-role="code-inline">_editorRegisterManifest</code> + 带 ack 触发的模态框处理器）。</li><li data-nac-id="nac_v22_roadmap.list.70.item.2" data-nac-role="list-item">Demo：已于 2026-05-11 在 <code data-nac-role="code-inline">example-v23-editor.php</code> 上线（3 个可编辑字段 + 绑定至 <code data-nac-role="code-inline">nac:action:succeeded</code> 的实时动词计数器）。</li><li data-nac-id="nac_v22_roadmap.list.70.item.3" data-nac-role="list-item">测试：已于 2026-05-11 在 <code data-nac-role="code-inline">packages/nac/test/v23-editor.mjs</code> 上线（8/8 通过）：存在性验证 + 无效 id 抛出异常 + 无效 role 抛出异常 + 挂载模态框 + 注册插件 + 幂等性 + cancel 关闭 + save 关闭。</li><li data-nac-id="nac_v22_roadmap.list.70.item.4" data-nac-role="list-item">规范：相关章节将在 v2.3 GA 周期内作为第 13 节添加至 SPEC.md。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.71" data-nac-role="paragraph"><strong>GA 所需额外工作量。</strong> 在现有基础上：ja/zh/ar/hi 原生语言标签审校（约 2 小时）、Playwright e2e 视觉规范（约 3 小时）、SPEC.md 规范文本（约 2 小时）。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.条目从本文档迁移至规范的流程" data-nac-role="heading" data-nac-level="2" id="条目从本文档迁移至规范的流程">条目从本文档迁移至规范的流程</h2>
+<ol data-nac-id="nac_v22_roadmap.list.74" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.74.item.1" data-nac-role="list-item">在功能标志后实现并上线运行时变更。</li><li data-nac-id="nac_v22_roadmap.list.74.item.2" data-nac-role="list-item">更新 Demo，使其通过新的严格验证。</li><li data-nac-id="nac_v22_roadmap.list.74.item.3" data-nac-role="list-item">在生产环境中至少经历一个发布周期的浸泡测试，期间标志默认为 <code data-nac-role="code-inline">warn</code>（非抛出模式）。</li><li data-nac-id="nac_v22_roadmap.list.74.item.4" data-nac-role="list-item">将规则迁移至 <code data-nac-role="code-inline">docs/spec.md</code>，并在下一个次版本中将默认值提升为 <code data-nac-role="code-inline">error</code>（抛出模式）。</li><li data-nac-id="nac_v22_roadmap.list.74.item.5" data-nac-role="list-item">从本路线图中删除该条目，并在 <code data-nac-role="code-inline">docs/CHANGELOG.md</code> 中添加一行记录。</li></ol>
+<hr />
+<p data-nac-id="nac_v22_roadmap.p.76" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_V22_ROADMAP.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_v22_roadmap",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_v22_roadmap.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_v22_roadmap.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_v22_roadmap.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_v22_roadmap.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

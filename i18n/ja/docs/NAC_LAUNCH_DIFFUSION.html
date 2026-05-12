@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 ローンチ拡散プラン -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_launch_diffusion" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_launch_diffusion" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_launch_diffusion.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_launch_diffusion.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_launch_diffusion.mp3" data-nac-id="nac_launch_diffusion.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_launch_diffusion.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_launch_diffusion.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.1" data-nac-role="paragraph">translation_source: docs/NAC_LAUNCH_DIFFUSION.md translation_source_hash: cbdf7b9e5ec3ed43a39111aab16fbe59c222a05a835429ea43148036320fc5cf translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T15:07:42.976955+00:00</p>
+<hr />
+<h1 data-nac-id="nac_launch_diffusion.h1.nac3-ローンチ拡散プラン" data-nac-role="heading" data-nac-level="1" id="nac3-ローンチ拡散プラン">NAC3 ローンチ拡散プラン</h1>
+<p data-nac-id="nac_launch_diffusion.p.4" data-nac-role="paragraph">NAC3 を使うべき人々に届けるための実践的なプレイブック。v2.2 / v2.3-preview ローンチに向けて 2026-05-10 に作成。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.リリース内容" data-nac-role="heading" data-nac-level="2" id="リリース内容">リリース内容</h2>
+<ul data-nac-id="nac_launch_diffusion.list.6" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.6.item.1" data-nac-role="list-item"><strong>仕様:</strong> v2.2 安定版、v2.3 プレビュー（フィールドエディタプリミティブ）。</li><li data-nac-id="nac_launch_diffusion.list.6.item.2" data-nac-role="list-item"><strong>ランタイム:</strong> npm の <code data-nac-role="code-inline">@nac3/runtime@2.2.0</code>（ESM + CJS + d.ts + CLI）。</li><li data-nac-id="nac_launch_diffusion.list.6.item.3" data-nac-role="list-item"><strong>デモ:</strong> yujin.app/nac-spec/ にライブデモ 4 本。</li><li data-nac-id="nac_launch_diffusion.list.6.item.4" data-nac-role="list-item"><strong>導入ガイド:</strong> React + Angular + LLM 連携。</li><li data-nac-id="nac_launch_diffusion.list.6.item.5" data-nac-role="list-item"><strong>スタディケース:</strong> <code data-nac-role="code-inline">packages/nac-react-demo</code> + <code data-nac-role="code-inline">packages/nac-angular-demo</code> に動作する Vite + React 18 および Angular 17 アプリ。</li><li data-nac-id="nac_launch_diffusion.list.6.item.6" data-nac-role="list-item"><strong>ブラウンフィールド移行事例:</strong> Yujin CRM 自体を pkuschnirof/yujin docs/MIGRATION_FROM_RPAFORCE.md にドキュメント化。</li><li data-nac-id="nac_launch_diffusion.list.6.item.7" data-nac-role="list-item"><strong>NAC-3 準拠:</strong> ランディングページ自体が NAC-3 準拠（manifest + chat + autopilot + isTrusted 対応）。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.メッセージング" data-nac-role="heading" data-nac-level="2" id="メッセージング">メッセージング</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.ワンライナー" data-nac-role="heading" data-nac-level="3" id="ワンライナー">ワンライナー</h3>
+<p data-nac-id="nac_launch_diffusion.p.9" data-nac-role="paragraph">&gt; <strong>NAC3 -- アプリごとのグルーコードなしに、Web UI を AI エージェント・音声ランナー・アクセシビリティツールから操作できるようにする、小さな公開仕様。</strong></p>
+<h3 data-nac-id="nac_launch_diffusion.h3.スリーライナー" data-nac-role="heading" data-nac-level="3" id="スリーライナー">スリーライナー</h3>
+<p data-nac-id="nac_launch_diffusion.p.11" data-nac-role="paragraph">&gt; NAC3 は、2026 年に LLM を念頭に置いて設計されていたとしたら ARIA がなっていたであろうものです。既存の UI に HTML 属性を 3 つ付けるだけ。ランタイムが名前解決・クリックのディスパッチ・完了イベントの発行・ローカライゼーション・プロベナンスをすべて処理します。Apache-2.0、npm install、ビルドステップの変更不要。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.30-秒ピッチ" data-nac-role="heading" data-nac-level="3" id="30-秒ピッチ">30 秒ピッチ</h3>
+<p data-nac-id="nac_launch_diffusion.p.13" data-nac-role="paragraph">&gt; 音声アシスタント、LLM チャットエージェント、アクセシビリティツールはすべて同じ問題を抱えています。操作したい要素に対して安定した名前が必要なのです。CSS セレクタは壊れる。ARIA は「これはボタンです」で止まる。どのチームも同じ配管を一から作り直している。 &gt; &gt; NAC3 はこれを解決する小さなコントラクトです。エージェントが操作すべき要素に <code data-nac-role="code-inline">data-nac-id</code>、<code data-nac-role="code-inline">data-nac-role</code>、<code data-nac-role="code-inline">data-nac-action</code> を追加すれば、あとはランタイムが引き受けます。v2.2 仕様、安定版 npm パッケージ、React + Angular ガイド、そして今すぐ話しかけられる Claude Sonnet チャットバックエンドにエンドツーエンドで接続されたものを含む 4 本のライブデモが揃っています。 &gt; &gt; Apache-2.0 です。私たちが必要としていた CRM を作る中で生まれました。今、あなたも使えます。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.ターゲットオーディエンス" data-nac-role="heading" data-nac-level="2" id="ターゲットオーディエンス">ターゲットオーディエンス</h2>
+<p data-nac-id="nac_launch_diffusion.p.15" data-nac-role="paragraph">| オーディエンス | チャネル | フック | |----------|---------|------| | React + Vue + Svelte + Angular 開発者 | dev.to、Hashnode、r/javascript、r/webdev | 「既存の React アプリを 80 行で音声対応にする」 | | 音声・エージェントビルダー | r/LocalLLaMA、r/ChatGPTCoding、エージェントビルダー Discord | 「音声アプリのユーザー向け側面に欠けていた標準」 | | アクセシビリティ推進者 | r/Accessibility、a11y メーリングリスト、A11y ミートアップ登壇者 | 「2026 年に LLM を念頭に置いて設計された ARIA」 | | テスト・QA エンジニア | r/qualityassurance、Selenium / Playwright コミュニティ | 「UI 再設計後も壊れない安定したセレクタ」 | | HN | news.ycombinator.com | 正統派 Show HN | | テックリード・CTO | LinkedIn、Mastodon | 「どうせ 12 ヶ月後には導入することになる」アングル | | Yujin CRM ユーザー | 直接メール + プロダクト内バナー | 「あなたの CRM は NAC3 に対応しています。その意味は」 |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.チャネル別サンプル投稿" data-nac-role="heading" data-nac-level="2" id="チャネル別サンプル投稿">チャネル別サンプル投稿</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.show-hn" data-nac-role="heading" data-nac-level="3" id="show-hn">Show HN</h3>
+<ul data-nac-id="nac_launch_diffusion.list.18" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.18.item.1" data-nac-role="list-item"><strong>タイトル:</strong> <code data-nac-role="code-inline">Show HN: NAC -- a small public spec that lets web UIs be driven by AI agents</code></li><li data-nac-id="nac_launch_diffusion.list.18.item.2" data-nac-role="list-item"><strong>冒頭文:</strong> "We made this while building Yujin CRM and realised every team trying to ship voice/agent UI rebuilds the same plumbing."</li><li data-nac-id="nac_launch_diffusion.list.18.item.3" data-nac-role="list-item"><strong>本文:</strong> コントラクト（属性 3 つ + manifest + イベント）を説明し、ライブデモ・仕様・npm パッケージ・React スタディケースへのリンクを貼る。200 語以内に収める。長い投稿よりコメントスレッドの方が注目を集める。</li><li data-nac-id="nac_launch_diffusion.list.18.item.4" data-nac-role="list-item"><strong>投稿日:</strong> 米国時間の火曜か水曜の午前。月曜・金曜は避ける。</li><li data-nac-id="nac_launch_diffusion.list.18.item.5" data-nac-role="list-item"><strong>フォローアップ:</strong> 少なくとも 4 時間はコメント欄に張り付く。技術的な質問にはすべて返答する。炎上には反応しない。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.rjavascript" data-nac-role="heading" data-nac-level="3" id="rjavascript">r/javascript</h3>
+<ul data-nac-id="nac_launch_diffusion.list.20" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.20.item.1" data-nac-role="list-item"><strong>タイトル:</strong> <code data-nac-role="code-inline">[Showoff] NAC: drive your React app with voice + chat using 3 HTML attributes</code></li><li data-nac-id="nac_launch_diffusion.list.20.item.2" data-nac-role="list-item"><strong>本文:</strong> 「React 導入者は何をするのか」に焦点を当てる。<code data-nac-role="code-inline">guides/REACT.md</code> のコード例を使用。スタディケースの GitHub ディレクトリへリンク。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.raccessibility" data-nac-role="heading" data-nac-level="3" id="raccessibility">r/Accessibility</h3>
+<ul data-nac-id="nac_launch_diffusion.list.22" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.22.item.1" data-nac-role="list-item"><strong>タイトル:</strong> <code data-nac-role="code-inline">NAC: a parallel layer to ARIA for AI-agent-driven UI</code></li><li data-nac-id="nac_launch_diffusion.list.22.item.2" data-nac-role="list-item"><strong>本文:</strong> 「これは ARIA の代替ではなく、兄弟関係にある仕様です」から始める。アクセシビリティ関係者は（正当な理由から）保守的なので注意。<code data-nac-role="code-inline">data-nac-role="action"</code> と <code data-nac-role="code-inline">role="button"</code> が共存する様子を示す。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.devto" data-nac-role="heading" data-nac-level="3" id="devto">dev.to</h3>
+<ul data-nac-id="nac_launch_diffusion.list.24" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.24.item.1" data-nac-role="list-item"><strong>タイトル:</strong> <code data-nac-role="code-inline">Drive any web UI by voice with @nac3/runtime</code></li><li data-nac-id="nac_launch_diffusion.list.24.item.2" data-nac-role="list-item"><strong>フック:</strong> React スタディケースリポジトリ。チャットパネルと autopilot ツアーのスクリーンショット・gif をインライン掲載。</li><li data-nac-id="nac_launch_diffusion.list.24.item.3" data-nac-role="list-item"><strong>長さ:</strong> 1500〜2000 語。ステップバイステップ形式。</li></ul>
+<h3 data-nac-id="nac_launch_diffusion.h3.twitter-x" data-nac-role="heading" data-nac-level="3" id="twitter-x">Twitter / X</h3>
+<p data-nac-id="nac_launch_diffusion.p.26" data-nac-role="paragraph">6 ツイートのスレッド:</p>
+<ol data-nac-id="nac_launch_diffusion.list.27" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.27.item.1" data-nac-role="list-item">「NAC3 v2.2 をリリースしました。Web UI を AI エージェントから操作できる公開仕様 + npm パッケージです。Apache-2.0。（デモの gif）」</li><li data-nac-id="nac_launch_diffusion.list.27.item.2" data-nac-role="list-item">「なぜ作ったか: 音声・エージェント UX を構築するすべてのチームが同じ配管を作り直しています。CSS セレクタは壊れる。ARIA はエージェント向けに設計されていない。小さなコントラクトが必要でした。」</li><li data-nac-id="nac_launch_diffusion.list.27.item.3" data-nac-role="list-item">「どれだけ小さいか: 要素ごとに HTML 属性 3 つ。（コードのスクリーンショット）」</li><li data-nac-id="nac_launch_diffusion.list.27.item.4" data-nac-role="list-item">「得られるもの: 安定した名前、決定論的な完了イベント、10 ロケール対応 i18n、HMAC + isTrusted によるプロベナンス、自動バリデーション。」</li><li data-nac-id="nac_launch_diffusion.list.27.item.5" data-nac-role="list-item">「yujin.app/nac-spec にライブデモあり。4 本のデモのうち 1 本は Claude Sonnet チャットバックエンドに接続済み。今すぐ話しかけてみてください。」</li><li data-nac-id="nac_launch_diffusion.list.27.item.6" data-nac-role="list-item">「React + Angular 導入ガイドと動作するスタディケースは github.com/pkuschnirof/rpaforce-crm に。仕様は yujin.app/nac-spec/SPEC.md に。」</li></ol>
+<h3 data-nac-id="nac_launch_diffusion.h3.linkedin" data-nac-role="heading" data-nac-level="3" id="linkedin">LinkedIn</h3>
+<p data-nac-id="nac_launch_diffusion.p.29" data-nac-role="paragraph">長文投稿（約 600 語）。「どうせ 12 ヶ月後には導入することになる」アングルを前面に出し、エージェント戦略を検討中の CTO に訴求する。BPMN 形式の autopilot ツアーのスクリーンショットを含める。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.mastodon" data-nac-role="heading" data-nac-level="3" id="mastodon">Mastodon</h3>
+<p data-nac-id="nac_launch_diffusion.p.31" data-nac-role="paragraph">Twitter スレッドをクロスポスト、簡潔に。すべての画像に alt テキストを付ける（Mastodon では重要）。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.デモ-gif動画プラン" data-nac-role="heading" data-nac-level="2" id="デモ-gif動画プラン">デモ gif・動画プラン</h2>
+<h3 data-nac-id="nac_launch_diffusion.h3.gif15-秒ループ" data-nac-role="heading" data-nac-level="3" id="gif15-秒ループ">Gif（15 秒、ループ）</h3>
+<p data-nac-id="nac_launch_diffusion.p.34" data-nac-role="paragraph">シーン 1（4 秒）: React デモのチャット入力に「agrega tomar agua」と入力。 シーン 2（3 秒）: LLM が解決し、todo がフラッシュハイライト付きで追加される。 シーン 3（4 秒）: 「tour」をクリック。autopilot がページをナレーション付きで案内。 シーン 4（4 秒）: マイクを押しながら「remove all done」と発話。todo がクリアされる。</p>
+<p data-nac-id="nac_launch_diffusion.p.35" data-nac-role="paragraph">8MB の MP4 + 4MB の WebP フォールバックとして <code data-nac-role="code-inline">yujin.app/nac-spec/assets/demo.{mp4,webp}</code> にホスト。README のヒーロー gif、OG 画像、Twitter カード、dev.to ヘッダーとして使用。</p>
+<h3 data-nac-id="nac_launch_diffusion.h3.動画90-秒ボイスオーバー" data-nac-role="heading" data-nac-level="3" id="動画90-秒ボイスオーバー">動画（90 秒、ボイスオーバー）</h3>
+<p data-nac-id="nac_launch_diffusion.p.37" data-nac-role="paragraph">YouTube + Vimeo に投稿。</p>
+<ul data-nac-id="nac_launch_diffusion.list.38" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.38.item.1" data-nac-role="list-item">0:00-0:10 -- 問題提起（「音声・エージェントには安定した名前が必要」）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.2" data-nac-role="list-item">0:10-0:25 -- コントラクト（属性 3 つ）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.3" data-nac-role="list-item">0:25-0:45 -- 導入デモ（React スタディケース、5 行追加）。</li><li data-nac-id="nac_launch_diffusion.list.38.item.4" data-nac-role="list-item">0:45-1:05 -- チャット・音声・autopilot による操作。</li><li data-nac-id="nac_launch_diffusion.list.38.item.5" data-nac-role="list-item">1:05-1:20 -- Yujin CRM ブラウンフィールド事例。</li><li data-nac-id="nac_launch_diffusion.list.38.item.6" data-nac-role="list-item">1:20-1:30 -- 「Apache-2.0、npm install @nac3/runtime、リンクは下記。」</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.フォローアップスケジュール" data-nac-role="heading" data-nac-level="2" id="フォローアップスケジュール">フォローアップスケジュール</h2>
+<p data-nac-id="nac_launch_diffusion.p.40" data-nac-role="paragraph">| タイミング | アクション | |------|--------| | Day 0 | Show HN + r/javascript + Twitter スレッド + dev.to 記事。4〜8 時間コメントに対応。 | | Day 1 | LinkedIn 投稿。dev.to コメントに対応。提起された簡単な課題を GitHub バックログに追加。 | | Day 3 | r/Accessibility 投稿 + Mastodon クロスポスト。 | | Day 7 | 「Week 1 振り返り」ブログ記事: 得られたフィードバック、変更点、上位 GitHub issues。 | | Day 14 | Day 0 にエンゲージしたアクセシビリティ・エージェントビルダー関係者に「話しませんか？」と DM。 | | Day 30 | コミュニティから要望の多かった修正を含む v2.2.x パッチをリリース。告知記事:「NAC3 の 30 日間で学んだこと」。 | | Day 90 | NAC3 v2.3 リリース（フィールドエディタ正式版、STRICT_VALIDATION デフォルト true）。新たなローンチパルス、小規模展開。 |</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.追跡指標" data-nac-role="heading" data-nac-level="2" id="追跡指標">追跡指標</h2>
+<ul data-nac-id="nac_launch_diffusion.list.42" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.42.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">@nac3/runtime</code> の週次 npm ダウンロード数。</li><li data-nac-id="nac_launch_diffusion.list.42.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">pkuschnirof/rpaforce-crm</code> と <code data-nac-role="code-inline">pkuschnirof/yujin</code> の GitHub スター数・フォーク数。</li><li data-nac-id="nac_launch_diffusion.list.42.item.3" data-nac-role="list-item">yujin.app/nac-spec/ のデモページビュー数（サーバーアクセスログ）。</li><li data-nac-id="nac_launch_diffusion.list.42.item.4" data-nac-role="list-item">開設された GitHub issues 数（エンゲージメントの代理指標）。</li><li data-nac-id="nac_launch_diffusion.list.42.item.5" data-nac-role="list-item">上記チャネル全体のユニークコメント投稿者数。</li><li data-nac-id="nac_launch_diffusion.list.42.item.6" data-nac-role="list-item">「Native Agent Contract」の検索トレンド（Google Trends）。</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.43" data-nac-role="paragraph">Week 1 目標:</p>
+<ul data-nac-id="nac_launch_diffusion.list.44" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.44.item.1" data-nac-role="list-item">npm ダウンロード 200 件</li><li data-nac-id="nac_launch_diffusion.list.44.item.2" data-nac-role="list-item">両リポジトリ合計 GitHub スター 100 個</li><li data-nac-id="nac_launch_diffusion.list.44.item.3" data-nac-role="list-item">デモページビュー 5000 件</li><li data-nac-id="nac_launch_diffusion.list.44.item.4" data-nac-role="list-item">issues / ディスカッション 10 件開設</li><li data-nac-id="nac_launch_diffusion.list.44.item.5" data-nac-role="list-item">外部者による自発的なブログ記事 1 本</li></ul>
+<p data-nac-id="nac_launch_diffusion.p.45" data-nac-role="paragraph">これらを 50% 以上下回った場合はメッセージングを見直し、Day 14 に LinkedIn + dev.to の投稿文を改訂して再挑戦する。</p>
+<h2 data-nac-id="nac_launch_diffusion.h2.公開前チェックリスト投稿ボタンを押す前に" data-nac-role="heading" data-nac-level="2" id="公開前チェックリスト投稿ボタンを押す前に">公開前チェックリスト（投稿ボタンを押す前に）</h2>
+<ul data-nac-id="nac_launch_diffusion.list.47" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.47.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm publish @nac3/runtime@2.2.0</code> 完了（<strong>手動</strong>操作が必要。オーナーの npm トークンが必要）。</li><li data-nac-id="nac_launch_diffusion.list.47.item.2" data-nac-role="list-item">[ ] 新規の tmp ディレクトリから <code data-nac-role="code-inline">npm install @nac3/runtime</code> が動作すること。</li><li data-nac-id="nac_launch_diffusion.list.47.item.3" data-nac-role="list-item">[ ] Chrome + Firefox + Safari でライブデモがコンソールエラーなしに読み込まれること。</li><li data-nac-id="nac_launch_diffusion.list.47.item.4" data-nac-role="list-item">[ ] ランディングページで <code data-nac-role="code-inline">validate_global({probe: true})</code> が <code data-nac-role="code-inline">[]</code> を返すこと。</li><li data-nac-id="nac_launch_diffusion.list.47.item.5" data-nac-role="list-item">[ ] デモ gif が dev.to + Twitter のプレビューカードで正しく表示されること。</li><li data-nac-id="nac_launch_diffusion.list.47.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">LICENSE</code>、<code data-nac-role="code-inline">CONTRIBUTING</code>、<code data-nac-role="code-inline">SECURITY</code> がすべて配置済みであること。</li><li data-nac-id="nac_launch_diffusion.list.47.item.7" data-nac-role="list-item">[ ] Day 1 に訪れたコントリビューターが取り組める場所を確保するため、「good first issue」ラベルの付いた GitHub issue が少なくとも 1 件あること。</li><li data-nac-id="nac_launch_diffusion.list.47.item.8" data-nac-role="list-item">[ ] Pablo が起きていて、4 時間コメントに対応できる状態であること。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.アンチゴール" data-nac-role="heading" data-nac-level="2" id="アンチゴール">アンチゴール</h2>
+<p data-nac-id="nac_launch_diffusion.p.49" data-nac-role="paragraph">やらないこと:</p>
+<ul data-nac-id="nac_launch_diffusion.list.50" data-nac-role="list"><li data-nac-id="nac_launch_diffusion.list.50.item.1" data-nac-role="list-item">広告費の支出（少なくとも Week 4 の指標が出るまで）。</li><li data-nac-id="nac_launch_diffusion.list.50.item.2" data-nac-role="list-item">ARIA、Selenium、Playwright、または任意のエージェントベンダーの批判。NAC3 は追加的なものであり、対立的なものではない。</li><li data-nac-id="nac_launch_diffusion.list.50.item.3" data-nac-role="list-item">ローンチ時点でのエンタープライズサポート契約の約束（サポート負荷を把握してから）。</li><li data-nac-id="nac_launch_diffusion.list.50.item.4" data-nac-role="list-item">オープンソースウォッシュ: コードは Apache-2.0 であり、チャットバックエンドのリファレンス実装も同様。「コア」と「プレミアム」機能を分けて堀を作ることはしない。堀はホスティング・LLM クレジット・運用にある。</li></ul>
+<h2 data-nac-id="nac_launch_diffusion.h2.ローンチ当日のプレイブック" data-nac-role="heading" data-nac-level="2" id="ローンチ当日のプレイブック">ローンチ当日のプレイブック</h2>
+<p data-nac-id="nac_launch_diffusion.p.52" data-nac-role="paragraph">Pablo がソロで運営するため、時間を区切って実施:</p>
+<p data-nac-id="nac_launch_diffusion.p.53" data-nac-role="paragraph">| 時刻 | アクション | |------|--------| | 06:00（米国 ET） | 最終スモークテスト: <code data-nac-role="code-inline">npm test</code> + <code data-nac-role="code-inline">npx @nac3/runtime validate yujin.app/nac-spec/</code> + シークレットモードですべてのデモを開く。問題があれば修正。 | | 09:00 | Show HN 投稿。 | | 09:05 | Twitter スレッド投稿。 | | 09:15 | r/javascript 投稿。 | | 09:30 | dev.to 記事投稿。 | | 09:30-13:30 | HN コメント欄に常駐。クイックリンクをトップコメントにピン留め。 | | 14:00 | LinkedIn 投稿。 | | 14:00-18:00 | dev.to コメント + Twitter メンションに常駐。 | | 18:00 | 終了。休む。 | | Day 1 09:00 | r/Accessibility + Mastodon 投稿。GitHub issues のトリアージ。 |</p>
+<hr />
+<p data-nac-id="nac_launch_diffusion.p.55" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_LAUNCH_DIFFUSION.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_launch_diffusion",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_launch_diffusion.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_launch_diffusion.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_launch_diffusion.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_launch_diffusion.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Estudos de caso -- bugs descobertos de forma autônoma -- NAC3</title>
+<meta name="nac3-doc-slug" content="case_studies_discovery" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="case_studies_discovery" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="case_studies_discovery.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="case_studies_discovery.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/case_studies_discovery.mp3" data-nac-id="case_studies_discovery.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="case_studies_discovery.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="case_studies_discovery.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="case_studies_discovery.main" data-nac-role="region">
+<hr />
+<p data-nac-id="case_studies_discovery.p.1" data-nac-role="paragraph">translation_source: docs/CASE_STUDIES_DISCOVERY.md translation_source_hash: 59b940d486104c6a9b42d59c1ee6f16c25eb01c0c08b8b98458c68ef4312ed77 translation_quality: machine_v1 translation_lang: pt translation_date: 2026-05-11T13:42:12.848738+00:00</p>
+<hr />
+<h1 data-nac-id="case_studies_discovery.h1.estudos-de-caso-bugs-descobertos-de-forma-autônoma" data-nac-role="heading" data-nac-level="1" id="estudos-de-caso-bugs-descobertos-de-forma-autônoma">Estudos de caso -- bugs descobertos de forma autônoma</h1>
+<p data-nac-id="case_studies_discovery.p.4" data-nac-role="paragraph">Bugs encontrados pela varredura diagnóstica com Playwright contra <code data-nac-role="code-inline">yujin.app/nac-spec/demos/react/</code> e <code data-nac-role="code-inline">/demos/angular/</code>. Pablo me pediu em 2026-05-11 para descobrir + documentar + corrigir sem que ele nomeasse os sintomas. Este arquivo registra o processo de descoberta + as correções.</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.bug-1-alto-o-intermediário-llm-não-enxerga-o-manifest-do-app" data-nac-role="heading" data-nac-level="2" id="bug-1-alto-o-intermediário-llm-não-enxerga-o-manifest-do-app">Bug #1 (ALTO) -- O intermediário LLM não enxerga o manifest do app</h2>
+<p data-nac-id="case_studies_discovery.p.7" data-nac-role="paragraph"><strong>Demos afetados:</strong> React + Angular.</p>
+<p data-nac-id="case_studies_discovery.p.8" data-nac-role="paragraph"><strong>Sintoma (observável):</strong> Quando o usuário digita "hola" no painel de chat do demo React ou Angular, o chat responde com um genérico "How can I help you with this page?" -- sem saber que se trata de um app de todos. Quando o usuário diz "agrega tomar agua", o LLM não consegue despachar <code data-nac-role="code-inline">click_by_verb('todos', 'add_todo')</code> porque não sabe que esse plugin existe.</p>
+<p data-nac-id="case_studies_discovery.p.9" data-nac-role="paragraph"><strong>Método de descoberta.</strong> A spec diagnóstica captura todas as mensagens de <code data-nac-role="code-inline">page.console</code> durante a interação com o chat. O cliente de chat registra:</p>
+<pre data-nac-id="case_studies_discovery.code.1" data-nac-role="code" data-nac-lang="text"><code>[nac-chat] snapshot plugins (1): chat
+[nac-chat] backend response: message=&quot;Hi! How can I help you with this page?&quot; actions=[]</code></pre>
+<p data-nac-id="case_studies_discovery.p.11" data-nac-role="paragraph"><code data-nac-role="code-inline">snapshot plugins (1): chat</code> é a prova cabal -- apenas UM plugin aparece no snapshot enviado ao LLM, o plugin <code data-nac-role="code-inline">chat</code>. O plugin <code data-nac-role="code-inline">todos</code> -- que o demo registra via <code data-nac-role="code-inline">NAC.register(TODOS_MANIFEST)</code> -- está ausente.</p>
+<p data-nac-id="case_studies_discovery.p.12" data-nac-role="paragraph"><strong>Causa raiz.</strong> <code data-nac-role="code-inline">NAC.describe()</code> enumera plugins percorrendo o DOM em busca de elementos <code data-nac-role="code-inline">[data-nac-plugin="..."]</code> (linha ~1557 de <code data-nac-role="code-inline">yujin.app/nac-spec/js/nac.js</code>). O painel de chat <code data-nac-role="code-inline">&lt;aside class="chat" data-nac-plugin="chat"&gt;</code> possui o atributo; a região de todos do app NÃO possui. O runtime nunca enxerga a região de todos como um escopo de plugin, portanto <code data-nac-role="code-inline">describe()</code> também não enxerga, <code data-nac-role="code-inline">snapshotTree()</code> também não, e o LLM também não.</p>
+<p data-nac-id="case_studies_discovery.p.13" data-nac-role="paragraph">O registro do manifest via <code data-nac-role="code-inline">NAC.register(...)</code> popula o mapa interno <code data-nac-role="code-inline">_manifests</code>, mas NÃO anexa automaticamente um atributo <code data-nac-role="code-inline">data-nac-plugin</code> ao DOM. Isso é responsabilidade de quem chama.</p>
+<p data-nac-id="case_studies_discovery.p.14" data-nac-role="paragraph"><strong>Correção.</strong> Adicionar <code data-nac-role="code-inline">data-nac-plugin="todos"</code> ao container principal do app em ambos os demos:</p>
+<ul data-nac-id="case_studies_discovery.list.15" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.15.item.1" data-nac-role="list-item">React: <code data-nac-role="code-inline">&lt;div className="app"&gt;</code> -&gt; <code data-nac-role="code-inline">&lt;div className="app" data-nac-plugin="todos"&gt;</code></li><li data-nac-id="case_studies_discovery.list.15.item.2" data-nac-role="list-item">Angular: <code data-nac-role="code-inline">&lt;div class="app"&gt;</code> no template -&gt; <code data-nac-role="code-inline">&lt;div class="app" data-nac-plugin="todos"&gt;</code></li></ul>
+<p data-nac-id="case_studies_discovery.p.16" data-nac-role="paragraph">Após a correção, <code data-nac-role="code-inline">NAC.describe()</code> retorna 2 plugins (<code data-nac-role="code-inline">todos</code> + <code data-nac-role="code-inline">chat</code>), o snapshot carrega ambos os manifests, e o LLM consegue despachar ações baseadas em verbos contra <code data-nac-role="code-inline">todos.*</code>.</p>
+<p data-nac-id="case_studies_discovery.p.17" data-nac-role="paragraph"><strong>Lição para o manual.</strong> O contrato NAC3 exige AMBOS:</p>
+<p data-nac-id="case_studies_discovery.p.18" data-nac-role="paragraph">o plugin na árvore de escopo.</p>
+<ol data-nac-id="case_studies_discovery.list.19" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.19.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.register(manifest)</code> para declarar o schema.</li><li data-nac-id="case_studies_discovery.list.19.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-plugin="&lt;slug&gt;"</code> em um nó raiz do DOM para inscrever</li></ol>
+<p data-nac-id="case_studies_discovery.p.20" data-nac-role="paragraph">Os guias de adoção e o NAC_TEST_MANUAL devem deixar isso explícito. Um erro comum de quem adota é registrar o manifest e esquecer o atributo DOM, produzindo exatamente o sintoma de "LLM cego" descrito acima. Adicionar a <code data-nac-role="code-inline">stage2-disambiguation.mjs</code> um teste de regressão: o snapshot deve incluir TODOS os plugins registrados; caso contrário, sinalizar uma descoberta.</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.bug-2-médio-handlers-onchataction-no-react-fecham-sobre-esta" data-nac-role="heading" data-nac-level="2" id="bug-2-médio-handlers-onchataction-no-react-fecham-sobre-esta">Bug #2 (MÉDIO) -- Handlers <code data-nac-role="code-inline">onChatAction</code> no React fecham sobre estado obsoleto</h2>
+<p data-nac-id="case_studies_discovery.p.23" data-nac-role="paragraph"><strong>Demo afetado:</strong> Somente React. Signals + <code data-nac-role="code-inline">update()</code> do Angular fazem com que essa categoria não se aplique.</p>
+<p data-nac-id="case_studies_discovery.p.24" data-nac-role="paragraph"><strong>Sintoma (observável):</strong> Após o deploy da correção #1, o despacho de verbos via chat ainda não adiciona todos. Enviar "agrega leche" não resulta em nenhum novo todo. O LLM emite corretamente a sequência de duas ações (<code data-nac-role="code-inline">fill todos.input "leche"</code> + <code data-nac-role="code-inline">click_by_verb todos add_todo</code>), mas o handler de <code data-nac-role="code-inline">add_todo</code> vê <code data-nac-role="code-inline">input.trim() === ''</code> e retorna silenciosamente sem chamar <code data-nac-role="code-inline">addTodo()</code>.</p>
+<p data-nac-id="case_studies_discovery.p.25" data-nac-role="paragraph"><strong>Método de descoberta.</strong> A varredura Playwright de descoberta profunda (rodada 2) captura a contagem de linhas antes/depois durante uma adição via chat. Descobertas:</p>
+<pre data-nac-id="case_studies_discovery.code.2" data-nac-role="code" data-nac-lang="text"><code>[WARN] chat.dispatch: [react] chat &quot;agrega leche&quot; did not add a
+todo (before=3, after=3). May be LLM hallucination or dispatch
+broken.</code></pre>
+<p data-nac-id="case_studies_discovery.p.27" data-nac-role="paragraph"><strong>Causa raiz.</strong> O <code data-nac-role="code-inline">useEffect</code> de <code data-nac-role="code-inline">App.tsx</code> para registro do handler de chat tem deps <code data-nac-role="code-inline">[input, todos]</code>. Os handlers fecham sobre os valores de estado do React NO MOMENTO DO REGISTRO. Quando o LLM envia <code data-nac-role="code-inline">actions[]</code> de forma síncrona, o cliente de chat despacha:</p>
+<p data-nac-id="case_studies_discovery.p.28" data-nac-role="paragraph">uma re-renderização.</p>
+<p data-nac-id="case_studies_discovery.p.29" data-nac-role="paragraph">mesma task JS. O React ainda não re-renderizou. O closure do    handler ainda tem <code data-nac-role="code-inline">input === ''</code>. A guarda <code data-nac-role="code-inline">input.trim()</code> falha;    <code data-nac-role="code-inline">addTodo()</code> nunca é executado.</p>
+<ol data-nac-id="case_studies_discovery.list.30" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.30.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">fill todos.input "leche"</code> -&gt; <code data-nac-role="code-inline">setInput('leche')</code> enfileira</li><li data-nac-id="case_studies_discovery.list.30.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">click_by_verb todos add_todo</code> -&gt; executa IMEDIATAMENTE, na</li></ol>
+<p data-nac-id="case_studies_discovery.p.31" data-nac-role="paragraph">Este é o clássico problema de closure vs. estado obsoleto no React.</p>
+<p data-nac-id="case_studies_discovery.p.32" data-nac-role="paragraph"><strong>Correção.</strong> Usar um <code data-nac-role="code-inline">useRef</code> que espelha <code data-nac-role="code-inline">input</code>; o handler lê do ref (sempre o valor atual) em vez de do closure. Mesmo padrão para <code data-nac-role="code-inline">todos</code>, caso verbos futuros precisem.</p>
+<pre data-nac-id="case_studies_discovery.code.3" data-nac-role="code" data-nac-lang="ts"><code>const inputRef = useRef(input);
+useEffect(() =&gt; { inputRef.current = input; }, [input]);
+
+useEffect(() =&gt; {
+  if (!window.NacChat) return;
+  window.NacChat.onAction(&#x27;click_by_verb&#x27;, (a) =&gt; {
+    if (a.plugin === &#x27;todos&#x27; &amp;&amp; a.verb === &#x27;add_todo&#x27;) {
+      const text = (a as any).args?.text || inputRef.current.trim();
+      if (text) {
+        addTodoFromText(text);
+        return { ok: true };
+      }
+    }
+    ...
+  });
+}, []); // registrar uma única vez</code></pre>
+<p data-nac-id="case_studies_discovery.p.34" data-nac-role="paragraph">Bônus: aceitar também que o LLM passe o texto diretamente em <code data-nac-role="code-inline">args.text</code>, para que até apps que não fazem fill-then-click funcionem.</p>
+<p data-nac-id="case_studies_discovery.p.35" data-nac-role="paragraph"><strong>Lição para o manual.</strong> Ao conectar verbos via chat NAC3 no React, NUNCA feche handlers diretamente sobre estado. Use refs ou o padrão de setter funcional. Adicionar ao guia de adoção React (<code data-nac-role="code-inline">guides/REACT.md</code>) e ao manual de testes uma seção de "armadilhas comuns".</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.bug-3-a-definir" data-nac-role="heading" data-nac-level="2" id="bug-3-a-definir">Bug #3 (A DEFINIR)</h2>
+<p data-nac-id="case_studies_discovery.p.38" data-nac-role="paragraph">Aguardando rodada diagnóstica 3.</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.log-de-iterações" data-nac-role="heading" data-nac-level="2" id="log-de-iterações">Log de iterações</h2>
+<p data-nac-id="case_studies_discovery.p.41" data-nac-role="paragraph">| Rodada | Quando | Erros React | Erros Angular | Bugs registrados | |--------|--------|-------------|---------------|------------------| | 1 | 2026-05-11 02:10 | 0 na varredura superficial | 0 na varredura superficial | #1 (cobertura de manifest) encontrado via análise de console |</p>
+<p data-nac-id="case_studies_discovery.p.42" data-nac-role="paragraph">As verificações estruturais da spec diagnóstica (NAC montado, <code data-nac-role="code-inline">validate_global</code> limpo, manifests no registry, CRUD de todos funcionando, toggle do chat funcionando) passam todas no verde. Os bugs surgem em semânticas mais profundas, como "o LLM está realmente enxergando o que registramos?". Rodadas diagnósticas futuras adicionam: formato das ações pós-resposta-LLM, verificação de que o dispatch dispara, verificação da propagação de mutação <code data-nac-role="code-inline">dt_state</code> pelo estado do framework, verificação de que o autopilot conclui todos os passos, verificação de troca de locale via chat.</p>
+<hr />
+<p data-nac-id="case_studies_discovery.p.44" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/CASE_STUDIES_DISCOVERY.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "case_studies_discovery",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "case_studies_discovery.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "case_studies_discovery.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "case_studies_discovery.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "case_studies_discovery.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Liste de contrôle testeur : visuel / mise en page front-end (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="tester_checklist_visual" data-doc-lang="en" data-nac-plugin="tester_form">
+<p class="tr-intro">Complete each task + press Submit at the end. Your report reaches the Yujin team.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<hr />
+<p>translation_source: docs/TESTER_CHECKLIST_VISUAL.md translation_source_hash: 096be2111afd4470edb63fbb0001b20e678a6720201334fc1622bed3a4d434fb translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T13:23:24.143305+00:00</p>
+<hr />
+<h1>NAC3 v2.2 -- Liste de contrôle testeur : visuel / mise en page front-end</h1>
+<p><strong>Destiné à :</strong> le testeur humain évaluant l'aspect visuel et le ressenti général. <strong>Durée :</strong> ~30 minutes. <strong>Prérequis :</strong> tout navigateur moderne (Chrome recommandé).</p>
+<h2>Comment utiliser cette liste de contrôle</h2>
+<p>Pour chaque tâche :</p>
+<p>1. Ouvrir l'URL indiquée. 2. Observer la page calmement. Prendre 30 à 60 secondes avant de juger. 3. Comparer avec la liste « Ce qu'il faut évaluer ». 4. Cocher <code>[X]</code> dans <strong>OK</strong> si tout semble correct. 5. Cocher <code>[X]</code> dans <strong>À CORRIGER</strong> si quelque chose semble mauvais / cassé / peu professionnel. 6. Écrire TOUJOURS au moins 1 phrase dans la zone Commentaires, même en cochant OK -- décrire ce que vous avez vu et ce que vous avez ressenti. 7. Si vous remarquez quelque chose qui ne figure pas dans la liste d'évaluation, l'écrire également dans les Commentaires. La zone Commentaires est la partie la plus importante de cette liste de contrôle.</p>
+<p>Soyez honnête, pas poli. Un « à corriger » avec un vrai commentaire est plus utile que 10 cases « OK » cochées par réflexe.</p>
+<hr />
+<h2>Section 1 -- Page d'accueil (la porte d'entrée)</h2>
+<p>### Tâche V1 -- Première impression de la page d'accueil</p>
+<p>a) Ouvrir Chrome en navigation privée, aller sur <code>https://yujin.app/nac-spec/</code>. b) Observer la page pendant 30 secondes sans faire défiler. c) S'imaginer arriver depuis Twitter pour la première fois. d) <strong>Ce qu'il faut évaluer :</strong> - La zone hero (haut de page) explique-t-elle clairement ce qu'est NAC3 en moins de 10 secondes de lecture ? - Le branding japonais sumi-e est-il visible sans être envahissant ? - La police est-elle lisible ? Le contraste est-il bon ? - Y a-t-il des endroits évidents où cliquer ensuite (Demo, Docs, etc.) ? - L'ensemble paraît-il professionnel ou amateur ?</p>
+<p>- [ ] OK -- aspect professionnel, message clair - [ ] À CORRIGER Commentaires (obligatoires) : _______________________________ _______________________________</p>
+<p>### Tâche V2 -- Espacement et rythme</p>
+<p>a) Faire défiler lentement la page d'accueil du haut vers le bas. b) Prêter attention au rythme vertical : les sections sont-elles séparées proprement, ou se chevauchent-elles ? c) <strong>Ce qu'il faut évaluer :</strong> - Espace blanc suffisant entre les sections (ni trop serré, ni trop aéré) ? - Les titres de section se distinguent-ils du corps du texte ? - Les lignes de texte sont-elles confortables à lire (ni trop larges, ni trop étroites) ? - Aucun élément ne semble « déborder » de son conteneur ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V3 -- Section « Made with NAC3 »</p>
+<p>a) Faire défiler jusqu'à la section « Made with NAC3 ». b) Observer les 4 cartes dans la grille. c) <strong>Ce qu'il faut évaluer :</strong> - Les 4 cartes ont-elles la même taille visuelle ? - Les caractères japonais en haut de chaque carte semblent-ils intentionnels ou aléatoires ? - Chaque carte est-elle lisible -- titre, description, flèche de lien tous clairs ? - La section donne-t-elle une impression d'utilisateurs prestigieux, ou de contenu de remplissage ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V4 -- Section liste d'attente Forge + Pilot</p>
+<p>a) Faire défiler jusqu'à « Coming Q3 2026: Yujin Forge + Pilot ». b) Observer les 2 cartes produit + le formulaire e-mail en dessous. c) <strong>Ce qu'il faut évaluer :</strong> - Les deux niveaux tarifaires (19 $ et 5 $) sont-ils visuellement distincts ? - Les listes de fonctionnalités produit (puces) sont-elles faciles à parcourir ? - Le formulaire e-mail est-il épuré -- pas surchargé ? - Le texte de mention légale concernant BYOK est-il lisible sans être trop présent ? - Le bouton « Notify me » est-il bien visible et semble-t-il cliquable ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V5 -- Gouvernance + pied de page</p>
+<p>a) Faire défiler jusqu'en bas de la page. b) Observer la section « Open standard, open governance » + le pied de page. c) <strong>Ce qu'il faut évaluer :</strong> - Le texte de gouvernance est-il lisible et rassurant ? - Le pied de page est-il minimaliste (kanji, licence, lien GitHub, lien Yujin, version) ? - Rien dans le pied de page ne semble cassé ou mal aligné ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<hr />
+<h2>Section 2 -- Visuel des démos</h2>
+<p>### Tâche V6 -- Démo Vanilla (example.php)</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example.php</code>. b) Observer la page sans interagir. c) <strong>Ce qu'il faut évaluer :</strong> - Les 27 widgets s'assemblent-ils de façon cohérente ou semblent-ils jetés au hasard ? - Les couleurs sont-elles cohérentes (palette sumi-e ou chaotique) ? - Les boutons semblent-ils cliquables (relief, couleur, espacement correct) ? - Les champs de saisie semblent-ils accessibles (le curseur s'y poserait clairement) ? - Les onglets (le cas échéant) ressemblent-ils à des onglets ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V7 -- Démo v20-full</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v20-full.php</code>. b) Prêter une attention particulière au « v20-panel », généralement en haut à droite. c) <strong>Ce qu'il faut évaluer :</strong> - Le v20-panel est-il visible immédiatement (pas caché, pas coupé) ? - Les boutons du panneau (describe_v2, validate_global_v2, etc.) sont-ils lisibles et distincts ? - Le panneau ne semble-t-il pas « rajouté à la va-vite » -- s'intègre-t-il visuellement à la page ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V8 -- Démo tableau de données (v21)</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Observer les onglets + le tableau de données à l'intérieur. c) <strong>Ce qu'il faut évaluer :</strong> - L'onglet actif est-il visuellement distinct des onglets inactifs ? - Les lignes du tableau alternent-elles de couleur (zèbre) pour faciliter la lecture ? - Les en-têtes de colonnes se distinguent-ils des lignes de données ? - Les boutons d'action « ajouter une ligne » ou similaires sont-ils repérables ? - Le panneau de chat ne chevauche-t-il pas le tableau et ne le masque-t-il pas ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V9 -- Démo interop (v22)</p>
+<p>a) Aller sur <code>https://yujin.app/nac-spec/example-v22-interop.php</code>. b) Observer les deux mini-applications côte à côte. c) <strong>Ce qu'il faut évaluer :</strong> - Les deux côtés sont-ils clairement séparés (bordure, couleur ou espacement) ? - Les 4 CTA (Export tree, Import remote, etc.) sont-ils visibles en haut ? - Après avoir cliqué sur un CTA, le panneau de sortie affiche-t-il clairement un retour ? - Le visuel donne-t-il l'impression de « deux applications » et non d'« une page confuse » ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V10 -- Démos React + Angular</p>
+<p>a) Ouvrir <code>https://yujin.app/nac-spec/demos/react/</code> et <code>https://yujin.app/nac-spec/demos/angular/</code> dans deux onglets. b) Les comparer côte à côte. c) <strong>Ce qu'il faut évaluer :</strong> - Donnent-ils l'impression de la même application implémentée dans 2 frameworks (cohérence) ? - Les deux ont-ils une interface Todos épurée : champ de saisie + bouton + liste ? - Les deux ont-ils un panneau de chat fonctionnel ? - Aucun des deux ne présente de bugs visuels évidents (chevauchements, texte coupé, couleurs incorrectes) ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<hr />
+<h2>Section 3 -- Visuel du panneau de chat</h2>
+<p>### Tâche V11 -- Mise en page du panneau de chat</p>
+<p>a) Sur la page d'accueil, ouvrir le panneau de chat (cliquer sur la bulle si replié). b) Redimensionner la fenêtre du navigateur : étroite (type téléphone, ~400 px de large) et large (bureau, 1400 px). c) <strong>Ce qu'il faut évaluer :</strong> - En large : le panneau de chat est-il ancré à droite sans écraser le contenu ? - En étroit : le panneau de chat occupe-t-il toute la largeur OU flotte-t-il de façon sensée ? - Le bouton microphone est-il toujours visible (jamais coupé) ? - Le bouton Envoyer est-il toujours cliquable ? - Les bulles de messages (lorsqu'il y en a) distinguent-elles clairement l'utilisateur de l'assistant ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V12 -- Lisibilité du chat</p>
+<p>a) Saisir et envoyer 3 messages. Attendre les réponses. b) Faire défiler la conversation. c) <strong>Ce qu'il faut évaluer :</strong> - Les messages de l'utilisateur et ceux de l'assistant sont-ils visuellement distincts ? - Les longues réponses (multi-paragraphes) sont-elles paginées / défilables proprement ? - Les blocs de code dans les réponses (le cas échéant) sont-ils mis en forme clairement ? - La taille de police est-elle confortable (ni trop petite, ni trop grande) ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<hr />
+<h2>Section 4 -- Mobile / responsive</h2>
+<p>### Tâche V13 -- Mobile portrait</p>
+<p>a) Sur un téléphone (ou en mode mobile DevTools du navigateur réglé sur iPhone), ouvrir <code>https://yujin.app/nac-spec/</code>. b) Faire défiler toute la page. c) <strong>Ce qu'il faut évaluer :</strong> - Pas de barre de défilement horizontal (la largeur de la page s'adapte) ? - Tous les boutons sont-ils accessibles avec le pouce (pas trop petits) ? - Le texte est-il lisible sans zoomer ? - Les images / GIF (le cas échéant) ne cassent-ils pas la mise en page ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V14 -- Tablette paysage</p>
+<p>a) Sur une tablette (ou DevTools iPad paysage), ouvrir la page d'accueil. b) Observer comment la mise en page exploite la largeur supplémentaire. c) <strong>Ce qu'il faut évaluer :</strong> - Les mises en page multi-colonnes s'activent-elles aux tailles plus larges ? - La page ne reste-t-elle PAS étroite (~600 px) sur un écran de 1024 px ? - L'espace blanc est-il équilibré, pas gênant ?</p>
+<p>- [ ] OK - [ ] À CORRIGER Commentaires : _______________________________ _______________________________</p>
+<hr />
+<h2>Section 5 -- Ressenti subjectif</h2>
+<p>### Tâche V15 -- Esthétique générale</p>
+<p>a) Sans trop réfléchir, parcourir la page d'accueil + 2 démos. b) Évaluer le ressenti selon ces dimensions :</p>
+<p>| Dimension | 1 (mauvais) - 5 (excellent) | |-----------|---------------------| | Professionnel vs amateur | __ | | Branding sumi-e intégré naturellement | __ | | Hiérarchie visuelle claire | __ | | Choix de couleurs cohérents | __ | | Typographie lisible et de bon goût | __ | | Signal de confiance (prendriez-vous ce produit au sérieux ?) | __ |</p>
+<p>Commentaires : _______________________________ _______________________________</p>
+<p>### Tâche V16 -- Une chose à changer</p>
+<p>Si vous pouviez changer UNE chose visuelle sur l'ensemble du site pour l'améliorer le plus, laquelle serait-ce ?</p>
+<p>Votre réponse (obligatoire, 1 à 3 phrases) : _______________________________ _______________________________ _______________________________</p>
+<p>### Tâche V17 -- Une chose à conserver</p>
+<p>Quel choix visuel sur le site vous impressionne le plus et devrait rester ?</p>
+<p>Votre réponse (obligatoire) : _______________________________ _______________________________</p>
+<p>### Tâche V18 -- Jugement de confiance</p>
+<p>a) Imaginez que vous êtes un CTO qui découvre cela pour la première fois. b) Feriez-vous suffisamment confiance à l'entreprise derrière ce produit pour envisager d'adopter NAC3 en production ? c) <strong>Pourquoi ou pourquoi pas ?</strong></p>
+<p>- [ ] Oui, je ferais confiance - [ ] Non, je ne ferais pas (encore) confiance Pourquoi : _______________________________ _______________________________</p>
+<p>### Tâche V19 -- Comparaison avec les pairs</p>
+<p>Comparé aux autres pages d'accueil d'outils open-standard / dev-tools (ex. Anthropic, Vercel, Linear, Notion), le site NAC3 paraît :</p>
+<p>- [ ] Meilleur - [ ] Au même niveau - [ ] En dessous - [ ] Bien en dessous</p>
+<p>Ce qui le distingue précisément : _______________________________ _______________________________</p>
+<p>### Tâche V20 -- Zone de retour libre</p>
+<p>Tout ce que vous avez remarqué et qui ne correspond à aucune tâche ci-dessus. Bugs, formulations maladroites, espacements étranges, liens cassés, parcours confus, opportunités manquées. Tout noter.</p>
+<p>_______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________</p>
+<hr />
+<h2>VALIDATION FINALE (évaluation visuelle)</h2>
+<pre class="tr-code"><code>Tag de version :    v____._.___
+Nom du testeur :    ______________________________
+Date :              ____-____-____
+Navigateur :        [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Appareil :          [ ] Bureau  [ ] Tablette  [ ] Téléphone
+
+Note visuelle globale (1-10) : __
+
+Top 3 des problèmes visuels à corriger (par ordre de priorité) :
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+Verdict pour le lancement :
+[ ] le visuel est prêt à être mis en ligne
+[ ] le visuel nécessite des corrections mais ce n&#x27;est pas bloquant
+[ ] le visuel est bloquant -- ne pas lancer encore
+
+Signature : ______________________________</code></pre>
+<hr />
+<h2>Voir aussi</h2>
+<p>- <code>TESTER_CHECKLIST_VOICE_CHAT.md</code> -- évaluation spécifique voix + chat. - <code>TESTER_CHECKLIST_VISUAL.es.md</code> -- version espagnole. - <code>HUMAN_OK_CHECKLIST_TESTER.md</code> -- liste de contrôle fonctionnelle générale.</p>
+<hr />
+<p><em>This is a machine translation of the canonical English version at <code>/nac-spec/docs/TESTER_CHECKLIST_VISUAL.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Submit report</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Auto-saved locally. Your progress restores if you close this tab.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

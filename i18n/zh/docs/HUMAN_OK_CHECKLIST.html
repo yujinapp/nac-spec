@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- 人工验收清单 -- NAC3</title>
+<meta name="nac3-doc-slug" content="human_ok_checklist" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="human_ok_checklist" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="human_ok_checklist.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="human_ok_checklist.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/human_ok_checklist.mp3" data-nac-id="human_ok_checklist.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="human_ok_checklist.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="human_ok_checklist.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="human_ok_checklist.main" data-nac-role="region">
+<hr />
+<p data-nac-id="human_ok_checklist.p.1" data-nac-role="paragraph">translation_source: docs/HUMAN_OK_CHECKLIST.md translation_source_hash: 2b87f1b0665762daf6be1ad520c7ba16f977d21771e6574ae60451039baada31 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:19:12.279484+00:00</p>
+<hr />
+<h1 data-nac-id="human_ok_checklist.h1.nac3-人工验收清单" data-nac-role="heading" data-nac-level="1" id="nac3-人工验收清单">NAC3 -- 人工验收清单</h1>
+<p data-nac-id="human_ok_checklist.p.4" data-nac-role="paragraph"><strong>规范版本：</strong> 2.2 + v2.3 预览版。 <strong>最近执行日期：</strong> 2026-05-11（每次发布后更新）。 <strong>用途：</strong> 本文档是 <a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.1" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a> 中 MAN 列的可执行形式。由人工逐项检查并勾选。任何一项未通过，该版本<strong>不得发布</strong>——请提交 bug 并修复后重新执行。</p>
+<p data-nac-id="human_ok_checklist.p.5" data-nac-role="paragraph">本文档<strong>不能</strong>替代自动化测试。在开始本清单之前，自动化测试套件（<code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code>）<strong>必须</strong>全部通过。本清单的存在是为了覆盖自动化无法检测的内容：真实音频、跨浏览器体验、母语者措辞、与真实对端的跨域握手、视觉细节。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.使用说明" data-nac-role="heading" data-nac-level="2" id="使用说明">使用说明</h2>
+<ol data-nac-id="human_ok_checklist.list.8" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.8.item.1" data-nac-role="list-item">打开全新的无痕窗口（依次使用 Chrome、Firefox、Safari，视觉相关章节需在每个浏览器中重复执行）。</li><li data-nac-id="human_ok_checklist.list.8.item.2" data-nac-role="list-item">按顺序逐节检查——某些章节依赖前一章节已正常运行（例如互操作性测试需要两个 demo 均已加载）。</li><li data-nac-id="human_ok_checklist.list.8.item.3" data-nac-role="list-item">仅在<strong>亲自确认</strong>后才勾选 <code data-nac-role="code-inline">[ ]</code>。不得委托他人。如有疑问，标记 <code data-nac-role="code-inline">[?]</code> 并咨询规范负责人。</li><li data-nac-id="human_ok_checklist.list.8.item.4" data-nac-role="list-item">完成后，在 SIGN-OFF 区域签名并注明日期。</li><li data-nac-id="human_ok_checklist.list.8.item.5" data-nac-role="list-item">提交文件时更新本次执行日期。</li></ol>
+<p data-nac-id="human_ok_checklist.p.9" data-nac-role="paragraph">每次执行预计耗时：<strong>45-60 分钟</strong>。请勿仓促完成；本关卡的意义正在于覆盖自动化遗漏的部分。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.1-运行时产物" data-nac-role="heading" data-nac-level="2" id="1-运行时产物">1. 运行时产物</h2>
+<h3 data-nac-id="human_ok_checklist.h3.11-跨浏览器冒烟测试-jsnacjs-nac-v2-extensionsjs" data-nac-role="heading" data-nac-level="3" id="11-跨浏览器冒烟测试-jsnacjs-nac-v2-extensionsjs">1.1 跨浏览器冒烟测试 -- <code data-nac-role="code-inline">js/nac.js</code> + <code data-nac-role="code-inline">nac-v2-extensions.js</code></h3>
+<p data-nac-id="human_ok_checklist.p.13" data-nac-role="paragraph">对每个浏览器（Chrome、Firefox、Safari）分别执行：</p>
+<ul data-nac-id="human_ok_checklist.list.14" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.14.item.1" data-nac-role="list-item">[ ] 在无痕模式下打开 <code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code>。</li><li data-nac-id="human_ok_checklist.list.14.item.2" data-nac-role="list-item">[ ] 等待 5 秒后，控制台无任何报错。</li><li data-nac-id="human_ok_checklist.list.14.item.3" data-nac-role="list-item">[ ] 在控制台执行 <code data-nac-role="code-inline">NAC.describe().plugins[0]</code>，返回一个对象。</li><li data-nac-id="human_ok_checklist.list.14.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.list_registered_plugins()</code> 返回至少一个 slug。</li><li data-nac-id="human_ok_checklist.list.14.item.5" data-nac-role="list-item">[ ] 点击一个带有 <code data-nac-role="code-inline">data-nac-role="action"</code> 的按钮——按钮正常响应，且 <code data-nac-role="code-inline">nac:action:succeeded</code> 事件触发（在控制台通过 <code data-nac-role="code-inline">document.addEventListener</code> 监听验证）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.12-实时聊天客户端-nac-chat-clientjs" data-nac-role="heading" data-nac-level="3" id="12-实时聊天客户端-nac-chat-clientjs">1.2 实时聊天客户端 -- <code data-nac-role="code-inline">nac-chat-client.js</code></h3>
+<ul data-nac-id="human_ok_checklist.list.16" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.16.item.1" data-nac-role="list-item">[ ] 在 <code data-nac-role="code-inline">example-v21-data-table.php</code> 上，点击麦克风按钮。</li><li data-nac-id="human_ok_checklist.list.16.item.2" data-nac-role="list-item">[ ] 说"ve a permisos"——聊天触发标签页切换，而非返回自由文本回复。</li><li data-nac-id="human_ok_checklist.list.16.item.3" data-nac-role="list-item">[ ] 用英语（"go to permissions"）和葡萄牙语（"vai para permissoes"）重复上述操作——均能正确触发分发。</li><li data-nac-id="human_ok_checklist.list.16.item.4" data-nac-role="list-item">[ ] 说"cambia de pestaña"——语言环境<strong>不</strong>切换为德语（V22-03 回归防护）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.13-互操作运行时-nac-mcp-interopjs" data-nac-role="heading" data-nac-level="3" id="13-互操作运行时-nac-mcp-interopjs">1.3 互操作运行时 -- <code data-nac-role="code-inline">nac-mcp-interop.js</code></h3>
+<ul data-nac-id="human_ok_checklist.list.18" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.18.item.1" data-nac-role="list-item">[ ] 打开 <code data-nac-role="code-inline">example-v22-interop.php</code>。</li><li data-nac-id="human_ok_checklist.list.18.item.2" data-nac-role="list-item">[ ] 按顺序使用 4 个 CTA：导出树 -&gt; 导入远程 -&gt; 列出远程应用 -&gt; 断开远程连接。</li><li data-nac-id="human_ok_checklist.list.18.item.3" data-nac-role="list-item">[ ] 每个 CTA 均在其输出面板中记录成功信息。</li><li data-nac-id="human_ok_checklist.list.18.item.4" data-nac-role="list-item">[ ] 断开连接后，远程应用不再出现在 <code data-nac-role="code-inline">NAC.list_remote_apps()</code> 中。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.2-npm-包" data-nac-role="heading" data-nac-level="2" id="2-npm-包">2. NPM 包</h2>
+<h3 data-nac-id="human_ok_checklist.h3.21-全新安装冒烟测试" data-nac-role="heading" data-nac-level="3" id="21-全新安装冒烟测试">2.1 全新安装冒烟测试</h3>
+<p data-nac-id="human_ok_checklist.p.22" data-nac-role="paragraph">``<code data-nac-role="code-inline">       mkdir /tmp/nac-smoke &amp;&amp; cd /tmp/nac-smoke       npm init -y       npm install @nac3/runtime       node -e "import('@nac3/runtime').then(m =&gt; console.log(Object.keys(m)))"       </code>``</p>
+<ul data-nac-id="human_ok_checklist.list.23" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.23.item.1" data-nac-role="list-item">[ ] 在临时目录中执行：</li><li data-nac-id="human_ok_checklist.list.23.item.2" data-nac-role="list-item">[ ] 输出中包含 <code data-nac-role="code-inline">NAC</code>、<code data-nac-role="code-inline">registerPlugin</code> 及各验证器。</li><li data-nac-id="human_ok_checklist.list.23.item.3" data-nac-role="list-item">[ ] 安装过程中无废弃警告。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.22-对外部项目运行-cli-验证器" data-nac-role="heading" data-nac-level="3" id="22-对外部项目运行-cli-验证器">2.2 对外部项目运行 CLI 验证器</h3>
+<ul data-nac-id="human_ok_checklist.list.25" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.25.item.1" data-nac-role="list-item">[ ] 选取任意一个非 Yujin 项目（采用案例中的 demo 或任意目录均可）。</li><li data-nac-id="human_ok_checklist.list.25.item.2" data-nac-role="list-item">[ ] 在其根目录执行 <code data-nac-role="code-inline">npx @nac3/runtime validate .</code>。</li><li data-nac-id="human_ok_checklist.list.25.item.3" data-nac-role="list-item">[ ] 输出内容可读，列出 0 个 BLOCKER；无问题时退出码为 0，有发现时退出码非 0。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.3-demo-演示" data-nac-role="heading" data-nac-level="2" id="3-demo-演示">3. Demo 演示</h2>
+<h3 data-nac-id="human_ok_checklist.h3.31-首页-indexhtml" data-nac-role="heading" data-nac-level="3" id="31-首页-indexhtml">3.1 首页 -- <code data-nac-role="code-inline">index.html</code></h3>
+<ul data-nac-id="human_ok_checklist.list.29" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.29.item.1" data-nac-role="list-item">[ ] 页面以 sumi-e 品牌风格渲染，无 FOUC（无样式内容闪烁）。</li><li data-nac-id="human_ok_checklist.list.29.item.2" data-nac-role="list-item">[ ] 点击"Autopilot"——5 秒导览运行，旁白可听（TTS 语音，非静音）。</li><li data-nac-id="human_ok_checklist.list.29.item.3" data-nac-role="list-item">[ ] 打开聊天，输入"que es NAC3?"——获得连贯的回复，无报错。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.32-参考-demo-examplephp" data-nac-role="heading" data-nac-level="3" id="32-参考-demo-examplephp">3.2 参考 demo -- <code data-nac-role="code-inline">example.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.31" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.31.item.1" data-nac-role="list-item">[ ] 逐一操作页面上可见的全部 27 个组件。</li><li data-nac-id="human_ok_checklist.list.31.item.2" data-nac-role="list-item">[ ] 完整操作后控制台无报错。</li><li data-nac-id="human_ok_checklist.list.31.item.3" data-nac-role="list-item">[ ] 无无响应组件（无点击后无任何反应的情况）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.33-棕地-demo-example-v20-fullphp" data-nac-role="heading" data-nac-level="3" id="33-棕地-demo-example-v20-fullphp">3.3 棕地 demo -- <code data-nac-role="code-inline">example-v20-full.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.33" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.33.item.1" data-nac-role="list-item">[ ] 页面加载后，<code data-nac-role="code-inline">v20-panel</code> 在右上角可见。</li><li data-nac-id="human_ok_checklist.list.33.item.2" data-nac-role="list-item">[ ] 点击"describe_v2"——面板显示有效的 JSON 输出。</li><li data-nac-id="human_ok_checklist.list.33.item.3" data-nac-role="list-item">[ ] 点击"validate_global_v2"——面板显示发现项（或"0 findings, OK"）。</li><li data-nac-id="human_ok_checklist.list.33.item.4" data-nac-role="list-item">[ ] 依次点击 v20-panel 中的 6 个按钮——所有按钮均触发 <code data-nac-role="code-inline">nac:action:succeeded</code>（附加监听器后在控制台可见）。</li><li data-nac-id="human_ok_checklist.list.33.item.5" data-nac-role="list-item">[ ] istrusted_fake 按钮——确认事件<strong>不</strong>触发（运行时正确拒绝针对 isTrusted 门控动词的合成点击）。</li><li data-nac-id="human_ok_checklist.list.33.item.6" data-nac-role="list-item">[ ] istrusted_real 按钮（真实人工点击）——确认事件<strong>正常</strong>触发。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.34-原语展示-demo-example-v20-primitives-showcasephp" data-nac-role="heading" data-nac-level="3" id="34-原语展示-demo-example-v20-primitives-showcasephp">3.4 原语展示 demo -- <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.35" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.35.item.1" data-nac-role="list-item">[ ] 8 个原语各自渲染一个包含可用示例的章节。</li><li data-nac-id="human_ok_checklist.list.35.item.2" data-nac-role="list-item">[ ] 每个章节中的说明文字显示正确（无乱码或占位符残留）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.35-数据表格-demo-example-v21-data-tablephp" data-nac-role="heading" data-nac-level="3" id="35-数据表格-demo-example-v21-data-tablephp">3.5 数据表格 demo -- <code data-nac-role="code-inline">example-v21-data-table.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.37" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.37.item.1" data-nac-role="list-item">[ ] 点击麦克风，说"agrega una linea con concepto leche cantidad 2 precio 100"——集合表格中出现一行新数据。</li><li data-nac-id="human_ok_checklist.list.37.item.2" data-nac-role="list-item">[ ] 说"cuanto total hay?"——聊天回复一个数字，而非原始表格内容。</li><li data-nac-id="human_ok_checklist.list.37.item.3" data-nac-role="list-item">[ ] 说"ve a permisos"——标签页切换。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.36-互操作-demo-example-v22-interopphp" data-nac-role="heading" data-nac-level="3" id="36-互操作-demo-example-v22-interopphp">3.6 互操作 demo -- <code data-nac-role="code-inline">example-v22-interop.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.39" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.39.item.1" data-nac-role="list-item">[ ] 已在 1.3 中覆盖。</li><li data-nac-id="human_ok_checklist.list.39.item.2" data-nac-role="list-item">[ ] 附加项：在两个浏览器标签页中同时打开该页面，重复握手流程——应仍可正常工作（每个标签页是独立的 NAC 实例，互操作层作为桥接）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.37-react-案例研究-demosreact" data-nac-role="heading" data-nac-level="3" id="37-react-案例研究-demosreact">3.7 React 案例研究 -- <code data-nac-role="code-inline">demos/react/</code></h3>
+<ul data-nac-id="human_ok_checklist.list.41" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.41.item.1" data-nac-role="list-item">[ ] 打开 <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code>。</li><li data-nac-id="human_ok_checklist.list.41.item.2" data-nac-role="list-item">[ ] 在文本框中输入"leche"，点击"Add"——待办事项出现。</li><li data-nac-id="human_ok_checklist.list.41.item.3" data-nac-role="list-item">[ ] 打开聊天，通过麦克风说"agrega pan"——待办事项"pan"通过聊天驱动路径出现。此为案例研究 bug #2 的回归防护。</li><li data-nac-id="human_ok_checklist.list.41.item.4" data-nac-role="list-item">[ ] 说"borra leche"——待办事项"leche"消失。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.38-angular-案例研究-demosangular" data-nac-role="heading" data-nac-level="3" id="38-angular-案例研究-demosangular">3.8 Angular 案例研究 -- <code data-nac-role="code-inline">demos/angular/</code></h3>
+<ul data-nac-id="human_ok_checklist.list.43" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.43.item.1" data-nac-role="list-item">[ ] 与 React 相同的 4 项检查，在 <code data-nac-role="code-inline">/nac-spec/demos/angular/</code> 上执行。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.4-文档" data-nac-role="heading" data-nac-level="2" id="4-文档">4. 文档</h2>
+<p data-nac-id="human_ok_checklist.p.46" data-nac-role="paragraph">以下每份文档，每季度发布时至少通读一遍。检查：</p>
+<ul data-nac-id="human_ok_checklist.list.47" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.47.item.1" data-nac-role="list-item">版本标记是否为当前版本（v2.2）。</li><li data-nac-id="human_ok_checklist.list.47.item.2" data-nac-role="list-item">无失效的内部链接。</li><li data-nac-id="human_ok_checklist.list.47.item.3" data-nac-role="list-item">无遗留的 TODO。</li><li data-nac-id="human_ok_checklist.list.47.item.4" data-nac-role="list-item">代码片段可按示例编译/运行。</li></ul>
+<ul data-nac-id="human_ok_checklist.list.48" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.48.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SPEC.md</code>（规范合同）。</li><li data-nac-id="human_ok_checklist.list.48.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">ABOUT.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">CONTRIBUTING.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SECURITY.md</code>——另需每季度重新阅读威胁模型。</li><li data-nac-id="human_ok_checklist.list.48.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">README_DEMOS.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_LAUNCH_DIFFUSION.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.11" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/TEST_COVERAGE_MATRIX.md</code>（本矩阵的关联文档）。</li><li data-nac-id="human_ok_checklist.list.48.item.12" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/VOICE_CHAT_ERROR_ANALYSIS_2026_05_09.md</code>。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.5-采用指南" data-nac-role="heading" data-nac-level="2" id="5-采用指南">5. 采用指南</h2>
+<p data-nac-id="human_ok_checklist.p.51" data-nac-role="paragraph">对于每份指南，请验证 hello-world 代码片段仍可编译，且步骤能引导初次阅读者完成可用的安装：</p>
+<ul data-nac-id="human_ok_checklist.list.52" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.52.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/REACT.md</code> -- 代码片段在 Vite + React 18 上可编译。</li><li data-nac-id="human_ok_checklist.list.52.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/ANGULAR.md</code> -- 代码片段在 Angular 17 standalone 上可编译。</li><li data-nac-id="human_ok_checklist.list.52.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> -- Node 参考后端可正常启动，示例契约测试通过。</li><li data-nac-id="human_ok_checklist.list.52.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_NEW_PROJECT.md</code> -- 步骤断言仍与运行时 API 匹配。</li><li data-nac-id="human_ok_checklist.list.52.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_MIGRATION.md</code> -- 同上。</li><li data-nac-id="human_ok_checklist.list.52.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_TESTING.md</code> -- 重新核对数据的时效性（每季度复查）。</li><li data-nac-id="human_ok_checklist.list.52.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_RPA.md</code> -- 同上。</li><li data-nac-id="human_ok_checklist.list.52.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_UIPATH.md</code> -- 运行一次 <code data-nac-role="code-inline">InvoiceFromCSV.xaml</code> 示例（或最新版 UiPath Studio 中的等效示例）。</li><li data-nac-id="human_ok_checklist.list.52.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_AUTOMATION_ANYWHERE.md</code> -- 等效示例工作流。</li><li data-nac-id="human_ok_checklist.list.52.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_BLUE_PRISM.md</code> -- 等效示例对象研究。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.6-测试套件" data-nac-role="heading" data-nac-level="2" id="6-测试套件">6. 测试套件</h2>
+<ul data-nac-id="human_ok_checklist.list.55" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.55.item.1" data-nac-role="list-item">[ ] 运行 <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> -- 在 15 秒内全部通过（ALL GREEN）。</li><li data-nac-id="human_ok_checklist.list.55.item.2" data-nac-role="list-item">[ ] 检查烟雾测试计数器（<code data-nac-role="code-inline">36 PASS</code>）-- 与预期总数一致。</li><li data-nac-id="human_ok_checklist.list.55.item.3" data-nac-role="list-item">[ ] 打开 <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/</code> -- 每个语言区域各选 1 个文件（共 10 个文件）-- 在音频播放器中播放 -- 确认清晰可辨。</li><li data-nac-id="human_ok_checklist.list.55.item.4" data-nac-role="list-item">[ ] 从 <code data-nac-role="code-inline">stage3-backend.mjs</code> 中随机抽查 2 条 LLM 提示词 -- 响应内容合理，无漂移现象。</li><li data-nac-id="human_ok_checklist.list.55.item.5" data-nac-role="list-item">[ ] 使用 <code data-nac-role="code-inline">--headed</code> 模式运行一次 Playwright 套件（<code data-nac-role="code-inline">npx playwright test --headed</code>）-- 目视检查每个规格的 UI 运行情况。</li><li data-nac-id="human_ok_checklist.list.55.item.6" data-nac-role="list-item">[ ] 运行 <code data-nac-role="code-inline">bash tools/nac/discovery-loop.sh 1</code> -- 一轮完成，0 个发现项。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.7-案例研究包" data-nac-role="heading" data-nac-level="2" id="7-案例研究包">7. 案例研究包</h2>
+<ul data-nac-id="human_ok_checklist.list.58" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.58.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-react-demo/</code> 构建无误（<code data-nac-role="code-inline">npm run build</code>）。</li><li data-nac-id="human_ok_checklist.list.58.item.2" data-nac-role="list-item">[ ] 已部署的 React 发布版与本地构建行为完全一致。</li><li data-nac-id="human_ok_checklist.list.58.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-angular-demo/</code> 构建无误。</li><li data-nac-id="human_ok_checklist.list.58.item.4" data-nac-role="list-item">[ ] 已部署的 Angular 发布版与本地构建行为完全一致。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.8-横切关注点" data-nac-role="heading" data-nac-level="2" id="8-横切关注点">8. 横切关注点</h2>
+<h3 data-nac-id="human_ok_checklist.h3.81-i18n" data-nac-role="heading" data-nac-level="3" id="81-i18n">8.1 i18n</h3>
+<ul data-nac-id="human_ok_checklist.list.62" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.62.item.1" data-nac-role="list-item">[ ] 选择一个语言区域（每次发布轮换）-- 发送给母语使用者对 10 条随机字符串进行抽查。</li><li data-nac-id="human_ok_checklist.list.62.item.2" data-nac-role="list-item">[ ] 验证器确认所有 10 个语言区域中 0 个缺失键（<code data-nac-role="code-inline">NAC.validate_global({locale: 'all'})</code>）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.82-hmac-溯源" data-nac-role="heading" data-nac-level="3" id="82-hmac-溯源">8.2 HMAC + 溯源</h3>
+<ul data-nac-id="human_ok_checklist.list.64" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.64.item.1" data-nac-role="list-item">[ ] 对 staging 租户运行多租户烟雾测试 -- 清单签名验证通过，日志中无 <code data-nac-role="code-inline">provenance_mismatch</code> 错误。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.83-istrusted-门控" data-nac-role="heading" data-nac-level="3" id="83-istrusted-门控">8.3 isTrusted 门控</h3>
+<ul data-nac-id="human_ok_checklist.list.66" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.66.item.1" data-nac-role="list-item">[ ] 在 <code data-nac-role="code-inline">example-v20-full.php</code> 上，istrusted_real 与 istrusted_fake 并排测试（见上方 3.3）通过视觉差异对比：真实事件触发 ack，伪造事件不触发。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.84-跨源互操作v23-预览版" data-nac-role="heading" data-nac-level="3" id="84-跨源互操作v23-预览版">8.4 跨源互操作（v2.3 预览版）</h3>
+<ul data-nac-id="human_ok_checklist.list.68" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.68.item.1" data-nac-role="list-item">[ ] 在声明 v2.3 GA 之前，至少完成一次跨源测试：打开互操作演示，连接托管在不同源上的远程 NAC3 对等节点，使用真实 bearer token 和真实 CORS 预检请求，确认往返成功。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.85-部署" data-nac-role="heading" data-nac-level="3" id="85-部署">8.5 部署</h3>
+<ul data-nac-id="human_ok_checklist.list.70" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.70.item.1" data-nac-role="list-item">[ ] 发布推送后，curl 以下 URL 并确认返回 200 及正确内容：</li><li data-nac-id="human_ok_checklist.list.70.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code></li><li data-nac-id="human_ok_checklist.list.70.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/SPEC.md</code></li><li data-nac-id="human_ok_checklist.list.70.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac.js</code></li><li data-nac-id="human_ok_checklist.list.70.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac-chat-client.js</code></li><li data-nac-id="human_ok_checklist.list.70.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code></li><li data-nac-id="human_ok_checklist.list.70.item.7" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="human_ok_checklist.list.70.item.8" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v22-interop.php</code></li><li data-nac-id="human_ok_checklist.list.70.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code></li><li data-nac-id="human_ok_checklist.list.70.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code></li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.86-真实音频" data-nac-role="heading" data-nac-level="3" id="86-真实音频">8.6 真实音频</h3>
+<ul data-nac-id="human_ok_checklist.list.72" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.72.item.1" data-nac-role="list-item">[ ] 使用真实硬件（笔记本麦克风 + 扬声器）-- 在线上 <code data-nac-role="code-inline">example-v21-data-table.php</code> 中按下麦克风按钮，每个语言区域各说一条提示词（共 10 条）-- 确认每个语言区域的 LLM 调度结果均合理。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.9-屏幕阅读器测试无障碍访问-track-g7" data-nac-role="heading" data-nac-level="2" id="9-屏幕阅读器测试无障碍访问-track-g7">9. 屏幕阅读器测试（无障碍访问 -- Track G7）</h2>
+<p data-nac-id="human_ok_checklist.p.75" data-nac-role="paragraph">本节在关闭显示器（或闭眼）的情况下，使用屏幕阅读器对演示进行完整走查。这是 <a href="ACCESSIBILITY.md" data-nac-id="human_ok_checklist.link.2" data-nac-role="action" data-nac-action="open">ACCESSIBILITY.md</a> 中无障碍访问承诺的准入门槛。</p>
+<p data-nac-id="human_ok_checklist.p.76" data-nac-role="paragraph">每次发布至少在<strong>两款</strong>屏幕阅读器上完成本节测试（NVDA 是 Windows 上最易上手的免费选项；VoiceOver 预装于 macOS；如有授权可使用 JAWS）。</p>
+<h3 data-nac-id="human_ok_checklist.h3.91-nvdawindows" data-nac-role="heading" data-nac-level="3" id="91-nvdawindows">9.1 NVDA（Windows）</h3>
+<ul data-nac-id="human_ok_checklist.list.78" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.78.item.1" data-nac-role="list-item">[ ] 安装 NVDA（免费，nvaccess.org）。使用 Ctrl+Alt+N 启动。</li><li data-nac-id="human_ok_checklist.list.78.item.2" data-nac-role="list-item">[ ] 关闭显示器（或闭眼）打开 <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code>。</li><li data-nac-id="human_ok_checklist.list.78.item.3" data-nac-role="list-item">[ ] 使用 H 键导航时，NVDA 播报页面标题及标题层级结构（h1、h2、h3）。</li><li data-nac-id="human_ok_checklist.list.78.item.4" data-nac-role="list-item">[ ] Tab 键按逻辑顺序到达每个可交互控件；每个控件清晰播报其角色和标签。</li><li data-nac-id="human_ok_checklist.list.78.item.5" data-nac-role="list-item">[ ] 打开聊天面板（NVDA 读出聊天输入框的 role=textbox 及清晰标签）。</li><li data-nac-id="human_ok_checklist.list.78.item.6" data-nac-role="list-item">[ ] 输入"que es NAC3?"并发送 -- 响应到达时 NVDA 完整朗读内容。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.92-nvda-在-example-v21-data-tablephp-上的测试" data-nac-role="heading" data-nac-level="3" id="92-nvda-在-example-v21-data-tablephp-上的测试">9.2 NVDA 在 <code data-nac-role="code-inline">example-v21-data-table.php</code> 上的测试</h3>
+<ul data-nac-id="human_ok_checklist.list.80" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.80.item.1" data-nac-role="list-item">[ ] NVDA 在 Tab 导航时播报"Lines（集合）标签页"及"权限"标签页。</li><li data-nac-id="human_ok_checklist.list.80.item.2" data-nac-role="list-item">[ ] 激活标签页时，通过 <code data-nac-role="code-inline">nac:tab:activated</code> 事件 ack 播报新状态。</li><li data-nac-id="human_ok_checklist.list.80.item.3" data-nac-role="list-item">[ ] LLM 新增行时，NVDA 自动（或按一次向下箭头后）朗读新行内容。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.93-voiceovermacos" data-nac-role="heading" data-nac-level="3" id="93-voiceovermacos">9.3 VoiceOver（macOS）</h3>
+<ul data-nac-id="human_ok_checklist.list.82" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.82.item.1" data-nac-role="list-item">[ ] 按 Cmd+F5 启动 VoiceOver。</li><li data-nac-id="human_ok_checklist.list.82.item.2" data-nac-role="list-item">[ ] 打开 <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code>。</li><li data-nac-id="human_ok_checklist.list.82.item.3" data-nac-role="list-item">[ ] VO+U 打开转子；确认标题、链接、表单控件均已填充。</li><li data-nac-id="human_ok_checklist.list.82.item.4" data-nac-role="list-item">[ ] VO+A 从头到尾朗读整个页面 -- 语义清晰，而非"div div div link link button"。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.94-voiceover-在-react-angular-案例研究中的测试" data-nac-role="heading" data-nac-level="3" id="94-voiceover-在-react-angular-案例研究中的测试">9.4 VoiceOver 在 React + Angular 案例研究中的测试</h3>
+<ul data-nac-id="human_ok_checklist.list.84" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.84.item.1" data-nac-role="list-item">[ ] 在 <code data-nac-role="code-inline">demos/react/</code> 上：仅使用键盘 + VoiceOver 通过输入框添加一条待办事项。添加后新待办事项被播报（ack 事件已接入）。</li><li data-nac-id="human_ok_checklist.list.84.item.2" data-nac-role="list-item">[ ] 在 <code data-nac-role="code-inline">demos/angular/</code> 上：相同测试，相同预期。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.95-纯键盘导航无屏幕阅读器仅禁用鼠标" data-nac-role="heading" data-nac-level="3" id="95-纯键盘导航无屏幕阅读器仅禁用鼠标">9.5 纯键盘导航（无屏幕阅读器，仅禁用鼠标）</h3>
+<ul data-nac-id="human_ok_checklist.list.86" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.86.item.1" data-nac-role="list-item">[ ] 断开/禁用鼠标。</li><li data-nac-id="human_ok_checklist.list.86.item.2" data-nac-role="list-item">[ ] 仅使用 Tab 键浏览落地页。每个焦点停留点均可见（焦点环存在）。</li><li data-nac-id="human_ok_checklist.list.86.item.3" data-nac-role="list-item">[ ] 通过键盘打开聊天面板，输入提示词并提交。结果正确朗读/显示。</li><li data-nac-id="human_ok_checklist.list.86.item.4" data-nac-role="list-item">[ ] Escape 键可关闭已打开的任何模态框。</li><li data-nac-id="human_ok_checklist.list.86.item.5" data-nac-role="list-item">[ ] 无键盘陷阱（Tab 最终可循环回到页面顶部）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.96-高对比度-200-缩放" data-nac-role="heading" data-nac-level="3" id="96-高对比度-200-缩放">9.6 高对比度 + 200% 缩放</h3>
+<ul data-nac-id="human_ok_checklist.list.88" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.88.item.1" data-nac-role="list-item">[ ] 将落地页浏览器缩放至 200%。布局不破坏，无横向滚动，无文字重叠。</li><li data-nac-id="human_ok_checklist.list.88.item.2" data-nac-role="list-item">[ ] 启用 Windows 高对比度模式（或 macOS 增强对比度）。按钮、链接、焦点环保持可见。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.97-语音控制递归场景" data-nac-role="heading" data-nac-level="3" id="97-语音控制递归场景">9.7 语音控制（递归场景）</h3>
+<ul data-nac-id="human_ok_checklist.list.90" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.90.item.1" data-nac-role="list-item">[ ] 在已安装 Pilot 的浏览器（或使用参考实现 <code data-nac-role="code-inline">nac-chat-client.js</code> 麦克风按钮）中，仅通过语音控制演示。</li><li data-nac-id="human_ok_checklist.list.90.item.2" data-nac-role="list-item">[ ] 麦克风按钮向 NVDA/VoiceOver 播报其状态（"录音已开始"、"录音已停止"）。</li><li data-nac-id="human_ok_checklist.list.90.item.3" data-nac-role="list-item">[ ] 通过 NAC3 分发的语音指令生效；ack 被播报给屏幕阅读器。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.98-发现的无障碍访问问题" data-nac-role="heading" data-nac-level="3" id="98-发现的无障碍访问问题">9.8 发现的无障碍访问问题</h3>
+<p data-nac-id="human_ok_checklist.p.92" data-nac-role="paragraph">在此列出本节发现的所有问题及其严重程度：</p>
+<pre data-nac-id="human_ok_checklist.code.1" data-nac-role="code" data-nac-lang="text"><code>-
+-
+-</code></pre>
+<p data-nac-id="human_ok_checklist.p.94" data-nac-role="paragraph">如有任何 BLOCKER 级别的问题未解决，该版本不得发布。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.签署确认" data-nac-role="heading" data-nac-level="2" id="签署确认">签署确认</h2>
+<pre data-nac-id="human_ok_checklist.code.2" data-nac-role="code" data-nac-lang="text"><code>发布标签：    v____._.___
+走查人：      ______________________
+走查日期：    ____-____-____
+使用浏览器：  [ ] Chrome  [ ] Firefox  [ ] Safari
+咨询的母语使用者（语言区域 -&gt; 姓名）：
+   ____________________________________________
+已走查项目总数：  ___ / ___
+失败项目（附 bug 链接）：
+   ____________________________________________
+   ____________________________________________
+签名：        ______________________</code></pre>
+<p data-nac-id="human_ok_checklist.p.98" data-nac-role="paragraph">填写完签署确认块后提交本文件，以标记该版本为"人工确认通过"。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.另请参阅" data-nac-role="heading" data-nac-level="2" id="另请参阅">另请参阅</h2>
+<ul data-nac-id="human_ok_checklist.list.101" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.101.item.1" data-nac-role="list-item"><a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.3" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a> -- 本检查清单所依据的矩阵。</li><li data-nac-id="human_ok_checklist.list.101.item.2" data-nac-role="list-item"><a href="NAC_TEST_MANUAL.md" data-nac-id="human_ok_checklist.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- 面向采用者的上游操作手册。</li><li data-nac-id="human_ok_checklist.list.101.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="human_ok_checklist.link.5" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a> -- 当前版本的自动覆盖率记录。</li></ul>
+<h2 data-nac-id="human_ok_checklist.h2.许可证" data-nac-role="heading" data-nac-level="2" id="许可证">许可证</h2>
+<p data-nac-id="human_ok_checklist.p.103" data-nac-role="paragraph">Apache-2.0。</p>
+<hr />
+<p data-nac-id="human_ok_checklist.p.105" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/HUMAN_OK_CHECKLIST.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "human_ok_checklist",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "human_ok_checklist.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "human_ok_checklist.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "human_ok_checklist.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "human_ok_checklist.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

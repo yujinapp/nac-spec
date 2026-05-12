@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Test de voz + chat (tester checklist en castellano) (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="tester_checklist_voice_chat" data-doc-lang="es" data-nac-plugin="tester_form">
+<p class="tr-intro">Completá cada tarea + apretá Enviar al final. Tu reporte llegará al equipo Yujin.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<hr />
+<p>translation_source: docs/TESTER_CHECKLIST_VOICE_CHAT.md translation_source_hash: rewrite-2026-05-11-v2 translation_quality: human_rewrite_v2 translation_lang: es translation_date: 2026-05-11T14:30:00+00:00</p>
+<hr />
+<h1>NAC3 v2.2 -- Test de voz + chat (tester checklist en castellano)</h1>
+<p><strong>Para:</strong> el tester hispanohablante enfocado en voz y chat. <strong>Tiempo estimado:</strong> 30 a 45 minutos. <strong>Necesitas:</strong></p>
+<p>- Una computadora con microfono integrado o microfono externo enchufado. - Auriculares o parlantes encendidos. - Chrome instalado y actualizado (recomendado).</p>
+<h2>Como usar esta lista</h2>
+<p>Cada tarea tiene una lista de pasos numerados (1, 2, 3, ...). Hay que hacerlos <strong>en orden</strong> sin saltar ninguno.</p>
+<p>Despues de hacer los pasos, mira el bloque <strong>"Resultado esperado"</strong>. Si lo que ves en pantalla coincide con lo descripto: marca <strong>OK</strong>.</p>
+<p>Si algo es distinto, no funciona o aparece un error: marca <strong>ERROR</strong> y escribi en <strong>Comentarios</strong> que viste exactamente (mensaje de error, comportamiento extrano, parte que no aparece). Despues segui con la tarea siguiente -- no te traves.</p>
+<p>Al final del formulario hay un bloque "Firma final" para tu nombre, navegador y veredicto general. Apreta <strong>Enviar reporte</strong> al terminar.</p>
+<hr />
+<fieldset class="tr-task" id="task-A1">
+<legend>Tarea A1 &mdash; Abrir la pagina principal</legend>
+<p>Pasos:</p>
+<p>1. Abri Chrome (no Firefox ni Safari para esta primera prueba). 2. Presiona Ctrl+Shift+N para abrir una ventana de incognito. 3. En la barra de direcciones, escribi exactamente: <code>https://yujin.app/nac-spec/</code> 4. Presiona Enter. 5. Espera 5 segundos sin hacer click en nada.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - En la parte de arriba a la izquierda ves un dibujo sumi-e (rama japonesa) + el texto "NAC". - En la parte de arriba a la derecha ves una fila de botones que incluye uno que dice "tour" y otro que dice "chat". - En el centro de la pantalla hay un titulo grande que dice "Drive web UIs by voice, chat, AI". - No hay ningun mensaje rojo de error en la pantalla.</p>
+<label class="tr-opt"><input type="radio" name="task-A1-status" value="ok" id="task-A1-ok" data-nac-id="tester_form.task-A1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A1-status" value="error" id="task-A1-error" data-nac-id="tester_form.task-A1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A1-comments">Comentarios</label>
+<textarea name="task-A1-comments" id="task-A1-comments" rows="2" data-nac-id="tester_form.task-A1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-A2">
+<legend>Tarea A2 &mdash; Abrir el panel de chat</legend>
+<p>Pasos:</p>
+<p>1. Estas en la pagina <code>https://yujin.app/nac-spec/</code> (la abriste en la tarea A1). 2. Localiza el boton que dice <strong>"chat"</strong> en la parte de arriba a la derecha de la pagina. 3. Hace click sobre el boton <strong>"chat"</strong>. 4. Espera 2 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- Aparece un panel angosto en el lado derecho de la pantalla. - En la parte de arriba del panel dice "Yujin chat". - Adentro del panel ves todo esto:   1. Un dropdown con codigos de idioma (por ejemplo "en" o "es") junto al titulo.   2. Un boton chico que dice "tts".   3. Una zona vacia gris en el medio (es el area donde apareceran los mensajes).   4. Un boton que dice "mic".   5. Un boton que dice "hands-free" (o "manos libres").   6. Un campo de texto vacio con un placeholder gris adentro.   7. Un boton al lado derecho del campo de texto que dice "send".</p>
+<label class="tr-opt"><input type="radio" name="task-A2-status" value="ok" id="task-A2-ok" data-nac-id="tester_form.task-A2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A2-status" value="error" id="task-A2-error" data-nac-id="tester_form.task-A2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A2-comments">Comentarios</label>
+<textarea name="task-A2-comments" id="task-A2-comments" rows="2" data-nac-id="tester_form.task-A2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-A3">
+<legend>Tarea A3 &mdash; ELEGIR CASTELLANO EN EL CHAT (paso obligatorio)</legend>
+<p><strong>Importante:</strong> este paso es obligatorio antes de cualquier prueba de voz o de TTS. Si no eliges el idioma correcto, el TTS no va a funcionar y el chat no te va a entender bien.</p>
+<p>Pasos:</p>
+<p>1. El panel de chat tiene que estar abierto (lo abriste en la tarea A2). 2. Localiza el dropdown de idioma en la parte de arriba del panel del chat. Es el desplegable con codigos de dos letras (por defecto puede decir "en"). 3. Hace click sobre el dropdown. 4. Elegi el codigo <strong>"es"</strong> (castellano). 5. Espera 1 segundo.</p>
+<p>Resultado esperado:</p>
+<p>- El dropdown muestra "es". - No aparece ningun mensaje rojo de error.</p>
+<label class="tr-opt"><input type="radio" name="task-A3-status" value="ok" id="task-A3-ok" data-nac-id="tester_form.task-A3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A3-status" value="error" id="task-A3-error" data-nac-id="tester_form.task-A3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A3-comments">Comentarios</label>
+<textarea name="task-A3-comments" id="task-A3-comments" rows="2" data-nac-id="tester_form.task-A3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-A4">
+<legend>Tarea A4 &mdash; Mandar una pregunta por texto</legend>
+<p>Pasos:</p>
+<p>1. El panel de chat sigue abierto y el idioma esta en "es" (desde la tarea A3). 2. Hace click adentro del campo de texto del chat (donde dice el placeholder gris). 3. Escribi exactamente: <code>que es NAC3</code> 4. Presiona Enter en el teclado <strong>o</strong> hace click en el boton "send". 5. Espera entre 5 y 15 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- Tu pregunta "que es NAC3" aparece en el area gris del chat (es el primer mensaje). - Despues aparece una respuesta del asistente (un parrafo o mas) explicando que es NAC3. - La respuesta esta en castellano. - La respuesta es coherente: dice que NAC3 es un protocolo o estandar abierto, no es texto random ni un error.</p>
+<label class="tr-opt"><input type="radio" name="task-A4-status" value="ok" id="task-A4-ok" data-nac-id="tester_form.task-A4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A4-status" value="error" id="task-A4-error" data-nac-id="tester_form.task-A4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A4-comments">Comentarios</label>
+<textarea name="task-A4-comments" id="task-A4-comments" rows="2" data-nac-id="tester_form.task-A4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-B1">
+<legend>Tarea B1 &mdash; Permitir el microfono</legend>
+<p>Pasos:</p>
+<p>1. El panel de chat sigue abierto y el idioma esta en "es". 2. Localiza el boton <strong>"mic"</strong> en el panel del chat (esta arriba del campo de texto, junto al boton "hands-free"). 3. Hace click sobre el boton <strong>"mic"</strong>. 4. <strong>Importante:</strong> el navegador te va a preguntar si permitis el uso del microfono. Aparece un cartel en la parte de arriba de la ventana. 5. En el cartel del navegador, hace click en <strong>"Permitir"</strong> o <strong>"Allow"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- Despues de permitir el microfono, el boton "mic" cambia de aspecto: cambia de color o aparece un pequeno indicador de que esta grabando. - No aparece ningun mensaje rojo de error.</p>
+<label class="tr-opt"><input type="radio" name="task-B1-status" value="ok" id="task-B1-ok" data-nac-id="tester_form.task-B1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B1-status" value="error" id="task-B1-error" data-nac-id="tester_form.task-B1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-B1-comments">Comentarios</label>
+<textarea name="task-B1-comments" id="task-B1-comments" rows="2" data-nac-id="tester_form.task-B1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-B2">
+<legend>Tarea B2 &mdash; Hablar al microfono en castellano</legend>
+<p><strong>Importante:</strong> el boton "mic" funciona como <strong>"push-to-talk"</strong> (apretar para hablar). Cada vez que querés decir algo nuevo, hay que clickearlo de nuevo. Esto es intencional, no es un bug. Hay un boton separado "hands-free" / "manos libres" si preferis modo continuo (no probamos eso en esta tarea).</p>
+<p>Pasos:</p>
+<p>1. El boton "mic" esta activo (lo activaste en la tarea B1). 2. El idioma del chat sigue siendo "es". 3. <strong>Acercate al microfono</strong> o hablale claramente en voz normal. 4. Deci en voz alta y clara: <strong>"hola"</strong> 5. Despues de decir la palabra, espera 2 segundos en silencio. 6. Si el boton "mic" sigue grabando despues de los 2 segundos, hace click en el boton "mic" otra vez para que pare de grabar. 7. Espera entre 5 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la palabra "hola" (o algo muy parecido). - Aparece una respuesta del asistente debajo, en castellano. - Por los parlantes/auriculares escuchas una voz natural que lee la respuesta en voz alta y en castellano. La voz no es robotica rota; es natural.</p>
+<label class="tr-opt"><input type="radio" name="task-B2-status" value="ok" id="task-B2-ok" data-nac-id="tester_form.task-B2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B2-status" value="error" id="task-B2-error" data-nac-id="tester_form.task-B2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<div class="tr-note">OK pero no escuche audio</div>
+<label class="tr-comments-label" for="task-B2-comments">Comentarios</label>
+<textarea name="task-B2-comments" id="task-B2-comments" rows="2" data-nac-id="tester_form.task-B2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C1">
+<legend>Tarea C1 &mdash; Abrir el demo de la tabla de datos</legend>
+<p>Pasos:</p>
+<p>1. En la barra de direcciones del navegador, escribi exactamente: <code>https://yujin.app/nac-spec/example-v21-data-table.php</code> 2. Presiona Enter. 3. Espera 5 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Arriba ves un titulo que dice "NAC v2.1 -- data-table primitive (live)". - En el centro de la pagina hay un cuadrado blanco grande con texto + un boton azul que dice <strong>"Edit invoice #INV-001"</strong>. - En el lado derecho de la pantalla hay un panel de chat (si no esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo).</p>
+<label class="tr-opt"><input type="radio" name="task-C1-status" value="ok" id="task-C1-ok" data-nac-id="tester_form.task-C1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C1-status" value="error" id="task-C1-error" data-nac-id="tester_form.task-C1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C1-comments">Comentarios</label>
+<textarea name="task-C1-comments" id="task-C1-comments" rows="2" data-nac-id="tester_form.task-C1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C2">
+<legend>Tarea C2 &mdash; Elegir castellano en el chat de este demo</legend>
+<p><strong>Importante:</strong> este demo tiene su propio panel de chat con su propio dropdown de idioma. Hay que elegirlo otra vez.</p>
+<p>Pasos:</p>
+<p>1. Estas en la pagina del demo v21 (la abriste en C1). 2. Localiza el dropdown de idioma en la parte de arriba del panel de chat (lado derecho). 3. Hace click sobre el dropdown. 4. Elegi el codigo <strong>"es"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- El dropdown muestra "es".</p>
+<label class="tr-opt"><input type="radio" name="task-C2-status" value="ok" id="task-C2-ok" data-nac-id="tester_form.task-C2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C2-status" value="error" id="task-C2-error" data-nac-id="tester_form.task-C2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C2-comments">Comentarios</label>
+<textarea name="task-C2-comments" id="task-C2-comments" rows="2" data-nac-id="tester_form.task-C2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C3">
+<legend>Tarea C3 &mdash; Abrir el modal de la factura</legend>
+<p>Pasos:</p>
+<p>1. El idioma del chat ya esta en "es" (desde C2). 2. Localiza el boton azul que dice <strong>"Edit invoice #INV-001"</strong> en el centro de la pagina. 3. Hace click sobre ese boton. 4. Espera 1 segundo.</p>
+<p>Resultado esperado:</p>
+<p>- Aparece un modal grande que cubre la mayor parte de la pantalla. - El modal tiene como titulo "Edit invoice #INV-001". - Adentro del modal <strong>al fin</strong> ves las pestanas. Hay al menos 2 pestanas en una fila: <strong>"Lines (collection)"</strong> y <strong>"Permissions (matrix)"</strong>. - Adentro del modal hay una tabla con filas (productos con cantidad y precio). - En la esquina del modal hay un boton "Cancel" y otro "Save".</p>
+<label class="tr-opt"><input type="radio" name="task-C3-status" value="ok" id="task-C3-ok" data-nac-id="tester_form.task-C3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C3-status" value="error" id="task-C3-error" data-nac-id="tester_form.task-C3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C3-comments">Comentarios</label>
+<textarea name="task-C3-comments" id="task-C3-comments" rows="2" data-nac-id="tester_form.task-C3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C4">
+<legend>Tarea C4 &mdash; Cambiar de pestana hablando</legend>
+<p>Pasos:</p>
+<p>1. El modal "Edit invoice #INV-001" tiene que estar abierto (lo abriste en C3). 2. La pestana activa por defecto es "Lines (collection)" -- esta resaltada con un fondo gris claro. 3. Localiza el boton <strong>"mic"</strong> en el panel de chat de la derecha. 4. Hace click sobre el boton <strong>"mic"</strong>. 5. Si el navegador te pide permiso de microfono, hace click en "Permitir" o "Allow". 6. En voz alta y clara, deci: <strong>"ve a permisos"</strong> 7. Espera 2 segundos en silencio. 8. Si el "mic" sigue grabando, hace click otra vez para que pare. 9. Espera entre 3 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece tu transcripcion "ve a permisos" (o algo muy parecido). - La pestana activa cambia de "Lines (collection)" a <strong>"Permissions (matrix)"</strong>. - El contenido del modal cambia: ahora ves una grilla de permisos en lugar de una lista de items.</p>
+<label class="tr-opt"><input type="radio" name="task-C4-status" value="ok" id="task-C4-ok" data-nac-id="tester_form.task-C4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C4-status" value="error" id="task-C4-error" data-nac-id="tester_form.task-C4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C4-comments">Comentarios</label>
+<textarea name="task-C4-comments" id="task-C4-comments" rows="2" data-nac-id="tester_form.task-C4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C5">
+<legend>Tarea C5 &mdash; Volver a la pestana de filas</legend>
+<p>Pasos:</p>
+<p>1. Sigues en el modal abierto del demo v21. 2. La pestana activa es "Permissions (matrix)" desde la tarea C4. 3. Hace click en el boton <strong>"mic"</strong>. 4. En voz alta deci: <strong>"ve a lineas"</strong> 5. Espera 2 segundos en silencio. 6. Si el "mic" sigue grabando, hace click otra vez. 7. Espera entre 3 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la transcripcion. - La pestana activa vuelve a <strong>"Lines (collection)"</strong>. - El modal vuelve a mostrar la lista de items.</p>
+<label class="tr-opt"><input type="radio" name="task-C5-status" value="ok" id="task-C5-ok" data-nac-id="tester_form.task-C5.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C5-status" value="error" id="task-C5-error" data-nac-id="tester_form.task-C5.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C5-comments">Comentarios</label>
+<textarea name="task-C5-comments" id="task-C5-comments" rows="2" data-nac-id="tester_form.task-C5.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C6">
+<legend>Tarea C6 &mdash; Agregar una fila a la tabla hablando</legend>
+<p>Pasos:</p>
+<p>1. Sigues en el modal del demo v21 con la pestana "Lines (collection)" activa. 2. Mira la tabla actual. Antes de hacer este paso, anota mentalmente cuantas filas tiene (por ejemplo "tiene 3 filas"). 3. Hace click en el boton <strong>"mic"</strong>. 4. En voz alta y clara, deci pausadamente: <strong>"agrega una linea con concepto leche cantidad dos precio cien"</strong> 5. Espera 2 segundos en silencio. 6. Si el "mic" sigue grabando, hace click otra vez. 7. Espera entre 5 y 15 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la transcripcion de lo que dijiste. - En la tabla aparece una <strong>nueva fila</strong> al final con: concepto "leche", cantidad 2, precio 100 (o algo cercano). - La tabla ahora tiene una fila MAS que antes. - El chat puede responder con un mensaje confirmando que agrego la fila.</p>
+<label class="tr-opt"><input type="radio" name="task-C6-status" value="ok" id="task-C6-ok" data-nac-id="tester_form.task-C6.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C6-status" value="error" id="task-C6-error" data-nac-id="tester_form.task-C6.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C6-comments">Comentarios</label>
+<textarea name="task-C6-comments" id="task-C6-comments" rows="2" data-nac-id="tester_form.task-C6.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-C7">
+<legend>Tarea C7 &mdash; Preguntar por el total de la tabla</legend>
+<p>Pasos:</p>
+<p>1. Sigues en el modal con la tabla "Lines (collection)" visible. 2. Hace click en el boton <strong>"mic"</strong>. 3. En voz alta deci: <strong>"cuanto total hay"</strong> 4. Espera 2 segundos en silencio + soltar mic si sigue grabando. 5. Espera entre 5 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la transcripcion. - El chat responde con un numero que es la suma de los precios x cantidades de la tabla. - Por los parlantes escuchas la voz leyendo el numero en castellano.</p>
+<label class="tr-opt"><input type="radio" name="task-C7-status" value="ok" id="task-C7-ok" data-nac-id="tester_form.task-C7.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C7-status" value="error" id="task-C7-error" data-nac-id="tester_form.task-C7.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<div class="tr-note">OK pero no escuche audio</div>
+<label class="tr-comments-label" for="task-C7-comments">Comentarios</label>
+<textarea name="task-C7-comments" id="task-C7-comments" rows="2" data-nac-id="tester_form.task-C7.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-D1">
+<legend>Tarea D1 &mdash; Demo de React: abrir y elegir castellano</legend>
+<p>Pasos:</p>
+<p>1. En una nueva pestana del navegador, escribi: <code>https://yujin.app/nac-spec/demos/react/</code> 2. Presiona Enter. 3. Espera 5 segundos. 4. Si el panel de chat NO esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo. 5. <strong>IMPORTANTE:</strong> localiza el dropdown de idioma en el panel de chat y elegi <strong>"es"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- La pagina carga sin error. - Ves una app "Todos" simple: tiene un titulo, un campo de texto vacio, un boton "Add", y un area abajo (sera la lista de todos, esta vacia). - En el lado derecho hay un panel de chat (despues del click en "chat" si no estaba abierto), con el dropdown en "es".</p>
+<label class="tr-opt"><input type="radio" name="task-D1-status" value="ok" id="task-D1-ok" data-nac-id="tester_form.task-D1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D1-status" value="error" id="task-D1-error" data-nac-id="tester_form.task-D1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D1-comments">Comentarios</label>
+<textarea name="task-D1-comments" id="task-D1-comments" rows="2" data-nac-id="tester_form.task-D1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-D2">
+<legend>Tarea D2 &mdash; React: agregar un todo a mano (teclado)</legend>
+<p>Pasos:</p>
+<p>1. Estas en el demo de React con el idioma del chat en "es" (desde D1). 2. Hace click adentro del campo de texto del demo (no el del chat -- el campo arriba que dice algo como "Add a todo"). 3. Escribi: <code>manzana</code> 4. Hace click en el boton <strong>"Add"</strong>.</p>
+<p>Resultado esperado:</p>
+<p>- En la lista debajo aparece un nuevo item: <strong>"manzana"</strong> con una casilla de seleccion al lado. - El campo de texto se vacia.</p>
+<label class="tr-opt"><input type="radio" name="task-D2-status" value="ok" id="task-D2-ok" data-nac-id="tester_form.task-D2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D2-status" value="error" id="task-D2-error" data-nac-id="tester_form.task-D2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D2-comments">Comentarios</label>
+<textarea name="task-D2-comments" id="task-D2-comments" rows="2" data-nac-id="tester_form.task-D2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-D3">
+<legend>Tarea D3 &mdash; React: agregar un todo hablando</legend>
+<p>Pasos:</p>
+<p>1. Sigues en el demo de React. Ya tiene un item "manzana". 2. Hace click en el boton <strong>"mic"</strong> del panel de chat (lado derecho). 3. En voz alta deci: <strong>"agrega pan"</strong> 4. Espera 2 segundos en silencio + soltar mic si sigue grabando. 5. Espera entre 5 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la transcripcion "agrega pan". - En la lista de todos aparece un <strong>nuevo</strong> item "pan". - La lista ahora tiene 2 items: "manzana" + "pan".</p>
+<label class="tr-opt"><input type="radio" name="task-D3-status" value="ok" id="task-D3-ok" data-nac-id="tester_form.task-D3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D3-status" value="error" id="task-D3-error" data-nac-id="tester_form.task-D3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D3-comments">Comentarios</label>
+<textarea name="task-D3-comments" id="task-D3-comments" rows="2" data-nac-id="tester_form.task-D3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-D4">
+<legend>Tarea D4 &mdash; React: borrar un todo hablando</legend>
+<p>Pasos:</p>
+<p>1. Sigues en el demo de React con 2 items en la lista ("manzana" + "pan"). 2. Hace click en el boton <strong>"mic"</strong>. 3. En voz alta deci: <strong>"borra manzana"</strong> 4. Espera 2 segundos en silencio. 5. Si el "mic" sigue grabando, hace click otra vez. 6. Espera entre 5 y 10 segundos.</p>
+<p>Resultado esperado:</p>
+<p>- En el chat aparece la transcripcion. - El item "manzana" <strong>desaparece</strong> de la lista. - Solo queda "pan" en la lista.</p>
+<label class="tr-opt"><input type="radio" name="task-D4-status" value="ok" id="task-D4-ok" data-nac-id="tester_form.task-D4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D4-status" value="error" id="task-D4-error" data-nac-id="tester_form.task-D4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D4-comments">Comentarios</label>
+<textarea name="task-D4-comments" id="task-D4-comments" rows="2" data-nac-id="tester_form.task-D4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-E1">
+<legend>Tarea E1 &mdash; Demo de Angular: las mismas pruebas</legend>
+<p>Pasos:</p>
+<p>1. En una nueva pestana del navegador, escribi: <code>https://yujin.app/nac-spec/demos/angular/</code> 2. Presiona Enter. 3. Espera 5 segundos. 4. Localiza el dropdown de idioma del chat y elegi <strong>"es"</strong>. 5. Repeti las tareas D2, D3, D4 en esta demo (agregar a mano "manzana", agregar hablando "agrega pan", borrar hablando "borra manzana").</p>
+<p>Resultado esperado:</p>
+<p>- Las 3 operaciones funcionan <strong>exactamente igual</strong> que en el demo de React. - La interfaz se ve practicamente identica.</p>
+<label class="tr-opt"><input type="radio" name="task-E1-status" value="ok" id="task-E1-ok" data-nac-id="tester_form.task-E1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-E1-status" value="error" id="task-E1-error" data-nac-id="tester_form.task-E1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<p>Comentarios (escribi diferencias notables si las hay): _______________________________</p>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-F1">
+<legend>Tarea F1 &mdash; "Cambia DE pestana" (frase ambigua)</legend>
+<p><strong>Que estamos probando:</strong> En castellano, la frase "cambia DE pestana" significa "cambia a otra pestana". La palabra "de" aca es una preposicion, NO el codigo de idioma aleman. El chat tiene que entender la intencion correcta: el usuario quiere <strong>cambiar de pestana</strong>, no quiere cambiar el idioma del chat a aleman.</p>
+<p><strong>Recordatorio de codigos de idioma del chat:</strong></p>
+<p>- <code>es</code> = espanol (castellano). - <code>en</code> = ingles. - <code>de</code> = aleman (Deutsch). - <code>fr</code> = frances. - etc.</p>
+<p>Pasos:</p>
+<p>1. En una nueva pestana del navegador, escribi: <code>https://yujin.app/nac-spec/example-v21-data-table.php</code> 2. Presiona Enter. 3. <strong>IMPORTANTE:</strong> localiza el dropdown de idioma del chat y verifica que esta en <strong>"es"</strong> (espanol). Si no esta en "es", clickealo y ponelo en "es". 4. Hace click en el boton azul <strong>"Edit invoice #INV-001"</strong> para abrir el modal. 5. Hace click en el boton <strong>"mic"</strong> del panel de chat. 6. En voz alta y clara, deci: <strong>"cambia de pestana"</strong> 7. Espera 2 segundos en silencio. 8. Si el "mic" sigue grabando, hace click otra vez para que pare. 9. Espera entre 3 y 10 segundos. 10. <strong>IMPORTANTE:</strong> mira <strong>dos cosas</strong> con atencion:     1. La pestana activa adentro del modal.     2. El dropdown de idioma del panel de chat (arriba a la derecha).</p>
+<p>Resultado esperado (los dos criterios tienen que cumplirse):</p>
+<p>- <strong>Criterio 1 -- la intencion fue entendida:</strong> la pestana activa adentro del modal cambia (de "Lines (collection)" a "Permissions (matrix)" o viceversa). O alternativamente, el chat te pregunta una aclaracion en castellano (algo como "a que pestana queres ir?"). Cualquiera de las dos respuestas es valida -- significa que entendio que querias cambiar de pestana.</p>
+<p>- <strong>Criterio 2 -- el idioma del chat NO cambia a aleman:</strong> el dropdown de idioma del chat sigue en <strong>"es"</strong>. NO se cambia a <strong>"de"</strong> (que seria aleman). Este es el bug que estamos buscando que NO ocurra: el sistema confundiendo la preposicion "de" con el codigo de idioma aleman.</p>
+<p>Marca:</p>
+<div class="tr-note">OK -- los dos criterios se cumplen (cambio de pestana o pidio aclaracion + el idioma sigue en "es")</div>
+<label class="tr-opt"><input type="radio" name="task-F1-status" value="error" id="task-F1-error" data-nac-id="tester_form.task-F1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-F1-status" value="error" id="task-F1-error" data-nac-id="tester_form.task-F1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-F1-comments">Comentarios</label>
+<textarea name="task-F1-comments" id="task-F1-comments" rows="2" data-nac-id="tester_form.task-F1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-task" id="task-F2">
+<legend>Tarea F2 &mdash; Cambio explicito de idioma a aleman</legend>
+<p><strong>Que estamos probando:</strong> que cuando el usuario <strong>explicitamente</strong> pide cambiar el idioma, el chat si lo cambie. Esto es lo opuesto de F1: aca queremos confirmar que el chat sabe distinguir un pedido explicito ("cambia el idioma a aleman") de una preposicion casual ("cambia de pestana").</p>
+<p>Pasos:</p>
+<p>1. Sigues en el demo v21 con el modal "Edit invoice #INV-001" abierto. 2. El chat sigue en idioma "es" (lo verificaste en F1). 3. Hace click en el boton <strong>"mic"</strong> del panel de chat. 4. En voz alta y clara, deci: <strong>"cambia el idioma a aleman"</strong> 5. Espera 2 segundos en silencio. 6. Si el "mic" sigue grabando, hace click otra vez. 7. Espera entre 3 y 10 segundos. 8. Mira el dropdown de idioma del chat.</p>
+<p>Resultado esperado:</p>
+<p>- El dropdown del chat <strong>SI</strong> se cambia a <strong>"de"</strong> (aleman, "Deutsch"). Este SI es el caso donde el cambio de idioma esta correctamente activado, porque vos lo pediste explicitamente. - La proxima respuesta del chat aparece en aleman.</p>
+<label class="tr-opt"><input type="radio" name="task-F2-status" value="ok" id="task-F2-ok" data-nac-id="tester_form.task-F2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-F2-status" value="error" id="task-F2-error" data-nac-id="tester_form.task-F2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-F2-comments">Comentarios</label>
+<textarea name="task-F2-comments" id="task-F2-comments" rows="2" data-nac-id="tester_form.task-F2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-signoff" id="tr-signoff">
+<legend>Firma final</legend>
+<label for="sign-release-tag">Etiqueta de release probado</label>
+<input type="text" name="sign-release-tag" id="sign-release-tag" data-nac-id="tester_form.sign.release-tag" data-nac-role="field" />
+<label for="sign-tester-name">Nombre del tester</label>
+<input type="text" name="sign-tester-name" id="sign-tester-name" data-nac-id="tester_form.sign.tester-name" data-nac-role="field" />
+<label for="sign-tester-email">Email del tester</label>
+<input type="email" name="sign-tester-email" id="sign-tester-email" data-nac-id="tester_form.sign.tester-email" data-nac-role="field" />
+<label for="sign-browser">Navegador</label>
+<input type="text" name="sign-browser" id="sign-browser" data-nac-id="tester_form.sign.browser" data-nac-role="field" />
+<label for="sign-os">Sistema operativo</label>
+<input type="text" name="sign-os" id="sign-os" data-nac-id="tester_form.sign.os" data-nac-role="field" />
+<label for="sign-device">Dispositivo (laptop / mobile)</label>
+<input type="text" name="sign-device" id="sign-device" data-nac-id="tester_form.sign.device" data-nac-role="field" />
+<label for="sign-verdict">Veredicto (ready / needs fixes / blocking)</label>
+<input type="text" name="sign-verdict" id="sign-verdict" data-nac-id="tester_form.sign.verdict" data-nac-role="field" />
+<label for="sign-rating">Calificacion general 1-10</label>
+<input type="number" name="sign-rating" id="sign-rating" data-nac-id="tester_form.sign.rating" data-nac-role="field" />
+<label for="sign-top-issues">Top 3 issues encontrados</label>
+<textarea name="sign-top-issues" id="sign-top-issues" rows="3" data-nac-id="tester_form.sign.top-issues" data-nac-role="field"></textarea>
+<label for="sign-free-form">Comentario libre / cosas que no entraron en ningun task</label>
+<textarea name="sign-free-form" id="sign-free-form" rows="3" data-nac-id="tester_form.sign.free-form" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Que pasa cuando aprietas "Enviar reporte"</h2>
+<p>- Tu reporte se manda automaticamente a los maintainers de Yujin. - Vas a ver un mensaje "Gracias. Tu reporte fue enviado (ID #N)". - Si el servidor no responde, el formulario abre tu cliente de email con todo el reporte ya pre-llenado en el cuerpo, para que lo mandes manualmente.</p>
+<p>Gracias por testear.</p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Enviar reporte</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Borrador guardado automáticamente. Tu progreso se restaura si cerrás esta pestaña.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

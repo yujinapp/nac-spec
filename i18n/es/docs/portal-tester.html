@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portal del Tester -- NAC3 v2.2 (Yujin)</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;
+        --surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;
+        --text:#1a1a1a;--text-2:#555;--text-3:#888;
+        --green:#2a6d2a;--serif:"Noto Serif JP",Georgia,serif;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.6;}
+  .container{max-width:820px;margin:0 auto;padding:40px 24px 80px;}
+  header{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;}
+  header .kanji{font-family:var(--serif);color:var(--gold);font-size:32px;}
+  header h1{font-size:28px;margin:0;}
+  header .ver{font-size:12px;color:var(--text-3);margin-left:auto;}
+  .intro{background:var(--surface);border:1px solid var(--border);
+         border-radius:8px;padding:20px 22px;margin-bottom:22px;}
+  .intro h2{margin:0 0 10px;font-size:18px;color:var(--accent);}
+  .intro p{margin:8px 0;color:var(--text-2);font-size:14.5px;}
+  .intro strong{color:var(--text);}
+  .test-grid{display:grid;gap:14px;}
+  .test-card{background:var(--surface);border:1px solid var(--border);
+             border-radius:8px;padding:18px 22px;text-decoration:none;
+             color:inherit;display:block;transition:border-color .15s;}
+  .test-card:hover{border-color:var(--accent);}
+  .test-card .head{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;}
+  .test-card .head .kanji{font-family:var(--serif);color:var(--gold);font-size:22px;}
+  .test-card h3{margin:0;font-size:18px;color:var(--accent);}
+  .test-card .meta{margin-left:auto;font-size:12px;color:var(--text-3);}
+  .test-card p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .test-card .open-btn{display:inline-block;margin-top:8px;
+        padding:8px 18px;background:var(--accent);color:#fff;
+        border-radius:4px;font-weight:600;font-size:14px;}
+  .meta-row{display:flex;gap:18px;font-size:13px;color:var(--text-3);
+            margin:6px 0 0;}
+  .meta-row span b{color:var(--text-2);}
+  .footer-note{margin-top:32px;padding:14px 18px;
+        background:var(--subtle);border-left:3px solid var(--gold);
+        border-radius:4px;font-size:13px;color:var(--text-2);}
+  .footer-note h4{margin:0 0 6px;font-size:14px;color:var(--text);}
+  .footer-note ol{margin:6px 0 0;padding-left:22px;}
+  .footer-note li{margin:3px 0;}
+  .lang-switch{margin-top:24px;font-size:12px;color:var(--text-3);}
+  .lang-switch a{color:var(--accent);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <span class="kanji" aria-hidden="true">&#35430;</span>
+  <h1>Portal del tester -- NAC3 v2.2</h1>
+  <span class="ver">v2.2 stable</span>
+</header>
+
+<section class="intro">
+  <h2>Hola, gracias por ayudarnos a probar</h2>
+  <p>NAC3 (Native Agent Contract) es un protocolo abierto que
+  estamos lanzando publicamente. Antes del lanzamiento te
+  pedimos que verifiques tres cosas en tu propia
+  computadora.</p>
+  <p>Hay <strong>tres pruebas</strong> abajo. Cada una toma
+  entre 30 y 90 minutos. Idealmente las haces las tres, pero
+  si solo tenes tiempo para una, hace la primera (general
+  smoke). Las otras dos son mas profundas en voz/chat y en
+  evaluacion visual del diseno.</p>
+  <p><strong>Importante:</strong> el formulario guarda
+  automaticamente tus respuestas en el navegador a medida que
+  vas tildando. Si cerras la pestana y volves, tus respuestas
+  estan ahi. Al final apretas "Enviar reporte" y el equipo de
+  Yujin recibe los resultados en su email. Si el servidor no
+  responde, el formulario abre tu cliente de email con todo
+  el reporte ya escrito como respaldo.</p>
+</section>
+
+<div class="test-grid">
+
+  <a class="test-card" href="HUMAN_OK_CHECKLIST_TESTER.interactive.html">
+    <div class="head">
+      <span class="kanji" aria-hidden="true">&#22522;</span>
+      <h3>1. Prueba general (smoke)</h3>
+      <span class="meta">28 tareas &middot; 60-90 min</span>
+    </div>
+    <p>Recorrido completo: landing, los demos en Chrome,
+    Firefox, Safari/Edge, navegacion solo con teclado,
+    multi-idioma, accesibilidad de screen reader (NVDA o
+    VoiceOver), zoom 200%. Es la prueba mas amplia.</p>
+    <div class="meta-row">
+      <span><b>Necesitas:</b> 2 navegadores</span>
+      <span><b>Opcional:</b> screen reader</span>
+    </div>
+    <span class="open-btn">Empezar la prueba 1 &rarr;</span>
+  </a>
+
+  <a class="test-card" href="TESTER_CHECKLIST_VOICE_CHAT.interactive.html">
+    <div class="head">
+      <span class="kanji" aria-hidden="true">&#22768;</span>
+      <h3>2. Voz + chat</h3>
+      <span class="meta">23 tareas &middot; 30-45 min</span>
+    </div>
+    <p>Foco solo en voz y chat: presionar el microfono,
+    hablar en espanol, ingles, portugues, frances, aleman,
+    confirmar que el TTS (texto-a-voz) lee bien la
+    respuesta, probar el dispatch de pestanas y de filas de
+    tabla, y verificar la regresion de la trampa "cambia DE
+    pestana" (que no se cambie el idioma a aleman por error).</p>
+    <div class="meta-row">
+      <span><b>Necesitas:</b> microfono + auriculares</span>
+    </div>
+    <span class="open-btn">Empezar la prueba 2 &rarr;</span>
+  </a>
+
+  <a class="test-card" href="TESTER_CHECKLIST_VISUAL.interactive.html">
+    <div class="head">
+      <span class="kanji" aria-hidden="true">&#35211;</span>
+      <h3>3. Evaluacion visual del front-end</h3>
+      <span class="meta">20 tareas &middot; ~30 min</span>
+    </div>
+    <p>Evaluacion subjetiva del diseno: espacios, tipografia,
+    integracion sumi-e, jerarquia visual, sensacion
+    profesional vs amateur. Cada tarea tiene un campo de
+    comentarios obligatorio: necesitamos escuchar tu opinion
+    en palabras, no solo OK/ERROR.</p>
+    <div class="meta-row">
+      <span><b>Necesitas:</b> ojos honestos</span>
+    </div>
+    <span class="open-btn">Empezar la prueba 3 &rarr;</span>
+  </a>
+
+</div>
+
+<section class="footer-note">
+  <h4>Como reportar problemas mientras testeas</h4>
+  <ol>
+    <li>En cada tarea, si el resultado <strong>no coincide</strong>
+    con el "Resultado esperado", marca el casillero <em>ERROR</em>
+    en lugar de <em>OK</em>.</li>
+    <li>Escribi en <em>Comentarios</em> que viste exactamente
+    (mensaje de error, comportamiento raro, captura de pantalla
+    si podes -- aunque no podes subirla, describila en texto).</li>
+    <li>No te traves: si una tarea no funciona, sigue con la
+    siguiente. Las tareas que fallaron quedan registradas en el
+    reporte completo.</li>
+    <li>Al final del formulario, en la seccion "Firma final",
+    poné tu nombre, email, navegador, sistema operativo, y un
+    veredicto general: <em>listo para lanzar</em>, <em>necesita
+    arreglos</em>, o <em>bloqueante</em>.</li>
+    <li>Apreta el boton <strong>Enviar reporte</strong>. Vas a
+    ver "Gracias. Tu reporte fue enviado". El equipo Yujin
+    recibe un email automatico con tu reporte.</li>
+  </ol>
+</section>
+
+<p class="lang-switch">
+  Idiomas disponibles:
+  <a href="/nac-spec/i18n/es/docs/portal-tester.html">es</a> &middot;
+  <a href="/nac-spec/i18n/pt/docs/portal-tester.html">pt</a> &middot;
+  <a href="/nac-spec/i18n/fr/docs/portal-tester.html">fr</a> &middot;
+  <a href="/nac-spec/docs/README_TESTER_FORMS.html">en</a>
+</p>
+
+</div>
+
+</body>
+</html>

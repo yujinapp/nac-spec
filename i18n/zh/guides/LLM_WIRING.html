@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + LLM 中间层 -- NAC3</title>
+<meta name="nac3-doc-slug" content="llm_wiring" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="llm_wiring" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="llm_wiring.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="llm_wiring.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/llm_wiring.mp3" data-nac-id="llm_wiring.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="llm_wiring.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="llm_wiring.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="llm_wiring.main" data-nac-role="region">
+<hr />
+<p data-nac-id="llm_wiring.p.1" data-nac-role="paragraph">translation_source: guides/LLM_WIRING.md translation_source_hash: 746145f0be3bee6ca1e8d89095de3168e60f2d7c55bf1af78a0086203be97555 translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T14:49:53.459807+00:00</p>
+<hr />
+<h1 data-nac-id="llm_wiring.h1.nac3-llm-中间层" data-nac-role="heading" data-nac-level="1" id="nac3-llm-中间层">NAC3 + LLM 中间层</h1>
+<p data-nac-id="llm_wiring.p.4" data-nac-role="paragraph">本指南介绍如何构建后端服务，将用户的自然语言指令（如 "guardar la factura"、"ve a permisos"、"borra el teclado"）转换为 NAC3 动作，再由聊天客户端执行。</p>
+<p data-nac-id="llm_wiring.p.5" data-nac-role="paragraph">NAC3 只规范该后端的输入和输出格式。选用哪个 LLM、提示词模板、限流策略和内容审核，均由你自行决定。本指南以 Claude 为例展示最简可用的实现方式；同样的模式也适用于 OpenAI、Gemini 或本地模型。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.1-接口约定" data-nac-role="heading" data-nac-level="2" id="1-接口约定">1. 接口约定</h2>
+<h3 data-nac-id="llm_wiring.h3.11-请求客户端-后端" data-nac-role="heading" data-nac-level="3" id="11-请求客户端-后端">1.1 请求：客户端 -&gt; 后端</h3>
+<p data-nac-id="llm_wiring.p.9" data-nac-role="paragraph">POST <code data-nac-role="code-inline">/your-endpoint</code>，JSON 请求体：</p>
+<pre data-nac-id="llm_wiring.code.1" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;session_id&quot;: &quot;sess_abc123&quot;,
+  &quot;prompt&quot;:     &quot;ve a permisos&quot;,
+  &quot;lang&quot;:       &quot;es&quot;,
+  &quot;history&quot;:    [
+    { &quot;role&quot;: &quot;user&quot;,      &quot;text&quot;: &quot;muestra factura 1&quot; },
+    { &quot;role&quot;: &quot;assistant&quot;, &quot;text&quot;: &quot;Abriendo la factura #INV-001.&quot; }
+  ],
+  &quot;nac_tree&quot;: {
+    &quot;active&quot;:  &quot;invoice_edit_modal&quot;,
+    &quot;plugins&quot;: [
+      { &quot;plugin&quot;: &quot;invoice&quot;, &quot;state&quot;: &quot;idle&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} },
+      { &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;state&quot;: &quot;active&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} }
+    ],
+    &quot;v2_scope_entries&quot;: [...],
+    &quot;data_tables&quot;: [...]
+  }
+}</code></pre>
+<p data-nac-id="llm_wiring.p.11" data-nac-role="paragraph">聊天客户端通过 <code data-nac-role="code-inline">NacChat.snapshotTree()</code> 提供 <code data-nac-role="code-inline">nac_tree</code> 快照；该快照由运行时的 <code data-nac-role="code-inline">NAC.describe()</code> + <code data-nac-role="code-inline">NAC.describe_v2()</code> 生成，是 LLM 了解当前页面状态的唯一来源。</p>
+<h3 data-nac-id="llm_wiring.h3.12-响应后端-客户端" data-nac-role="heading" data-nac-level="3" id="12-响应后端-客户端">1.2 响应：后端 -&gt; 客户端</h3>
+<pre data-nac-id="llm_wiring.code.2" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;ok&quot;:      true,
+  &quot;message&quot;: &quot;Abriendo la pestana Permisos.&quot;,
+  &quot;actions&quot;: [
+    { &quot;kind&quot;: &quot;tab&quot;, &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;tab_key&quot;: &quot;tab.permissions&quot; }
+  ]
+}</code></pre>
+<p data-nac-id="llm_wiring.p.14" data-nac-role="paragraph"><code data-nac-role="code-inline">message</code> 是聊天界面展示的文本，同时通过 TTS 朗读。<code data-nac-role="code-inline">actions[]</code> 是结构化的执行动作列表。聊天客户端在调用 <code data-nac-role="code-inline">NAC.click()</code> / <code data-nac-role="code-inline">NAC.tab()</code> 等方法之前，会先将每个动作与发送时的快照进行校验（nac_id 是否存在？tab_key 是否为已知标签页？）。</p>
+<h3 data-nac-id="llm_wiring.h3.13-动作格式" data-nac-role="heading" data-nac-level="3" id="13-动作格式">1.3 动作格式</h3>
+<p data-nac-id="llm_wiring.p.16" data-nac-role="paragraph">| <code data-nac-role="code-inline">kind</code> | 必填字段 | 对应方法 | |--------|----------|---------| | <code data-nac-role="code-inline">click</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.click(nac_id)</code> | | <code data-nac-role="code-inline">click_by_verb</code> | <code data-nac-role="code-inline">verb</code>，可选 <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> | | <code data-nac-role="code-inline">fill</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.fill(nac_id, value)</code> | | <code data-nac-role="code-inline">select</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.select(nac_id, value)</code> | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">plugin</code>, <code data-nac-role="code-inline">tab_key</code> | <code data-nac-role="code-inline">NAC.tab(plugin, tab_key)</code> | | <code data-nac-role="code-inline">tab_by_label</code> | <code data-nac-role="code-inline">label</code>，可选 <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.tab_by_label(plugin, label)</code> | | <code data-nac-role="code-inline">go_to_section</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.go_to_section(nac_id)</code> | | <code data-nac-role="code-inline">drag_drop</code> | <code data-nac-role="code-inline">nac_id</code>, <code data-nac-role="code-inline">target_nac_id</code>，可选 <code data-nac-role="code-inline">to_index</code> | <code data-nac-role="code-inline">NAC.drag_drop(...)</code> | | <code data-nac-role="code-inline">say</code> | <code data-nac-role="code-inline">text</code> | 仅 botSpeak，不操作 DOM | | <code data-nac-role="code-inline">change_locale</code> | <code data-nac-role="code-inline">locale</code>（2 位语言代码） | <code data-nac-role="code-inline">NacChat.setLang(locale)</code> | | <code data-nac-role="code-inline">dt_add_row</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">values</code> | <code data-nac-role="code-inline">NAC.dt_add_row(...)</code> | | <code data-nac-role="code-inline">dt_remove_row</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">row_id</code> | <code data-nac-role="code-inline">NAC.dt_remove_row(...)</code> | | <code data-nac-role="code-inline">dt_edit_cell</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">row_id</code>, <code data-nac-role="code-inline">column</code>, <code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.dt_edit_cell(...)</code> | | <code data-nac-role="code-inline">dt_commit</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_commit(...)</code> | | <code data-nac-role="code-inline">dt_discard</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_discard(...)</code> | | <code data-nac-role="code-inline">dt_read_aggregate</code> | <code data-nac-role="code-inline">table_id</code>, <code data-nac-role="code-inline">agg_key</code>, <code data-nac-role="code-inline">column</code> | <code data-nac-role="code-inline">NAC.dt_read_aggregate(...)</code> |</p>
+<p data-nac-id="llm_wiring.p.17" data-nac-role="paragraph">完整的动作枚举定义在聊天客户端的 <code data-nac-role="code-inline">_dispatchAction()</code> switch 语句中（<code data-nac-role="code-inline">js/nac-chat-client.js</code>）。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.2-参考后端实现node-anthropic-sdk" data-nac-role="heading" data-nac-level="2" id="2-参考后端实现node-anthropic-sdk">2. 参考后端实现（Node + Anthropic SDK）</h2>
+<pre data-nac-id="llm_wiring.code.3" data-nac-role="code" data-nac-lang="js"><code>// nac-intermediary.mjs
+// Run: node nac-intermediary.mjs
+// Env: ANTHROPIC_API_KEY
+
+import http from &#x27;node:http&#x27;;
+import Anthropic from &#x27;@anthropic-ai/sdk&#x27;;
+
+const anthropic = new Anthropic();
+
+const MODEL = &#x27;claude-sonnet-4-6&#x27;;
+
+function systemPrompt(snapshot, lang) {
+  return `You drive a web UI by emitting structured NAC actions.
+
+Rules:
+1. Resolve the user&#x27;s intent against the NAC tree below. Prefer
+   click_by_verb when a verb matches; fall back to click(nac_id)
+   only if no verb fits.
+2. For tab switching, use tab() with the plugin + tab_key from
+   the manifest, NOT click().
+3. NEVER invent nac_ids. Every action MUST reference a name
+   present in the tree. If you cannot find a matching name, ask
+   the user a clarifying question via {message} with empty actions[].
+4. Reply in language: ${lang}.
+5. Output JSON only:
+   { &quot;message&quot;: &quot;...&quot;, &quot;actions&quot;: [...] }
+6. message is what the user sees + hears. Keep it short (one
+   sentence is ideal).
+7. If the user said &quot;cambia a &lt;language&gt;&quot; emit a single
+   change_locale action with the 2-letter code.
+8. For data-tables: use dt_add_row / dt_remove_row / dt_edit_cell /
+   dt_commit / dt_discard. Compute aggregates with dt_read_aggregate
+   then read in the message.
+9. Bare 2-letter locale codes (&#x27;de&#x27;,&#x27;es&#x27;,&#x27;en&#x27;) are language codes
+   ONLY when followed/preceded by an explicit language trigger word
+   (&#x27;idioma&#x27;, &#x27;language&#x27;, &#x27;sprache&#x27;). &#x27;cambia DE pestana&#x27; is NOT
+   German -- &#x27;de&#x27; here is the Spanish preposition.
+
+NAC tree snapshot (JSON):
+${JSON.stringify(snapshot, null, 2)}
+`;
+}
+
+const server = http.createServer(async (req, res) =&gt; {
+  if (req.method !== &#x27;POST&#x27;) { res.writeHead(405); res.end(); return; }
+
+  let raw = &#x27;&#x27;;
+  req.on(&#x27;data&#x27;, c =&gt; raw += c);
+  req.on(&#x27;end&#x27;, async () =&gt; {
+    let body;
+    try { body = JSON.parse(raw); }
+    catch (_) { res.writeHead(400); res.end(&#x27;bad json&#x27;); return; }
+
+    try {
+      const completion = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 1024,
+        temperature: 0.2,
+        system: systemPrompt(body.nac_tree, body.lang || &#x27;es&#x27;),
+        messages: [
+          ...body.history.map(h =&gt; ({
+            role: h.role === &#x27;assistant&#x27; ? &#x27;assistant&#x27; : &#x27;user&#x27;,
+            content: h.text
+          })),
+          { role: &#x27;user&#x27;, content: body.prompt }
+        ]
+      });
+
+      // Claude returns JSON inside a text block; parse it.
+      const text = completion.content[0].text.trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch (_) {
+        // Fallback: model returned prose. Wrap it.
+        parsed = { message: text, actions: [] };
+      }
+
+      res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({
+        ok: true,
+        message: parsed.message || &#x27;&#x27;,
+        actions: Array.isArray(parsed.actions) ? parsed.actions : []
+      }));
+    } catch (e) {
+      console.error(&#x27;intermediary error&#x27;, e.message);
+      res.writeHead(500, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+  });
+});
+
+server.listen(3000, () =&gt; {
+  console.log(&#x27;NAC intermediary listening on :3000&#x27;);
+});</code></pre>
+<p data-nac-id="llm_wiring.p.21" data-nac-role="paragraph">将聊天客户端指向该服务：</p>
+<pre data-nac-id="llm_wiring.code.4" data-nac-role="code" data-nac-lang="js"><code>NacChat._endpoint = &#x27;http://localhost:3000/&#x27;;</code></pre>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.3-校验在执行前" data-nac-role="heading" data-nac-level="2" id="3-校验在执行前">3. 校验——在执行前</h2>
+<p data-nac-id="llm_wiring.p.25" data-nac-role="paragraph">关键防线：在执行前，将 LLM 返回的每个动作与发送时的快照进行校验。</p>
+<pre data-nac-id="llm_wiring.code.5" data-nac-role="code" data-nac-lang="js"><code>function isActionSafe(action, snapshot) {
+  if (!action || !action.kind) return false;
+  switch (action.kind) {
+    case &#x27;click&#x27;:
+    case &#x27;fill&#x27;:
+    case &#x27;select&#x27;:
+    case &#x27;go_to_section&#x27;:
+      return snapshotHasId(snapshot, action.nac_id);
+    case &#x27;click_by_verb&#x27;:
+      return snapshotHasVerb(snapshot, action.plugin, action.verb);
+    case &#x27;tab&#x27;:
+      return snapshotHasTab(snapshot, action.plugin, action.tab_key);
+    case &#x27;tab_by_label&#x27;:
+      return snapshotHasTabLabel(snapshot, action.plugin, action.label);
+    case &#x27;say&#x27;:
+    case &#x27;change_locale&#x27;:
+      return true;
+    default:
+      // dt_* actions: validate table_id exists.
+      if (action.kind.startsWith(&#x27;dt_&#x27;)) {
+        return snapshotHasTable(snapshot, action.table_id);
+      }
+      return false;
+  }
+}
+
+// Reject the action if not safe; show the user a generic message.
+for (const a of response.actions) {
+  if (!isActionSafe(a, mySnapshot)) {
+    console.warn(&#x27;[nac] dropping unsafe action&#x27;, a);
+    botSpeak(&#x27;No pude resolver eso.&#x27;);
+    return;
+  }
+  await dispatchAction(a);
+}</code></pre>
+<p data-nac-id="llm_wiring.p.27" data-nac-role="paragraph">参考客户端（<code data-nac-role="code-inline">js/nac-chat-client.js</code>）在 <code data-nac-role="code-inline">_dispatchAction</code> 中已实现此逻辑。请勿跳过——这是防止 LLM 幻构 id 或执行提示词注入攻击的唯一防线。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.4-语言环境处理" data-nac-role="heading" data-nac-level="2" id="4-语言环境处理">4. 语言环境处理</h2>
+<p data-nac-id="llm_wiring.p.30" data-nac-role="paragraph">用户的 <code data-nac-role="code-inline">lang</code> 作为请求中的独立字段显式传递。系统提示词会指示模型以该语言回复。另有两点需要注意：</p>
+<ul data-nac-id="llm_wiring.list.31" data-nac-role="list"><li data-nac-id="llm_wiring.list.31.item.1" data-nac-role="list-item">若用户要求切换语言（如 "cambia a inglés"），模型返回 <code data-nac-role="code-inline">{ kind: 'change_locale', locale: 'en' }</code>，客户端调用 <code data-nac-role="code-inline">NacChat.setLang('en')</code>，后续请求将携带 <code data-nac-role="code-inline">lang: 'en'</code>。</li><li data-nac-id="llm_wiring.list.31.item.2" data-nac-role="list-item">2 位语言代码误判问题：聊天客户端的 <code data-nac-role="code-inline">_detectLangSwitch</code> 会在进入 LLM 调用前短路处理语言切换请求。该问题已于 2026-05-09 修复：只有当 2 位代码（<code data-nac-role="code-inline">de</code>、<code data-nac-role="code-inline">es</code>、<code data-nac-role="code-inline">en</code>）前后伴随明确的语言触发词时，才将其识别为语言代码。修复前，"cambia DE pestana" 会被错误地切换为德语。</li></ul>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.5-快照大小" data-nac-role="heading" data-nac-level="2" id="5-快照大小">5. 快照大小</h2>
+<p data-nac-id="llm_wiring.p.34" data-nac-role="paragraph">线上页面可能产生较大的快照（50+ 个插件 × 30 个元素 × 10 种语言 = 15000+ 条目）。按 Claude Sonnet 的计费标准，每次请求的成本不可忽视。</p>
+<p data-nac-id="llm_wiring.p.35" data-nac-role="paragraph">优化方案：</p>
+<ul data-nac-id="llm_wiring.list.36" data-nac-role="list"><li data-nac-id="llm_wiring.list.36.item.1" data-nac-role="list-item"><strong>仅发送活跃插件。</strong> 只发送当前活跃插件及其在 scope 树中的父级。客户端的 <code data-nac-role="code-inline">snapshotTree()</code> 已只包含已挂载的插件。</li><li data-nac-id="llm_wiring.list.36.item.2" data-nac-role="list-item"><strong>单语言快照。</strong> 将 <code data-nac-role="code-inline">label_i18n</code> 裁剪为仅保留用户当前使用的 <code data-nac-role="code-inline">lang</code>，客户端在执行时再做翻译。</li><li data-nac-id="llm_wiring.list.36.item.3" data-nac-role="list-item"><strong>元素裁剪。</strong> 只保留 <code data-nac-role="code-inline">role: 'action'</code>、<code data-nac-role="code-inline">'tab'</code>、<code data-nac-role="code-inline">'field'</code>、<code data-nac-role="code-inline">'option'</code> 的元素，跳过 <code data-nac-role="code-inline">'section'</code>、<code data-nac-role="code-inline">'region'</code> 及装饰性元素。智能体很少直接操作这些元素。</li></ul>
+<p data-nac-id="llm_wiring.p.37" data-nac-role="paragraph">在 Yujin 的生产部署中，裁剪后快照体积缩减约 10 倍，且不影响指令解析准确率。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.6-流式响应与延迟" data-nac-role="heading" data-nac-level="2" id="6-流式响应与延迟">6. 流式响应与延迟</h2>
+<p data-nac-id="llm_wiring.p.40" data-nac-role="paragraph">上述参考后端为非流式实现。对于语音交互场景（用户希望 TTS 尽快开始播报），可采用流式方案：</p>
+<ul data-nac-id="llm_wiring.list.41" data-nac-role="list"><li data-nac-id="llm_wiring.list.41.item.1" data-nac-role="list-item">在 LLM 响应生成时实时流式传输。</li><li data-nac-id="llm_wiring.list.41.item.2" data-nac-role="list-item">一旦 <code data-nac-role="code-inline">message</code> 字段可解析（通常在前 50 个 token 内），立即启动 TTS。</li><li data-nac-id="llm_wiring.list.41.item.3" data-nac-role="list-item">等待 JSON 完整接收后再执行 <code data-nac-role="code-inline">actions[]</code>，在 <code data-nac-role="code-inline">message</code> 播报完毕后触发动作。</li></ul>
+<p data-nac-id="llm_wiring.p.42" data-nac-role="paragraph">当前聊天客户端不支持流式响应，该功能列为 v2.2 候选特性。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.7-多-llm-支持" data-nac-role="heading" data-nac-level="2" id="7-多-llm-支持">7. 多 LLM 支持</h2>
+<p data-nac-id="llm_wiring.p.45" data-nac-role="paragraph">切换 LLM 主要涉及系统提示词和 SDK 的调整，NAC3 的数据格式不变。</p>
+<ul data-nac-id="llm_wiring.list.46" data-nac-role="list"><li data-nac-id="llm_wiring.list.46.item.1" data-nac-role="list-item"><strong>OpenAI：</strong> <code data-nac-role="code-inline">gpt-4-turbo</code> 或 <code data-nac-role="code-inline">gpt-5</code> 均可正常使用。建议设置 <code data-nac-role="code-inline">response_format: { type: 'json_object' }</code> 强制 JSON 输出，可省去解析兜底逻辑。</li><li data-nac-id="llm_wiring.list.46.item.2" data-nac-role="list-item"><strong>Gemini：</strong> <code data-nac-role="code-inline">gemini-1.5-pro</code>，格式相同，使用 <code data-nac-role="code-inline">responseMimeType: 'application/json'</code>。</li><li data-nac-id="llm_wiring.list.46.item.3" data-nac-role="list-item"><strong>本地模型（Ollama、vLLM）：</strong> 较小的模型难以处理完整快照，需按第 5 节大幅裁剪，并使用仅列出动词的精简提示词模板。质量有所下降，但可离线运行。</li></ul>
+<p data-nac-id="llm_wiring.p.47" data-nac-role="paragraph">Yujin 生产环境使用 Claude Sonnet，综合考量了成本、延迟和工具调用准确率。我们也对 GPT-4 Turbo 和 Gemini 1.5 Pro 进行了基准测试，两者均可正常工作，但在我们的提示词规模下每次请求成本更高。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.8-生产加固" data-nac-role="heading" data-nac-level="2" id="8-生产加固">8. 生产加固</h2>
+<p data-nac-id="llm_wiring.p.50" data-nac-role="paragraph">上线前请确认以下事项：</p>
+<ol data-nac-id="llm_wiring.list.51" data-nac-role="list"><li data-nac-id="llm_wiring.list.51.item.1" data-nac-role="list-item"><strong>鉴权。</strong> 中间层端点必须要求来自已认证应用的会话令牌，否则攻击者可直接调用该接口，免费消耗 Claude 额度。</li><li data-nac-id="llm_wiring.list.51.item.2" data-nac-role="list-item"><strong>限流。</strong> 按会话、按租户分别限流。Yujin 代码库中 <code data-nac-role="code-inline">core/Orchestrator.php</code> 的 <code data-nac-role="code-inline">TenantRateLimiter</code> 可供参考改造。</li><li data-nac-id="llm_wiring.list.51.item.3" data-nac-role="list-item"><strong>快照信任边界。</strong> <code data-nac-role="code-inline">nac_tree</code> 来自客户端，应视为不可信输入：写入日志前须做脱敏处理；动作中引用的 id 必须存在于本次请求的快照中。</li><li data-nac-id="llm_wiring.list.51.item.4" data-nac-role="list-item"><strong>日志记录。</strong> 只记录提示词和执行的动作，不记录快照。快照可能包含用户数据（姓名、金额等）。</li><li data-nac-id="llm_wiring.list.51.item.5" data-nac-role="list-item"><strong>费用保护。</strong> 按租户统计 token 用量，达到套餐上限时强制停止。</li></ol>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.9-参考生产端点格式" data-nac-role="heading" data-nac-level="2" id="9-参考生产端点格式">9. 参考：生产端点格式</h2>
+<p data-nac-id="llm_wiring.p.54" data-nac-role="paragraph">Yujin 生产端点位于 <code data-nac-role="code-inline">/crm/api/v1/yujin/nac-demo</code>，源码为 <code data-nac-role="code-inline">yujin.app/crm/api/v1/yujin.php</code>。该实现涵盖上述所有内容，并额外实现了按租户的用量统计（F15）和审计日志（<code data-nac-role="code-inline">yujin_assistant_log</code>）。可作为经过生产验证的参考示例，按需取用。</p>
+<hr />
+<p data-nac-id="llm_wiring.p.56" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/LLM_WIRING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "llm_wiring",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "llm_wiring.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "llm_wiring.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "llm_wiring.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "llm_wiring.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

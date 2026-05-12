@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- 通过 MCP 实现跨应用互操作 -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_interop_mcp" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_interop_mcp" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_interop_mcp.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_interop_mcp.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_interop_mcp.mp3" data-nac-id="nac_interop_mcp.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_interop_mcp.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_interop_mcp.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_interop_mcp.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_interop_mcp.p.1" data-nac-role="paragraph">translation_source: docs/NAC_INTEROP_MCP.md translation_source_hash: 559b9c7f1d01da4f76e35b6e4f1fcb558f8f0bbca87f7cb4148738989b83b49c translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T15:13:57.777412+00:00</p>
+<hr />
+<h1 data-nac-id="nac_interop_mcp.h1.nac3-通过-mcp-实现跨应用互操作" data-nac-role="heading" data-nac-level="1" id="nac3-通过-mcp-实现跨应用互操作">NAC3 -- 通过 MCP 实现跨应用互操作</h1>
+<p data-nac-id="nac_interop_mcp.p.4" data-nac-role="paragraph"><strong>状态：</strong> v2.3 预览版（分支 <code data-nac-role="code-inline">feat/nac-interop-mcp</code>，尚未合并到 main）。 <strong>规范章节：</strong> 待该功能退出预览后，将作为 SPEC.md 第 11 节插入。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.背景" data-nac-role="heading" data-nac-level="2" id="背景">背景</h2>
+<p data-nac-id="nac_interop_mcp.p.6" data-nac-role="paragraph">NAC3 v1.9 + v2.0 + v2.1 + v2.2 规范了<em>单个</em> Web UI 由 AI 代理驱动的方式。v2.3 将契约扩展至<em>多个</em> NAC3 应用之间的互操作。</p>
+<p data-nac-id="nac_interop_mcp.p.7" data-nac-role="paragraph">典型用户流程如下：</p>
+<p data-nac-id="nac_interop_mcp.p.8" data-nac-role="paragraph">&gt; Pablo 正在 Yujin CRM 中通过语音对话操作。他说： &gt; <em>"Yujin，跳转到 Excel。"</em> &gt; &gt; Yujin 的聊天客户端识别出这是一个互操作意图。它对用户当前打开的 Excel 实例调用 <code data-nac-role="code-inline">nac.export_tree</code> MCP 工具，拉取 Excel 完整的 NAC3 树（活动工作簿、当前工作表、命名区域、功能区按钮），并将其注册为 <code data-nac-role="code-inline">remote:excel:<em></code> 下的远程插件。 &gt; &gt; 此后，Pablo 可以说 </em>"将单元格 A1 设为 100"<em>，Yujin 的中间层将 <code data-nac-role="code-inline">remote:excel:cell.A1</code> 解析为 <code data-nac-role="code-inline">NAC.fill('remote:excel:cell.A1', 100)</code>。运行时检测到 <code data-nac-role="code-inline">remote:</code> 前缀，通过 MCP 代理分发该操作。Excel 执行副作用，发出 <code data-nac-role="code-inline">nac:field:changed</code> 确认，SSE 流将其传回 Yujin 的运行时，本地 Promise 完成。Pablo 在 Yujin 聊天中看到： &gt; </em>"单元格 A1 已设为 100。"* &gt; &gt; 关键在于：<strong>代理无需提前了解 Excel 的 schema</strong>。export_tree 调用在需要时即时提供了清单。</p>
+<p data-nac-id="nac_interop_mcp.p.9" data-nac-role="paragraph">这是 Yujin 在 v2.3 发布时宣布的<strong>可附加商业产品池</strong>的基础。任何第三方应用，只要其 MCP 服务器暴露了以下四个互操作工具，就可以作为任意其他 NAC3 宿主的导航目标。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.架构" data-nac-role="heading" data-nac-level="2" id="架构">架构</h2>
+<pre data-nac-id="nac_interop_mcp.code.1" data-nac-role="code" data-nac-lang="text"><code>+----------------+         +-----------------+         +----------------+
+|  Yujin (host)  |  call   |   MCP bridge    |  HTTP   |  Excel (peer)  |
+|   nac.export   | ------&gt; | (agent process) | ------&gt; |   nac.export   |
+|   nac.import   | &lt;------ |                 | &lt;------ |   nac.invoke   |
++----------------+         +-----------------+         +----------------+
+         ^                                                      |
+         |     ack events (SSE: nac:*:succeeded / :failed)     |
+         +------------------------------------------------------+</code></pre>
+<p data-nac-id="nac_interop_mcp.p.12" data-nac-role="paragraph">三个参与方：</p>
+<ol data-nac-id="nac_interop_mcp.list.13" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.13.item.1" data-nac-role="list-item"><strong>宿主（Host）</strong> —— 用户当前操作的应用（示例中为 Yujin）。</li><li data-nac-id="nac_interop_mcp.list.13.item.2" data-nac-role="list-item"><strong>对端（Peer）</strong> —— 被导入的外部 NAC-3 兼容应用（示例中为 Excel）。</li><li data-nac-id="nac_interop_mcp.list.13.item.3" data-nac-role="list-item"><strong>MCP 桥接（MCP bridge）</strong> —— 通常是宿主的代理进程。它持有已知对端的 bearer token，并代理调用。桥接<strong>不会</strong>以用户身份向对端发起请求，而是使用自身凭据。</li></ol>
+<h2 data-nac-id="nac_interop_mcp.h2.mcp-工具接口" data-nac-role="heading" data-nac-level="2" id="mcp-工具接口">MCP 工具接口</h2>
+<p data-nac-id="nac_interop_mcp.p.15" data-nac-role="paragraph">每个 NAC-3 兼容的对端<strong>必须</strong>在其 MCP 端点暴露以下四个工具：</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nacexport_tree" data-nac-role="heading" data-nac-level="3" id="nacexport_tree"><code data-nac-role="code-inline">nac.export_tree</code></h3>
+<p data-nac-id="nac_interop_mcp.p.17" data-nac-role="paragraph">入站。返回一个自描述的载荷，供其他应用导入。</p>
+<p data-nac-id="nac_interop_mcp.p.18" data-nac-role="paragraph"><strong>输入：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.2" data-nac-role="code" data-nac-lang="ts"><code>{
+  scope?: &#x27;full&#x27; | &#x27;active_plugin&#x27; | &#x27;plugin_slug:&lt;slug&gt;&#x27;,
+  include_dom_state?: boolean,    // default false (privacy)
+  include_locales?: string[],     // default all 10
+  bearer: string                  // peer&#x27;s per-tenant token
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.20" data-nac-role="paragraph"><strong>输出：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.3" data-nac-role="code" data-nac-lang="ts"><code>{
+  app_id: string,                 // &#x27;yujin-crm&#x27;, &#x27;excel-online&#x27;, etc.
+  app_version: string,            // semver of the app, NOT of NAC
+  nac_version: &#x27;2.3&#x27;,
+  exported_at: string,            // ISO8601
+  active_plugin: string | null,
+  manifests: Record&lt;string, Manifest&gt;,   // by plugin_slug
+  scope_tree: ScopeNode[],
+  data_tables: DataTableSnap[],   // v2.1 sec 18
+  state: {
+    url?: string,
+    title?: string,
+    user_lang: string,
+    tenant_id?: string
+  },
+  ack_endpoint: string            // SSE URL for subscribe_events
+}</code></pre>
+<h3 data-nac-id="nac_interop_mcp.h3.nacinvoke" data-nac-role="heading" data-nac-level="3" id="nacinvoke"><code data-nac-role="code-inline">nac.invoke</code></h3>
+<p data-nac-id="nac_interop_mcp.p.23" data-nac-role="paragraph">入站。在对端分发一个 NAC3 动作。</p>
+<p data-nac-id="nac_interop_mcp.p.24" data-nac-role="paragraph"><strong>输入：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.4" data-nac-role="code" data-nac-lang="ts"><code>{
+  bearer: string,
+  nac_id: string,                 // peer-local id, NOT prefixed
+  action: {
+    kind: &#x27;click&#x27; | &#x27;click_by_verb&#x27; | &#x27;fill&#x27; | &#x27;select&#x27;
+        | &#x27;tab&#x27; | &#x27;tab_by_label&#x27; | &#x27;go_to_section&#x27;
+        | &#x27;dt_add_row&#x27; | &#x27;dt_edit_cell&#x27; | &#x27;dt_remove_row&#x27;
+        | &#x27;dt_commit&#x27; | &#x27;dt_discard&#x27;
+        | &#x27;edit_field&#x27;,
+    args: Record&lt;string, unknown&gt;   // shape depends on kind
+  },
+  hmac?: string                   // optional HMAC-SHA256 of body
+                                  // for sensitive verbs
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.26" data-nac-role="paragraph"><strong>输出：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.5" data-nac-role="code" data-nac-lang="ts"><code>{
+  ok: boolean,
+  result?: { row_id?: string, value?: unknown, ... },
+  error?: { code: string, message: string }
+}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.28" data-nac-role="paragraph">对端通过其本地 <code data-nac-role="code-inline">NAC.&lt;kind&gt;(...)</code> 分发动作，等待规范确认事件族（超时 5 秒），并返回结果。确认事件同时也会广播到 SSE 通道，供宿主进行关联。</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nacsubscribe_events" data-nac-role="heading" data-nac-level="3" id="nacsubscribe_events"><code data-nac-role="code-inline">nac.subscribe_events</code></h3>
+<p data-nac-id="nac_interop_mcp.p.30" data-nac-role="paragraph">流式（SSE）。将对端的确认事件推送回宿主。</p>
+<p data-nac-id="nac_interop_mcp.p.31" data-nac-role="paragraph"><strong>输入（查询字符串）：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.6" data-nac-role="code" data-nac-lang="text"><code>?bearer=&lt;token&gt;&amp;plugins=&lt;csv-of-plugin-slugs&gt;&amp;since=&lt;iso8601&gt;</code></pre>
+<p data-nac-id="nac_interop_mcp.p.33" data-nac-role="paragraph"><strong>输出（每条事件）：</strong></p>
+<pre data-nac-id="nac_interop_mcp.code.7" data-nac-role="code" data-nac-lang="text"><code>event: nac:action:succeeded
+data: {&quot;plugin&quot;:&quot;excel&quot;,&quot;action_id&quot;:&quot;excel.cell.A1&quot;,&quot;is_trusted&quot;:false,
+       &quot;result&quot;:{&quot;value&quot;:100},&quot;ts&quot;:&quot;2026-05-10T18:30:01.234Z&quot;}
+
+event: nac:tab:activated
+data: {&quot;plugin&quot;:&quot;excel&quot;,&quot;tab_id&quot;:&quot;tab.sheet2&quot;,...}</code></pre>
+<p data-nac-id="nac_interop_mcp.p.35" data-nac-role="paragraph">宿主运行时将这些事件中继到本地文档，使得调用 <code data-nac-role="code-inline">NAC.click('remote:excel:cell.A1')</code> 的代理能够获得由远程事件驱动的本地 Promise 解析。</p>
+<h3 data-nac-id="nac_interop_mcp.h3.nachealth" data-nac-role="heading" data-nac-level="3" id="nachealth"><code data-nac-role="code-inline">nac.health</code></h3>
+<p data-nac-id="nac_interop_mcp.p.37" data-nac-role="paragraph">入站，简单接口。返回：</p>
+<pre data-nac-id="nac_interop_mcp.code.8" data-nac-role="code" data-nac-lang="ts"><code>{ ok: true, nac_version: &#x27;2.3&#x27;, app_id: &#x27;excel-online&#x27;,
+  uptime_ms: 12345 }</code></pre>
+<p data-nac-id="nac_interop_mcp.p.39" data-nac-role="paragraph">宿主在导入前用于验证对端是否可达。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.宿主侧运行时-api" data-nac-role="heading" data-nac-level="2" id="宿主侧运行时-api">宿主侧运行时 API</h2>
+<p data-nac-id="nac_interop_mcp.p.41" data-nac-role="paragraph">v2.3 落地后，以下三个新函数将挂载在 <code data-nac-role="code-inline">window.NAC</code> 上：</p>
+<pre data-nac-id="nac_interop_mcp.code.9" data-nac-role="code" data-nac-lang="ts"><code>NAC.export_tree(opts?: {
+  scope?: &#x27;full&#x27; | &#x27;active_plugin&#x27; | &#x27;plugin_slug:&lt;slug&gt;&#x27;,
+  include_dom_state?: boolean,
+  include_locales?: string[]
+}): Promise&lt;NACExportV1&gt;</code></pre>
+<p data-nac-id="nac_interop_mcp.p.43" data-nac-role="paragraph">返回上述定义的载荷。纯本地读取，无 I/O。</p>
+<pre data-nac-id="nac_interop_mcp.code.10" data-nac-role="code" data-nac-lang="ts"><code>NAC.import_remote_tree(
+  payload: NACExportV1,
+  conn: {
+    transport: &#x27;http&#x27; | &#x27;stdio&#x27;,
+    endpoint: string,            // URL for http, command for stdio
+    bearer: string,
+    namespace?: string,          // defaults to payload.app_id
+    auto_subscribe?: boolean     // default true
+  }
+): RemoteHandle</code></pre>
+<p data-nac-id="nac_interop_mcp.p.45" data-nac-role="paragraph">将 <code data-nac-role="code-inline">payload.manifests</code> 中的每个清单注册到带命名空间的插件 slug 下：</p>
+<ul data-nac-id="nac_interop_mcp.list.46" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.46.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">payload.manifests.invoice</code> 在 <code data-nac-role="code-inline">NAC.describe()</code> 中变为 <code data-nac-role="code-inline">remote:&lt;namespace&gt;:invoice</code>。</li><li data-nac-id="nac_interop_mcp.list.46.item.2" data-nac-role="list-item">该清单内所有 nac_id 在被 <code data-nac-role="code-inline">NAC.click()</code> / <code data-nac-role="code-inline">NAC.fill()</code> 等解析时，均会加上 <code data-nac-role="code-inline">remote:&lt;namespace&gt;:</code> 前缀。</li><li data-nac-id="nac_interop_mcp.list.46.item.3" data-nac-role="list-item">运行时的元素解析器优先检查前缀；若匹配，则通过连接的传输层代理分发，而非查询 DOM。</li></ul>
+<pre data-nac-id="nac_interop_mcp.code.11" data-nac-role="code" data-nac-lang="ts"><code>NAC.list_remote_apps(): RemoteHandle[]
+NAC.disconnect_remote(remote_id: string): void</code></pre>
+<p data-nac-id="nac_interop_mcp.p.48" data-nac-role="paragraph">用于检查和清理。断开连接时会关闭 SSE 流并注销命名空间下的插件。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.分发代理" data-nac-role="heading" data-nac-level="2" id="分发代理">分发代理</h2>
+<p data-nac-id="nac_interop_mcp.p.50" data-nac-role="paragraph">当 <code data-nac-role="code-inline">NAC.click(id)</code> 被调用且 <code data-nac-role="code-inline">id</code> 以 <code data-nac-role="code-inline">remote:</code> 开头时：</p>
+<ol data-nac-id="nac_interop_mcp.list.51" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.51.item.1" data-nac-role="list-item">解析 <code data-nac-role="code-inline">remote:&lt;namespace&gt;:&lt;peer_local_id&gt;</code>。</li><li data-nac-id="nac_interop_mcp.list.51.item.2" data-nac-role="list-item">查找 <code data-nac-role="code-inline">_remotes[namespace]</code> —— 导入时存储的 RemoteHandle。</li><li data-nac-id="nac_interop_mcp.list.51.item.3" data-nac-role="list-item">向 <code data-nac-role="code-inline">handle.endpoint + '/nac.invoke'</code> POST <code data-nac-role="code-inline">{ bearer, nac_id: peer_local_id, action: { kind:'click', args: {} } }</code>。</li><li data-nac-id="nac_interop_mcp.list.51.item.4" data-nac-role="list-item">若 <code data-nac-role="code-inline">ok: true</code>，立即解析本地 Promise（SSE 流同时也会分发本地 <code data-nac-role="code-inline">nac:action:succeeded</code>，使没有持有 Promise 的等待方也能收到通知）。</li><li data-nac-id="nac_interop_mcp.list.51.item.5" data-nac-role="list-item">若 <code data-nac-role="code-inline">ok: false</code>，以对端的错误码拒绝 Promise。</li></ol>
+<p data-nac-id="nac_interop_mcp.p.52" data-nac-role="paragraph">其他动作类型（<code data-nac-role="code-inline">fill</code>、<code data-nac-role="code-inline">tab</code>、<code data-nac-role="code-inline">tab_by_label</code>、<code data-nac-role="code-inline">dt_*</code>、<code data-nac-role="code-inline">edit_field</code>）遵循相同模式。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.安全模型" data-nac-role="heading" data-nac-level="2" id="安全模型">安全模型</h2>
+<h3 data-nac-id="nac_interop_mcp.h3.信任边界" data-nac-role="heading" data-nac-level="3" id="信任边界">信任边界</h3>
+<ul data-nac-id="nac_interop_mcp.list.55" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.55.item.1" data-nac-role="list-item"><strong>Bearer token</strong> 用于宿主向对端进行身份验证。它由对端的管理层（租户管理）签发，存储在桥接服务端，<strong>不会</strong>暴露给 LLM 中间层的提示词。</li><li data-nac-id="nac_interop_mcp.list.55.item.2" data-nac-role="list-item">每次动作的 <strong>HMAC</strong> 是可选的，但对于对端标记为敏感的操作（<code data-nac-role="code-inline">delete</code>、<code data-nac-role="code-inline">payment.*</code>、角色授权）建议使用。HMAC 正文 = <code data-nac-role="code-inline">bearer + nac_id + kind + sorted(args)</code>，使用 SHA-256 哈希。</li><li data-nac-id="nac_interop_mcp.list.55.item.3" data-nac-role="list-item"><strong>来源白名单</strong> —— 对端的 MCP 服务器会根据已注册列表校验 Origin 头（或其 MCP 传输层等价物）。不在列表中的宿主将收到 HTTP 403。</li></ul>
+<h3 data-nac-id="nac_interop_mcp.h3.is_trusted-转发" data-nac-role="heading" data-nac-level="3" id="is_trusted-转发">is_trusted 转发</h3>
+<p data-nac-id="nac_interop_mcp.p.57" data-nac-role="paragraph">所有通过代理分发的动作，其确认事件详情中均携带 <code data-nac-role="code-inline">is_trusted: false</code>。对端的宿主代码<strong>可以</strong>据此拒绝该动作：</p>
+<pre data-nac-id="nac_interop_mcp.code.12" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, function (e) {
+  if (e.detail.action_id === &#x27;invoice.delete&#x27; &amp;&amp; !e.detail.is_trusted) {
+    console.warn(&#x27;[security] refused synthetic delete via interop&#x27;);
+    e.preventDefault();
+  }
+});</code></pre>
+<h3 data-nac-id="nac_interop_mcp.h3.token-轮换" data-nac-role="heading" data-nac-level="3" id="token-轮换">Token 轮换</h3>
+<p data-nac-id="nac_interop_mcp.p.60" data-nac-role="paragraph">Bearer token 按对端正常会话周期在服务端轮换（例如每 24 小时）。宿主检测到对端返回 401 后，会通过用户的认证流程重新获取新 token。无法重新认证的会话将被干净地断开。</p>
+<h2 data-nac-id="nac_interop_mcp.h2.时序图文本" data-nac-role="heading" data-nac-level="2" id="时序图文本">时序图（文本）</h2>
+<pre data-nac-id="nac_interop_mcp.code.13" data-nac-role="code" data-nac-lang="text"><code>USER         YUJIN HOST              MCP BRIDGE              EXCEL PEER
+ |              |                       |                        |
+ |- &quot;jump      -&gt;| recognise intent     |                        |
+ |   to Excel&quot;  | ack=tts                                        |
+ |              |- nac.export_tree --&gt; | --- HTTP --------&gt; | export
+ |              |                       |                    | tree
+ |              |&lt;-- payload --------- | &lt;-- response ----- |
+ |              |  import_remote_tree(payload, conn)              |
+ |              |  remote plugins now in NAC.describe()           |
+ |              |- subscribe_events --&gt; | --- SSE open ----&gt; |
+ |              |&lt;------------------- ack stream live &lt;---- |
+ |- &quot;set A1    -&gt;| chat resolve to                                |
+ |   to 100&quot;    |  click_by_verb(&#x27;remote:excel&#x27;, &#x27;set_cell&#x27;, ...) |
+ |              |- detect remote: prefix                          |
+ |              |- proxy invoke -----&gt; | --- HTTP --------&gt; | NAC.fill
+ |              |                       |                    | side fx
+ |              |                       |                    | emit ack
+ |              |&lt;------------------- ack via SSE &lt;-------- |
+ |              |  local promise resolves                         |
+ |- ack tts &lt;--|  &quot;Cell A1 set to 100&quot;                            |
+ |              |                                                  |</code></pre>
+<h2 data-nac-id="nac_interop_mcp.h2.非目标延期" data-nac-role="heading" data-nac-level="2" id="非目标延期">非目标（延期）</h2>
+<ul data-nac-id="nac_interop_mcp.list.64" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.64.item.1" data-nac-role="list-item"><strong>对端也导入宿主的双向互操作。</strong> v2.3 模型为宿主 -&gt; 对端的单向导航。交叉导入引入了重入和循环检测的复杂性，延期至 v2.4。</li><li data-nac-id="nac_interop_mcp.list.64.item.2" data-nac-role="list-item"><strong>多跳链路</strong>（Yujin -&gt; Excel -&gt; Slack）。同样因复杂性原因，v2.3 最多支持一跳。</li><li data-nac-id="nac_interop_mcp.list.64.item.3" data-nac-role="list-item"><strong>流式动作</strong>（实时光标跟随）。属于远期目标，需要超出 SSE 能力的 WebRTC 类通道。</li></ul>
+<h2 data-nac-id="nac_interop_mcp.h2.性能预算" data-nac-role="heading" data-nac-level="2" id="性能预算">性能预算</h2>
+<ul data-nac-id="nac_interop_mcp.list.66" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.66.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">nac.export_tree</code> 往返时延：局域网 p95 &lt; 200 ms。</li><li data-nac-id="nac_interop_mcp.list.66.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac.invoke</code> 往返时延（不含对端副作用时间）：p95 &lt; 100 ms。</li><li data-nac-id="nac_interop_mcp.list.66.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">nac.subscribe_events</code> 保活：每 15 秒发送一次心跳。</li></ul>
+<h2 data-nac-id="nac_interop_mcp.h2.实现文件本分支" data-nac-role="heading" data-nac-level="2" id="实现文件本分支">实现文件（本分支）</h2>
+<p data-nac-id="nac_interop_mcp.p.68" data-nac-role="paragraph">| 文件 | 职责 | |------|------| | <code data-nac-role="code-inline">yujin.app/nac-spec/js/nac-mcp-interop.js</code> | 宿主侧运行时：export_tree + import + proxy | | <code data-nac-role="code-inline">agent/mcp_interop.py</code> | Yujin 作为对端时的 MCP 服务器工具实现 | | <code data-nac-role="code-inline">packages/nac/src/interop.ts</code> | TypeScript 类型定义与辅助函数 | | <code data-nac-role="code-inline">yujin.app/nac-spec/example-v22-interop.php</code> | 在线演示：两个并排互相导入的迷你应用 | | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | export + import + proxy 的单元测试 | | <code data-nac-role="code-inline">tools/nac/test-launch.sh</code> | 扩展了第 6 层（互操作）测试 |</p>
+<h2 data-nac-id="nac_interop_mcp.h2.v23-ga-前的待决问题" data-nac-role="heading" data-nac-level="2" id="v23-ga-前的待决问题">v2.3 GA 前的待决问题</h2>
+<ul data-nac-id="nac_interop_mcp.list.70" data-nac-role="list"><li data-nac-id="nac_interop_mcp.list.70.item.1" data-nac-role="list-item">导出载荷是否应可选地使用对端的 HMAC 密钥签名，以便宿主在通过不受信任的桥接代理时也能验证来源？（倾向于是；v2.3.1 候选项。）</li><li data-nac-id="nac_interop_mcp.list.70.item.2" data-nac-role="list-item">聊天界面中"远程应用可用"的规范 UI 呈现方式是什么？表情符号？标签胶囊？来自清单的应用图标？（规范第 14 节候选项。）</li><li data-nac-id="nac_interop_mcp.list.70.item.3" data-nac-role="list-item">对端的 <code data-nac-role="code-inline">data_tables</code> 是否应允许宿主代理编辑，还是默认只读？（倾向于只读，写入需显式启用。）</li></ul>
+<hr />
+<p data-nac-id="nac_interop_mcp.p.72" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_INTEROP_MCP.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_interop_mcp",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_interop_mcp.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_interop_mcp.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_interop_mcp.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_interop_mcp.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

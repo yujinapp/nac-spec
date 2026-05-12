@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>المساهمة في NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="contributing" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="contributing" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="contributing.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="contributing.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/contributing.mp3" data-nac-id="contributing.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="contributing.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="contributing.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="contributing.main" data-nac-role="region">
+<hr />
+<p data-nac-id="contributing.p.1" data-nac-role="paragraph">translation_source: CONTRIBUTING.md translation_source_hash: 15fa7e8a34cc86e6193de8cd9826a9bd98d4b3ac1c72a43646521d75f88f9a26 translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T13:18:04.605208+00:00</p>
+<hr />
+<h1 data-nac-id="contributing.h1.المساهمة-في-nac3" data-nac-role="heading" data-nac-level="1" id="المساهمة-في-nac3">المساهمة في NAC3</h1>
+<p data-nac-id="contributing.p.4" data-nac-role="paragraph"><strong>إصدار المواصفة:</strong> 2.2 مستقر (+ معاينة التوافق مع v2.3).</p>
+<h2 data-nac-id="contributing.h2.الحوكمة" data-nac-role="heading" data-nac-level="2" id="الحوكمة">الحوكمة</h2>
+<p data-nac-id="contributing.p.6" data-nac-role="paragraph">تتولى Yujin حاليًا الإشراف على NAC3. المواصفة مرخصة بموجب Apache 2.0، والبيئة المرجعية للتشغيل مرخصة بموجب MIT. تلتزم Yujin بنقل NAC3 إلى مؤسسة محايدة (مجموعة مجتمع W3C، أو Linux Foundation، أو ما يعادلها) متى ما استدعى حجم التبني ذلك. حتى ذلك الحين، تتبع تغييرات المواصفة عملية RFC الموضحة أدناه، مع فترة تعليق عام لا تقل عن 14 يومًا لأي تغيير يطال واجهة برمجة التطبيقات العامة أو صيغ الإرسال.</p>
+<p data-nac-id="contributing.p.7" data-nac-role="paragraph">يضمن الترخيص المزدوج Apache 2.0 + MIT استمرارية المواصفة والبيئة التشغيلية بصرف النظر عن أي تغيير في الوضع المؤسسي لـ Yujin. التفرعات (Forks) مرحب بها صراحةً في إطار كلا الترخيصين.</p>
+<hr />
+<p data-nac-id="contributing.p.9" data-nac-role="paragraph">شكرًا لتفكيرك في المساهمة. NAC3 عبارة عن مواصفة عامة مع تطبيق مرجعي؛ وكلاهما يقبل المساهمات.</p>
+<h2 data-nac-id="contributing.h2.ثلاثة-أنواع-من-المساهمات" data-nac-role="heading" data-nac-level="2" id="ثلاثة-أنواع-من-المساهمات">ثلاثة أنواع من المساهمات</h2>
+<h3 data-nac-id="contributing.h3.1-تغيير-المواصفة-يستلزم-rfc" data-nac-role="heading" data-nac-level="3" id="1-تغيير-المواصفة-يستلزم-rfc">1. تغيير المواصفة (يستلزم RFC)</h3>
+<p data-nac-id="contributing.p.12" data-nac-role="paragraph">أي تعديل على <code data-nac-role="code-inline">SPEC.md</code> أو <code data-nac-role="code-inline">ABOUT.md</code> أو <code data-nac-role="code-inline">docs/NAC_V*_ROADMAP.md</code> يُعدّ تغييرًا في المواصفة. قبل فتح طلب سحب (PR):</p>
+<ol data-nac-id="contributing.list.13" data-nac-role="list"><li data-nac-id="contributing.list.13.item.1" data-nac-role="list-item">افتح مشكلة (Issue) على GitHub بعنوان <code data-nac-role="code-inline">RFC: &lt;ملخص في سطر واحد&gt;</code>.</li><li data-nac-id="contributing.list.13.item.2" data-nac-role="list-item">صف فئة المشكلة (الخطأ أو القيد الذي يعالجه التغيير، ويُفضَّل تقديم مثال تطبيقي ملموس).</li><li data-nac-id="contributing.list.13.item.3" data-nac-role="list-item">صف التغيير المقترح في العقد.</li><li data-nac-id="contributing.list.13.item.4" data-nac-role="list-item">صف مسار الترحيل للمستخدمين الحاليين.</li><li data-nac-id="contributing.list.13.item.5" data-nac-role="list-item">انتظر ردًا من مشرف واحد على الأقل على المشكلة قبل فتح طلب السحب.</li></ol>
+<p data-nac-id="contributing.p.14" data-nac-role="paragraph">سيتم إغلاق طلبات السحب الخاصة بالمواصفة التي تصل دون مشكلة RFC مقترنة، مع الإشارة إلى هذا القسم.</p>
+<h3 data-nac-id="contributing.h3.2-تغيير-البيئة-المرجعية-للتشغيل" data-nac-role="heading" data-nac-level="3" id="2-تغيير-البيئة-المرجعية-للتشغيل">2. تغيير البيئة المرجعية للتشغيل</h3>
+<p data-nac-id="contributing.p.16" data-nac-role="paragraph">أي تعديل على <code data-nac-role="code-inline">js/nac.js</code> أو <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> أو <code data-nac-role="code-inline">js/nac-chat-client.js</code>. طلبات السحب مرحب بها دون الحاجة إلى RFC في الحالات التالية:</p>
+<ul data-nac-id="contributing.list.17" data-nac-role="list"><li data-nac-id="contributing.list.17.item.1" data-nac-role="list-item">إذا كان التغيير إصلاحًا لخطأ يجعل البيئة التشغيلية متوافقة مع المواصفة الحالية.</li><li data-nac-id="contributing.list.17.item.2" data-nac-role="list-item">إذا كان التغيير تحسينًا في الأداء دون أي أثر على السلوك.</li><li data-nac-id="contributing.list.17.item.3" data-nac-role="list-item">إذا كان التغيير يتعلق بالتوثيق أو الأنواع أو تغطية الاختبارات.</li></ul>
+<p data-nac-id="contributing.p.18" data-nac-role="paragraph">طلبات السحب التي تُغيّر سلوك البيئة التشغيلية بما يؤثر على عقد المواصفة يجب أن تقترن بـ RFC أولًا.</p>
+<h3 data-nac-id="contributing.h3.3-تحسين-العروض-التوضيحية-أو-الأدوات-أو-التوثيق" data-nac-role="heading" data-nac-level="3" id="3-تحسين-العروض-التوضيحية-أو-الأدوات-أو-التوثيق">3. تحسين العروض التوضيحية أو الأدوات أو التوثيق</h3>
+<p data-nac-id="contributing.p.20" data-nac-role="paragraph">أي تعديل على <code data-nac-role="code-inline">example*.php</code> أو <code data-nac-role="code-inline">tools/</code> أو <code data-nac-role="code-inline">guides/</code> أو أي ملف Markdown لا يتعلق بالمواصفة. افتح طلب السحب مباشرةً. أبقِ التغييرات في حدودها الدنيا؛ نفضّل عشرة طلبات سحب صغيرة على طلب واحد ضخم.</p>
+<h2 data-nac-id="contributing.h2.أسلوب-الكود" data-nac-role="heading" data-nac-level="2" id="أسلوب-الكود">أسلوب الكود</h2>
+<ul data-nac-id="contributing.list.22" data-nac-role="list"><li data-nac-id="contributing.list.22.item.1" data-nac-role="list-item">ملفات المصدر بترميز ASCII فقط (المشروع مُنشر عبر GoDaddy؛ PHP 8.3 يرفض المحارف غير ASCII حتى في التعليقات). استخدم <code data-nac-role="code-inline">--</code> بدلًا من الشرطة الطويلة (em-dash).</li><li data-nac-id="contributing.list.22.item.2" data-nac-role="list-item">JavaScript: لا مُحوِّل (transpiler)، ولا مُجمِّع (bundler)، ولا خطوة بناء على ملفات البيئة التشغيلية. استخدم ES2018+ الصريح. تضيف حزمة npm غلافًا ESM/CJS حول المصدر ذاته.</li><li data-nac-id="contributing.list.22.item.3" data-nac-role="list-item">PHP: أبقِ heredocs بسيطة (<code data-nac-role="code-inline">{$var}</code> فقط، بدون تعبيرات).</li><li data-nac-id="contributing.list.22.item.4" data-nac-role="list-item">التعليقات: اشرح السبب (WHY)، لا الفعل (WHAT). الفرق (diff) يُظهر الفعل بالفعل.</li><li data-nac-id="contributing.list.22.item.5" data-nac-role="list-item">الاختبارات: كل تغيير في السلوك يجب أن يُرفق باختبار يفشل قبل التغيير ويجتاز بعده. شغّل <code data-nac-role="code-inline">make test-launch</code> من جذر المستودع قبل الرفع.</li></ul>
+<h2 data-nac-id="contributing.h2.أسلوب-الـ-commit" data-nac-role="heading" data-nac-level="2" id="أسلوب-الـ-commit">أسلوب الـ Commit</h2>
+<ul data-nac-id="contributing.list.24" data-nac-role="list"><li data-nac-id="contributing.list.24.item.1" data-nac-role="list-item">العنوان أقل من 70 حرفًا، بصيغة الأمر في المضارع. مثال: <code data-nac-role="code-inline">"fix(nac): treat tab role drift as register-time error"</code> لا <code data-nac-role="code-inline">"Fixed tab thing"</code>.</li><li data-nac-id="contributing.list.24.item.2" data-nac-role="list-item">النص يشرح المشكلة وسببها وطريقة الإصلاح. أشر إلى الـ commits ذات الصلة بالـ SHA المختصر.</li><li data-nac-id="contributing.list.24.item.3" data-nac-role="list-item">إضافة تذييل Co-author للـ commits المُنجزة بمساعدة الذكاء الاصطناعي أمر مقبول؛ لا نُخفي الأدوات المستخدمة.</li></ul>
+<h2 data-nac-id="contributing.h2.المراجعة" data-nac-role="heading" data-nac-level="2" id="المراجعة">المراجعة</h2>
+<ul data-nac-id="contributing.list.26" data-nac-role="list"><li data-nac-id="contributing.list.26.item.1" data-nac-role="list-item">طلبات إصلاح الأخطاء: موافقة مراجع واحد، ثم الدمج.</li><li data-nac-id="contributing.list.26.item.2" data-nac-role="list-item">طلبات البيئة التشغيلية والمواصفة: موافقة مراجع واحد + CI أخضر، ثم الدمج.</li><li data-nac-id="contributing.list.26.item.3" data-nac-role="list-item">طلبات تغيير المواصفة: مشكلة RFC مقترنة مع نقاش + موافقة مراجع واحد + CI أخضر + نافذة تعليق مدتها 7 أيام بعد فتح طلب السحب.</li></ul>
+<h2 data-nac-id="contributing.h2.الترخيص" data-nac-role="heading" data-nac-level="2" id="الترخيص">الترخيص</h2>
+<p data-nac-id="contributing.p.28" data-nac-role="paragraph">بتقديمك لطلب سحب، فإنك تمنح ترخيصًا لمساهمتك بموجب Apache-2.0 ليتوافق مع المشروع. يتضمن نموذج طلب السحب خانة اختيار؛ تأكد من تحديدها.</p>
+<h2 data-nac-id="contributing.h2.مدونة-السلوك" data-nac-role="heading" data-nac-level="2" id="مدونة-السلوك">مدونة السلوك</h2>
+<p data-nac-id="contributing.p.30" data-nac-role="paragraph">كن دقيقًا تقنيًا، موجزًا، ولطيفًا. الاختلاف في الرأي مقبول؛ الهجوم الشخصي غير مقبول. يحق للمشرفين إغلاق المحادثات أو سحب صلاحيات الـ commit في حالات الانتهاك المتكرر.</p>
+<h2 data-nac-id="contributing.h2.أين-تطرح-أسئلتك" data-nac-role="heading" data-nac-level="2" id="أين-تطرح-أسئلتك">أين تطرح أسئلتك</h2>
+<ul data-nac-id="contributing.list.32" data-nac-role="list"><li data-nac-id="contributing.list.32.item.1" data-nac-role="list-item">GitHub Discussions لأسئلة التصميم، ولاستفسارات من قبيل "هل يناسبني NAC3 لهذا الغرض؟"، وعروض المشاريع.</li><li data-nac-id="contributing.list.32.item.2" data-nac-role="list-item">GitHub Issues لتقارير الأخطاء.</li><li data-nac-id="contributing.list.32.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">nac@yujin.dev</code> للإفصاح عن الثغرات الأمنية (راجع <code data-nac-role="code-inline">SECURITY.md</code>).</li></ul>
+<hr />
+<p data-nac-id="contributing.p.34" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/CONTRIBUTING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "contributing",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "contributing.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "contributing.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "contributing.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "contributing.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

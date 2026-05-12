@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- Native Agent Contract -- NAC3</title>
+<meta name="nac3-doc-slug" content="spec" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="spec" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="spec.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="spec.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/spec.mp3" data-nac-id="spec.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="spec.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="spec.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="spec.main" data-nac-role="region">
+<hr />
+<p data-nac-id="spec.p.1" data-nac-role="paragraph">translation_source: SPEC.md translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76 translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T12:52:03.130346+00:00</p>
+<hr />
+<h1 data-nac-id="spec.h1.nac3-native-agent-contract" data-nac-role="heading" data-nac-level="1" id="nac3-native-agent-contract">NAC3 -- Native Agent Contract</h1>
+<p data-nac-id="spec.p.4" data-nac-role="paragraph"><strong>Version:</strong> 2.2.0 <strong>Statut :</strong> Stable <strong>Licence :</strong> Apache-2.0 <strong>Éditeur :</strong> Yujin (rpaforce.com)</p>
+<hr />
+<h2 data-nac-id="spec.h2.0-objectif" data-nac-role="heading" data-nac-level="2" id="0-objectif">0. Objectif</h2>
+<p data-nac-id="spec.p.7" data-nac-role="paragraph">NAC3 est un contrat entre les interfaces web et les agents qui les pilotent. Les agents comprennent les moteurs vocaux, les intermédiaires LLM, les bots RPA, les outils d'accessibilité et les outils de test de bout en bout. Le contrat spécifie :</p>
+<p data-nac-id="spec.p.8" data-nac-role="paragraph">bouton enregistrer » et le résoudre vers un unique nœud DOM.</p>
+<p data-nac-id="spec.p.9" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.fill(id, value)</code>, <code data-nac-role="code-inline">NAC.tab(plugin, key)</code>, etc., sans    code de liaison spécifique à chaque application.</p>
+<p data-nac-id="spec.p.10" data-nac-role="paragraph">étape est terminée, avec une famille d'événements déterministe par rôle.</p>
+<p data-nac-id="spec.p.11" data-nac-role="paragraph">distinguer un vrai clic utilisateur d'un clic synthétisé.</p>
+<ol data-nac-id="spec.list.12" data-nac-role="list"><li data-nac-id="spec.list.12.item.1" data-nac-role="list-item"><strong>Comment les éléments sont nommés</strong> -- afin qu'un agent puisse demander « cliquer sur le</li><li data-nac-id="spec.list.12.item.2" data-nac-role="list-item"><strong>Comment les verbes s'appliquent</strong> -- afin qu'un agent puisse appeler <code data-nac-role="code-inline">NAC.click(id)</code>,</li><li data-nac-id="spec.list.12.item.3" data-nac-role="list-item"><strong>Comment la complétion est signalée</strong> -- afin qu'un agent sache quand une</li><li data-nac-id="spec.list.12.item.4" data-nac-role="list-item"><strong>Comment la provenance est préservée</strong> -- afin qu'un système en aval puisse</li></ol>
+<p data-nac-id="spec.p.13" data-nac-role="paragraph">NAC3 ajoute une couche légère par-dessus le framework avec lequel vous effectuez déjà le rendu. Il ne remplace pas ARIA, React, Vue, ni votre système de design.</p>
+<hr />
+<h2 data-nac-id="spec.h2.1-rôles" data-nac-role="heading" data-nac-level="2" id="1-rôles">1. Rôles</h2>
+<p data-nac-id="spec.p.16" data-nac-role="paragraph">Chaque élément DOM pertinent pour un agent porte <code data-nac-role="code-inline">data-nac-role</code>. Les rôles canoniques sont :</p>
+<p data-nac-id="spec.p.17" data-nac-role="paragraph">| Rôle | Signification | Exemple | |------|---------------|---------| | <code data-nac-role="code-inline">plugin</code> | Un module d'interface autonome (une page, un panneau, une collection de widgets). | <code data-nac-role="code-inline">&lt;article data-nac-plugin="invoice"&gt;</code> | | <code data-nac-role="code-inline">section</code> | Un point de repère à l'intérieur d'un plugin (en-tête, corps, pied de page, barre latérale). | <code data-nac-role="code-inline">&lt;section data-nac-role="section"&gt;</code> | | <code data-nac-role="code-inline">region</code> | Une zone nommable à l'intérieur d'une section (un groupe de cartes, une liste de résultats). | <code data-nac-role="code-inline">&lt;div data-nac-role="region"&gt;</code> | | <code data-nac-role="code-inline">action</code> | Un widget cliquable qui déclenche un verbe (bouton, lien utilisé comme bouton). | <code data-nac-role="code-inline">&lt;button data-nac-role="action" data-nac-action="save"&gt;</code> | | <code data-nac-role="code-inline">field</code> | Une entrée que l'utilisateur saisit ou bascule (texte, nombre, case à cocher, radio, date, fichier). | <code data-nac-role="code-inline">&lt;input data-nac-role="field"&gt;</code> | | <code data-nac-role="code-inline">option</code> | Une option sélectionnable à l'intérieur d'un champ (enfant d'une liste déroulante / select / groupe radio). | <code data-nac-role="code-inline">&lt;li data-nac-role="option"&gt;</code> | | <code data-nac-role="code-inline">tab</code> | Un sélecteur de panneau commutable. <strong>Obligatoire lorsque <code data-nac-role="code-inline">data-nac-id</code> correspond à <code data-nac-role="code-inline">^tab\.</code></strong> | <code data-nac-role="code-inline">&lt;button data-nac-role="tab" data-nac-id="tab.lines"&gt;</code> | | <code data-nac-role="code-inline">breadcrumb-item</code> | Un élément de fil d'Ariane. | <code data-nac-role="code-inline">&lt;a data-nac-role="breadcrumb-item"&gt;</code> | | <code data-nac-role="code-inline">accordion-toggle</code> | Un contrôle d'expansion/réduction. | <code data-nac-role="code-inline">&lt;button data-nac-role="accordion-toggle"&gt;</code> | | <code data-nac-role="code-inline">step</code> | Un indicateur d'étape dans un assistant. | <code data-nac-role="code-inline">&lt;li data-nac-role="step"&gt;</code> | | <code data-nac-role="code-inline">pagination-item</code> | Un contrôle de saut de page dans une liste paginée. | <code data-nac-role="code-inline">&lt;button data-nac-role="pagination-item"&gt;</code> | | <code data-nac-role="code-inline">confirm-button</code> | Un bouton confirmer/annuler à l'intérieur d'une boîte de dialogue de confirmation. | <code data-nac-role="code-inline">&lt;button data-nac-role="confirm-button"&gt;</code> | | <code data-nac-role="code-inline">sort-control</code> | Un en-tête de colonne pour le tri. | <code data-nac-role="code-inline">&lt;th data-nac-role="sort-control"&gt;</code> | | <code data-nac-role="code-inline">filter-control</code> | Un déclencheur de filtre de colonne. | <code data-nac-role="code-inline">&lt;button data-nac-role="filter-control"&gt;</code> | | <code data-nac-role="code-inline">data-table</code> | Un hôte de tableau de données (v2.1). | <code data-nac-role="code-inline">&lt;table data-nac-role="data-table"&gt;</code> | | <code data-nac-role="code-inline">navigation</code> | Une région de navigation de repère. <strong>Pas un onglet.</strong> | <code data-nac-role="code-inline">&lt;nav data-nac-role="navigation"&gt;</code> | | <code data-nac-role="code-inline">confirm-dialog</code> | La modale d'une demande de confirmation. | <code data-nac-role="code-inline">&lt;div data-nac-role="confirm-dialog"&gt;</code> |</p>
+<p data-nac-id="spec.p.18" data-nac-role="paragraph">Les rôles ne figurant pas dans cette liste sont réservés à un usage futur. Un runtime NAC-strict DEVRAIT rejeter les rôles inconnus au moment de l'enregistrement (v2.2). Un runtime NAC-permissif PEUT traiter les rôles inconnus comme <code data-nac-role="code-inline">action</code> pour la rétrocompatibilité (comportement par défaut en v1.9 et v2.0).</p>
+<hr />
+<h2 data-nac-id="spec.h2.2-noms" data-nac-role="heading" data-nac-level="2" id="2-noms">2. Noms</h2>
+<p data-nac-id="spec.p.21" data-nac-role="paragraph">Chaque élément résolvable par un agent porte <code data-nac-role="code-inline">data-nac-id</code>. L'identifiant est :</p>
+<p data-nac-id="spec.p.22" data-nac-role="paragraph">Les points séparent les niveaux sémantiques ; le runtime ne les interprète   pas, mais les humains et les LLM le font.</p>
+<p data-nac-id="spec.p.23" data-nac-role="paragraph">plugins différents PEUVENT partager un identifiant ; le runtime résout par   la paire <code data-nac-role="code-inline">(plugin, id)</code>.</p>
+<p data-nac-id="spec.p.24" data-nac-role="paragraph">à chaque rendu (hachages aléatoires, compteurs d'instances) rompent le contrat.</p>
+<p data-nac-id="spec.p.25" data-nac-role="paragraph">vers un menu déroulant ; son identifiant DOIT rester le même.</p>
+<ul data-nac-id="spec.list.26" data-nac-role="list"><li data-nac-id="spec.list.26.item.1" data-nac-role="list-item"><strong>Un chemin pointé</strong> (ex. <code data-nac-role="code-inline">deals.list.row.42.actions.delete</code>).</li><li data-nac-id="spec.list.26.item.2" data-nac-role="list-item"><strong>Globalement unique dans la portée d'un <code data-nac-role="code-inline">data-nac-plugin</code>.</strong> Deux</li><li data-nac-id="spec.list.26.item.3" data-nac-role="list-item"><strong>Stable entre les re-rendus.</strong> Les frameworks qui produisent un nouvel identifiant</li><li data-nac-id="spec.list.26.item.4" data-nac-role="list-item"><strong>Stable entre les refontes de l'interface.</strong> Un bouton se déplace de la barre d'outils</li></ul>
+<p data-nac-id="spec.p.27" data-nac-role="paragraph">Préfixes d'identifiant réservés (v2.1) :</p>
+<p data-nac-id="spec.p.28" data-nac-role="paragraph">| Préfixe | Réservé pour | |---------|--------------| | <code data-nac-role="code-inline">tab.</code> | Boutons d'onglets. Le rôle DOIT être <code data-nac-role="code-inline">tab</code>. | | <code data-nac-role="code-inline">modal.</code> | Éléments à portée modale. Le rôle est celui du widget feuille. | | <code data-nac-role="code-inline">field.</code> | Raccourci pour les champs de formulaire. Le rôle DOIT être <code data-nac-role="code-inline">field</code> ou <code data-nac-role="code-inline">option</code>. | | <code data-nac-role="code-inline">confirm.</code> | Boîtes de dialogue de confirmation. |</p>
+<hr />
+<h2 data-nac-id="spec.h2.3-verbes" data-nac-role="heading" data-nac-level="2" id="3-verbes">3. Verbes</h2>
+<p data-nac-id="spec.p.31" data-nac-role="paragraph">Un élément <code data-nac-role="code-inline">data-nac-role="action"</code> PEUT porter <code data-nac-role="code-inline">data-nac-action="&lt;verb&gt;"</code> indiquant ce qu'il fait. Le verbe est un identifiant libre en snake_case convenu entre l'hôte et l'agent. Verbes courants :</p>
+<p data-nac-id="spec.p.32" data-nac-role="paragraph"><code data-nac-role="code-inline">save</code>, <code data-nac-role="code-inline">cancel</code>, <code data-nac-role="code-inline">submit</code>, <code data-nac-role="code-inline">delete</code>, <code data-nac-role="code-inline">edit</code>, <code data-nac-role="code-inline">view</code>, <code data-nac-role="code-inline">create</code>, <code data-nac-role="code-inline">approve</code>, <code data-nac-role="code-inline">reject</code>, <code data-nac-role="code-inline">send</code>, <code data-nac-role="code-inline">download</code>, <code data-nac-role="code-inline">upload</code>, <code data-nac-role="code-inline">refresh</code>, <code data-nac-role="code-inline">expand</code>, <code data-nac-role="code-inline">collapse</code>, <code data-nac-role="code-inline">open</code>, <code data-nac-role="code-inline">close</code>, <code data-nac-role="code-inline">add_row</code>, <code data-nac-role="code-inline">remove_row</code>.</p>
+<p data-nac-id="spec.p.33" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> résout un verbe vers l'action unique sous ce plugin et clique dessus. Plusieurs actions partageant le même verbe sous un même plugin constituent une erreur manifeste (lint : <code data-nac-role="code-inline">duplicate_verb</code>).</p>
+<hr />
+<h2 data-nac-id="spec.h2.4-manifeste" data-nac-role="heading" data-nac-level="2" id="4-manifeste">4. Manifeste</h2>
+<p data-nac-id="spec.p.36" data-nac-role="paragraph">Chaque plugin PEUT enregistrer un manifeste via :</p>
+<pre data-nac-id="spec.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
+  plugin_slug: &#x27;invoice&#x27;,
+  version:     &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.1&#x27;,
+  elements: [
+    { id: &#x27;invoice.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{ verb: &#x27;save&#x27;, label_i18n: { es: &#x27;Guardar&#x27;, en: &#x27;Save&#x27;, ... } }],
+      label_i18n: { es: &#x27;Guardar factura&#x27;, en: &#x27;Save invoice&#x27;, ... } },
+    ...
+  ],
+  tabs: [
+    { nac_id: &#x27;tab.lines&#x27;, label_i18n: { es: &#x27;Lineas&#x27;, en: &#x27;Lines&#x27; } },
+    ...
+  ],
+  fields: [
+    { id: &#x27;field.client_name&#x27;, type: &#x27;text&#x27;, required: true,
+      label_i18n: { es: &#x27;Cliente&#x27;, en: &#x27;Customer&#x27; } },
+    ...
+  ],
+  data_tables: [...]
+});</code></pre>
+<p data-nac-id="spec.p.38" data-nac-role="paragraph">Le manifeste est la source de vérité côté agent. Un intermédiaire LLM qui détermine que « l'utilisateur a dit 'guardar' » consulte le manifeste du plugin, trouve le verbe <code data-nac-role="code-inline">save</code>, et émet <code data-nac-role="code-inline">NAC.click_by_verb('invoice', 'save')</code>.</p>
+<h3 data-nac-id="spec.h3.41-champs-obligatoires" data-nac-role="heading" data-nac-level="3" id="41-champs-obligatoires">4.1 Champs obligatoires</h3>
+<p data-nac-id="spec.p.40" data-nac-role="paragraph">Le runtime rejette les manifestes déclarant une version supérieure à la sienne.</p>
+<ul data-nac-id="spec.list.41" data-nac-role="list"><li data-nac-id="spec.list.41.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">plugin_slug</code> -- correspond à <code data-nac-role="code-inline">data-nac-plugin</code> sur l'élément hôte.</li><li data-nac-id="spec.list.41.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac_version</code> -- la version de NAC3 que ce manifeste déclare respecter.</li></ul>
+<h3 data-nac-id="spec.h3.42-champs-optionnels" data-nac-role="heading" data-nac-level="3" id="42-champs-optionnels">4.2 Champs optionnels</h3>
+<p data-nac-id="spec.p.43" data-nac-role="paragraph">avoir <code data-nac-role="code-inline">id</code> et <code data-nac-role="code-inline">role</code>.</p>
+<p data-nac-id="spec.p.44" data-nac-role="paragraph">entrées <code data-nac-role="code-inline">elements[]</code> avec <code data-nac-role="code-inline">role:'tab'</code>. Les deux formes sont valides.</p>
+<p data-nac-id="spec.p.45" data-nac-role="paragraph">typées ; mêmes sémantiques que <code data-nac-role="code-inline">elements[]</code> filtrées par   rôle. Les démos choisissent la forme la plus lisible pour les humains.</p>
+<ul data-nac-id="spec.list.46" data-nac-role="list"><li data-nac-id="spec.list.46.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">elements[]</code> -- le catalogue des widgets nommés. Chaque entrée DOIT</li><li data-nac-id="spec.list.46.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tabs[]</code> -- un tableau de premier niveau distinct pour les onglets. Équivalent aux</li><li data-nac-id="spec.list.46.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">fields[]</code>, <code data-nac-role="code-inline">actions[]</code>, <code data-nac-role="code-inline">kpis[]</code>, <code data-nac-role="code-inline">data_tables[]</code> -- sous-collections</li></ul>
+<h3 data-nac-id="spec.h3.43-i18n" data-nac-role="heading" data-nac-level="3" id="43-i18n">4.3 i18n</h3>
+<p data-nac-id="spec.p.48" data-nac-role="paragraph">Chaque <code data-nac-role="code-inline">label_i18n</code> DOIT couvrir l'ensemble des 10 locales NAC3 :</p>
+<pre data-nac-id="spec.code.2" data-nac-role="code" data-nac-lang="text"><code>es, en, pt, fr, ja, zh, hi, ar, de, it</code></pre>
+<p data-nac-id="spec.p.50" data-nac-role="paragraph"><code data-nac-role="code-inline">i18n_strict: 'permissive'</code> sur <code data-nac-role="code-inline">NAC.autoRegister.watch()</code> autorise une couverture partielle lors d'une migration brownfield ; les manifestes de production doivent embarquer les 10 locales.</p>
+<hr />
+<h2 data-nac-id="spec.h2.5-api-publique" data-nac-role="heading" data-nac-level="2" id="5-api-publique">5. API Publique</h2>
+<h3 data-nac-id="spec.h3.51-impératif" data-nac-role="heading" data-nac-level="3" id="51-impératif">5.1 Impératif</h3>
+<pre data-nac-id="spec.code.3" data-nac-role="code" data-nac-lang="ts"><code>NAC.click(nac_id: string, opts?: ClickOpts): Promise&lt;{ok: true}&gt;
+NAC.click_by_verb(plugin: string|null, verb: string, opts?): Promise&lt;...&gt;
+NAC.fill(nac_id: string, value: string|number|boolean): Promise&lt;...&gt;
+NAC.select(nac_id: string, value: string): Promise&lt;...&gt;
+NAC.tab(plugin: string, tab_key: string): Promise&lt;...&gt;
+NAC.tab_by_label(plugin: string|null, label: string): Promise&lt;...&gt;
+NAC.go_to_section(nac_id: string): Promise&lt;...&gt;
+NAC.drag_drop(source_id, target_id, opts?: {to_index?: number}): Promise&lt;...&gt;
+NAC.set_mode(mode: &#x27;modal&#x27;|&#x27;maximized&#x27;|&#x27;new_tab&#x27;|&#x27;new_window&#x27;): void
+NAC.screenshot(): Promise&lt;string&gt;  // data URL
+NAC.bindAction(el, handler, {plugin, action_id}): () =&gt; void  // v2.2</code></pre>
+<h3 data-nac-id="spec.h3.511-aide-à-la-conformité-v22" data-nac-role="heading" data-nac-level="3" id="511-aide-à-la-conformité-v22">5.1.1 Aide à la conformité (v2.2)</h3>
+<p data-nac-id="spec.p.56" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> est la méthode conforme à la spécification pour brancher un gestionnaire de clic. Elle émet automatiquement <code data-nac-role="code-inline">nac:action:succeeded</code> (ou <code data-nac-role="code-inline">:failed</code>) après l'exécution du gestionnaire (synchrone, exception, ou Promise). Retourne une fonction de débranchement. À utiliser à la place d'un <code data-nac-role="code-inline">addEventListener('click', ...)</code> brut dès que l'hôte le permet ; le code brownfield peut toujours émettre l'événement manuellement comme auparavant.</p>
+<h3 data-nac-id="spec.h3.513-éditeur-de-champ-aperçu-v23" data-nac-role="heading" data-nac-level="3" id="513-éditeur-de-champ-aperçu-v23">5.1.3 Éditeur de champ (aperçu v2.3)</h3>
+<p data-nac-id="spec.p.58" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.edit_field(nac_id)</code> ouvre une modale permettant à un utilisateur (ou à un agent agissant en son nom) de modifier n'importe quel champ texte avec des outils de type Word :</p>
+<pre data-nac-id="spec.code.4" data-nac-role="code" data-nac-lang="ts"><code>NAC.edit_field(nac_id: string): Promise&lt;{ok:true}&gt;</code></pre>
+<p data-nac-id="spec.p.60" data-nac-role="paragraph">La modale s'enregistre sous <code data-nac-role="code-inline">plugin_slug='nac_editor'</code> avec les verbes NAC-3 appelables suivants :</p>
+<p data-nac-id="spec.p.61" data-nac-role="paragraph">| Verbe | Effet | |-------|-------| | <code data-nac-role="code-inline">select_word</code> | sélectionne le mot à la position du curseur | | <code data-nac-role="code-inline">select_sentence</code> | sélectionne la phrase à la position du curseur | | <code data-nac-role="code-inline">select_all</code> | Ctrl+A dans l'éditeur | | <code data-nac-role="code-inline">replace</code> | remplace la sélection par le texte fourni | | <code data-nac-role="code-inline">delete_selection</code> | supprime la sélection courante | | <code data-nac-role="code-inline">ai_correct_syntax</code> | envoie la valeur courante au LLM intermédiaire via POST avec le prompt système « fix grammar + spelling, return only fixed text » ; remplace la valeur par la réponse | | <code data-nac-role="code-inline">save</code> | reporte la valeur dans le champ source, déclenche les événements input + change, ferme la modale | | <code data-nac-role="code-inline">cancel</code> | abandonne les modifications, ferme la modale |</p>
+<p data-nac-id="spec.p.62" data-nac-role="paragraph">Échap ferme la modale (annulation). Ctrl/Cmd+Entrée sauvegarde. Un clic sur le fond de l'overlay annule.</p>
+<p data-nac-id="spec.p.63" data-nac-role="paragraph">La section 13 de la spécification formalisera le contrat en v2.3 ; le runtime v2.2 embarque une implémentation de référence fonctionnelle afin que les adoptants puissent l'intégrer dès aujourd'hui. Disponible sur n'importe quel champ via :</p>
+<pre data-nac-id="spec.code.5" data-nac-role="code" data-nac-lang="js"><code>NAC.edit_field(&#x27;invoice.client_name&#x27;);
+// ou via un intermédiaire :
+NAC.click_by_verb(&#x27;myplugin&#x27;, &#x27;edit_field&#x27;, { nac_id: &#x27;invoice.client_name&#x27; });</code></pre>
+<h3 data-nac-id="spec.h3.512-indicateur-de-validation-stricte-v22" data-nac-role="heading" data-nac-level="3" id="512-indicateur-de-validation-stricte-v22">5.1.2 Indicateur de validation stricte (v2.2)</h3>
+<p data-nac-id="spec.p.66" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> (booléen, <code data-nac-role="code-inline">false</code> par défaut en v2.2). Lorsqu'il est <code data-nac-role="code-inline">true</code>, <code data-nac-role="code-inline">NAC.register()</code> lève une <code data-nac-role="code-inline">Error</code> avec <code data-nac-role="code-inline">code='strict_validation'</code> et un tableau <code data-nac-role="code-inline">findings</code> dans l'un des cas suivants :</p>
+<p data-nac-id="spec.p.67" data-nac-role="paragraph">n'est pas <code data-nac-role="code-inline">'tab'</code>.</p>
+<p data-nac-id="spec.p.68" data-nac-role="paragraph">diffère du rôle de l'entrée dans le manifeste.</p>
+<ul data-nac-id="spec.list.69" data-nac-role="list"><li data-nac-id="spec.list.69.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- le rôle d'une entrée ne fait pas partie de l'ensemble canonique.</li><li data-nac-id="spec.list.69.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tab_id_manifest_role_drift</code> -- l'identifiant correspond à <code data-nac-role="code-inline">^tab\.</code> mais le rôle</li><li data-nac-id="spec.list.69.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- l'attribut <code data-nac-role="code-inline">data-nac-role</code> de l'élément DOM monté</li></ul>
+<p data-nac-id="spec.p.70" data-nac-role="paragraph">En v2.3, la valeur par défaut passe à <code data-nac-role="code-inline">true</code>. En v3.0, l'indicateur est supprimé (le mode strict devient le seul mode disponible).</p>
+<p data-nac-id="spec.p.71" data-nac-role="paragraph">Toutes les méthodes asynchrones rejettent avec une <code data-nac-role="code-inline">NacError</code> dont le <code data-nac-role="code-inline">code</code> est l'un des suivants :</p>
+<p data-nac-id="spec.p.72" data-nac-role="paragraph">n'est pas arrivé dans les 5 secondes. <strong>Un timeout signifie un vrai échec</strong> :   le gestionnaire a peut-être planté, l'acquittement n'a jamais été branché,   une situation de compétition réseau s'est produite. Les appelants DOIVENT traiter un timeout comme un échec,   sauf s'ils disposent d'une preuve de l'effet de bord via un autre canal.</p>
+<ul data-nac-id="spec.list.73" data-nac-role="list"><li data-nac-id="spec.list.73.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">not_found</code> -- l'élément, le rôle ou le verbe nommé est absent du DOM.</li><li data-nac-id="spec.list.73.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">invalid</code> -- la forme de l'argument est incorrecte.</li><li data-nac-id="spec.list.73.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">timeout</code> -- l'effet de bord a été déclenché mais l'événement d'acquittement de conformité</li></ul>
+<h3 data-nac-id="spec.h3.52-introspection" data-nac-role="heading" data-nac-level="3" id="52-introspection">5.2 Introspection</h3>
+<pre data-nac-id="spec.code.6" data-nac-role="code" data-nac-lang="ts"><code>NAC.describe():    { active: string|null, plugins: PluginSnap[] }
+NAC.describe_v2(): { v2_scope_entries: [...], sitemap: ..., data_tables: [...] }
+NAC.manifest(plugin_slug: string): Manifest|null
+NAC.validate_global(opts?: {probe?: boolean}): Findings[]</code></pre>
+<h3 data-nac-id="spec.h3.53-tables-de-données-v21" data-nac-role="heading" data-nac-level="3" id="53-tables-de-données-v21">5.3 Tables de données (v2.1)</h3>
+<pre data-nac-id="spec.code.7" data-nac-role="code" data-nac-lang="ts"><code>NAC.registerDataTable(spec: DataTableSpec): void
+NAC.dt_add_row(table_id, values): {ok, row_id}
+NAC.dt_remove_row(table_id, row_id): {ok}
+NAC.dt_edit_cell(table_id, row_id, column, value): {ok} | {ok:false, error}
+NAC.dt_set_cell(table_id, row, col, value): {ok} | {ok:false, error}
+NAC.dt_select(table_id, target): {ok}
+NAC.dt_commit(table_id): {ok, final_state} | {ok:false, errors:[...]}
+NAC.dt_discard(table_id): {ok}
+NAC.dt_state(table_id): TableState
+NAC.dt_read_aggregate(table_id, agg_key, column): number|null
+NAC.registerDataTableComputed(table_id, column, fn): void</code></pre>
+<p data-nac-id="spec.p.78" data-nac-role="paragraph">Une table de données possède un <code data-nac-role="code-inline">subkind</code> :</p>
+<p data-nac-id="spec.p.79" data-nac-role="paragraph">Utilisé pour les lignes de facture, les articles d'un panier, les entrées de journal.</p>
+<p data-nac-id="spec.p.80" data-nac-role="paragraph">Utilisé pour les matrices de permissions, les grilles de planning.</p>
+<ul data-nac-id="spec.list.81" data-nac-role="list"><li data-nac-id="spec.list.81.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">collection</code> -- lignes ordonnées avec validation transactionnelle optionnelle.</li><li data-nac-id="spec.list.81.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">matrix</code> -- grille lignes × colonnes où chaque cellule porte une valeur.</li><li data-nac-id="spec.list.81.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">matrix-singletree</code> -- matrice où chaque ligne se replie en arbre (cas rare).</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.6-événements" data-nac-role="heading" data-nac-level="2" id="6-événements">6. Événements</h2>
+<p data-nac-id="spec.p.84" data-nac-role="paragraph">Chaque action émet un événement de complétion déterministe. La méthode <code data-nac-role="code-inline">NAC.click()</code> du runtime attend cet événement et se résout à sa réception.</p>
+<p data-nac-id="spec.p.85" data-nac-role="paragraph">| Rôle | Événement de succès | Événement d'échec | |------|---------------------|-------------------| | <code data-nac-role="code-inline">action</code> | <code data-nac-role="code-inline">nac:action:succeeded</code> | <code data-nac-role="code-inline">nac:action:failed</code> | | <code data-nac-role="code-inline">field</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">option</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">nac:tab:activated</code> | -- | | <code data-nac-role="code-inline">breadcrumb-item</code> | <code data-nac-role="code-inline">nac:breadcrumb:navigated</code> | -- | | <code data-nac-role="code-inline">accordion-toggle</code> | <code data-nac-role="code-inline">nac:accordion:expanded</code> / <code data-nac-role="code-inline">:collapsed</code> | -- | | <code data-nac-role="code-inline">step</code> | <code data-nac-role="code-inline">nac:step:advanced</code> | -- | | <code data-nac-role="code-inline">pagination-item</code> | <code data-nac-role="code-inline">nac:table:page_changed</code> | -- | | <code data-nac-role="code-inline">confirm-button</code> | <code data-nac-role="code-inline">nac:confirm:resolved</code> / <code data-nac-role="code-inline">:cancelled</code> | -- | | <code data-nac-role="code-inline">sort-control</code> | <code data-nac-role="code-inline">nac:table:sort_changed</code> | -- | | <code data-nac-role="code-inline">filter-control</code> | <code data-nac-role="code-inline">nac:table:filter_changed</code> | -- |</p>
+<h3 data-nac-id="spec.h3.61-structure-du-détail-dévénement" data-nac-role="heading" data-nac-level="3" id="61-structure-du-détail-dévénement">6.1 Structure du détail d'événement</h3>
+<p data-nac-id="spec.p.87" data-nac-role="paragraph">Chaque détail d'événement contient le champ d'identifiant canonique ainsi que <code data-nac-role="code-inline">plugin</code> :</p>
+<pre data-nac-id="spec.code.8" data-nac-role="code" data-nac-lang="js"><code>nac:action:succeeded {
+  detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27;, ... }
+}
+nac:tab:activated {
+  detail: { plugin: &#x27;invoice_edit_modal&#x27;, tab_id: &#x27;tab.lines&#x27;, ... }
+}
+nac:field:changed {
+  detail: { plugin: &#x27;invoice&#x27;, field_id: &#x27;field.client_name&#x27;,
+            value: &#x27;Acme Corp&#x27;, ... }
+}</code></pre>
+<h3 data-nac-id="spec.h3.62-émission-depuis-un-gestionnaire-hôte" data-nac-role="heading" data-nac-level="3" id="62-émission-depuis-un-gestionnaire-hôte">6.2 Émission depuis un gestionnaire hôte</h3>
+<p data-nac-id="spec.p.90" data-nac-role="paragraph">Un gestionnaire de clic DOIT émettre l'événement de succès correspondant après son effet de bord synchrone :</p>
+<pre data-nac-id="spec.code.9" data-nac-role="code" data-nac-lang="js"><code>button.addEventListener(&#x27;click&#x27;, function (ev) {
+  // ... effectuer le traitement ...
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+  }));
+});</code></pre>
+<p data-nac-id="spec.p.92" data-nac-role="paragraph">Si le traitement est asynchrone, émettre après la résolution. En cas d'échec, émettre <code data-nac-role="code-inline">nac:action:failed</code> avec <code data-nac-role="code-inline">{detail: {plugin, action_id, error: &lt;message&gt;}}</code>.</p>
+<p data-nac-id="spec.p.93" data-nac-role="paragraph">Le runtime v2.2 fournira <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> qui encapsule <code data-nac-role="code-inline">addEventListener</code> et émet automatiquement.</p>
+<h3 data-nac-id="spec.h3.63-pourquoi-ne-pas-utiliser-lévénement-click-lui-même" data-nac-role="heading" data-nac-level="3" id="63-pourquoi-ne-pas-utiliser-lévénement-click-lui-même">6.3 Pourquoi ne pas utiliser l'événement click lui-même ?</h3>
+<p data-nac-id="spec.p.95" data-nac-role="paragraph">Un événement DOM <code data-nac-role="code-inline">click</code> se déclenche avant l'exécution du gestionnaire. Le contrat de NAC3 doit savoir quand <strong>l'effet de bord s'est achevé</strong>, et non quand le clic a démarré. D'où la famille d'événements dédiée.</p>
+<hr />
+<h2 data-nac-id="spec.h2.7-provenance" data-nac-role="heading" data-nac-level="2" id="7-provenance">7. Provenance</h2>
+<h3 data-nac-id="spec.h3.71-istrusted" data-nac-role="heading" data-nac-level="3" id="71-istrusted">7.1 isTrusted</h3>
+<p data-nac-id="spec.p.99" data-nac-role="paragraph"><code data-nac-role="code-inline">event.isTrusted</code> vaut <code data-nac-role="code-inline">true</code> pour les clics initiés par l'utilisateur (vraie souris, vraie touche, activation par lecteur d'écran) et <code data-nac-role="code-inline">false</code> pour les clics synthétisés (<code data-nac-role="code-inline">element.click()</code>, dispatchEvent d'un MouseEvent construit manuellement, automatisation).</p>
+<p data-nac-id="spec.p.100" data-nac-role="paragraph">NAC3 DOIT exposer cette valeur via <code data-nac-role="code-inline">event.detail.is_trusted</code> dans l'événement de succès. Les hôtes qui effectuent des actions sensibles sur le plan de la sécurité (paiement, suppression) PEUVENT exiger <code data-nac-role="code-inline">is_trusted === true</code> et rejeter les clics synthétiques. La démo de référence <code data-nac-role="code-inline">example-v20-full.php</code> inclut une paire de boutons (<code data-nac-role="code-inline">v20_panel.istrusted_real</code> et <code data-nac-role="code-inline">v20_panel.istrusted_fake</code>) qui illustre cette distinction.</p>
+<h3 data-nac-id="spec.h3.72-manifestes-signés-par-hmac" data-nac-role="heading" data-nac-level="3" id="72-manifestes-signés-par-hmac">7.2 Manifestes signés par HMAC</h3>
+<p data-nac-id="spec.p.102" data-nac-role="paragraph">Un manifeste PEUT contenir un bloc <code data-nac-role="code-inline">provenance</code> :</p>
+<pre data-nac-id="spec.code.10" data-nac-role="code" data-nac-lang="js"><code>NAC.set_provenance_secret(&#x27;your-tenant-secret&#x27;);
+NAC.register({
+  plugin_slug: &#x27;invoice&#x27;,
+  ...,
+  provenance: {
+    signed_at: &#x27;2026-05-09T10:00:00Z&#x27;,
+    signed_by: &#x27;tenant-X&#x27;,
+    signature: &#x27;&lt;HMAC-SHA256 of manifest body&gt;&#x27;
+  }
+});</code></pre>
+<p data-nac-id="spec.p.104" data-nac-role="paragraph">Le moteur d'exécution calcule le HMAC attendu sur une sérialisation stable du manifeste (en excluant la signature elle-même) et rejette les manifestes dont la signature ne correspond pas. Utilisé dans les déploiements multi-locataires pour empêcher un locataire d'usurper le manifeste d'un autre.</p>
+<h3 data-nac-id="spec.h3.73-modèle-de-menace" data-nac-role="heading" data-nac-level="3" id="73-modèle-de-menace">7.3 Modèle de menace</h3>
+<p data-nac-id="spec.p.106" data-nac-role="paragraph">Consultez <code data-nac-role="code-inline">SECURITY.md</code> pour le modèle de menace complet. En résumé :</p>
+<p data-nac-id="spec.p.107" data-nac-role="paragraph">(isTrusted) afin qu'un hôte puisse refuser ces derniers pour les actions sensibles.</p>
+<p data-nac-id="spec.p.108" data-nac-role="paragraph">de l'utilisateur. Un tel agent peut faire tout ce que l'utilisateur peut faire.</p>
+<ul data-nac-id="spec.list.109" data-nac-role="list"><li data-nac-id="spec.list.109.item.1" data-nac-role="list-item">NAC3 n'authentifie pas l'<strong>utilisateur</strong>. C'est le rôle de votre couche d'authentification.</li><li data-nac-id="spec.list.109.item.2" data-nac-role="list-item">NAC3 authentifie le <strong>manifeste</strong> (HMAC).</li><li data-nac-id="spec.list.109.item.3" data-nac-role="list-item">NAC3 distingue les clics réels des clics synthétisés</li><li data-nac-id="spec.list.109.item.4" data-nac-role="list-item">NAC3 ne protège pas contre un agent malveillant s'exécutant avec les droits</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.8-niveaux-de-conformité" data-nac-role="heading" data-nac-level="2" id="8-niveaux-de-conformité">8. Niveaux de conformité</h2>
+<p data-nac-id="spec.p.112" data-nac-role="paragraph">Une page est <strong>conforme NAC-1</strong> si :</p>
+<p data-nac-id="spec.p.113" data-nac-role="paragraph">porte <code data-nac-role="code-inline">data-nac-id</code> et <code data-nac-role="code-inline">data-nac-role</code>.</p>
+<p data-nac-id="spec.p.114" data-nac-role="paragraph"><code data-nac-role="code-inline">nac:action:succeeded</code> après son effet de bord.</p>
+<p data-nac-id="spec.p.115" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.register()</code>.</p>
+<ul data-nac-id="spec.list.116" data-nac-role="list"><li data-nac-id="spec.list.116.item.1" data-nac-role="list-item">Chaque widget cliquable qu'un agent doit pouvoir actionner</li><li data-nac-id="spec.list.116.item.2" data-nac-role="list-item">Chaque élément <code data-nac-role="code-inline">data-nac-role="action"</code> émet</li><li data-nac-id="spec.list.116.item.3" data-nac-role="list-item">La page enregistre au moins un manifeste de plugin via</li><li data-nac-id="spec.list.116.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click(id)</code> fonctionne pour chaque identifiant déclaré.</li></ul>
+<p data-nac-id="spec.p.117" data-nac-role="paragraph">Une page est <strong>conforme NAC-2</strong> si elle satisfait également :</p>
+<p data-nac-id="spec.p.118" data-nac-role="paragraph">dans son manifeste (sans inférence depuis le DOM).</p>
+<p data-nac-id="spec.p.119" data-nac-role="paragraph">libellé visible par l'utilisateur.</p>
+<p data-nac-id="spec.p.120" data-nac-role="paragraph">capture éphémère, autoRegister.watch.</p>
+<p data-nac-id="spec.p.121" data-nac-role="paragraph">de sévérité <code data-nac-role="code-inline">error</code>.</p>
+<ul data-nac-id="spec.list.122" data-nac-role="list"><li data-nac-id="spec.list.122.item.1" data-nac-role="list-item">L'enregistrement explicite des tableaux <code data-nac-role="code-inline">tabs[]</code>, <code data-nac-role="code-inline">fields[]</code>, <code data-nac-role="code-inline">actions[]</code></li><li data-nac-id="spec.list.122.item.2" data-nac-role="list-item">La fourniture de <code data-nac-role="code-inline">label_i18n</code> couvrant les 10 locales NAC3 pour chaque</li><li data-nac-id="spec.list.122.item.3" data-nac-role="list-item">L'implémentation des primitives brownfield v2.0 : arbre de portée,</li><li data-nac-id="spec.list.122.item.4" data-nac-role="list-item">Le passage de <code data-nac-role="code-inline">NAC.validate_global({probe: false})</code> sans aucun résultat</li></ul>
+<p data-nac-id="spec.p.123" data-nac-role="paragraph">Une page est <strong>conforme NAC-3</strong> si elle satisfait également :</p>
+<ul data-nac-id="spec.list.124" data-nac-role="list"><li data-nac-id="spec.list.124.item.1" data-nac-role="list-item">La présence de manifestes signés par HMAC.</li><li data-nac-id="spec.list.124.item.2" data-nac-role="list-item">La distinction de <code data-nac-role="code-inline">isTrusted</code> pour les actions sensibles sur le plan de la sécurité.</li><li data-nac-id="spec.list.124.item.3" data-nac-role="list-item">Le passage de <code data-nac-role="code-inline">NAC.validate_global({probe: true})</code> sans aucun résultat.</li></ul>
+<p data-nac-id="spec.p.125" data-nac-role="paragraph">Le CLI du package NPM (<code data-nac-role="code-inline">npx @nac3/runtime validate &lt;url&gt;</code>) indique le niveau le plus élevé atteint par une page.</p>
+<hr />
+<h2 data-nac-id="spec.h2.9-gestion-des-versions" data-nac-role="heading" data-nac-level="2" id="9-gestion-des-versions">9. Gestion des versions</h2>
+<p data-nac-id="spec.p.128" data-nac-role="paragraph">NAC3 suit le versionnage sémantique (semver) :</p>
+<p data-nac-id="spec.p.129" data-nac-role="paragraph">d'échange. Les adoptants doivent modifier leur code.</p>
+<p data-nac-id="spec.p.130" data-nac-role="paragraph">continue de fonctionner.</p>
+<ul data-nac-id="spec.list.131" data-nac-role="list"><li data-nac-id="spec.list.131.item.1" data-nac-role="list-item">Incrément <strong>majeur</strong> : changement incompatible de l'API publique ou des formats</li><li data-nac-id="spec.list.131.item.2" data-nac-role="list-item">Incrément <strong>mineur</strong> : nouvelles fonctionnalités, rétrocompatibles. Le code existant</li><li data-nac-id="spec.list.131.item.3" data-nac-role="list-item">Incrément de <strong>correctif</strong> : corrections de bogues, modifications de documentation uniquement.</li></ul>
+<p data-nac-id="spec.p.132" data-nac-role="paragraph">Politique de dépréciation : une fonctionnalité marquée <code data-nac-role="code-inline">@deprecated</code> dans la version <code data-nac-role="code-inline">X.Y.0</code> n'est supprimée qu'à partir de <code data-nac-role="code-inline">(X+1).0.0</code> au plus tôt. Les notes de version documentent explicitement chaque suppression.</p>
+<p data-nac-id="spec.p.133" data-nac-role="paragraph">La version du package NPM reflète la version de la spécification : <code data-nac-role="code-inline">@nac3/runtime@2.1.3</code> implémente NAC3 v2.1 avec trois révisions de correctifs.</p>
+<hr />
+<h2 data-nac-id="spec.h2.10-validateurs" data-nac-role="heading" data-nac-level="2" id="10-validateurs">10. Validateurs</h2>
+<h3 data-nac-id="spec.h3.101-moteur-dexécution-nacvalidate_global" data-nac-role="heading" data-nac-level="3" id="101-moteur-dexécution-nacvalidate_global">10.1 Moteur d'exécution : <code data-nac-role="code-inline">NAC.validate_global()</code></h3>
+<p data-nac-id="spec.p.137" data-nac-role="paragraph">Parcourt le DOM en direct, les manifestes enregistrés et le catalogue i18n, puis retourne un tableau de résultats :</p>
+<pre data-nac-id="spec.code.11" data-nac-role="code" data-nac-lang="ts"><code>{
+  severity: &#x27;error&#x27; | &#x27;warn&#x27; | &#x27;info&#x27;,
+  code:     string,                     // e.g. &#x27;tab_role_drift&#x27;
+  nac_id:   string | null,
+  message:  string,
+  detail:   Record&lt;string, any&gt;
+}</code></pre>
+<p data-nac-id="spec.p.139" data-nac-role="paragraph">Les codes de résultats sont stables entre les versions de correctifs ; de nouveaux codes n'apparaissent qu'avec les incréments mineurs.</p>
+<h3 data-nac-id="spec.h3.102-cli-npx-yujinnac-validate-target" data-nac-role="heading" data-nac-level="3" id="102-cli-npx-yujinnac-validate-target">10.2 CLI : <code data-nac-role="code-inline">npx @nac3/runtime validate &lt;target&gt;</code></h3>
+<p data-nac-id="spec.p.141" data-nac-role="paragraph">Encapsule <code data-nac-role="code-inline">validate_global</code> et ajoute une analyse statique de la cohérence HTML/manifeste. Codes de sortie :</p>
+<ul data-nac-id="spec.list.142" data-nac-role="list"><li data-nac-id="spec.list.142.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">0</code> -- aucun résultat de sévérité supérieure ou égale au seuil configuré.</li><li data-nac-id="spec.list.142.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">1</code> -- des résultats ont été trouvés.</li><li data-nac-id="spec.list.142.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">2</code> -- la cible elle-même n'a pas pu être chargée.</li></ul>
+<p data-nac-id="spec.p.143" data-nac-role="paragraph">Utile en CI : <code data-nac-role="code-inline">npx @nac3/runtime validate ./dist/index.html --severity=error</code>.</p>
+<hr />
+<h2 data-nac-id="spec.h2.11-lécosystème-autour-de-nac3" data-nac-role="heading" data-nac-level="2" id="11-lécosystème-autour-de-nac3">11. L'écosystème autour de NAC3</h2>
+<p data-nac-id="spec.p.146" data-nac-role="paragraph">NAC3 est une couche contractuelle. Pour transformer une page conforme NAC en application pilotée par la voix, vous avez également besoin de :</p>
+<p data-nac-id="spec.p.147" data-nac-role="paragraph">Whisper API, etc.).</p>
+<p data-nac-id="spec.p.148" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.describe()</code> de la page et un indicateur i18n, puis émet des actions    structurées : <code data-nac-role="code-inline">[{kind: 'click', nac_id: 'X'}, {kind: 'fill', nac_id:    'Y', value: 'Z'}]</code>. Voir <code data-nac-role="code-inline">guides/LLM_WIRING.md</code>.</p>
+<p data-nac-id="spec.p.149" data-nac-role="paragraph">La référence est <code data-nac-role="code-inline">js/nac-chat-client.js</code>.</p>
+<p data-nac-id="spec.p.150" data-nac-role="paragraph">du navigateur, ElevenLabs, etc.).</p>
+<ol data-nac-id="spec.list.151" data-nac-role="list"><li data-nac-id="spec.list.151.item.1" data-nac-role="list-item"><strong>Une source de reconnaissance vocale</strong> (SpeechRecognition du navigateur,</li><li data-nac-id="spec.list.151.item.2" data-nac-role="list-item"><strong>Un intermédiaire LLM</strong> qui prend le texte de l'utilisateur, le snapshot</li><li data-nac-id="spec.list.151.item.3" data-nac-role="list-item"><strong>Un client de conversation</strong> qui gère le dialogue et distribue les actions.</li><li data-nac-id="spec.list.151.item.4" data-nac-role="list-item"><strong>Un moteur de synthèse vocale</strong> pour les réponses parlées (SpeechSynthesis</li></ol>
+<p data-nac-id="spec.p.152" data-nac-role="paragraph">NAC3 standardise uniquement la forme d'entrée/sortie de l'étape 2 (le snapshot <code data-nac-role="code-inline">NAC.describe()</code> et la forme des actions). Les étapes 1, 3 et 4 sont hors spécification ; vous composez librement ce qui vous convient.</p>
+<hr />
+<h2 data-nac-id="spec.h2.12-garanties-de-stabilité" data-nac-role="heading" data-nac-level="2" id="12-garanties-de-stabilité">12. Garanties de stabilité</h2>
+<p data-nac-id="spec.p.155" data-nac-role="paragraph">Ce que cette spécification garantit :</p>
+<p data-nac-id="spec.p.156" data-nac-role="paragraph">De nouveaux rôles PEUVENT être ajoutés dans les versions mineures.</p>
+<p data-nac-id="spec.p.157" data-nac-role="paragraph">De nouveaux événements PEUVENT être ajoutés dans les versions mineures.</p>
+<p data-nac-id="spec.p.158" data-nac-role="paragraph">dans les versions mineures. De nouveaux champs <code data-nac-role="code-inline">opts</code> optionnels PEUVENT apparaître.</p>
+<p data-nac-id="spec.p.159" data-nac-role="paragraph">des conditions différentes entre les versions mineures.</p>
+<ol data-nac-id="spec.list.160" data-nac-role="list"><li data-nac-id="spec.list.160.item.1" data-nac-role="list-item">L'ensemble des rôles canoniques de la section 1 ne sera pas réduit.</li><li data-nac-id="spec.list.160.item.2" data-nac-role="list-item">La famille d'événements de la section 6 ne sera pas renommée.</li><li data-nac-id="spec.list.160.item.3" data-nac-role="list-item">Les signatures de <code data-nac-role="code-inline">NAC.click</code>, <code data-nac-role="code-inline">NAC.fill</code>, etc. ne changeront pas</li><li data-nac-id="spec.list.160.item.4" data-nac-role="list-item">Les codes de résultats de <code data-nac-role="code-inline">validate_global</code> ne seront pas réutilisés pour</li></ol>
+<p data-nac-id="spec.p.161" data-nac-role="paragraph">Ce que cette spécification ne garantit PAS :</p>
+<p data-nac-id="spec.p.162" data-nac-role="paragraph">les traductions peuvent évoluer).</p>
+<p data-nac-id="spec.p.163" data-nac-role="paragraph">pourrait migrer vers un index plus rapide ultérieurement).</p>
+<p data-nac-id="spec.p.164" data-nac-role="paragraph">étant en écriture seule côté hôte, et en lecture seule côté agent.</p>
+<ol data-nac-id="spec.list.165" data-nac-role="list"><li data-nac-id="spec.list.165.item.1" data-nac-role="list-item">Le libellé précis des messages d'erreur (ce sont des chaînes du catalogue i18n ;</li><li data-nac-id="spec.list.165.item.2" data-nac-role="list-item">La stratégie DOM pour trouver les éléments (<code data-nac-role="code-inline">querySelector</code> aujourd'hui ;</li><li data-nac-id="spec.list.165.item.3" data-nac-role="list-item">La structure interne du cache de manifestes. Traitez les manifestes comme</li></ol>
+<hr />
+<h2 data-nac-id="spec.h2.13-questions-ouvertes-suivies-séparément" data-nac-role="heading" data-nac-level="2" id="13-questions-ouvertes-suivies-séparément">13. Questions ouvertes (suivies séparément)</h2>
+<p data-nac-id="spec.p.168" data-nac-role="paragraph">Actuellement non (v2.1). La feuille de route v22 plaide pour un rejet plus strict.</p>
+<p data-nac-id="spec.p.169" data-nac-role="paragraph">signifier « save sous le plugin actif ») ? Pas en v2.1 ; envisagé pour la v2.3.</p>
+<p data-nac-id="spec.p.170" data-nac-role="paragraph">(un manifeste de base étendu par un locataire) ? Suivi comme candidat pour la v3.0.</p>
+<ul data-nac-id="spec.list.171" data-nac-role="list"><li data-nac-id="spec.list.171.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role="navigation"</code> devrait-il jamais se résoudre en onglet ?</li><li data-nac-id="spec.list.171.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click()</code> devrait-il accepter des identifiants relatifs (par ex. <code data-nac-role="code-inline">'./save'</code> pour</li><li data-nac-id="spec.list.171.item.3" data-nac-role="list-item">Les manifestes devraient-ils prendre en charge l'héritage / l'extension entre plugins</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.135-gouvernance" data-nac-role="heading" data-nac-level="2" id="135-gouvernance">13.5 Gouvernance</h2>
+<p data-nac-id="spec.p.174" data-nac-role="paragraph">NAC3 est actuellement géré par Yujin. La spécification est publiée sous licence Apache 2.0 ; le moteur d'exécution de référence sous MIT. Yujin s'engage à transférer NAC3 à une fondation neutre (groupe communautaire W3C, Linux Foundation ou organisme industriel équivalent) si et quand l'adoption justifie une gouvernance neutre. En attendant, les modifications de la spécification suivent le processus RFC documenté dans <code data-nac-role="code-inline">CONTRIBUTING.md</code>, avec une période de commentaires publics d'au moins 14 jours pour tout changement affectant l'API publique ou les formats d'échange.</p>
+<p data-nac-id="spec.p.175" data-nac-role="paragraph">Pour les adoptants : la combinaison de licences Apache 2.0 + MIT garantit que la spécification et le moteur d'exécution survivent à tout changement de statut juridique de Yujin. Vous pouvez forker l'un ou l'autre, l'exécuter et le distribuer, aujourd'hui comme après notre disparition. Ce document consigne cet engagement afin que le chemin vers cette pérennité soit explicite, et non implicite.</p>
+<hr />
+<h2 data-nac-id="spec.h2.14-implémentation-de-référence" data-nac-role="heading" data-nac-level="2" id="14-implémentation-de-référence">14. Implémentation de référence</h2>
+<p data-nac-id="spec.p.178" data-nac-role="paragraph">L'implémentation canonique est le moteur d'exécution de référence distribué sous forme de package NPM <code data-nac-role="code-inline">@nac3/runtime</code>. Le moteur est complet pour la v2.1 et inclut :</p>
+<p data-nac-id="spec.p.179" data-nac-role="paragraph">(arbre de portée, capture éphémère, autoRegister, HMAC, isTrusted).</p>
+<p data-nac-id="spec.p.180" data-nac-role="paragraph">la voix, le LLM et le distributeur d'actions.</p>
+<ul data-nac-id="spec.list.181" data-nac-role="list"><li data-nac-id="spec.list.181.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac.js</code> -- base v1.9 + l'API publique de la section 5.</li><li data-nac-id="spec.list.181.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-v2-extensions.js</code> -- les primitives brownfield v2.0</li><li data-nac-id="spec.list.181.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-chat-client.js</code> -- un client de conversation de référence qui connecte</li></ul>
+<p data-nac-id="spec.p.182" data-nac-role="paragraph">D'autres implémentations sont les bienvenues (Python pour les moteurs d'automatisation natifs, Rust pour les agents embarqués, etc.). La spécification, et non le code JS, fait autorité.</p>
+<hr />
+<p data-nac-id="spec.p.184" data-nac-role="paragraph"><em>Ce document est la spécification canonique NAC3 v2.1. Toute modification de ce fichier constitue un changement de spécification et requiert un RFC ; voir <code data-nac-role="code-inline">CONTRIBUTING.md</code>.</em></p>
+<hr />
+<p data-nac-id="spec.p.186" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/SPEC.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "spec",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "spec.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "spec.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "spec.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "spec.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

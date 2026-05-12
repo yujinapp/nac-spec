@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Playbook -- Migrer un projet existant vers NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="ai_playbook_migration" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="ai_playbook_migration" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="ai_playbook_migration.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="ai_playbook_migration.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/ai_playbook_migration.mp3" data-nac-id="ai_playbook_migration.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="ai_playbook_migration.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="ai_playbook_migration.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="ai_playbook_migration.main" data-nac-role="region">
+<hr />
+<p data-nac-id="ai_playbook_migration.p.1" data-nac-role="paragraph">translation_source: guides/AI_PLAYBOOK_MIGRATION.md translation_source_hash: f49b65c798ab36923cab79511851c64a81ad6609a1c37d4936d4c6c0542cc706 translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T13:44:26.802281+00:00</p>
+<hr />
+<h1 data-nac-id="ai_playbook_migration.h1.ai-playbook-migrer-un-projet-existant-vers-nac3" data-nac-role="heading" data-nac-level="1" id="ai-playbook-migrer-un-projet-existant-vers-nac3">AI Playbook -- Migrer un projet existant vers NAC3</h1>
+<p data-nac-id="ai_playbook_migration.p.4" data-nac-role="paragraph"><strong>Version NAC3 :</strong> 2.2 stable + aperçu interop v2.3. <strong>Audience :</strong> Tout agent IA (Claude, GPT, Gemini, LLM local) chargé de migrer une application web existante vers la conformité NAC-3. <strong>Format :</strong> Runbook étape par étape avec QUOI, COMMENT, VÉRIFIER par étape.</p>
+<p data-nac-id="ai_playbook_migration.p.5" data-nac-role="paragraph">Lorsqu'un humain dit <strong>« migrons ce projet vers NAC-3 »</strong>, un agent IA lisant ce fichier DOIT exécuter les étapes ci-dessous dans l'ordre. La migration brownfield est plus difficile que le greenfield car on ne peut pas casser l'application en production. Chaque étape est livrée INDÉPENDAMMENT.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-0-périmètre-garde-fous" data-nac-role="heading" data-nac-level="2" id="étape-0-périmètre-garde-fous">Étape 0 -- Périmètre + garde-fous</h2>
+<h3 data-nac-id="ai_playbook_migration.h3.01-questions-à-poser-à-lhumain" data-nac-role="heading" data-nac-level="3" id="01-questions-à-poser-à-lhumain">0.1 Questions à poser à l'humain</h3>
+<p data-nac-id="ai_playbook_migration.p.9" data-nac-role="paragraph">la migration se fait écran par écran derrière des feature flags. En    staging, on peut être plus audacieux.</p>
+<p data-nac-id="ai_playbook_migration.p.10" data-nac-role="paragraph">l'arborescence du projet, puis confirmer avec l'humain.</p>
+<p data-nac-id="ai_playbook_migration.p.11" data-nac-role="paragraph">les plus utilisées dans son application (enregistrer, annuler,    rechercher, filtrer, etc.). Celles-ci migrent en premier.</p>
+<p data-nac-id="ai_playbook_migration.p.12" data-nac-role="paragraph">existante (Yujin chat sur <code data-nac-role="code-inline">/yujin/nac-demo</code>, ou votre propre    intermédiaire LLM) ?</p>
+<p data-nac-id="ai_playbook_migration.p.13" data-nac-role="paragraph">existants ? Les tests NAC3 seront ajoutés en parallèle, sans    remplacer les existants.</p>
+<p data-nac-id="ai_playbook_migration.p.14" data-nac-role="paragraph">custom ? Certaines bibliothèques absorbent les props <code data-nac-role="code-inline">data-*</code> ; des    wrappers seront nécessaires (voir étape 5).</p>
+<ol data-nac-id="ai_playbook_migration.list.15" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.15.item.1" data-nac-role="list-item"><strong>Niveau de risque</strong> : L'application est-elle en production ? Si oui,</li><li data-nac-id="ai_playbook_migration.list.15.item.2" data-nac-role="list-item"><strong>Framework</strong> : Détecter depuis <code data-nac-role="code-inline">package.json</code> / <code data-nac-role="code-inline">composer.json</code> /</li><li data-nac-id="ai_playbook_migration.list.15.item.3" data-nac-role="list-item"><strong>Top 10 des verbes</strong> : Demander à l'humain de lister les 10 actions</li><li data-nac-id="ai_playbook_migration.list.15.item.4" data-nac-role="list-item"><strong>Backend de chat</strong> : Réutilisera-t-on une infrastructure de chat</li><li data-nac-id="ai_playbook_migration.list.15.item.5" data-nac-role="list-item"><strong>Couverture de tests actuelle</strong> : Playwright / Cypress / Jest</li><li data-nac-id="ai_playbook_migration.list.15.item.6" data-nac-role="list-item"><strong>Bibliothèque de composants</strong> : shadcn / MUI / PrimeNG / Mantine /</li></ol>
+<h3 data-nac-id="ai_playbook_migration.h3.02-hygiène-git-avant-démarrage" data-nac-role="heading" data-nac-level="3" id="02-hygiène-git-avant-démarrage">0.2 Hygiène git avant démarrage</h3>
+<pre data-nac-id="ai_playbook_migration.code.1" data-nac-role="code" data-nac-lang="bash"><code>git status              # DOIT être propre avant de commencer
+git checkout -b feat/nac3-migration</code></pre>
+<p data-nac-id="ai_playbook_migration.p.18" data-nac-role="paragraph">Chaque étape de migration NAC vit dans son propre commit afin que l'humain puisse relire et annuler par tranche.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-1-installer-le-runtime-créer-le-module-de-démarrage" data-nac-role="heading" data-nac-level="2" id="étape-1-installer-le-runtime-créer-le-module-de-démarrage">Étape 1 -- Installer le runtime + créer le module de démarrage</h2>
+<pre data-nac-id="ai_playbook_migration.code.2" data-nac-role="code" data-nac-lang="bash"><code>npm install @nac3/runtime@^2.2.0</code></pre>
+<p data-nac-id="ai_playbook_migration.p.22" data-nac-role="paragraph">Créer <code data-nac-role="code-inline">src/nac/boot.ts</code> (ou l'équivalent selon le framework) :</p>
+<pre data-nac-id="ai_playbook_migration.code.3" data-nac-role="code" data-nac-lang="ts"><code>import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+// import &#x27;@nac3/runtime/chat-client&#x27;;  // uncomment when ready for chat
+
+declare global { interface Window { NAC?: any; NacChat?: any; } }</code></pre>
+<p data-nac-id="ai_playbook_migration.p.24" data-nac-role="paragraph">Importer une seule fois depuis le point d'entrée racine de l'application (<code data-nac-role="code-inline">main.tsx</code>, <code data-nac-role="code-inline">app.module.ts</code>, ou en haut du script dans le <code data-nac-role="code-inline">&lt;head&gt;</code> HTML).</p>
+<p data-nac-id="ai_playbook_migration.p.25" data-nac-role="paragraph"><strong>Vérifier :</strong> <code data-nac-role="code-inline">window.NAC</code> défini dans la console du navigateur ; <code data-nac-role="code-inline">window.NAC.version</code> retourne <code data-nac-role="code-inline">'2.2.0'</code> (ou supérieur).</p>
+<p data-nac-id="ai_playbook_migration.p.26" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 1 -- install runtime + boot module</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-2-décorer-le-shell-de-lapplication" data-nac-role="heading" data-nac-level="2" id="étape-2-décorer-le-shell-de-lapplication">Étape 2 -- Décorer le shell de l'application</h2>
+<p data-nac-id="ai_playbook_migration.p.29" data-nac-role="paragraph">Ajouter <code data-nac-role="code-inline">data-nac-plugin="&lt;app-slug&gt;"</code> sur le conteneur LE PLUS EXTERNE qui enveloppe l'interface principale. C'est l'attribut le plus important de la migration -- sans lui, le snapshot de l'intermédiaire LLM est vide (leçon tirée des études de cas React + Angular, bug #1, documenté dans <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code>).</p>
+<h3 data-nac-id="ai_playbook_migration.h3.exemple-react" data-nac-role="heading" data-nac-level="3" id="exemple-react">Exemple React</h3>
+<pre data-nac-id="ai_playbook_migration.code.4" data-nac-role="code" data-nac-lang="tsx"><code>return (
+  &lt;div className=&quot;app&quot; data-nac-plugin=&quot;my-app&quot;&gt;
+    ...
+  &lt;/div&gt;
+);</code></pre>
+<h3 data-nac-id="ai_playbook_migration.h3.exemple-angular" data-nac-role="heading" data-nac-level="3" id="exemple-angular">Exemple Angular</h3>
+<pre data-nac-id="ai_playbook_migration.code.5" data-nac-role="code" data-nac-lang="html"><code>&lt;div class=&quot;app&quot; data-nac-plugin=&quot;my-app&quot;&gt;
+  ...
+&lt;/div&gt;</code></pre>
+<h3 data-nac-id="ai_playbook_migration.h3.rendu-côté-serveur-php-rails-django" data-nac-role="heading" data-nac-level="3" id="rendu-côté-serveur-php-rails-django">Rendu côté serveur (PHP / Rails / Django)</h3>
+<pre data-nac-id="ai_playbook_migration.code.6" data-nac-role="code" data-nac-lang="html"><code>&lt;body data-nac-plugin=&quot;my-app&quot;&gt;
+  ...
+&lt;/body&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.36" data-nac-role="paragraph"><strong>Vérifier :</strong> Console du navigateur : <code data-nac-role="code-inline">NAC.describe().plugins.length &gt;= 1</code>.</p>
+<p data-nac-id="ai_playbook_migration.p.37" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 2 -- root data-nac-plugin attribute</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-3-décorer-les-boutons-porteurs-des-10-verbes-principau" data-nac-role="heading" data-nac-level="2" id="étape-3-décorer-les-boutons-porteurs-des-10-verbes-principau">Étape 3 -- Décorer les boutons porteurs des 10 verbes principaux</h2>
+<p data-nac-id="ai_playbook_migration.p.40" data-nac-role="paragraph">Reprendre les 10 actions les plus utilisées de l'étape 0.3. Pour chaque bouton :</p>
+<pre data-nac-id="ai_playbook_migration.code.7" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;&lt;plugin&gt;.&lt;verb&gt;&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;&lt;verb&gt;&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.42" data-nac-role="paragraph"><strong>Conventions d'ID :</strong></p>
+<p data-nac-id="ai_playbook_migration.p.43" data-nac-role="paragraph"><code data-nac-role="code-inline">dashboard.invoice.list.row.42.delete</code>.</p>
+<ul data-nac-id="ai_playbook_migration.list.44" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.44.item.1" data-nac-role="list-item">Préfixé par le plugin : <code data-nac-role="code-inline">invoice.save</code>, pas juste <code data-nac-role="code-inline">save</code>.</li><li data-nac-id="ai_playbook_migration.list.44.item.2" data-nac-role="list-item">Snake_case en minuscules : <code data-nac-role="code-inline">add_row</code>, pas <code data-nac-role="code-inline">AddRow</code> ni <code data-nac-role="code-inline">add-row</code>.</li><li data-nac-id="ai_playbook_migration.list.44.item.3" data-nac-role="list-item">Verbe en feuille pour un verbe global de l'application ; sinon imbriqué :</li></ul>
+<p data-nac-id="ai_playbook_migration.p.45" data-nac-role="paragraph">Ne pas toucher au <code data-nac-role="code-inline">onclick</code> / gestionnaire d'événement existant -- la décoration est additive.</p>
+<p data-nac-id="ai_playbook_migration.p.46" data-nac-role="paragraph"><strong>Vérifier :</strong> Depuis la console :</p>
+<pre data-nac-id="ai_playbook_migration.code.8" data-nac-role="code" data-nac-lang="js"><code>NAC.describe().plugins[0].elements.length  // &gt;= 10
+NAC.list_registered_plugins()                // includes your plugin</code></pre>
+<p data-nac-id="ai_playbook_migration.p.48" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 3 -- top-10 buttons decorated</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-4-ajouter-un-manifeste-minimal" data-nac-role="heading" data-nac-level="2" id="étape-4-ajouter-un-manifeste-minimal">Étape 4 -- Ajouter un manifeste minimal</h2>
+<p data-nac-id="ai_playbook_migration.p.51" data-nac-role="paragraph">Ne pas chercher à couvrir TOUS les éléments dès le premier jour. Couvrir les 10 boutons porteurs de verbes de l'étape 3 avec un <code data-nac-role="code-inline">label_i18n</code> approprié :</p>
+<pre data-nac-id="ai_playbook_migration.code.9" data-nac-role="code" data-nac-lang="ts"><code>// src/nac/manifest.ts
+const li = (es:string,en:string,pt:string,fr:string,it:string,
+            de:string,ja:string,zh:string,hi:string,ar:string) =&gt;
+  ({ es, en, pt, fr, it, de, ja, zh, hi, ar });
+
+export const APP_MANIFEST = {
+  plugin_slug: &#x27;my-app&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.2&#x27;,
+  elements: [
+    {
+      id: &#x27;my-app.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: li(&#x27;Guardar&#x27;,&#x27;Save&#x27;,&#x27;Salvar&#x27;,&#x27;Sauver&#x27;,&#x27;Salva&#x27;,
+                       &#x27;Speichern&#x27;,&#x27;保存&#x27;,&#x27;保存&#x27;,&#x27;sahejna&#x27;,&#x27;حفظ&#x27;)
+      }],
+      label_i18n: li(/* same */)
+    },
+    // ... 9 more ...
+  ]
+};</code></pre>
+<p data-nac-id="ai_playbook_migration.p.53" data-nac-role="paragraph">Enregistrer au démarrage :</p>
+<pre data-nac-id="ai_playbook_migration.code.10" data-nac-role="code" data-nac-lang="ts"><code>window.NAC?.register(APP_MANIFEST);</code></pre>
+<p data-nac-id="ai_playbook_migration.p.55" data-nac-role="paragraph">Si les 10 locales ne peuvent pas être livrées dès le premier jour, utiliser <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> sur le chemin autoRegister.watch. Il s'agit d'une béquille temporaire ; le validateur strict NAC3 v2.2 en production avertira en cas d'i18n incomplète.</p>
+<p data-nac-id="ai_playbook_migration.p.56" data-nac-role="paragraph"><strong>Vérifier :</strong></p>
+<pre data-nac-id="ai_playbook_migration.code.11" data-nac-role="code" data-nac-lang="js"><code>NAC.list_registered_plugins()           // [&#x27;my-app&#x27;]
+await NAC.click_by_verb(&#x27;my-app&#x27;,&#x27;save&#x27;)  // resolves</code></pre>
+<p data-nac-id="ai_playbook_migration.p.58" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 4 -- manifest with top-10 verbs</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-5-gérer-la-bibliothèque-de-composants-si-applicable" data-nac-role="heading" data-nac-level="2" id="étape-5-gérer-la-bibliothèque-de-composants-si-applicable">Étape 5 -- Gérer la bibliothèque de composants (si applicable)</h2>
+<p data-nac-id="ai_playbook_migration.p.61" data-nac-role="paragraph">Si l'application utilise MUI / Mantine / PrimeNG / etc. et que les boutons absorbent les props <code data-nac-role="code-inline">data-*</code>, écrire un wrapper léger :</p>
+<pre data-nac-id="ai_playbook_migration.code.12" data-nac-role="code" data-nac-lang="tsx"><code>// src/nac/NacButton.tsx
+import { Button as MuiButton } from &#x27;@mui/material&#x27;;
+import { useEffect, useRef } from &#x27;react&#x27;;
+
+export function NacButton({ nacId, verb, plugin, children, ...rest }) {
+  const ref = useRef(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    el.setAttribute(&#x27;data-nac-id&#x27;, nacId);
+    el.setAttribute(&#x27;data-nac-role&#x27;, &#x27;action&#x27;);
+    el.setAttribute(&#x27;data-nac-action&#x27;, verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest}&gt;{children}&lt;/MuiButton&gt;;
+}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.63" data-nac-role="paragraph">Remplacer <code data-nac-role="code-inline">&lt;Button&gt;</code> par <code data-nac-role="code-inline">&lt;NacButton nacId="..." verb="..."&gt;</code> pour les 10 boutons principaux. Procéder de manière incrémentale.</p>
+<p data-nac-id="ai_playbook_migration.p.64" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 5 -- component library wrapper</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-6-émettre-le-contrat-dacquittement" data-nac-role="heading" data-nac-level="2" id="étape-6-émettre-le-contrat-dacquittement">Étape 6 -- Émettre le contrat d'acquittement</h2>
+<p data-nac-id="ai_playbook_migration.p.67" data-nac-role="paragraph">Le helper <code data-nac-role="code-inline">bindAction</code> de la v2.2 est la voie la plus propre :</p>
+<pre data-nac-id="ai_playbook_migration.code.13" data-nac-role="code" data-nac-lang="ts"><code>import { useRef, useEffect } from &#x27;react&#x27;;
+
+export function useNacAction(plugin: string, actionId: string) {
+  const ref = useRef&lt;HTMLElement&gt;(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el || !window.NAC) return;
+    return window.NAC.bindAction(el, () =&gt; {}, { plugin, action_id: actionId });
+  }, [plugin, actionId]);
+  return ref;
+}</code></pre>
+<pre data-nac-id="ai_playbook_migration.code.14" data-nac-role="code" data-nac-lang="tsx"><code>function SaveButton({ onSave }) {
+  const ref = useNacAction(&#x27;my-app&#x27;, &#x27;my-app.save&#x27;);
+  return &lt;button ref={ref} onClick={onSave}&gt;Save&lt;/button&gt;;
+}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.70" data-nac-role="paragraph">La couche bindAction déclenche <code data-nac-role="code-inline">nac:action:succeeded</code> automatiquement après le retour du <code data-nac-role="code-inline">onClick</code> de l'utilisateur. Fini le « le chat dit 'No pude ejecutar X: timeout' ».</p>
+<p data-nac-id="ai_playbook_migration.p.71" data-nac-role="paragraph"><strong>Vérifier :</strong> Depuis la console :</p>
+<pre data-nac-id="ai_playbook_migration.code.15" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt; console.log(e.detail));
+await NAC.click(&#x27;my-app.save&#x27;);
+// Should print {plugin: &#x27;my-app&#x27;, action_id: &#x27;my-app.save&#x27;, ...}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.73" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 6 -- bindAction ack contract</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-7-ajouter-les-champs-onglets" data-nac-role="heading" data-nac-level="2" id="étape-7-ajouter-les-champs-onglets">Étape 7 -- Ajouter les champs + onglets</h2>
+<p data-nac-id="ai_playbook_migration.p.76" data-nac-role="paragraph">Pour chaque champ de saisie :</p>
+<pre data-nac-id="ai_playbook_migration.code.16" data-nac-role="code" data-nac-lang="html"><code>&lt;input data-nac-id=&quot;my-app.field_x&quot; data-nac-role=&quot;field&quot; ...&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.78" data-nac-role="paragraph">Pour chaque onglet dans les composants de type tab-strip :</p>
+<pre data-nac-id="ai_playbook_migration.code.17" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;tab.&lt;key&gt;&quot;
+  data-nac-role=&quot;tab&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.80" data-nac-role="paragraph"><strong>Point critique (règle du validateur strict v2.2) :</strong> Tout ID correspondant à <code data-nac-role="code-inline">^tab\.</code> DOIT avoir le rôle <code data-nac-role="code-inline">tab</code>. Un rôle incohérent produit le finding <code data-nac-role="code-inline">tab_id_manifest_role_drift</code> et le runtime ne peut plus trouver l'onglet via <code data-nac-role="code-inline">NAC.tab()</code>.</p>
+<p data-nac-id="ai_playbook_migration.p.81" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 7 -- fields + tabs decorated</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-8-ajouter-le-panneau-de-chat-optionnel-différable" data-nac-role="heading" data-nac-level="2" id="étape-8-ajouter-le-panneau-de-chat-optionnel-différable">Étape 8 -- Ajouter le panneau de chat (optionnel, différable)</h2>
+<p data-nac-id="ai_playbook_migration.p.84" data-nac-role="paragraph">Intégrer le <code data-nac-role="code-inline">nac-chat-client.js</code> de référence :</p>
+<pre data-nac-id="ai_playbook_migration.code.18" data-nac-role="code" data-nac-lang="html"><code>&lt;aside class=&quot;chat&quot; data-nac-plugin=&quot;chat&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div id=&quot;chat-log&quot; data-nac-id=&quot;chat.log&quot; data-nac-role=&quot;region&quot;&gt;&lt;/div&gt;
+  &lt;input id=&quot;chat-input&quot; data-nac-id=&quot;chat.input&quot; data-nac-role=&quot;field&quot;&gt;
+  &lt;button id=&quot;chat-send&quot; data-nac-id=&quot;chat.send&quot; data-nac-role=&quot;action&quot;&gt;send&lt;/button&gt;
+&lt;/aside&gt;
+
+&lt;script src=&quot;https://yujin.app/nac-spec/js/nac-chat-client.js?v=v22&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+NacChat.init({
+  endpoint: &#x27;/your-llm-intermediary&#x27;,   // or &#x27;/crm/api/v1/yujin/nac-demo&#x27;
+  chatLog: document.getElementById(&#x27;chat-log&#x27;),
+  input:   document.getElementById(&#x27;chat-input&#x27;),
+  sendBtn: document.getElementById(&#x27;chat-send&#x27;)
+});
+&lt;/script&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.86" data-nac-role="paragraph">Alternativement, <strong>différer entièrement le chat</strong> et inviter les utilisateurs à installer Yujin Pilot (<code data-nac-role="code-inline">yujin.app/pilot</code>), qui découvre l'application via MCP et la pilote depuis un cockpit centralisé.</p>
+<p data-nac-id="ai_playbook_migration.p.87" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 8 -- chat panel</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-9-ajouter-le-corpus-de-tests-nac3" data-nac-role="heading" data-nac-level="2" id="étape-9-ajouter-le-corpus-de-tests-nac3">Étape 9 -- Ajouter le corpus de tests NAC3</h2>
+<p data-nac-id="ai_playbook_migration.p.90" data-nac-role="paragraph">Copier l'infrastructure de tests de référence Yujin :</p>
+<pre data-nac-id="ai_playbook_migration.code.19" data-nac-role="code" data-nac-lang="bash"><code>mkdir -p test/nac3
+cp /path/to/rpaforce-crm/packages/nac/test/stage*.mjs ./test/nac3/
+cp /path/to/rpaforce-crm/tools/nac/test-launch.sh ./test/nac3/</code></pre>
+<p data-nac-id="ai_playbook_migration.p.92" data-nac-role="paragraph">Adapter le slug du plugin et la référence au manifeste. Lancer :</p>
+<pre data-nac-id="ai_playbook_migration.code.20" data-nac-role="code" data-nac-lang="bash"><code>bash ./test/nac3/test-launch.sh</code></pre>
+<p data-nac-id="ai_playbook_migration.p.94" data-nac-role="paragraph"><strong>Vérifier :</strong> Toutes les couches au VERT.</p>
+<p data-nac-id="ai_playbook_migration.p.95" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 9 -- NAC3 test corpus</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.étape-10-promouvoir-vers-la-conformité-nac-3" data-nac-role="heading" data-nac-level="2" id="étape-10-promouvoir-vers-la-conformité-nac-3">Étape 10 -- Promouvoir vers la conformité NAC-3</h2>
+<pre data-nac-id="ai_playbook_migration.code.21" data-nac-role="code" data-nac-lang="bash"><code># Dans votre CI :
+npx @nac3/runtime validate ./src --severity=error  # exit 0 required
+NAC.validate_global({probe: true})              # zero findings required</code></pre>
+<p data-nac-id="ai_playbook_migration.p.99" data-nac-role="paragraph">Définir <code data-nac-role="code-inline">NAC.STRICT_VALIDATION = true</code> dans le boot de production pour imposer la cohérence des rôles à l'enregistrement.</p>
+<p data-nac-id="ai_playbook_migration.p.100" data-nac-role="paragraph"><strong>Commit :</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 10 -- NAC-3 conformance gate</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.ordre-de-migration-entre-les-écrans" data-nac-role="heading" data-nac-level="2" id="ordre-de-migration-entre-les-écrans">Ordre de migration entre les écrans</h2>
+<p data-nac-id="ai_playbook_migration.p.103" data-nac-role="paragraph">Dans une application en production avec de nombreux écrans, ne pas tout migrer d'un coup :</p>
+<p data-nac-id="ai_playbook_migration.p.104" data-nac-role="paragraph">utilisateurs avancés passent leur temps).</p>
+<p data-nac-id="ai_playbook_migration.p.105" data-nac-role="paragraph">plus longue).</p>
+<ol data-nac-id="ai_playbook_migration.list.106" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.106.item.1" data-nac-role="list-item"><strong>L'écran le plus utilisé en premier</strong> (ex. : connexion + tableau de bord).</li><li data-nac-id="ai_playbook_migration.list.106.item.2" data-nac-role="list-item"><strong>L'écran à plus forte valeur ensuite</strong> (celui dans lequel vos</li><li data-nac-id="ai_playbook_migration.list.106.item.3" data-nac-role="list-item"><strong>Les écrans publics</strong> (visibles par le trafic anonyme).</li><li data-nac-id="ai_playbook_migration.list.106.item.4" data-nac-role="list-item"><strong>Les écrans d'administration en dernier</strong> (faible trafic, acceptation</li></ol>
+<p data-nac-id="ai_playbook_migration.p.107" data-nac-role="paragraph">Chaque écran fait l'objet de sa propre PR. Chaque PR est livrée derrière un feature flag si disponible ; le rollback se fait en basculant le flag.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.pièges-courants-lors-de-la-migration" data-nac-role="heading" data-nac-level="2" id="pièges-courants-lors-de-la-migration">Pièges courants lors de la migration</h2>
+<p data-nac-id="ai_playbook_migration.p.110" data-nac-role="paragraph">mais le LLM ne voit rien. <strong>Symptôme :</strong> le chat répond de manière    générique « Comment puis-je vous aider ? » sans proposer d'actions.    Correction : ajouter l'attribut. (Bug #1 des études de cas.)</p>
+<p data-nac-id="ai_playbook_migration.p.111" data-nac-role="paragraph">refs + des setters fonctionnels. (Bug #2 des études de cas.)</p>
+<p data-nac-id="ai_playbook_migration.p.112" data-nac-role="paragraph"><code data-nac-role="code-inline">^tab\.</code> DOIT avoir le rôle <code data-nac-role="code-inline">tab</code>.</p>
+<p data-nac-id="ai_playbook_migration.p.113" data-nac-role="paragraph">un nouveau rôle sémantique DOIT recevoir un nouvel ID. La réutilisation    casse l'automatisation en aval.</p>
+<p data-nac-id="ai_playbook_migration.p.114" data-nac-role="paragraph">écrire un wrapper (étape 5).</p>
+<p data-nac-id="ai_playbook_migration.p.115" data-nac-role="paragraph"><code data-nac-role="code-inline">bindAction</code>. Sans lui, <code data-nac-role="code-inline">NAC.click()</code> expire après 5 s même si    l'effet de bord a fonctionné.</p>
+<ol data-nac-id="ai_playbook_migration.list.116" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.116.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">data-nac-plugin</code> oublié sur la racine.</strong> Le manifeste est enregistré</li><li data-nac-id="ai_playbook_migration.list.116.item.2" data-nac-role="list-item"><strong>Fermeture stale de l'état React dans onChatAction.</strong> Utiliser des</li><li data-nac-id="ai_playbook_migration.list.116.item.3" data-nac-role="list-item"><strong>ID d'onglet avec un rôle non-tab.</strong> Finding du validateur strict v2.2.</li><li data-nac-id="ai_playbook_migration.list.116.item.4" data-nac-role="list-item"><strong>Réutilisation d'IDs après un refactoring.</strong> Un bouton déplacé vers</li><li data-nac-id="ai_playbook_migration.list.116.item.5" data-nac-role="list-item">*<em>La bibliothèque de composants absorbe les <code data-nac-role="code-inline">data-</em></code>.** Détecter tôt ;</li><li data-nac-id="ai_playbook_migration.list.116.item.6" data-nac-role="list-item"><strong>Le gestionnaire de clic n'émet pas d'acquittement.</strong> Utiliser</li></ol>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.voir-aussi" data-nac-role="heading" data-nac-level="2" id="voir-aussi">Voir aussi</h2>
+<p data-nac-id="ai_playbook_migration.p.119" data-nac-role="paragraph">projets greenfield.</p>
+<p data-nac-id="ai_playbook_migration.p.120" data-nac-role="paragraph">par framework.</p>
+<p data-nac-id="ai_playbook_migration.p.121" data-nac-role="paragraph">post-migration.</p>
+<p data-nac-id="ai_playbook_migration.p.122" data-nac-role="paragraph">-- bugs découverts lors de la migration de référence Yujin.</p>
+<ul data-nac-id="ai_playbook_migration.list.123" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.123.item.1" data-nac-role="list-item"><a href="AI_PLAYBOOK_NEW_PROJECT.md" data-nac-id="ai_playbook_migration.link.1" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_NEW_PROJECT.md</a> -- pour les</li><li data-nac-id="ai_playbook_migration.list.123.item.2" data-nac-role="list-item"><a href="REACT.md" data-nac-id="ai_playbook_migration.link.2" data-nac-role="action" data-nac-action="open">REACT.md</a> / <a href="ANGULAR.md" data-nac-id="ai_playbook_migration.link.3" data-nac-role="action" data-nac-action="open">ANGULAR.md</a> -- approfondissements</li><li data-nac-id="ai_playbook_migration.list.123.item.3" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="ai_playbook_migration.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- playbook de tests</li><li data-nac-id="ai_playbook_migration.list.123.item.4" data-nac-role="list-item"><a href="../docs/CASE_STUDIES_DISCOVERY.md" data-nac-id="ai_playbook_migration.link.5" data-nac-role="action" data-nac-action="open">CASE_STUDIES_DISCOVERY.md</a></li></ul>
+<h2 data-nac-id="ai_playbook_migration.h2.licence" data-nac-role="heading" data-nac-level="2" id="licence">Licence</h2>
+<p data-nac-id="ai_playbook_migration.p.125" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="ai_playbook_migration.p.127" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/AI_PLAYBOOK_MIGRATION.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "ai_playbook_migration",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "ai_playbook_migration.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "ai_playbook_migration.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "ai_playbook_migration.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "ai_playbook_migration.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

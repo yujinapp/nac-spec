@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>À propos de NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="about" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="about" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="about.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="about.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/about.mp3" data-nac-id="about.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="about.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="about.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="about.main" data-nac-role="region">
+<hr />
+<p data-nac-id="about.p.1" data-nac-role="paragraph">translation_source: ABOUT.md translation_source_hash: 4ab5d9a2ad96ee42811299474895d9836adc1ca93ea37726806f190f59646484 translation_quality: machine_v1 translation_lang: fr translation_date: 2026-05-11T12:52:21.335473+00:00</p>
+<hr />
+<h1 data-nac-id="about.h1.à-propos-de-nac3" data-nac-role="heading" data-nac-level="1" id="à-propos-de-nac3">À propos de NAC3</h1>
+<p data-nac-id="about.p.4" data-nac-role="paragraph"><strong>Version de la spec :</strong> 2.2 stable (+ aperçu d'interopérabilité v2.3).</p>
+<p data-nac-id="about.p.5" data-nac-role="paragraph"><strong>NAC3</strong> = <strong>Native Agent Contract</strong>.</p>
+<p data-nac-id="about.p.6" data-nac-role="paragraph">Une spec publique et légère qui permet aux interfaces web d'être pilotées par des agents IA, des moteurs vocaux et des outils d'accessibilité, de la même façon qu'elles le sont par des humains aujourd'hui : en cliquant, en tapant et en lisant -- mais avec des noms que les machines peuvent résoudre, des événements sur lesquels elles peuvent attendre, et une piste de provenance qui distingue un vrai utilisateur d'un appelant synthétique.</p>
+<p data-nac-id="about.p.7" data-nac-role="paragraph">NAC3 se place aux côtés de ARIA, et non par-dessus. Là où ARIA a standardisé l'<strong>arbre d'accessibilité</strong> pour que les lecteurs d'écran et les dispositifs de commutation puissent utiliser la même interface qu'un utilisateur voyant, NAC3 standardise l'<strong>arbre d'agents</strong> pour qu'une commande vocale, un intermédiaire LLM ou un bot RPA puisse faire de même sans code de liaison spécifique à chaque application.</p>
+<h2 data-nac-id="about.h2.ce-que-vous-écrivez" data-nac-role="heading" data-nac-level="2" id="ce-que-vous-écrivez">Ce que vous écrivez</h2>
+<p data-nac-id="about.p.9" data-nac-role="paragraph">Une poignée d'attributs HTML (<code data-nac-role="code-inline">data-nac-id</code>, <code data-nac-role="code-inline">data-nac-role</code>, <code data-nac-role="code-inline">data-nac-action</code>, <code data-nac-role="code-inline">data-nac-plugin</code>) ainsi qu'un manifeste JS optionnel qui nomme les éléments de la page et les verbes qu'ils acceptent. Le runtime résout les noms en éléments et leur distribue les appels.</p>
+<h2 data-nac-id="about.h2.ce-que-vous-obtenez" data-nac-role="heading" data-nac-level="2" id="ce-que-vous-obtenez">Ce que vous obtenez</h2>
+<ul data-nac-id="about.list.11" data-nac-role="list"><li data-nac-id="about.list.11.item.1" data-nac-role="list-item">Une page qui répond à <code data-nac-role="code-inline">NAC.click('deals.create')</code> depuis n'importe quel appelant -- un moteur vocal, une spec Playwright, un intermédiaire LLM, une macro clavier, un outil d'accessibilité.</li><li data-nac-id="about.list.11.item.2" data-nac-role="list-item">Une page qui émet une famille d'événements déterministes (<code data-nac-role="code-inline">nac:action:succeeded</code>, <code data-nac-role="code-inline">nac:tab:activated</code>, <code data-nac-role="code-inline">nac:field:changed</code>, ...) pour que l'appelant sache quand chaque étape est terminée.</li><li data-nac-id="about.list.11.item.3" data-nac-role="list-item">Une page dont le contrat repose sur les identités des éléments, et non sur leurs coordonnées -- ainsi, une refonte de l'interface ne casse pas l'automatisation.</li><li data-nac-id="about.list.11.item.4" data-nac-role="list-item">Une couche de provenance (<code data-nac-role="code-inline">isTrusted</code>, manifestes signés HMAC) qui indique à un système en aval si un clic provient d'un vrai utilisateur ou d'un autre agent.</li></ul>
+<h2 data-nac-id="about.h2.ce-que-nac3-nest-pas" data-nac-role="heading" data-nac-level="2" id="ce-que-nac3-nest-pas">Ce que NAC3 n'est pas</h2>
+<ul data-nac-id="about.list.13" data-nac-role="list"><li data-nac-id="about.list.13.item.1" data-nac-role="list-item">Ce n'est pas un framework UI. Vous conservez React / Vue / vanilla / PHP / ce que vous voulez. NAC3 est un contrat léger superposé à ce que vous rendez déjà.</li><li data-nac-id="about.list.13.item.2" data-nac-role="list-item">Ce n'est pas un LLM. Le LLM qui traduit « clique sur le bouton enregistrer » en <code data-nac-role="code-inline">NAC.click('deals.save')</code> est votre affaire (ou celle de votre fournisseur) ; consultez <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> pour une référence.</li><li data-nac-id="about.list.13.item.3" data-nac-role="list-item">Ce n'est pas un substitut à l'accessibilité. Conservez vos rôles ARIA. NAC3 ajoute une couche parallèle ; de nombreux adoptants se retrouvent avec à la fois <code data-nac-role="code-inline">role="button"</code> et <code data-nac-role="code-inline">data-nac-role="action"</code> sur le même élément.</li></ul>
+<h2 data-nac-id="about.h2.statut" data-nac-role="heading" data-nac-level="2" id="statut">Statut</h2>
+<ul data-nac-id="about.list.15" data-nac-role="list"><li data-nac-id="about.list.15.item.1" data-nac-role="list-item"><strong>v1.9</strong> -- stable. 27 widgets couverts, 9 familles d'événements, HMAC + isTrusted, mode strict i18n, validateur. La référence de production est <code data-nac-role="code-inline">example.php</code>.</li><li data-nac-id="about.list.15.item.2" data-nac-role="list-item"><strong>v2.0</strong> -- introduit le scénario de migration brownfield (les pages existantes deviennent pilotées par NAC via ~80 lignes de configuration). Référence : <code data-nac-role="code-inline">example-v20-full.php</code>.</li><li data-nac-id="about.list.15.item.3" data-nac-role="list-item"><strong>v2.1</strong> -- ajoute la primitive data-table (<code data-nac-role="code-inline">collection</code>, <code data-nac-role="code-inline">matrix</code>, sous-types <code data-nac-role="code-inline">matrix-singletree</code> ; <code data-nac-role="code-inline">dt_add_row</code>, <code data-nac-role="code-inline">dt_edit_cell</code>, agrégats, commit transactionnel). Référence : <code data-nac-role="code-inline">example-v21-data-table.php</code>.</li><li data-nac-id="about.list.15.item.4" data-nac-role="list-item"><strong>v2.2</strong> -- LIVRÉ le 2026-05-10. <code data-nac-role="code-inline">NAC.register</code> est désormais un validateur strict (<code data-nac-role="code-inline">manifest_role_unknown</code>, <code data-nac-role="code-inline">tab_id_manifest_role_drift</code>, <code data-nac-role="code-inline">manifest_dom_role_mismatch</code>). Nouveau helper <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> qui intègre le contrat <code data-nac-role="code-inline">nac:action:succeeded</code> dans le runtime. Nouveau flag <code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> qui bascule les résultats entre avertissement uniquement (défaut en 2.2) et exception (défaut en 2.3). <strong>C'est ce que <code data-nac-role="code-inline">npm install @nac3/runtime</code> installe aujourd'hui.</strong> Voir <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code> pour le journal des modifications complet.</li><li data-nac-id="about.list.15.item.5" data-nac-role="list-item"><strong>v2.3</strong> -- en cours de planification. La valeur par défaut de <code data-nac-role="code-inline">STRICT_VALIDATION</code> passe à <code data-nac-role="code-inline">true</code>. Companion <code data-nac-role="code-inline">NAC.bindTab(el, handler, ctx)</code> pour les widgets d'onglets. Option d'activation facultative : dispatch de chat en streaming.</li></ul>
+<h2 data-nac-id="about.h2.par-où-commencer" data-nac-role="heading" data-nac-level="2" id="par-où-commencer">Par où commencer</h2>
+<ul data-nac-id="about.list.17" data-nac-role="list"><li data-nac-id="about.list.17.item.1" data-nac-role="list-item">Lancez les démos sur <code data-nac-role="code-inline">yujin.app/nac-spec/</code> (tout navigateur, tout appareil).</li><li data-nac-id="about.list.17.item.2" data-nac-role="list-item">Lisez <code data-nac-role="code-inline">SPEC.md</code> pour le contrat complet.</li><li data-nac-id="about.list.17.item.3" data-nac-role="list-item">Lisez <code data-nac-role="code-inline">guides/REACT.md</code> si vous adoptez NAC3 depuis React.</li><li data-nac-id="about.list.17.item.4" data-nac-role="list-item">Lisez <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> si vous connectez votre propre intermédiaire LLM.</li><li data-nac-id="about.list.17.item.5" data-nac-role="list-item">Lisez <code data-nac-role="code-inline">SECURITY.md</code> avant de déployer NAC3 dans un contexte multi-tenant.</li></ul>
+<h2 data-nac-id="about.h2.gouvernance" data-nac-role="heading" data-nac-level="2" id="gouvernance">Gouvernance</h2>
+<p data-nac-id="about.p.19" data-nac-role="paragraph">NAC3 est actuellement géré par Yujin. La spec est sous licence Apache 2.0 ; le runtime de référence est sous MIT. Yujin s'engage à transférer NAC3 à une fondation neutre (groupe communautaire W3C, Linux Foundation ou organisme industriel équivalent) si et quand l'adoption le justifie. En attendant, les modifications de la spec suivent le processus RFC décrit dans <code data-nac-role="code-inline">CONTRIBUTING.md</code>, avec une période de commentaires publics d'au moins 14 jours pour toute modification de l'API publique ou du format de transmission.</p>
+<p data-nac-id="about.p.20" data-nac-role="paragraph">La double licence Apache 2.0 + MIT garantit que la spec et le runtime survivent à tout changement de statut juridique de Yujin. Les adoptants peuvent forker l'un ou l'autre, les exécuter et les distribuer, aujourd'hui et après la disparition éventuelle de Yujin.</p>
+<h2 data-nac-id="about.h2.paternité" data-nac-role="heading" data-nac-level="2" id="paternité">Paternité</h2>
+<p data-nac-id="about.p.22" data-nac-role="paragraph">NAC3 est rédigé et maintenu par Yujin (rpaforce.com). Apache-2.0. Contributions bienvenues -- voir <code data-nac-role="code-inline">CONTRIBUTING.md</code>.</p>
+<hr />
+<p data-nac-id="about.p.24" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/ABOUT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "about",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "about.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "about.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "about.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "about.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

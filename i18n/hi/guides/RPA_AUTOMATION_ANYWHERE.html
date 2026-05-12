@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + Automation Anywhere इंटीग्रेशन गाइड -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_automation_anywhere" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_automation_anywhere" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_automation_anywhere.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_automation_anywhere.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_automation_anywhere.mp3" data-nac-id="rpa_automation_anywhere.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_automation_anywhere.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_automation_anywhere.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_automation_anywhere.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_automation_anywhere.p.1" data-nac-role="paragraph">translation_source: guides/RPA_AUTOMATION_ANYWHERE.md translation_source_hash: 165e60e4b3922f8353a3f038d815452ebf9ba7d597cb68f8c313eb47cb416eab translation_quality: machine_v1 translation_lang: hi translation_date: 2026-05-11T15:05:11.375308+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_automation_anywhere.h1.nac3-automation-anywhere-इटगरशन-गइड" data-nac-role="heading" data-nac-level="1" id="nac3-automation-anywhere-इटगरशन-गइड">NAC3 + Automation Anywhere इंटीग्रेशन गाइड</h1>
+<p data-nac-id="rpa_automation_anywhere.p.4" data-nac-role="paragraph"><strong>NAC3 संस्करण:</strong> 2.2 (v2.3 इंटरऑप प्रीव्यू सहित) <strong>परीक्षण किया गया:</strong> Automation Anywhere A2019 + A360 पर।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.द-रसत-अपन-aa-ससकरण-क-अनसर-चन" data-nac-role="heading" data-nac-level="2" id="द-रसत-अपन-aa-ससकरण-क-अनसर-चन">दो रास्ते -- अपने AA संस्करण के अनुसार चुनें</h2>
+<h3 data-nac-id="rpa_automation_anywhere.h3.path-a-a360-web-recorder-run-javascript" data-nac-role="heading" data-nac-level="3" id="path-a-a360-web-recorder-run-javascript">Path A -- A360 + Web Recorder + Run JavaScript</h3>
+<p data-nac-id="rpa_automation_anywhere.p.7" data-nac-role="paragraph">AA का <code data-nac-role="code-inline">Run JavaScript Function</code> एक्शन सक्रिय ब्राउज़र टैब में इंजेक्ट करता है।</p>
+<pre data-nac-id="rpa_automation_anywhere.code.1" data-nac-role="code" data-nac-lang="js"><code>// payload variable: NAC_ID = &quot;invoice.save&quot;
+async function nacClick(id) {
+  await window.NAC.click(id);
+  return &#x27;ok&#x27;;
+}
+return nacClick($NAC_ID$);</code></pre>
+<p data-nac-id="rpa_automation_anywhere.p.9" data-nac-role="paragraph">इनपुट वेरिएबल्स (<code data-nac-role="code-inline">$NAC_ID$</code>, <code data-nac-role="code-inline">$VALUE$</code>) को डिज़ाइन टाइम पर बाइंड करें; एक्शन एक स्ट्रिंग रिटर्न करता है जिस पर बॉट ब्रांचिंग करता है।</p>
+<h3 data-nac-id="rpa_automation_anywhere.h3.path-b-a2019-object-cloning-with-custom-attribute" data-nac-role="heading" data-nac-level="3" id="path-b-a2019-object-cloning-with-custom-attribute">Path B -- A2019 + Object Cloning with custom attribute</h3>
+<p data-nac-id="rpa_automation_anywhere.p.11" data-nac-role="paragraph">A2019 का <code data-nac-role="code-inline">Object Cloning</code> परंपरागत रूप से DOM प्रॉपर्टीज़ के ज़रिए टार्गेट करता है। प्रॉपर्टी सेलेक्टर इस प्रकार कॉन्फ़िगर करें:</p>
+<pre data-nac-id="rpa_automation_anywhere.code.2" data-nac-role="code" data-nac-lang="text"><code>HTML.Attribute: data-nac-id
+Search value: invoice.save</code></pre>
+<p data-nac-id="rpa_automation_anywhere.p.13" data-nac-role="paragraph">Path A की तुलना में कम मज़बूत (DOM ट्री टाइमिंग पर निर्भर), लेकिन अनुभवी A2019 बॉट्स को फ्लो दोबारा लिखे बिना NAC3 अपनाने की सुविधा देता है।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.कननकल-8-एकशन-बट-टमपलट" data-nac-role="heading" data-nac-level="2" id="कननकल-8-एकशन-बट-टमपलट">कैनोनिकल 8-एक्शन बॉट टेम्पलेट</h2>
+<p data-nac-id="rpa_automation_anywhere.p.15" data-nac-role="paragraph">v21 इनवॉइस डेमो के लिए:</p>
+<p data-nac-id="rpa_automation_anywhere.p.16" data-nac-role="paragraph">| चरण | एक्शन | पेलोड | |------|--------|---------| | 1 | Open Browser | https://your-app.example.com/ | | 2 | Wait | <code data-nac-role="code-inline">window.NAC</code> रेडी होने तक (poll JS) | | 3 | Loop CSV | rows | | 4 | Run JS | <code data-nac-role="code-inline">await window.NAC.click_by_verb('invoice','new')</code> | | 5 | Run JS | <code data-nac-role="code-inline">await window.NAC.fill('invoice.client',$row.client$)</code> | | 6 | Run JS | <code data-nac-role="code-inline">await window.NAC.fill('invoice.amount',$row.amount$)</code> | | 7 | Run JS | <code data-nac-role="code-inline">await window.NAC.click_by_verb('invoice','save')</code> | | 8 | End Loop | -- |</p>
+<p data-nac-id="rpa_automation_anywhere.p.17" data-nac-role="paragraph">UI की जटिलता चाहे जितनी हो, केवल 8 एक्शन। CSS-सेलेक्टर फ्लो के सामान्य 30-60 एक्शन से तुलना करें।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.nacdescribe-क-जरए-डसकवर" data-nac-role="heading" data-nac-level="2" id="nacdescribe-क-जरए-डसकवर"><code data-nac-role="code-inline">NAC.describe()</code> के ज़रिए डिस्कवरी</h2>
+<pre data-nac-id="rpa_automation_anywhere.code.3" data-nac-role="code" data-nac-lang="js"><code>return JSON.stringify(window.NAC.describe());</code></pre>
+<p data-nac-id="rpa_automation_anywhere.p.20" data-nac-role="paragraph">मैनिफेस्ट ट्री रिटर्न करता है। AA इसे <code data-nac-role="code-inline">JSON Parse</code> से पार्स करके डायनामिक फ्लोचार्ट बना सकता है।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.provenance-istrusted" data-nac-role="heading" data-nac-level="2" id="provenance-istrusted">Provenance + isTrusted</h2>
+<p data-nac-id="rpa_automation_anywhere.p.22" data-nac-role="paragraph">AA सिंथेटिक क्लिक्स डिस्पैच करता है। होस्ट ऐप संवेदनशील वर्ब्स (delete, payment) को तब तक अस्वीकार कर सकता है जब तक उन्हें स्पष्ट रूप से व्हाइटलिस्ट न किया जाए। होस्ट-साइड ऑप्ट-इन पैटर्न के लिए <code data-nac-role="code-inline">RPA_UIPATH.md</code> का "Provenance" सेक्शन देखें। यही AA पर भी लागू होता है।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.एरर-हडलग" data-nac-role="heading" data-nac-level="2" id="एरर-हडलग">एरर हैंडलिंग</h2>
+<p data-nac-id="rpa_automation_anywhere.p.24" data-nac-role="paragraph">हर JS कॉल को <code data-nac-role="code-inline">try/catch</code> में लपेटें और JSON रिटर्न करें:</p>
+<pre data-nac-id="rpa_automation_anywhere.code.4" data-nac-role="code" data-nac-lang="js"><code>try {
+  await window.NAC.fill(&#x27;@id@&#x27;, &#x27;@value@&#x27;);
+  return JSON.stringify({ok: true});
+} catch (e) {
+  return JSON.stringify({ok: false, code: e.code, message: e.message});
+}</code></pre>
+<p data-nac-id="rpa_automation_anywhere.p.26" data-nac-role="paragraph"><code data-nac-role="code-inline">If</code> एक्शन पार्स किए गए JSON पर ब्रांचिंग करता है।</p>
+<h2 data-nac-id="rpa_automation_anywhere.h2.लइसस-अनय-सदरभ" data-nac-role="heading" data-nac-level="2" id="लइसस-अनय-सदरभ">लाइसेंस + अन्य संदर्भ</h2>
+<p data-nac-id="rpa_automation_anywhere.p.28" data-nac-role="paragraph">Apache-2.0। विस्तृत जानकारी के लिए <a href="RPA_UIPATH.md" data-nac-id="rpa_automation_anywhere.link.1" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a> देखें; वहाँ के पैटर्न 1:1 यहाँ भी लागू होते हैं।</p>
+<hr />
+<p data-nac-id="rpa_automation_anywhere.p.30" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_AUTOMATION_ANYWHERE.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_automation_anywhere",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_automation_anywhere.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_automation_anywhere.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_automation_anywhere.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_automation_anywhere.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

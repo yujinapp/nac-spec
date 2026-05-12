@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relatório de cobertura NAC3 -- noite de 2026-05-10 / 11 -- NAC3</title>
+<meta name="nac3-doc-slug" content="coverage_report_2026_05_10" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="coverage_report_2026_05_10" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="coverage_report_2026_05_10.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="coverage_report_2026_05_10.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/coverage_report_2026_05_10.mp3" data-nac-id="coverage_report_2026_05_10.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="coverage_report_2026_05_10.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="coverage_report_2026_05_10.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="coverage_report_2026_05_10.main" data-nac-role="region">
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.1" data-nac-role="paragraph">translation_source: docs/COVERAGE_REPORT_2026_05_10.md translation_source_hash: 4da4311e057dd1c23dea9b23a506ada42741d28b05b94709cb5150b1686c51ac translation_quality: machine_v1 translation_lang: pt translation_date: 2026-05-11T13:43:16.406280+00:00</p>
+<hr />
+<h1 data-nac-id="coverage_report_2026_05_10.h1.relatório-de-cobertura-nac3-noite-de-2026-05-10-11" data-nac-role="heading" data-nac-level="1" id="relatório-de-cobertura-nac3-noite-de-2026-05-10-11">Relatório de cobertura NAC3 -- noite de 2026-05-10 / 11</h1>
+<p data-nac-id="coverage_report_2026_05_10.p.4" data-nac-role="paragraph">Gerado ao final da noite de cobertura na branch <code data-nac-role="code-inline">feat/nac-interop-mcp</code>. Este é o registro honesto, caso a caso, do que foi testado + em que profundidade.</p>
+<p data-nac-id="coverage_report_2026_05_10.p.5" data-nac-role="paragraph">Substitui as afirmações informais anteriores de "50/50 PASS" / "5/5 camadas GREEN". Esses números eram estruturalmente corretos, mas a profundidade era desigual; este relatório reapresenta o quadro por estágio do pipeline.</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.lembrete-dos-estágios-do-pipeline" data-nac-role="heading" data-nac-level="2" id="lembrete-dos-estágios-do-pipeline">Lembrete dos estágios do pipeline</h2>
+<pre data-nac-id="coverage_report_2026_05_10.code.1" data-nac-role="code" data-nac-lang="text"><code>Comunicacion -&gt; Desambiguacion -&gt; Intencion -&gt; Llamada -&gt; Resultado -&gt; Ack
+    (1)              (2)             (3)         (4)        (5)         (6)</code></pre>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.suites-entregues-esta-branch" data-nac-role="heading" data-nac-level="2" id="suites-entregues-esta-branch">Suites entregues (esta branch)</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.9" data-nac-role="paragraph">| Suite | Caminho | Testes | |-------|---------|--------| | smoke | <code data-nac-role="code-inline">packages/nac/test/smoke.mjs</code> | 36 | | v22 (constructor strict + bindAction) | <code data-nac-role="code-inline">packages/nac/test/v22.mjs</code> | 14 | | v23-interop (MCP entre apps) | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | 14 | | stage1-audio (mock STT + corpus TTS) | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code> | 33 | | stage2-disambiguation | <code data-nac-role="code-inline">packages/nac/test/stage2-disambiguation.mjs</code> | 31 | | stage3-backend (chamadas ao vivo) | <code data-nac-role="code-inline">packages/nac/test/stage3-backend.mjs</code> | ~80 | | stage4-calls | <code data-nac-role="code-inline">packages/nac/test/stage4-calls.mjs</code> | 31 | | stage6-ack | <code data-nac-role="code-inline">packages/nac/test/stage6-ack.mjs</code> | 16 | | <strong>Total local</strong> | | <strong>175+</strong> |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.10" data-nac-role="paragraph">Todos atualmente PASS local. Nenhuma execução no GitHub Actions (orçamento de créditos zerado; testes rodam apenas no laptop do Pablo + sob demanda).</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.matriz-de-cobertura-por-estágio-do-pipeline" data-nac-role="heading" data-nac-level="2" id="matriz-de-cobertura-por-estágio-do-pipeline">Matriz de cobertura por estágio do pipeline</h2>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-1-comunicacion-stt-entrada-bruta" data-nac-role="heading" data-nac-level="3" id="estágio-1-comunicacion-stt-entrada-bruta">Estágio 1 -- Comunicacion (STT + entrada bruta)</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.13" data-nac-role="paragraph">| Camada | Status | Observações | |--------|--------|-------------| | <strong>CAPA A: mock STT + injeção de corpus</strong> | PASS (30/30) | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code>. Mock <code data-nac-role="code-inline">SpeechRecognition</code> sintetiza um evento <code data-nac-role="code-inline">result</code>; NacChat recebe + despacha normalmente. Verifica que armadilhas de idioma permanecem no locale, prompts de troca alternam, prompts normais acionam o backend. | | <strong>CAPA B: integridade do corpus</strong> | PASS (3/3) | 30 arquivos MP3 gerados via Google Cloud TTS em <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/</code>. Total de 365 KB em 10 locales. Verificação de presença de arquivo + sanidade de tamanho mínimo. | | Reprodução de áudio real com SpeechRecognition do browser | ADIADO | A Web Speech API requer um stream de microfone real + browser. Pertence ao e2e com Playwright (na fila). |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.14" data-nac-role="paragraph"><strong>Cobertura do Estágio 1: ~85%</strong> -- caminhos de texto + corpus + STT-mock totalmente cobertos. Apenas a reprodução de áudio real no browser permanece pendente, o que requer Playwright.</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-2-desambiguacion" data-nac-role="heading" data-nac-level="3" id="estágio-2-desambiguacion">Estágio 2 -- Desambiguacion</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.16" data-nac-role="paragraph">| Preocupação | Casos | Resultado | |-------------|-------|-----------| | Guarda contra falso-positivo em <code data-nac-role="code-inline">_detectLangSwitch</code> (classe de bug f631d77a) | 12 | PASS -- <code data-nac-role="code-inline">cambia de pestana</code>, <code data-nac-role="code-inline">cambia precio de mouse 40</code>, <code data-nac-role="code-inline">borra de la lista</code>, <code data-nac-role="code-inline">pasa de A a B</code> todos CORRETAMENTE permanecem em espanhol. <code data-nac-role="code-inline">cambia a aleman</code>, <code data-nac-role="code-inline">switch to english</code>, <code data-nac-role="code-inline">use spanish</code>, <code data-nac-role="code-inline">cambia idioma a de</code> trocam corretamente. Noop para mesmo idioma + sem crash em entrada vazia. | | Correspondência exata de textContent em <code data-nac-role="code-inline">tab_by_label</code> | 1 | PASS | | Remoção de parênteses em <code data-nac-role="code-inline">tab_by_label</code> (<code data-nac-role="code-inline">"Lines (collection)"</code> corresponde a <code data-nac-role="code-inline">"Lines"</code>) | 1 | PASS | | Correspondência de locale i18n em <code data-nac-role="code-inline">tab_by_label</code> | 1 | PASS | | <code data-nac-role="code-inline">tab_by_label</code> desconhecido -&gt; not_found | 1 | PASS | | <code data-nac-role="code-inline">snapshotTree</code> retorna formato válido | 6 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.17" data-nac-role="paragraph"><strong>Cobertura do Estágio 2: ~95%.</strong> O ajuste no matcher (exigir <code data-nac-role="code-inline">cand.length &gt;= 3</code> para correspondências parciais) foi entregue como correção paralela na mesma suite, fechando o falso-positivo de rótulo de 1 caractere.</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-3-intencion" data-nac-role="heading" data-nac-level="3" id="estágio-3-intencion">Estágio 3 -- Intencion</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.19" data-nac-role="paragraph">Chamadas ao vivo contra o endpoint de produção <code data-nac-role="code-inline">https://yujin.app/crm/api/v1/yujin/nac-demo</code>. O backend de chat Yujin (Claude Sonnet) é o intermediário LLM.</p>
+<p data-nac-id="coverage_report_2026_05_10.p.20" data-nac-role="paragraph">| Preocupação | Casos | Resultado | |-------------|-------|-----------| | HTTP 200 + resposta JSON por prompt | 15 prompts em 7 locales (es/en/pt/fr/de/ja + um prompt-armadilha em espanhol) | PASS para todos | | Resposta contém booleano <code data-nac-role="code-inline">ok</code> | 15 | PASS | | Quando <code data-nac-role="code-inline">ok</code>, possui string <code data-nac-role="code-inline">message</code> + array <code data-nac-role="code-inline">actions</code> | 15 | PASS | | Cada ação contém string <code data-nac-role="code-inline">kind</code> | 15 | PASS | | <strong>Guarda anti-bug</strong>: <code data-nac-role="code-inline">cambia de pestana</code> NÃO emite <code data-nac-role="code-inline">change_locale: 'de'</code> | 1 | PASS -- o LLM ao vivo respeita a regra do system prompt entregue em 2026-05-09. |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.21" data-nac-role="paragraph"><strong>Cobertura do Estágio 3: ~85%</strong> do formato do contrato. Não é 100% porque os conteúdos específicos das ações do LLM são não-determinísticos; verificamos apenas o formato + o caso anti-bug.</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-4-llamada-todas-as-funções-públicas-nac" data-nac-role="heading" data-nac-level="3" id="estágio-4-llamada-todas-as-funções-públicas-nac">Estágio 4 -- Llamada (todas as funções públicas NAC.*)</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.23" data-nac-role="paragraph">| Função | Casos | Resultado | |--------|-------|-----------| | <code data-nac-role="code-inline">NAC.click</code> | happy / not_found / invalid | 3 PASS | | <code data-nac-role="code-inline">NAC.click_by_verb</code> | happy / verbo desconhecido | 2 PASS | | <code data-nac-role="code-inline">NAC.fill</code> | happy / not_found / valor aplicado ao DOM | 3 PASS | | <code data-nac-role="code-inline">NAC.select</code> | happy / not_found | 2 PASS | | <code data-nac-role="code-inline">NAC.tab</code> | happy / tecla desconhecida / plugin não montado | 3 PASS | | <code data-nac-role="code-inline">NAC.tab_by_label</code> | textContent / parênteses / i18n / not_found | 4 PASS (sobrepõe estágio 2) | | <code data-nac-role="code-inline">NAC.go_to_section</code> | happy / section_not_found | 2 PASS | | <code data-nac-role="code-inline">NAC.set_mode</code> | válido / inválido | 2 PASS | | <code data-nac-role="code-inline">NAC.screenshot</code> | retorna data URL | 1 PASS | | <code data-nac-role="code-inline">NAC.edit_field</code> (preview v2.3) | abre / not_found / invalid | 3 PASS | | <code data-nac-role="code-inline">NAC.dt_add_row</code> | retorna row_id | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_edit_cell</code> | happy / rejeita inválido | 2 PASS | | <code data-nac-role="code-inline">NAC.dt_remove_row</code> | decrementa estado | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_commit</code> | retorna final_state | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_discard</code> | reverte não-commitado | 1 PASS | | <code data-nac-role="code-inline">NAC.dt_read_aggregate</code> | agregado de soma | 1 PASS | | <code data-nac-role="code-inline">NAC.bindAction</code> | handler dispara + unbinder funciona | 2 PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.24" data-nac-role="paragraph"><strong>Cobertura do Estágio 4: ~95%</strong> da superfície pública de escrita. Faltando: <code data-nac-role="code-inline">drag_drop</code> (sem cobertura de shim ainda), primitivas de toast / banner / confirm dialog da v1.3 (baixa prioridade para v2.x).</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-5-resultado-efeito-colateral-no-dom" data-nac-role="heading" data-nac-level="3" id="estágio-5-resultado-efeito-colateral-no-dom">Estágio 5 -- Resultado (efeito colateral no DOM)</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.26" data-nac-role="paragraph">| Preocupação | Status | |-------------|--------| | <code data-nac-role="code-inline">fill</code> atualiza input.value | PASS (T6 estágio 4 verifica) | | <code data-nac-role="code-inline">select</code> atualiza elemento select | PASS (T8 estágio 4) | | Mutações <code data-nac-role="code-inline">dt_*</code> refletem em <code data-nac-role="code-inline">dt_state()</code> | PASS (T24-T30 estágio 4) | | Modal de <code data-nac-role="code-inline">edit_field</code> é montado | PASS (T21 estágio 4) | | Verificação DOM em tela cheia com Playwright | ADIADO -- requer browser real + etapas de build Vite/ng |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.27" data-nac-role="paragraph"><strong>Cobertura do Estágio 5: ~70%</strong> no nível de unidade. Verificação DOM em tela cheia na fila.</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.estágio-6-família-de-eventos-ack" data-nac-role="heading" data-nac-level="3" id="estágio-6-família-de-eventos-ack">Estágio 6 -- Família de eventos Ack</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.29" data-nac-role="paragraph">| Família | Casos | Resultado | |---------|-------|-----------| | Formato de <code data-nac-role="code-inline">nac:action:succeeded</code> (plugin + action_id + is_trusted) | 4 | PASS | | Formato de <code data-nac-role="code-inline">nac:field:changed</code> | 3 | PASS | | Formato de <code data-nac-role="code-inline">nac:tab:activated</code> | 2 | PASS | | <code data-nac-role="code-inline">nac:action:failed</code> ao lançar exceção no handler | 2 | PASS | | Caminho de resolução assíncrona em <code data-nac-role="code-inline">bindAction</code> | 1 | PASS | | Tempo de click-to-resolve &lt; 200ms | 1 | PASS | | Formato canônico de detail entre famílias | 3 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.30" data-nac-role="paragraph"><strong>Cobertura do Estágio 6: ~95%.</strong> Faltando: as famílias de eventos de cauda longa (<code data-nac-role="code-inline">nac:breadcrumb:navigated</code>, <code data-nac-role="code-inline">nac:accordion:expanded</code>, <code data-nac-role="code-inline">nac:step:advanced</code>, <code data-nac-role="code-inline">nac:table:sort_changed</code>, <code data-nac-role="code-inline">nac:table:filter_changed</code>, <code data-nac-role="code-inline">nac:confirm:resolved</code>). O padrão é o mesmo; cobri-los seria mecânico.</p>
+<h3 data-nac-id="coverage_report_2026_05_10.h3.transversal-interop-preview-v23" data-nac-role="heading" data-nac-level="3" id="transversal-interop-preview-v23">Transversal: interop (preview v2.3)</h3>
+<p data-nac-id="coverage_report_2026_05_10.p.32" data-nac-role="paragraph">| Preocupação | Casos | Resultado | |-------------|-------|-----------| | Formato de <code data-nac-role="code-inline">export_tree</code> + escopo + filtro de locale | 7 | PASS | | <code data-nac-role="code-inline">import_remote_tree</code> valida conexão + registra plugins com namespace + reflete na listagem | 5 | PASS | | Despacho via proxy para <code data-nac-role="code-inline">click</code> + <code data-nac-role="code-inline">fill</code> | 4 | PASS | | Espelho de ack local com <code data-nac-role="code-inline">via_interop:true</code> | 1 | PASS | | Código de erro do peer sobe corretamente | 1 | PASS | | <code data-nac-role="code-inline">disconnect_remote</code> + rejeição pós-desconexão | 2 | PASS | | Cliques locais NÃO fazem proxy | 1 | PASS |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.33" data-nac-role="paragraph"><strong>Cobertura de interop: 100%</strong> da superfície preview v2.3.</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.resumo-de-cobertura-pipeline-ponderado" data-nac-role="heading" data-nac-level="2" id="resumo-de-cobertura-pipeline-ponderado">Resumo de cobertura -- pipeline ponderado</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.35" data-nac-role="paragraph">| Estágio | Cobertura | Veredicto | |---------|-----------|-----------| | 1 Comunicacion | <strong>85%</strong> | Mock STT + corpus TTS PASS. Apenas reprodução de áudio real no browser na fila. | | 2 Desambiguacion | 95% | Sólido. Classe de bug verificada. | | 3 Intencion | 85% | Formato do backend ao vivo coberto. | | 4 Llamada | 95% | Toda API pública de escrita testada. | | 5 Resultado | 70% | Majoritariamente no nível de unidade. Playwright na fila. | | 6 Ack | 95% | Famílias principais cobertas; cauda longa é mecânica. | | Interop | 100% | Superfície completa do preview v2.3. | | <strong>Média ponderada</strong> | <strong>~90%</strong> | |</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.o-que-mudou-no-runtime-como-resultado" data-nac-role="heading" data-nac-level="2" id="o-que-mudou-no-runtime-como-resultado">O que mudou no runtime como resultado</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.37" data-nac-role="paragraph">Os testes identificaram dois problemas reais que foram corrigidos na mesma branch:</p>
+<p data-nac-id="coverage_report_2026_05_10.p.38" data-nac-role="paragraph">1 caractere.** Corrigido em <code data-nac-role="code-inline">js/nac.js</code> linha 2264 exigindo    <code data-nac-role="code-inline">cand.length &gt;= 3</code> para correspondência parcial bidirecional.    Igualdade exata sempre permitida. Identificado pelo teste B4    do Estágio 2 (rótulo desconhecido passava indevidamente).</p>
+<ol data-nac-id="coverage_report_2026_05_10.list.39" data-nac-role="list"><li data-nac-id="coverage_report_2026_05_10.list.39.item.1" data-nac-role="list-item">**Matcher de <code data-nac-role="code-inline">tab_by_label</code> muito permissivo para rótulos de</li></ol>
+<p data-nac-id="coverage_report_2026_05_10.p.40" data-nac-role="paragraph">ausente.** Adicionado em <code data-nac-role="code-inline">js/nac.js</code> para que o <code data-nac-role="code-inline">export_tree</code>    da camada de interop possa iterar os manifests registrados    independentemente do estado de montagem no DOM. Identificado    ao escrever a suite de interop v23.</p>
+<ol data-nac-id="coverage_report_2026_05_10.list.41" data-nac-role="list"><li data-nac-id="coverage_report_2026_05_10.list.41.item.1" data-nac-role="list-item">**Helper de introspecção <code data-nac-role="code-inline">NAC.list_registered_plugins()</code></li></ol>
+<p data-nac-id="coverage_report_2026_05_10.p.42" data-nac-role="paragraph">Ambos têm valor real -- os testes extraíram bugs verdadeiros do runtime, que é exatamente o objetivo.</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.o-que-ainda-precisa-acontecer-antes-do-merge-para-main" data-nac-role="heading" data-nac-level="2" id="o-que-ainda-precisa-acontecer-antes-do-merge-para-main">O que ainda precisa acontecer antes do merge para main</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.44" data-nac-role="paragraph">| Tarefa | Prioridade | Esforço | |--------|------------|---------| | e2e com Playwright nas 6 demos ao vivo | alta | 1h | | Playwright nos casos de estudo React + Angular (servidor de dev) | alta | 30min | | Geração do corpus TTS (Google Cloud, 30 prompts) | média | 20min | | Teste de mock STT + injeção de corpus | média | 30min | | Teste unitário de <code data-nac-role="code-inline">drag_drop</code> | baixa | 10min | | Testes das famílias de ack de cauda longa (breadcrumb, accordion, step, etc) | baixa | 30min | | Cherry-pick de <code data-nac-role="code-inline">yujin.app/nac-spec/demos/</code> + landing para main | bloqueante | 2min | | Transição de e-mail para Pablo | bloqueante | 5min |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.45" data-nac-role="paragraph">Estimativa restante: <strong>~3h de tempo Sumi</strong> para fechar em &gt;= 90% de média ponderada + um cherry-pick limpo para main.</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.tempos-de-execução-dos-testes-laptop-cold" data-nac-role="heading" data-nac-level="2" id="tempos-de-execução-dos-testes-laptop-cold">Tempos de execução dos testes (laptop, cold)</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.47" data-nac-role="paragraph">| Suite | Tempo | |-------|-------| | smoke | &lt; 1s | | v22 | &lt; 1s | | v23-interop | &lt; 2s | | stage2 | &lt; 1s | | stage3 (backend ao vivo) | ~60s (15 prompts x ~4s média + 500ms de espaçamento) | | stage4 | ~2s (setup de modal + dt) | | stage6 | &lt; 1s | | <strong>Total</strong> | <strong>~75s</strong> |</p>
+<p data-nac-id="coverage_report_2026_05_10.p.48" data-nac-role="paragraph"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code> (o harness) precisa ser estendido para incluir os estágios 2-6 + interop; pendente.</p>
+<h2 data-nac-id="coverage_report_2026_05_10.h2.trilha-de-auditoria" data-nac-role="heading" data-nac-level="2" id="trilha-de-auditoria">Trilha de auditoria</h2>
+<p data-nac-id="coverage_report_2026_05_10.p.50" data-nac-role="paragraph">| Commit | Conteúdo | |--------|----------| | <code data-nac-role="code-inline">5b06ae3f</code> | demos compiladas + implantadas + estágio 2 | | <code data-nac-role="code-inline">632aa1f6</code> | estágios 2+4 + casos de uso da landing | | (pendente) | estágios 3+6 + este relatório |</p>
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.52" data-nac-role="paragraph"><em>Este documento é o registro canônico de cobertura para a branch de interop v2.3 + o runtime v2.2 conforme está em 2026-05-11 00:50 UTC-3. Atualizações chegam conforme novas suites são entregues.</em></p>
+<hr />
+<p data-nac-id="coverage_report_2026_05_10.p.54" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/COVERAGE_REPORT_2026_05_10.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "coverage_report_2026_05_10",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "coverage_report_2026_05_10.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "coverage_report_2026_05_10.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "coverage_report_2026_05_10.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "coverage_report_2026_05_10.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

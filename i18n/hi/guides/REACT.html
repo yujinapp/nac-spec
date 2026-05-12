@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + React अपनाने की गाइड -- NAC3</title>
+<meta name="nac3-doc-slug" content="react" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="react" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="react.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="react.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/react.mp3" data-nac-id="react.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="react.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="react.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="react.main" data-nac-role="region">
+<hr />
+<p data-nac-id="react.p.1" data-nac-role="paragraph">translation_source: guides/REACT.md translation_source_hash: 9026b361e9e072347481a1f4492eea6f306e77cbbdb53b0d1a40d25008dbecdd translation_quality: machine_v1 translation_lang: hi translation_date: 2026-05-11T14:56:46.897124+00:00</p>
+<hr />
+<h1 data-nac-id="react.h1.nac3-react-अपनन-क-गइड" data-nac-role="heading" data-nac-level="1" id="nac3-react-अपनन-क-गइड">NAC3 + React अपनाने की गाइड</h1>
+<p data-nac-id="react.p.4" data-nac-role="paragraph">यह गाइड एक React ऐप को दो तरीकों से NAC-संचालित बनाती है:</p>
+<ul data-nac-id="react.list.5" data-nac-role="list"><li data-nac-id="react.list.5.item.1" data-nac-role="list-item"><strong>Greenfield:</strong> नया प्रोजेक्ट, शुरू से ही NAC3।</li><li data-nac-id="react.list.5.item.2" data-nac-role="list-item"><strong>Brownfield:</strong> मौजूदा ऐप, बिना पूरी तरह दोबारा लिखे NAC3 को धीरे-धीरे जोड़ना।</li></ul>
+<p data-nac-id="react.p.6" data-nac-role="paragraph">दोनों में npm से <code data-nac-role="code-inline">@nac3/runtime</code> का उपयोग होता है। किसी खास build-step की ज़रूरत नहीं; यह Vite, Next.js, Create React App, Remix, या किसी भी सामान्य पैकेज को bundle करने वाले टूल के साथ काम करता है।</p>
+<hr />
+<h2 data-nac-id="react.h2.1-इसटल-कर" data-nac-role="heading" data-nac-level="2" id="1-इसटल-कर">1. इंस्टॉल करें</h2>
+<pre data-nac-id="react.code.1" data-nac-role="code" data-nac-lang="text"><code>npm install @nac3/runtime</code></pre>
+<p data-nac-id="react.p.10" data-nac-role="paragraph">पैकेज पहली बार import होने के बाद runtime को <code data-nac-role="code-inline">window.NAC</code> के रूप में उपलब्ध कराता है। Runtime framework-agnostic है; React बस JSX में <code data-nac-role="code-inline">data-nac-*</code> attributes जोड़ता है और <code data-nac-role="code-inline">useEffect</code> के ज़रिए manifests रजिस्टर करता है।</p>
+<hr />
+<h2 data-nac-id="react.h2.2-greenfield-नय-ऐप" data-nac-role="heading" data-nac-level="2" id="2-greenfield-नय-ऐप">2. Greenfield -- नया ऐप</h2>
+<h3 data-nac-id="react.h3.21-runtime-क-एक-बर-मउट-कर" data-nac-role="heading" data-nac-level="3" id="21-runtime-क-एक-बर-मउट-कर">2.1 Runtime को एक बार माउंट करें</h3>
+<p data-nac-id="react.p.14" data-nac-role="paragraph">अपने root component (या <code data-nac-role="code-inline">main.tsx</code> / <code data-nac-role="code-inline">_app.tsx</code>) में:</p>
+<pre data-nac-id="react.code.2" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;   // v2.0 brownfield primitives + HMAC
+// वैकल्पिक: voice + chat के लिए &#x27;@nac3/runtime/chat-client&#x27;
+
+export function App() {
+  useEffect(() =&gt; {
+    // Tenant prefix (multi-tenant SaaS pattern)। single-tenant हो तो छोड़ें।
+    if (window.NAC?.setTenantPrefix) {
+      window.NAC.setTenantPrefix(&#x27;demo&#x27;);
+    }
+    // अगर signed manifests भेज रहे हैं तो HMAC secret। अपने auth API से लें।
+    // window.NAC.set_provenance_secret(secret);
+  }, []);
+
+  return &lt;YourAppShell /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.22-components-क-decorate-कर" data-nac-role="heading" data-nac-level="3" id="22-components-क-decorate-कर">2.2 Components को decorate करें</h3>
+<p data-nac-id="react.p.17" data-nac-role="paragraph">हर clickable / fillable / switchable element को ये मिलते हैं:</p>
+<ul data-nac-id="react.list.18" data-nac-role="list"><li data-nac-id="react.list.18.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-id</code> -- एक स्थिर dotted path।</li><li data-nac-id="react.list.18.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role</code> -- canonical roles में से एक (SPEC sec 1 देखें)।</li><li data-nac-id="react.list.18.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-action="&lt;verb&gt;"</code> -- केवल <code data-nac-role="code-inline">role="action"</code> के लिए।</li></ul>
+<pre data-nac-id="react.code.3" data-nac-role="code" data-nac-lang="tsx"><code>function InvoiceForm({ invoice, onSave, onCancel }) {
+  return (
+    &lt;article data-nac-plugin=&quot;invoice&quot;&gt;
+      &lt;input
+        type=&quot;text&quot;
+        data-nac-id=&quot;invoice.client_name&quot;
+        data-nac-role=&quot;field&quot;
+        value={invoice.clientName}
+        onChange={(e) =&gt; /* ... */}
+      /&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.save&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;save&quot;
+        onClick={onSave}
+      &gt;
+        Save
+      &lt;/button&gt;
+
+      &lt;button
+        data-nac-id=&quot;invoice.cancel&quot;
+        data-nac-role=&quot;action&quot;
+        data-nac-action=&quot;cancel&quot;
+        onClick={onCancel}
+      &gt;
+        Cancel
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.23-manifest-रजसटर-कर" data-nac-role="heading" data-nac-level="3" id="23-manifest-रजसटर-कर">2.3 Manifest रजिस्टर करें</h3>
+<p data-nac-id="react.p.21" data-nac-role="paragraph">Manifest agent के लिए सच्चाई का स्रोत है। "guardar" को resolve करने वाला LLM यहाँ verb <code data-nac-role="code-inline">save</code> ढूंढता है:</p>
+<pre data-nac-id="react.code.4" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect } from &#x27;react&#x27;;
+
+const INVOICE_MANIFEST = {
+  plugin_slug: &#x27;invoice&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.1&#x27;,
+  elements: [
+    {
+      id: &#x27;invoice.client_name&#x27;,
+      role: &#x27;field&#x27;,
+      label_i18n: {
+        es: &#x27;Nombre del cliente&#x27;, en: &#x27;Customer name&#x27;,
+        pt: &#x27;Nome do cliente&#x27;, fr: &#x27;Nom du client&#x27;,
+        it: &#x27;Nome del cliente&#x27;, de: &#x27;Kundenname&#x27;,
+        ja: &#x27;顧客名&#x27;, zh: &#x27;客户名称&#x27;,
+        hi: &#x27;ग्राहक का नाम&#x27;, ar: &#x27;اسم العميل&#x27;
+      }
+    },
+    {
+      id: &#x27;invoice.save&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: { /* 10 locales */ }
+      }],
+      label_i18n: { /* 10 locales */ }
+    },
+    {
+      id: &#x27;invoice.cancel&#x27;,
+      role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;cancel&#x27;,
+        label_i18n: { /* 10 locales */ }
+      }],
+      label_i18n: { /* 10 locales */ }
+    }
+  ]
+};
+
+export function InvoiceForm(props) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(INVOICE_MANIFEST);
+  }, []);
+  // ... 2.2 का JSX ...
+}</code></pre>
+<p data-nac-id="react.p.23" data-nac-role="paragraph">मुख्य नियम:</p>
+<ul data-nac-id="react.list.24" data-nac-role="list"><li data-nac-id="react.list.24.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">useEffect</code> के साथ <code data-nac-role="code-inline">[]</code> deps: mount पर एक बार रजिस्टर करें।</li><li data-nac-id="react.list.24.item.2" data-nac-role="list-item">Manifest एक static object है; हर render पर इसे दोबारा न बनाएं (runtime <code data-nac-role="code-inline">register</code> को idempotent मानता है, लेकिन cycles बर्बाद होते हैं)।</li><li data-nac-id="react.list.24.item.3" data-nac-role="list-item">React Strict Mode dev में effects को दो बार invoke करता है। Runtime का <code data-nac-role="code-inline">register</code> idempotent है; सुरक्षित है।</li></ul>
+<h3 data-nac-id="react.h3.24-handlers-स-success-events-emit-कर" data-nac-role="heading" data-nac-level="3" id="24-handlers-स-success-events-emit-कर">2.4 Handlers से success events emit करें</h3>
+<p data-nac-id="react.p.26" data-nac-role="paragraph">अगर runtime को किसी agent द्वारा चलाया जाना है जो <code data-nac-role="code-inline">NAC.click()</code> का इंतज़ार करता है, तो आपके handlers को side effect के बाद <code data-nac-role="code-inline">nac:action:succeeded</code> emit करना होगा:</p>
+<pre data-nac-id="react.code.5" data-nac-role="code" data-nac-lang="tsx"><code>function onSave() {
+  await api.saveInvoice(/* ... */);
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+  }));
+}</code></pre>
+<p data-nac-id="react.p.28" data-nac-role="paragraph">यह v2.1 contract है। v2.2 में एक <code data-nac-role="code-inline">useNACAction</code> hook आता है जो यह काम आपके लिए करता है (नीचे Hooks section देखें)।</p>
+<h3 data-nac-id="react.h3.25-इस-चलए" data-nac-role="heading" data-nac-level="3" id="25-इस-चलए">2.5 इसे चलाएं</h3>
+<p data-nac-id="react.p.30" data-nac-role="paragraph">किसी भी agent, voice runner, या test से:</p>
+<pre data-nac-id="react.code.6" data-nac-role="code" data-nac-lang="tsx"><code>await window.NAC.click(&#x27;invoice.save&#x27;);
+// या verb से:
+await window.NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;save&#x27;);
+// या field भरें:
+await window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme Corp&#x27;);</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.3-brownfield-मजद-react-ऐप" data-nac-role="heading" data-nac-level="2" id="3-brownfield-मजद-react-ऐप">3. Brownfield -- मौजूदा React ऐप</h2>
+<p data-nac-id="react.p.34" data-nac-role="paragraph">सिद्धांत: एक साथ सब कुछ refactor न करें। NAC3 को एक component में जोड़ें, validate करें, दोहराएं।</p>
+<h3 data-nac-id="react.h3.31-कम-क-करम" data-nac-role="heading" data-nac-level="3" id="31-कम-क-करम">3.1 काम का क्रम</h3>
+<ol data-nac-id="react.list.36" data-nac-role="list"><li data-nac-id="react.list.36.item.1" data-nac-role="list-item"><strong>पहले top-level wrapper।</strong> अपने root <code data-nac-role="code-inline">&lt;div&gt;</code> या <code data-nac-role="code-inline">&lt;main&gt;</code> में <code data-nac-role="code-inline">data-nac-plugin="&lt;your-app-slug&gt;"</code> जोड़ें। Runtime का scope tree इसे उठा लेता है।</li><li data-nac-id="react.list.36.item.2" data-nac-role="list-item"><strong>इसके बाद सबसे ज़्यादा इस्तेमाल होने वाले buttons।</strong> अपनी सबसे व्यस्त screens में Save, cancel, submit, delete। <code data-nac-role="code-inline">data-nac-id</code>, <code data-nac-role="code-inline">data-nac-role="action"</code>, <code data-nac-role="code-inline">data-nac-action="&lt;verb&gt;"</code> जोड़ें। अभी manifest न जोड़ें।</li><li data-nac-id="react.list.36.item.3" data-nac-role="list-item"><strong>Verify करें कि runtime उन्हें देख रहा है।</strong> DevTools खोलें, <code data-nac-role="code-inline">NAC.describe()</code> चलाएं। Buttons अपने plugin slug के नीचे दिखने चाहिए।</li><li data-nac-id="react.list.36.item.4" data-nac-role="list-item"><strong>एक minimal manifest जोड़ें।</strong> बस step 2 के buttons, उनके verbs के साथ। अब <code data-nac-role="code-inline">NAC.click_by_verb()</code> काम करेगा।</li><li data-nac-id="react.list.36.item.5" data-nac-role="list-item"><strong>Fields जोड़ें।</strong> Inputs को <code data-nac-role="code-inline">data-nac-role="field"</code> + manifest entries मिलती हैं।</li><li data-nac-id="react.list.36.item.6" data-nac-role="list-item"><strong>Tabs जोड़ें।</strong> Tab switchers को <code data-nac-role="code-inline">data-nac-role="tab"</code> मिलता है। <strong>ज़रूरी:</strong> <code data-nac-role="code-inline">^tab\.</code> से मेल खाने वाले ids का role <code data-nac-role="code-inline">tab</code> होना चाहिए (runtime का <code data-nac-role="code-inline">NAC.tab()</code> query canonical-role-only है; SPEC sec 1 देखें)।</li></ol>
+<h3 data-nac-id="react.h3.32-अपन-मजद-component-library-स-न-लड" data-nac-role="heading" data-nac-level="3" id="32-अपन-मजद-component-library-स-न-लड">3.2 अपनी मौजूदा component library से न लड़ें</h3>
+<p data-nac-id="react.p.38" data-nac-role="paragraph">आप शायद shadcn / Mantine / MUI / Chakra / अपना custom system इस्तेमाल करते हैं। इनमें से ज़्यादातर अपना DOM render करते हैं। दो patterns काम करते हैं:</p>
+<p data-nac-id="react.p.39" data-nac-role="paragraph"><strong>Pattern A: NAC3 attrs पास करें।</strong> ज़्यादातर अच्छी तरह बनी libraries unknown props को underlying DOM element तक forward करती हैं:</p>
+<pre data-nac-id="react.code.7" data-nac-role="code" data-nac-lang="tsx"><code>&lt;Button
+  data-nac-id=&quot;invoice.save&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;save&quot;
+  onClick={onSave}
+&gt;
+  Save
+&lt;/Button&gt;</code></pre>
+<p data-nac-id="react.p.41" data-nac-role="paragraph">अगर आपकी library <code data-nac-role="code-inline">data-*</code> attrs forward करती है, तो यही काफी है।</p>
+<p data-nac-id="react.p.42" data-nac-role="paragraph"><strong>Pattern B: wrapper component।</strong> अगर आपकी library <code data-nac-role="code-inline">data-*</code> props को निगल जाती है, तो एक छोटा wrapper लिखें:</p>
+<pre data-nac-id="react.code.8" data-nac-role="code" data-nac-lang="tsx"><code>import { Button as MuiButton } from &#x27;@mui/material&#x27;;
+import { useEffect, useRef } from &#x27;react&#x27;;
+
+interface NACButtonProps {
+  nacId: string;
+  verb: string;
+  // ...अन्य Mui props
+}
+
+export function NACButton({ nacId, verb, ...rest }: NACButtonProps) {
+  const ref = useRef&lt;HTMLButtonElement&gt;(null);
+  useEffect(() =&gt; {
+    if (!ref.current) return;
+    ref.current.setAttribute(&#x27;data-nac-id&#x27;, nacId);
+    ref.current.setAttribute(&#x27;data-nac-role&#x27;, &#x27;action&#x27;);
+    ref.current.setAttribute(&#x27;data-nac-action&#x27;, verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest} /&gt;;
+}</code></pre>
+<h3 data-nac-id="react.h3.33-dom-स-auto-register-कर" data-nac-role="heading" data-nac-level="3" id="33-dom-स-auto-register-कर">3.3 DOM से auto-register करें</h3>
+<p data-nac-id="react.p.45" data-nac-role="paragraph">अगर manifests हाथ से declare करना थकाऊ है, तो v2.0 extension <code data-nac-role="code-inline">autoRegister.watch</code> DOM को traverse करता है और <code data-nac-role="code-inline">data-nac-id</code> + <code data-nac-role="code-inline">data-nac-role</code> वाली हर चीज़ को अपने आप रजिस्टर करता है:</p>
+<pre data-nac-id="react.code.9" data-nac-role="code" data-nac-lang="tsx"><code>useEffect(() =&gt; {
+  if (!window.NAC?.autoRegister) return;
+  const root = document.querySelector(&#x27;[data-nac-plugin]&#x27;);
+  if (!root) return;
+  root.setAttribute(&#x27;data-nac-watch&#x27;, &#x27;1&#x27;);
+  window.NAC.autoRegister.watch(root, {
+    i18n_strict: &#x27;permissive&#x27;,  // migration के दौरान partial 10-locale स्वीकार करें
+    throttleMs: 100
+  });
+}, []);</code></pre>
+<p data-nac-id="react.p.47" data-nac-role="paragraph">Brownfield के लिए <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> सही है। Production के लिए, जब आपका i18n catalogue पूरा हो जाए तो <code data-nac-role="code-inline">'strict'</code> पर switch करें।</p>
+<hr />
+<h2 data-nac-id="react.h2.4-hooks-v22-preview" data-nac-role="heading" data-nac-level="2" id="4-hooks-v22-preview">4. Hooks (v2.2 preview)</h2>
+<p data-nac-id="react.p.50" data-nac-role="paragraph">ये v2.2 में आते हैं। v2.1 के लिए आप इन्हें आज अपने प्रोजेक्ट में copy कर सकते हैं; ये v2.1 runtime को wrap करते हैं और एक ज़्यादा idiomatic React API देते हैं।</p>
+<h3 data-nac-id="react.h3.41-usenacmanifest" data-nac-role="heading" data-nac-level="3" id="41-usenacmanifest">4.1 <code data-nac-role="code-inline">useNACManifest</code></h3>
+<pre data-nac-id="react.code.10" data-nac-role="code" data-nac-lang="tsx"><code>export function useNACManifest(manifest) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    window.NAC.register(manifest);
+  }, [manifest.plugin_slug]);  // केवल slug बदलने पर re-register करें
+}</code></pre>
+<h3 data-nac-id="react.h3.42-usenacaction-auto-emit-ack" data-nac-role="heading" data-nac-level="3" id="42-usenacaction-auto-emit-ack">4.2 <code data-nac-role="code-inline">useNACAction</code> -- auto-emit ack</h3>
+<pre data-nac-id="react.code.11" data-nac-role="code" data-nac-lang="tsx"><code>import { useEffect, useRef } from &#x27;react&#x27;;
+
+export function useNACAction(plugin: string, actionId: string) {
+  const ref = useRef&lt;HTMLElement&gt;(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    function onClick() {
+      // React का synthetic event खत्म होने के बाद v2.1 contract event emit करें।
+      // Microtask delay ताकि React का synthetic event पहले पूरा हो।
+      queueMicrotask(() =&gt; {
+        document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+          detail: { plugin, action_id: actionId }
+        }));
+      });
+    }
+    el.addEventListener(&#x27;click&#x27;, onClick);
+    return () =&gt; el.removeEventListener(&#x27;click&#x27;, onClick);
+  }, [plugin, actionId]);
+  return ref;
+}</code></pre>
+<p data-nac-id="react.p.55" data-nac-role="paragraph">उपयोग:</p>
+<pre data-nac-id="react.code.12" data-nac-role="code" data-nac-lang="tsx"><code>function SaveButton({ onSave }) {
+  const ref = useNACAction(&#x27;invoice&#x27;, &#x27;invoice.save&#x27;);
+  return (
+    &lt;button
+      ref={ref}
+      data-nac-id=&quot;invoice.save&quot;
+      data-nac-role=&quot;action&quot;
+      data-nac-action=&quot;save&quot;
+      onClick={onSave}
+    &gt;
+      Save
+    &lt;/button&gt;
+  );
+}</code></pre>
+<h3 data-nac-id="react.h3.43-usenacdescribe-panel-स-tree-क-introspect-कर" data-nac-role="heading" data-nac-level="3" id="43-usenacdescribe-panel-स-tree-क-introspect-कर">4.3 <code data-nac-role="code-inline">useNACDescribe</code> -- panel से tree को introspect करें</h3>
+<pre data-nac-id="react.code.13" data-nac-role="code" data-nac-lang="tsx"><code>import { useState, useEffect } from &#x27;react&#x27;;
+
+export function useNACDescribe() {
+  const [snap, setSnap] = useState(null);
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    setSnap(window.NAC.describe());
+    const tick = setInterval(() =&gt; setSnap(window.NAC.describe()), 1000);
+    return () =&gt; clearInterval(tick);
+  }, []);
+  return snap;
+}</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.5-testing" data-nac-role="heading" data-nac-level="2" id="5-testing">5. Testing</h2>
+<h3 data-nac-id="react.h3.51-unit-integration" data-nac-role="heading" data-nac-level="3" id="51-unit-integration">5.1 Unit + integration</h3>
+<p data-nac-id="react.p.62" data-nac-role="paragraph">NAC3 React Testing Library के साथ अच्छी तरह काम करता है:</p>
+<pre data-nac-id="react.code.14" data-nac-role="code" data-nac-lang="tsx"><code>import { render, fireEvent, waitFor } from &#x27;@testing-library/react&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import { InvoiceForm } from &#x27;./InvoiceForm&#x27;;
+
+test(&#x27;save button drives via NAC&#x27;, async () =&gt; {
+  render(&lt;InvoiceForm /&gt;);
+
+  const saved = jest.fn();
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, saved);
+
+  await window.NAC.click(&#x27;invoice.save&#x27;);
+
+  await waitFor(() =&gt; expect(saved).toHaveBeenCalled());
+});</code></pre>
+<h3 data-nac-id="react.h3.52-end-to-end-playwright" data-nac-role="heading" data-nac-level="3" id="52-end-to-end-playwright">5.2 End-to-end (Playwright)</h3>
+<pre data-nac-id="react.code.15" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;invoice save&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;/invoices/new&#x27;);
+  await page.evaluate(() =&gt; window.NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;));
+  await page.evaluate(() =&gt; window.NAC.click(&#x27;invoice.save&#x27;));
+  await expect(page.getByText(&#x27;Invoice saved&#x27;)).toBeVisible();
+});</code></pre>
+<hr />
+<h2 data-nac-id="react.h2.6-आम-गलतय" data-nac-role="heading" data-nac-level="2" id="6-आम-गलतय">6. आम गलतियाँ</h2>
+<ul data-nac-id="react.list.68" data-nac-role="list"><li data-nac-id="react.list.68.item.1" data-nac-role="list-item"><strong>Keyed lists में stale ids।</strong> अगर आप ids row index से बनाते हैं (<code data-nac-role="code-inline">data-nac-id={'row.' + i}</code>) और rows का क्रम बदलता है, तो id cache करने वाले agents टूट जाते हैं। Stable keys (DB ids) इस्तेमाल करें।</li><li data-nac-id="react.list.68.item.2" data-nac-role="list-item"><strong>Conditional rendering।</strong> एक button जो <code data-nac-role="code-inline">if (loaded)</code> के आधार पर mount/unmount होता है, उस LLM को confuse करता है जिसने load से पहले tree का snapshot लिया था। LLM को बताएं कि <code data-nac-role="code-inline">NAC.describe()</code> में हर element के लिए <code data-nac-role="code-inline">mounted</code> flag होता है (v2.1 में हमेशा चालू); आपके snapshot consumer को उसी से filter करना चाहिए।</li><li data-nac-id="react.list.68.item.3" data-nac-role="list-item"><strong>React 18 Strict Mode।</strong> Double-invoked effects manifest को दोबारा रजिस्टर करते हैं। Runtime idempotent है; सुरक्षित है, लेकिन dev में double log lines दिखेंगी।</li><li data-nac-id="react.list.68.item.4" data-nac-role="list-item"><strong>Server components / SSR।</strong> NAC3 केवल client-side है। NAC इस्तेमाल करने वाले components को <code data-nac-role="code-inline">'use client'</code> (Next.js App Router) से mark करें या उन्हें lazily render करें।</li></ul>
+<hr />
+<h2 data-nac-id="react.h2.7-production-म-जन" data-nac-role="heading" data-nac-level="2" id="7-production-म-जन">7. Production में जाना</h2>
+<p data-nac-id="react.p.71" data-nac-role="paragraph">भेजने से पहले:</p>
+<ol data-nac-id="react.list.72" data-nac-role="list"><li data-nac-id="react.list.72.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">i18n_strict: 'permissive'</code> को <code data-nac-role="code-inline">'strict'</code> से बदलें। CI छूटे हुए translations पकड़ेगा।</li><li data-nac-id="react.list.72.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> चलाएं -- zero error-severity findings की उम्मीद करें।</li><li data-nac-id="react.list.72.item.3" data-nac-role="list-item">Playwright test से <code data-nac-role="code-inline">NAC.validate_global()</code> चलाएं; assert करें कि यह <code data-nac-role="code-inline">[]</code> return करता है।</li><li data-nac-id="react.list.72.item.4" data-nac-role="list-item">Multi-tenant होने पर, सुनिश्चित करें कि manifests server-side HMAC-signed हों और <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> authenticated code से call हो।</li></ol>
+<hr />
+<h2 data-nac-id="react.h2.8-आग-कह-जए" data-nac-role="heading" data-nac-level="2" id="8-आग-कह-जए">8. आगे कहाँ जाएं</h2>
+<ul data-nac-id="react.list.75" data-nac-role="list"><li data-nac-id="react.list.75.item.1" data-nac-role="list-item">पूरे contract के लिए <code data-nac-role="code-inline">SPEC.md</code>।</li><li data-nac-id="react.list.75.item.2" data-nac-role="list-item">उस intermediary backend के लिए <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> जो "guardar la factura" को <code data-nac-role="code-inline">NAC.click_by_verb('invoice','save')</code> में resolve करता है।</li><li data-nac-id="react.list.75.item.3" data-nac-role="list-item">Threat model के लिए <code data-nac-role="code-inline">SECURITY.md</code>।</li><li data-nac-id="react.list.75.item.4" data-nac-role="list-item">yujin.app/nac-spec/ पर demos (<code data-nac-role="code-inline">example.php</code> v1.9 reference है; <code data-nac-role="code-inline">example-v20-full.php</code> brownfield migration की कहानी है)।</li></ul>
+<hr />
+<p data-nac-id="react.p.77" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/REACT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "react",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "react.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "react.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "react.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "react.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

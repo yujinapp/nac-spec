@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Tester checklist: voice + chat (interactive) &mdash; NAC3</title>
+<style>
+  :root{--accent:#4f5b87;--gold:#c8a04d;--bg:#fafaf7;--surface:#fff;--subtle:#f5f2ea;--border:#e6e3da;--text:#1a1a1a;--text-2:#555;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:32px 22px;}
+  form{max-width:780px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 12px;}
+  h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  fieldset.tr-task{border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:0 0 14px;background:var(--surface);}
+  fieldset.tr-task legend{padding:0 8px;font-weight:600;color:var(--accent);}
+  fieldset.tr-task p{margin:6px 0;color:var(--text-2);font-size:14px;}
+  .tr-note{font-size:14px;color:var(--text-2);margin:4px 0;}
+  .tr-opt{display:inline-flex;align-items:center;gap:6px;margin:6px 14px 6px 0;font-size:14px;}
+  .tr-comments-label{display:block;margin:8px 0 4px;font-size:13px;color:var(--text-2);}
+  textarea,input[type="text"],input[type="email"],input[type="number"]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--subtle);font-family:inherit;font-size:14px;color:var(--text);}
+  textarea{min-height:64px;resize:vertical;}
+  fieldset.tr-signoff{border:2px solid var(--gold);border-radius:6px;padding:14px 16px;margin:24px 0;background:var(--surface);}
+  fieldset.tr-signoff legend{padding:0 8px;font-weight:700;color:var(--gold);}
+  fieldset.tr-signoff label{display:block;margin:10px 0 4px;font-size:13px;color:var(--text-2);font-weight:600;}
+  .tr-actions{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;}
+  .tr-submit{padding:10px 20px;background:var(--accent);color:#fff;border:0;border-radius:5px;font-weight:600;font-size:15px;cursor:pointer;}
+  .tr-submit:hover{filter:brightness(1.1);}
+  .tr-submit:disabled{opacity:.6;cursor:wait;}
+  .tr-status{margin-top:12px;padding:10px 12px;border-radius:4px;font-size:14px;min-height:18px;}
+  .tr-status-info{background:var(--subtle);color:var(--text-2);}
+  .tr-status-success{background:#e6f4e6;color:#2a6d2a;}
+  .tr-status-warning{background:#fff3cd;color:#7a5a00;}
+  .tr-status-error{background:#fbe1e1;color:#8a1f1f;}
+  .tr-autosave{margin-top:10px;font-size:12px;color:#888;}
+  .tr-intro{background:var(--subtle);padding:10px 12px;border-radius:4px;font-size:14px;color:var(--text-2);margin-bottom:18px;}
+  pre.tr-code{background:var(--subtle);padding:10px 12px;border-radius:4px;overflow-x:auto;font-size:13px;}
+  hr{border:0;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body data-nac-plugin="tester_form">
+<form id="tester-form" method="post" novalidate data-doc-slug="tester_checklist_voice_chat" data-doc-lang="en" data-nac-plugin="tester_form">
+<p class="tr-intro">Complete each task + press Submit at the end. Your report reaches the Yujin team.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true" />
+<h1>NAC3 v2.2 -- Tester checklist: voice + chat</h1>
+<p><strong>For:</strong> the human tester focused on voice + chat behavior. <strong>Time:</strong> ~30-45 minutes. <strong>Pre-requisite:</strong> working microphone + speakers/headphones.</p>
+<h2>Instructions</h2>
+<p>For each task:</p>
+<p>1. Read step a, b, c, d in order. 2. Do exactly what step a says, then b, then c. 3. Compare what you see/hear with the "Expected result" in d. 4. Mark <code>[X]</code> in <strong>OK</strong> if matches; mark <code>[X]</code> in <strong>ERROR</strong> + write what actually happened. 5. Do not skip. If a task fails, continue to the next one.</p>
+<hr />
+<h2>Section A -- Chat panel basics</h2>
+<fieldset class="tr-task" id="task-A1">
+<legend>Task A1 &mdash; Open the chat panel</legend>
+<p>a) Open Chrome incognito (Ctrl+Shift+N). b) Go to <code>https://yujin.app/nac-spec/</code>. c) Find the chat panel (usually a circular bubble bottom-right; click it to expand). If already expanded, skip this click. d) <strong>Expected result:</strong> A chat panel opens on the right side of the screen. It has: a header with "Yujin chat" text, a language selector dropdown, a text input box at the bottom, a Send button, and a microphone button next to the input.</p>
+<label class="tr-opt"><input type="radio" name="task-A1-status" value="ok" id="task-A1-ok" data-nac-id="tester_form.task-A1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A1-status" value="error" id="task-A1-error" data-nac-id="tester_form.task-A1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A1-comments">Comments</label>
+<textarea name="task-A1-comments" id="task-A1-comments" rows="2" data-nac-id="tester_form.task-A1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-A2">
+<legend>Task A2 &mdash; Send a text question</legend>
+<p>a) Click into the chat input box. b) Type: <code>que es NAC3?</code> c) Click the Send button (or press Enter). d) <strong>Expected result:</strong> Within 5-15 seconds, the chat shows a response in Spanish (because the message was in Spanish). The response explains what NAC3 is. The response is at least 2 sentences long. No red error message appears.</p>
+<label class="tr-opt"><input type="radio" name="task-A2-status" value="ok" id="task-A2-ok" data-nac-id="tester_form.task-A2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A2-status" value="error" id="task-A2-error" data-nac-id="tester_form.task-A2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A2-comments">Comments</label>
+<textarea name="task-A2-comments" id="task-A2-comments" rows="2" data-nac-id="tester_form.task-A2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-A3">
+<legend>Task A3 &mdash; Send another question in English</legend>
+<p>a) In the same chat, type: <code>how do I install NAC3?</code> b) Press Enter. c) Wait for response. d) <strong>Expected result:</strong> The response comes back in English. It mentions <code>npm install @nac3/runtime</code> or a similar install command.</p>
+<label class="tr-opt"><input type="radio" name="task-A3-status" value="ok" id="task-A3-ok" data-nac-id="tester_form.task-A3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-A3-status" value="error" id="task-A3-error" data-nac-id="tester_form.task-A3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-A3-comments">Comments</label>
+<textarea name="task-A3-comments" id="task-A3-comments" rows="2" data-nac-id="tester_form.task-A3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Section B -- Voice input (microphone)</h2>
+<fieldset class="tr-task" id="task-B1">
+<legend>Task B1 &mdash; First mic activation (permission grant)</legend>
+<p>a) Click the microphone button next to the chat input. b) The browser will ask for microphone permission. Click "Allow". c) Notice the button visual state. d) <strong>Expected result:</strong> The microphone button changes appearance (color, animation, or icon) to indicate it is actively listening. There may be a visible "recording" indicator.</p>
+<label class="tr-opt"><input type="radio" name="task-B1-status" value="ok" id="task-B1-ok" data-nac-id="tester_form.task-B1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B1-status" value="error" id="task-B1-error" data-nac-id="tester_form.task-B1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-B1-comments">Comments</label>
+<textarea name="task-B1-comments" id="task-B1-comments" rows="2" data-nac-id="tester_form.task-B1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-B2">
+<legend>Task B2 &mdash; Speak in Spanish</legend>
+<p>a) With the microphone active, speak clearly: <strong>"hola"</strong> (just one word). b) After ~2 seconds of silence, the recording auto-stops (or click the mic button again to stop). c) Wait 3-5 seconds. d) <strong>Expected result:</strong> The chat panel shows the transcribed word "hola" (or close to it). A response from the chat appears in Spanish within 10 seconds.</p>
+<label class="tr-opt"><input type="radio" name="task-B2-status" value="ok" id="task-B2-ok" data-nac-id="tester_form.task-B2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B2-status" value="error" id="task-B2-error" data-nac-id="tester_form.task-B2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-B2-comments">Comments</label>
+<textarea name="task-B2-comments" id="task-B2-comments" rows="2" data-nac-id="tester_form.task-B2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-B3">
+<legend>Task B3 &mdash; Voice in English</legend>
+<p>a) Click the microphone button again. b) Speak clearly: <strong>"what is NAC3"</strong>. c) Wait for response. d) <strong>Expected result:</strong> Transcription shows "what is NAC3" (or close). Response in English.</p>
+<label class="tr-opt"><input type="radio" name="task-B3-status" value="ok" id="task-B3-ok" data-nac-id="tester_form.task-B3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B3-status" value="error" id="task-B3-error" data-nac-id="tester_form.task-B3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-B3-comments">Comments</label>
+<textarea name="task-B3-comments" id="task-B3-comments" rows="2" data-nac-id="tester_form.task-B3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-B4">
+<legend>Task B4 &mdash; TTS (text-to-speech) audio playback</legend>
+<p>a) After Task B3's response appears, listen carefully to your speakers. b) Pay attention during the 5 seconds after the response appears in the chat. d) <strong>Expected result:</strong> A clear English voice reads the response aloud through your speakers. The voice is natural-sounding (not robotic-broken).</p>
+<label class="tr-opt"><input type="radio" name="task-B4-status" value="ok" id="task-B4-ok" data-nac-id="tester_form.task-B4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-B4-status" value="error" id="task-B4-error" data-nac-id="tester_form.task-B4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<div class="tr-note">No audio heard</div>
+<label class="tr-comments-label" for="task-B4-comments">Comments</label>
+<textarea name="task-B4-comments" id="task-B4-comments" rows="2" data-nac-id="tester_form.task-B4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Section C -- Voice dispatch on data-table demo</h2>
+<fieldset class="tr-task" id="task-C1">
+<legend>Task C1 &mdash; Load the data-table demo</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Wait 5 seconds for full load. c) Locate the chat panel and the tabs across the top of the data table. d) <strong>Expected result:</strong> The page shows multiple tabs (at least "Lines (collection)" and "Permissions"). Chat panel is visible.</p>
+<label class="tr-opt"><input type="radio" name="task-C1-status" value="ok" id="task-C1-ok" data-nac-id="tester_form.task-C1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C1-status" value="error" id="task-C1-error" data-nac-id="tester_form.task-C1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C1-comments">Comments</label>
+<textarea name="task-C1-comments" id="task-C1-comments" rows="2" data-nac-id="tester_form.task-C1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-C2">
+<legend>Task C2 &mdash; Tab switch by voice (Spanish)</legend>
+<p>a) Click the microphone button. b) Speak: <strong>"ve a permisos"</strong>. c) Wait up to 5 seconds. d) <strong>Expected result:</strong> The tab "Permisos" (or "Permissions") becomes active. The visible content area changes.</p>
+<label class="tr-opt"><input type="radio" name="task-C2-status" value="ok" id="task-C2-ok" data-nac-id="tester_form.task-C2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C2-status" value="error" id="task-C2-error" data-nac-id="tester_form.task-C2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C2-comments">Comments</label>
+<textarea name="task-C2-comments" id="task-C2-comments" rows="2" data-nac-id="tester_form.task-C2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-C3">
+<legend>Task C3 &mdash; Tab switch by voice (English)</legend>
+<p>a) Click the microphone. b) Speak: <strong>"go to lines"</strong>. c) Wait. d) <strong>Expected result:</strong> The "Lines (collection)" tab activates.</p>
+<label class="tr-opt"><input type="radio" name="task-C3-status" value="ok" id="task-C3-ok" data-nac-id="tester_form.task-C3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C3-status" value="error" id="task-C3-error" data-nac-id="tester_form.task-C3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C3-comments">Comments</label>
+<textarea name="task-C3-comments" id="task-C3-comments" rows="2" data-nac-id="tester_form.task-C3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-C4">
+<legend>Task C4 &mdash; Add a row by voice</legend>
+<p>a) Click microphone. b) Speak slowly: <strong>"agrega una linea con concepto leche cantidad dos precio cien"</strong>. c) Wait up to 10 seconds. d) <strong>Expected result:</strong> A new row appears in the data table with: concept = "leche" (or "milk"), quantity = 2, price = 100 (or similar parsing).</p>
+<label class="tr-opt"><input type="radio" name="task-C4-status" value="ok" id="task-C4-ok" data-nac-id="tester_form.task-C4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C4-status" value="error" id="task-C4-error" data-nac-id="tester_form.task-C4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C4-comments">Comments</label>
+<textarea name="task-C4-comments" id="task-C4-comments" rows="2" data-nac-id="tester_form.task-C4.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-C5">
+<legend>Task C5 &mdash; Read aggregate by voice</legend>
+<p>a) Click microphone. b) Speak: <strong>"cuanto total hay?"</strong> (or "what is the total?"). c) Wait for response. d) <strong>Expected result:</strong> The chat responds with a numeric value matching the sum of the visible rows. The TTS reads the number aloud.</p>
+<label class="tr-opt"><input type="radio" name="task-C5-status" value="ok" id="task-C5-ok" data-nac-id="tester_form.task-C5.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-C5-status" value="error" id="task-C5-error" data-nac-id="tester_form.task-C5.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-C5-comments">Comments</label>
+<textarea name="task-C5-comments" id="task-C5-comments" rows="2" data-nac-id="tester_form.task-C5.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Section D -- Voice dispatch on React + Angular demos</h2>
+<fieldset class="tr-task" id="task-D1">
+<legend>Task D1 &mdash; React demo: voice-add</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/demos/react/</code>. b) Wait 5 seconds. c) Click microphone in the chat panel. d) Speak: <strong>"agrega leche"</strong>. e) Wait 5 seconds. d) <strong>Expected result:</strong> A todo item "leche" (or "milk") appears in the todo list.</p>
+<label class="tr-opt"><input type="radio" name="task-D1-status" value="ok" id="task-D1-ok" data-nac-id="tester_form.task-D1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D1-status" value="error" id="task-D1-error" data-nac-id="tester_form.task-D1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D1-comments">Comments</label>
+<textarea name="task-D1-comments" id="task-D1-comments" rows="2" data-nac-id="tester_form.task-D1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-D2">
+<legend>Task D2 &mdash; React demo: voice-delete</legend>
+<p>a) In the same demo, click microphone. b) Speak: <strong>"borra leche"</strong>. c) Wait 5 seconds. d) <strong>Expected result:</strong> The "leche/milk" item disappears from the list.</p>
+<label class="tr-opt"><input type="radio" name="task-D2-status" value="ok" id="task-D2-ok" data-nac-id="tester_form.task-D2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D2-status" value="error" id="task-D2-error" data-nac-id="tester_form.task-D2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D2-comments">Comments</label>
+<textarea name="task-D2-comments" id="task-D2-comments" rows="2" data-nac-id="tester_form.task-D2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-D3">
+<legend>Task D3 &mdash; Angular demo: same flows</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/demos/angular/</code>. b) Repeat Task D1 and D2 on this demo. c) Compare behavior to React demo. d) <strong>Expected result:</strong> Identical behavior -- voice-add works, voice-delete works.</p>
+<label class="tr-opt"><input type="radio" name="task-D3-status" value="ok" id="task-D3-ok" data-nac-id="tester_form.task-D3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-D3-status" value="error" id="task-D3-error" data-nac-id="tester_form.task-D3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-D3-comments">Comments</label>
+<textarea name="task-D3-comments" id="task-D3-comments" rows="2" data-nac-id="tester_form.task-D3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<h2>Section E -- Multi-language voice (only test languages you speak)</h2>
+<p>For each language you actually speak, do the test below. Skip otherwise.</p>
+<fieldset class="tr-task" id="task-E1">
+<legend>Task E1 &mdash; Portuguese</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Change the chat language to "pt" (Portuguese) via the dropdown. c) Click microphone, speak: <strong>"vai para permissoes"</strong>. d) <strong>Expected result:</strong> Permissions tab activates. Chat response in Portuguese.</p>
+<label class="tr-opt"><input type="radio" name="task-E1-status" value="ok" id="task-E1-ok" data-nac-id="tester_form.task-E1.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-E1-status" value="error" id="task-E1-error" data-nac-id="tester_form.task-E1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-E1-status" value="skipped" id="task-E1-skipped" data-nac-id="tester_form.task-E1.status_skipped" data-nac-role="option" /> <span>Skipped</span></label>
+<label class="tr-comments-label" for="task-E1-comments">Comments</label>
+<textarea name="task-E1-comments" id="task-E1-comments" rows="2" data-nac-id="tester_form.task-E1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-E2">
+<legend>Task E2 &mdash; French</legend>
+<p>a) Change language to "fr". b) Speak: <strong>"va aux permissions"</strong>. c) Observe. d) <strong>Expected result:</strong> Permissions activates. Response in French.</p>
+<label class="tr-opt"><input type="radio" name="task-E2-status" value="ok" id="task-E2-ok" data-nac-id="tester_form.task-E2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-E2-status" value="error" id="task-E2-error" data-nac-id="tester_form.task-E2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-E2-status" value="skipped" id="task-E2-skipped" data-nac-id="tester_form.task-E2.status_skipped" data-nac-role="option" /> <span>Skipped</span></label>
+<label class="tr-comments-label" for="task-E2-comments">Comments</label>
+<textarea name="task-E2-comments" id="task-E2-comments" rows="2" data-nac-id="tester_form.task-E2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-E3">
+<legend>Task E3 &mdash; German</legend>
+<p>a) Change language to "de". b) Speak: <strong>"gehe zu berechtigungen"</strong>. c) Observe. d) <strong>Expected result:</strong> Permissions activates. Response in German.</p>
+<label class="tr-opt"><input type="radio" name="task-E3-status" value="ok" id="task-E3-ok" data-nac-id="tester_form.task-E3.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-E3-status" value="error" id="task-E3-error" data-nac-id="tester_form.task-E3.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-E3-status" value="skipped" id="task-E3-skipped" data-nac-id="tester_form.task-E3.status_skipped" data-nac-role="option" /> <span>Skipped</span></label>
+<label class="tr-comments-label" for="task-E3-comments">Comments</label>
+<textarea name="task-E3-comments" id="task-E3-comments" rows="2" data-nac-id="tester_form.task-E3.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-E4">
+<legend>Task E4 &mdash; Other (it / ja / zh / hi / ar)</legend>
+<p>For any other language you speak from {Italian, Japanese, Chinese, Hindi, Arabic}, run the same test with the equivalent "go to permissions" phrase.</p>
+<label class="tr-opt"><input type="radio" name="task-E4-status" value="ok" id="task-E4-ok" data-nac-id="tester_form.task-E4.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-E4-status" value="error" id="task-E4-error" data-nac-id="tester_form.task-E4.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-opt"><input type="radio" name="task-E4-status" value="skipped" id="task-E4-skipped" data-nac-id="tester_form.task-E4.status_skipped" data-nac-role="option" /> <span>Skipped</span></label>
+<label class="tr-comments-label" for="task-E4-comments">Comments</label>
+<textarea name="task-E4-comments" id="task-E4-comments" rows="2" data-nac-id="tester_form.task-E4.comments" data-nac-role="field"></textarea>
+<p>Language tested: ______________</p>
+</fieldset>
+<hr />
+<h2>Section F -- Locale-switch trap (regression guard)</h2>
+<fieldset class="tr-task" id="task-F1">
+<legend>Task F1 &mdash; The "de" preposition trap (Spanish)</legend>
+<p>a) Go to <code>https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Make sure chat is in Spanish ("es") in the language dropdown. c) Click microphone, speak: <strong>"cambia de pestana"</strong> (Spanish for "switch tab" -- "de" is the Spanish preposition, NOT German). d) Wait for response. d) <strong>Expected result:</strong> The chat does NOT switch to German. The language dropdown stays at "es". The chat may answer in Spanish asking for clarification, or it may switch tabs -- both are OK. The forbidden outcome is "language switched to German".</p>
+<div class="tr-note">OK (stayed in Spanish)</div>
+<label class="tr-opt"><input type="radio" name="task-F1-status" value="error" id="task-F1-error" data-nac-id="tester_form.task-F1.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-F1-comments">Comments</label>
+<textarea name="task-F1-comments" id="task-F1-comments" rows="2" data-nac-id="tester_form.task-F1.comments" data-nac-role="field"></textarea>
+</fieldset>
+<fieldset class="tr-task" id="task-F2">
+<legend>Task F2 &mdash; Explicit language switch (allowed)</legend>
+<p>a) Click microphone. b) Speak: <strong>"cambia el idioma a aleman"</strong> (explicit "change the language to German"). c) Wait. d) <strong>Expected result:</strong> The chat language switches to "de" (German). This IS the legitimate trigger.</p>
+<label class="tr-opt"><input type="radio" name="task-F2-status" value="ok" id="task-F2-ok" data-nac-id="tester_form.task-F2.status_ok" data-nac-role="option" /> <span>OK</span></label>
+<label class="tr-opt"><input type="radio" name="task-F2-status" value="error" id="task-F2-error" data-nac-id="tester_form.task-F2.status_error" data-nac-role="option" /> <span>ERROR</span></label>
+<label class="tr-comments-label" for="task-F2-comments">Comments</label>
+<textarea name="task-F2-comments" id="task-F2-comments" rows="2" data-nac-id="tester_form.task-F2.comments" data-nac-role="field"></textarea>
+</fieldset>
+<hr />
+<fieldset class="tr-signoff" id="tr-signoff">
+<legend>Sign-off</legend>
+<label for="sign-release-tag">Release tag tested</label>
+<input type="text" name="sign-release-tag" id="sign-release-tag" data-nac-id="tester_form.sign.release-tag" data-nac-role="field" />
+<label for="sign-tester-name">Tester name</label>
+<input type="text" name="sign-tester-name" id="sign-tester-name" data-nac-id="tester_form.sign.tester-name" data-nac-role="field" />
+<label for="sign-tester-email">Tester email</label>
+<input type="email" name="sign-tester-email" id="sign-tester-email" data-nac-id="tester_form.sign.tester-email" data-nac-role="field" />
+<label for="sign-browser">Browser</label>
+<input type="text" name="sign-browser" id="sign-browser" data-nac-id="tester_form.sign.browser" data-nac-role="field" />
+<label for="sign-os">Operating system</label>
+<input type="text" name="sign-os" id="sign-os" data-nac-id="tester_form.sign.os" data-nac-role="field" />
+<label for="sign-device">Device (laptop / mobile)</label>
+<input type="text" name="sign-device" id="sign-device" data-nac-id="tester_form.sign.device" data-nac-role="field" />
+<label for="sign-verdict">Verdict (ready / needs fixes / blocking)</label>
+<input type="text" name="sign-verdict" id="sign-verdict" data-nac-id="tester_form.sign.verdict" data-nac-role="field" />
+<label for="sign-rating">Overall rating 1-10</label>
+<input type="number" name="sign-rating" id="sign-rating" data-nac-id="tester_form.sign.rating" data-nac-role="field" />
+<label for="sign-top-issues">Top 3 issues found</label>
+<textarea name="sign-top-issues" id="sign-top-issues" rows="3" data-nac-id="tester_form.sign.top-issues" data-nac-role="field"></textarea>
+<label for="sign-free-form">Free-form comment / anything that did not fit a task</label>
+<textarea name="sign-free-form" id="sign-free-form" rows="3" data-nac-id="tester_form.sign.free-form" data-nac-role="field"></textarea>
+</fieldset>
+<pre class="tr-code"><code>Release tag:        v____._.___
+Tester name:        ______________________________
+Date:               ____-____-____
+Browser:            [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Mic + speakers OK:  [ ] yes  [ ] no
+Languages tested:   __ , __ , __ , __ , __ , __
+Tasks walked:       __ of 23
+Tasks marked OK:    __
+Tasks marked ERROR: __
+Overall verdict:    [ ] ready  [ ] needs fixes  [ ] blocking issues
+
+Top 3 issues (if any):
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+Signature: ______________________________</code></pre>
+<hr />
+<h2>See also</h2>
+<p>- <code>TESTER_CHECKLIST_VISUAL.md</code> -- visual layout evaluation. - <code>TESTER_CHECKLIST_VOICE_CHAT.es.md</code> -- Spanish version of this file. - <code>HUMAN_OK_CHECKLIST_TESTER.md</code> -- general functional checklist.</p>
+<div class="tr-actions">
+<button type="submit" class="tr-submit" data-nac-id="tester_form.submit" data-nac-role="action" data-nac-action="submit">Submit report</button>
+<div class="tr-status" aria-live="polite"></div>
+<p class="tr-autosave">Auto-saved locally. Your progress restores if you close this tab.</p>
+</div>
+</form>
+<script src="/nac-spec/js/tester-report.js?v=v22-2026-05-11"></script>
+</body>
+</html>

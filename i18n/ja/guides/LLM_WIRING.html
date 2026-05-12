@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + LLM 仲介バックエンド -- NAC3</title>
+<meta name="nac3-doc-slug" content="llm_wiring" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="llm_wiring" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="llm_wiring.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="llm_wiring.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/llm_wiring.mp3" data-nac-id="llm_wiring.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="llm_wiring.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="llm_wiring.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="llm_wiring.main" data-nac-role="region">
+<hr />
+<p data-nac-id="llm_wiring.p.1" data-nac-role="paragraph">translation_source: guides/LLM_WIRING.md translation_source_hash: 746145f0be3bee6ca1e8d89095de3168e60f2d7c55bf1af78a0086203be97555 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T14:39:17.735302+00:00</p>
+<hr />
+<h1 data-nac-id="llm_wiring.h1.nac3-llm-仲介バックエンド" data-nac-role="heading" data-nac-level="1" id="nac3-llm-仲介バックエンド">NAC3 + LLM 仲介バックエンド</h1>
+<p data-nac-id="llm_wiring.p.4" data-nac-role="paragraph">このガイドでは、ユーザーのプロンプト（"guardar la factura"、"ve a permisos"、"borra el teclado"）をチャットクライアントがディスパッチする NAC3 アクションに変換するバックエンドを構築します。</p>
+<p data-nac-id="llm_wiring.p.5" data-nac-role="paragraph">NAC3 が標準化するのは、このバックエンドの入出力のみです。使用する LLM、プロンプトテンプレート、レート制限、モデレーションはすべて開発者が決定します。このガイドでは Claude を使った最もシンプルな実装例を示しますが、同じパターンは OpenAI、Gemini、またはローカルモデルにも適用できます。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.1-コントラクト" data-nac-role="heading" data-nac-level="2" id="1-コントラクト">1. コントラクト</h2>
+<h3 data-nac-id="llm_wiring.h3.11-リクエスト-クライアント-バックエンド" data-nac-role="heading" data-nac-level="3" id="11-リクエスト-クライアント-バックエンド">1.1 リクエスト: クライアント -&gt; バックエンド</h3>
+<p data-nac-id="llm_wiring.p.9" data-nac-role="paragraph">POST <code data-nac-role="code-inline">/your-endpoint</code>、JSON ボディ:</p>
+<pre data-nac-id="llm_wiring.code.1" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;session_id&quot;: &quot;sess_abc123&quot;,
+  &quot;prompt&quot;:     &quot;ve a permisos&quot;,
+  &quot;lang&quot;:       &quot;es&quot;,
+  &quot;history&quot;:    [
+    { &quot;role&quot;: &quot;user&quot;,      &quot;text&quot;: &quot;muestra factura 1&quot; },
+    { &quot;role&quot;: &quot;assistant&quot;, &quot;text&quot;: &quot;Abriendo la factura #INV-001.&quot; }
+  ],
+  &quot;nac_tree&quot;: {
+    &quot;active&quot;:  &quot;invoice_edit_modal&quot;,
+    &quot;plugins&quot;: [
+      { &quot;plugin&quot;: &quot;invoice&quot;, &quot;state&quot;: &quot;idle&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} },
+      { &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;state&quot;: &quot;active&quot;, &quot;elements&quot;: [...], &quot;manifest&quot;: {...} }
+    ],
+    &quot;v2_scope_entries&quot;: [...],
+    &quot;data_tables&quot;: [...]
+  }
+}</code></pre>
+<p data-nac-id="llm_wiring.p.11" data-nac-role="paragraph">チャットクライアントは <code data-nac-role="code-inline">NacChat.snapshotTree()</code> を通じて <code data-nac-role="code-inline">nac_tree</code> スナップショットを提供します。これはランタイムの <code data-nac-role="code-inline">NAC.describe()</code> と <code data-nac-role="code-inline">NAC.describe_v2()</code> によって生成されます。LLM がページ状態を把握できる唯一の情報源です。</p>
+<h3 data-nac-id="llm_wiring.h3.12-レスポンス-バックエンド-クライアント" data-nac-role="heading" data-nac-level="3" id="12-レスポンス-バックエンド-クライアント">1.2 レスポンス: バックエンド -&gt; クライアント</h3>
+<pre data-nac-id="llm_wiring.code.2" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;ok&quot;:      true,
+  &quot;message&quot;: &quot;Abriendo la pestana Permisos.&quot;,
+  &quot;actions&quot;: [
+    { &quot;kind&quot;: &quot;tab&quot;, &quot;plugin&quot;: &quot;invoice_edit_modal&quot;, &quot;tab_key&quot;: &quot;tab.permissions&quot; }
+  ]
+}</code></pre>
+<p data-nac-id="llm_wiring.p.14" data-nac-role="paragraph"><code data-nac-role="code-inline">message</code> はチャットに表示され、TTS で読み上げられる内容です。<code data-nac-role="code-inline">actions[]</code> は構造化されたディスパッチリストです。チャットクライアントは <code data-nac-role="code-inline">NAC.click()</code> / <code data-nac-role="code-inline">NAC.tab()</code> などを呼び出す前に、送信したスナップショットに対して各アクションを検証します（nac_id が存在するか、tab_key が既知のタブかなど）。</p>
+<h3 data-nac-id="llm_wiring.h3.13-アクションの形式" data-nac-role="heading" data-nac-level="3" id="13-アクションの形式">1.3 アクションの形式</h3>
+<p data-nac-id="llm_wiring.p.16" data-nac-role="paragraph">| <code data-nac-role="code-inline">kind</code> | 必須フィールド | マップ先 | |--------|----------------|---------| | <code data-nac-role="code-inline">click</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.click(nac_id)</code> | | <code data-nac-role="code-inline">click_by_verb</code> | <code data-nac-role="code-inline">verb</code>、オプション <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> | | <code data-nac-role="code-inline">fill</code> | <code data-nac-role="code-inline">nac_id</code>、<code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.fill(nac_id, value)</code> | | <code data-nac-role="code-inline">select</code> | <code data-nac-role="code-inline">nac_id</code>、<code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.select(nac_id, value)</code> | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">plugin</code>、<code data-nac-role="code-inline">tab_key</code> | <code data-nac-role="code-inline">NAC.tab(plugin, tab_key)</code> | | <code data-nac-role="code-inline">tab_by_label</code> | <code data-nac-role="code-inline">label</code>、オプション <code data-nac-role="code-inline">plugin</code> | <code data-nac-role="code-inline">NAC.tab_by_label(plugin, label)</code> | | <code data-nac-role="code-inline">go_to_section</code> | <code data-nac-role="code-inline">nac_id</code> | <code data-nac-role="code-inline">NAC.go_to_section(nac_id)</code> | | <code data-nac-role="code-inline">drag_drop</code> | <code data-nac-role="code-inline">nac_id</code>、<code data-nac-role="code-inline">target_nac_id</code>、オプション <code data-nac-role="code-inline">to_index</code> | <code data-nac-role="code-inline">NAC.drag_drop(...)</code> | | <code data-nac-role="code-inline">say</code> | <code data-nac-role="code-inline">text</code> | botSpeak のみ、DOM アクションなし | | <code data-nac-role="code-inline">change_locale</code> | <code data-nac-role="code-inline">locale</code>（2文字コード） | <code data-nac-role="code-inline">NacChat.setLang(locale)</code> | | <code data-nac-role="code-inline">dt_add_row</code> | <code data-nac-role="code-inline">table_id</code>、<code data-nac-role="code-inline">values</code> | <code data-nac-role="code-inline">NAC.dt_add_row(...)</code> | | <code data-nac-role="code-inline">dt_remove_row</code> | <code data-nac-role="code-inline">table_id</code>、<code data-nac-role="code-inline">row_id</code> | <code data-nac-role="code-inline">NAC.dt_remove_row(...)</code> | | <code data-nac-role="code-inline">dt_edit_cell</code> | <code data-nac-role="code-inline">table_id</code>、<code data-nac-role="code-inline">row_id</code>、<code data-nac-role="code-inline">column</code>、<code data-nac-role="code-inline">value</code> | <code data-nac-role="code-inline">NAC.dt_edit_cell(...)</code> | | <code data-nac-role="code-inline">dt_commit</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_commit(...)</code> | | <code data-nac-role="code-inline">dt_discard</code> | <code data-nac-role="code-inline">table_id</code> | <code data-nac-role="code-inline">NAC.dt_discard(...)</code> | | <code data-nac-role="code-inline">dt_read_aggregate</code> | <code data-nac-role="code-inline">table_id</code>、<code data-nac-role="code-inline">agg_key</code>、<code data-nac-role="code-inline">column</code> | <code data-nac-role="code-inline">NAC.dt_read_aggregate(...)</code> |</p>
+<p data-nac-id="llm_wiring.p.17" data-nac-role="paragraph">完全な列挙はチャットクライアントの <code data-nac-role="code-inline">_dispatchAction()</code> スイッチ（<code data-nac-role="code-inline">js/nac-chat-client.js</code>）に記載されています。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.2-リファレンスバックエンドnode-anthropic-sdk" data-nac-role="heading" data-nac-level="2" id="2-リファレンスバックエンドnode-anthropic-sdk">2. リファレンスバックエンド（Node + Anthropic SDK）</h2>
+<pre data-nac-id="llm_wiring.code.3" data-nac-role="code" data-nac-lang="js"><code>// nac-intermediary.mjs
+// Run: node nac-intermediary.mjs
+// Env: ANTHROPIC_API_KEY
+
+import http from &#x27;node:http&#x27;;
+import Anthropic from &#x27;@anthropic-ai/sdk&#x27;;
+
+const anthropic = new Anthropic();
+
+const MODEL = &#x27;claude-sonnet-4-6&#x27;;
+
+function systemPrompt(snapshot, lang) {
+  return `You drive a web UI by emitting structured NAC actions.
+
+Rules:
+1. Resolve the user&#x27;s intent against the NAC tree below. Prefer
+   click_by_verb when a verb matches; fall back to click(nac_id)
+   only if no verb fits.
+2. For tab switching, use tab() with the plugin + tab_key from
+   the manifest, NOT click().
+3. NEVER invent nac_ids. Every action MUST reference a name
+   present in the tree. If you cannot find a matching name, ask
+   the user a clarifying question via {message} with empty actions[].
+4. Reply in language: ${lang}.
+5. Output JSON only:
+   { &quot;message&quot;: &quot;...&quot;, &quot;actions&quot;: [...] }
+6. message is what the user sees + hears. Keep it short (one
+   sentence is ideal).
+7. If the user said &quot;cambia a &lt;language&gt;&quot; emit a single
+   change_locale action with the 2-letter code.
+8. For data-tables: use dt_add_row / dt_remove_row / dt_edit_cell /
+   dt_commit / dt_discard. Compute aggregates with dt_read_aggregate
+   then read in the message.
+9. Bare 2-letter locale codes (&#x27;de&#x27;,&#x27;es&#x27;,&#x27;en&#x27;) are language codes
+   ONLY when followed/preceded by an explicit language trigger word
+   (&#x27;idioma&#x27;, &#x27;language&#x27;, &#x27;sprache&#x27;). &#x27;cambia DE pestana&#x27; is NOT
+   German -- &#x27;de&#x27; here is the Spanish preposition.
+
+NAC tree snapshot (JSON):
+${JSON.stringify(snapshot, null, 2)}
+`;
+}
+
+const server = http.createServer(async (req, res) =&gt; {
+  if (req.method !== &#x27;POST&#x27;) { res.writeHead(405); res.end(); return; }
+
+  let raw = &#x27;&#x27;;
+  req.on(&#x27;data&#x27;, c =&gt; raw += c);
+  req.on(&#x27;end&#x27;, async () =&gt; {
+    let body;
+    try { body = JSON.parse(raw); }
+    catch (_) { res.writeHead(400); res.end(&#x27;bad json&#x27;); return; }
+
+    try {
+      const completion = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 1024,
+        temperature: 0.2,
+        system: systemPrompt(body.nac_tree, body.lang || &#x27;es&#x27;),
+        messages: [
+          ...body.history.map(h =&gt; ({
+            role: h.role === &#x27;assistant&#x27; ? &#x27;assistant&#x27; : &#x27;user&#x27;,
+            content: h.text
+          })),
+          { role: &#x27;user&#x27;, content: body.prompt }
+        ]
+      });
+
+      // Claude returns JSON inside a text block; parse it.
+      const text = completion.content[0].text.trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch (_) {
+        // Fallback: model returned prose. Wrap it.
+        parsed = { message: text, actions: [] };
+      }
+
+      res.writeHead(200, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({
+        ok: true,
+        message: parsed.message || &#x27;&#x27;,
+        actions: Array.isArray(parsed.actions) ? parsed.actions : []
+      }));
+    } catch (e) {
+      console.error(&#x27;intermediary error&#x27;, e.message);
+      res.writeHead(500, { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
+    }
+  });
+});
+
+server.listen(3000, () =&gt; {
+  console.log(&#x27;NAC intermediary listening on :3000&#x27;);
+});</code></pre>
+<p data-nac-id="llm_wiring.p.21" data-nac-role="paragraph">チャットクライアントからこのエンドポイントを指定します:</p>
+<pre data-nac-id="llm_wiring.code.4" data-nac-role="code" data-nac-lang="js"><code>NacChat._endpoint = &#x27;http://localhost:3000/&#x27;;</code></pre>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.3-バリデーション-ディスパッチ前" data-nac-role="heading" data-nac-level="2" id="3-バリデーション-ディスパッチ前">3. バリデーション — ディスパッチ前</h2>
+<p data-nac-id="llm_wiring.p.25" data-nac-role="paragraph">重要な防御策: LLM が返したすべてのアクションを、送信したスナップショットに対して検証します。</p>
+<pre data-nac-id="llm_wiring.code.5" data-nac-role="code" data-nac-lang="js"><code>function isActionSafe(action, snapshot) {
+  if (!action || !action.kind) return false;
+  switch (action.kind) {
+    case &#x27;click&#x27;:
+    case &#x27;fill&#x27;:
+    case &#x27;select&#x27;:
+    case &#x27;go_to_section&#x27;:
+      return snapshotHasId(snapshot, action.nac_id);
+    case &#x27;click_by_verb&#x27;:
+      return snapshotHasVerb(snapshot, action.plugin, action.verb);
+    case &#x27;tab&#x27;:
+      return snapshotHasTab(snapshot, action.plugin, action.tab_key);
+    case &#x27;tab_by_label&#x27;:
+      return snapshotHasTabLabel(snapshot, action.plugin, action.label);
+    case &#x27;say&#x27;:
+    case &#x27;change_locale&#x27;:
+      return true;
+    default:
+      // dt_* actions: validate table_id exists.
+      if (action.kind.startsWith(&#x27;dt_&#x27;)) {
+        return snapshotHasTable(snapshot, action.table_id);
+      }
+      return false;
+  }
+}
+
+// Reject the action if not safe; show the user a generic message.
+for (const a of response.actions) {
+  if (!isActionSafe(a, mySnapshot)) {
+    console.warn(&#x27;[nac] dropping unsafe action&#x27;, a);
+    botSpeak(&#x27;No pude resolver eso.&#x27;);
+    return;
+  }
+  await dispatchAction(a);
+}</code></pre>
+<p data-nac-id="llm_wiring.p.27" data-nac-role="paragraph">リファレンスクライアント（<code data-nac-role="code-inline">js/nac-chat-client.js</code>）はこの処理を <code data-nac-role="code-inline">_dispatchAction</code> 内で行っています。省略しないでください — これが、LLM が存在しない ID をハルシネーションしたり、プロンプトインジェクションを実行したりすることに対する唯一の防御策です。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.4-ロケール処理" data-nac-role="heading" data-nac-level="2" id="4-ロケール処理">4. ロケール処理</h2>
+<p data-nac-id="llm_wiring.p.30" data-nac-role="paragraph">ユーザーの <code data-nac-role="code-inline">lang</code> はリクエストの明示的なフィールドです。システムプロンプトはモデルにその言語で返答するよう指示します。追加で考慮すべき点が2つあります:</p>
+<ul data-nac-id="llm_wiring.list.31" data-nac-role="list"><li data-nac-id="llm_wiring.list.31.item.1" data-nac-role="list-item">ユーザーが言語切り替えを要求した場合（"cambia a inglés" など）、モデルは <code data-nac-role="code-inline">{ kind: 'change_locale', locale: 'en' }</code> を返します。クライアントは <code data-nac-role="code-inline">NacChat.setLang('en')</code> を呼び出し、次のリクエストには <code data-nac-role="code-inline">lang: 'en'</code> が含まれます。</li><li data-nac-id="llm_wiring.list.31.item.2" data-nac-role="list-item">2文字コードの誤検知: チャットクライアントの <code data-nac-role="code-inline">_detectLangSwitch</code> は、ユーザーの入力がロケール切り替えパターンに一致する場合、LLM のラウンドトリップをショートサーキットします。2026-05-09 にリリースされた修正により、裸の2文字コード（<code data-nac-role="code-inline">de</code>、<code data-nac-role="code-inline">es</code>、<code data-nac-role="code-inline">en</code>）は、明示的な言語トリガーワードが同時に存在する場合にのみロケールコードとして扱われます。この修正がなければ、"cambia DE pestana" がサイレントにドイツ語へ切り替わっていました。</li></ul>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.5-スナップショットのサイズ" data-nac-role="heading" data-nac-level="2" id="5-スナップショットのサイズ">5. スナップショットのサイズ</h2>
+<p data-nac-id="llm_wiring.p.34" data-nac-role="paragraph">ライブページは大きなスナップショットを生成することがあります（50以上のプラグイン × 30要素 × 10ロケール = 15,000以上のエントリ）。Claude Sonnet の料金体系では、リクエストごとに無視できないコストになります。</p>
+<p data-nac-id="llm_wiring.p.35" data-nac-role="paragraph">対策:</p>
+<ul data-nac-id="llm_wiring.list.36" data-nac-role="list"><li data-nac-id="llm_wiring.list.36.item.1" data-nac-role="list-item"><strong>アクティブプラグインフィルター。</strong> アクティブなプラグインとスコープツリー内の親のみを送信します。チャットクライアントの <code data-nac-role="code-inline">snapshotTree()</code> はすでにマウント済みのプラグインのみを含んでいます。</li><li data-nac-id="llm_wiring.list.36.item.2" data-nac-role="list-item"><strong>単一ロケールスナップショット。</strong> <code data-nac-role="code-inline">label_i18n</code> をユーザーの現在の <code data-nac-role="code-inline">lang</code> のみに絞り込みます。クライアントはディスパッチ時に再翻訳できます。</li><li data-nac-id="llm_wiring.list.36.item.3" data-nac-role="list-item"><strong>要素の刈り込み。</strong> <code data-nac-role="code-inline">role: 'action'</code>、<code data-nac-role="code-inline">'tab'</code>、<code data-nac-role="code-inline">'field'</code>、<code data-nac-role="code-inline">'option'</code> のみを含め、<code data-nac-role="code-inline">'section'</code>、<code data-nac-role="code-inline">'region'</code>、装飾的な要素はスキップします。エージェントがこれらを直接ターゲットにすることはほとんどありません。</li></ul>
+<p data-nac-id="llm_wiring.p.37" data-nac-role="paragraph">Yujin のプロダクション環境では、この刈り込みによってスナップショットサイズが約10分の1に削減され、解決精度の低下はありませんでした。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.6-ストリーミングとレイテンシ" data-nac-role="heading" data-nac-level="2" id="6-ストリーミングとレイテンシ">6. ストリーミングとレイテンシ</h2>
+<p data-nac-id="llm_wiring.p.40" data-nac-role="paragraph">上記のリファレンスバックエンドは非ストリーミングです。音声フロー（ユーザーが TTS をできるだけ早く開始したい場合）では、ストリーミングを使用します:</p>
+<ul data-nac-id="llm_wiring.list.41" data-nac-role="list"><li data-nac-id="llm_wiring.list.41.item.1" data-nac-role="list-item">LLM のレスポンスを受信しながらストリーミングします。</li><li data-nac-id="llm_wiring.list.41.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">message</code> フィールドがパース可能になった時点（通常は最初の50トークン以内）で TTS を開始します。</li><li data-nac-id="llm_wiring.list.41.item.3" data-nac-role="list-item">JSON が完成するまで <code data-nac-role="code-inline">actions[]</code> を保留し、<code data-nac-role="code-inline">message</code> の読み上げが終わった後にディスパッチします。</li></ul>
+<p data-nac-id="llm_wiring.p.42" data-nac-role="paragraph">チャットクライアントは現時点ではストリーミングに対応していません。これは v2.2 の候補機能です。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.7-マルチ-llm" data-nac-role="heading" data-nac-level="2" id="7-マルチ-llm">7. マルチ LLM</h2>
+<p data-nac-id="llm_wiring.p.45" data-nac-role="paragraph">LLM の切り替えは、主にシステムプロンプトと SDK の変更で対応できます。NAC3 のワイヤーフォーマットは変わりません。</p>
+<ul data-nac-id="llm_wiring.list.46" data-nac-role="list"><li data-nac-id="llm_wiring.list.46.item.1" data-nac-role="list-item"><strong>OpenAI:</strong> <code data-nac-role="code-inline">gpt-4-turbo</code> または <code data-nac-role="code-inline">gpt-5</code> が良好に動作します。<code data-nac-role="code-inline">response_format: { type: 'json_object' }</code> を使用して JSON 出力を強制することで、パースフォールバック処理を省略できます。</li><li data-nac-id="llm_wiring.list.46.item.2" data-nac-role="list-item"><strong>Gemini:</strong> <code data-nac-role="code-inline">gemini-1.5-pro</code>。同じ形式で、<code data-nac-role="code-inline">responseMimeType: 'application/json'</code> を使用します。</li><li data-nac-id="llm_wiring.list.46.item.3" data-nac-role="list-item"><strong>ローカル（Ollama、vLLM）:</strong> 小規模モデルはフルスナップショットの処理が苦手です。積極的に刈り込み（セクション5参照）を行い、動詞のみをリストアップした小さなプロンプトテンプレートを使用してください。品質は低下しますが、オフラインで動作します。</li></ul>
+<p data-nac-id="llm_wiring.p.47" data-nac-role="paragraph">Yujin のプロダクション環境では、コスト・レイテンシ・ツール使用精度の観点から Claude Sonnet を採用しています。GPT-4 Turbo と Gemini 1.5 Pro もベンチマーク済みで、どちらも動作しますが、現在のプロンプトサイズではリクエストあたりのコストが高くなります。</p>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.8-プロダクション向け堅牢化" data-nac-role="heading" data-nac-level="2" id="8-プロダクション向け堅牢化">8. プロダクション向け堅牢化</h2>
+<p data-nac-id="llm_wiring.p.50" data-nac-role="paragraph">リリース前に確認すべき事項:</p>
+<ol data-nac-id="llm_wiring.list.51" data-nac-role="list"><li data-nac-id="llm_wiring.list.51.item.1" data-nac-role="list-item"><strong>認証。</strong> 仲介エンドポイントは、認証済みアプリのセッショントークンを必須にしなければなりません。そうしないと、攻撃者が直接呼び出して Claude を無料で利用できてしまいます。</li><li data-nac-id="llm_wiring.list.51.item.2" data-nac-role="list-item"><strong>レート制限。</strong> セッション単位、テナント単位で設定します。Yujin コードベースのリファレンス <code data-nac-role="code-inline">core/Orchestrator.php</code> には、参考にできる <code data-nac-role="code-inline">TenantRateLimiter</code> が含まれています。</li><li data-nac-id="llm_wiring.list.51.item.3" data-nac-role="list-item"><strong>スナップショットの信頼性。</strong> <code data-nac-role="code-inline">nac_tree</code> はクライアントから送信されます。信頼できないデータとして扱ってください。サニタイズせずにログに記録しないこと、また今回のリクエストのスナップショットに含まれていない ID をアクションが参照しないようにしてください。</li><li data-nac-id="llm_wiring.list.51.item.4" data-nac-role="list-item"><strong>ロギング。</strong> スナップショットではなく、プロンプトと選択されたアクションのみをログに記録します。スナップショットにはユーザーデータ（氏名、金額など）が含まれる場合があります。</li><li data-nac-id="llm_wiring.list.51.item.5" data-nac-role="list-item"><strong>コスト制限。</strong> テナントごとのトークンカウンター。プランの上限に達したら強制停止します。</li></ol>
+<hr />
+<h2 data-nac-id="llm_wiring.h2.9-リファレンス-プロダクションエンドポイントの形式" data-nac-role="heading" data-nac-level="2" id="9-リファレンス-プロダクションエンドポイントの形式">9. リファレンス: プロダクションエンドポイントの形式</h2>
+<p data-nac-id="llm_wiring.p.54" data-nac-role="paragraph">Yujin のプロダクションエンドポイントは <code data-nac-role="code-inline">/crm/api/v1/yujin/nac-demo</code> にあります。ソース: <code data-nac-role="code-inline">yujin.app/crm/api/v1/yujin.php</code>。上記のすべてに加え、テナントごとの使用量カウンター（F15）と監査ログ（<code data-nac-role="code-inline">yujin_assistant_log</code>）を実装しています。実戦で検証済みの例として参照し、必要な部分を流用してください。</p>
+<hr />
+<p data-nac-id="llm_wiring.p.56" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/LLM_WIRING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "llm_wiring",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "llm_wiring.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "llm_wiring.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "llm_wiring.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "llm_wiring.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

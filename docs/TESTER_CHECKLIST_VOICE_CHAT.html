@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Tester checklist: voice + chat -- NAC3</title>
+<meta name="nac3-doc-slug" content="tester_checklist_voice_chat" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="tester_checklist_voice_chat" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="tester_checklist_voice_chat.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="tester_checklist_voice_chat.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/tester_checklist_voice_chat.mp3" data-nac-id="tester_checklist_voice_chat.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="tester_checklist_voice_chat.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="tester_checklist_voice_chat.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="tester_checklist_voice_chat.main" data-nac-role="region">
+<h1 data-nac-id="tester_checklist_voice_chat.h1.nac3-v22-tester-checklist-voice-chat" data-nac-role="heading" data-nac-level="1" id="nac3-v22-tester-checklist-voice-chat">NAC3 v2.2 -- Tester checklist: voice + chat</h1>
+<p data-nac-id="tester_checklist_voice_chat.p.1" data-nac-role="paragraph"><strong>For:</strong> the human tester focused on voice + chat behavior. <strong>Time:</strong> ~30-45 minutes. <strong>Pre-requisite:</strong> working microphone + speakers/headphones.</p>
+<h2 data-nac-id="tester_checklist_voice_chat.h2.instructions" data-nac-role="heading" data-nac-level="2" id="instructions">Instructions</h2>
+<p data-nac-id="tester_checklist_voice_chat.p.3" data-nac-role="paragraph">For each task:</p>
+<ol data-nac-id="tester_checklist_voice_chat.list.4" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.4.item.1" data-nac-role="list-item">Read step a, b, c, d in order.</li><li data-nac-id="tester_checklist_voice_chat.list.4.item.2" data-nac-role="list-item">Do exactly what step a says, then b, then c.</li><li data-nac-id="tester_checklist_voice_chat.list.4.item.3" data-nac-role="list-item">Compare what you see/hear with the "Expected result" in d.</li><li data-nac-id="tester_checklist_voice_chat.list.4.item.4" data-nac-role="list-item">Mark <code data-nac-role="code-inline">[X]</code> in <strong>OK</strong> if matches; mark <code data-nac-role="code-inline">[X]</code> in <strong>ERROR</strong> + write what actually happened.</li><li data-nac-id="tester_checklist_voice_chat.list.4.item.5" data-nac-role="list-item">Do not skip. If a task fails, continue to the next one.</li></ol>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-a-chat-panel-basics" data-nac-role="heading" data-nac-level="2" id="section-a-chat-panel-basics">Section A -- Chat panel basics</h2>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-a1-open-the-chat-panel" data-nac-role="heading" data-nac-level="3" id="task-a1-open-the-chat-panel">Task A1 -- Open the chat panel</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.8" data-nac-role="paragraph">a) Open Chrome incognito (Ctrl+Shift+N). b) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code>. c) Find the chat panel (usually a circular bubble bottom-right; click it to expand). If already expanded, skip this click. d) <strong>Expected result:</strong> A chat panel opens on the right side of the screen. It has: a header with "Yujin chat" text, a language selector dropdown, a text input box at the bottom, a Send button, and a microphone button next to the input.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.9" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.10" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.10.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.10.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-a2-send-a-text-question" data-nac-role="heading" data-nac-level="3" id="task-a2-send-a-text-question">Task A2 -- Send a text question</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.12" data-nac-role="paragraph">a) Click into the chat input box. b) Type: <code data-nac-role="code-inline">que es NAC3?</code> c) Click the Send button (or press Enter). d) <strong>Expected result:</strong> Within 5-15 seconds, the chat shows a response in Spanish (because the message was in Spanish). The response explains what NAC3 is. The response is at least 2 sentences long. No red error message appears.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.13" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.14" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.14.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.14.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-a3-send-another-question-in-english" data-nac-role="heading" data-nac-level="3" id="task-a3-send-another-question-in-english">Task A3 -- Send another question in English</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.16" data-nac-role="paragraph">a) In the same chat, type: <code data-nac-role="code-inline">how do I install NAC3?</code> b) Press Enter. c) Wait for response. d) <strong>Expected result:</strong> The response comes back in English. It mentions <code data-nac-role="code-inline">npm install @nac3/runtime</code> or a similar install command.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.17" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.18" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.18.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.18.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-b-voice-input-microphone" data-nac-role="heading" data-nac-level="2" id="section-b-voice-input-microphone">Section B -- Voice input (microphone)</h2>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-b1-first-mic-activation-permission-grant" data-nac-role="heading" data-nac-level="3" id="task-b1-first-mic-activation-permission-grant">Task B1 -- First mic activation (permission grant)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.22" data-nac-role="paragraph">a) Click the microphone button next to the chat input. b) The browser will ask for microphone permission. Click "Allow". c) Notice the button visual state. d) <strong>Expected result:</strong> The microphone button changes appearance (color, animation, or icon) to indicate it is actively listening. There may be a visible "recording" indicator.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.23" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.24" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.24.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.24.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-b2-speak-in-spanish" data-nac-role="heading" data-nac-level="3" id="task-b2-speak-in-spanish">Task B2 -- Speak in Spanish</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.26" data-nac-role="paragraph">a) With the microphone active, speak clearly: <strong>"hola"</strong> (just one word). b) After ~2 seconds of silence, the recording auto-stops (or click the mic button again to stop). c) Wait 3-5 seconds. d) <strong>Expected result:</strong> The chat panel shows the transcribed word "hola" (or close to it). A response from the chat appears in Spanish within 10 seconds.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.27" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.28" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.28.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.28.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-b3-voice-in-english" data-nac-role="heading" data-nac-level="3" id="task-b3-voice-in-english">Task B3 -- Voice in English</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.30" data-nac-role="paragraph">a) Click the microphone button again. b) Speak clearly: <strong>"what is NAC3"</strong>. c) Wait for response. d) <strong>Expected result:</strong> Transcription shows "what is NAC3" (or close). Response in English.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.31" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.32" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.32.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.32.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-b4-tts-text-to-speech-audio-playback" data-nac-role="heading" data-nac-level="3" id="task-b4-tts-text-to-speech-audio-playback">Task B4 -- TTS (text-to-speech) audio playback</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.34" data-nac-role="paragraph">a) After Task B3's response appears, listen carefully to your speakers. b) Pay attention during the 5 seconds after the response appears in the chat. d) <strong>Expected result:</strong> A clear English voice reads the response aloud through your speakers. The voice is natural-sounding (not robotic-broken).</p>
+<p data-nac-id="tester_checklist_voice_chat.p.35" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.36" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.36.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.36.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="tester_checklist_voice_chat.list.36.item.3" data-nac-role="list-item">[ ] No audio heard</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-c-voice-dispatch-on-data-table-demo" data-nac-role="heading" data-nac-level="2" id="section-c-voice-dispatch-on-data-table-demo">Section C -- Voice dispatch on data-table demo</h2>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-c1-load-the-data-table-demo" data-nac-role="heading" data-nac-level="3" id="task-c1-load-the-data-table-demo">Task C1 -- Load the data-table demo</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.40" data-nac-role="paragraph">a) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Wait 5 seconds for full load. c) Locate the chat panel and the tabs across the top of the data table. d) <strong>Expected result:</strong> The page shows multiple tabs (at least "Lines (collection)" and "Permissions"). Chat panel is visible.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.41" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.42" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.42.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.42.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-c2-tab-switch-by-voice-spanish" data-nac-role="heading" data-nac-level="3" id="task-c2-tab-switch-by-voice-spanish">Task C2 -- Tab switch by voice (Spanish)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.44" data-nac-role="paragraph">a) Click the microphone button. b) Speak: <strong>"ve a permisos"</strong>. c) Wait up to 5 seconds. d) <strong>Expected result:</strong> The tab "Permisos" (or "Permissions") becomes active. The visible content area changes.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.45" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.46" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.46.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.46.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-c3-tab-switch-by-voice-english" data-nac-role="heading" data-nac-level="3" id="task-c3-tab-switch-by-voice-english">Task C3 -- Tab switch by voice (English)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.48" data-nac-role="paragraph">a) Click the microphone. b) Speak: <strong>"go to lines"</strong>. c) Wait. d) <strong>Expected result:</strong> The "Lines (collection)" tab activates.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.49" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.50" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.50.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.50.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-c4-add-a-row-by-voice" data-nac-role="heading" data-nac-level="3" id="task-c4-add-a-row-by-voice">Task C4 -- Add a row by voice</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.52" data-nac-role="paragraph">a) Click microphone. b) Speak slowly: <strong>"agrega una linea con concepto leche cantidad dos precio cien"</strong>. c) Wait up to 10 seconds. d) <strong>Expected result:</strong> A new row appears in the data table with: concept = "leche" (or "milk"), quantity = 2, price = 100 (or similar parsing).</p>
+<p data-nac-id="tester_checklist_voice_chat.p.53" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.54" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.54.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.54.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-c5-read-aggregate-by-voice" data-nac-role="heading" data-nac-level="3" id="task-c5-read-aggregate-by-voice">Task C5 -- Read aggregate by voice</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.56" data-nac-role="paragraph">a) Click microphone. b) Speak: <strong>"cuanto total hay?"</strong> (or "what is the total?"). c) Wait for response. d) <strong>Expected result:</strong> The chat responds with a numeric value matching the sum of the visible rows. The TTS reads the number aloud.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.57" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.58" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.58.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.58.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-d-voice-dispatch-on-react-angular-demos" data-nac-role="heading" data-nac-level="2" id="section-d-voice-dispatch-on-react-angular-demos">Section D -- Voice dispatch on React + Angular demos</h2>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-d1-react-demo-voice-add" data-nac-role="heading" data-nac-level="3" id="task-d1-react-demo-voice-add">Task D1 -- React demo: voice-add</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.62" data-nac-role="paragraph">a) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code>. b) Wait 5 seconds. c) Click microphone in the chat panel. d) Speak: <strong>"agrega leche"</strong>. e) Wait 5 seconds. d) <strong>Expected result:</strong> A todo item "leche" (or "milk") appears in the todo list.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.63" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.64" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.64.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.64.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-d2-react-demo-voice-delete" data-nac-role="heading" data-nac-level="3" id="task-d2-react-demo-voice-delete">Task D2 -- React demo: voice-delete</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.66" data-nac-role="paragraph">a) In the same demo, click microphone. b) Speak: <strong>"borra leche"</strong>. c) Wait 5 seconds. d) <strong>Expected result:</strong> The "leche/milk" item disappears from the list.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.67" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.68" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.68.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.68.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-d3-angular-demo-same-flows" data-nac-role="heading" data-nac-level="3" id="task-d3-angular-demo-same-flows">Task D3 -- Angular demo: same flows</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.70" data-nac-role="paragraph">a) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code>. b) Repeat Task D1 and D2 on this demo. c) Compare behavior to React demo. d) <strong>Expected result:</strong> Identical behavior -- voice-add works, voice-delete works.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.71" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.72" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.72.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.72.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-e-multi-language-voice-only-test-languages-you-speak" data-nac-role="heading" data-nac-level="2" id="section-e-multi-language-voice-only-test-languages-you-speak">Section E -- Multi-language voice (only test languages you speak)</h2>
+<p data-nac-id="tester_checklist_voice_chat.p.75" data-nac-role="paragraph">For each language you actually speak, do the test below. Skip otherwise.</p>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-e1-portuguese" data-nac-role="heading" data-nac-level="3" id="task-e1-portuguese">Task E1 -- Portuguese</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.77" data-nac-role="paragraph">a) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Change the chat language to "pt" (Portuguese) via the dropdown. c) Click microphone, speak: <strong>"vai para permissoes"</strong>. d) <strong>Expected result:</strong> Permissions tab activates. Chat response in Portuguese.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.78" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.79" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.79.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.79.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="tester_checklist_voice_chat.list.79.item.3" data-nac-role="list-item">[ ] Skipped (don't speak Portuguese)</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-e2-french" data-nac-role="heading" data-nac-level="3" id="task-e2-french">Task E2 -- French</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.81" data-nac-role="paragraph">a) Change language to "fr". b) Speak: <strong>"va aux permissions"</strong>. c) Observe. d) <strong>Expected result:</strong> Permissions activates. Response in French.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.82" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.83" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.83.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.83.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="tester_checklist_voice_chat.list.83.item.3" data-nac-role="list-item">[ ] Skipped</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-e3-german" data-nac-role="heading" data-nac-level="3" id="task-e3-german">Task E3 -- German</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.85" data-nac-role="paragraph">a) Change language to "de". b) Speak: <strong>"gehe zu berechtigungen"</strong>. c) Observe. d) <strong>Expected result:</strong> Permissions activates. Response in German.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.86" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.87" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.87.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.87.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="tester_checklist_voice_chat.list.87.item.3" data-nac-role="list-item">[ ] Skipped</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-e4-other-it-ja-zh-hi-ar" data-nac-role="heading" data-nac-level="3" id="task-e4-other-it-ja-zh-hi-ar">Task E4 -- Other (it / ja / zh / hi / ar)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.89" data-nac-role="paragraph">For any other language you speak from {Italian, Japanese, Chinese, Hindi, Arabic}, run the same test with the equivalent "go to permissions" phrase.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.90" data-nac-role="paragraph">Language tested: ______________ Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.91" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.91.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.91.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="tester_checklist_voice_chat.list.91.item.3" data-nac-role="list-item">[ ] Skipped</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.section-f-locale-switch-trap-regression-guard" data-nac-role="heading" data-nac-level="2" id="section-f-locale-switch-trap-regression-guard">Section F -- Locale-switch trap (regression guard)</h2>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-f1-the-de-preposition-trap-spanish" data-nac-role="heading" data-nac-level="3" id="task-f1-the-de-preposition-trap-spanish">Task F1 -- The "de" preposition trap (Spanish)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.95" data-nac-role="paragraph">a) Go to <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code>. b) Make sure chat is in Spanish ("es") in the language dropdown. c) Click microphone, speak: <strong>"cambia de pestana"</strong> (Spanish for "switch tab" -- "de" is the Spanish preposition, NOT German). d) Wait for response. d) <strong>Expected result:</strong> The chat does NOT switch to German. The language dropdown stays at "es". The chat may answer in Spanish asking for clarification, or it may switch tabs -- both are OK. The forbidden outcome is "language switched to German".</p>
+<p data-nac-id="tester_checklist_voice_chat.p.96" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.97" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.97.item.1" data-nac-role="list-item">[ ] OK (stayed in Spanish)</li><li data-nac-id="tester_checklist_voice_chat.list.97.item.2" data-nac-role="list-item">[ ] ERROR (switched to German -- regression!)</li></ul>
+<h3 data-nac-id="tester_checklist_voice_chat.h3.task-f2-explicit-language-switch-allowed" data-nac-role="heading" data-nac-level="3" id="task-f2-explicit-language-switch-allowed">Task F2 -- Explicit language switch (allowed)</h3>
+<p data-nac-id="tester_checklist_voice_chat.p.99" data-nac-role="paragraph">a) Click microphone. b) Speak: <strong>"cambia el idioma a aleman"</strong> (explicit "change the language to German"). c) Wait. d) <strong>Expected result:</strong> The chat language switches to "de" (German). This IS the legitimate trigger.</p>
+<p data-nac-id="tester_checklist_voice_chat.p.100" data-nac-role="paragraph">Comments: _______________________________</p>
+<ul data-nac-id="tester_checklist_voice_chat.list.101" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.101.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_voice_chat.list.101.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.sign-off-voice-chat" data-nac-role="heading" data-nac-level="2" id="sign-off-voice-chat">SIGN-OFF (voice + chat)</h2>
+<pre data-nac-id="tester_checklist_voice_chat.code.1" data-nac-role="code" data-nac-lang="text"><code>Release tag:        v____._.___
+Tester name:        ______________________________
+Date:               ____-____-____
+Browser:            [ ] Chrome  [ ] Firefox  [ ] Safari  [ ] Edge
+Mic + speakers OK:  [ ] yes  [ ] no
+Languages tested:   __ , __ , __ , __ , __ , __
+Tasks walked:       __ of 23
+Tasks marked OK:    __
+Tasks marked ERROR: __
+Overall verdict:    [ ] ready  [ ] needs fixes  [ ] blocking issues
+
+Top 3 issues (if any):
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+Signature: ______________________________</code></pre>
+<hr />
+<h2 data-nac-id="tester_checklist_voice_chat.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
+<ul data-nac-id="tester_checklist_voice_chat.list.107" data-nac-role="list"><li data-nac-id="tester_checklist_voice_chat.list.107.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">TESTER_CHECKLIST_VISUAL.md</code> -- visual layout evaluation.</li><li data-nac-id="tester_checklist_voice_chat.list.107.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">TESTER_CHECKLIST_VOICE_CHAT.es.md</code> -- Spanish version of this file.</li><li data-nac-id="tester_checklist_voice_chat.list.107.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">HUMAN_OK_CHECKLIST_TESTER.md</code> -- general functional checklist.</li></ul>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "tester_checklist_voice_chat",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "tester_checklist_voice_chat.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "tester_checklist_voice_chat.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "tester_checklist_voice_chat.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "tester_checklist_voice_chat.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

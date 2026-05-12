@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ケーススタディ -- 自律的に発見されたデモのバグ -- NAC3</title>
+<meta name="nac3-doc-slug" content="case_studies_discovery" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="case_studies_discovery" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="case_studies_discovery.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="case_studies_discovery.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/case_studies_discovery.mp3" data-nac-id="case_studies_discovery.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="case_studies_discovery.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="case_studies_discovery.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="case_studies_discovery.main" data-nac-role="region">
+<hr />
+<p data-nac-id="case_studies_discovery.p.1" data-nac-role="paragraph">translation_source: docs/CASE_STUDIES_DISCOVERY.md translation_source_hash: 59b940d486104c6a9b42d59c1ee6f16c25eb01c0c08b8b98458c68ef4312ed77 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T15:04:54.749447+00:00</p>
+<hr />
+<h1 data-nac-id="case_studies_discovery.h1.ケーススタディ-自律的に発見されたデモのバグ" data-nac-role="heading" data-nac-level="1" id="ケーススタディ-自律的に発見されたデモのバグ">ケーススタディ -- 自律的に発見されたデモのバグ</h1>
+<p data-nac-id="case_studies_discovery.p.4" data-nac-role="paragraph">Playwright による診断スイープを <code data-nac-role="code-inline">yujin.app/nac-spec/demos/react/</code> および <code data-nac-role="code-inline">/demos/angular/</code> に対して実行し、発見されたバグの記録。Pablo から 2026-05-11 に、症状を明示せずに発見・文書化・修正するよう依頼された。このファイルは発見プロセスと修正内容を記録する。</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.バグ-1-high-llm-仲介層がアプリのマニフェストを認識できない" data-nac-role="heading" data-nac-level="2" id="バグ-1-high-llm-仲介層がアプリのマニフェストを認識できない">バグ #1 (HIGH) -- LLM 仲介層がアプリのマニフェストを認識できない</h2>
+<p data-nac-id="case_studies_discovery.p.7" data-nac-role="paragraph"><strong>影響するデモ:</strong> React + Angular。</p>
+<p data-nac-id="case_studies_discovery.p.8" data-nac-role="paragraph"><strong>症状（観測可能）:</strong> React または Angular デモのチャットパネルで「hola」と入力すると、チャットが「How can I help you with this page?」という汎用的な返答を返す。これが todos アプリであることを認識していない。「agrega tomar agua」と入力しても、LLM は <code data-nac-role="code-inline">click_by_verb('todos', 'add_todo')</code> をディスパッチできない。そのプラグインの存在を知らないためだ。</p>
+<p data-nac-id="case_studies_discovery.p.9" data-nac-role="paragraph"><strong>発見方法。</strong> 診断スペックはチャット操作中のすべての <code data-nac-role="code-inline">page.console</code> メッセージをキャプチャする。チャットクライアントのログ:</p>
+<pre data-nac-id="case_studies_discovery.code.1" data-nac-role="code" data-nac-lang="text"><code>[nac-chat] snapshot plugins (1): chat
+[nac-chat] backend response: message=&quot;Hi! How can I help you with this page?&quot; actions=[]</code></pre>
+<p data-nac-id="case_studies_discovery.p.11" data-nac-role="paragraph"><code data-nac-role="code-inline">snapshot plugins (1): chat</code> が決定的な証拠だ。LLM に送られるスナップショットに含まれるプラグインが <code data-nac-role="code-inline">chat</code> の <strong>1 つだけ</strong>になっている。デモが <code data-nac-role="code-inline">NAC.register(TODOS_MANIFEST)</code> で登録している <code data-nac-role="code-inline">todos</code> プラグインが存在しない。</p>
+<p data-nac-id="case_studies_discovery.p.12" data-nac-role="paragraph"><strong>根本原因。</strong> <code data-nac-role="code-inline">NAC.describe()</code> は DOM 上の <code data-nac-role="code-inline">[data-nac-plugin="..."]</code> 要素を走査してプラグインを列挙する（<code data-nac-role="code-inline">yujin.app/nac-spec/js/nac.js</code> の約 1557 行目）。チャットパネルの <code data-nac-role="code-inline">&lt;aside class="chat" data-nac-plugin="chat"&gt;</code> にはこの属性があるが、アプリの todos 領域には<strong>ない</strong>。ランタイムは todos 領域をプラグインスコープとして認識できず、<code data-nac-role="code-inline">describe()</code> も <code data-nac-role="code-inline">snapshotTree()</code> も LLM も同様に認識できない。</p>
+<p data-nac-id="case_studies_discovery.p.13" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.register(...)</code> によるマニフェスト登録は内部の <code data-nac-role="code-inline">_manifests</code> マップを更新するが、DOM に <code data-nac-role="code-inline">data-nac-plugin</code> 属性を自動付与<strong>しない</strong>。それは呼び出し側の責任だ。</p>
+<p data-nac-id="case_studies_discovery.p.14" data-nac-role="paragraph"><strong>修正。</strong> 両デモのメインアプリコンテナに <code data-nac-role="code-inline">data-nac-plugin="todos"</code> を追加する:</p>
+<ul data-nac-id="case_studies_discovery.list.15" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.15.item.1" data-nac-role="list-item">React: <code data-nac-role="code-inline">&lt;div className="app"&gt;</code> -&gt; <code data-nac-role="code-inline">&lt;div className="app" data-nac-plugin="todos"&gt;</code></li><li data-nac-id="case_studies_discovery.list.15.item.2" data-nac-role="list-item">Angular: テンプレートの <code data-nac-role="code-inline">&lt;div class="app"&gt;</code> -&gt; <code data-nac-role="code-inline">&lt;div class="app" data-nac-plugin="todos"&gt;</code></li></ul>
+<p data-nac-id="case_studies_discovery.p.16" data-nac-role="paragraph">修正後、<code data-nac-role="code-inline">NAC.describe()</code> は 2 つのプラグイン（<code data-nac-role="code-inline">todos</code> + <code data-nac-role="code-inline">chat</code>）を返し、スナップショットに両方のマニフェストが含まれ、LLM が <code data-nac-role="code-inline">todos.*</code> に対してバーブベースのアクションをディスパッチできるようになる。</p>
+<p data-nac-id="case_studies_discovery.p.17" data-nac-role="paragraph"><strong>マニュアルへの教訓。</strong> NAC3 のコントラクトでは以下の<strong>両方</strong>が必要:</p>
+<ol data-nac-id="case_studies_discovery.list.18" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.18.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.register(manifest)</code> でスキーマを宣言する。</li><li data-nac-id="case_studies_discovery.list.18.item.2" data-nac-role="list-item">DOM ルートに <code data-nac-role="code-inline">data-nac-plugin="&lt;slug&gt;"</code> を付与してプラグインをスコープツリーに登録する。</li></ol>
+<p data-nac-id="case_studies_discovery.p.19" data-nac-role="paragraph">導入ガイドおよび NAC_TEST_MANUAL でこの点を明示すること。「マニフェストを登録したが DOM 属性を忘れた」というのは典型的な導入ミスであり、上記の「LLM が盲目になる」症状を引き起こす。<code data-nac-role="code-inline">stage2-disambiguation.mjs</code> にリグレッションテストを追加すること: スナップショットに登録済みのすべてのプラグインが含まれていなければ、ファインディングとしてフラグを立てる。</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.バグ-2-medium-react-の-onchataction-ハンドラが古いステートをクロージャで参照する" data-nac-role="heading" data-nac-level="2" id="バグ-2-medium-react-の-onchataction-ハンドラが古いステートをクロージャで参照する">バグ #2 (MEDIUM) -- React の onChatAction ハンドラが古いステートをクロージャで参照する</h2>
+<p data-nac-id="case_studies_discovery.p.22" data-nac-role="paragraph"><strong>影響するデモ:</strong> React のみ。Angular はシグナルと <code data-nac-role="code-inline">update()</code> を使用するため、このカテゴリの問題は発生しない。</p>
+<p data-nac-id="case_studies_discovery.p.23" data-nac-role="paragraph"><strong>症状（観測可能）:</strong> バグ #1 の修正後も、チャット経由のバーブディスパッチで todo が追加されない。「agrega leche」を送信しても新しい todo が追加されない。LLM は正しく 2 アクションのシーケンス（<code data-nac-role="code-inline">fill todos.input "leche"</code> + <code data-nac-role="code-inline">click_by_verb todos add_todo</code>）を生成しているが、<code data-nac-role="code-inline">add_todo</code> ハンドラ側で <code data-nac-role="code-inline">input.trim() === ''</code> となり、<code data-nac-role="code-inline">addTodo()</code> を呼ばずにサイレントリターンしてしまう。</p>
+<p data-nac-id="case_studies_discovery.p.24" data-nac-role="paragraph"><strong>発見方法。</strong> 深層探索 Playwright スイープ（ラウンド 2）がチャット経由の追加操作前後の行数をキャプチャする。ファインディング:</p>
+<pre data-nac-id="case_studies_discovery.code.2" data-nac-role="code" data-nac-lang="text"><code>[WARN] chat.dispatch: [react] chat &quot;agrega leche&quot; did not add a
+todo (before=3, after=3). May be LLM hallucination or dispatch
+broken.</code></pre>
+<p data-nac-id="case_studies_discovery.p.26" data-nac-role="paragraph"><strong>根本原因。</strong> <code data-nac-role="code-inline">App.tsx</code> のチャットハンドラ登録用 <code data-nac-role="code-inline">useEffect</code> は deps に <code data-nac-role="code-inline">[input, todos]</code> を持つ。ハンドラは<strong>登録時点</strong>の React ステート値をクロージャで参照する。LLM が <code data-nac-role="code-inline">actions[]</code> を同期的に送信すると、チャットクライアントは以下をディスパッチする:</p>
+<ol data-nac-id="case_studies_discovery.list.27" data-nac-role="list"><li data-nac-id="case_studies_discovery.list.27.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">fill todos.input "leche"</code> -&gt; <code data-nac-role="code-inline">setInput('leche')</code> が再レンダリングをキューに積む。</li><li data-nac-id="case_studies_discovery.list.27.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">click_by_verb todos add_todo</code> -&gt; <strong>同じ JS タスク内で即座に実行される</strong>。React はまだ再レンダリングしていない。ハンドラのクロージャは依然として <code data-nac-role="code-inline">input === ''</code> を参照している。<code data-nac-role="code-inline">input.trim()</code> のガードが失敗し、<code data-nac-role="code-inline">addTodo()</code> が実行されない。</li></ol>
+<p data-nac-id="case_studies_discovery.p.28" data-nac-role="paragraph">これは React の典型的なクロージャ vs. 古いステートの問題だ。</p>
+<p data-nac-id="case_studies_discovery.p.29" data-nac-role="paragraph"><strong>修正。</strong> <code data-nac-role="code-inline">input</code> を追跡する <code data-nac-role="code-inline">useRef</code> を使用し、ハンドラはクロージャではなく ref（常に最新の値）から読み取るようにする。将来のバーブで必要になる場合に備えて <code data-nac-role="code-inline">todos</code> にも同じパターンを適用する。</p>
+<pre data-nac-id="case_studies_discovery.code.3" data-nac-role="code" data-nac-lang="ts"><code>const inputRef = useRef(input);
+useEffect(() =&gt; { inputRef.current = input; }, [input]);
+
+useEffect(() =&gt; {
+  if (!window.NacChat) return;
+  window.NacChat.onAction(&#x27;click_by_verb&#x27;, (a) =&gt; {
+    if (a.plugin === &#x27;todos&#x27; &amp;&amp; a.verb === &#x27;add_todo&#x27;) {
+      const text = (a as any).args?.text || inputRef.current.trim();
+      if (text) {
+        addTodoFromText(text);
+        return { ok: true };
+      }
+    }
+    ...
+  });
+}, []); // 一度だけ登録</code></pre>
+<p data-nac-id="case_studies_discovery.p.31" data-nac-role="paragraph">ボーナス: LLM が <code data-nac-role="code-inline">args.text</code> に直接テキストを渡す場合も受け付けるようにする。これにより、fill-then-click を行わないアプリでも動作する。</p>
+<p data-nac-id="case_studies_discovery.p.32" data-nac-role="paragraph"><strong>マニュアルへの教訓。</strong> React で NAC3 チャット駆動バーブを接続する際は、ハンドラをステートに直接クロージャさせては<strong>いけない</strong>。ref または関数型セッターパターンを使用すること。React 導入ガイド（<code data-nac-role="code-inline">guides/REACT.md</code>）およびテストマニュアルに「よくある落とし穴」セクションを追加すること。</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.バグ-3-tbd" data-nac-role="heading" data-nac-level="2" id="バグ-3-tbd">バグ #3 (TBD)</h2>
+<p data-nac-id="case_studies_discovery.p.35" data-nac-role="paragraph">診断ラウンド 3 待ち。</p>
+<hr />
+<h2 data-nac-id="case_studies_discovery.h2.ループログ" data-nac-role="heading" data-nac-level="2" id="ループログ">ループログ</h2>
+<p data-nac-id="case_studies_discovery.p.38" data-nac-role="paragraph">| ラウンド | 日時 | React エラー | Angular エラー | 登録バグ | |-------|------|--------------|----------------|------------| | 1 | 2026-05-11 02:10 | 表面スキャンで 0 件 | 表面スキャンで 0 件 | #1（マニフェストカバレッジ）コンソール解析で発見 |</p>
+<p data-nac-id="case_studies_discovery.p.39" data-nac-role="paragraph">診断スペックの構造チェック（NAC マウント済み、validate_global クリーン、レジストリ内マニフェスト、todos CRUD 動作、チャットトグル動作）はすべてグリーンで<strong>合格</strong>する。バグは「LLM が登録済みの内容を実際に認識しているか」といった深いセマンティクスの層で表面化する。今後の診断ラウンドでは以下を追加する: LLM レスポンス後のアクション形状の検証、ディスパッチの発火確認、フレームワークステートを通じた dt_state ミューテーション伝播の検証、オートパイロットの全ステップ完了確認、チャットからのロケール切り替え確認。</p>
+<hr />
+<p data-nac-id="case_studies_discovery.p.41" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/CASE_STUDIES_DISCOVERY.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "case_studies_discovery",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "case_studies_discovery.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "case_studies_discovery.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "case_studies_discovery.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "case_studies_discovery.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

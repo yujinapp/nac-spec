@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- Human OK チェックリスト -- NAC3</title>
+<meta name="nac3-doc-slug" content="human_ok_checklist" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="human_ok_checklist" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="human_ok_checklist.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="human_ok_checklist.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/human_ok_checklist.mp3" data-nac-id="human_ok_checklist.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="human_ok_checklist.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="human_ok_checklist.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="human_ok_checklist.main" data-nac-role="region">
+<hr />
+<p data-nac-id="human_ok_checklist.p.1" data-nac-role="paragraph">translation_source: docs/HUMAN_OK_CHECKLIST.md translation_source_hash: 2b87f1b0665762daf6be1ad520c7ba16f977d21771e6574ae60451039baada31 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T15:04:17.711340+00:00</p>
+<hr />
+<h1 data-nac-id="human_ok_checklist.h1.nac3-human-ok-チェックリスト" data-nac-role="heading" data-nac-level="1" id="nac3-human-ok-チェックリスト">NAC3 -- Human OK チェックリスト</h1>
+<p data-nac-id="human_ok_checklist.p.4" data-nac-role="paragraph"><strong>仕様バージョン:</strong> 2.2 + v2.3 プレビュー。 <strong>最終確認日:</strong> 2026-05-11（リリースごとに更新）。 <strong>目的:</strong> <a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.1" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a> の MAN 列を実行可能な形式にしたもの。担当者が以下の全項目を確認し、チェックを入れる。いずれかの項目が失敗した場合、リリースは <strong>出荷しない</strong> -- バグを起票し、修正後に再試行すること。</p>
+<p data-nac-id="human_ok_checklist.p.5" data-nac-role="paragraph">これは自動テストの代替ではない。自動テストスイート（<code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code>）が <strong>グリーン</strong> であることを確認してからこのチェックリストを開始すること。このチェックリストは、自動化では確認できない事項のために存在する: 実際の音声、クロスブラウザの操作感、ネイティブスピーカーによる文言確認、ライブピアとのクロスオリジンハンドシェイク、ビジュアルの品質。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.このドキュメントの使い方" data-nac-role="heading" data-nac-level="2" id="このドキュメントの使い方">このドキュメントの使い方</h2>
+<ol data-nac-id="human_ok_checklist.list.8" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.8.item.1" data-nac-role="list-item">新しいシークレットウィンドウを開く（Chrome → Firefox → Safari の順に、ビジュアル確認セクションは各ブラウザで繰り返す）。</li><li data-nac-id="human_ok_checklist.list.8.item.2" data-nac-role="list-item">セクションを順番に進める -- 前のセクションが完了していることを前提とするセクションがある（例: インターオペラビリティの確認には両方のデモがロード済みである必要がある）。</li><li data-nac-id="human_ok_checklist.list.8.item.3" data-nac-role="list-item">自分自身で確認した場合のみ <code data-nac-role="code-inline">[ ]</code> にチェックを入れる。他者に委任しない。不明な場合は <code data-nac-role="code-inline">[?]</code> とマークし、仕様リードに確認する。</li><li data-nac-id="human_ok_checklist.list.8.item.4" data-nac-role="list-item">最後に SIGN-OFF ブロックに署名と日付を記入する。</li><li data-nac-id="human_ok_checklist.list.8.item.5" data-nac-role="list-item">新しい実行日付スタンプを付けてファイルをコミットする。</li></ol>
+<p data-nac-id="human_ok_checklist.p.9" data-nac-role="paragraph">1回あたりの所要時間の目安: <strong>45〜60分</strong>。急がないこと。このゲートの目的は、自動化が見逃す部分を確認することにある。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.1-ランタイム成果物" data-nac-role="heading" data-nac-level="2" id="1-ランタイム成果物">1. ランタイム成果物</h2>
+<h3 data-nac-id="human_ok_checklist.h3.11-クロスブラウザ-スモークテスト-jsnacjs-nac-v2-extensionsjs" data-nac-role="heading" data-nac-level="3" id="11-クロスブラウザ-スモークテスト-jsnacjs-nac-v2-extensionsjs">1.1 クロスブラウザ スモークテスト -- <code data-nac-role="code-inline">js/nac.js</code> + <code data-nac-role="code-inline">nac-v2-extensions.js</code></h3>
+<p data-nac-id="human_ok_checklist.p.13" data-nac-role="paragraph">各ブラウザ（Chrome、Firefox、Safari）で実施:</p>
+<ul data-nac-id="human_ok_checklist.list.14" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.14.item.1" data-nac-role="list-item">[ ] シークレットモードで <code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code> を開く。</li><li data-nac-id="human_ok_checklist.list.14.item.2" data-nac-role="list-item">[ ] 5秒後にコンソールにエラーがゼロであること。</li><li data-nac-id="human_ok_checklist.list.14.item.3" data-nac-role="list-item">[ ] コンソールで <code data-nac-role="code-inline">NAC.describe().plugins[0]</code> がオブジェクトを返すこと。</li><li data-nac-id="human_ok_checklist.list.14.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.list_registered_plugins()</code> が少なくとも1つのスラッグを返すこと。</li><li data-nac-id="human_ok_checklist.list.14.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">data-nac-role="action"</code> が付いたボタンを1つクリック -- 動作すること、かつ <code data-nac-role="code-inline">nac:action:succeeded</code> イベントが発火すること（コンソールで <code data-nac-role="code-inline">document.addEventListener</code> を使って確認）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.12-ライブチャットクライアント-nac-chat-clientjs" data-nac-role="heading" data-nac-level="3" id="12-ライブチャットクライアント-nac-chat-clientjs">1.2 ライブチャットクライアント -- <code data-nac-role="code-inline">nac-chat-client.js</code></h3>
+<ul data-nac-id="human_ok_checklist.list.16" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.16.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">example-v21-data-table.php</code> でマイクボタンを押す。</li><li data-nac-id="human_ok_checklist.list.16.item.2" data-nac-role="list-item">[ ] "ve a permisos" と発話 -- チャットがフリーテキスト返答ではなくタブ切り替えをディスパッチすること。</li><li data-nac-id="human_ok_checklist.list.16.item.3" data-nac-role="list-item">[ ] 英語（"go to permissions"）とポルトガル語（"vai para permissoes"）でも繰り返す -- 正しくディスパッチされること。</li><li data-nac-id="human_ok_checklist.list.16.item.4" data-nac-role="list-item">[ ] "cambia de pestaña" と発話 -- ロケールがドイツ語に切り替わらないこと（V22-03 のリグレッションガード）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.13-インターオペラビリティ-ランタイム-nac-mcp-interopjs" data-nac-role="heading" data-nac-level="3" id="13-インターオペラビリティ-ランタイム-nac-mcp-interopjs">1.3 インターオペラビリティ ランタイム -- <code data-nac-role="code-inline">nac-mcp-interop.js</code></h3>
+<ul data-nac-id="human_ok_checklist.list.18" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.18.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">example-v22-interop.php</code> を開く。</li><li data-nac-id="human_ok_checklist.list.18.item.2" data-nac-role="list-item">[ ] 4つの CTA を順番に使用: Export tree → Import remote → List remote apps → Disconnect remote。</li><li data-nac-id="human_ok_checklist.list.18.item.3" data-nac-role="list-item">[ ] 各 CTA が出力パネルに成功ログを記録すること。</li><li data-nac-id="human_ok_checklist.list.18.item.4" data-nac-role="list-item">[ ] Disconnect 後、リモートアプリが <code data-nac-role="code-inline">NAC.list_remote_apps()</code> に表示されなくなること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.2-npm-パッケージ" data-nac-role="heading" data-nac-level="2" id="2-npm-パッケージ">2. NPM パッケージ</h2>
+<h3 data-nac-id="human_ok_checklist.h3.21-クリーンインストール-スモークテスト" data-nac-role="heading" data-nac-level="3" id="21-クリーンインストール-スモークテスト">2.1 クリーンインストール スモークテスト</h3>
+<p data-nac-id="human_ok_checklist.p.22" data-nac-role="paragraph">``<code data-nac-role="code-inline">       mkdir /tmp/nac-smoke &amp;&amp; cd /tmp/nac-smoke       npm init -y       npm install @nac3/runtime       node -e "import('@nac3/runtime').then(m =&gt; console.log(Object.keys(m)))"       </code>``</p>
+<ul data-nac-id="human_ok_checklist.list.23" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.23.item.1" data-nac-role="list-item">[ ] スクラッチディレクトリで実行:</li><li data-nac-id="human_ok_checklist.list.23.item.2" data-nac-role="list-item">[ ] 出力に <code data-nac-role="code-inline">NAC</code>、<code data-nac-role="code-inline">registerPlugin</code>、バリデーターが含まれること。</li><li data-nac-id="human_ok_checklist.list.23.item.3" data-nac-role="list-item">[ ] インストール中に非推奨警告が表示されないこと。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.22-外部プロジェクトに対する-cli-バリデーター" data-nac-role="heading" data-nac-level="3" id="22-外部プロジェクトに対する-cli-バリデーター">2.2 外部プロジェクトに対する CLI バリデーター</h3>
+<ul data-nac-id="human_ok_checklist.list.25" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.25.item.1" data-nac-role="list-item">[ ] Yujin 以外のプロジェクト（採用デモまたは任意のフォルダ）を選択する。</li><li data-nac-id="human_ok_checklist.list.25.item.2" data-nac-role="list-item">[ ] そのルートから <code data-nac-role="code-inline">npx @nac3/runtime validate .</code> を実行する。</li><li data-nac-id="human_ok_checklist.list.25.item.3" data-nac-role="list-item">[ ] 出力が人間が読める形式であること、BLOCKER が 0 件であること、クリーンな場合は終了コード 0 / 問題がある場合は非ゼロで終了すること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.3-デモ" data-nac-role="heading" data-nac-level="2" id="3-デモ">3. デモ</h2>
+<h3 data-nac-id="human_ok_checklist.h3.31-ランディングページ-indexhtml" data-nac-role="heading" data-nac-level="3" id="31-ランディングページ-indexhtml">3.1 ランディングページ -- <code data-nac-role="code-inline">index.html</code></h3>
+<ul data-nac-id="human_ok_checklist.list.29" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.29.item.1" data-nac-role="list-item">[ ] ページが sumi-e ブランディングで FOUC なしにレンダリングされること。</li><li data-nac-id="human_ok_checklist.list.29.item.2" data-nac-role="list-item">[ ] "Autopilot" をクリック -- 5秒間のツアーが実行され、ナレーションが聞こえること（TTS、無音でないこと）。</li><li data-nac-id="human_ok_checklist.list.29.item.3" data-nac-role="list-item">[ ] チャットを開き "que es NAC3?" と入力 -- エラーではなく、意味のある応答が返ること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.32-リファレンスデモ-examplephp" data-nac-role="heading" data-nac-level="3" id="32-リファレンスデモ-examplephp">3.2 リファレンスデモ -- <code data-nac-role="code-inline">example.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.31" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.31.item.1" data-nac-role="list-item">[ ] ページ上に表示されている 27 個のウィジェット全てを操作する。</li><li data-nac-id="human_ok_checklist.list.31.item.2" data-nac-role="list-item">[ ] 全操作後にコンソールエラーがゼロであること。</li><li data-nac-id="human_ok_checklist.list.31.item.3" data-nac-role="list-item">[ ] 反応しないウィジェットがゼロであること（クリックしても何も起きないものがないこと）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.33-ブラウンフィールドデモ-example-v20-fullphp" data-nac-role="heading" data-nac-level="3" id="33-ブラウンフィールドデモ-example-v20-fullphp">3.3 ブラウンフィールドデモ -- <code data-nac-role="code-inline">example-v20-full.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.33" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.33.item.1" data-nac-role="list-item">[ ] ページロード後に <code data-nac-role="code-inline">v20-panel</code> が右上に表示されること。</li><li data-nac-id="human_ok_checklist.list.33.item.2" data-nac-role="list-item">[ ] "describe_v2" をクリック -- パネルに有効な JSON 出力が表示されること。</li><li data-nac-id="human_ok_checklist.list.33.item.3" data-nac-role="list-item">[ ] "validate_global_v2" をクリック -- パネルに検出結果（または "0 findings, OK"）が表示されること。</li><li data-nac-id="human_ok_checklist.list.33.item.4" data-nac-role="list-item">[ ] v20-panel 内の 6 つのボタンを全てクリック -- 全て <code data-nac-role="code-inline">nac:action:succeeded</code> を発火すること（リスナーを設定している場合はコンソールで確認）。</li><li data-nac-id="human_ok_checklist.list.33.item.5" data-nac-role="list-item">[ ] istrusted_fake ボタン -- ack が <strong>発火しない</strong>こと（ランタイムが isTrusted ゲート付き動詞に対して合成クリックを正しく拒否すること）。</li><li data-nac-id="human_ok_checklist.list.33.item.6" data-nac-role="list-item">[ ] istrusted_real ボタン（実際の人間によるクリック）-- ack が <strong>発火する</strong>こと。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.34-プリミティブ-ショーケース-example-v20-primitives-showcasephp" data-nac-role="heading" data-nac-level="3" id="34-プリミティブ-ショーケース-example-v20-primitives-showcasephp">3.4 プリミティブ ショーケース -- <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.35" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.35.item.1" data-nac-role="list-item">[ ] 8 つのプリミティブそれぞれが、動作するサンプルを含むセクションをレンダリングすること。</li><li data-nac-id="human_ok_checklist.list.35.item.2" data-nac-role="list-item">[ ] 各セクションの解説テキストが正しく表示されること（文字化けやプレースホルダーが残っていないこと）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.35-データテーブルデモ-example-v21-data-tablephp" data-nac-role="heading" data-nac-level="3" id="35-データテーブルデモ-example-v21-data-tablephp">3.5 データテーブルデモ -- <code data-nac-role="code-inline">example-v21-data-table.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.37" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.37.item.1" data-nac-role="list-item">[ ] マイクを押し "agrega una linea con concepto leche cantidad 2 precio 100" と発話 -- コレクションテーブルに行が追加されること。</li><li data-nac-id="human_ok_checklist.list.37.item.2" data-nac-role="list-item">[ ] "cuanto total hay?" と発話 -- チャットが生のテーブルではなく数値で返答すること。</li><li data-nac-id="human_ok_checklist.list.37.item.3" data-nac-role="list-item">[ ] "ve a permisos" と発話 -- タブが切り替わること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.36-インターオペラビリティデモ-example-v22-interopphp" data-nac-role="heading" data-nac-level="3" id="36-インターオペラビリティデモ-example-v22-interopphp">3.6 インターオペラビリティデモ -- <code data-nac-role="code-inline">example-v22-interop.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.39" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.39.item.1" data-nac-role="list-item">[ ] 上記 1.3 で既に確認済み。</li><li data-nac-id="human_ok_checklist.list.39.item.2" data-nac-role="list-item">[ ] ボーナス: 2つのブラウザタブでページを開き、ハンドシェイクを繰り返す -- タブをまたいでも動作すること（各タブは独立した NAC インスタンスであり、インターオペラビリティレイヤーがブリッジとなる）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.37-react-ケーススタディ-demosreact" data-nac-role="heading" data-nac-level="3" id="37-react-ケーススタディ-demosreact">3.7 React ケーススタディ -- <code data-nac-role="code-inline">demos/react/</code></h3>
+<ul data-nac-id="human_ok_checklist.list.41" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.41.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code> を開く。</li><li data-nac-id="human_ok_checklist.list.41.item.2" data-nac-role="list-item">[ ] テキストボックスに "leche" と入力し "Add" をクリック -- todo が表示されること。</li><li data-nac-id="human_ok_checklist.list.41.item.3" data-nac-role="list-item">[ ] チャットを開き、マイクで "agrega pan" と発話 -- チャット経由のパスで todo "pan" が追加されること。これはケーススタディ バグ #2 のリグレッションガードである。</li><li data-nac-id="human_ok_checklist.list.41.item.4" data-nac-role="list-item">[ ] "borra leche" と発話 -- todo "leche" が消えること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.38-angular-ケーススタディ-demosangular" data-nac-role="heading" data-nac-level="3" id="38-angular-ケーススタディ-demosangular">3.8 Angular ケーススタディ -- <code data-nac-role="code-inline">demos/angular/</code></h3>
+<ul data-nac-id="human_ok_checklist.list.43" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.43.item.1" data-nac-role="list-item">[ ] React と同じ 4 項目を <code data-nac-role="code-inline">/nac-spec/demos/angular/</code> で確認する。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.4-ドキュメント" data-nac-role="heading" data-nac-level="2" id="4-ドキュメント">4. ドキュメント</h2>
+<p data-nac-id="human_ok_checklist.p.46" data-nac-role="paragraph">以下の各ドキュメントについて、四半期リリースごとに少なくとも1回は通読すること。確認事項:</p>
+<ul data-nac-id="human_ok_checklist.list.47" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.47.item.1" data-nac-role="list-item">バージョンスタンプが最新（v2.2）であること。</li><li data-nac-id="human_ok_checklist.list.47.item.2" data-nac-role="list-item">内部リンクが壊れていないこと。</li><li data-nac-id="human_ok_checklist.list.47.item.3" data-nac-role="list-item">未解決の TODO が残っていないこと。</li><li data-nac-id="human_ok_checklist.list.47.item.4" data-nac-role="list-item">コードスニペットが記載通りにコンパイル / 実行できること。</li></ul>
+<ul data-nac-id="human_ok_checklist.list.48" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.48.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SPEC.md</code>（正規コントラクト）。</li><li data-nac-id="human_ok_checklist.list.48.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">ABOUT.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">CONTRIBUTING.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">SECURITY.md</code> -- 加えて四半期ごとの脅威モデルの再読。</li><li data-nac-id="human_ok_checklist.list.48.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">README_DEMOS.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/NAC_LAUNCH_DIFFUSION.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code>。</li><li data-nac-id="human_ok_checklist.list.48.item.11" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/TEST_COVERAGE_MATRIX.md</code>（このマトリクスの兄弟ドキュメント）。</li><li data-nac-id="human_ok_checklist.list.48.item.12" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">docs/VOICE_CHAT_ERROR_ANALYSIS_2026_05_09.md</code>。</li></ul>
+<h2 data-nac-id="human_ok_checklist.h2.5-導入ガイド" data-nac-role="heading" data-nac-level="2" id="5-導入ガイド">5. 導入ガイド</h2>
+<p data-nac-id="human_ok_checklist.p.50" data-nac-role="paragraph">各ガイドについて、hello-world スニペットが引き続きコンパイルできること、および手順に従えば初めての読者でも動作するインストールが完了できることを確認する:</p>
+<ul data-nac-id="human_ok_checklist.list.51" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.51.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/REACT.md</code> -- Vite + React 18 でスニペットがコンパイルできること。</li><li data-nac-id="human_ok_checklist.list.51.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/ANGULAR.md</code> -- Angular 17 スタンドアロンでスニペットがコンパイルできること。</li><li data-nac-id="human_ok_checklist.list.51.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> -- Node リファレンスバックエンドが起動し、サンプルのコントラクトテストが通ること。</li><li data-nac-id="human_ok_checklist.list.51.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_NEW_PROJECT.md</code> -- ステップのアサーションが現在のランタイム API と一致していること。</li><li data-nac-id="human_ok_checklist.list.51.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/AI_PLAYBOOK_MIGRATION.md</code> -- 同上。</li><li data-nac-id="human_ok_checklist.list.51.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_TESTING.md</code> -- 数値を最新状態に再確認すること（四半期ごとに再チェック）。</li><li data-nac-id="human_ok_checklist.list.51.item.7" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/IMPACT_RPA.md</code> -- 同上。</li><li data-nac-id="human_ok_checklist.list.51.item.8" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_UIPATH.md</code> -- <code data-nac-role="code-inline">InvoiceFromCSV.xaml</code> サンプルを一度実行すること（または最新の UiPath Studio における相当のサンプル）。</li><li data-nac-id="human_ok_checklist.list.51.item.9" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_AUTOMATION_ANYWHERE.md</code> -- 相当するサンプルワークフローを実行すること。</li><li data-nac-id="human_ok_checklist.list.51.item.10" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">guides/RPA_BLUE_PRISM.md</code> -- 相当するサンプルオブジェクトスタディを実行すること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.6-テストスイート" data-nac-role="heading" data-nac-level="2" id="6-テストスイート">6. テストスイート</h2>
+<ul data-nac-id="human_ok_checklist.list.54" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.54.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> を実行 -- 15 秒以内に全件 GREEN であること。</li><li data-nac-id="human_ok_checklist.list.54.item.2" data-nac-role="list-item">[ ] スモークカウンター（<code data-nac-role="code-inline">36 PASS</code>）を確認 -- 期待する合計数と一致していること。</li><li data-nac-id="human_ok_checklist.list.54.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac/test/fixtures/voice/</code> を開き、ロケールごとに 1 ファイル（計 10 ファイル）を選択してオーディオプレイヤーで再生 -- 音声が聞こえ、かつ聞き取れること。</li><li data-nac-id="human_ok_checklist.list.54.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">stage3-backend.mjs</code> からランダムに 2 件の LLM プロンプトをスポットチェック -- レスポンスが妥当であり、ドリフトがないこと。</li><li data-nac-id="human_ok_checklist.list.54.item.5" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">--headed</code> オプション付きで Playwright スイートを一度実行（<code data-nac-role="code-inline">npx playwright test --headed</code>）-- 実行中に各スペックの UI を目視確認すること。</li><li data-nac-id="human_ok_checklist.list.54.item.6" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">bash tools/nac/discovery-loop.sh 1</code> を実行 -- 1 ラウンドが 0 件の検出で完了すること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.7-スタディケースパッケージ" data-nac-role="heading" data-nac-level="2" id="7-スタディケースパッケージ">7. スタディケースパッケージ</h2>
+<ul data-nac-id="human_ok_checklist.list.57" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.57.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-react-demo/</code> がクリーンにビルドできること（<code data-nac-role="code-inline">npm run build</code>）。</li><li data-nac-id="human_ok_checklist.list.57.item.2" data-nac-role="list-item">[ ] デプロイ済みの React dist がローカルビルドと同一の動作をすること。</li><li data-nac-id="human_ok_checklist.list.57.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">packages/nac-angular-demo/</code> がクリーンにビルドできること。</li><li data-nac-id="human_ok_checklist.list.57.item.4" data-nac-role="list-item">[ ] デプロイ済みの Angular dist が同一の動作をすること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.8-横断的確認事項" data-nac-role="heading" data-nac-level="2" id="8-横断的確認事項">8. 横断的確認事項</h2>
+<h3 data-nac-id="human_ok_checklist.h3.81-i18n" data-nac-role="heading" data-nac-level="3" id="81-i18n">8.1 i18n</h3>
+<ul data-nac-id="human_ok_checklist.list.61" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.61.item.1" data-nac-role="list-item">[ ] ロケールを 1 つ選択（リリースごとにローテーション）-- ネイティブスピーカーにランダムな 10 文字列のスポットチェックを依頼すること。</li><li data-nac-id="human_ok_checklist.list.61.item.2" data-nac-role="list-item">[ ] バリデーターが全 10 ロケールにわたってキーの欠落が 0 件であることを確認すること（<code data-nac-role="code-inline">NAC.validate_global({locale: 'all'})</code>）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.82-hmac-プロベナンス" data-nac-role="heading" data-nac-level="3" id="82-hmac-プロベナンス">8.2 HMAC + プロベナンス</h3>
+<ul data-nac-id="human_ok_checklist.list.63" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.63.item.1" data-nac-role="list-item">[ ] ステージングテナントに対してマルチテナントスモークを実行 -- マニフェスト署名が検証され、ログに <code data-nac-role="code-inline">provenance_mismatch</code> エラーが出ないこと。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.83-istrusted-ゲーティング" data-nac-role="heading" data-nac-level="3" id="83-istrusted-ゲーティング">8.3 isTrusted ゲーティング</h3>
+<ul data-nac-id="human_ok_checklist.list.65" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.65.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">example-v20-full.php</code> において、istrusted_real と istrusted_fake の並列テスト（上記 3.3 で対象）がビジュアル差分で PASS すること: real は ack を発火し、fake は発火しないこと。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.84-クロスオリジン相互運用v23-プレビュー" data-nac-role="heading" data-nac-level="3" id="84-クロスオリジン相互運用v23-プレビュー">8.4 クロスオリジン相互運用（v2.3 プレビュー）</h3>
+<ul data-nac-id="human_ok_checklist.list.67" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.67.item.1" data-nac-role="list-item">[ ] v2.3 を GA 宣言する前に、クロスオリジンテストを少なくとも 1 件実施すること: 異なるオリジンにホストされたリモートの NAC3 ピアに対して相互運用デモを開き、実際の Bearer トークンと実際の CORS プリフライトを使用してラウンドトリップが成功すること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.85-デプロイメント" data-nac-role="heading" data-nac-level="3" id="85-デプロイメント">8.5 デプロイメント</h3>
+<ul data-nac-id="human_ok_checklist.list.69" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.69.item.1" data-nac-role="list-item">[ ] リリースプッシュ後、以下の URL に curl し、200 と正しいコンテンツが返ることを確認すること:</li><li data-nac-id="human_ok_checklist.list.69.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code></li><li data-nac-id="human_ok_checklist.list.69.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/SPEC.md</code></li><li data-nac-id="human_ok_checklist.list.69.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac.js</code></li><li data-nac-id="human_ok_checklist.list.69.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/js/nac-chat-client.js</code></li><li data-nac-id="human_ok_checklist.list.69.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code></li><li data-nac-id="human_ok_checklist.list.69.item.7" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="human_ok_checklist.list.69.item.8" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v22-interop.php</code></li><li data-nac-id="human_ok_checklist.list.69.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code></li><li data-nac-id="human_ok_checklist.list.69.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code></li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.86-実音声" data-nac-role="heading" data-nac-level="3" id="86-実音声">8.6 実音声</h3>
+<ul data-nac-id="human_ok_checklist.list.71" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.71.item.1" data-nac-role="list-item">[ ] 実機ハードウェア（ノート PC のマイク＋スピーカー）を使用 -- ライブの <code data-nac-role="code-inline">example-v21-data-table.php</code> でマイクボタンを押し、ロケールごとに 1 プロンプトを発話（計 10 プロンプト）-- 全ロケールで LLM のディスパッチが妥当であること。</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.9-スクリーンリーダーパスアクセシビリティ-track-g7" data-nac-role="heading" data-nac-level="2" id="9-スクリーンリーダーパスアクセシビリティ-track-g7">9. スクリーンリーダーパス（アクセシビリティ -- Track G7）</h2>
+<p data-nac-id="human_ok_checklist.p.74" data-nac-role="paragraph">このセクションでは、スクリーンリーダーを使用し、モニターをオフにした状態（または文字通り目を閉じた状態）でデモを操作する。これは <a href="ACCESSIBILITY.md" data-nac-id="human_ok_checklist.link.2" data-nac-role="action" data-nac-action="open">ACCESSIBILITY.md</a> におけるアクセシビリティコミットメントのゲートである。</p>
+<p data-nac-id="human_ok_checklist.p.75" data-nac-role="paragraph">このセクションはリリースごとに少なくとも <strong>2 種類</strong>のスクリーンリーダーで実施すること（Windows では NVDA が最も手軽; macOS には VoiceOver がプリインストール済み; ライセンスがあれば JAWS も使用）。</p>
+<h3 data-nac-id="human_ok_checklist.h3.91-nvdawindows" data-nac-role="heading" data-nac-level="3" id="91-nvdawindows">9.1 NVDA（Windows）</h3>
+<ul data-nac-id="human_ok_checklist.list.77" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.77.item.1" data-nac-role="list-item">[ ] NVDA をインストールする（無料、nvaccess.org）。Ctrl+Alt+N で起動する。</li><li data-nac-id="human_ok_checklist.list.77.item.2" data-nac-role="list-item">[ ] モニターをオフにした状態（または目を閉じた状態）で <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code> を開く。</li><li data-nac-id="human_ok_checklist.list.77.item.3" data-nac-role="list-item">[ ] H キーでナビゲートしたとき、NVDA がページタイトルと見出しの構造的なアウトライン（h1、h2、h3）を読み上げること。</li><li data-nac-id="human_ok_checklist.list.77.item.4" data-nac-role="list-item">[ ] Tab キーで全インタラクティブコントロールに論理的な順序で到達でき、各コントロールがロールとラベルを明確に読み上げること。</li><li data-nac-id="human_ok_checklist.list.77.item.5" data-nac-role="list-item">[ ] チャットパネルを開く（NVDA がチャット入力欄のロールが role=textbox であり、明確なラベルがあることを読み上げること）。</li><li data-nac-id="human_ok_checklist.list.77.item.6" data-nac-role="list-item">[ ] "que es NAC3?" と入力して送信 -- レスポンスが届いたとき NVDA が全文を読み上げること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.92-nvda-での-example-v21-data-tablephp" data-nac-role="heading" data-nac-level="3" id="92-nvda-での-example-v21-data-tablephp">9.2 NVDA での <code data-nac-role="code-inline">example-v21-data-table.php</code></h3>
+<ul data-nac-id="human_ok_checklist.list.79" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.79.item.1" data-nac-role="list-item">[ ] Tab ナビゲーションで NVDA が "Lines (collection) tab" と Permissions タブを読み上げること。</li><li data-nac-id="human_ok_checklist.list.79.item.2" data-nac-role="list-item">[ ] タブをアクティブにすると、<code data-nac-role="code-inline">nac:tab:activated</code> イベントの ack を通じて新しい状態が読み上げられること。</li><li data-nac-id="human_ok_checklist.list.79.item.3" data-nac-role="list-item">[ ] LLM が行を追加したとき、NVDA が新しい行の内容を自動で（または Down キー 1 回で）読み上げること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.93-voiceovermacos" data-nac-role="heading" data-nac-level="3" id="93-voiceovermacos">9.3 VoiceOver（macOS）</h3>
+<ul data-nac-id="human_ok_checklist.list.81" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.81.item.1" data-nac-role="list-item">[ ] Cmd+F5 で VoiceOver を起動する。</li><li data-nac-id="human_ok_checklist.list.81.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">https://yujin.app/nac-spec/index.html</code> を開く。</li><li data-nac-id="human_ok_checklist.list.81.item.3" data-nac-role="list-item">[ ] VO+U でローターを開き、見出し・リンク・フォームコントロールが表示されていることを確認する。</li><li data-nac-id="human_ok_checklist.list.81.item.4" data-nac-role="list-item">[ ] VO+A でページ全体を上から下まで読み上げる -- "div div div link link button" ではなく、意味的に理解できる内容であること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.94-react-angular-スタディケースでの-voiceover" data-nac-role="heading" data-nac-level="3" id="94-react-angular-スタディケースでの-voiceover">9.4 React + Angular スタディケースでの VoiceOver</h3>
+<ul data-nac-id="human_ok_checklist.list.83" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.83.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">demos/react/</code> にて: キーボードと VoiceOver のみを使用して入力フィールドから todo を追加する。追加時に新しい todo が読み上げられること（ack イベントが接続されていること）。</li><li data-nac-id="human_ok_checklist.list.83.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">demos/angular/</code> にて: 同じテスト、同じ期待値。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.95-キーボードのみのナビゲーションスクリーンリーダーなしマウスなし" data-nac-role="heading" data-nac-level="3" id="95-キーボードのみのナビゲーションスクリーンリーダーなしマウスなし">9.5 キーボードのみのナビゲーション（スクリーンリーダーなし、マウスなし）</h3>
+<ul data-nac-id="human_ok_checklist.list.85" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.85.item.1" data-nac-role="list-item">[ ] マウスを切断または無効化する。</li><li data-nac-id="human_ok_checklist.list.85.item.2" data-nac-role="list-item">[ ] Tab キーのみでランディングページを操作する。すべてのフォーカス停止箇所が視覚的に確認できること（フォーカスリングが表示されること）。</li><li data-nac-id="human_ok_checklist.list.85.item.3" data-nac-role="list-item">[ ] キーボードでチャットパネルを開き、プロンプトを入力して送信する。結果が正しく表示・読み上げられること。</li><li data-nac-id="human_ok_checklist.list.85.item.4" data-nac-role="list-item">[ ] Escape キーで開いているモーダルが閉じること。</li><li data-nac-id="human_ok_checklist.list.85.item.5" data-nac-role="list-item">[ ] キーボードトラップがないこと（Tab で最終的にページ先頭に戻ってくること）。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.96-ハイコントラスト-200-ズーム" data-nac-role="heading" data-nac-level="3" id="96-ハイコントラスト-200-ズーム">9.6 ハイコントラスト + 200% ズーム</h3>
+<ul data-nac-id="human_ok_checklist.list.87" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.87.item.1" data-nac-role="list-item">[ ] ランディングページをブラウザで 200% にズームする。レイアウトが崩れないこと、横スクロールが発生しないこと、テキストが重ならないこと。</li><li data-nac-id="human_ok_checklist.list.87.item.2" data-nac-role="list-item">[ ] Windows ハイコントラストモード（または macOS のコントラストを上げる設定）を使用する。ボタン・リンク・フォーカスリングが引き続き視認できること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.97-音声コントロール再帰的なケース" data-nac-role="heading" data-nac-level="3" id="97-音声コントロール再帰的なケース">9.7 音声コントロール（再帰的なケース）</h3>
+<ul data-nac-id="human_ok_checklist.list.89" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.89.item.1" data-nac-role="list-item">[ ] Pilot 対応ブラウザ（またはリファレンスの <code data-nac-role="code-inline">nac-chat-client.js</code> マイクボタンを使用）で、音声のみでデモを操作する。</li><li data-nac-id="human_ok_checklist.list.89.item.2" data-nac-role="list-item">[ ] マイクボタンが NVDA/VoiceOver に状態を読み上げること（"recording started"、"recording stopped"）。</li><li data-nac-id="human_ok_checklist.list.89.item.3" data-nac-role="list-item">[ ] NAC3 経由でディスパッチされた音声コマンドが有効になり、ack がスクリーンリーダーに読み上げられること。</li></ul>
+<h3 data-nac-id="human_ok_checklist.h3.98-発見されたアクセシビリティ上の問題" data-nac-role="heading" data-nac-level="3" id="98-発見されたアクセシビリティ上の問題">9.8 発見されたアクセシビリティ上の問題</h3>
+<p data-nac-id="human_ok_checklist.p.91" data-nac-role="paragraph">このセクションで発見された問題を重大度とともに以下に列挙すること:</p>
+<pre data-nac-id="human_ok_checklist.code.1" data-nac-role="code" data-nac-lang="text"><code>-
+-
+-</code></pre>
+<p data-nac-id="human_ok_checklist.p.93" data-nac-role="paragraph">BLOCKER 重大度の問題が未解決の場合、解決するまでリリースを出荷しないこと。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.sign-off" data-nac-role="heading" data-nac-level="2" id="sign-off">SIGN-OFF</h2>
+<pre data-nac-id="human_ok_checklist.code.2" data-nac-role="code" data-nac-lang="text"><code>Release tag:    v____._.___
+Walked by:      ______________________
+Walked on:      ____-____-____
+Browsers used:  [ ] Chrome  [ ] Firefox  [ ] Safari
+Native speakers consulted (locale -&gt; name):
+   ____________________________________________
+Total items walked:  ___ / ___
+Failed items (list with bug links):
+   ____________________________________________
+   ____________________________________________
+Signature:      ______________________</code></pre>
+<p data-nac-id="human_ok_checklist.p.97" data-nac-role="paragraph">SIGN-OFF ブロックを記入した状態でこのファイルをコミットし、リリースを「human OK」としてマークすること。</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist.h2.参照" data-nac-role="heading" data-nac-level="2" id="参照">参照</h2>
+<ul data-nac-id="human_ok_checklist.list.100" data-nac-role="list"><li data-nac-id="human_ok_checklist.list.100.item.1" data-nac-role="list-item"><a href="TEST_COVERAGE_MATRIX.md" data-nac-id="human_ok_checklist.link.3" data-nac-role="action" data-nac-action="open">TEST_COVERAGE_MATRIX.md</a> -- このチェックリストの元となるマトリクス。</li><li data-nac-id="human_ok_checklist.list.100.item.2" data-nac-role="list-item"><a href="NAC_TEST_MANUAL.md" data-nac-id="human_ok_checklist.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- 導入者向けのアップストリームプレイブック。</li><li data-nac-id="human_ok_checklist.list.100.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="human_ok_checklist.link.5" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a> -- 現在のリリースの自動カバレッジ記録。</li></ul>
+<h2 data-nac-id="human_ok_checklist.h2.ライセンス" data-nac-role="heading" data-nac-level="2" id="ライセンス">ライセンス</h2>
+<p data-nac-id="human_ok_checklist.p.102" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="human_ok_checklist.p.104" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/HUMAN_OK_CHECKLIST.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "human_ok_checklist",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "human_ok_checklist.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "human_ok_checklist.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "human_ok_checklist.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "human_ok_checklist.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

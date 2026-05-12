@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- セキュリティモデル -- NAC3</title>
+<meta name="nac3-doc-slug" content="security" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="security" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="security.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="security.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/security.mp3" data-nac-id="security.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="security.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="security.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="security.main" data-nac-role="region">
+<hr />
+<p data-nac-id="security.p.1" data-nac-role="paragraph">translation_source: SECURITY.md translation_source_hash: 4d9f26e0cc810ed4f1c6cf921c7ae8f5c004d8ba42445a69a2de58106db2b64f translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T13:04:59.650913+00:00</p>
+<hr />
+<h1 data-nac-id="security.h1.nac3-セキュリティモデル" data-nac-role="heading" data-nac-level="1" id="nac3-セキュリティモデル">NAC3 -- セキュリティモデル</h1>
+<p data-nac-id="security.p.4" data-nac-role="paragraph"><strong>仕様バージョン:</strong> 2.2 stable（+ v2.3 相互運用プレビュー）</p>
+<h2 data-nac-id="security.h2.脅威モデル" data-nac-role="heading" data-nac-level="2" id="脅威モデル">脅威モデル</h2>
+<p data-nac-id="security.p.6" data-nac-role="paragraph">NAC3 はエージェントと UI の間に位置します。これは認証レイヤーではなく、コントラクトレイヤーです。複数の異なるトラストバウンダリが存在します。このドキュメントでは、NAC3 が保護するバウンダリとそうでないバウンダリを明確に区別するために、それぞれを定義します。</p>
+<h3 data-nac-id="security.h3.バウンダリ-a-ユーザー-ui" data-nac-role="heading" data-nac-level="3" id="バウンダリ-a-ユーザー-ui">バウンダリ A: ユーザー -&gt; UI</h3>
+<p data-nac-id="security.p.8" data-nac-role="paragraph">NAC のスコープ外です。既存の認証機構（セッション、OAuth、SSO、MFA）を使用してください。ユーザーが認証済みであれば、NAC3 は UI 上でそのユーザーが実行できるあらゆる操作を許可されたものとみなします。</p>
+<h3 data-nac-id="security.h3.バウンダリ-b-ユーザー制御エージェント-ui" data-nac-role="heading" data-nac-level="3" id="バウンダリ-b-ユーザー制御エージェント-ui">バウンダリ B: ユーザー制御エージェント -&gt; UI</h3>
+<p data-nac-id="security.p.10" data-nac-role="paragraph">ユーザーがエージェントに対して、自分のブラウザセッションを操作する権限を付与するケースです。例として、音声アシスタント、スクリーンリーダー、同一ページに埋め込まれた LLM チャットクライアントなどが挙げられます。このバウンダリにおける NAC3 の役割は以下のとおりです。</p>
+<ol data-nac-id="security.list.11" data-nac-role="list"><li data-nac-id="security.list.11.item.1" data-nac-role="list-item">エージェントに安定した要素名を提供し、座標のスクレイピングなしに操作できるようにする。</li><li data-nac-id="security.list.11.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">event.isTrusted</code> を公開し、ホストがセキュリティ上重要な操作（支払い、削除、ロール付与）に対して合成クリックを拒否できるようにする。エージェントは <code data-nac-role="code-inline">isTrusted=true</code> を偽造できません。実際のユーザージェスチャーのみがこれを設定します。</li><li data-nac-id="security.list.11.item.3" data-nac-role="list-item">イベントレベルの確認応答を提供し、エージェントが DOM を再読み込みせずに完了した操作を把握できるようにする。</li></ol>
+<p data-nac-id="security.p.12" data-nac-role="paragraph">NAC3 は、ユーザーが明示的に信頼したエージェントがその信頼を悪用するケースを防ぎません。それはユーザーエクスペリエンスの問題（重要な操作前の同意プロンプト）であり、NAC ではなくアプリケーション側で対処するものです。</p>
+<h3 data-nac-id="security.h3.バウンダリ-c-外部サービス-uillm-仲介" data-nac-role="heading" data-nac-level="3" id="バウンダリ-c-外部サービス-uillm-仲介">バウンダリ C: 外部サービス -&gt; UI（LLM 仲介）</h3>
+<p data-nac-id="security.p.14" data-nac-role="paragraph">ユーザーの音声プロンプトがリモート LLM に送信され、LLM が NAC3 アクションを返す場合、LLM はトラストプリンシパルになります。このバウンダリにおける NAC3 の役割は以下のとおりです。</p>
+<ol data-nac-id="security.list.15" data-nac-role="list"><li data-nac-id="security.list.15.item.1" data-nac-role="list-item">LLM は <code data-nac-role="code-inline">NAC.describe()</code> が公開する情報（ツリースナップショット + 登録済みマニフェスト）のみを参照します。ユーザーの認証トークン、Cookie、またはマニフェストで宣言された範囲を超えた DOM の内部情報は参照できません。</li><li data-nac-id="security.list.15.item.2" data-nac-role="list-item">LLM はクリックを直接引き起こすことはできません。LLM は構造化されたアクションを返し、チャットクライアントがディスパッチ前にそれを検証します（<code data-nac-role="code-inline">nac_id</code> は存在するか？動詞は許可されているか？）。</li><li data-nac-id="security.list.15.item.3" data-nac-role="list-item">チャットクライアントは、送信したスナップショットに含まれていない <code data-nac-role="code-inline">nac_id</code> を持つアクションを拒否すべきです（SHOULD）。これにより、任意の ID を埋め込むプロンプトインジェクションを防ぎます。</li></ol>
+<p data-nac-id="security.p.16" data-nac-role="paragraph">NAC3 は LLM のプロンプトテンプレート、レート制限、またはフィルタリングを規定しません。推奨事項については <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> を参照してください。</p>
+<h3 data-nac-id="security.h3.バウンダリ-d-テナント-テナントマルチテナント展開" data-nac-role="heading" data-nac-level="3" id="バウンダリ-d-テナント-テナントマルチテナント展開">バウンダリ D: テナント -&gt; テナント（マルチテナント展開）</h3>
+<p data-nac-id="security.p.18" data-nac-role="paragraph">テナントがランタイムを共有しつつデータを共有しないマルチテナント SaaS の場合、NAC3 は HMAC 署名付きマニフェストでこれを保護します。</p>
+<ol data-nac-id="security.list.19" data-nac-role="list"><li data-nac-id="security.list.19.item.1" data-nac-role="list-item">各テナントは、サーバー側に保存されたテナントごとのシークレットを使用して、安定したシリアライゼーションに対して計算された HMAC 署名とともにマニフェストを送信します。</li><li data-nac-id="security.list.19.item.2" data-nac-role="list-item">ランタイムは <code data-nac-role="code-inline">NAC.register()</code> 時に、アクティブなテナントに期待するシークレットを使って HMAC を再計算します。署名が一致しない場合、マニフェストは拒否されます。</li><li data-nac-id="security.list.19.item.3" data-nac-role="list-item">悪意のあるテナントは、署名シークレットなしに別のテナントのマニフェストを偽造できません。</li></ol>
+<p data-nac-id="security.p.20" data-nac-role="paragraph">NAC3 は、基本的なサイズ上限を超えた過度に大きいまたは不正なマニフェストの登録を防ぎません。信頼できないマニフェストを受け入れる場合は、サーバー側でマニフェスト登録のレート制限を設けてください。</p>
+<h3 data-nac-id="security.h3.バウンダリ-e-悪意のあるスクリプト-ページ" data-nac-role="heading" data-nac-level="3" id="バウンダリ-e-悪意のあるスクリプト-ページ">バウンダリ E: 悪意のあるスクリプト -&gt; ページ</h3>
+<p data-nac-id="security.p.22" data-nac-role="paragraph">攻撃者が制御する JS（XSS、サプライチェーン侵害）を含むページはすでに危険な状態です。NAC3 はここでは対処できません。攻撃者は <code data-nac-role="code-inline">NAC.click(...)</code> を直接呼び出すことができます。CSP、SRI、および通常の Web セキュリティスタックで緩和してください。</p>
+<h2 data-nac-id="security.h2.プロベナンスシグナル" data-nac-role="heading" data-nac-level="2" id="プロベナンスシグナル">プロベナンスシグナル</h2>
+<h3 data-nac-id="security.h3.成功イベントにおける-is_trusted" data-nac-role="heading" data-nac-level="3" id="成功イベントにおける-is_trusted">成功イベントにおける <code data-nac-role="code-inline">is_trusted</code></h3>
+<p data-nac-id="security.p.25" data-nac-role="paragraph">すべてのアクション成功イベントの detail には <code data-nac-role="code-inline">is_trusted: boolean</code> が含まれます。ホストはセキュリティ上重要な操作に対してこれを必須にできます。</p>
+<pre data-nac-id="security.code.1" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, function (e) {
+  var d = e.detail;
+  if (d.action_id === &#x27;invoice.delete&#x27; &amp;&amp; !d.is_trusted) {
+    console.warn(&#x27;[security] refused synthetic delete click&#x27;);
+    e.preventDefault();
+  }
+});</code></pre>
+<p data-nac-id="security.p.27" data-nac-role="paragraph">リファレンスデモ <code data-nac-role="code-inline">example-v20-full.php</code> には、パネル出力でその違いを示すボタンペア（<code data-nac-role="code-inline">v20_panel.istrusted_real</code> と <code data-nac-role="code-inline">v20_panel.istrusted_fake</code>）が含まれています。</p>
+<h3 data-nac-id="security.h3.hmac-マニフェスト署名" data-nac-role="heading" data-nac-level="3" id="hmac-マニフェスト署名">HMAC マニフェスト署名</h3>
+<p data-nac-id="security.p.29" data-nac-role="paragraph">サーバー側で署名を生成します。</p>
+<pre data-nac-id="security.code.2" data-nac-role="code" data-nac-lang="python"><code>import hmac, hashlib, json
+manifest_body = json.dumps(manifest, sort_keys=True, separators=(&#x27;,&#x27;, &#x27;:&#x27;))
+sig = hmac.new(
+    tenant_secret.encode(&#x27;utf-8&#x27;),
+    manifest_body.encode(&#x27;utf-8&#x27;),
+    hashlib.sha256
+).hexdigest()
+manifest[&#x27;provenance&#x27;] = {
+    &#x27;signed_at&#x27;: now_iso8601(),
+    &#x27;signed_by&#x27;: tenant_slug,
+    &#x27;signature&#x27;: sig
+}</code></pre>
+<p data-nac-id="security.p.31" data-nac-role="paragraph">クライアント側:</p>
+<pre data-nac-id="security.code.3" data-nac-role="code" data-nac-lang="js"><code>NAC.set_provenance_secret(SECRET_FROM_AUTHED_RESPONSE);
+NAC.register(manifest);
+// runtime recomputes hmac, rejects if mismatch</code></pre>
+<p data-nac-id="security.p.33" data-nac-role="paragraph">シークレットは認証済みサーバーレスポンスから取得しなければなりません。JS ソースに埋め込まないでください。脅威モデルが要求する場合は、セッションごとにローテーションしてください。</p>
+<h2 data-nac-id="security.h2.脆弱性の報告" data-nac-role="heading" data-nac-level="2" id="脆弱性の報告">脆弱性の報告</h2>
+<p data-nac-id="security.p.35" data-nac-role="paragraph"><code data-nac-role="code-inline">nac@yujin.dev</code> に以下の内容をメールで送信してください。</p>
+<ol data-nac-id="security.list.36" data-nac-role="list"><li data-nac-id="security.list.36.item.1" data-nac-role="list-item">脆弱性の説明。</li><li data-nac-id="security.list.36.item.2" data-nac-role="list-item">再現手順または概念実証（PoC）。</li><li data-nac-id="security.list.36.item.3" data-nac-role="list-item">影響を受ける NAC3 のバージョン。</li><li data-nac-id="security.list.36.item.4" data-nac-role="list-item">緩和策の提案（ある場合）。</li></ol>
+<p data-nac-id="security.p.37" data-nac-role="paragraph">公開 GitHub Issue は作成しないでください。私たちは以下を約束します。</p>
+<ul data-nac-id="security.list.38" data-nac-role="list"><li data-nac-id="security.list.38.item.1" data-nac-role="list-item">3 営業日以内に受領を確認します。</li><li data-nac-id="security.list.38.item.2" data-nac-role="list-item">10 営業日以内にトリアージ評価を提供します。</li><li data-nac-id="security.list.38.item.3" data-nac-role="list-item">報告者と開示タイミングを調整します。</li></ul>
+<p data-nac-id="security.p.39" data-nac-role="paragraph">公開仕様に影響するクリティカルな問題は 30 日以内にパッチリリースで対応します。それ以下の重大度の問題は 90 日以内に対応します。</p>
+<h2 data-nac-id="security.h2.nac3-が明示的に行わないこと" data-nac-role="heading" data-nac-level="2" id="nac3-が明示的に行わないこと">NAC3 が明示的に行わないこと</h2>
+<ul data-nac-id="security.list.41" data-nac-role="list"><li data-nac-id="security.list.41.item.1" data-nac-role="list-item">ユーザーの認証。</li><li data-nac-id="security.list.41.item.2" data-nac-role="list-item">転送中のデータの暗号化（TLS を使用してください）。</li><li data-nac-id="security.list.41.item.3" data-nac-role="list-item">ユーザーが許可された操作を行うことの防止。</li><li data-nac-id="security.list.41.item.4" data-nac-role="list-item">エージェント同士の分離（すべて同一ページで動作します。分離が必要な場合は別々のページで実行してください）。</li><li data-nac-id="security.list.41.item.5" data-nac-role="list-item">個別アクションへの署名（マニフェストのみ）。アクションごとの署名は v3.0 の候補として追跡中です。</li></ul>
+<hr />
+<p data-nac-id="security.p.43" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/SECURITY.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "security",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "security.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "security.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "security.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "security.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

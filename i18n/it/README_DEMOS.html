@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Demo live di NAC3 su yujin.app/nac-spec/ -- NAC3</title>
+<meta name="nac3-doc-slug" content="readme_demos" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="readme_demos" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="readme_demos.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="readme_demos.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/readme_demos.mp3" data-nac-id="readme_demos.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="readme_demos.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="readme_demos.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="readme_demos.main" data-nac-role="region">
+<hr />
+<p data-nac-id="readme_demos.p.1" data-nac-role="paragraph">translation_source: README_DEMOS.md translation_source_hash: 0f488dd749283f4f2e03f0e431de47d7007818c6745ce1ce993014bdf9839480 translation_quality: machine_v1 translation_lang: it translation_date: 2026-05-11T12:57:12.538260+00:00</p>
+<hr />
+<h1 data-nac-id="readme_demos.h1.demo-live-di-nac3-su-yujinappnac-spec" data-nac-role="heading" data-nac-level="1" id="demo-live-di-nac3-su-yujinappnac-spec">Demo live di NAC3 su yujin.app/nac-spec/</h1>
+<p data-nac-id="readme_demos.p.4" data-nac-role="paragraph"><strong>Versione spec:</strong> 2.2 stable (+ anteprima interop v2.3).</p>
+<p data-nac-id="readme_demos.p.5" data-nac-role="paragraph"><strong>NAC3</strong> = <strong>Native Agent Contract</strong>. La spec che consente alle UI web di essere pilotate da assistenti AI, voice runner e strumenti di accessibilità senza codice di collegamento specifico per ogni app.</p>
+<p data-nac-id="readme_demos.p.6" data-nac-role="paragraph">Tre demo attive in parallelo. Ciascuna ha uno scopo distinto; non confondetele.</p>
+<p data-nac-id="readme_demos.p.7" data-nac-role="paragraph">| File | Versione | Scopo | |---|---|---| | <code data-nac-role="code-inline">example.php</code> | v1.9 stable | La demo canonica per NAC3 v1.9. 27 widget (chat, calendario, autopilot, modal, tab, grafici, ecc.). Mostra l'intera superficie funzionale v1.9 in una UI di forma produttiva. <strong>Invariata.</strong> | | <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code> | v2.0-rc4 | <strong>Showcase didattico</strong> degli 8 primitivi v2.0 + HMAC + isTrusted + contratto i18n. 8 sezioni, una per primitivo. Utile per revisori e adottanti che vogliono comprendere ogni nuovo primitivo in isolamento. <strong>NON è una migrazione di example.php.</strong> | | <code data-nac-role="code-inline">example-v20-full.php</code> | v2.0-rc4 | <strong>Migrazione brownfield</strong> di <code data-nac-role="code-inline">example.php</code> a NAC3 v2.0 strict. Stessi 27 widget, stesso HTML, stessi handler -- con il layer v2.0 applicato sopra tramite ~80 righe di codice di setup. Dimostra che l'adozione nel mondo reale NON richiede la riscrittura di ogni widget. |</p>
+<h2 data-nac-id="readme_demos.h2.confronto-affiancato" data-nac-role="heading" data-nac-level="2" id="confronto-affiancato">Confronto affiancato</h2>
+<p data-nac-id="readme_demos.p.9" data-nac-role="paragraph">Apri <code data-nac-role="code-inline">example.php</code> e <code data-nac-role="code-inline">example-v20-full.php</code> in due tab.</p>
+<h3 data-nac-id="readme_demos.h3.cosa-è-identico" data-nac-role="heading" data-nac-level="3" id="cosa-è-identico">Cosa è identico</h3>
+<p data-nac-id="readme_demos.p.11" data-nac-role="paragraph"><code data-nac-role="code-inline">data-nac-id</code>, ogni riferimento al catalogo i18n, ogni handler)</p>
+<ul data-nac-id="readme_demos.list.12" data-nac-role="list"><li data-nac-id="readme_demos.list.12.item.1" data-nac-role="list-item">Markup HTML (ogni <code data-nac-role="code-inline">&lt;article data-nac-plugin="X"&gt;</code>, ogni</li><li data-nac-id="readme_demos.list.12.item.2" data-nac-role="list-item">Aspetto visivo (stesso layout, stessi widget, stesse interazioni)</li><li data-nac-id="readme_demos.list.12.item.3" data-nac-role="list-item">Runtime di riferimento v1.9 (<code data-nac-role="code-inline">js/nac.js</code>) caricato nello stesso modo</li><li data-nac-id="readme_demos.list.12.item.4" data-nac-role="list-item">Riferimenti al catalogo <code data-nac-role="code-inline">data-i18n-key</code> esistenti</li></ul>
+<h3 data-nac-id="readme_demos.h3.cosa-cambia-nella-versione-v20-full" data-nac-role="heading" data-nac-level="3" id="cosa-cambia-nella-versione-v20-full">Cosa cambia nella versione v2.0-full</h3>
+<p data-nac-id="readme_demos.p.14" data-nac-role="paragraph">showcase di migrazione brownfield.</p>
+<p data-nac-id="readme_demos.p.15" data-nac-role="paragraph">dopo <code data-nac-role="code-inline">nac.js</code> e prima di <code data-nac-role="code-inline">example.js</code>.</p>
+<p data-nac-id="readme_demos.p.16" data-nac-role="paragraph">pagina) che:</p>
+<ol data-nac-id="readme_demos.list.17" data-nac-role="list"><li data-nac-id="readme_demos.list.17.item.1" data-nac-role="list-item"><strong>Docstring nell'intestazione</strong> che spiega esplicitamente che si tratta di uno</li><li data-nac-id="readme_demos.list.17.item.2" data-nac-role="list-item"><strong>Un tag script aggiuntivo</strong>: <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> caricato</li><li data-nac-id="readme_demos.list.17.item.3" data-nac-role="list-item"><strong>Un blocco di setup aggiuntivo</strong> (~80 righe in fondo alla</li></ol>
+<p data-nac-id="readme_demos.p.18" data-nac-role="paragraph"><code data-nac-role="code-inline">data-nac-plugin</code> esistenti (ogni plugin diventa uno scope      sotto <code data-nac-role="code-inline">demo.shell</code>).</p>
+<ul data-nac-id="readme_demos.list.19" data-nac-role="list"><li data-nac-id="readme_demos.list.19.item.1" data-nac-role="list-item">Costruisce un albero di scope gerarchico dagli attributi</li><li data-nac-id="readme_demos.list.19.item.2" data-nac-role="list-item">Chiama <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> per abilitare la firma HMAC.</li><li data-nac-id="readme_demos.list.19.item.3" data-nac-role="list-item">Chiama <code data-nac-role="code-inline">NAC.setTenantPrefix('demo')</code> per dimostrare il multi-tenant.</li><li data-nac-id="readme_demos.list.19.item.4" data-nac-role="list-item">Avvia il ring buffer <code data-nac-role="code-inline">NAC.captureEphemeral()</code> per i toast.</li><li data-nac-id="readme_demos.list.19.item.5" data-nac-role="list-item">Chiama <code data-nac-role="code-inline">NAC.autoRegister.watch()</code> sul contenitore delle card.</li></ul>
+<p data-nac-id="readme_demos.p.20" data-nac-role="paragraph">che espone <code data-nac-role="code-inline">describe_v2()</code>, <code data-nac-role="code-inline">validate_global_v2()</code>, la demo di firma HMAC    e il pulsante per la distinzione isTrusted, tutti in tempo reale.</p>
+<ol data-nac-id="readme_demos.list.21" data-nac-role="list"><li data-nac-id="readme_demos.list.21.item.1" data-nac-role="list-item"><strong>Un pannello UI aggiuntivo</strong> (<code data-nac-role="code-inline">#v20-panel</code>, fisso in basso a destra)</li></ol>
+<p data-nac-id="readme_demos.p.22" data-nac-role="paragraph">Questo è l'intero delta. Gli adottanti reali possono riutilizzare questo pattern alla lettera.</p>
+<h2 data-nac-id="readme_demos.h2.come-valutare" data-nac-role="heading" data-nac-level="2" id="come-valutare">Come valutare</h2>
+<p data-nac-id="readme_demos.p.24" data-nac-role="paragraph">Se sei un revisore peer di NAC3 v2.0:</p>
+<p data-nac-id="readme_demos.p.25" data-nac-role="paragraph">le funzionalità v1.9 (chat, calendario, autopilot, ecc.).</p>
+<ol data-nac-id="readme_demos.list.26" data-nac-role="list"><li data-nac-id="readme_demos.list.26.item.1" data-nac-role="list-item">Apri prima <code data-nac-role="code-inline">example.php</code>. Verifica che la demo v1.9 funzioni come prima.</li><li data-nac-id="readme_demos.list.26.item.2" data-nac-role="list-item">Apri <code data-nac-role="code-inline">example-v20-full.php</code>. Verifica che funzioni IN MODO IDENTICO per</li><li data-nac-id="readme_demos.list.26.item.3" data-nac-role="list-item">Apri il pannello v2.0 (angolo in basso a destra). Clicca ogni pulsante:</li></ol>
+<p data-nac-id="readme_demos.p.27" data-nac-role="paragraph">attributi plugin brownfield.</p>
+<p data-nac-id="readme_demos.p.28" data-nac-role="paragraph">se il catalogo i18n ha lacune).</p>
+<p data-nac-id="readme_demos.p.29" data-nac-role="paragraph">in azione.</p>
+<ul data-nac-id="readme_demos.list.30" data-nac-role="list"><li data-nac-id="readme_demos.list.30.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">describe_v2()</code> -- visualizza l'albero di scope costruito dagli</li><li data-nac-id="readme_demos.list.30.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global_v2()</code> -- visualizza i risultati (probabilmente solo avvisi</li><li data-nac-id="readme_demos.list.30.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">sign as agent</code> -- visualizza la firma HMAC prodotta.</li><li data-nac-id="readme_demos.list.30.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">click=trusted</code> / <code data-nac-role="code-inline">.click()=fake</code> -- osserva la distinzione isTrusted</li></ul>
+<p data-nac-id="readme_demos.p.31" data-nac-role="paragraph">Se sei un adottante:</p>
+<p data-nac-id="readme_demos.p.32" data-nac-role="paragraph">Usa il blocco di setup di <code data-nac-role="code-inline">example-v20-full.php</code> come template. Adatta l'albero di scope alla struttura dei plugin della tua app. La maggior parte del lavoro consiste nell'identificare la gerarchia degli scope; il resto è meccanico.</p>
+<h2 data-nac-id="readme_demos.h2.link-correlati" data-nac-role="heading" data-nac-level="2" id="link-correlati">Link correlati</h2>
+<ul data-nac-id="readme_demos.list.34" data-nac-role="list"><li data-nac-id="readme_demos.list.34.item.1" data-nac-role="list-item">Spec NAC3: https://github.com/pkuschnirof/nac-spec</li><li data-nac-id="readme_demos.list.34.item.2" data-nac-role="list-item">Release v1.9: tag <code data-nac-role="code-inline">v1.9.0</code></li><li data-nac-id="readme_demos.list.34.item.3" data-nac-role="list-item">Release candidate v2.0: <code data-nac-role="code-inline">2.0.0-rc4</code> su <code data-nac-role="code-inline">main</code></li><li data-nac-id="readme_demos.list.34.item.4" data-nac-role="list-item">Traccia della revisione peer Round 3: <code data-nac-role="code-inline">docs/PEER_REVIEW.md</code></li></ul>
+<hr />
+<p data-nac-id="readme_demos.p.36" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/README_DEMOS.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "readme_demos",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "readme_demos.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "readme_demos.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "readme_demos.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "readme_demos.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

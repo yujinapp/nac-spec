@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- ロードマップ -- NAC3</title>
+<meta name="nac3-doc-slug" content="nac_v22_roadmap" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="nac_v22_roadmap" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="nac_v22_roadmap.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="nac_v22_roadmap.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/nac_v22_roadmap.mp3" data-nac-id="nac_v22_roadmap.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="nac_v22_roadmap.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="nac_v22_roadmap.main" data-nac-role="region">
+<hr />
+<p data-nac-id="nac_v22_roadmap.p.1" data-nac-role="paragraph">translation_source: docs/NAC_V22_ROADMAP.md translation_source_hash: 8d844659a0ed290a00c015c5b2e875d6d9b3d52b18f02f8c182169927d3d4750 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T14:56:25.867715+00:00</p>
+<hr />
+<h1 data-nac-id="nac_v22_roadmap.h1.nac3-v22-ロードマップ" data-nac-role="heading" data-nac-level="1" id="nac3-v22-ロードマップ">NAC3 v2.2 -- ロードマップ</h1>
+<p data-nac-id="nac_v22_roadmap.p.4" data-nac-role="paragraph">NAC3 = <strong>Native Agent Contract</strong>。</p>
+<p data-nac-id="nac_v22_roadmap.p.5" data-nac-role="paragraph">2026-05-09 開始。このファイルは NAC3 仕様の次マイナーバージョンに向けた進化項目を蓄積する。各セクションは独立した構成となっており、問題の説明、防止できるバグの種類、提案するコントラクト変更、および実装メモを含む。</p>
+<p data-nac-id="nac_v22_roadmap.p.6" data-nac-role="paragraph"><strong>2026-05-10 時点のステータス:</strong> v2.2 リリース済み。V22-01 + V22-02 + V22-03 + V22-04 はすべて <code data-nac-role="code-inline">js/nac.js</code> および <code data-nac-role="code-inline">@nac3/runtime</code> 2.2.0 NPM パッケージに含まれている。このファイルは当バージョンの正式な変更履歴となる。</p>
+<p data-nac-id="nac_v22_roadmap.p.7" data-nac-role="paragraph">| 項目 | ステータス | コミット | |------|--------|--------| | V22-01 厳格バリデーター | リリース済み | 6c2b1866 | | V22-02 bindAction ヘルパー | リリース済み | 6c2b1866 | | V22-03 ロケール検出の堅牢化 | リリース済み 2026-05-09 | f631d77a | | V22-04 tab_by_label 括弧の正規化 | リリース済み 2026-05-09 | f631d77a | | V23-01 フィールドエディタープリミティブ（プレビュー） | デモリリース済み 2026-05-11 | (example-v23-editor.php + packages/nac/test/v23-editor.mjs 8/8 PASS) |</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-01-コンストラクターnacregisterを厳格バリデーターに変更" data-nac-role="heading" data-nac-level="2" id="v22-01-コンストラクターnacregisterを厳格バリデーターに変更">V22-01 -- コンストラクター（<code data-nac-role="code-inline">NAC.register</code>）を厳格バリデーターに変更</h2>
+<p data-nac-id="nac_v22_roadmap.p.10" data-nac-role="paragraph"><strong>バグの種類。</strong> ブラウンフィールドのデモでは、マニフェスト要素に非正規のロール値（タブに <code data-nac-role="code-inline">role:'navigation'</code>、<code data-nac-role="code-inline">'action'</code> の代わりに <code data-nac-role="code-inline">role:'button'</code> など）を宣言することがある。現在のコンストラクターは受け取った形状をそのまま受け入れて保存する。バグが表面化するのは、API（<code data-nac-role="code-inline">NAC.tab()</code>、<code data-nac-role="code-inline">NAC.tab_by_label()</code>、<code data-nac-role="code-inline">NAC.click()</code>）が要素を見つけられない実行時であり、正規の DOM クエリ（<code data-nac-role="code-inline">[data-nac-role="tab"]</code>）がマッチしないことが原因となる。その時点ではデモはすでにデプロイ済みで、ユーザーはすでに壊れた音声コマンドを実行しており、ランタイムは正しく <code data-nac-role="code-inline">tab X missing</code> をスローする――しかしこれは誤解を招くエラーであり、要素は DOM に存在しているが、誤ったロールで登録されているだけである。</p>
+<p data-nac-id="nac_v22_roadmap.p.11" data-nac-role="paragraph"><strong>具体的なトリガー（2026-05-09）。</strong> Pablo が <code data-nac-role="code-inline">example-v21-data-table.php</code> で <code data-nac-role="code-inline">ve a pestana permisos</code> と発話する。LLM は <code data-nac-role="code-inline">NAC.tab('invoice_edit_modal','tab.permissions')</code> に解決する。ボタンは DOM に存在するが、<code data-nac-role="code-inline">data-nac-role="navigation"</code> が設定されている（デモ作成者が HTML セマンティクスの観点からタブをナビゲーションとして扱ったため）。ランタイムはボタンが目の前にあるにもかかわらず「tab tab.permissions missing」をスローする。同じ根本原因が、同セッションの前半で <code data-nac-role="code-inline">tab_by_label('Lines (collection)')</code> の失敗も引き起こしていた。</p>
+<p data-nac-id="nac_v22_roadmap.p.12" data-nac-role="paragraph"><strong>3 つのガード層がなぜ検出できなかったか。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.13" data-nac-role="paragraph">| 層 | 検出すべき内容 | 現在の動作 | |---|---|---| | プリコミットリント | PHP/HTML デモファイルのロールずれ | 存在しない | | <code data-nac-role="code-inline">NAC.register(manifest)</code>（登録時） | 非正規ロール、id/ロールの不一致 | すべてサイレントに受け入れる | | <code data-nac-role="code-inline">NAC.validate_global()</code>（リント時） | <code data-nac-role="code-inline">m.elements[]</code> 内のロールずれ | <code data-nac-role="code-inline">m.tabs[]</code> の存在確認のみ |</p>
+<p data-nac-id="nac_v22_roadmap.p.14" data-nac-role="paragraph">ランタイム API 層（<code data-nac-role="code-inline">NAC.tab</code> など）は<strong>第 4 の</strong>ガードであり、今日唯一発火するものだが――エンドユーザーへのランタイムエラーとして発生する。その時点でコストは最大となる。</p>
+<p data-nac-id="nac_v22_roadmap.p.15" data-nac-role="paragraph"><strong>v2.2 向けの提案コントラクト変更。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.16" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.register</code> はマニフェストを保存する前に検証しなければならない。 検証ルール:</p>
+<ol data-nac-id="nac_v22_roadmap.list.17" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.17.item.1" data-nac-role="list-item"><strong>既知のロール列挙。</strong> すべての <code data-nac-role="code-inline">m.elements[i].role</code> は正規ロールセット（<code data-nac-role="code-inline">_CLICK_EVENT_FAMILY</code> を拡張）のメンバーでなければならない:</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.18" data-nac-role="paragraph">``<code data-nac-role="code-inline">    action, field, option, tab, breadcrumb-item, accordion-toggle,    step, pagination-item, confirm-button, sort-control,    filter-control, data-table, plugin, section, region,    navigation, banner, complementary, contentinfo, button    </code>``</p>
+<p data-nac-id="nac_v22_roadmap.p.19" data-nac-role="paragraph">未知のロール -&gt; <code data-nac-role="code-inline">console.error</code> + 登録呼び出しを拒否。    ランドマークロール（<code data-nac-role="code-inline">navigation</code>、<code data-nac-role="code-inline">banner</code> など）は受け入れるが、クリッカブルウィジェットではなくリージョンコンテナーに対応する DOM ノードを持つ要素にのみ適用される。</p>
+<ol data-nac-id="nac_v22_roadmap.list.20" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.20.item.1" data-nac-role="list-item"><strong>id/ロールの整合性。</strong> <code data-nac-role="code-inline">e.id</code> が <code data-nac-role="code-inline">^tab\.</code> にマッチする場合、<code data-nac-role="code-inline">e.role === 'tab'</code> が必須。<code data-nac-role="code-inline">e.id</code> が <code data-nac-role="code-inline">^modal\.</code> にマッチする場合、<code data-nac-role="code-inline">e.role === 'action'</code>（またはアクションのサブロール）が必須。不一致の場合 -&gt; <code data-nac-role="code-inline">console.error</code> + 拒否。id フィールドの文法もコントラクトであり、現在は暗黙的となっている。</li></ol>
+<ol data-nac-id="nac_v22_roadmap.list.21" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.21.item.1" data-nac-role="list-item"><strong>DOM 整合性（ベストエフォート）。</strong> DOM のパース後に <code data-nac-role="code-inline">register</code> が呼ばれた場合（典型的なパス）、DOM 内の <code data-nac-role="code-inline">[data-nac-id="&lt;e.id&gt;"]</code> を検索する。見つかり、その <code data-nac-role="code-inline">data-nac-role</code> が <code data-nac-role="code-inline">e.role</code> と異なる場合、<code data-nac-role="code-inline">console.error</code> + 拒否。これは Pablo が 2026-05-09 に遭遇したケースを捕捉する: マニフェストは <code data-nac-role="code-inline">role:'tab'</code> と言っているが、HTML は依然として <code data-nac-role="code-inline">data-nac-role="navigation"</code> と言っている（またはその逆）。DOM の準備が整う前に呼ばれた場合は、<code data-nac-role="code-inline">DOMContentLoaded</code> のポストパスにチェックを遅延させる。</li></ol>
+<ol data-nac-id="nac_v22_roadmap.list.22" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.22.item.1" data-nac-role="list-item"><strong>マイグレーションヘルパー（1 リリースウィンドウ）。</strong> v2.2.0 では上記は <code data-nac-role="code-inline">console.error</code> を出力するが、スローしない――採用者にはマイグレーションのための猶予期間が必要。v2.3.0 以降は <code data-nac-role="code-inline">RegisterError</code> をスローし、マニフェストは完全に拒否される。ランタイムでは <code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> フラグで管理され、v2.2 ではデフォルト <code data-nac-role="code-inline">false</code>、v2.3 では <code data-nac-role="code-inline">true</code> となる。</li></ol>
+<p data-nac-id="nac_v22_roadmap.p.23" data-nac-role="paragraph"><strong><code data-nac-role="code-inline">NAC.validate_global()</code> の拡張。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.24" data-nac-role="paragraph">新たに 3 つの検出項目を追加:</p>
+<ul data-nac-id="nac_v22_roadmap.list.25" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.25.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- 要素のロールが正規セットの外にある。</li><li data-nac-id="nac_v22_roadmap.list.25.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- <code data-nac-role="code-inline">&lt;id&gt;</code> に対するマニフェストのロールが DOM の <code data-nac-role="code-inline">data-nac-role</code> 属性と異なる。</li><li data-nac-id="nac_v22_roadmap.list.25.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">tab_role_drift</code> -- DOM 内の <code data-nac-role="code-inline">&lt;button&gt;</code>（またはクリッカブル要素）が <code data-nac-role="code-inline">data-nac-id="tab.X"</code> を持つが <code data-nac-role="code-inline">data-nac-role</code> が <code data-nac-role="code-inline">"tab"</code> でない――マニフェストエントリーの有無にかかわらず。マニフェストバリデーターが定義上見逃す HTML のみのずれを捕捉する。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.26" data-nac-role="paragraph">各検出項目はデフォルトで severity <code data-nac-role="code-inline">error</code> を持ち、プロジェクトごとに <code data-nac-role="code-inline">{ kind: 'warn' }</code> でオーバーライド可能。</p>
+<p data-nac-id="nac_v22_roadmap.p.27" data-nac-role="paragraph"><strong>プリコミットリント（別途デリバラブル、同じずれをブロック）。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.28" data-nac-role="paragraph">新しい Node スクリプト <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code> が <code data-nac-role="code-inline">yujin.app/nac-spec/</code> 内のすべての <code data-nac-role="code-inline"><em>.php</code> および <code data-nac-role="code-inline"></em>.html</code> を読み込み、cheerio（または軽量パスとして正規表現）で疑似 DOM を構築し、インラインスクリプトからすべての <code data-nac-role="code-inline">NAC.register({...})</code> 呼び出しを抽出して、同じ整合性ルールをクロスチェックする。GitHub Actions およびローカルの <code data-nac-role="code-inline">pre-commit</code> git フックに接続される。いずれかのルールが失敗した場合はコミットをブロックする。</p>
+<p data-nac-id="nac_v22_roadmap.p.29" data-nac-role="paragraph"><strong>工数見積もり。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.30" data-nac-role="paragraph">| タスク | 場所 | 工数 | |---|---|---| | <code data-nac-role="code-inline">NAC.register</code> 厳格モード | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | <code data-nac-role="code-inline">validate_global</code> 新規検出項目 | <code data-nac-role="code-inline">js/nac.js</code> | 2h | | プリコミットリントスクリプト | <code data-nac-role="code-inline">tools/nac/check_demos.mjs</code> | 4h | | 既存デモへのマイグレーション適用 | <code data-nac-role="code-inline">example-v*.php</code> | 1h | | 仕様のドキュメント更新 | <code data-nac-role="code-inline">docs/spec.md</code> など | 1h | | テストおよび CI 配線 | <code data-nac-role="code-inline">tests/</code> + <code data-nac-role="code-inline">.github/workflows/</code> | 2h |</p>
+<p data-nac-id="nac_v22_roadmap.p.31" data-nac-role="paragraph">合計: 集中作業で約 12h。</p>
+<p data-nac-id="nac_v22_roadmap.p.32" data-nac-role="paragraph"><strong>後方互換性。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.33" data-nac-role="paragraph">v2.2 リリースノートには以下を明記すること:</p>
+<ul data-nac-id="nac_v22_roadmap.list.34" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.34.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.register</code> はロールずれに対して <code data-nac-role="code-inline">console.error</code> を出力するようになった（スローなし）。</li><li data-nac-id="nac_v22_roadmap.list.34.item.2" data-nac-role="list-item">v2.3 では同条件で <code data-nac-role="code-inline">RegisterError</code> をスローするようになる。</li><li data-nac-id="nac_v22_roadmap.list.34.item.3" data-nac-role="list-item">採用者はリリース前に <code data-nac-role="code-inline">NAC.validate_global()</code> を実行すること。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.35" data-nac-role="paragraph">このリポジトリ内の既存 6 つのデモへのマイグレーションパスは、コミット <code data-nac-role="code-inline">0633e080</code>（2026-05-09）時点で完了済み: v21 デモのタブボタンとマニフェストが <code data-nac-role="code-inline">role:'tab'</code> に修正された。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-02-action-ack-コントラクトの強制" data-nac-role="heading" data-nac-level="2" id="v22-02-action-ack-コントラクトの強制">V22-02 -- Action-ack コントラクトの強制</h2>
+<p data-nac-id="nac_v22_roadmap.p.38" data-nac-role="paragraph"><strong>問題のクラス。</strong> 同期的に処理を行うクリックハンドラは、副作用の後に <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded', {detail:{plugin,action_id}}))</code> を呼び出す必要がある。ブラウンフィールドのパネルはこれを忘れがちだ。その結果、副作用はすでに発生しているにもかかわらず、ランタイムが 5 秒の ack ポーリングをタイムアウトさせ、チャットやエージェントが <code data-nac-role="code-inline">No pude ejecutar X: timeout</code> と報告してしまう。</p>
+<p data-nac-id="nac_v22_roadmap.p.39" data-nac-role="paragraph"><strong>具体的なトリガー（2026-05-09）。</strong> Pablo: <code data-nac-role="code-inline">hide</code> -&gt; パネルは正しく非表示になるが、チャットには「No pude ejecutar v20_panel.toggle: timeout」と表示される。v20-panel 上のすべてのボタンで同様の問題が発生。</p>
+<p data-nac-id="nac_v22_roadmap.p.40" data-nac-role="paragraph"><strong>以前のワークアラウンドは誤りだった。</strong> コミット <code data-nac-role="code-inline">ad200e4c</code> は、チャットのエージェントループ内で <code data-nac-role="code-inline">err.code === 'timeout'</code> を成功として握りつぶしていた。Pablo はこれが実際の障害（ハンドラのハング、ネットワーク競合、未処理の例外）を隠蔽し、ランタイムの唯一の正直なシグナルを壊すと正しく指摘した。<code data-nac-role="code-inline">c9bf2bdb</code> でリバートされた。</p>
+<p data-nac-id="nac_v22_roadmap.p.41" data-nac-role="paragraph"><strong>正しい修正はすでにリリース済み。</strong> <code data-nac-role="code-inline">example-v20-full.php</code> の <code data-nac-role="code-inline">bind()</code> をラップして、すべてのハンドラの後に <code data-nac-role="code-inline">nac:action:succeeded</code>/<code data-nac-role="code-inline">nac:action:failed</code> を自動的に emit するようにした。<code data-nac-role="code-inline">c9bf2bdb</code> で対応済み。</p>
+<p data-nac-id="nac_v22_roadmap.p.42" data-nac-role="paragraph"><strong>v2.2 向けのコントラクト変更案。</strong></p>
+<p data-nac-id="nac_v22_roadmap.p.43" data-nac-role="paragraph">ランタイムはヘルパーを提供すべきである（SHOULD）:</p>
+<pre data-nac-id="nac_v22_roadmap.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.bindAction(el, handler, { plugin, action_id })</code></pre>
+<p data-nac-id="nac_v22_roadmap.p.45" data-nac-role="paragraph">このヘルパーは ack の emit を自動的に処理する。<code data-nac-role="code-inline">addEventListener('click', handler)</code> と同じインターフェースだが、適合コントラクトが組み込まれている。このヘルパーを採用したデモは ack を忘れることがない。</p>
+<p data-nac-id="nac_v22_roadmap.p.46" data-nac-role="paragraph"><code data-nac-role="code-inline">validate_global</code> に新しい検出項目を追加する:</p>
+<ul data-nac-id="nac_v22_roadmap.list.47" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.47.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">action_handler_without_ack</code> -- インストルメンテーションによる検出: <code data-nac-role="code-inline">validate_global</code> 実行中に、バリデータが制御されたコンテキスト下で各 <code data-nac-role="code-inline">data-nac-role="action"</code> 要素に対して合成クリックをディスパッチし、500ms 間 <code data-nac-role="code-inline">nac:action:succeeded</code> を待ち受け、発火しないものをフラグする。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.48" data-nac-role="paragraph">合成クリックには副作用があるため、この検出項目はオプトイン（<code data-nac-role="code-inline">NAC.validate_global({ probe: true })</code>）とする。</p>
+<p data-nac-id="nac_v22_roadmap.p.49" data-nac-role="paragraph"><strong>工数。</strong> ヘルパーに約 3 時間 + プローブベースの検出項目に約 4 時間。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-03-ロケール切り替え検出のハード化" data-nac-role="heading" data-nac-level="2" id="v22-03-ロケール切り替え検出のハード化">V22-03 -- ロケール切り替え検出のハード化</h2>
+<p data-nac-id="nac_v22_roadmap.p.52" data-nac-role="paragraph"><strong>問題のクラス。</strong> チャットクライアントの言語検出器における 2 文字のロケールコード（<code data-nac-role="code-inline">'de'</code>、<code data-nac-role="code-inline">'es'</code>、<code data-nac-role="code-inline">'en'</code>）が、複数の言語の前置詞や冠詞と衝突する。<code data-nac-role="code-inline">cambia DE pestana</code> がチャットをドイツ語に切り替えてしまっていた。</p>
+<p data-nac-id="nac_v22_roadmap.p.53" data-nac-role="paragraph"><strong>修正はすでにリリース済み。</strong> <code data-nac-role="code-inline">nac-chat-client.js</code> の <code data-nac-role="code-inline">_detectLangSwitch</code> は、2 文字の単独コードに対して明示的な <code data-nac-role="code-inline">LOCALE_TRIGGER</code>（<code data-nac-role="code-inline">idioma</code>/<code data-nac-role="code-inline">language</code>/<code data-nac-role="code-inline">sprache</code>/...）との共存を必須とするようになった。<code data-nac-role="code-inline">f631d77a</code> で対応済み。</p>
+<p data-nac-id="nac_v22_roadmap.p.54" data-nac-role="paragraph"><strong>v2.2 向けの提案。</strong> ロケール検出器をチャットクライアントから NAC3 プリミティブに移動し、すべてのブラウンフィールドのチャット埋め込みが同じハード化された検出器を使用できるようにする。将来の実装がバグを再導入しないよう、偽陽性のクラスをスペックに明示的に文書化する。</p>
+<p data-nac-id="nac_v22_roadmap.p.55" data-nac-role="paragraph"><strong>工数。</strong> 約 2 時間。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-04-tab_by_label-の自然言語許容度" data-nac-role="heading" data-nac-level="2" id="v22-04-tab_by_label-の自然言語許容度">V22-04 -- <code data-nac-role="code-inline">tab_by_label</code> の自然言語許容度</h2>
+<p data-nac-id="nac_v22_roadmap.p.58" data-nac-role="paragraph"><strong>すでに対応済み。</strong> 括弧の除去（<code data-nac-role="code-inline">"Lines (collection)"</code> が <code data-nac-role="code-inline">"Lines"</code> および <code data-nac-role="code-inline">"Lines tab"</code> にマッチする）は <code data-nac-role="code-inline">f631d77a</code> でリリースされた。これはレガシーのフォールバックでは<strong>なく</strong>、LLM が引用したボタンテキストの正当な正規化である。スペックにおける正規のマッチャー動作として文書化する。</p>
+<p data-nac-id="nac_v22_roadmap.p.59" data-nac-role="paragraph"><strong>工数。</strong> 約 1 時間（ドキュメントのみ）。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v22-のスコープ外v23-以降に延期" data-nac-role="heading" data-nac-level="2" id="v22-のスコープ外v23-以降に延期">v2.2 のスコープ外（v2.3 以降に延期）</h2>
+<ul data-nac-id="nac_v22_roadmap.list.62" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.62.item.1" data-nac-role="list-item">コンポーザブルなロールの階層（<code data-nac-role="code-inline">role:'tab.primary'</code> vs <code data-nac-role="code-inline">role:'tab.secondary'</code>）: あると便利だが具体的なトリガーなし。</li><li data-nac-id="nac_v22_roadmap.list.62.item.2" data-nac-role="list-item">マニフェストのホットリロード: まだ稀なケース。現在のページリロードで十分。</li><li data-nac-id="nac_v22_roadmap.list.62.item.3" data-nac-role="list-item">全 10 ロケールにわたるマルチロケールラベルの同時検索（現在のマッチャーはシリアルに反復するが、プラグインあたり約 20 タブ程度であれば問題ない）。</li></ul>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.v23-01-フィールドエディタプリミティブプレビューリリース済み" data-nac-role="heading" data-nac-level="2" id="v23-01-フィールドエディタプリミティブプレビューリリース済み">V23-01 -- フィールドエディタプリミティブ（プレビューリリース済み）</h2>
+<p data-nac-id="nac_v22_roadmap.p.65" data-nac-role="paragraph"><strong>問題のクラス。</strong> ボイスランナーやエージェントには、<code data-nac-role="code-inline">&lt;input&gt;</code> や <code data-nac-role="code-inline">&lt;textarea&gt;</code> 内のテキストを細かく操作する汎用的な手段がない。利用できるのは <code data-nac-role="code-inline">NAC.fill(id, value)</code> のみで、これはすべての内容を置き換えてしまう。実際のタスク（段落内の文法修正、選択範囲のみの置換、AI による文章改善）にはより細粒度の動詞が必要だ。現在は、この機能が必要な採用者がそれぞれ独自に実装している。</p>
+<p data-nac-id="nac_v22_roadmap.p.66" data-nac-role="paragraph"><strong>解決策。</strong> 新しいランタイムプリミティブ <code data-nac-role="code-inline">NAC.edit_field(nac_id)</code> は、編集サーフェスを所有するモーダルを開き、8 つの正規動詞を持つ独自プラグイン <code data-nac-role="code-inline">nac_editor</code> を登録する:</p>
+<p data-nac-id="nac_v22_roadmap.p.67" data-nac-role="paragraph">| 動詞 | 説明 | |------|-------------| | <code data-nac-role="code-inline">select_word</code> | キャレット位置の単語を選択する | | <code data-nac-role="code-inline">select_sentence</code> | キャレット位置の文を選択する | | <code data-nac-role="code-inline">select_all</code> | すべてのテキストを選択する | | <code data-nac-role="code-inline">replace</code> | 選択範囲を指定したテキストで置換する | | <code data-nac-role="code-inline">delete_selection</code> | 現在の選択範囲を削除する | | <code data-nac-role="code-inline">ai_correct_syntax</code> | 現在の値をチャットバックエンドに POST し、AI が修正したバージョンで置換する | | <code data-nac-role="code-inline">save</code> | ソースフィールドに書き戻し、モーダルを閉じる | | <code data-nac-role="code-inline">cancel</code> | 変更を破棄し、モーダルを閉じる |</p>
+<p data-nac-id="nac_v22_roadmap.p.68" data-nac-role="paragraph">モーダルのマニフェストはべき等に登録される（複数の <code data-nac-role="code-inline">edit_field</code> 呼び出しは 1 つの <code data-nac-role="code-inline">nac_editor</code> プラグインを共有する）。すべての動詞は全 10 ロケールの <code data-nac-role="code-inline">label_i18n</code> を持つ。</p>
+<p data-nac-id="nac_v22_roadmap.p.69" data-nac-role="paragraph"><strong>ステータス:</strong></p>
+<ul data-nac-id="nac_v22_roadmap.list.70" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.70.item.1" data-nac-role="list-item">ランタイム: 2026-05-10 に <code data-nac-role="code-inline">js/nac.js</code> へ SHIPPED（関数 <code data-nac-role="code-inline">edit_field</code> + <code data-nac-role="code-inline">_editorRegisterManifest</code> + ack を emit するモーダルハンドラ）。</li><li data-nac-id="nac_v22_roadmap.list.70.item.2" data-nac-role="list-item">デモ: 2026-05-11 に <code data-nac-role="code-inline">example-v23-editor.php</code> へ SHIPPED（3 つの編集可能フィールド + <code data-nac-role="code-inline">nac:action:succeeded</code> に接続されたライブ動詞カウンター）。</li><li data-nac-id="nac_v22_roadmap.list.70.item.3" data-nac-role="list-item">テスト: 2026-05-11 に <code data-nac-role="code-inline">packages/nac/test/v23-editor.mjs</code> へ SHIPPED（8/8 PASS）: 存在確認 + 無効な id で例外 + 無効なロールで例外 + モーダルのマウント + プラグインの登録 + べき等性 + キャンセルで閉じる + 保存で閉じる。</li><li data-nac-id="nac_v22_roadmap.list.70.item.4" data-nac-role="list-item">スペック: v2.3 GA サイクルの一環として SPEC.md セクション 13 に追加予定。</li></ul>
+<p data-nac-id="nac_v22_roadmap.p.71" data-nac-role="paragraph"><strong>GA までの工数。</strong> すでに実装済みの内容を超えるもの: ja/zh/ar/hi のネイティブロケールラベルレビュー（約 2 時間）、Playwright e2e ビジュアルスペック（約 3 時間）、SPEC.md のスペックテキスト（約 2 時間）。</p>
+<hr />
+<h2 data-nac-id="nac_v22_roadmap.h2.このドキュメントからスペックへの移行手順" data-nac-role="heading" data-nac-level="2" id="このドキュメントからスペックへの移行手順">このドキュメントからスペックへの移行手順</h2>
+<ol data-nac-id="nac_v22_roadmap.list.74" data-nac-role="list"><li data-nac-id="nac_v22_roadmap.list.74.item.1" data-nac-role="list-item">フィーチャーフラグの後ろでランタイム変更を実装・リリースする。</li><li data-nac-id="nac_v22_roadmap.list.74.item.2" data-nac-role="list-item">新しい厳格なバリデーションをパスするようにデモを更新する。</li><li data-nac-id="nac_v22_roadmap.list.74.item.3" data-nac-role="list-item">フラグのデフォルトを <code data-nac-role="code-inline">warn</code>（非スロー）にした状態で、少なくとも 1 リリースサイクル本番環境でソークする。</li><li data-nac-id="nac_v22_roadmap.list.74.item.4" data-nac-role="list-item">ルールを <code data-nac-role="code-inline">docs/spec.md</code> に移動し、次のマイナーバージョンでデフォルトを <code data-nac-role="code-inline">error</code>（スロー）に引き上げる。</li><li data-nac-id="nac_v22_roadmap.list.74.item.5" data-nac-role="list-item">このロードマップからエントリを削除し、<code data-nac-role="code-inline">docs/CHANGELOG.md</code> に 1 行のエントリを追加する。</li></ol>
+<hr />
+<p data-nac-id="nac_v22_roadmap.p.76" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/NAC_V22_ROADMAP.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "nac_v22_roadmap",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "nac_v22_roadmap.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "nac_v22_roadmap.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "nac_v22_roadmap.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "nac_v22_roadmap.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

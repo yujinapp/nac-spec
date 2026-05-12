@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Test visual del front-end (tester checklist en castellano) -- NAC3</title>
+<meta name="nac3-doc-slug" content="tester_checklist_visual" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="tester_checklist_visual" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="tester_checklist_visual.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="tester_checklist_visual.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/tester_checklist_visual.mp3" data-nac-id="tester_checklist_visual.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="tester_checklist_visual.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="tester_checklist_visual.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="tester_checklist_visual.main" data-nac-role="region">
+<hr />
+<p data-nac-id="tester_checklist_visual.p.1" data-nac-role="paragraph">translation_source: docs/TESTER_CHECKLIST_VISUAL.md translation_source_hash: rewrite-2026-05-11-v2 translation_quality: human_rewrite_v2 translation_lang: es translation_date: 2026-05-11T15:00:00+00:00</p>
+<hr />
+<h1 data-nac-id="tester_checklist_visual.h1.nac3-v22-test-visual-del-front-end-tester-checklist-en-caste" data-nac-role="heading" data-nac-level="1" id="nac3-v22-test-visual-del-front-end-tester-checklist-en-caste">NAC3 v2.2 -- Test visual del front-end (tester checklist en castellano)</h1>
+<p data-nac-id="tester_checklist_visual.p.4" data-nac-role="paragraph"><strong>Para:</strong> el tester hispanohablante que evalua el aspecto visual del producto. <strong>Tiempo estimado:</strong> 30 minutos. <strong>Necesitas:</strong> cualquier navegador moderno (Chrome recomendado).</p>
+<h2 data-nac-id="tester_checklist_visual.h2.como-usar-esta-lista" data-nac-role="heading" data-nac-level="2" id="como-usar-esta-lista">Como usar esta lista</h2>
+<p data-nac-id="tester_checklist_visual.p.6" data-nac-role="paragraph">Cada tarea tiene una lista de pasos numerados (1, 2, 3, ...). Hay que hacerlos <strong>en orden</strong>.</p>
+<p data-nac-id="tester_checklist_visual.p.7" data-nac-role="paragraph">Despues de hacer los pasos, mira el bloque <strong>"Que evaluar"</strong> y comparalo con lo que ves en pantalla. Tomate 30 a 60 segundos por tarea antes de juzgar -- no te apures.</p>
+<p data-nac-id="tester_checklist_visual.p.8" data-nac-role="paragraph">Despues marca <strong>OK</strong> si el aspecto visual es bueno, o <strong>NECESITA ARREGLO</strong> si hay algo que se ve mal, roto o amateur.</p>
+<p data-nac-id="tester_checklist_visual.p.9" data-nac-role="paragraph"><strong>Importante:</strong> en <strong>cada</strong> tarea hay que escribir <strong>al menos 1 oracion</strong> en el cuadro de Comentarios, aun cuando marques OK. Describi lo que viste y como se sintio. El cuadro de comentarios es la parte mas importante de este test.</p>
+<p data-nac-id="tester_checklist_visual.p.10" data-nac-role="paragraph">Si notas algo que no entra en ninguna lista de evaluacion, escribilo igual en Comentarios. Necesitamos tu opinion en palabras, no solo OK / ERROR.</p>
+<p data-nac-id="tester_checklist_visual.p.11" data-nac-role="paragraph">Se honesto, no diplomatico. Un "Necesita arreglo" con un comentario util vale 10 veces mas que 10 OK reflejos.</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v1-primera-impresion-de-la-pagina-principal" data-nac-role="heading" data-nac-level="2" id="tarea-v1-primera-impresion-de-la-pagina-principal">Tarea V1 -- Primera impresion de la pagina principal</h2>
+<p data-nac-id="tester_checklist_visual.p.14" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.15" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.15.item.1" data-nac-role="list-item">Abri Chrome (o tu navegador preferido) en modo incognito (Ctrl+Shift+N).</li><li data-nac-id="tester_checklist_visual.list.15.item.2" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code></li><li data-nac-id="tester_checklist_visual.list.15.item.3" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="tester_checklist_visual.list.15.item.4" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="tester_checklist_visual.list.15.item.5" data-nac-role="list-item"><strong>Importante:</strong> mira la pagina por 30 segundos sin hacer scroll.</li><li data-nac-id="tester_checklist_visual.list.15.item.6" data-nac-role="list-item">Imagina que estas llegando por primera vez desde un link de Twitter.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.16" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.17" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.17.item.1" data-nac-role="list-item">En menos de 10 segundos de leer, ¿queda claro que es NAC3?</li><li data-nac-id="tester_checklist_visual.list.17.item.2" data-nac-role="list-item">¿La marca japonesa (sumi-e) se ve sin ser invasiva?</li><li data-nac-id="tester_checklist_visual.list.17.item.3" data-nac-role="list-item">¿La tipografia es legible? ¿El contraste es bueno?</li><li data-nac-id="tester_checklist_visual.list.17.item.4" data-nac-role="list-item">¿Hay lugares obvios para hacer click despues (Demo, Docs, etc)?</li><li data-nac-id="tester_checklist_visual.list.17.item.5" data-nac-role="list-item">¿Se ve profesional o amateur?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.18" data-nac-role="paragraph">Comentarios (obligatorio, al menos 1 oracion): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.19" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.19.item.1" data-nac-role="list-item">[ ] OK -- se ve profesional, mensaje claro</li><li data-nac-id="tester_checklist_visual.list.19.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v2-ritmo-espaciado" data-nac-role="heading" data-nac-level="2" id="tarea-v2-ritmo-espaciado">Tarea V2 -- Ritmo + espaciado</h2>
+<p data-nac-id="tester_checklist_visual.p.22" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.23" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.23.item.1" data-nac-role="list-item">Estas en la misma pagina del paso anterior.</li><li data-nac-id="tester_checklist_visual.list.23.item.2" data-nac-role="list-item">Hace scroll despacio desde arriba hasta abajo de la pagina.</li><li data-nac-id="tester_checklist_visual.list.23.item.3" data-nac-role="list-item">Prestale atencion al ritmo vertical: como estan separadas las secciones.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.24" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.25" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.25.item.1" data-nac-role="list-item">¿Hay espacio en blanco adecuado entre secciones (ni demasiado apretado, ni demasiado disperso)?</li><li data-nac-id="tester_checklist_visual.list.25.item.2" data-nac-role="list-item">¿Los titulos de seccion se distinguen del texto del cuerpo?</li><li data-nac-id="tester_checklist_visual.list.25.item.3" data-nac-role="list-item">¿El ancho de las lineas de texto es comodo (ni muy ancho, ni muy angosto)?</li><li data-nac-id="tester_checklist_visual.list.25.item.4" data-nac-role="list-item">¿Ningun elemento "se escapa" de su contenedor?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.26" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.27" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.27.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.27.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v3-seccion-made-with-nac3" data-nac-role="heading" data-nac-level="2" id="tarea-v3-seccion-made-with-nac3">Tarea V3 -- Seccion "Made with NAC3"</h2>
+<p data-nac-id="tester_checklist_visual.p.30" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.31" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.31.item.1" data-nac-role="list-item">Hace scroll hasta encontrar la seccion con titulo <strong>"Made with NAC3"</strong>.</li><li data-nac-id="tester_checklist_visual.list.31.item.2" data-nac-role="list-item">Mira las 4 tarjetas de la grilla.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.32" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.33" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.33.item.1" data-nac-role="list-item">¿Las 4 tarjetas son del mismo tamano visual?</li><li data-nac-id="tester_checklist_visual.list.33.item.2" data-nac-role="list-item">¿Los caracteres japoneses arriba de cada tarjeta se ven intencionales (no random)?</li><li data-nac-id="tester_checklist_visual.list.33.item.3" data-nac-role="list-item">¿Cada tarjeta es legible -- titulo, descripcion, flecha del link, todo claro?</li><li data-nac-id="tester_checklist_visual.list.33.item.4" data-nac-role="list-item">¿La seccion se siente como "adopters prestigiosos" o "contenido de relleno"?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.34" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.35" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.35.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.35.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v4-seccion-waitlist-forge-pilot" data-nac-role="heading" data-nac-level="2" id="tarea-v4-seccion-waitlist-forge-pilot">Tarea V4 -- Seccion waitlist Forge + Pilot</h2>
+<p data-nac-id="tester_checklist_visual.p.38" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.39" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.39.item.1" data-nac-role="list-item">Hace scroll hasta encontrar la seccion <strong>"Coming Q3 2026: Yujin Forge + Pilot"</strong>.</li><li data-nac-id="tester_checklist_visual.list.39.item.2" data-nac-role="list-item">Mira las 2 tarjetas de producto + el formulario de email abajo.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.40" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.41" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.41.item.1" data-nac-role="list-item">¿Los dos precios ($19 y $5) son visualmente distintos?</li><li data-nac-id="tester_checklist_visual.list.41.item.2" data-nac-role="list-item">¿Las listas de features (bullets) son faciles de escanear?</li><li data-nac-id="tester_checklist_visual.list.41.item.3" data-nac-role="list-item">¿El formulario de email se ve limpio -- no apretado?</li><li data-nac-id="tester_checklist_visual.list.41.item.4" data-nac-role="list-item">¿El texto del disclaimer BYOK es legible pero no gritando?</li><li data-nac-id="tester_checklist_visual.list.41.item.5" data-nac-role="list-item">¿El boton "Notify me" se ve obvio y clickeable?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.42" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.43" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.43.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.43.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v5-governance-footer" data-nac-role="heading" data-nac-level="2" id="tarea-v5-governance-footer">Tarea V5 -- Governance + footer</h2>
+<p data-nac-id="tester_checklist_visual.p.46" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.47" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.47.item.1" data-nac-role="list-item">Hace scroll hasta el fondo de la pagina.</li><li data-nac-id="tester_checklist_visual.list.47.item.2" data-nac-role="list-item">Mira la seccion "Open standard, open governance" + el footer.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.48" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.49" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.49.item.1" data-nac-role="list-item">¿El texto de governance es legible y tranquilizador?</li><li data-nac-id="tester_checklist_visual.list.49.item.2" data-nac-role="list-item">¿El footer es minimo (caracter japones + licencia + link a GitHub + link a Yujin + version)?</li><li data-nac-id="tester_checklist_visual.list.49.item.3" data-nac-role="list-item">¿No hay nada en el footer que se vea roto o desalineado?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.50" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.51" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.51.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.51.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v6-demo-vanilla-examplephp" data-nac-role="heading" data-nac-level="2" id="tarea-v6-demo-vanilla-examplephp">Tarea V6 -- Demo vanilla (example.php)</h2>
+<p data-nac-id="tester_checklist_visual.p.54" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.55" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.55.item.1" data-nac-role="list-item">En la barra de direcciones del navegador, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example.php</code></li><li data-nac-id="tester_checklist_visual.list.55.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="tester_checklist_visual.list.55.item.3" data-nac-role="list-item">Espera 5 segundos sin interactuar.</li><li data-nac-id="tester_checklist_visual.list.55.item.4" data-nac-role="list-item">Mira la pagina con calma.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.56" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.57" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.57.item.1" data-nac-role="list-item">¿Los widgets se sienten coherentes entre si o se ven tirados al azar?</li><li data-nac-id="tester_checklist_visual.list.57.item.2" data-nac-role="list-item">¿Los colores son consistentes con el resto del producto (paleta sumi-e)?</li><li data-nac-id="tester_checklist_visual.list.57.item.3" data-nac-role="list-item">¿Los botones se ven clickeables (con relieve, color, espacio)?</li><li data-nac-id="tester_checklist_visual.list.57.item.4" data-nac-role="list-item">¿Los inputs se ven como inputs (donde claramente el cursor podria entrar)?</li><li data-nac-id="tester_checklist_visual.list.57.item.5" data-nac-role="list-item">¿Las pestanas (si las hay) se ven como pestanas?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.58" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.59" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.59.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.59.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v7-demo-v20-brownfield" data-nac-role="heading" data-nac-level="2" id="tarea-v7-demo-v20-brownfield">Tarea V7 -- Demo v20 (brownfield)</h2>
+<p data-nac-id="tester_checklist_visual.p.62" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.63" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.63.item.1" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v20-full.php</code></li><li data-nac-id="tester_checklist_visual.list.63.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="tester_checklist_visual.list.63.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="tester_checklist_visual.list.63.item.4" data-nac-role="list-item"><strong>Importante:</strong> buscá un panel chico que diga "v20-panel" generalmente arriba a la derecha.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.64" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.65" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.65.item.1" data-nac-role="list-item">¿El "v20-panel" es visible inmediatamente (no oculto, no cortado)?</li><li data-nac-id="tester_checklist_visual.list.65.item.2" data-nac-role="list-item">¿Los botones del panel (describe_v2, validate_global_v2, etc) son legibles + distintos?</li><li data-nac-id="tester_checklist_visual.list.65.item.3" data-nac-role="list-item">¿El panel se ve "atornillado" o se integra visualmente a la pagina?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.66" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.67" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.67.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.67.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v8-demo-data-table-v21" data-nac-role="heading" data-nac-level="2" id="tarea-v8-demo-data-table-v21">Tarea V8 -- Demo data-table (v21)</h2>
+<p data-nac-id="tester_checklist_visual.p.70" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.71" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.71.item.1" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="tester_checklist_visual.list.71.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="tester_checklist_visual.list.71.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="tester_checklist_visual.list.71.item.4" data-nac-role="list-item">Hace click en el boton azul <strong>"Edit invoice #INV-001"</strong> en el centro.</li><li data-nac-id="tester_checklist_visual.list.71.item.5" data-nac-role="list-item">Mira el modal que se abrio (con las pestanas y la tabla adentro).</li></ol>
+<p data-nac-id="tester_checklist_visual.p.72" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.73" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.73.item.1" data-nac-role="list-item">¿La pestana activa se ve visualmente distinta de las inactivas?</li><li data-nac-id="tester_checklist_visual.list.73.item.2" data-nac-role="list-item">¿Las filas de la tabla alternan color (rayas zebra) para legibilidad?</li><li data-nac-id="tester_checklist_visual.list.73.item.3" data-nac-role="list-item">¿Los headers de columna se distinguen de las filas de datos?</li><li data-nac-id="tester_checklist_visual.list.73.item.4" data-nac-role="list-item">¿Los botones de accion (agregar fila, etc) son faciles de encontrar?</li><li data-nac-id="tester_checklist_visual.list.73.item.5" data-nac-role="list-item">¿El panel de chat del lado derecho no se superpone ni oculta la tabla?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.74" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.75" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.75.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.75.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v9-demo-de-interoperabilidad-v22" data-nac-role="heading" data-nac-level="2" id="tarea-v9-demo-de-interoperabilidad-v22">Tarea V9 -- Demo de interoperabilidad (v22)</h2>
+<p data-nac-id="tester_checklist_visual.p.78" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.79" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.79.item.1" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v22-interop.php</code></li><li data-nac-id="tester_checklist_visual.list.79.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="tester_checklist_visual.list.79.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="tester_checklist_visual.list.79.item.4" data-nac-role="list-item">Mira la pagina (deberia tener dos mini-apps lado a lado).</li></ol>
+<p data-nac-id="tester_checklist_visual.p.80" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.81" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.81.item.1" data-nac-role="list-item">¿Las dos apps estan claramente separadas (borde, color, espacio)?</li><li data-nac-id="tester_checklist_visual.list.81.item.2" data-nac-role="list-item">¿Los 4 botones de accion ("Export tree", "Import remote", etc) son visibles arriba?</li><li data-nac-id="tester_checklist_visual.list.81.item.3" data-nac-role="list-item">¿Si haces click en un boton, aparece feedback claro en algun panel de output?</li><li data-nac-id="tester_checklist_visual.list.81.item.4" data-nac-role="list-item">¿La pagina se siente como "dos apps" y no como "una pagina confusa"?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.82" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.83" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.83.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.83.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v10-demos-react-angular-comparados" data-nac-role="heading" data-nac-level="2" id="tarea-v10-demos-react-angular-comparados">Tarea V10 -- Demos React + Angular comparados</h2>
+<p data-nac-id="tester_checklist_visual.p.86" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.87" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.87.item.1" data-nac-role="list-item">Abri en una nueva pestana: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code></li><li data-nac-id="tester_checklist_visual.list.87.item.2" data-nac-role="list-item">Abri en otra pestana: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code></li><li data-nac-id="tester_checklist_visual.list.87.item.3" data-nac-role="list-item">Cambia entre las dos pestanas para compararlas lado a lado.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.88" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.89" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.89.item.1" data-nac-role="list-item">¿Se ven como la misma app implementada en 2 frameworks distintos (consistente)?</li><li data-nac-id="tester_checklist_visual.list.89.item.2" data-nac-role="list-item">¿Ambas tienen UI limpia: input + boton + lista + chat?</li><li data-nac-id="tester_checklist_visual.list.89.item.3" data-nac-role="list-item">¿Ambas tienen un panel de chat funcionando?</li><li data-nac-id="tester_checklist_visual.list.89.item.4" data-nac-role="list-item">¿Ninguno tiene bugs visuales obvios (superposiciones, texto cortado, colores raros)?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.90" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.91" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.91.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.91.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v11-panel-de-chat-layout" data-nac-role="heading" data-nac-level="2" id="tarea-v11-panel-de-chat-layout">Tarea V11 -- Panel de chat (layout)</h2>
+<p data-nac-id="tester_checklist_visual.p.94" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.95" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.95.item.1" data-nac-role="list-item">Volve a la pagina principal: <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code></li><li data-nac-id="tester_checklist_visual.list.95.item.2" data-nac-role="list-item">Abri el panel de chat haciendo click en el boton <strong>"chat"</strong> arriba a la derecha (si no esta abierto).</li><li data-nac-id="tester_checklist_visual.list.95.item.3" data-nac-role="list-item">Cambia el tamano de la ventana del navegador:</li></ol>
+<ul data-nac-id="tester_checklist_visual.list.96" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.96.item.1" data-nac-role="list-item">Hace la ventana <strong>angosta</strong> (~400px de ancho, como un celular).</li><li data-nac-id="tester_checklist_visual.list.96.item.2" data-nac-role="list-item">Despues hace la ventana <strong>ancha</strong> (1400px o mas).</li></ul>
+<p data-nac-id="tester_checklist_visual.p.97" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.98" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.98.item.1" data-nac-role="list-item">En ventana ancha: ¿el chat queda anclado a la derecha sin aplastar el contenido?</li><li data-nac-id="tester_checklist_visual.list.98.item.2" data-nac-role="list-item">En ventana angosta: ¿el chat cubre toda la ventana o flota sensatamente?</li><li data-nac-id="tester_checklist_visual.list.98.item.3" data-nac-role="list-item">¿El boton del microfono siempre es visible (nunca cortado)?</li><li data-nac-id="tester_checklist_visual.list.98.item.4" data-nac-role="list-item">¿El boton Send siempre es clickeable?</li><li data-nac-id="tester_checklist_visual.list.98.item.5" data-nac-role="list-item">Cuando hay mensajes (si los hay), ¿user/assistant se distinguen visualmente?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.99" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.100" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.100.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.100.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v12-legibilidad-del-chat" data-nac-role="heading" data-nac-level="2" id="tarea-v12-legibilidad-del-chat">Tarea V12 -- Legibilidad del chat</h2>
+<p data-nac-id="tester_checklist_visual.p.103" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.104" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.104.item.1" data-nac-role="list-item">El panel de chat sigue abierto.</li><li data-nac-id="tester_checklist_visual.list.104.item.2" data-nac-role="list-item">Elegi "es" en el dropdown de idioma.</li><li data-nac-id="tester_checklist_visual.list.104.item.3" data-nac-role="list-item">Escribi en el chat 3 mensajes distintos (por ejemplo: <code data-nac-role="code-inline">hola</code>, <code data-nac-role="code-inline">que es NAC3</code>, <code data-nac-role="code-inline">mostrame el ejemplo</code>).</li><li data-nac-id="tester_checklist_visual.list.104.item.4" data-nac-role="list-item">Espera las respuestas.</li><li data-nac-id="tester_checklist_visual.list.104.item.5" data-nac-role="list-item">Hace scroll por la conversacion.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.105" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.106" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.106.item.1" data-nac-role="list-item">¿Los mensajes tuyos y los del asistente se distinguen visualmente?</li><li data-nac-id="tester_checklist_visual.list.106.item.2" data-nac-role="list-item">¿Las respuestas largas (multi-parrafo) se ven prolijas y se pueden hacer scroll limpiamente?</li><li data-nac-id="tester_checklist_visual.list.106.item.3" data-nac-role="list-item">¿Si hay codigo en alguna respuesta, esta formateado de manera clara?</li><li data-nac-id="tester_checklist_visual.list.106.item.4" data-nac-role="list-item">¿El tamano de fuente es comodo (no muy chico, no muy grande)?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.107" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.108" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.108.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.108.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v13-mobile-portrait" data-nac-role="heading" data-nac-level="2" id="tarea-v13-mobile-portrait">Tarea V13 -- Mobile portrait</h2>
+<p data-nac-id="tester_checklist_visual.p.111" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.112" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.112.item.1" data-nac-role="list-item"><strong>Opcion A (preferida):</strong> abri la pagina principal en tu celular (<code data-nac-role="code-inline">https://yujin.app/nac-spec/</code>).</li><li data-nac-id="tester_checklist_visual.list.112.item.2" data-nac-role="list-item"><strong>Opcion B:</strong> en Chrome desktop, presiona F12, despues hace click en el icono que parece un celular en la barra de herramientas para activar el modo movil; elegi un iPhone.</li><li data-nac-id="tester_checklist_visual.list.112.item.3" data-nac-role="list-item">Hace scroll por toda la pagina.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.113" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.114" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.114.item.1" data-nac-role="list-item">¿No aparece una barra de scroll horizontal (el ancho de la pagina entra)?</li><li data-nac-id="tester_checklist_visual.list.114.item.2" data-nac-role="list-item">¿Todos los botones son alcanzables con el pulgar (no muy chicos)?</li><li data-nac-id="tester_checklist_visual.list.114.item.3" data-nac-role="list-item">¿El texto es legible sin hacer zoom?</li><li data-nac-id="tester_checklist_visual.list.114.item.4" data-nac-role="list-item">¿Las imagenes / GIFs (si hay) no rompen el layout?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.115" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.116" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.116.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.116.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v14-tablet-landscape" data-nac-role="heading" data-nac-level="2" id="tarea-v14-tablet-landscape">Tarea V14 -- Tablet landscape</h2>
+<p data-nac-id="tester_checklist_visual.p.119" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.120" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.120.item.1" data-nac-role="list-item">En Chrome desktop, sigue en el modo movil de F12.</li><li data-nac-id="tester_checklist_visual.list.120.item.2" data-nac-role="list-item">Cambia el dispositivo a un iPad (preferiblemente en orientacion horizontal/landscape).</li><li data-nac-id="tester_checklist_visual.list.120.item.3" data-nac-role="list-item">Mira la pagina.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.121" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.122" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.122.item.1" data-nac-role="list-item">¿En el ancho mayor se activan layouts de multi-columna?</li><li data-nac-id="tester_checklist_visual.list.122.item.2" data-nac-role="list-item">¿La pagina NO se queda angosta (~600px) en una pantalla de 1024px?</li><li data-nac-id="tester_checklist_visual.list.122.item.3" data-nac-role="list-item">¿El espacio en blanco esta balanceado, no incomodo?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.123" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.124" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.124.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="tester_checklist_visual.list.124.item.2" data-nac-role="list-item">[ ] NECESITA ARREGLO</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v15-calificacion-global" data-nac-role="heading" data-nac-level="2" id="tarea-v15-calificacion-global">Tarea V15 -- Calificacion global</h2>
+<p data-nac-id="tester_checklist_visual.p.127" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.128" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.128.item.1" data-nac-role="list-item">Cerra el modo movil de F12 (volve a desktop).</li><li data-nac-id="tester_checklist_visual.list.128.item.2" data-nac-role="list-item">Volve a la pagina principal <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code> y navega un poco mas + visita 2 demos.</li><li data-nac-id="tester_checklist_visual.list.128.item.3" data-nac-role="list-item">Sin pensar demasiado, califica la pagina en cada dimension.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.129" data-nac-role="paragraph">Que evaluar (calificacion del 1 al 5, donde 1 es muy malo y 5 es excelente):</p>
+<ul data-nac-id="tester_checklist_visual.list.130" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.130.item.1" data-nac-role="list-item">Profesional vs amateur: __</li><li data-nac-id="tester_checklist_visual.list.130.item.2" data-nac-role="list-item">Marca sumi-e integrada naturalmente: __</li><li data-nac-id="tester_checklist_visual.list.130.item.3" data-nac-role="list-item">Jerarquia visual clara: __</li><li data-nac-id="tester_checklist_visual.list.130.item.4" data-nac-role="list-item">Eleccion de colores coherente: __</li><li data-nac-id="tester_checklist_visual.list.130.item.5" data-nac-role="list-item">Tipografia legible y con gusto: __</li><li data-nac-id="tester_checklist_visual.list.130.item.6" data-nac-role="list-item">Senal de confianza (¿tomarias el producto en serio?): __</li></ul>
+<p data-nac-id="tester_checklist_visual.p.131" data-nac-role="paragraph">Comentarios (obligatorio): _______________________________</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v16-una-cosa-para-cambiar" data-nac-role="heading" data-nac-level="2" id="tarea-v16-una-cosa-para-cambiar">Tarea V16 -- Una cosa para cambiar</h2>
+<p data-nac-id="tester_checklist_visual.p.134" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.135" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.135.item.1" data-nac-role="list-item">Pensalo bien por 2 minutos.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.136" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.137" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.137.item.1" data-nac-role="list-item">Si pudieras cambiar UNA cosa visual en todo el sitio que mas lo mejoraria, ¿que seria?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.138" data-nac-role="paragraph">Tu respuesta (obligatorio, 1 a 3 oraciones): _______________________________ _______________________________</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v17-una-cosa-para-preservar" data-nac-role="heading" data-nac-level="2" id="tarea-v17-una-cosa-para-preservar">Tarea V17 -- Una cosa para preservar</h2>
+<p data-nac-id="tester_checklist_visual.p.141" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.142" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.142.item.1" data-nac-role="list-item">Pensalo bien por 2 minutos.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.143" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.144" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.144.item.1" data-nac-role="list-item">¿Que UNA decision visual del sitio te impresiona mas y deberia quedarse?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.145" data-nac-role="paragraph">Tu respuesta (obligatorio): _______________________________</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v18-juicio-de-confianza" data-nac-role="heading" data-nac-level="2" id="tarea-v18-juicio-de-confianza">Tarea V18 -- Juicio de confianza</h2>
+<p data-nac-id="tester_checklist_visual.p.148" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.149" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.149.item.1" data-nac-role="list-item">Imagina que sos un CTO de una empresa mediana viendo NAC3 por primera vez.</li></ol>
+<p data-nac-id="tester_checklist_visual.p.150" data-nac-role="paragraph">Que evaluar:</p>
+<ul data-nac-id="tester_checklist_visual.list.151" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.151.item.1" data-nac-role="list-item">¿Confiarias en la empresa atras de este producto lo suficiente como para considerar adoptar NAC3 en produccion?</li><li data-nac-id="tester_checklist_visual.list.151.item.2" data-nac-role="list-item">¿Por que si o por que no?</li></ul>
+<p data-nac-id="tester_checklist_visual.p.152" data-nac-role="paragraph">Por que (obligatorio): _______________________________</p>
+<ul data-nac-id="tester_checklist_visual.list.153" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.153.item.1" data-nac-role="list-item">[ ] Si, confiaria</li><li data-nac-id="tester_checklist_visual.list.153.item.2" data-nac-role="list-item">[ ] No, no confiaria (aun)</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v19-comparacion-con-pares" data-nac-role="heading" data-nac-level="2" id="tarea-v19-comparacion-con-pares">Tarea V19 -- Comparacion con pares</h2>
+<p data-nac-id="tester_checklist_visual.p.156" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="tester_checklist_visual.list.157" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.157.item.1" data-nac-role="list-item">Pensa en otras landing pages de dev tools / open standards que conoces (por ejemplo: anthropic.com, vercel.com, linear.app, notion.so, raycast.com).</li></ol>
+<p data-nac-id="tester_checklist_visual.p.158" data-nac-role="paragraph">Que evaluar:</p>
+<p data-nac-id="tester_checklist_visual.p.159" data-nac-role="paragraph">Comparado con esas, el sitio NAC3 se ve:</p>
+<ul data-nac-id="tester_checklist_visual.list.160" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.160.item.1" data-nac-role="list-item">[ ] Mejor</li><li data-nac-id="tester_checklist_visual.list.160.item.2" data-nac-role="list-item">[ ] A la par</li><li data-nac-id="tester_checklist_visual.list.160.item.3" data-nac-role="list-item">[ ] Abajo</li><li data-nac-id="tester_checklist_visual.list.160.item.4" data-nac-role="list-item">[ ] Muy abajo</li></ul>
+<p data-nac-id="tester_checklist_visual.p.161" data-nac-role="paragraph">¿Que especificamente? (obligatorio): _______________________________</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.tarea-v20-caja-de-feedback-libre" data-nac-role="heading" data-nac-level="2" id="tarea-v20-caja-de-feedback-libre">Tarea V20 -- Caja de feedback libre</h2>
+<p data-nac-id="tester_checklist_visual.p.164" data-nac-role="paragraph">Cualquier cosa que viste que no entro en ninguna tarea de arriba: bugs, copy raro, espaciado raro, links rotos, flujos confusos, oportunidades perdidas, ideas para mejorar.</p>
+<p data-nac-id="tester_checklist_visual.p.165" data-nac-role="paragraph">Escribi todo lo que se te ocurra (cuanto mas detalle, mejor):</p>
+<p data-nac-id="tester_checklist_visual.p.166" data-nac-role="paragraph">_______________________________ _______________________________ _______________________________ _______________________________ _______________________________ _______________________________</p>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.sign-off-firma-final" data-nac-role="heading" data-nac-level="2" id="sign-off-firma-final">SIGN-OFF / Firma final</h2>
+<p data-nac-id="tester_checklist_visual.p.169" data-nac-role="paragraph">Completa los siguientes datos. Despues apreta el boton "Enviar reporte" al final del formulario.</p>
+<ul data-nac-id="tester_checklist_visual.list.170" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.170.item.1" data-nac-role="list-item">Etiqueta del release que probaste: (ejemplo <code data-nac-role="code-inline">v2.2.0-rc1</code>)</li><li data-nac-id="tester_checklist_visual.list.170.item.2" data-nac-role="list-item">Tu nombre completo</li><li data-nac-id="tester_checklist_visual.list.170.item.3" data-nac-role="list-item">Tu email</li><li data-nac-id="tester_checklist_visual.list.170.item.4" data-nac-role="list-item">Navegador usado (Chrome, Firefox, Safari, Edge)</li><li data-nac-id="tester_checklist_visual.list.170.item.5" data-nac-role="list-item">Sistema operativo (Windows, macOS, Linux)</li><li data-nac-id="tester_checklist_visual.list.170.item.6" data-nac-role="list-item">Dispositivo (laptop, desktop, tablet, mobile)</li><li data-nac-id="tester_checklist_visual.list.170.item.7" data-nac-role="list-item">Calificacion visual global (1 a 10): __</li><li data-nac-id="tester_checklist_visual.list.170.item.8" data-nac-role="list-item">Veredicto para lanzamiento:</li><li data-nac-id="tester_checklist_visual.list.170.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">ready</code> (lo visual esta listo para lanzar)</li><li data-nac-id="tester_checklist_visual.list.170.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">needs fixes</code> (lo visual necesita arreglos pero no es bloqueante)</li><li data-nac-id="tester_checklist_visual.list.170.item.11" data-nac-role="list-item"><code data-nac-role="code-inline">blocking</code> (lo visual bloquea el lanzamiento)</li><li data-nac-id="tester_checklist_visual.list.170.item.12" data-nac-role="list-item">Los 3 problemas visuales mas importantes para arreglar (en orden de prioridad)</li></ul>
+<hr />
+<h2 data-nac-id="tester_checklist_visual.h2.que-pasa-cuando-aprietas-enviar-reporte" data-nac-role="heading" data-nac-level="2" id="que-pasa-cuando-aprietas-enviar-reporte">Que pasa cuando aprietas "Enviar reporte"</h2>
+<ul data-nac-id="tester_checklist_visual.list.173" data-nac-role="list"><li data-nac-id="tester_checklist_visual.list.173.item.1" data-nac-role="list-item">Tu reporte se manda automaticamente a los maintainers de Yujin.</li><li data-nac-id="tester_checklist_visual.list.173.item.2" data-nac-role="list-item">Vas a ver un mensaje "Gracias. Tu reporte fue enviado (ID #N)".</li><li data-nac-id="tester_checklist_visual.list.173.item.3" data-nac-role="list-item">Si el servidor no responde, el formulario abre tu cliente de email con todo el reporte ya pre-llenado.</li></ul>
+<p data-nac-id="tester_checklist_visual.p.174" data-nac-role="paragraph">Gracias por testear.</p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "tester_checklist_visual",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "tester_checklist_visual.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "tester_checklist_visual.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "tester_checklist_visual.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "tester_checklist_visual.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

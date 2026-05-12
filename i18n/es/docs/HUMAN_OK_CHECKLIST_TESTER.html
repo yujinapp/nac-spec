@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 v2.2 -- Test smoke general (tester checklist en castellano) -- NAC3</title>
+<meta name="nac3-doc-slug" content="human_ok_checklist_tester" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="human_ok_checklist_tester" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="human_ok_checklist_tester.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="human_ok_checklist_tester.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/human_ok_checklist_tester.mp3" data-nac-id="human_ok_checklist_tester.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="human_ok_checklist_tester.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="human_ok_checklist_tester.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="human_ok_checklist_tester.main" data-nac-role="region">
+<hr />
+<p data-nac-id="human_ok_checklist_tester.p.1" data-nac-role="paragraph">translation_source: docs/HUMAN_OK_CHECKLIST_TESTER.md translation_source_hash: rewrite-2026-05-11-v2 translation_quality: human_rewrite_v2 translation_lang: es translation_date: 2026-05-11T14:45:00+00:00</p>
+<hr />
+<h1 data-nac-id="human_ok_checklist_tester.h1.nac3-v22-test-smoke-general-tester-checklist-en-castellano" data-nac-role="heading" data-nac-level="1" id="nac3-v22-test-smoke-general-tester-checklist-en-castellano">NAC3 v2.2 -- Test smoke general (tester checklist en castellano)</h1>
+<p data-nac-id="human_ok_checklist_tester.p.4" data-nac-role="paragraph"><strong>Para:</strong> el tester hispanohablante que va a hacer la pasada general. <strong>Tiempo estimado:</strong> 60 a 90 minutos. <strong>Necesitas:</strong></p>
+<ul data-nac-id="human_ok_checklist_tester.list.5" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.5.item.1" data-nac-role="list-item">Chrome instalado y actualizado (obligatorio para la primera mitad).</li><li data-nac-id="human_ok_checklist_tester.list.5.item.2" data-nac-role="list-item">Firefox instalado (para una seccion mas adelante).</li><li data-nac-id="human_ok_checklist_tester.list.5.item.3" data-nac-role="list-item">Una computadora con microfono y parlantes/auriculares.</li><li data-nac-id="human_ok_checklist_tester.list.5.item.4" data-nac-role="list-item">Si tenes acceso a Safari (Mac) o Edge (Windows), mejor.</li></ul>
+<h2 data-nac-id="human_ok_checklist_tester.h2.como-usar-esta-lista" data-nac-role="heading" data-nac-level="2" id="como-usar-esta-lista">Como usar esta lista</h2>
+<p data-nac-id="human_ok_checklist_tester.p.7" data-nac-role="paragraph">Cada tarea tiene una lista de pasos numerados (1, 2, 3, ...). Hay que hacerlos <strong>en orden</strong> sin saltar ninguno.</p>
+<p data-nac-id="human_ok_checklist_tester.p.8" data-nac-role="paragraph">Despues de los pasos, mira el bloque <strong>"Resultado esperado"</strong>. Si lo que ves coincide: marca <strong>OK</strong>.</p>
+<p data-nac-id="human_ok_checklist_tester.p.9" data-nac-role="paragraph">Si algo es distinto, no funciona o aparece un error: marca <strong>ERROR</strong> y escribi en <strong>Comentarios</strong> que viste exactamente. Despues segui con la tarea siguiente -- no te traves.</p>
+<p data-nac-id="human_ok_checklist_tester.p.10" data-nac-role="paragraph">Al final del formulario, completa la firma final y apreta <strong>Enviar reporte</strong>.</p>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-1-abrir-la-pagina-principal-chrome" data-nac-role="heading" data-nac-level="2" id="tarea-1-abrir-la-pagina-principal-chrome">Tarea 1 -- Abrir la pagina principal (Chrome)</h2>
+<p data-nac-id="human_ok_checklist_tester.p.13" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.14" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.14.item.1" data-nac-role="list-item">Abri Chrome.</li><li data-nac-id="human_ok_checklist_tester.list.14.item.2" data-nac-role="list-item">Presiona Ctrl+Shift+N para abrir una ventana de incognito.</li><li data-nac-id="human_ok_checklist_tester.list.14.item.3" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code></li><li data-nac-id="human_ok_checklist_tester.list.14.item.4" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.14.item.5" data-nac-role="list-item">Espera 5 segundos sin hacer click en nada.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.15" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.16" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.16.item.1" data-nac-role="list-item">La pagina carga sin error.</li><li data-nac-id="human_ok_checklist_tester.list.16.item.2" data-nac-role="list-item">Arriba a la izquierda ves un dibujo sumi-e + el texto "NAC".</li><li data-nac-id="human_ok_checklist_tester.list.16.item.3" data-nac-role="list-item">Arriba a la derecha hay una fila de botones que incluye "tour" y "chat".</li><li data-nac-id="human_ok_checklist_tester.list.16.item.4" data-nac-role="list-item">En el centro hay un titulo grande "Drive web UIs by voice, chat, AI".</li><li data-nac-id="human_ok_checklist_tester.list.16.item.5" data-nac-role="list-item">No hay ningun mensaje rojo de error en la pantalla.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.17" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.18" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.18.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.18.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-2-consola-de-desarrollador-sin-errores" data-nac-role="heading" data-nac-level="2" id="tarea-2-consola-de-desarrollador-sin-errores">Tarea 2 -- Consola de desarrollador sin errores</h2>
+<p data-nac-id="human_ok_checklist_tester.p.21" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.22" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.22.item.1" data-nac-role="list-item">Estas en la pagina del paso 1.</li><li data-nac-id="human_ok_checklist_tester.list.22.item.2" data-nac-role="list-item">Presiona la tecla F12 para abrir las herramientas de desarrollador del navegador.</li><li data-nac-id="human_ok_checklist_tester.list.22.item.3" data-nac-role="list-item">En la barra de tabs de las herramientas, hace click en <strong>"Console"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.22.item.4" data-nac-role="list-item">Espera 3 segundos.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.23" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.24" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.24.item.1" data-nac-role="list-item">En el panel Console no hay lineas rojas de error.</li><li data-nac-id="human_ok_checklist_tester.list.24.item.2" data-nac-role="list-item">Puede haber lineas amarillas (warnings) -- esas no son problema.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.25" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.26" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.26.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.26.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-3-cerrar-la-consola" data-nac-role="heading" data-nac-level="2" id="tarea-3-cerrar-la-consola">Tarea 3 -- Cerrar la consola</h2>
+<p data-nac-id="human_ok_checklist_tester.p.29" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.30" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.30.item.1" data-nac-role="list-item">Presiona F12 otra vez para cerrar las herramientas de desarrollador.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.31" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.32" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.32.item.1" data-nac-role="list-item">Las herramientas de desarrollador se cierran. La pagina queda visible al 100%.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.33" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.34" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.34.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.34.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-4-seccion-made-with-nac3" data-nac-role="heading" data-nac-level="2" id="tarea-4-seccion-made-with-nac3">Tarea 4 -- Seccion "Made with NAC3"</h2>
+<p data-nac-id="human_ok_checklist_tester.p.37" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.38" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.38.item.1" data-nac-role="list-item">En la pagina principal, baja con la rueda del mouse o con la barra de desplazamiento.</li><li data-nac-id="human_ok_checklist_tester.list.38.item.2" data-nac-role="list-item">Buscá una seccion que tiene como titulo <strong>"Made with NAC3"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.38.item.3" data-nac-role="list-item">Mira las tarjetas adentro de esa seccion.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.39" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.40" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.40.item.1" data-nac-role="list-item">Encontras la seccion "Made with NAC3" en la pagina.</li><li data-nac-id="human_ok_checklist_tester.list.40.item.2" data-nac-role="list-item">Adentro hay al menos 4 tarjetas en una grilla.</li><li data-nac-id="human_ok_checklist_tester.list.40.item.3" data-nac-role="list-item">Las tarjetas son: "Yujin CRM", "Reference demos", "Cal.com (coming)", y "Your app".</li><li data-nac-id="human_ok_checklist_tester.list.40.item.4" data-nac-role="list-item">Cada tarjeta tiene arriba un caracter japones, un titulo, una descripcion corta, y un link con una flecha <code data-nac-role="code-inline">-&gt;</code>.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.41" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.42" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.42.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.42.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-5-seccion-waitlist-forgepilot" data-nac-role="heading" data-nac-level="2" id="tarea-5-seccion-waitlist-forgepilot">Tarea 5 -- Seccion waitlist Forge/Pilot</h2>
+<p data-nac-id="human_ok_checklist_tester.p.45" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.46" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.46.item.1" data-nac-role="list-item">Sigue bajando en la pagina principal.</li><li data-nac-id="human_ok_checklist_tester.list.46.item.2" data-nac-role="list-item">Buscá una seccion con titulo <strong>"Coming Q3 2026: Yujin Forge + Pilot"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.46.item.3" data-nac-role="list-item">Adentro hay un formulario con un campo de email.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.47" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.48" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.48.item.1" data-nac-role="list-item">Encontras la seccion.</li><li data-nac-id="human_ok_checklist_tester.list.48.item.2" data-nac-role="list-item">El campo de email dice "you@example.com" como placeholder.</li><li data-nac-id="human_ok_checklist_tester.list.48.item.3" data-nac-role="list-item">Debajo hay dos casillas marcadas "Forge ($19)" y "Pilot ($5)".</li><li data-nac-id="human_ok_checklist_tester.list.48.item.4" data-nac-role="list-item">Hay un boton azul que dice "Notify me".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.49" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.50" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.50.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.50.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-6-probar-el-formulario-de-waitlist" data-nac-role="heading" data-nac-level="2" id="tarea-6-probar-el-formulario-de-waitlist">Tarea 6 -- Probar el formulario de waitlist</h2>
+<p data-nac-id="human_ok_checklist_tester.p.53" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.54" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.54.item.1" data-nac-role="list-item">En el campo de email del formulario waitlist, escribi tu email <strong>o</strong> un email de prueba (<code data-nac-role="code-inline">test@example.com</code> esta bien).</li><li data-nac-id="human_ok_checklist_tester.list.54.item.2" data-nac-role="list-item">Verifica que las dos casillas "Forge" y "Pilot" estan marcadas.</li><li data-nac-id="human_ok_checklist_tester.list.54.item.3" data-nac-role="list-item">Hace click en el boton <strong>"Notify me"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.54.item.4" data-nac-role="list-item">Espera 5 segundos.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.55" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.56" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.56.item.1" data-nac-role="list-item">Aparece un mensaje al lado del boton, alguno de estos dos:</li></ul>
+<ol data-nac-id="human_ok_checklist_tester.list.57" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.57.item.1" data-nac-role="list-item"><strong>"Got it. You will hear from us when Forge + Pilot launch."</strong> (significa que se mando bien)</li><li data-nac-id="human_ok_checklist_tester.list.57.item.2" data-nac-role="list-item"><strong>"Submission failed -- email hello@yujin.app instead."</strong> (significa que el servidor no respondio pero el fallback funciono)</li></ol>
+<ul data-nac-id="human_ok_checklist_tester.list.58" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.58.item.1" data-nac-role="list-item">Cualquiera de los dos mensajes es aceptable -- ambos indican que el formulario esta cableado.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.59" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.60" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.60.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.60.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-7-abrir-el-demo-data-table" data-nac-role="heading" data-nac-level="2" id="tarea-7-abrir-el-demo-data-table">Tarea 7 -- Abrir el demo data-table</h2>
+<p data-nac-id="human_ok_checklist_tester.p.63" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.64" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.64.item.1" data-nac-role="list-item">En la barra de direcciones del navegador, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="human_ok_checklist_tester.list.64.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.64.item.3" data-nac-role="list-item">Espera 5 segundos.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.65" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.66" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.66.item.1" data-nac-role="list-item">La pagina carga sin error.</li><li data-nac-id="human_ok_checklist_tester.list.66.item.2" data-nac-role="list-item">Ves un titulo "NAC v2.1 -- data-table primitive (live)".</li><li data-nac-id="human_ok_checklist_tester.list.66.item.3" data-nac-role="list-item">En el centro hay un cuadrado blanco con texto + un boton azul <strong>"Edit invoice #INV-001"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.66.item.4" data-nac-role="list-item">En el lado derecho hay un panel de chat (si no esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo).</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.67" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.68" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.68.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.68.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-8-elegir-castellano-en-el-chat-del-demo" data-nac-role="heading" data-nac-level="2" id="tarea-8-elegir-castellano-en-el-chat-del-demo">Tarea 8 -- Elegir castellano en el chat del demo</h2>
+<p data-nac-id="human_ok_checklist_tester.p.71" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.72" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.72.item.1" data-nac-role="list-item">Estas en el demo v21 (paso 7).</li><li data-nac-id="human_ok_checklist_tester.list.72.item.2" data-nac-role="list-item">Localiza el dropdown de idioma en la parte de arriba del panel de chat (lado derecho).</li><li data-nac-id="human_ok_checklist_tester.list.72.item.3" data-nac-role="list-item">Hace click sobre el dropdown.</li><li data-nac-id="human_ok_checklist_tester.list.72.item.4" data-nac-role="list-item">Elegi <strong>"es"</strong>.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.73" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.74" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.74.item.1" data-nac-role="list-item">El dropdown muestra "es".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.75" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.76" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.76.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.76.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-9-abrir-el-modal-de-la-factura" data-nac-role="heading" data-nac-level="2" id="tarea-9-abrir-el-modal-de-la-factura">Tarea 9 -- Abrir el modal de la factura</h2>
+<p data-nac-id="human_ok_checklist_tester.p.79" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.80" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.80.item.1" data-nac-role="list-item">Hace click sobre el boton azul <strong>"Edit invoice #INV-001"</strong> en el centro de la pagina.</li><li data-nac-id="human_ok_checklist_tester.list.80.item.2" data-nac-role="list-item">Espera 1 segundo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.81" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.82" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.82.item.1" data-nac-role="list-item">Aparece un modal grande que cubre la mayor parte de la pantalla.</li><li data-nac-id="human_ok_checklist_tester.list.82.item.2" data-nac-role="list-item">Tiene titulo "Edit invoice #INV-001".</li><li data-nac-id="human_ok_checklist_tester.list.82.item.3" data-nac-role="list-item">Adentro ves pestanas: <strong>"Lines (collection)"</strong> y <strong>"Permissions (matrix)"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.82.item.4" data-nac-role="list-item">Adentro hay una tabla con filas (productos con cantidad y precio).</li><li data-nac-id="human_ok_checklist_tester.list.82.item.5" data-nac-role="list-item">En la esquina del modal hay botones "Cancel" y "Save".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.83" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.84" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.84.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.84.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-10-cambiar-pestanas-con-el-mouse" data-nac-role="heading" data-nac-level="2" id="tarea-10-cambiar-pestanas-con-el-mouse">Tarea 10 -- Cambiar pestanas con el mouse</h2>
+<p data-nac-id="human_ok_checklist_tester.p.87" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.88" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.88.item.1" data-nac-role="list-item">El modal "Edit invoice" sigue abierto.</li><li data-nac-id="human_ok_checklist_tester.list.88.item.2" data-nac-role="list-item">La pestana activa es "Lines (collection)" (resaltada con fondo gris claro).</li><li data-nac-id="human_ok_checklist_tester.list.88.item.3" data-nac-role="list-item">Hace click sobre la pestana <strong>"Permissions (matrix)"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.88.item.4" data-nac-role="list-item">Espera 1 segundo.</li><li data-nac-id="human_ok_checklist_tester.list.88.item.5" data-nac-role="list-item">Hace click sobre <strong>"Lines (collection)"</strong> para volver.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.89" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.90" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.90.item.1" data-nac-role="list-item">Cuando hiciste click en "Permissions", la pestana resaltada cambio + el contenido del modal cambio (ahora se ve una grilla de permisos).</li><li data-nac-id="human_ok_checklist_tester.list.90.item.2" data-nac-role="list-item">Cuando hiciste click de vuelta en "Lines", volvio a verse la tabla original.</li><li data-nac-id="human_ok_checklist_tester.list.90.item.3" data-nac-role="list-item">Ninguna pestana se "trabo".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.91" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.92" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.92.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.92.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-11-cerrar-el-modal" data-nac-role="heading" data-nac-level="2" id="tarea-11-cerrar-el-modal">Tarea 11 -- Cerrar el modal</h2>
+<p data-nac-id="human_ok_checklist_tester.p.95" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.96" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.96.item.1" data-nac-role="list-item">Hace click sobre el boton <strong>"Cancel"</strong> del modal (esquina superior derecha del modal).</li><li data-nac-id="human_ok_checklist_tester.list.96.item.2" data-nac-role="list-item">Espera 1 segundo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.97" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.98" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.98.item.1" data-nac-role="list-item">El modal se cierra.</li><li data-nac-id="human_ok_checklist_tester.list.98.item.2" data-nac-role="list-item">Volves a ver la pagina del demo con el boton "Edit invoice #INV-001" en el centro.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.99" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.100" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.100.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.100.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-12-abrir-el-demo-react" data-nac-role="heading" data-nac-level="2" id="tarea-12-abrir-el-demo-react">Tarea 12 -- Abrir el demo React</h2>
+<p data-nac-id="human_ok_checklist_tester.p.103" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.104" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.104.item.1" data-nac-role="list-item">En la barra de direcciones del navegador, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/react/</code></li><li data-nac-id="human_ok_checklist_tester.list.104.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.104.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="human_ok_checklist_tester.list.104.item.4" data-nac-role="list-item">Si el panel de chat NO esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.105" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.106" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.106.item.1" data-nac-role="list-item">La pagina carga sin error.</li><li data-nac-id="human_ok_checklist_tester.list.106.item.2" data-nac-role="list-item">Ves una app "Todos" simple: un campo de texto, un boton "Add", y un area abajo (lista de todos vacia).</li><li data-nac-id="human_ok_checklist_tester.list.106.item.3" data-nac-role="list-item">En el lado derecho aparece el panel de chat (despues del click en "chat" si no estaba abierto).</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.107" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.108" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.108.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.108.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-13-elegir-castellano-en-el-chat-del-demo-react" data-nac-role="heading" data-nac-level="2" id="tarea-13-elegir-castellano-en-el-chat-del-demo-react">Tarea 13 -- Elegir castellano en el chat del demo React</h2>
+<p data-nac-id="human_ok_checklist_tester.p.111" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.112" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.112.item.1" data-nac-role="list-item">Localiza el dropdown de idioma del panel de chat del demo React.</li><li data-nac-id="human_ok_checklist_tester.list.112.item.2" data-nac-role="list-item">Hace click.</li><li data-nac-id="human_ok_checklist_tester.list.112.item.3" data-nac-role="list-item">Elegi <strong>"es"</strong>.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.113" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.114" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.114.item.1" data-nac-role="list-item">El dropdown muestra "es".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.115" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.116" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.116.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.116.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-14-agregar-un-todo-a-mano" data-nac-role="heading" data-nac-level="2" id="tarea-14-agregar-un-todo-a-mano">Tarea 14 -- Agregar un todo a mano</h2>
+<p data-nac-id="human_ok_checklist_tester.p.119" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.120" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.120.item.1" data-nac-role="list-item">En el demo React, hace click adentro del campo de texto del demo (no el del chat -- el campo principal del demo que dice algo como "Add a todo").</li><li data-nac-id="human_ok_checklist_tester.list.120.item.2" data-nac-role="list-item">Escribi: <code data-nac-role="code-inline">leche</code></li><li data-nac-id="human_ok_checklist_tester.list.120.item.3" data-nac-role="list-item">Hace click en el boton <strong>"Add"</strong> del demo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.121" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.122" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.122.item.1" data-nac-role="list-item">En la lista de todos aparece un item nuevo: <strong>"leche"</strong> con una casilla de seleccion al lado.</li><li data-nac-id="human_ok_checklist_tester.list.122.item.2" data-nac-role="list-item">El campo de texto se vacio.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.123" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.124" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.124.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.124.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-15-abrir-el-demo-angular" data-nac-role="heading" data-nac-level="2" id="tarea-15-abrir-el-demo-angular">Tarea 15 -- Abrir el demo Angular</h2>
+<p data-nac-id="human_ok_checklist_tester.p.127" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.128" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.128.item.1" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/demos/angular/</code></li><li data-nac-id="human_ok_checklist_tester.list.128.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.128.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="human_ok_checklist_tester.list.128.item.4" data-nac-role="list-item">Si el panel de chat NO esta visible al cargar, busca arriba a la derecha el boton <strong>"chat"</strong> y clickealo para abrirlo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.129" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.130" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.130.item.1" data-nac-role="list-item">La pagina carga sin error.</li><li data-nac-id="human_ok_checklist_tester.list.130.item.2" data-nac-role="list-item">Ves la misma estructura que el demo React: app Todos + chat panel (despues del click en "chat" si no estaba abierto).</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.131" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.132" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.132.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.132.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-16-repetir-agregar-todo-a-mano-en-angular" data-nac-role="heading" data-nac-level="2" id="tarea-16-repetir-agregar-todo-a-mano-en-angular">Tarea 16 -- Repetir agregar todo a mano en Angular</h2>
+<p data-nac-id="human_ok_checklist_tester.p.135" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.136" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.136.item.1" data-nac-role="list-item">Localiza el dropdown de idioma del chat de Angular y elegi <strong>"es"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.136.item.2" data-nac-role="list-item">Hace click en el campo de texto del demo Angular.</li><li data-nac-id="human_ok_checklist_tester.list.136.item.3" data-nac-role="list-item">Escribi: <code data-nac-role="code-inline">manzana</code></li><li data-nac-id="human_ok_checklist_tester.list.136.item.4" data-nac-role="list-item">Hace click en <strong>"Add"</strong>.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.137" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.138" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.138.item.1" data-nac-role="list-item">En la lista aparece <strong>"manzana"</strong>.</li><li data-nac-id="human_ok_checklist_tester.list.138.item.2" data-nac-role="list-item">El campo se vacio.</li><li data-nac-id="human_ok_checklist_tester.list.138.item.3" data-nac-role="list-item">La operacion funciona identicamente al demo React.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.139" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.140" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.140.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.140.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-17-probar-firefox-cross-browser-smoke" data-nac-role="heading" data-nac-level="2" id="tarea-17-probar-firefox-cross-browser-smoke">Tarea 17 -- Probar Firefox (cross-browser smoke)</h2>
+<p data-nac-id="human_ok_checklist_tester.p.143" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.144" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.144.item.1" data-nac-role="list-item">Abri Firefox (si no lo tenes, descargalo de https://www.mozilla.org/firefox).</li><li data-nac-id="human_ok_checklist_tester.list.144.item.2" data-nac-role="list-item">Abri una pestana de Navegacion Privada (Ctrl+Shift+P).</li><li data-nac-id="human_ok_checklist_tester.list.144.item.3" data-nac-role="list-item">En la barra de direcciones, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code></li><li data-nac-id="human_ok_checklist_tester.list.144.item.4" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.144.item.5" data-nac-role="list-item">Espera 5 segundos.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.145" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.146" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.146.item.1" data-nac-role="list-item">La pagina carga sin error igual que en Chrome.</li><li data-nac-id="human_ok_checklist_tester.list.146.item.2" data-nac-role="list-item">Se ve practicamente identica.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.147" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.148" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.148.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.148.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-18-firefox-data-table-demo" data-nac-role="heading" data-nac-level="2" id="tarea-18-firefox-data-table-demo">Tarea 18 -- Firefox: data-table demo</h2>
+<p data-nac-id="human_ok_checklist_tester.p.151" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.152" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.152.item.1" data-nac-role="list-item">En Firefox, escribi: <code data-nac-role="code-inline">https://yujin.app/nac-spec/example-v21-data-table.php</code></li><li data-nac-id="human_ok_checklist_tester.list.152.item.2" data-nac-role="list-item">Presiona Enter.</li><li data-nac-id="human_ok_checklist_tester.list.152.item.3" data-nac-role="list-item">Espera 5 segundos.</li><li data-nac-id="human_ok_checklist_tester.list.152.item.4" data-nac-role="list-item">Hace click en <strong>"Edit invoice #INV-001"</strong> para abrir el modal.</li><li data-nac-id="human_ok_checklist_tester.list.152.item.5" data-nac-role="list-item">Hace click sobre cada una de las pestanas que ves arriba ("Lines (collection)" + "Permissions (matrix)").</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.153" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.154" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.154.item.1" data-nac-role="list-item">Cada click cambia el contenido del modal.</li><li data-nac-id="human_ok_checklist_tester.list.154.item.2" data-nac-role="list-item">No aparecen errores.</li><li data-nac-id="human_ok_checklist_tester.list.154.item.3" data-nac-role="list-item">Ninguna pestana se "traba".</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.155" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.156" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.156.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.156.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-19-safari-o-edge-un-tercer-navegador" data-nac-role="heading" data-nac-level="2" id="tarea-19-safari-o-edge-un-tercer-navegador">Tarea 19 -- Safari o Edge (un tercer navegador)</h2>
+<p data-nac-id="human_ok_checklist_tester.p.159" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.160" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.160.item.1" data-nac-role="list-item">Abri Safari (en Mac) o Edge (en Windows).</li><li data-nac-id="human_ok_checklist_tester.list.160.item.2" data-nac-role="list-item">Si no tenes ninguno de los dos, marca "Skipped" y pasa a la siguiente tarea.</li><li data-nac-id="human_ok_checklist_tester.list.160.item.3" data-nac-role="list-item">Andate a <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code></li><li data-nac-id="human_ok_checklist_tester.list.160.item.4" data-nac-role="list-item">Espera 5 segundos.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.161" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.162" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.162.item.1" data-nac-role="list-item">La pagina carga sin error igual que en Chrome y Firefox.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.163" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.164" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.164.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.164.item.2" data-nac-role="list-item">[ ] ERROR</li><li data-nac-id="human_ok_checklist_tester.list.164.item.3" data-nac-role="list-item">[ ] Skipped (no tengo Safari ni Edge)</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-20-navegacion-solo-con-teclado-sin-mouse" data-nac-role="heading" data-nac-level="2" id="tarea-20-navegacion-solo-con-teclado-sin-mouse">Tarea 20 -- Navegacion solo con teclado (sin mouse)</h2>
+<p data-nac-id="human_ok_checklist_tester.p.167" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.168" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.168.item.1" data-nac-role="list-item">Volve a Chrome o Firefox, abrí <code data-nac-role="code-inline">https://yujin.app/nac-spec/</code>.</li><li data-nac-id="human_ok_checklist_tester.list.168.item.2" data-nac-role="list-item"><strong>Desconecta o ignora el mouse</strong> -- no lo uses para esta tarea.</li><li data-nac-id="human_ok_checklist_tester.list.168.item.3" data-nac-role="list-item">Presiona la tecla Tab repetidamente, al menos 15 veces.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.169" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.170" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.170.item.1" data-nac-role="list-item">Con cada Tab, ves un "anillo de foco" (focus ring) azul o de color visible saltando por la pagina entre botones y enlaces.</li><li data-nac-id="human_ok_checklist_tester.list.170.item.2" data-nac-role="list-item">El foco siempre es visible -- nunca desaparece en una zona invisible.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.171" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.172" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.172.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.172.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-21-zoom-200" data-nac-role="heading" data-nac-level="2" id="tarea-21-zoom-200">Tarea 21 -- Zoom 200%</h2>
+<p data-nac-id="human_ok_checklist_tester.p.175" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.176" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.176.item.1" data-nac-role="list-item">En la misma pestana del paso 20, presiona Ctrl+= (Ctrl y el signo igual) repetidamente hasta que el indicador de zoom del navegador llegue a 200%.</li><li data-nac-id="human_ok_checklist_tester.list.176.item.2" data-nac-role="list-item">Hace scroll por toda la pagina de arriba a abajo.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.177" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.178" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.178.item.1" data-nac-role="list-item">Todo el texto se lee sin problemas.</li><li data-nac-id="human_ok_checklist_tester.list.178.item.2" data-nac-role="list-item">Los botones siguen siendo clickeables.</li><li data-nac-id="human_ok_checklist_tester.list.178.item.3" data-nac-role="list-item">Ningun texto queda cortado o superpuesto con otros elementos.</li><li data-nac-id="human_ok_checklist_tester.list.178.item.4" data-nac-role="list-item">No aparece una barra de scroll horizontal.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.179" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.180" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.180.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.180.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-22-restaurar-zoom" data-nac-role="heading" data-nac-level="2" id="tarea-22-restaurar-zoom">Tarea 22 -- Restaurar zoom</h2>
+<p data-nac-id="human_ok_checklist_tester.p.183" data-nac-role="paragraph">Pasos:</p>
+<ol data-nac-id="human_ok_checklist_tester.list.184" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.184.item.1" data-nac-role="list-item">Presiona Ctrl+0 (Ctrl y cero) para restaurar el zoom al 100%.</li></ol>
+<p data-nac-id="human_ok_checklist_tester.p.185" data-nac-role="paragraph">Resultado esperado:</p>
+<ul data-nac-id="human_ok_checklist_tester.list.186" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.186.item.1" data-nac-role="list-item">La pagina vuelve a su tamano normal.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.187" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.188" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.188.item.1" data-nac-role="list-item">[ ] OK</li><li data-nac-id="human_ok_checklist_tester.list.188.item.2" data-nac-role="list-item">[ ] ERROR</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.tarea-23-urls-criticas-chequeo-de-no-404" data-nac-role="heading" data-nac-level="2" id="tarea-23-urls-criticas-chequeo-de-no-404">Tarea 23 -- URLs criticas: chequeo de "no 404"</h2>
+<p data-nac-id="human_ok_checklist_tester.p.191" data-nac-role="paragraph">Pasos:</p>
+<p data-nac-id="human_ok_checklist_tester.p.192" data-nac-role="paragraph">Para cada URL de la tabla siguiente: copiala y pegala en la barra de direcciones del navegador, presiona Enter y verifica que <strong>no da error 404 ni pagina en blanco</strong>.</p>
+<p data-nac-id="human_ok_checklist_tester.p.193" data-nac-role="paragraph">| URL | OK? (escribi "ok" o "error") | |-----|-----| | https://yujin.app/nac-spec/ | __ | | https://yujin.app/nac-spec/SPEC.md | __ | | https://yujin.app/nac-spec/js/nac.js | __ | | https://yujin.app/nac-spec/example.php | __ | | https://yujin.app/nac-spec/example-v21-data-table.php | __ | | https://yujin.app/nac-spec/example-v22-interop.php | __ | | https://yujin.app/nac-spec/demos/react/ | __ | | https://yujin.app/nac-spec/demos/angular/ | __ |</p>
+<p data-nac-id="human_ok_checklist_tester.p.194" data-nac-role="paragraph">Comentarios: _______________________________</p>
+<ul data-nac-id="human_ok_checklist_tester.list.195" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.195.item.1" data-nac-role="list-item">[ ] Todas OK</li><li data-nac-id="human_ok_checklist_tester.list.195.item.2" data-nac-role="list-item">[ ] Al menos una fallo (especificá en Comentarios cual fallo)</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.sign-off-firma-final" data-nac-role="heading" data-nac-level="2" id="sign-off-firma-final">SIGN-OFF / Firma final</h2>
+<p data-nac-id="human_ok_checklist_tester.p.198" data-nac-role="paragraph">Completa los siguientes datos. Despues apreta el boton "Enviar reporte" al final del formulario.</p>
+<ul data-nac-id="human_ok_checklist_tester.list.199" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.199.item.1" data-nac-role="list-item">Etiqueta del release que probaste: (ejemplo <code data-nac-role="code-inline">v2.2.0-rc1</code>)</li><li data-nac-id="human_ok_checklist_tester.list.199.item.2" data-nac-role="list-item">Tu nombre completo</li><li data-nac-id="human_ok_checklist_tester.list.199.item.3" data-nac-role="list-item">Tu email</li><li data-nac-id="human_ok_checklist_tester.list.199.item.4" data-nac-role="list-item">Navegador usado (Chrome, Firefox, Safari, Edge)</li><li data-nac-id="human_ok_checklist_tester.list.199.item.5" data-nac-role="list-item">Sistema operativo (Windows, macOS, Linux)</li><li data-nac-id="human_ok_checklist_tester.list.199.item.6" data-nac-role="list-item">Dispositivo (laptop, desktop, tablet)</li><li data-nac-id="human_ok_checklist_tester.list.199.item.7" data-nac-role="list-item">Veredicto general: <code data-nac-role="code-inline">ready</code> (listo para lanzar), <code data-nac-role="code-inline">needs fixes</code> (necesita arreglos), o <code data-nac-role="code-inline">blocking</code> (problemas bloqueantes)</li><li data-nac-id="human_ok_checklist_tester.list.199.item.8" data-nac-role="list-item">Calificacion general del 1 al 10</li><li data-nac-id="human_ok_checklist_tester.list.199.item.9" data-nac-role="list-item">Los 3 problemas mas importantes que encontraste, si los hay</li><li data-nac-id="human_ok_checklist_tester.list.199.item.10" data-nac-role="list-item">Comentarios libres -- cualquier cosa que no encajaba en ninguna tarea de arriba</li></ul>
+<hr />
+<h2 data-nac-id="human_ok_checklist_tester.h2.que-pasa-cuando-aprietas-enviar-reporte" data-nac-role="heading" data-nac-level="2" id="que-pasa-cuando-aprietas-enviar-reporte">Que pasa cuando aprietas "Enviar reporte"</h2>
+<ul data-nac-id="human_ok_checklist_tester.list.202" data-nac-role="list"><li data-nac-id="human_ok_checklist_tester.list.202.item.1" data-nac-role="list-item">Tu reporte se manda automaticamente a los maintainers de Yujin.</li><li data-nac-id="human_ok_checklist_tester.list.202.item.2" data-nac-role="list-item">Vas a ver un mensaje "Gracias. Tu reporte fue enviado (ID #N)".</li><li data-nac-id="human_ok_checklist_tester.list.202.item.3" data-nac-role="list-item">Si el servidor no responde, el formulario abre tu cliente de email con todo el reporte ya pre-llenado.</li></ul>
+<p data-nac-id="human_ok_checklist_tester.p.203" data-nac-role="paragraph">Gracias por testear.</p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "human_ok_checklist_tester",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "human_ok_checklist_tester.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "human_ok_checklist_tester.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "human_ok_checklist_tester.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "human_ok_checklist_tester.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + Playwright 統合ガイド -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_playwright" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_playwright" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_playwright.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_playwright.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_playwright.mp3" data-nac-id="rpa_playwright.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_playwright.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_playwright.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_playwright.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_playwright.p.1" data-nac-role="paragraph">translation_source: guides/RPA_PLAYWRIGHT.md translation_source_hash: c90a4cc097a692f6fd51ae96eed88a67cadbd94b52bed4bba18af184a4b915bf translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T14:46:42.204936+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_playwright.h1.nac3-playwright-統合ガイド" data-nac-role="heading" data-nac-level="1" id="nac3-playwright-統合ガイド">NAC3 + Playwright 統合ガイド</h1>
+<p data-nac-id="rpa_playwright.p.4" data-nac-role="paragraph"><strong>NAC3 バージョン:</strong> 2.2（v2.3 interop プレビュー対応） <strong>ステータス:</strong> 安定版。Playwright 1.47 + chromium / firefox / webkit で動作確認済み。</p>
+<p data-nac-id="rpa_playwright.p.5" data-nac-role="paragraph">Playwright は現在のブラウザ自動化における事実上の標準であり、QA チームのエンドツーエンドテストや、無人実行される軽量 RPA フローの両方で広く使われています。NAC3 と組み合わせることで、Playwright スクリプトは CSS セレクターや XPath を直接ターゲットにするのをやめ、ページの NAC3 コントラクトを通じてディスパッチするようになります。このコントラクトは、音声ランナー・アクセシビリティツール・エージェント型 LLM ワークフロー・本ガイドシリーズで紹介する他の RPA プラットフォームでも共通して使用されます。</p>
+<p data-nac-id="rpa_playwright.p.6" data-nac-role="paragraph">Yujin リファレンステストスイート（<code data-nac-role="code-inline">tests/e2e-nac/specs/*.spec.ts</code>）が標準的な実装例です。</p>
+<h2 data-nac-id="rpa_playwright.h2.nac3-playwright-を使う理由" data-nac-role="heading" data-nac-level="2" id="nac3-playwright-を使う理由">NAC3 + Playwright を使う理由</h2>
+<p data-nac-id="rpa_playwright.p.8" data-nac-role="paragraph">| 従来の課題 | NAC3 による解決 | |--------------|---------| | <code data-nac-role="code-inline">page.click('button.save')</code> は CSS クラス名が変わると壊れる | <code data-nac-role="code-inline">page.evaluate(() =&gt; window.NAC.click('invoice.save'))</code> は安定している | | <code data-nac-role="code-inline">page.getByRole('button', {name: 'Save'})</code> はローカライズで壊れる | ラベルではなく id でディスパッチ。label_i18n は LLM が担当 | | <code data-nac-role="code-inline">waitForSelector</code> は DOM をポーリングするため、非同期 UI で不安定になる | <code data-nac-role="code-inline">nac:action:succeeded</code> は決定論的なイベント | | ページオブジェクトパターンはアプリの UI 構造を重複させる | NAC3 マニフェスト自体がページオブジェクト――テストとアプリで共有される | | ビジュアルテストはデザイン変更のたびに壊れる | NAC3 id を使った振る舞いテストはデザイン変更に耐える |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.2-つの統合パス" data-nac-role="heading" data-nac-level="2" id="2-つの統合パス">2 つの統合パス</h2>
+<h3 data-nac-id="rpa_playwright.h3.パス-a-pageevaluate-インジェクション推奨" data-nac-role="heading" data-nac-level="3" id="パス-a-pageevaluate-インジェクション推奨">パス A -- <code data-nac-role="code-inline">page.evaluate</code> インジェクション（推奨）</h3>
+<p data-nac-id="rpa_playwright.p.12" data-nac-role="paragraph">最もシンプルなパターン：すべての操作をページコンテキスト内で評価される <code data-nac-role="code-inline">window.NAC</code> を通じて行います。</p>
+<pre data-nac-id="rpa_playwright.code.1" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;save an invoice&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+
+  // Wait for NAC3 to mount.
+  await page.waitForFunction(() =&gt; window.NAC?.describe);
+
+  // Fill a field.
+  await page.evaluate(() =&gt;
+    window.NAC.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;)
+  );
+
+  // Click an action + wait for its ack.
+  const ackPromise = page.evaluate(() =&gt;
+    new Promise(resolve =&gt; {
+      document.addEventListener(
+        &#x27;nac:action:succeeded&#x27;,
+        e =&gt; resolve(e.detail),
+        { once: true }
+      );
+    })
+  );
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;invoice.save&#x27;)
+  );
+  const ack = await ackPromise;
+
+  expect(ack).toMatchObject({
+    plugin: &#x27;invoice&#x27;,
+    action_id: &#x27;invoice.save&#x27;
+  });
+});</code></pre>
+<h3 data-nac-id="rpa_playwright.h3.パス-b-nac-をラップするカスタムフィクスチャ" data-nac-role="heading" data-nac-level="3" id="パス-b-nac-をラップするカスタムフィクスチャ">パス B -- NAC をラップするカスタムフィクスチャ</h3>
+<p data-nac-id="rpa_playwright.p.15" data-nac-role="paragraph">ボイラープレートを Playwright フィクスチャにまとめます：</p>
+<pre data-nac-id="rpa_playwright.code.2" data-nac-role="code" data-nac-lang="ts"><code>// tests/fixtures/nac.ts
+import { test as base, Page } from &#x27;@playwright/test&#x27;;
+
+type NacApi = {
+  click: (id: string) =&gt; Promise&lt;void&gt;;
+  fill:  (id: string, value: string) =&gt; Promise&lt;void&gt;;
+  tab:   (plugin: string, tabKey: string) =&gt; Promise&lt;void&gt;;
+  describe: () =&gt; Promise&lt;any&gt;;
+  waitForAck: () =&gt; Promise&lt;any&gt;;
+};
+
+export const test = base.extend&lt;{ nac: NacApi }&gt;({
+  nac: async ({ page }, use) =&gt; {
+    await page.waitForFunction(() =&gt; window.NAC?.describe);
+    const api: NacApi = {
+      click:  id =&gt; page.evaluate(i =&gt; window.NAC.click(i), id),
+      fill:   (id, v) =&gt; page.evaluate(
+        ([i, val]) =&gt; window.NAC.fill(i, val), [id, v]
+      ),
+      tab:    (p, k) =&gt; page.evaluate(
+        ([pl, key]) =&gt; window.NAC.tab(pl, key), [p, k]
+      ),
+      describe: () =&gt; page.evaluate(() =&gt; window.NAC.describe()),
+      waitForAck: () =&gt; page.evaluate(() =&gt;
+        new Promise(resolve =&gt; {
+          document.addEventListener(
+            &#x27;nac:action:succeeded&#x27;,
+            e =&gt; resolve(e.detail),
+            { once: true }
+          );
+        })
+      )
+    };
+    await use(api);
+  }
+});
+
+export { expect } from &#x27;@playwright/test&#x27;;</code></pre>
+<p data-nac-id="rpa_playwright.p.17" data-nac-role="paragraph">これにより、テストコードがアプリケーションの言葉で書けるようになります：</p>
+<pre data-nac-id="rpa_playwright.code.3" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;./fixtures/nac&#x27;;
+
+test(&#x27;save flow&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+
+  const ackPromise = nac.waitForAck();
+  await nac.click(&#x27;invoice.save&#x27;);
+  const ack = await ackPromise;
+
+  expect(ack.action_id).toBe(&#x27;invoice.save&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.19" data-nac-role="paragraph">Yujin リファレンスはパス B を採用しています（<code data-nac-role="code-inline">tests/e2e-nac/specs/01-landing.spec.ts</code> 参照）。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.動詞ベースのディスパッチクロスアプリ再利用に推奨" data-nac-role="heading" data-nac-level="2" id="動詞ベースのディスパッチクロスアプリ再利用に推奨">動詞ベースのディスパッチ（クロスアプリ再利用に推奨）</h2>
+<p data-nac-id="rpa_playwright.p.22" data-nac-role="paragraph">同じ Playwright スイートを複数のデプロイメント（テナントやブランドが異なるが、コントラクトは同じ）に対して実行する場合は、id よりも動詞を優先してください：</p>
+<pre data-nac-id="rpa_playwright.code.4" data-nac-role="code" data-nac-lang="ts"><code>await nac.clickByVerb(&#x27;invoice&#x27;, &#x27;save&#x27;);</code></pre>
+<p data-nac-id="rpa_playwright.p.24" data-nac-role="paragraph">ヘルパー：</p>
+<pre data-nac-id="rpa_playwright.code.5" data-nac-role="code" data-nac-lang="ts"><code>clickByVerb: (plugin: string, verb: string) =&gt;
+  page.evaluate(
+    ([p, v]) =&gt; window.NAC.click_by_verb(p, v),
+    [plugin, verb]
+  )</code></pre>
+<p data-nac-id="rpa_playwright.p.26" data-nac-role="paragraph">マニフェストのコントラクト：各テナントは <code data-nac-role="code-inline">invoice.save</code>（またはローカルで選んだ任意の id）を動詞 <code data-nac-role="code-inline">save</code> にマッピングします。テストはローカル id を知る必要がありません。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ack-の待機waitforselector-に代わる決定論的な方法" data-nac-role="heading" data-nac-level="2" id="ack-の待機waitforselector-に代わる決定論的な方法">ack の待機（<code data-nac-role="code-inline">waitForSelector</code> に代わる決定論的な方法）</h2>
+<p data-nac-id="rpa_playwright.p.29" data-nac-role="paragraph">従来の Playwright：</p>
+<pre data-nac-id="rpa_playwright.code.6" data-nac-role="code" data-nac-lang="ts"><code>await page.click(&#x27;button.save&#x27;);
+await page.waitForSelector(&#x27;.toast-success&#x27;, { timeout: 5000 });</code></pre>
+<p data-nac-id="rpa_playwright.p.31" data-nac-role="paragraph">これは脆弱です。トーストの UI が変わるだけで壊れます。</p>
+<p data-nac-id="rpa_playwright.p.32" data-nac-role="paragraph">NAC3 対応版：</p>
+<pre data-nac-id="rpa_playwright.code.7" data-nac-role="code" data-nac-lang="ts"><code>const ack = await new Promise(resolve =&gt; {
+  page.on(&#x27;console&#x27;, msg =&gt; { /* optional log */ });
+  page.evaluate(() =&gt; new Promise(r =&gt;
+    document.addEventListener(&#x27;nac:action:succeeded&#x27;,
+      e =&gt; r(e.detail), { once: true }
+    )));
+}).then(...);
+
+// フィクスチャを使う場合:
+const ackPromise = nac.waitForAck();
+await nac.click(&#x27;invoice.save&#x27;);
+const ack = await ackPromise;</code></pre>
+<p data-nac-id="rpa_playwright.p.34" data-nac-role="paragraph">このイベントはコントラクトの一部です。任意のトーストが描画されたタイミングではなく、副作用が完了したタイミングで発火します。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.テストケースの自動検出" data-nac-role="heading" data-nac-level="2" id="テストケースの自動検出">テストケースの自動検出</h2>
+<p data-nac-id="rpa_playwright.p.37" data-nac-role="paragraph">NAC3 の <code data-nac-role="code-inline">describe()</code> は要素カタログ全体を返します。これを使って、すべてのアクションのテストスキャフォールディングを自動生成できます：</p>
+<pre data-nac-id="rpa_playwright.code.8" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;smoke -- click every action&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+
+  for (const plugin of tree.plugins) {
+    for (const el of plugin.elements) {
+      if (el.role !== &#x27;action&#x27;) continue;
+      console.log(&#x27;smoke clicking&#x27;, el.id);
+      await page.evaluate(id =&gt;
+        window.NAC.click(id), el.id
+      );
+    }
+  }
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.39" data-nac-role="paragraph">テスト 1 本で全アクションをカバーし、アクションごとのメンテナンスはゼロです。仕様書の <code data-nac-role="code-inline">validate_global({probe: true})</code> と組み合わせると効果的です。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.マルチロケール実行" data-nac-role="heading" data-nac-level="2" id="マルチロケール実行">マルチロケール実行</h2>
+<p data-nac-id="rpa_playwright.p.42" data-nac-role="paragraph">コントラクトはロケール非依存なので、Playwright のマトリックス実行は簡単です：</p>
+<pre data-nac-id="rpa_playwright.code.9" data-nac-role="code" data-nac-lang="ts"><code>const locales = [&#x27;es&#x27;, &#x27;en&#x27;, &#x27;pt&#x27;, &#x27;fr&#x27;, &#x27;de&#x27;, &#x27;ja&#x27;,
+                 &#x27;zh&#x27;, &#x27;hi&#x27;, &#x27;ar&#x27;, &#x27;it&#x27;];
+
+for (const lang of locales) {
+  test(`save invoice -- ${lang}`, async ({ page, nac }) =&gt; {
+    await page.goto(`https://your-app.example.com/?lang=${lang}`);
+    await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+    const ack = nac.waitForAck();
+    await nac.click(&#x27;invoice.save&#x27;);
+    expect((await ack).action_id).toBe(&#x27;invoice.save&#x27;);
+  });
+}</code></pre>
+<p data-nac-id="rpa_playwright.p.44" data-nac-role="paragraph">同じテストで 10 ロケールに対応。ページ内の label_i18n は変わっても、コントラクトは変わりません。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ビジュアルリグレッション用スナップショット" data-nac-role="heading" data-nac-level="2" id="ビジュアルリグレッション用スナップショット">ビジュアルリグレッション用スナップショット</h2>
+<p data-nac-id="rpa_playwright.p.47" data-nac-role="paragraph">NAC3 ツリー自体が構造的なスナップショットです。リリース間で比較できます：</p>
+<pre data-nac-id="rpa_playwright.code.10" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;structural snapshot&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+  expect(tree).toMatchSnapshot(&#x27;app-tree.json&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.49" data-nac-role="paragraph">ボタンが 200px 移動するようなデザイン変更はスナップショットの差分に現れません。ボタンが<strong>削除</strong>された場合は差分に現れます。これが振る舞いグレードのリグレッションに適した粒度です。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.クロスオリジン-interop-テストv23-プレビュー" data-nac-role="heading" data-nac-level="2" id="クロスオリジン-interop-テストv23-プレビュー">クロスオリジン / interop テスト（v2.3 プレビュー）</h2>
+<pre data-nac-id="rpa_playwright.code.11" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;interop import remote app&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://app-a.example.com/&#x27;);
+  await page.evaluate(() =&gt; window.NAC.import_remote_tree({
+    url: &#x27;https://app-b.example.com/nac/export&#x27;,
+    bearer: &#x27;TEST_TOKEN&#x27;,
+    namespace: &#x27;b&#x27;
+  }));
+  const remotes = await page.evaluate(() =&gt;
+    window.NAC.list_remote_apps()
+  );
+  expect(remotes).toContainEqual(
+    expect.objectContaining({ namespace: &#x27;b&#x27; })
+  );
+
+  // Now dispatch into the remote app via the local NAC:
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;remote:b:invoice.save&#x27;)
+  );
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.53" data-nac-role="paragraph"><code data-nac-role="code-inline">remote:</code> プレフィックスは <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code> に記載されている interop レイヤーを通じてルーティングされます。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.障害モードとデバッグ" data-nac-role="heading" data-nac-level="2" id="障害モードとデバッグ">障害モードとデバッグ</h2>
+<p data-nac-id="rpa_playwright.p.56" data-nac-role="paragraph">| 症状 | 診断 | |---------|-----------| | <code data-nac-role="code-inline">window.NAC is undefined</code> | ページに nac.js が含まれていない――<code data-nac-role="code-inline">&lt;script&gt;</code> タグを確認 | | <code data-nac-role="code-inline">NAC.click(...)</code> が <code data-nac-role="code-inline">{ok: false, error: 'not_found'}</code> を返す | id がマニフェストに存在しない。<code data-nac-role="code-inline">NAC.validate_global()</code> を実行してタイポを確認 | | ack が発火しない（waitForAck でテストがハング） | ハンドラーに <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded',...))</code> がない――<code data-nac-role="code-inline">NAC.bindAction()</code>（V22-02）に移行する | | 特定ロケールでロケール依存のラベルテストが失敗する | label_i18n にそのロケールが欠けている――仕様バリデーターで検出可能 | | クロスオリジンテストで CORS プリフライトが失敗する | リモートピアの CORS 設定で <code data-nac-role="code-inline">Origin: &lt;your-test-host&gt;</code> を許可する必要がある |</p>
+<p data-nac-id="rpa_playwright.p.57" data-nac-role="paragraph">より詳細なデバッグには、以下を追加してください：</p>
+<pre data-nac-id="rpa_playwright.code.12" data-nac-role="code" data-nac-lang="ts"><code>await page.evaluate(() =&gt; {
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt;
+    console.log(&#x27;[ACK]&#x27;, e.detail));
+  document.addEventListener(&#x27;nac:action:failed&#x27;, e =&gt;
+    console.warn(&#x27;[ACK-FAIL]&#x27;, e.detail));
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.59" data-nac-role="paragraph">その後、<code data-nac-role="code-inline">--headed</code> で実行してコンソールを確認します。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.yujin-リファレンススイート" data-nac-role="heading" data-nac-level="2" id="yujin-リファレンススイート">Yujin リファレンススイート</h2>
+<p data-nac-id="rpa_playwright.p.62" data-nac-role="paragraph">Yujin デモには <code data-nac-role="code-inline">tests/e2e-nac/specs/</code> に完全な Playwright スイートが付属しています。パターンを学ぶために以下の順番で読んでください：</p>
+<p data-nac-id="rpa_playwright.p.63" data-nac-role="paragraph">| スペック | パターン | |------|---------| | <code data-nac-role="code-inline">01-landing.spec.ts</code> | 基本的なページロード + オートパイロット起動 | | <code data-nac-role="code-inline">02-demo-v19.spec.ts</code> | 全ウィジェットを巡回するスモーク | | <code data-nac-role="code-inline">03-demo-v20.spec.ts</code> | v20 パネルのボタン + bindAction ack | | <code data-nac-role="code-inline">04-demo-v21.spec.ts</code> | データテーブルの dt_* ディスパッチ | | <code data-nac-role="code-inline">05-demo-v22-interop.spec.ts</code> | v2.3 interop フルハンドシェイク | | <code data-nac-role="code-inline">06-demo-react.spec.ts</code> | チャット経由の React ケーススタディ | | <code data-nac-role="code-inline">07-demo-angular.spec.ts</code> | チャット経由の Angular ケーススタディ | | <code data-nac-role="code-inline">08-pipeline-end-to-end.spec.ts</code> | チャット -&gt; LLM -&gt; ディスパッチ -&gt; ack | | <code data-nac-role="code-inline">09-diagnostic.spec.ts</code> | 障害注入 + リカバリー | | <code data-nac-role="code-inline">10-deep-discovery.spec.ts</code> | 自律的な探索ループ |</p>
+<p data-nac-id="rpa_playwright.p.64" data-nac-role="paragraph">全 16 スペックは <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> で実行でき、クリーンなチェックアウト状態で 15 秒以内に完了します。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ci-統合" data-nac-role="heading" data-nac-level="2" id="ci-統合">CI 統合</h2>
+<p data-nac-id="rpa_playwright.p.67" data-nac-role="paragraph"><code data-nac-role="code-inline">.github/workflows/e2e.yml</code> に以下を追加してください：</p>
+<pre data-nac-id="rpa_playwright.code.13" data-nac-role="code" data-nac-lang="yaml"><code>name: e2e
+on: [push, pull_request]
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          BASE_URL: https://staging.your-app.example.com</code></pre>
+<p data-nac-id="rpa_playwright.p.69" data-nac-role="paragraph">ロケール / ブラウザ / テナントをまたいだマトリックス実行の場合：</p>
+<pre data-nac-id="rpa_playwright.code.14" data-nac-role="code" data-nac-lang="yaml"><code>strategy:
+  matrix:
+    locale: [es, en, pt, fr, de, ja, zh, hi, ar, it]
+    browser: [chromium, firefox, webkit]</code></pre>
+<p data-nac-id="rpa_playwright.p.71" data-nac-role="paragraph">10 ロケール × 3 ブラウザ = 30 ジョブ、すべて同じ NAC3 ディスパッチのテストコードを再利用します。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.従来の-playwright-テストとの比較" data-nac-role="heading" data-nac-level="2" id="従来の-playwright-テストとの比較">従来の Playwright テストとの比較</h2>
+<p data-nac-id="rpa_playwright.p.74" data-nac-role="paragraph">典型的な 100 ページ規模のエンタープライズアプリでは、約 500〜800 本の Playwright テストを管理しており、UI デザイン変更後のフレーク率は約 20% に達します。NAC3 を使うと：</p>
+<p data-nac-id="rpa_playwright.p.75" data-nac-role="paragraph">| 指標 | 従来型 | NAC3 バックド | |--------|-------------|-------------| | 同等カバレッジのテスト数 | 約 500 本 | 約 100 本（動詞ベース） | | デザイン変更後のフレーク率 | 約 20% | 約 2%（コントラクトが実際に壊れた場合のみ） | | <code data-nac-role="code-inline">&lt;button&gt;</code> → <code data-nac-role="code-inline">&lt;a&gt;</code> 変更後のメンテナンス | セレクターを書き直す | 不要――id は安定 | | 新ロケール対応 | ラベルベースのセレクターをすべて書き直す | 不要――ロケール非依存 | | クロステナント再利用 | 不可能（セレクターが異なる） | 簡単（動詞ベース） |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.関連情報" data-nac-role="heading" data-nac-level="2" id="関連情報">関連情報</h2>
+<ul data-nac-id="rpa_playwright.list.78" data-nac-role="list"><li data-nac-id="rpa_playwright.list.78.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">tests/e2e-nac/specs/</code> -- リファレンススイート</li><li data-nac-id="rpa_playwright.list.78.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code> -- オーケストレーター</li><li data-nac-id="rpa_playwright.list.78.item.3" data-nac-role="list-item"><a href="IMPACT_TESTING.md" data-nac-id="rpa_playwright.link.1" data-nac-role="action" data-nac-action="open">IMPACT_TESTING.md</a> -- QA チーム向けの広範な影響分析</li><li data-nac-id="rpa_playwright.list.78.item.4" data-nac-role="list-item"><a href="LLM_WIRING.md" data-nac-id="rpa_playwright.link.2" data-nac-role="action" data-nac-action="open">LLM_WIRING.md</a> -- LLM エージェントが使用する同じディスパッチコントラクト</li><li data-nac-id="rpa_playwright.list.78.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code> -- 標準化されたテストプレイブック</li></ul>
+<h2 data-nac-id="rpa_playwright.h2.ライセンス" data-nac-role="heading" data-nac-level="2" id="ライセンス">ライセンス</h2>
+<p data-nac-id="rpa_playwright.p.80" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="rpa_playwright.p.82" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_PLAYWRIGHT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_playwright",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_playwright.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_playwright.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_playwright.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_playwright.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

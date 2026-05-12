@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>العروض التوضيحية المباشرة لـ NAC3 على yujin.app/nac-spec/ -- NAC3</title>
+<meta name="nac3-doc-slug" content="readme_demos" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="readme_demos" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="readme_demos.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="readme_demos.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/readme_demos.mp3" data-nac-id="readme_demos.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="readme_demos.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="readme_demos.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="readme_demos.main" data-nac-role="region">
+<hr />
+<p data-nac-id="readme_demos.p.1" data-nac-role="paragraph">translation_source: README_DEMOS.md translation_source_hash: 0f488dd749283f4f2e03f0e431de47d7007818c6745ce1ce993014bdf9839480 translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T13:19:38.399839+00:00</p>
+<hr />
+<h1 data-nac-id="readme_demos.h1.العروض-التوضيحية-المباشرة-لـ-nac3-على-yujinappnac-spec" data-nac-role="heading" data-nac-level="1" id="العروض-التوضيحية-المباشرة-لـ-nac3-على-yujinappnac-spec">العروض التوضيحية المباشرة لـ NAC3 على yujin.app/nac-spec/</h1>
+<p data-nac-id="readme_demos.p.4" data-nac-role="paragraph"><strong>إصدار المواصفة:</strong> 2.2 مستقر (+ معاينة التوافق مع v2.3).</p>
+<p data-nac-id="readme_demos.p.5" data-nac-role="paragraph"><strong>NAC3</strong> = <strong>Native Agent Contract</strong>. المواصفة التي تتيح لواجهات الويب أن تُدار بواسطة مساعدي الذكاء الاصطناعي وأدوات تشغيل الصوت وأدوات إمكانية الوصول، دون الحاجة إلى كود ربط خاص بكل تطبيق.</p>
+<p data-nac-id="readme_demos.p.6" data-nac-role="paragraph">ثلاثة عروض توضيحية تعمل جنبًا إلى جنب. لكل منها غرض محدد؛ لا تخلط بينها.</p>
+<p data-nac-id="readme_demos.p.7" data-nac-role="paragraph">| الملف | الإصدار | الغرض | |---|---|---| | <code data-nac-role="code-inline">example.php</code> | v1.9 مستقر | العرض التوضيحي المرجعي لـ NAC3 v1.9. يضم 27 عنصرًا (دردشة، تقويم، طيار آلي، نوافذ منبثقة، تبويبات، مخططات، إلخ). يعرض كامل مزايا v1.9 في واجهة مستخدم تشبه بيئة الإنتاج. <strong>لم يتغير.</strong> | | <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code> | v2.0-rc4 | <strong>عرض تعليمي</strong> للعناصر الأولية الثمانية في v2.0 + HMAC + isTrusted + عقد i18n. ثمانية أقسام، قسم لكل عنصر أولي. مفيد للمراجعين والمتبنين الراغبين في فهم كل عنصر أولي جديد بمعزل عن غيره. <strong>ليس ترحيلًا لـ example.php.</strong> | | <code data-nac-role="code-inline">example-v20-full.php</code> | v2.0-rc4 | <strong>ترحيل بيئة قائمة</strong> لـ <code data-nac-role="code-inline">example.php</code> إلى NAC3 v2.0 الصارم. نفس الـ 27 عنصرًا، ونفس HTML، ونفس المعالجات -- مع تطبيق طبقة v2.0 فوقها عبر نحو 80 سطرًا من كود الإعداد. يُثبت أن التبني الفعلي لا يستلزم إعادة كتابة كل عنصر. |</p>
+<h2 data-nac-id="readme_demos.h2.المقارنة-جنبا-إلى-جنب" data-nac-role="heading" data-nac-level="2" id="المقارنة-جنبا-إلى-جنب">المقارنة جنبًا إلى جنب</h2>
+<p data-nac-id="readme_demos.p.9" data-nac-role="paragraph">افتح <code data-nac-role="code-inline">example.php</code> و<code data-nac-role="code-inline">example-v20-full.php</code> في تبويبين منفصلين.</p>
+<h3 data-nac-id="readme_demos.h3.ما-هو-متطابق" data-nac-role="heading" data-nac-level="3" id="ما-هو-متطابق">ما هو متطابق</h3>
+<ul data-nac-id="readme_demos.list.11" data-nac-role="list"><li data-nac-id="readme_demos.list.11.item.1" data-nac-role="list-item">ترميز HTML (كل <code data-nac-role="code-inline">&lt;article data-nac-plugin="X"&gt;</code>، وكل <code data-nac-role="code-inline">data-nac-id</code>، وكل مرجع في كتالوج i18n، وكل معالج)</li><li data-nac-id="readme_demos.list.11.item.2" data-nac-role="list-item">المظهر البصري (نفس التخطيط، ونفس العناصر، ونفس التفاعلات)</li><li data-nac-id="readme_demos.list.11.item.3" data-nac-role="list-item">وقت تشغيل مرجع v1.9 (<code data-nac-role="code-inline">js/nac.js</code>) يُحمَّل بالطريقة ذاتها</li><li data-nac-id="readme_demos.list.11.item.4" data-nac-role="list-item">مراجع كتالوج <code data-nac-role="code-inline">data-i18n-key</code> الموجودة</li></ul>
+<h3 data-nac-id="readme_demos.h3.ما-يختلف-في-إصدار-v20-full" data-nac-role="heading" data-nac-level="3" id="ما-يختلف-في-إصدار-v20-full">ما يختلف في إصدار v2.0-full</h3>
+<ol data-nac-id="readme_demos.list.13" data-nac-role="list"><li data-nac-id="readme_demos.list.13.item.1" data-nac-role="list-item"><strong>تعليق توثيقي في الترويسة</strong> يوضح صراحةً أنه عرض لترحيل بيئة قائمة.</li><li data-nac-id="readme_demos.list.13.item.2" data-nac-role="list-item"><strong>وسم script إضافي واحد</strong>: <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> يُحمَّل بعد <code data-nac-role="code-inline">nac.js</code> وقبل <code data-nac-role="code-inline">example.js</code>.</li><li data-nac-id="readme_demos.list.13.item.3" data-nac-role="list-item"><strong>كتلة إعداد إضافية واحدة</strong> (نحو 80 سطرًا في أسفل الصفحة) تقوم بما يلي:</li></ol>
+<ul data-nac-id="readme_demos.list.14" data-nac-role="list"><li data-nac-id="readme_demos.list.14.item.1" data-nac-role="list-item">بناء شجرة نطاق هرمية من سمات <code data-nac-role="code-inline">data-nac-plugin</code> الموجودة (يصبح كل إضافة نطاقًا تحت <code data-nac-role="code-inline">demo.shell</code>).</li><li data-nac-id="readme_demos.list.14.item.2" data-nac-role="list-item">استدعاء <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> لتفعيل توقيع HMAC.</li><li data-nac-id="readme_demos.list.14.item.3" data-nac-role="list-item">استدعاء <code data-nac-role="code-inline">NAC.setTenantPrefix('demo')</code> للتوضيح في بيئة متعددة المستأجرين.</li><li data-nac-id="readme_demos.list.14.item.4" data-nac-role="list-item">تشغيل حلقة المخزن المؤقت <code data-nac-role="code-inline">NAC.captureEphemeral()</code> للإشعارات العابرة.</li><li data-nac-id="readme_demos.list.14.item.5" data-nac-role="list-item">استدعاء <code data-nac-role="code-inline">NAC.autoRegister.watch()</code> على حاوية البطاقات.</li></ul>
+<ol data-nac-id="readme_demos.list.15" data-nac-role="list"><li data-nac-id="readme_demos.list.15.item.1" data-nac-role="list-item"><strong>لوحة واجهة مستخدم إضافية</strong> (<code data-nac-role="code-inline">#v20-panel</code>، ثابتة في أسفل اليمين) تعرض <code data-nac-role="code-inline">describe_v2()</code> و<code data-nac-role="code-inline">validate_global_v2()</code> وعرض توقيع HMAC وزر التمييز بين isTrusted مباشرةً.</li></ol>
+<p data-nac-id="readme_demos.p.16" data-nac-role="paragraph">هذا هو الفارق بأكمله. يمكن للمتبنين الفعليين إعادة استخدام هذا النمط كما هو.</p>
+<h2 data-nac-id="readme_demos.h2.كيفية-التقييم" data-nac-role="heading" data-nac-level="2" id="كيفية-التقييم">كيفية التقييم</h2>
+<p data-nac-id="readme_demos.p.18" data-nac-role="paragraph">إذا كنت مراجعًا لـ NAC3 v2.0:</p>
+<ol data-nac-id="readme_demos.list.19" data-nac-role="list"><li data-nac-id="readme_demos.list.19.item.1" data-nac-role="list-item">افتح <code data-nac-role="code-inline">example.php</code> أولًا. تحقق من أن عرض v1.9 يعمل كما كان.</li><li data-nac-id="readme_demos.list.19.item.2" data-nac-role="list-item">افتح <code data-nac-role="code-inline">example-v20-full.php</code>. تحقق من أنه يعمل بصورة <strong>مطابقة تمامًا</strong> فيما يخص وظائف v1.9 (الدردشة، التقويم، الطيار الآلي، إلخ).</li><li data-nac-id="readme_demos.list.19.item.3" data-nac-role="list-item">افتح لوحة v2.0 (الزاوية السفلية اليمنى). انقر على كل زر:</li></ol>
+<ul data-nac-id="readme_demos.list.20" data-nac-role="list"><li data-nac-id="readme_demos.list.20.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">describe_v2()</code> -- شاهد شجرة النطاق المبنية من سمات الإضافات في البيئة القائمة.</li><li data-nac-id="readme_demos.list.20.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global_v2()</code> -- شاهد النتائج (على الأرجح تحذيرات فقط إذا كان كتالوج i18n يحتوي على ثغرات).</li><li data-nac-id="readme_demos.list.20.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">sign as agent</code> -- شاهد توقيع HMAC المُنتَج.</li><li data-nac-id="readme_demos.list.20.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">click=trusted</code> / <code data-nac-role="code-inline">.click()=fake</code> -- شاهد التمييز بين isTrusted عمليًا.</li></ul>
+<p data-nac-id="readme_demos.p.21" data-nac-role="paragraph">إذا كنت متبنيًا:</p>
+<p data-nac-id="readme_demos.p.22" data-nac-role="paragraph">استخدم كتلة الإعداد في <code data-nac-role="code-inline">example-v20-full.php</code> كقالب لك. كيّف شجرة النطاق وفق بنية الإضافات في تطبيقك. معظم العمل يكمن في تحديد التسلسل الهرمي للنطاقات؛ أما الباقي فهو إجراءات آلية.</p>
+<h2 data-nac-id="readme_demos.h2.روابط-ذات-صلة" data-nac-role="heading" data-nac-level="2" id="روابط-ذات-صلة">روابط ذات صلة</h2>
+<ul data-nac-id="readme_demos.list.24" data-nac-role="list"><li data-nac-id="readme_demos.list.24.item.1" data-nac-role="list-item">مواصفة NAC3: https://github.com/pkuschnirof/nac-spec</li><li data-nac-id="readme_demos.list.24.item.2" data-nac-role="list-item">إصدار v1.9: الوسم <code data-nac-role="code-inline">v1.9.0</code></li><li data-nac-id="readme_demos.list.24.item.3" data-nac-role="list-item">مرشح إصدار v2.0: <code data-nac-role="code-inline">2.0.0-rc4</code> على <code data-nac-role="code-inline">main</code></li><li data-nac-id="readme_demos.list.24.item.4" data-nac-role="list-item">سجل المراجعة من الجولة الثالثة: <code data-nac-role="code-inline">docs/PEER_REVIEW.md</code></li></ul>
+<hr />
+<p data-nac-id="readme_demos.p.26" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/README_DEMOS.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "readme_demos",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "readme_demos.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "readme_demos.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "readme_demos.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "readme_demos.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

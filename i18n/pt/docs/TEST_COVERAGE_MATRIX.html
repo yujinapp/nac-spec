@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- Matriz de Cobertura de Testes (automático + manual) -- NAC3</title>
+<meta name="nac3-doc-slug" content="test_coverage_matrix" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="test_coverage_matrix" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="test_coverage_matrix.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="test_coverage_matrix.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/test_coverage_matrix.mp3" data-nac-id="test_coverage_matrix.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="test_coverage_matrix.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="test_coverage_matrix.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="test_coverage_matrix.main" data-nac-role="region">
+<hr />
+<p data-nac-id="test_coverage_matrix.p.1" data-nac-role="paragraph">translation_source: docs/TEST_COVERAGE_MATRIX.md translation_source_hash: 378d7bf89e65b07e54f5d5dc1c62938accfe383e903468a4df028a3e2936f48d translation_quality: machine_v1 translation_lang: pt translation_date: 2026-05-11T13:40:13.688411+00:00</p>
+<hr />
+<h1 data-nac-id="test_coverage_matrix.h1.nac3-matriz-de-cobertura-de-testes-automático-manual" data-nac-role="heading" data-nac-level="1" id="nac3-matriz-de-cobertura-de-testes-automático-manual">NAC3 -- Matriz de Cobertura de Testes (automático + manual)</h1>
+<p data-nac-id="test_coverage_matrix.p.4" data-nac-role="paragraph"><strong>Versão da spec:</strong> 2.2 + prévia v2.3. <strong>Gerado em:</strong> 2026-05-11. <strong>Referência para:</strong> o repositório de referência Yujin <code data-nac-role="code-inline">pkuschnirof/rpaforce-crm</code> na branch <code data-nac-role="code-inline">main</code>.</p>
+<p data-nac-id="test_coverage_matrix.p.5" data-nac-role="paragraph">Esta matriz lista TODOS os artefatos do ecossistema NAC3 e reporta sua cobertura por testes automatizados + o gate de verificação manual (o checklist "human OK").</p>
+<p data-nac-id="test_coverage_matrix.p.6" data-nac-role="paragraph">Adotantes: copie esta estrutura de matriz para o seu próprio app. Substitua as colunas pelos seus artefatos; mantenha a mesma profundidade por linha.</p>
+<hr />
+<h2 data-nac-id="test_coverage_matrix.h2.legenda" data-nac-role="heading" data-nac-level="2" id="legenda">Legenda</h2>
+<p data-nac-id="test_coverage_matrix.p.9" data-nac-role="paragraph">| Símbolo | Significado | |---------|-------------| | AUTO | Coberto por testes automatizados (Playwright / suite Node) | | MAN  | Requer verificação humana (visual no browser, gesto de voz, UX subjetiva) | | BOTH | Coberto por auto para invariantes + verificado por humano para UX | | --   | Sem cobertura planejada (intencional) | | TBD  | Cobertura planejada mas não implementada |</p>
+<hr />
+<h2 data-nac-id="test_coverage_matrix.h2.1-artefatos-de-runtime" data-nac-role="heading" data-nac-level="2" id="1-artefatos-de-runtime">1. Artefatos de runtime</h2>
+<p data-nac-id="test_coverage_matrix.p.12" data-nac-role="paragraph">| Artefato | Cobertura AUTO | Gate manual | Notas | |----------|----------------|-------------|-------| | <code data-nac-role="code-inline">js/nac.js</code> (base v1.9 + v2.0 + v2.1) | AUTO 95% | MAN (smoke cross-browser) | smoke + v22 + stage4 cobrem a write API; manual = abrir no Firefox + Safari pelo menos uma vez por release | | <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> | AUTO 90% | MAN (autoRegister.watch em um DOM novo) | stage4 dt_* + v22 parcial; manual = montar um novo plugin em runtime via autoRegister | | <code data-nac-role="code-inline">js/nac-chat-client.js</code> | AUTO 95% | MAN (STT com microfone real) | stage1-audio faz mock do SpeechRecognition; manual = pressionar o mic na demo ao vivo + falar um prompt por locale | | <code data-nac-role="code-inline">js/nac-mcp-interop.js</code> (prévia v2.3) | AUTO 100% | MAN (roundtrip cross-origin com peer real) | v23-interop cobre o cenário de página local; manual = testar contra um peer NAC3 remoto real via HTTPS |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.2-pacote-npm" data-nac-role="heading" data-nac-level="2" id="2-pacote-npm">2. Pacote NPM</h2>
+<p data-nac-id="test_coverage_matrix.p.14" data-nac-role="paragraph">| Artefato | Cobertura AUTO | Gate manual | Notas | |----------|----------------|-------------|-------| | Build do <code data-nac-role="code-inline">@nac3/runtime</code> (dist/ ESM + CJS + d.ts + CLI) | AUTO 100% | MAN (<code data-nac-role="code-inline">npm install</code> em um diretório novo) | smoke.mjs com 36 verificações; manual = npm pack + install + import em um projeto Node vazio para verificar | | Subpath <code data-nac-role="code-inline">@nac3/runtime/extensions</code> | AUTO 100% | -- | smoke confirma presença dos arquivos + d.ts | | Subpath <code data-nac-role="code-inline">@nac3/runtime/chat-client</code> | AUTO 100% | -- | smoke confirma presença dos arquivos + d.ts | | CLI <code data-nac-role="code-inline">npx @nac3/runtime validate</code> | AUTO 100% | MAN (executar contra um projeto construído externamente pelo time) | smoke executa o CLI contra o diretório de demos; manual = executar contra o repositório do cliente antes do deploy |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.3-demos-ao-vivo-em-yujinappnac-spec" data-nac-role="heading" data-nac-level="2" id="3-demos-ao-vivo-em-yujinappnac-spec">3. Demos (ao vivo em yujin.app/nac-spec/)</h2>
+<p data-nac-id="test_coverage_matrix.p.16" data-nac-role="paragraph">| Demo | Cobertura AUTO | Gate manual | Notas | |------|----------------|-------------|-------| | <code data-nac-role="code-inline">index.html</code> (landing) | BOTH | MAN (tour autopilot + envio de chat) | Playwright 01-landing.spec.ts verifica a superfície; manual = executar o autopilot em um browser real, narração audível | | <code data-nac-role="code-inline">example.php</code> (referência v1.9) | AUTO | MAN (click-through nos 27 widgets) | Playwright 02-demo-v19 verifica a inicialização; manual = percorrer todos os 27 widgets sem erros no console | | <code data-nac-role="code-inline">example-v20-full.php</code> (brownfield) | AUTO | MAN (botões describe_v2 / validate_global_v2 do painel v20) | Playwright 03-demo-v20 cobre painel + ack do bindAction; manual = clicar em cada botão do painel + inspecionar saída | | <code data-nac-role="code-inline">example-v20-primitives-showcase.php</code> | -- | MAN (percurso didático por primitivo) | Demo puramente educacional; manual = o tour dos 8 primitivos | | <code data-nac-role="code-inline">example-v21-data-table.php</code> | AUTO | MAN (chat de voz com mic) | Playwright 04-demo-v21 cobre dt_state + tab.permissions; manual = usar o mic de voz, observar o LLM despachar corretamente | | <code data-nac-role="code-inline">example-v22-interop.php</code> (prévia v2.3) | AUTO | MAN (usar os 4 CTAs em ordem) | Playwright 05-demo-v22-interop end-to-end; manual = o fluxo dos 4 botões com atenção visual na tela | | <code data-nac-role="code-inline">demos/react/</code> (estudo de caso compilado) | AUTO | MAN (add/delete via chat) | Playwright 06-demo-react cobre mount + add; manual = enviar chat "agrega leche" via mic real, observar atualização do estado React | | <code data-nac-role="code-inline">demos/angular/</code> (estudo de caso compilado) | AUTO | MAN (add/delete via chat) | Playwright 07-demo-angular cobre mount + add; manual = igual ao React |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.4-documentação" data-nac-role="heading" data-nac-level="2" id="4-documentação">4. Documentação</h2>
+<p data-nac-id="test_coverage_matrix.p.18" data-nac-role="paragraph">| Doc | Cobertura AUTO | Gate manual | Notas | |-----|----------------|-------------|-------| | <code data-nac-role="code-inline">SPEC.md</code> (canônico v2.2) | -- | MAN (revisão de PR por um mantenedor) | A spec é prosa; nenhum auto-teste é possível. Humano revisa cada palavra | | <code data-nac-role="code-inline">ABOUT.md</code> | -- | MAN (revisão de PR) | Igual | | <code data-nac-role="code-inline">CONTRIBUTING.md</code> | -- | MAN (revisão de PR) | Igual | | <code data-nac-role="code-inline">SECURITY.md</code> | -- | MAN (revisão de PR) | Igual. Mais releitura trimestral do modelo de ameaças | | <code data-nac-role="code-inline">README_DEMOS.md</code> | -- | MAN | Verificação manual de links | | <code data-nac-role="code-inline">docs/NAC_V22_ROADMAP.md</code> | -- | MAN | Atualizar + revisar por release | | <code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code> | AUTO (links) | MAN (revisão de PR) | A camada 3 do test-launch.sh verifica a existência dos 11 docs; manual = ler para verificar precisão | | <code data-nac-role="code-inline">docs/COVERAGE_REPORT_2026_05_10.md</code> | -- | MAN (regenerar por release) | Este é o próprio registro de cobertura; humano escreve por release | | <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code> | -- | MAN | Proposta de spec, revisada por humano | | <code data-nac-role="code-inline">docs/NAC_LAUNCH_DIFFUSION.md</code> | -- | MAN | Playbook interno | | <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code> | -- | MAN | Postmortems de bugs; curado por humano | | <code data-nac-role="code-inline">docs/LAUNCH_PLAN_2026_05_10.md</code> | -- | MAN (histórico) | Registro histórico | | <code data-nac-role="code-inline">docs/TEST_COVERAGE_MATRIX.md</code> (este arquivo) | AUTO (links) | MAN | Atualizar por release | | <code data-nac-role="code-inline">docs/VOICE_CHAT_ERROR_ANALYSIS_2026_05_09.md</code> | -- | MAN | Análise histórica de bugs | | <code data-nac-role="code-inline">docs/HUMAN_OK_CHECKLIST.md</code> | -- | MAN (Pablo executa) | O próprio checklist; Pablo executa |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.5-guias-de-adoção" data-nac-role="heading" data-nac-level="2" id="5-guias-de-adoção">5. Guias de adoção</h2>
+<p data-nac-id="test_coverage_matrix.p.20" data-nac-role="paragraph">| Guia | Cobertura AUTO | Gate manual | Notas | |------|----------------|-------------|-------| | <code data-nac-role="code-inline">guides/REACT.md</code> | -- | MAN (revisão de PR + feedback de adotantes) | O snippet hello-world deve continuar compilando; manual = verificação anual de rebuild | | <code data-nac-role="code-inline">guides/ANGULAR.md</code> | -- | MAN (revisão de PR) | Igual | | <code data-nac-role="code-inline">guides/LLM_WIRING.md</code> | -- | MAN (revisão de PR) | O backend Node de referência funciona; manual = executar contra a spec ao vivo | | <code data-nac-role="code-inline">guides/AI_PLAYBOOK_NEW_PROJECT.md</code> | -- | MAN (revisão de PR) | As asserções de etapas devem permanecer executáveis | | <code data-nac-role="code-inline">guides/AI_PLAYBOOK_MIGRATION.md</code> | -- | MAN (revisão de PR) | Igual | | <code data-nac-role="code-inline">guides/IMPACT_TESTING.md</code> | -- | MAN (revisão de PR) | Afirmações de impacto; atualizar números por trimestre | | <code data-nac-role="code-inline">guides/IMPACT_RPA.md</code> | -- | MAN (revisão de PR) | Igual | | <code data-nac-role="code-inline">guides/RPA_UIPATH.md</code> | -- | MAN (executar o workflow de exemplo uma vez por release) | Manual = exercitar o InvoiceFromCSV.xaml | | <code data-nac-role="code-inline">guides/RPA_AUTOMATION_ANYWHERE.md</code> | -- | MAN | Mesmo formato | | <code data-nac-role="code-inline">guides/RPA_BLUE_PRISM.md</code> | -- | MAN | Mesmo formato | | <code data-nac-role="code-inline">guides/RPA_PLAYWRIGHT.md</code> | AUTO (suite de referência) | MAN (revisão de PR) | Os padrões são exercitados por <code data-nac-role="code-inline">tests/e2e-nac/specs/</code>; manual = ler uma vez por release |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.6-suites-de-testes" data-nac-role="heading" data-nac-level="2" id="6-suites-de-testes">6. Suites de testes</h2>
+<p data-nac-id="test_coverage_matrix.p.22" data-nac-role="paragraph">| Suite | Cobertura AUTO | Gate manual | Notas | |-------|----------------|-------------|-------| | <code data-nac-role="code-inline">packages/nac/test/smoke.mjs</code> | AUTO (própria) | MAN (revisar taxa de aprovação) | 36 verificações; manual = conferir a contagem uma vez por release | | <code data-nac-role="code-inline">packages/nac/test/v22.mjs</code> | AUTO (própria) | -- | 14 testes unitários | | <code data-nac-role="code-inline">packages/nac/test/v23-interop.mjs</code> | AUTO (própria) | -- | 14 testes unitários | | <code data-nac-role="code-inline">packages/nac/test/stage1-audio.mjs</code> | AUTO (própria) | MAN (regenerar corpus por locale) | 33 verificações; manual = ouvir uma amostra do corpus TTS, verificar se está audível | | <code data-nac-role="code-inline">packages/nac/test/stage2-disambiguation.mjs</code> | AUTO (própria) | -- | 31 verificações | | <code data-nac-role="code-inline">packages/nac/test/stage3-backend.mjs</code> | AUTO (própria, ao vivo) | MAN (revisar respostas do LLM) | 45 prompts x 10 locales; manual = verificar pontualmente se o LLM não derivou em 2 prompts aleatórios | | <code data-nac-role="code-inline">packages/nac/test/stage4-calls.mjs</code> | AUTO (própria) | -- | 31 verificações | | <code data-nac-role="code-inline">packages/nac/test/stage6-ack.mjs</code> | AUTO (própria) | -- | 16 verificações | | <code data-nac-role="code-inline">packages/nac/test/stage6b-longtail.mjs</code> | AUTO (própria) | -- | 14 verificações | | <code data-nac-role="code-inline">tests/e2e-nac/specs/*.spec.ts</code> | AUTO (própria) | MAN (revisão visual de execução com interface uma vez por release) | 16 specs; manual = executar com <code data-nac-role="code-inline">--headed</code> uma vez para inspecionar visualmente | | Corpus TTS (30 arquivos MP3) | AUTO (presença + tamanho) | MAN (ouvir 1 por locale) | Manual = amostrar 10 arquivos, confirmar audível, sem lixo | | <code data-nac-role="code-inline">tools/nac/test-launch.sh</code> | AUTO (própria) | -- | Orquestrador | | <code data-nac-role="code-inline">tools/nac/discovery-loop.sh</code> | AUTO (própria) | -- | Loop de descoberta + correção |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.7-pacotes-de-estudo-de-caso" data-nac-role="heading" data-nac-level="2" id="7-pacotes-de-estudo-de-caso">7. Pacotes de estudo de caso</h2>
+<p data-nac-id="test_coverage_matrix.p.24" data-nac-role="paragraph">| Pacote | Cobertura AUTO | Gate manual | Notas | |--------|----------------|-------------|-------| | Fonte de <code data-nac-role="code-inline">packages/nac-react-demo/</code> | AUTO (build + Playwright) | MAN (visual no dist implantado) | Build Vite limpo; Playwright cobre todos+chat+autopilot | | Dist implantado de <code data-nac-role="code-inline">packages/nac-react-demo/</code> | AUTO | MAN (abrir em aba anônima, percorrer) | Manual = o walkthrough humano em /demos/react/ | | Fonte de <code data-nac-role="code-inline">packages/nac-angular-demo/</code> | AUTO | MAN | Mesmo formato | | Dist implantado de <code data-nac-role="code-inline">packages/nac-angular-demo/</code> | AUTO | MAN | Igual |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.8-aspectos-transversais" data-nac-role="heading" data-nac-level="2" id="8-aspectos-transversais">8. Aspectos transversais</h2>
+<p data-nac-id="test_coverage_matrix.p.26" data-nac-role="paragraph">| Aspecto | Cobertura AUTO | Gate manual | Notas | |---------|----------------|-------------|-------| | Completude do catálogo i18n | AUTO (validador) | MAN (revisão por falante nativo por locale) | O validador em modo estrito sinaliza chaves ausentes; falante nativo verifica pontualmente se as strings fazem sentido culturalmente | | Assinatura de manifesto HMAC | AUTO (unitário) | MAN (smoke de deploy multi-tenant) | Testes unitários assinam + verificam; manual = smoke de produção contra o fluxo de distribuição de segredos | | Controle por isTrusted | AUTO (unitário) | MAN (clique real vs. sintético lado a lado) | Unitário v22 cobre a flag; manual = o par de botões istrusted_real / istrusted_fake em example-v20-full.php | | Interop cross-origin (v2.3) | AUTO (mock) | MAN (peer real com bearer token real) | v23-interop usa mock na página; manual = pelo menos um teste cross-origin antes de declarar v2.3 GA | | Deploy para yujin.app | AUTO (push -&gt; deploy automático) | MAN (verificar se as URLs retornam 200 + conteúdo correto) | GoDaddy faz deploy automático; manual = curl em todas as URLs críticas após cada push na main | | Reprodução de áudio em browser real | -- | MAN (teste de mic + alto-falante) | A Web Speech API precisa de hardware real; manual = pressionar o mic na demo v21 ao vivo, dizer um prompt por locale |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.resumo-cobertura-ponderada-por-categoria" data-nac-role="heading" data-nac-level="2" id="resumo-cobertura-ponderada-por-categoria">Resumo -- cobertura ponderada por categoria</h2>
+<p data-nac-id="test_coverage_matrix.p.28" data-nac-role="paragraph">| Categoria | AUTO | MAN | BOTH | Saúde da cobertura | |-----------|------|-----|------|--------------------| | Artefatos de runtime | 4 | 0 | 0 | EXCELENTE (média auto 95%) | | Pacote NPM | 4 | 0 | 0 | EXCELENTE (100% auto) | | Demos | 6 | 1 | 1 | BOM (auto para invariantes, manual para UX) | | Documentação | 1 | 14 | 0 | ESPERADO (docs são revisados, não testados unitariamente) | | Guias de adoção | 0 | 10 | 0 | ESPERADO | | Suites de testes | 13 | 4 | 0 | EXCELENTE | | Pacotes de estudo de caso | 2 | 2 | 0 | BOM (auto + visual manual) | | Aspectos transversais | 4 | 2 | 0 | BOM | | <strong>TOTAL</strong> | <strong>34</strong> | <strong>33</strong> | <strong>1</strong> | <strong>EXCELENTE</strong> |</p>
+<h2 data-nac-id="test_coverage_matrix.h2.como-usar-esta-matriz" data-nac-role="heading" data-nac-level="2" id="como-usar-esta-matriz">Como usar esta matriz</h2>
+<h3 data-nac-id="test_coverage_matrix.h3.por-release" data-nac-role="heading" data-nac-level="3" id="por-release">Por release</h3>
+<ol data-nac-id="test_coverage_matrix.list.31" data-nac-role="list"><li data-nac-id="test_coverage_matrix.list.31.item.1" data-nac-role="list-item">Marque a versão da spec + versão da suite de referência.</li><li data-nac-id="test_coverage_matrix.list.31.item.2" data-nac-role="list-item">Execute <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> -- cada linha AUTO é um gate.</li><li data-nac-id="test_coverage_matrix.list.31.item.3" data-nac-role="list-item">Percorra a coluna MAN -- o <a href="HUMAN_OK_CHECKLIST.md" data-nac-id="test_coverage_matrix.link.1" data-nac-role="action" data-nac-action="open">checklist Human OK</a> é a forma executável.</li><li data-nac-id="test_coverage_matrix.list.31.item.4" data-nac-role="list-item">Atualize o COVERAGE_REPORT_&lt;data&gt;.md com os resultados da execução.</li><li data-nac-id="test_coverage_matrix.list.31.item.5" data-nac-role="list-item">Ajuste esta matriz se o conjunto de artefatos mudou.</li></ol>
+<h3 data-nac-id="test_coverage_matrix.h3.por-adotante" data-nac-role="heading" data-nac-level="3" id="por-adotante">Por adotante</h3>
+<p data-nac-id="test_coverage_matrix.p.33" data-nac-role="paragraph">Copie esta estrutura de matriz para o seu próprio app. Substitua os nomes dos artefatos; mantenha o mesmo formato. A disciplina é a mesma: cada artefato recebe um gate explícito de auto + manual.</p>
+<h3 data-nac-id="test_coverage_matrix.h3.anti-padrão" data-nac-role="heading" data-nac-level="3" id="anti-padrão">Anti-padrão</h3>
+<p data-nac-id="test_coverage_matrix.p.35" data-nac-role="paragraph">NÃO marque um artefato como "AUTO" se o teste apenas verifica a presença do arquivo. AUTO significa que o teste exercita comportamento. Verificações de presença de arquivo ficam no harness (test-launch.sh), não na matriz de artefatos.</p>
+<h2 data-nac-id="test_coverage_matrix.h2.veja-também" data-nac-role="heading" data-nac-level="2" id="veja-também">Veja também</h2>
+<p data-nac-id="test_coverage_matrix.p.37" data-nac-role="paragraph">matriz deriva.</p>
+<p data-nac-id="test_coverage_matrix.p.38" data-nac-role="paragraph">da coluna MAN.</p>
+<p data-nac-id="test_coverage_matrix.p.39" data-nac-role="paragraph">-- os resultados reais da execução para o release atual.</p>
+<ul data-nac-id="test_coverage_matrix.list.40" data-nac-role="list"><li data-nac-id="test_coverage_matrix.list.40.item.1" data-nac-role="list-item"><a href="NAC_TEST_MANUAL.md" data-nac-id="test_coverage_matrix.link.2" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- o playbook do qual esta</li><li data-nac-id="test_coverage_matrix.list.40.item.2" data-nac-role="list-item"><a href="HUMAN_OK_CHECKLIST.md" data-nac-id="test_coverage_matrix.link.3" data-nac-role="action" data-nac-action="open">HUMAN_OK_CHECKLIST.md</a> -- a forma executável</li><li data-nac-id="test_coverage_matrix.list.40.item.3" data-nac-role="list-item"><a href="COVERAGE_REPORT_2026_05_10.md" data-nac-id="test_coverage_matrix.link.4" data-nac-role="action" data-nac-action="open">COVERAGE_REPORT_2026_05_10.md</a></li></ul>
+<h2 data-nac-id="test_coverage_matrix.h2.licença" data-nac-role="heading" data-nac-level="2" id="licença">Licença</h2>
+<p data-nac-id="test_coverage_matrix.p.42" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="test_coverage_matrix.p.44" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/docs/TEST_COVERAGE_MATRIX.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "test_coverage_matrix",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "test_coverage_matrix.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "test_coverage_matrix.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "test_coverage_matrix.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "test_coverage_matrix.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

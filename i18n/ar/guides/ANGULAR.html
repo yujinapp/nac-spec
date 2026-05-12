@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>دليل اعتماد NAC3 مع Angular -- NAC3</title>
+<meta name="nac3-doc-slug" content="angular" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="angular" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="angular.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="angular.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/angular.mp3" data-nac-id="angular.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="angular.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="angular.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="angular.main" data-nac-role="region">
+<hr />
+<p data-nac-id="angular.p.1" data-nac-role="paragraph">translation_source: guides/ANGULAR.md translation_source_hash: db5a73d8ddcd813e9bac7918d3e48e9834f98d5f60e855ace8c2f9df7cc0f0af translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T15:09:28.328111+00:00</p>
+<hr />
+<h1 data-nac-id="angular.h1.دليل-اعتماد-nac3-مع-angular" data-nac-role="heading" data-nac-level="1" id="دليل-اعتماد-nac3-مع-angular">دليل اعتماد NAC3 مع Angular</h1>
+<p data-nac-id="angular.p.4" data-nac-role="paragraph">يوضح هذا الدليل طريقتين لتحويل تطبيق Angular إلى تطبيق مدار بـ NAC:</p>
+<ul data-nac-id="angular.list.5" data-nac-role="list"><li data-nac-id="angular.list.5.item.1" data-nac-role="list-item"><strong>Greenfield:</strong> مشروع جديد، يُدمج NAC3 منذ <code data-nac-role="code-inline">ng new</code>.</li><li data-nac-id="angular.list.5.item.2" data-nac-role="list-item"><strong>Brownfield:</strong> تطبيق قائم، يُضاف إليه NAC3 تدريجيًا دون إعادة كتابة.</li></ul>
+<p data-nac-id="angular.p.6" data-nac-role="paragraph">تم الاختبار مع Angular 17+ (المكوّنات المستقلة، والإشارات، و inject). كما يغطي الدليل الشكل القديم لـ Angular (NgModules). الحزمة المستخدمة هي <code data-nac-role="code-inline">@nac3/runtime</code> ذاتها المستخدمة مع React؛ والفرق يكمن في مدى ملاءمة طريقة التكامل لأسلوب Angular.</p>
+<hr />
+<h2 data-nac-id="angular.h2.1-التثبيت" data-nac-role="heading" data-nac-level="2" id="1-التثبيت">1. التثبيت</h2>
+<pre data-nac-id="angular.code.1" data-nac-role="code" data-nac-lang="text"><code>npm install @nac3/runtime</code></pre>
+<p data-nac-id="angular.p.10" data-nac-role="paragraph">يُدرج Angular الحزمة عبر خط أنابيب البناء القياسي (esbuild في الإصدار 17+، وwebpack في الإصدارات الأقدم). لا حاجة لأي إعداد إضافي في <code data-nac-role="code-inline">angular.json</code>.</p>
+<hr />
+<h2 data-nac-id="angular.h2.2-greenfield-تطبيق-جديد" data-nac-role="heading" data-nac-level="2" id="2-greenfield-تطبيق-جديد">2. Greenfield -- تطبيق جديد</h2>
+<h3 data-nac-id="angular.h3.21-تشغيل-وقت-التشغيل-مرة-واحدة" data-nac-role="heading" data-nac-level="3" id="21-تشغيل-وقت-التشغيل-مرة-واحدة">2.1 تشغيل وقت التشغيل مرة واحدة</h3>
+<p data-nac-id="angular.p.14" data-nac-role="paragraph">في <code data-nac-role="code-inline">main.ts</code>:</p>
+<pre data-nac-id="angular.code.2" data-nac-role="code" data-nac-lang="ts"><code>import { bootstrapApplication } from &#x27;@angular/platform-browser&#x27;;
+import { provideRouter } from &#x27;@angular/router&#x27;;
+import { AppComponent } from &#x27;./app/app.component&#x27;;
+import { routes } from &#x27;./app/app.routes&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+// optional: import &#x27;@nac3/runtime/chat-client&#x27;;
+
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes)]
+}).then(() =&gt; {
+  // window.NAC is now ready. Configure tenant + provenance once.
+  if ((window as any).NAC?.setTenantPrefix) {
+    (window as any).NAC.setTenantPrefix(&#x27;demo&#x27;);
+  }
+});</code></pre>
+<p data-nac-id="angular.p.16" data-nac-role="paragraph">بالنسبة للمشاريع القديمة التي تستخدم <code data-nac-role="code-inline">app.module.ts</code> (NgModule)، تُضاف نفس عمليات الاستيراد في ملف الوحدة قبل استدعاء <code data-nac-role="code-inline">platformBrowserDynamic().bootstrapModule(...)</code>.</p>
+<h3 data-nac-id="angular.h3.22-خدمة-nac3-مركزة-التسجيل" data-nac-role="heading" data-nac-level="3" id="22-خدمة-nac3-مركزة-التسجيل">2.2 خدمة NAC3 -- مركزة التسجيل</h3>
+<pre data-nac-id="angular.code.3" data-nac-role="code" data-nac-lang="ts"><code>// nac.service.ts
+import { Injectable, OnDestroy } from &#x27;@angular/core&#x27;;
+
+declare global {
+  interface Window { NAC?: any; }
+}
+
+export interface NACManifest {
+  plugin_slug: string;
+  nac_version?: string;
+  elements?: Array&lt;{
+    id: string; role: string;
+    label_i18n?: Record&lt;string, string&gt;;
+    actions?: Array&lt;{ verb: string; label_i18n?: Record&lt;string, string&gt; }&gt;;
+  }&gt;;
+  tabs?: Array&lt;{ nac_id: string; label_i18n?: Record&lt;string, string&gt; }&gt;;
+}
+
+@Injectable({ providedIn: &#x27;root&#x27; })
+export class NacService {
+  get runtime() { return window.NAC; }
+
+  register(manifest: NACManifest) {
+    if (!this.runtime) {
+      console.warn(&#x27;NAC runtime not ready, skipping register for&#x27;, manifest.plugin_slug);
+      return;
+    }
+    this.runtime.register(manifest);
+  }
+
+  click(id: string)                       { return this.runtime?.click(id); }
+  click_by_verb(plugin: string|null, verb: string) { return this.runtime?.click_by_verb(plugin, verb); }
+  fill(id: string, value: any)            { return this.runtime?.fill(id, value); }
+  tab(plugin: string, tab_key: string)    { return this.runtime?.tab(plugin, tab_key); }
+  describe()                              { return this.runtime?.describe(); }
+  validate_global()                       { return this.runtime?.validate_global(); }
+
+  /* v2.2 helper. */
+  bindAction(el: HTMLElement, handler: (ev: Event) =&gt; void | Promise&lt;unknown&gt;,
+             ctx: { plugin: string; action_id: string }) {
+    return this.runtime?.bindAction(el, handler, ctx);
+  }
+}</code></pre>
+<h3 data-nac-id="angular.h3.23-تزيين-المكونات" data-nac-role="heading" data-nac-level="3" id="23-تزيين-المكونات">2.3 تزيين المكوّنات</h3>
+<pre data-nac-id="angular.code.4" data-nac-role="code" data-nac-lang="ts"><code>import { Component, OnInit, ElementRef, inject, ViewChild, AfterViewInit, OnDestroy } from &#x27;@angular/core&#x27;;
+import { NacService } from &#x27;./nac.service&#x27;;
+
+const INVOICE_MANIFEST = {
+  plugin_slug: &#x27;invoice&#x27;,
+  nac_version: &#x27;2.2&#x27;,
+  elements: [
+    {
+      id: &#x27;invoice.client_name&#x27;, role: &#x27;field&#x27;,
+      label_i18n: { es:&#x27;Nombre&#x27;,en:&#x27;Name&#x27;,pt:&#x27;Nome&#x27;,fr:&#x27;Nom&#x27;,
+                    it:&#x27;Nome&#x27;,de:&#x27;Name&#x27;,ja:&#x27;名前&#x27;,zh:&#x27;姓名&#x27;,
+                    hi:&#x27;naam&#x27;,ar:&#x27;الاسم&#x27; }
+    },
+    {
+      id: &#x27;invoice.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{ verb: &#x27;save&#x27;, label_i18n: { es:&#x27;Guardar&#x27;,en:&#x27;Save&#x27;,
+                  pt:&#x27;Salvar&#x27;,fr:&#x27;Sauver&#x27;,it:&#x27;Salva&#x27;,de:&#x27;Speichern&#x27;,
+                  ja:&#x27;保存&#x27;,zh:&#x27;保存&#x27;,hi:&#x27;sahejna&#x27;,ar:&#x27;حفظ&#x27; } }],
+      label_i18n: { es:&#x27;Guardar factura&#x27;,en:&#x27;Save invoice&#x27;,
+                    pt:&#x27;Salvar fatura&#x27;,fr:&#x27;Sauver facture&#x27;,
+                    it:&#x27;Salva fattura&#x27;,de:&#x27;Rechnung speichern&#x27;,
+                    ja:&#x27;請求書保存&#x27;,zh:&#x27;保存发票&#x27;,
+                    hi:&#x27;invoice sahejen&#x27;,ar:&#x27;حفظ الفاتورة&#x27; }
+    }
+  ]
+};
+
+@Component({
+  selector: &#x27;app-invoice-form&#x27;,
+  standalone: true,
+  template: `
+    &lt;article data-nac-plugin=&quot;invoice&quot;&gt;
+      &lt;input type=&quot;text&quot;
+             data-nac-id=&quot;invoice.client_name&quot;
+             data-nac-role=&quot;field&quot;
+             [(ngModel)]=&quot;clientName&quot;&gt;
+
+      &lt;button #saveBtn
+              data-nac-id=&quot;invoice.save&quot;
+              data-nac-role=&quot;action&quot;
+              data-nac-action=&quot;save&quot;
+              (click)=&quot;onSave()&quot;&gt;
+        Save
+      &lt;/button&gt;
+    &lt;/article&gt;
+  `
+})
+export class InvoiceFormComponent implements OnInit, AfterViewInit, OnDestroy {
+  private nac = inject(NacService);
+  @ViewChild(&#x27;saveBtn&#x27;, { static: true }) saveBtn!: ElementRef&lt;HTMLButtonElement&gt;;
+
+  clientName = &#x27;&#x27;;
+  private unbind: (() =&gt; void) | undefined;
+
+  ngOnInit() {
+    this.nac.register(INVOICE_MANIFEST);
+  }
+
+  ngAfterViewInit() {
+    /* v2.2: bindAction wraps the click + emits the ack so any
+       agent awaiting NAC.click(&#x27;invoice.save&#x27;) resolves cleanly. */
+    this.unbind = this.nac.bindAction(
+      this.saveBtn.nativeElement,
+      () =&gt; this.onSave(),
+      { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+    );
+  }
+
+  ngOnDestroy() {
+    this.unbind?.();
+  }
+
+  async onSave() {
+    // ... your save logic ...
+  }
+}</code></pre>
+<h3 data-nac-id="angular.h3.24-naciddirective-الاختصار-الملائم-لـ-brownfield" data-nac-role="heading" data-nac-level="3" id="24-naciddirective-الاختصار-الملائم-لـ-brownfield">2.4 NacIdDirective -- الاختصار الملائم لـ Brownfield</h3>
+<p data-nac-id="angular.p.22" data-nac-role="paragraph">بالنسبة للتزيين المتكرر، يبدو استخدام موجّه السمات أكثر توافقًا مع أسلوب Angular مقارنةً بكتابة ثلاثية <code data-nac-role="code-inline">data-nac-*</code> يدويًا. يكفي تطبيقه مرة واحدة، وسيتولى الموجّه ضبط السمات الثلاث:</p>
+<pre data-nac-id="angular.code.5" data-nac-role="code" data-nac-lang="ts"><code>// nac-id.directive.ts
+import { Directive, ElementRef, Input, OnInit } from &#x27;@angular/core&#x27;;
+
+@Directive({
+  selector: &#x27;[nacId]&#x27;,
+  standalone: true
+})
+export class NacIdDirective implements OnInit {
+  @Input({ required: true }) nacId!: string;
+  @Input() nacRole: &#x27;action&#x27; | &#x27;field&#x27; | &#x27;tab&#x27; | &#x27;option&#x27; | &#x27;data-table&#x27; | string = &#x27;action&#x27;;
+  @Input() nacAction?: string;
+
+  constructor(private el: ElementRef&lt;HTMLElement&gt;) {}
+
+  ngOnInit() {
+    const e = this.el.nativeElement;
+    e.setAttribute(&#x27;data-nac-id&#x27;, this.nacId);
+    e.setAttribute(&#x27;data-nac-role&#x27;, this.nacRole);
+    if (this.nacAction) {
+      e.setAttribute(&#x27;data-nac-action&#x27;, this.nacAction);
+    }
+  }
+}</code></pre>
+<p data-nac-id="angular.p.24" data-nac-role="paragraph">مثال على الاستخدام:</p>
+<pre data-nac-id="angular.code.6" data-nac-role="code" data-nac-lang="html"><code>&lt;button nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<h3 data-nac-id="angular.h3.25-nacactiondirective-تغليف-bindaction-تلقائيا" data-nac-role="heading" data-nac-level="3" id="25-nacactiondirective-تغليف-bindaction-تلقائيا">2.5 NacActionDirective -- تغليف bindAction تلقائيًا</h3>
+<p data-nac-id="angular.p.27" data-nac-role="paragraph">يُغلّف <code data-nac-role="code-inline">bindAction</code> بحيث يُصدر أي معالج <code data-nac-role="code-inline">(click)</code> مزيَّن بـ <code data-nac-role="code-inline">nacAction</code> تلقائيًا عقد الإقرار الخاص بالإصدار v2.2:</p>
+<pre data-nac-id="angular.code.7" data-nac-role="code" data-nac-lang="ts"><code>// nac-action.directive.ts
+import { Directive, ElementRef, Input, OnInit, OnDestroy, inject } from &#x27;@angular/core&#x27;;
+import { NacService } from &#x27;./nac.service&#x27;;
+
+@Directive({
+  selector: &#x27;[nacAction]&#x27;,
+  standalone: true
+})
+export class NacActionDirective implements OnInit, OnDestroy {
+  @Input({ required: true }) nacAction!: { plugin: string; actionId: string };
+  private nac = inject(NacService);
+  private unbind?: () =&gt; void;
+
+  constructor(private el: ElementRef&lt;HTMLElement&gt;) {}
+
+  ngOnInit() {
+    /* The element MUST already have a (click) handler attached
+       by Angular at this point. We add ours alongside; the v2.2
+       runtime emits the ack after both have run. */
+    this.unbind = this.nac.bindAction(
+      this.el.nativeElement,
+      () =&gt; { /* contract event only -- the user&#x27;s (click) runs separately */ },
+      { plugin: this.nacAction.plugin, action_id: this.nacAction.actionId }
+    );
+  }
+
+  ngOnDestroy() { this.unbind?.(); }
+}</code></pre>
+<p data-nac-id="angular.p.29" data-nac-role="paragraph">مثال على الاستخدام:</p>
+<pre data-nac-id="angular.code.8" data-nac-role="code" data-nac-lang="html"><code>&lt;button nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+        [nacAction]=&quot;{ plugin: &#x27;invoice&#x27;, actionId: &#x27;invoice.save&#x27; }&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<p data-nac-id="angular.p.31" data-nac-role="paragraph">(نعم، محدد الموجّه <code data-nac-role="code-inline">nacAction</code> يتداخل مع مدخل الاختصار <code data-nac-role="code-inline">data-nac-action</code>. من الناحية العملية، يختار كل مشروع أحد النمطين؛ وهذا القسم موجّه للمطوّرين الراغبين في استخدام تغليف <code data-nac-role="code-inline">bindAction</code>.)</p>
+<hr />
+<h2 data-nac-id="angular.h2.3-brownfield-التطبيق-القائم" data-nac-role="heading" data-nac-level="2" id="3-brownfield-التطبيق-القائم">3. Brownfield -- التطبيق القائم</h2>
+<p data-nac-id="angular.p.34" data-nac-role="paragraph">المبدأ (كما هو الحال في React): لا تُعيد هيكلة كل شيء دفعةً واحدة.</p>
+<h3 data-nac-id="angular.h3.31-ترتيب-العمل" data-nac-role="heading" data-nac-level="3" id="31-ترتيب-العمل">3.1 ترتيب العمل</h3>
+<p data-nac-id="angular.p.36" data-nac-role="paragraph">إلى العنصر الأعلى في قالب <code data-nac-role="code-inline">&lt;app-root&gt;</code>. تلتقطه شجرة النطاق في وقت التشغيل فوراً.</p>
+<p data-nac-id="angular.p.37" data-nac-role="paragraph">في الشاشات الأكثر نشاطاً. أضف السمات الثلاث <code data-nac-role="code-inline">data-nac-*</code>    مباشرةً في القالب (أو عبر <code data-nac-role="code-inline">NacIdDirective</code>).</p>
+<p data-nac-id="angular.p.38" data-nac-role="paragraph">وحدة تحكم المتصفح. يجب أن تظهر الأزرار تحت مُعرِّف الإضافة الخاص بك.</p>
+<p data-nac-id="angular.p.39" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb()</code> يعمل الآن.</p>
+<p data-nac-id="angular.p.40" data-nac-role="paragraph"><code data-nac-role="code-inline">role="tab"</code> -- <strong>ملاحظة</strong>: المُعرِّفات المطابقة للنمط <code data-nac-role="code-inline">^tab\.</code> يجب أن تحمل الدور    <code data-nac-role="code-inline">'tab'</code> وفقاً للمواصفة القسم 1 + المدقق الصارم V22-01.</p>
+<ol data-nac-id="angular.list.41" data-nac-role="list"><li data-nac-id="angular.list.41.item.1" data-nac-role="list-item"><strong>الغلاف الخارجي أولاً.</strong> أضف <code data-nac-role="code-inline">data-nac-plugin="&lt;your-app-slug&gt;"</code></li><li data-nac-id="angular.list.41.item.2" data-nac-role="list-item"><strong>الأزرار الأكثر استخداماً بعد ذلك.</strong> حفظ / إلغاء / إرسال / حذف</li><li data-nac-id="angular.list.41.item.3" data-nac-role="list-item"><strong>التحقق في DevTools.</strong> شغّل <code data-nac-role="code-inline">window.NAC.describe()</code> من</li><li data-nac-id="angular.list.41.item.4" data-nac-role="list-item"><strong>أضف ملف manifest.</strong> فقط الأزرار من الخطوة 2، مع الأفعال.</li><li data-nac-id="angular.list.41.item.5" data-nac-role="list-item"><strong>أضف الحقول والتبويبات.</strong> تحصل المدخلات على <code data-nac-role="code-inline">role="field"</code>. تحصل التبويبات على</li></ol>
+<h3 data-nac-id="angular.h3.32-العمل-مع-angular-material-primeng-taiga" data-nac-role="heading" data-nac-level="3" id="32-العمل-مع-angular-material-primeng-taiga">3.2 العمل مع Angular Material / PrimeNG / Taiga</h3>
+<p data-nac-id="angular.p.43" data-nac-role="paragraph">تتيح معظم مكتبات مكوّنات Angular ربط المدخلات بأسلوب <code data-nac-role="code-inline">[attr.data-nac-*]</code> أو تمرير السمات غير المعروفة مباشرةً إلى العنصر المضيف. نمطان شائعان:</p>
+<p data-nac-id="angular.p.44" data-nac-role="paragraph"><strong>النمط A: ربط السمة مباشرةً.</strong></p>
+<pre data-nac-id="angular.code.9" data-nac-role="code" data-nac-lang="html"><code>&lt;!-- Material --&gt;
+&lt;button mat-raised-button
+        [attr.data-nac-id]=&quot;&#x27;invoice.save&#x27;&quot;
+        [attr.data-nac-role]=&quot;&#x27;action&#x27;&quot;
+        [attr.data-nac-action]=&quot;&#x27;save&#x27;&quot;
+        (click)=&quot;onSave()&quot;&gt;
+  Save
+&lt;/button&gt;</code></pre>
+<p data-nac-id="angular.p.46" data-nac-role="paragraph"><strong>النمط B: NacIdDirective على العنصر الغلاف.</strong></p>
+<p data-nac-id="angular.p.47" data-nac-role="paragraph">إذا كانت المكتبة تُصيِّر عنصراً مضيفاً وأردت تطبيق NAC3 على الزر الداخلي، فاستخدم غلافاً:</p>
+<pre data-nac-id="angular.code.10" data-nac-role="code" data-nac-lang="html"><code>&lt;span nacId=&quot;invoice.save&quot; nacRole=&quot;action&quot; nacAction=&quot;save&quot;
+      (click)=&quot;onSave()&quot;&gt;
+  &lt;button mat-raised-button&gt;Save&lt;/button&gt;
+&lt;/span&gt;</code></pre>
+<p data-nac-id="angular.p.49" data-nac-role="paragraph">يعتمد وقت تشغيل NAC3 على <code data-nac-role="code-inline">data-nac-id</code> لا على نوع العنصر، لذا يعمل هذا بشكل صحيح.</p>
+<h3 data-nac-id="angular.h3.33-التسجيل-التلقائي-من-dom" data-nac-role="heading" data-nac-level="3" id="33-التسجيل-التلقائي-من-dom">3.3 التسجيل التلقائي من DOM</h3>
+<p data-nac-id="angular.p.51" data-nac-role="paragraph">نفس نمط <code data-nac-role="code-inline">autoRegister.watch</code> المستخدم في React:</p>
+<pre data-nac-id="angular.code.11" data-nac-role="code" data-nac-lang="ts"><code>// in your AppComponent ngAfterViewInit:
+const root = document.querySelector(&#x27;[data-nac-plugin]&#x27;) as HTMLElement;
+if (root &amp;&amp; (window as any).NAC?.autoRegister) {
+  root.setAttribute(&#x27;data-nac-watch&#x27;, &#x27;1&#x27;);
+  (window as any).NAC.autoRegister.watch(root, {
+    i18n_strict: &#x27;permissive&#x27;,
+    throttleMs: 100
+  });
+}</code></pre>
+<p data-nac-id="angular.p.53" data-nac-role="paragraph">بدّل <code data-nac-role="code-inline">i18n_strict</code> إلى <code data-nac-role="code-inline">'strict'</code> بمجرد أن يغطي كتالوج الترجمة لديك جميع لغات NAC3 العشر.</p>
+<hr />
+<h2 data-nac-id="angular.h2.4-التوجيه-ودورة-الحياة" data-nac-role="heading" data-nac-level="2" id="4-التوجيه-ودورة-الحياة">4. التوجيه ودورة الحياة</h2>
+<p data-nac-id="angular.p.56" data-nac-role="paragraph">لقطة NAC3 هي <strong>ما هو مُحمَّل حالياً</strong>. مع موجّه Angular يعني ذلك:</p>
+<p data-nac-id="angular.p.57" data-nac-role="paragraph">الخاص به في <code data-nac-role="code-inline">ngOnInit</code>.</p>
+<p data-nac-id="angular.p.58" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.unregister(plugin_slug)</code> في <code data-nac-role="code-inline">ngOnDestroy</code> حتى لا تظهر   الإضافات القديمة في لقطة الوكيل.</p>
+<ul data-nac-id="angular.list.59" data-nac-role="list"><li data-nac-id="angular.list.59.item.1" data-nac-role="list-item">المكوّن الذي يُحمَّل عند التنقل بين المسارات يُسجِّل ملف manifest</li><li data-nac-id="angular.list.59.item.2" data-nac-role="list-item">المكوّن الذي يُفرَّغ عند التنقل يجب أن يستدعي</li></ul>
+<pre data-nac-id="angular.code.12" data-nac-role="code" data-nac-lang="ts"><code>ngOnDestroy() {
+  this.nac.runtime?.unregister?.(&#x27;invoice&#x27;);
+}</code></pre>
+<p data-nac-id="angular.p.61" data-nac-role="paragraph">بالنسبة لمكوّنات الغلاف طويلة الأمد (الشريط العلوي، الشريط الجانبي)، لا تُلغِ التسجيل -- يجب أن تبقى دائماً في الشجرة.</p>
+<hr />
+<h2 data-nac-id="angular.h2.5-الاختبار" data-nac-role="heading" data-nac-level="2" id="5-الاختبار">5. الاختبار</h2>
+<h3 data-nac-id="angular.h3.51-testbed-karma" data-nac-role="heading" data-nac-level="3" id="51-testbed-karma">5.1 TestBed / Karma</h3>
+<pre data-nac-id="angular.code.13" data-nac-role="code" data-nac-lang="ts"><code>import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { InvoiceFormComponent } from &#x27;./invoice-form.component&#x27;;
+import &#x27;@nac3/runtime&#x27;;
+
+describe(&#x27;InvoiceFormComponent&#x27;, () =&gt; {
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [InvoiceFormComponent]
+    });
+  });
+
+  it(&#x27;save button drives via NAC&#x27;, async () =&gt; {
+    const fixture = TestBed.createComponent(InvoiceFormComponent);
+    fixture.detectChanges();
+
+    let acked = false;
+    document.addEventListener(&#x27;nac:action:succeeded&#x27;, () =&gt; { acked = true; });
+
+    await (window as any).NAC.click(&#x27;invoice.save&#x27;);
+
+    expect(acked).toBe(true);
+  });
+});</code></pre>
+<h3 data-nac-id="angular.h3.52-playwright-e2e" data-nac-role="heading" data-nac-level="3" id="52-playwright-e2e">5.2 Playwright (e2e)</h3>
+<p data-nac-id="angular.p.67" data-nac-role="paragraph">كما هو الحال في دليل React:</p>
+<pre data-nac-id="angular.code.14" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;invoice save&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;/invoices/new&#x27;);
+  await page.evaluate(() =&gt; (window as any).NAC.fill(&#x27;invoice.client_name&#x27;, &#x27;Acme&#x27;));
+  await page.evaluate(() =&gt; (window as any).NAC.click(&#x27;invoice.save&#x27;));
+  await expect(page.getByText(&#x27;Invoice saved&#x27;)).toBeVisible();
+});</code></pre>
+<hr />
+<h2 data-nac-id="angular.h2.6-المشكلات-الشائعة" data-nac-role="heading" data-nac-level="2" id="6-المشكلات-الشائعة">6. المشكلات الشائعة</h2>
+<p data-nac-id="angular.p.71" data-nac-role="paragraph">(<code data-nac-role="code-inline">data-nac-id="row.{{i}}"</code>), فإن الوكلاء الذين خزّنوا مُعرِّفاً ما سيتعطلون عند إعادة الترتيب. استخدم مفاتيح ثابتة (مُعرِّفات قاعدة البيانات).</p>
+<p data-nac-id="angular.p.72" data-nac-role="paragraph">في <code data-nac-role="code-inline">ngOnChanges</code> أو في دالة getter تعمل في كل دورة كشف. <code data-nac-role="code-inline">ngOnInit</code> مرةً واحدة هو المكان الصحيح.</p>
+<p data-nac-id="angular.p.73" data-nac-role="paragraph">وهي ليست zone-aware بشكل افتراضي. إذا احتجت إلى معالجة zone-aware، فاستخدم الغلاف التالي:   ``<code data-nac-role="code-inline">ts   this.zone.run(() =&gt; { /<em> respond to nac:action:succeeded </em>/ });   </code>``</p>
+<p data-nac-id="angular.p.74" data-nac-role="paragraph">``<code data-nac-role="code-inline">ts   if (isPlatformBrowser(this.platformId)) {     this.nac.register(...);   }   </code>``</p>
+<ul data-nac-id="angular.list.75" data-nac-role="list"><li data-nac-id="angular.list.75.item.1" data-nac-role="list-item">*<em>مُعرِّفات قديمة في <code data-nac-role="code-inline"></em>ngFor</code>.** إذا بنيت المُعرِّفات من الفهرس</li><li data-nac-id="angular.list.75.item.2" data-nac-role="list-item"><strong>حلقات الكشف عن التغييرات والتسجيل.</strong> لا تُسجِّل ملف manifest</li><li data-nac-id="angular.list.75.item.3" data-nac-role="list-item"><strong>الوضع الصارم + zone.js.</strong> تتدفق أحداث NAC3 عبر المستند العام؛</li><li data-nac-id="angular.list.75.item.4" data-nac-role="list-item"><strong>SSR (Angular Universal).</strong> NAC3 مخصص للمتصفح فقط. احمِ الخدمة:</li></ul>
+<hr />
+<h2 data-nac-id="angular.h2.7-قائمة-التحقق-قبل-الإنتاج" data-nac-role="heading" data-nac-level="2" id="7-قائمة-التحقق-قبل-الإنتاج">7. قائمة التحقق قبل الإنتاج</h2>
+<p data-nac-id="angular.p.78" data-nac-role="paragraph">قبل الإطلاق:</p>
+<p data-nac-id="angular.p.79" data-nac-role="paragraph">الترجمات المفقودة.</p>
+<p data-nac-id="angular.p.80" data-nac-role="paragraph">الإنتاج لديك لتفعيل فحوصات التسجيل وفق v2.2 (manifest_role_unknown    وما شابهها) كاستثناءات.</p>
+<p data-nac-id="angular.p.81" data-nac-role="paragraph"><code data-nac-role="code-inline">[]</code>.</p>
+<p data-nac-id="angular.p.82" data-nac-role="paragraph">واستدعِ <code data-nac-role="code-inline">NAC.set_provenance_secret()</code> من الكود المُصادَق عليه.</p>
+<ol data-nac-id="angular.list.83" data-nac-role="list"><li data-nac-id="angular.list.83.item.1" data-nac-role="list-item">استبدل <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> بـ <code data-nac-role="code-inline">'strict'</code>. يرصد CI</li><li data-nac-id="angular.list.83.item.2" data-nac-role="list-item">شغّل <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> -- توقّع صفراً من النتائج ذات مستوى الخطأ.</li><li data-nac-id="angular.list.83.item.3" data-nac-role="list-item">اضبط <code data-nac-role="code-inline">(window as any).NAC.STRICT_VALIDATION = true</code> في إقلاع</li><li data-nac-id="angular.list.83.item.4" data-nac-role="list-item">من اختبار Playwright، تحقق من أن <code data-nac-role="code-inline">NAC.validate_global()</code> تُعيد</li><li data-nac-id="angular.list.83.item.5" data-nac-role="list-item">البيئات متعددة المستأجرين: وقّع ملفات manifest بـ HMAC من جانب الخادم</li></ol>
+<hr />
+<h2 data-nac-id="angular.h2.8-الخطوات-التالية" data-nac-role="heading" data-nac-level="2" id="8-الخطوات-التالية">8. الخطوات التالية</h2>
+<p data-nac-id="angular.p.86" data-nac-role="paragraph"><code data-nac-role="code-inline">example-v20-full.php</code> ترحيل brownfield؛ <code data-nac-role="code-inline">example-v21-data-table.php</code>   جدول البيانات + الدردشة).</p>
+<ul data-nac-id="angular.list.87" data-nac-role="list"><li data-nac-id="angular.list.87.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">SPEC.md</code> للعقد الكامل.</li><li data-nac-id="angular.list.87.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">guides/REACT.md</code> للمقارنة بين الأطر المختلفة.</li><li data-nac-id="angular.list.87.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">guides/LLM_WIRING.md</code> للواجهة الخلفية الوسيطة.</li><li data-nac-id="angular.list.87.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">SECURITY.md</code> لنموذج التهديدات.</li><li data-nac-id="angular.list.87.item.5" data-nac-role="list-item">العروض التوضيحية على yujin.app/nac-spec/ (<code data-nac-role="code-inline">example.php</code> مرجع الإصدار v1.9؛</li></ul>
+<hr />
+<p data-nac-id="angular.p.89" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/ANGULAR.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "angular",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "angular.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "angular.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "angular.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "angular.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

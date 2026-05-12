@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 へのコントリビューション -- NAC3</title>
+<meta name="nac3-doc-slug" content="contributing" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="contributing" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="contributing.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="contributing.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/contributing.mp3" data-nac-id="contributing.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="contributing.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="contributing.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="contributing.main" data-nac-role="region">
+<hr />
+<p data-nac-id="contributing.p.1" data-nac-role="paragraph">translation_source: CONTRIBUTING.md translation_source_hash: 15fa7e8a34cc86e6193de8cd9826a9bd98d4b3ac1c72a43646521d75f88f9a26 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T13:04:14.071966+00:00</p>
+<hr />
+<h1 data-nac-id="contributing.h1.nac3-へのコントリビューション" data-nac-role="heading" data-nac-level="1" id="nac3-へのコントリビューション">NAC3 へのコントリビューション</h1>
+<p data-nac-id="contributing.p.4" data-nac-role="paragraph"><strong>仕様バージョン:</strong> 2.2 stable（+ v2.3 相互運用プレビュー）</p>
+<h2 data-nac-id="contributing.h2.ガバナンス" data-nac-role="heading" data-nac-level="2" id="ガバナンス">ガバナンス</h2>
+<p data-nac-id="contributing.p.6" data-nac-role="paragraph">NAC3 は現在 Yujin によって管理されています。仕様は Apache 2.0、リファレンスランタイムは MIT ライセンスです。Yujin は、採用状況が中立的なガバナンスを正当化する場合、NAC3 を中立的な財団（W3C コミュニティグループ、Linux Foundation、または同等の組織）に移管することを約束しています。それまでの間、仕様の変更は以下の RFC プロセスに従い、公開 API またはワイヤーフォーマットへの変更には少なくとも 14 日間のパブリックコメント期間が設けられます。</p>
+<p data-nac-id="contributing.p.7" data-nac-role="paragraph">Apache 2.0 + MIT のライセンス構成により、Yujin の企業状況に変化が生じた場合でも、仕様とランタイムは存続します。両ライセンスのもとでのフォークは明示的に歓迎されています。</p>
+<hr />
+<p data-nac-id="contributing.p.9" data-nac-role="paragraph">コントリビューションをご検討いただきありがとうございます。NAC3 は公開仕様とリファレンス実装で構成されており、どちらもコントリビューションを受け付けています。</p>
+<h2 data-nac-id="contributing.h2.コントリビューションの種類" data-nac-role="heading" data-nac-level="2" id="コントリビューションの種類">コントリビューションの種類</h2>
+<h3 data-nac-id="contributing.h3.1-仕様変更rfc-必須" data-nac-role="heading" data-nac-level="3" id="1-仕様変更rfc-必須">1. 仕様変更（RFC 必須）</h3>
+<p data-nac-id="contributing.p.12" data-nac-role="paragraph"><code data-nac-role="code-inline">SPEC.md</code>、<code data-nac-role="code-inline">ABOUT.md</code>、または <code data-nac-role="code-inline">docs/NAC_V*_ROADMAP.md</code> の編集は仕様変更に該当します。PR を開く前に以下の手順を踏んでください：</p>
+<ol data-nac-id="contributing.list.13" data-nac-role="list"><li data-nac-id="contributing.list.13.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">RFC: &lt;一行の概要&gt;</code> というタイトルで GitHub Issue を作成する。</li><li data-nac-id="contributing.list.13.item.2" data-nac-role="list-item">問題の種類を説明する（修正するバグや制限、できれば具体的な再現手順を含む）。</li><li data-nac-id="contributing.list.13.item.3" data-nac-role="list-item">提案するコントラクト変更を説明する。</li><li data-nac-id="contributing.list.13.item.4" data-nac-role="list-item">既存の採用者向けの移行パスを説明する。</li><li data-nac-id="contributing.list.13.item.5" data-nac-role="list-item">PR を開く前に、少なくとも 1 人のメンテナーから Issue への返信を待つ。</li></ol>
+<p data-nac-id="contributing.p.14" data-nac-role="paragraph">RFC Issue と対になっていない仕様 PR は、このセクションへのポインターとともにクローズされます。</p>
+<h3 data-nac-id="contributing.h3.2-リファレンスランタイムの変更" data-nac-role="heading" data-nac-level="3" id="2-リファレンスランタイムの変更">2. リファレンスランタイムの変更</h3>
+<p data-nac-id="contributing.p.16" data-nac-role="paragraph"><code data-nac-role="code-inline">js/nac.js</code>、<code data-nac-role="code-inline">js/nac-v2-extensions.js</code>、または <code data-nac-role="code-inline">js/nac-chat-client.js</code> の編集。以下の場合は RFC なしで PR を歓迎します：</p>
+<ul data-nac-id="contributing.list.17" data-nac-role="list"><li data-nac-id="contributing.list.17.item.1" data-nac-role="list-item">変更がランタイムを現在の仕様に合わせるバグ修正である場合。</li><li data-nac-id="contributing.list.17.item.2" data-nac-role="list-item">変更が動作に影響を与えないパフォーマンス改善である場合。</li><li data-nac-id="contributing.list.17.item.3" data-nac-role="list-item">変更がドキュメント、型定義、またはテストカバレッジに関するものである場合。</li></ul>
+<p data-nac-id="contributing.p.18" data-nac-role="paragraph">仕様コントラクトに影響するランタイムの動作変更を伴う PR は、必ず先に仕様 RFC と対にする必要があります。</p>
+<h3 data-nac-id="contributing.h3.3-デモツールまたはドキュメントの改善" data-nac-role="heading" data-nac-level="3" id="3-デモツールまたはドキュメントの改善">3. デモ、ツール、またはドキュメントの改善</h3>
+<p data-nac-id="contributing.p.20" data-nac-role="paragraph"><code data-nac-role="code-inline">example*.php</code>、<code data-nac-role="code-inline">tools/</code>、<code data-nac-role="code-inline">guides/</code>、またはその他の非仕様 Markdown の編集。直接 PR してください。変更は最小限に留めてください。大きな PR 1 つより小さな PR 10 個を推奨します。</p>
+<h2 data-nac-id="contributing.h2.コードスタイル" data-nac-role="heading" data-nac-level="2" id="コードスタイル">コードスタイル</h2>
+<ul data-nac-id="contributing.list.22" data-nac-role="list"><li data-nac-id="contributing.list.22.item.1" data-nac-role="list-item">ソースファイルは ASCII のみ（プロジェクトは GoDaddy にデプロイされており、PHP 8.3 はコメント内でも非 ASCII を拒否します）。em ダッシュには <code data-nac-role="code-inline">--</code> を使用し、<code data-nac-role="code-inline">--</code> は使わないでください。</li><li data-nac-id="contributing.list.22.item.2" data-nac-role="list-item">JS: ランタイムファイルにトランスパイラー、バンドラー、ビルドステップは使用しない。プレーンな ES2018+。npm パッケージは同じソースに ESM/CJS ラッパーを追加します。</li><li data-nac-id="contributing.list.22.item.3" data-nac-role="list-item">PHP: heredoc はシンプルに保つ（<code data-nac-role="code-inline">{$var}</code> のみ、式は不可）。</li><li data-nac-id="contributing.list.22.item.4" data-nac-role="list-item">コメント: WHY（なぜ）を説明し、WHAT（何を）は書かない。差分が「何を」は示しています。</li><li data-nac-id="contributing.list.22.item.5" data-nac-role="list-item">テスト: 動作変更にはすべて、変更前に失敗し変更後に通過するテストを付ける。プッシュ前にリポジトリルートから <code data-nac-role="code-inline">make test-launch</code> を実行してください。</li></ul>
+<h2 data-nac-id="contributing.h2.コミットスタイル" data-nac-role="heading" data-nac-level="2" id="コミットスタイル">コミットスタイル</h2>
+<p data-nac-id="contributing.p.24" data-nac-role="paragraph">「fix(nac): treat tab role drift as register-time error」のように書き、「Fixed tab thing」のような書き方はしない。</p>
+<ul data-nac-id="contributing.list.25" data-nac-role="list"><li data-nac-id="contributing.list.25.item.1" data-nac-role="list-item">サブジェクトは 70 文字以内、現在形の命令形で。</li><li data-nac-id="contributing.list.25.item.2" data-nac-role="list-item">本文には問題、原因、修正内容を説明する。関連コミットは短い SHA で参照する。</li><li data-nac-id="contributing.list.25.item.3" data-nac-role="list-item">AI を活用したコミットへの Co-author トレーラーは問題ありません。ツールの使用を隠す必要はありません。</li></ul>
+<h2 data-nac-id="contributing.h2.レビュー" data-nac-role="heading" data-nac-level="2" id="レビュー">レビュー</h2>
+<ul data-nac-id="contributing.list.27" data-nac-role="list"><li data-nac-id="contributing.list.27.item.1" data-nac-role="list-item">バグ修正 PR: 承認者 1 名でマージ。</li><li data-nac-id="contributing.list.27.item.2" data-nac-role="list-item">ランタイム／仕様 PR: 承認者 1 名 + CI グリーンでマージ。</li><li data-nac-id="contributing.list.27.item.3" data-nac-role="list-item">仕様変更 PR: 対になる RFC Issue でのディスカッション + 承認者 1 名 + CI グリーン + PR オープン後 7 日間のコメント期間。</li></ul>
+<h2 data-nac-id="contributing.h2.ライセンス" data-nac-role="heading" data-nac-level="2" id="ライセンス">ライセンス</h2>
+<p data-nac-id="contributing.p.29" data-nac-role="paragraph">PR を提出することで、プロジェクトに合わせて Apache-2.0 のもとでコントリビューションをライセンスすることに同意したものとみなされます。PR テンプレートにチェックボックスが含まれていますので、チェックを入れてください。</p>
+<h2 data-nac-id="contributing.h2.行動規範" data-nac-role="heading" data-nac-level="2" id="行動規範">行動規範</h2>
+<p data-nac-id="contributing.p.31" data-nac-role="paragraph">技術的に正確に、簡潔に、そして親切に。意見の相違は問題ありませんが、人身攻撃は許容されません。繰り返し違反した場合、メンテナーはスレッドをクローズしたり、コミットアクセスを取り消したりすることがあります。</p>
+<h2 data-nac-id="contributing.h2.質問する場所" data-nac-role="heading" data-nac-level="2" id="質問する場所">質問する場所</h2>
+<ul data-nac-id="contributing.list.33" data-nac-role="list"><li data-nac-id="contributing.list.33.item.1" data-nac-role="list-item">設計に関する質問、「NAC3 をこの用途に使うべきか？」、ショーケースには GitHub Discussions を使用してください。</li><li data-nac-id="contributing.list.33.item.2" data-nac-role="list-item">バグ報告には GitHub Issues を使用してください。</li><li data-nac-id="contributing.list.33.item.3" data-nac-role="list-item">セキュリティの開示には <code data-nac-role="code-inline">nac@yujin.dev</code> へ連絡してください（<code data-nac-role="code-inline">SECURITY.md</code> 参照）。</li></ul>
+<hr />
+<p data-nac-id="contributing.p.35" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/CONTRIBUTING.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "contributing",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "contributing.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "contributing.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "contributing.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "contributing.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

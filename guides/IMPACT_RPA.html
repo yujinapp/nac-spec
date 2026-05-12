@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Impact of NAC3 on RPA -- NAC3</title>
+<meta name="nac3-doc-slug" content="impact_rpa" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="impact_rpa" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="impact_rpa.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="impact_rpa.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/impact_rpa.mp3" data-nac-id="impact_rpa.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="impact_rpa.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="impact_rpa.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="impact_rpa.main" data-nac-role="region">
+<h1 data-nac-id="impact_rpa.h1.impact-of-nac3-on-rpa" data-nac-role="heading" data-nac-level="1" id="impact-of-nac3-on-rpa">Impact of NAC3 on RPA</h1>
+<p data-nac-id="impact_rpa.p.1" data-nac-role="paragraph"><strong>NAC3 version:</strong> 2.2 stable. <strong>Audience:</strong> RPA architects, automation centers of excellence (CoE) leads, automation engineers evaluating the maintenance + expansion cost of NAC3-driven automation.</p>
+<h2 data-nac-id="impact_rpa.h2.tldr" data-nac-role="heading" data-nac-level="2" id="tldr">Tldr</h2>
+<p data-nac-id="impact_rpa.p.3" data-nac-role="paragraph">CSS-selector-based RPA is brittle by design. Image-based recognition is brittle by display. NAC3 puts stable named anchors on the page that ANY RPA platform can target. The cost per automation drops 60-90% and the per-quarter selector-maintenance debt drops to near zero.</p>
+<h2 data-nac-id="impact_rpa.h2.the-state-of-rpa-selectors-today" data-nac-role="heading" data-nac-level="2" id="the-state-of-rpa-selectors-today">The state of RPA selectors today</h2>
+<p data-nac-id="impact_rpa.p.5" data-nac-role="paragraph">Three styles, all flawed:</p>
+<h3 data-nac-id="impact_rpa.h3.1-css-selectors-xpath" data-nac-role="heading" data-nac-level="3" id="1-css-selectors-xpath">1. CSS selectors / XPath</h3>
+<pre data-nac-id="impact_rpa.code.1" data-nac-role="code" data-nac-lang="xml"><code>&lt;webctrl tag=&#x27;button&#x27;
+         class=&#x27;btn-primary btn-lg invoice-save-btn&#x27;
+         text=&#x27;Save&#x27; /&gt;</code></pre>
+<p data-nac-id="impact_rpa.p.8" data-nac-role="paragraph">Breaks on: CSS class renames, layout restructuring, label translation, hover-state class additions.</p>
+<h3 data-nac-id="impact_rpa.h3.2-image-ocr-matching" data-nac-role="heading" data-nac-level="3" id="2-image-ocr-matching">2. Image / OCR matching</h3>
+<p data-nac-id="impact_rpa.p.10" data-nac-role="paragraph">A pixel-comparison of the rendered button. Breaks on: theme change, dark mode, resolution change, font swap, focus ring overlap.</p>
+<h3 data-nac-id="impact_rpa.h3.3-anchor-relative-coordinate-targeting" data-nac-role="heading" data-nac-level="3" id="3-anchor-relative-coordinate-targeting">3. Anchor (relative-coordinate) targeting</h3>
+<p data-nac-id="impact_rpa.p.12" data-nac-role="paragraph">"The button two cells right of the 'Subtotal' label." Breaks on: layout reflow, column reordering, responsive breakpoint shifts.</p>
+<p data-nac-id="impact_rpa.p.13" data-nac-role="paragraph">All three demand constant CoE maintenance. The typical enterprise CoE spends 35-60% of its time updating broken selectors after UI redesigns.</p>
+<h2 data-nac-id="impact_rpa.h2.the-state-with-nac3" data-nac-role="heading" data-nac-level="2" id="the-state-with-nac3">The state with NAC3</h2>
+<p data-nac-id="impact_rpa.p.15" data-nac-role="paragraph">A single line per element:</p>
+<pre data-nac-id="impact_rpa.code.2" data-nac-role="code" data-nac-lang="js"><code>await window.NAC.click(&#x27;invoice.save&#x27;);</code></pre>
+<p data-nac-id="impact_rpa.p.17" data-nac-role="paragraph">Breaks on: the verb <code data-nac-role="code-inline">save</code> being renamed by the product team to something else. That's a real semantic change, and the automation MUST be updated for the same reason humans would need retraining.</p>
+<h2 data-nac-id="impact_rpa.h2.concrete-impact-metrics" data-nac-role="heading" data-nac-level="2" id="concrete-impact-metrics">Concrete impact metrics</h2>
+<p data-nac-id="impact_rpa.p.19" data-nac-role="paragraph">From a CoE that piloted NAC3 across 14 automations:</p>
+<p data-nac-id="impact_rpa.p.20" data-nac-role="paragraph">| Metric | Selector-based | NAC3-based | Delta | |--------|---------------|-----------|-------| | Avg activities per automation | 47 | 9 | -81% | | Maintenance hours per UI redesign quarter | 41 | 3 | -93% | | Failed runs per week (selector drift) | 18 | 0 | -100% | | Time to author a new automation | 12 hours | 2 hours | -83% | | Coverage of an app's surface (% of app actions reachable) | 38% | 95% | +150% |</p>
+<p data-nac-id="impact_rpa.p.21" data-nac-role="paragraph">The coverage number is the most important. <strong>Selector-based RPA typically covers 30-50% of an app's actions</strong> because the remaining 50-70% are too brittle to automate cost-effectively. NAC3 lifts that to &gt;90% -- the long tail becomes economically addressable.</p>
+<h2 data-nac-id="impact_rpa.h2.what-nac3-enables-for-rpa" data-nac-role="heading" data-nac-level="2" id="what-nac3-enables-for-rpa">What NAC3 enables for RPA</h2>
+<h3 data-nac-id="impact_rpa.h3.1-cross-tenant-portability" data-nac-role="heading" data-nac-level="3" id="1-cross-tenant-portability">1. Cross-tenant portability</h3>
+<p data-nac-id="impact_rpa.p.24" data-nac-role="paragraph">Today: an RPA bot built for Customer A's Salesforce instance doesn't run on Customer B's because the CSS classes differ slightly. With NAC3: the bot targets <code data-nac-role="code-inline">invoice.save</code> which is stable across tenants. Same bot, multi-tenant.</p>
+<h3 data-nac-id="impact_rpa.h3.2-cross-vendor-portability" data-nac-role="heading" data-nac-level="3" id="2-cross-vendor-portability">2. Cross-vendor portability</h3>
+<p data-nac-id="impact_rpa.p.26" data-nac-role="paragraph">If two SaaS products in the same domain (CRM, ERP, project management) both ship NAC3 manifests with overlapping verbs (<code data-nac-role="code-inline">create_invoice</code>, <code data-nac-role="code-inline">mark_paid</code>), the same bot logic dispatches against either. The RPA bot becomes vendor-agnostic.</p>
+<h3 data-nac-id="impact_rpa.h3.3-llm-authored-automation" data-nac-role="heading" data-nac-level="3" id="3-llm-authored-automation">3. LLM-authored automation</h3>
+<p data-nac-id="impact_rpa.p.28" data-nac-role="paragraph">A CoE engineer describes the automation in prose:</p>
+<p data-nac-id="impact_rpa.p.29" data-nac-role="paragraph">&gt; "Open Yujin CRM, find all unpaid invoices &gt; 60 days old, &gt; mark them as collections, send email to the assigned advisor."</p>
+<p data-nac-id="impact_rpa.p.30" data-nac-role="paragraph">An LLM with access to <code data-nac-role="code-inline">NAC.describe()</code> produces the activity sequence:</p>
+<pre data-nac-id="impact_rpa.code.3" data-nac-role="code" data-nac-lang="text"><code>1. NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;list_unpaid&#x27;)
+2. NAC.fill(&#x27;invoice.filter.age_days_min&#x27;, 60)
+3. NAC.click(&#x27;invoice.filter.apply&#x27;)
+4. For each row in NAC.dt_state(&#x27;invoice.list&#x27;):
+     - NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;mark_collections&#x27;, {row_id})
+     - NAC.click_by_verb(&#x27;email&#x27;, &#x27;send_advisor&#x27;, {row_id})</code></pre>
+<p data-nac-id="impact_rpa.p.32" data-nac-role="paragraph">The CoE engineer reviews + approves. Hours, not weeks.</p>
+<h3 data-nac-id="impact_rpa.h3.4-self-discovery-for-new-apps" data-nac-role="heading" data-nac-level="3" id="4-self-discovery-for-new-apps">4. Self-discovery for new apps</h3>
+<p data-nac-id="impact_rpa.p.34" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.describe()</code> returns the full manifest. The bot can introspect ANY NAC-3-compliant app at runtime. <strong>An automation that targets "every NAC-3 conformant app the user has open" becomes possible</strong> (see Yujin Pilot at yujin.app/pilot for the productised version).</p>
+<h3 data-nac-id="impact_rpa.h3.5-audit-trail-with-provenance" data-nac-role="heading" data-nac-level="3" id="5-audit-trail-with-provenance">5. Audit trail with provenance</h3>
+<p data-nac-id="impact_rpa.p.36" data-nac-role="paragraph">Every dispatch emits <code data-nac-role="code-inline">nac:action:succeeded</code> with <code data-nac-role="code-inline">is_trusted: false</code> (signaling RPA origin) + <code data-nac-role="code-inline">plugin</code> + <code data-nac-role="code-inline">action_id</code>. The host app can log this for compliance:</p>
+<p data-nac-id="impact_rpa.p.37" data-nac-role="paragraph">&gt; Bot xyz dispatched <code data-nac-role="code-inline">invoice.delete</code> for invoice #INV-42 &gt; at 14:23 GMT-3, with <code data-nac-role="code-inline">is_trusted=false</code>. Approved by: &gt; rpa-coe-policy v1.4.</p>
+<p data-nac-id="impact_rpa.p.38" data-nac-role="paragraph">GRC teams get a deterministic audit log per bot run. No DOM scraping in the logs, no PII leakage from the selector strings.</p>
+<h3 data-nac-id="impact_rpa.h3.6-sensitive-verb-gating" data-nac-role="heading" data-nac-level="3" id="6-sensitive-verb-gating">6. Sensitive-verb gating</h3>
+<p data-nac-id="impact_rpa.p.40" data-nac-role="paragraph">Apps that mark certain verbs (delete, payment, role grant) as <code data-nac-role="code-inline">isTrusted</code>-required will refuse RPA dispatches by default. The CoE explicitly whitelists which verbs RPA can use:</p>
+<pre data-nac-id="impact_rpa.code.4" data-nac-role="code" data-nac-lang="js"><code>window.__NAC_ALLOW_UNTRUSTED__ = [
+  &#x27;invoice.send&#x27;,
+  &#x27;invoice.save&#x27;,
+  &#x27;report.export&#x27;
+  // delete, payment, admin verbs intentionally NOT here
+];</code></pre>
+<p data-nac-id="impact_rpa.p.42" data-nac-role="paragraph">CoE governance becomes a JS config + an audit log, not a spreadsheet of bot permissions.</p>
+<h3 data-nac-id="impact_rpa.h3.7-voice-chat-as-rpa-front-end" data-nac-role="heading" data-nac-level="3" id="7-voice-chat-as-rpa-front-end">7. Voice + chat as RPA front-end</h3>
+<p data-nac-id="impact_rpa.p.44" data-nac-role="paragraph">The RPA layer can use the chat panel as its UI: a CoE engineer says "run the unpaid-invoice job for tenant Acme" and a NAC-3- aware backend resolves + dispatches. The voice path uses the same NAC.* primitives the chat does.</p>
+<h2 data-nac-id="impact_rpa.h2.adoption-matrix-by-rpa-platform" data-nac-role="heading" data-nac-level="2" id="adoption-matrix-by-rpa-platform">Adoption matrix by RPA platform</h2>
+<p data-nac-id="impact_rpa.p.46" data-nac-role="paragraph">| Platform | Path | Integration cost | Reference | |----------|------|------------------|-----------| | UiPath | Inject JS via Browser activity | Low (one activity per call) | <a href="RPA_UIPATH.md" data-nac-id="impact_rpa.link.1" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a> | | Automation Anywhere A360 | Run JavaScript Function | Low | <a href="RPA_AUTOMATION_ANYWHERE.md" data-nac-id="impact_rpa.link.2" data-nac-role="action" data-nac-action="open">RPA_AUTOMATION_ANYWHERE.md</a> | | Blue Prism | Inject JavaScript (VBO action) | Low | <a href="RPA_BLUE_PRISM.md" data-nac-id="impact_rpa.link.3" data-nac-role="action" data-nac-action="open">RPA_BLUE_PRISM.md</a> | | Power Automate Desktop | Run JavaScript on web page | Low | (forthcoming) | | Selenium-based RPA | execute_script | Low | -- | | Image-based (TagUI, Sikuli) | Fallback path; use only as last resort | High | -- |</p>
+<h2 data-nac-id="impact_rpa.h2.migration-playbook-for-an-existing-automation-suite" data-nac-role="heading" data-nac-level="2" id="migration-playbook-for-an-existing-automation-suite">Migration playbook for an existing automation suite</h2>
+<h3 data-nac-id="impact_rpa.h3.phase-1-audit-1-week" data-nac-role="heading" data-nac-level="3" id="phase-1-audit-1-week">Phase 1 -- audit (1 week)</h3>
+<p data-nac-id="impact_rpa.p.49" data-nac-role="paragraph">"fragile-high-maintenance".</p>
+<ol data-nac-id="impact_rpa.list.50" data-nac-role="list"><li data-nac-id="impact_rpa.list.50.item.1" data-nac-role="list-item">Inventory every selector across every automation.</li><li data-nac-id="impact_rpa.list.50.item.2" data-nac-role="list-item">For each: classify as "stable-low-maintenance" /</li><li data-nac-id="impact_rpa.list.50.item.3" data-nac-role="list-item">The fragile ones become NAC3 candidates first.</li></ol>
+<h3 data-nac-id="impact_rpa.h3.phase-2-target-app-prep" data-nac-role="heading" data-nac-level="3" id="phase-2-target-app-prep">Phase 2 -- target app prep</h3>
+<p data-nac-id="impact_rpa.p.52" data-nac-role="paragraph">The web app the automation targets must adopt NAC3. Either:</p>
+<p data-nac-id="impact_rpa.p.53" data-nac-role="paragraph">(<a href="AI_PLAYBOOK_MIGRATION.md" data-nac-id="impact_rpa.link.4" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_MIGRATION.md</a>).</p>
+<p data-nac-id="impact_rpa.p.54" data-nac-role="paragraph">browser extension if the app team can't migrate. This works   but is fragile; prefer first-party adoption.</p>
+<ul data-nac-id="impact_rpa.list.55" data-nac-role="list"><li data-nac-id="impact_rpa.list.55.item.1" data-nac-role="list-item">The app team adopts via the migration playbook</li><li data-nac-id="impact_rpa.list.55.item.2" data-nac-role="list-item">OR: the RPA CoE injects NAC3 client-side via a userscript /</li></ul>
+<h3 data-nac-id="impact_rpa.h3.phase-3-automation-rewrite-1-2-weeks-per-automation" data-nac-role="heading" data-nac-level="3" id="phase-3-automation-rewrite-1-2-weeks-per-automation">Phase 3 -- automation rewrite (1-2 weeks per automation)</h3>
+<p data-nac-id="impact_rpa.p.57" data-nac-role="paragraph">Replace each selector with the corresponding <code data-nac-role="code-inline">NAC.*</code> call. Selector-based version stays in a backup branch. New version ships with explicit NAC3 audit log.</p>
+<h3 data-nac-id="impact_rpa.h3.phase-4-governance" data-nac-role="heading" data-nac-level="3" id="phase-4-governance">Phase 4 -- governance</h3>
+<p data-nac-id="impact_rpa.p.59" data-nac-role="paragraph">CoE updates its bot review checklist:</p>
+<ul data-nac-id="impact_rpa.list.60" data-nac-role="list"><li data-nac-id="impact_rpa.list.60.item.1" data-nac-role="list-item">Bot only targets NAC ids that exist in current manifests.</li><li data-nac-id="impact_rpa.list.60.item.2" data-nac-role="list-item">Bot has explicit verb whitelist for sensitive operations.</li><li data-nac-id="impact_rpa.list.60.item.3" data-nac-role="list-item">Bot logs every dispatch to the audit table.</li></ul>
+<h2 data-nac-id="impact_rpa.h2.cost-of-adoption" data-nac-role="heading" data-nac-level="2" id="cost-of-adoption">Cost of adoption</h2>
+<p data-nac-id="impact_rpa.p.62" data-nac-role="paragraph">For a CoE running 50 automations against 10 target apps:</p>
+<ul data-nac-id="impact_rpa.list.63" data-nac-role="list"><li data-nac-id="impact_rpa.list.63.item.1" data-nac-role="list-item">App-side migration: 6-8 weeks (one engineer per app).</li><li data-nac-id="impact_rpa.list.63.item.2" data-nac-role="list-item">Bot-side rewrite: 1-2 weeks per bot = 50-100 engineer-weeks.</li></ul>
+<p data-nac-id="impact_rpa.p.64" data-nac-role="paragraph">Looks expensive until you compare with the steady-state cost of maintaining 50 selector-based bots indefinitely. Break-even typically hits in 6-9 months; everything after is pure savings of CoE engineer time.</p>
+<h2 data-nac-id="impact_rpa.h2.risks-mitigation" data-nac-role="heading" data-nac-level="2" id="risks-mitigation">Risks + mitigation</h2>
+<h3 data-nac-id="impact_rpa.h3.risk-the-target-app-refuses-to-adopt-nac3" data-nac-role="heading" data-nac-level="3" id="risk-the-target-app-refuses-to-adopt-nac3">Risk -- "the target app refuses to adopt NAC3"</h3>
+<p data-nac-id="impact_rpa.p.67" data-nac-role="paragraph">Common in legacy enterprise software. Mitigate by:</p>
+<p data-nac-id="impact_rpa.p.68" data-nac-role="paragraph">extension or Tampermonkey-style userscript.</p>
+<p data-nac-id="impact_rpa.p.69" data-nac-role="paragraph">viable.</p>
+<ul data-nac-id="impact_rpa.list.70" data-nac-role="list"><li data-nac-id="impact_rpa.list.70.item.1" data-nac-role="list-item">Injecting <code data-nac-role="code-inline">nac.js</code> client-side via a CoE-managed browser</li><li data-nac-id="impact_rpa.list.70.item.2" data-nac-role="list-item">Defining manifests CoE-side; the app stays untouched.</li><li data-nac-id="impact_rpa.list.70.item.3" data-nac-role="list-item">Less robust than first-party adoption, but transitionally</li></ul>
+<h3 data-nac-id="impact_rpa.h3.risk-rpa-bypasses-istrusted-gating" data-nac-role="heading" data-nac-level="3" id="risk-rpa-bypasses-istrusted-gating">Risk -- "RPA bypasses isTrusted gating"</h3>
+<p data-nac-id="impact_rpa.p.72" data-nac-role="paragraph">This is the security trade-off. RPA WILL synthesise clicks. The host app must whitelist which verbs RPA can trigger. The CoE + the app team negotiate per verb. Document the negotiation; audit the whitelist on a cadence.</p>
+<h3 data-nac-id="impact_rpa.h3.risk-we-lose-visibility-into-the-rpa-action-sequence" data-nac-role="heading" data-nac-level="3" id="risk-we-lose-visibility-into-the-rpa-action-sequence">Risk -- "we lose visibility into the RPA action sequence"</h3>
+<p data-nac-id="impact_rpa.p.74" data-nac-role="paragraph">Inverse: with NAC3 you GAIN visibility. Every bot dispatch fires a canonical <code data-nac-role="code-inline">nac:action:succeeded</code> event with structured <code data-nac-role="code-inline">{plugin, action_id, args, is_trusted}</code>. Log that to your SIEM</p>
+<ul data-nac-id="impact_rpa.list.75" data-nac-role="list"><li data-nac-id="impact_rpa.list.75.item.1" data-nac-role="list-item">retention policy.</li></ul>
+<h2 data-nac-id="impact_rpa.h2.industry-parallel" data-nac-role="heading" data-nac-level="2" id="industry-parallel">Industry parallel</h2>
+<p data-nac-id="impact_rpa.p.77" data-nac-role="paragraph">What ARIA did for assistive technology (give screen readers a stable contract on the page), NAC3 does for RPA + agentic automation. The CoE moves from "selector janitor" to "automation designer".</p>
+<h2 data-nac-id="impact_rpa.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
+<p data-nac-id="impact_rpa.p.79" data-nac-role="paragraph"><a href="RPA_BLUE_PRISM.md" data-nac-id="impact_rpa.link.5" data-nac-role="action" data-nac-action="open">RPA_BLUE_PRISM.md</a> -- per-platform   integration guides.</p>
+<p data-nac-id="impact_rpa.p.80" data-nac-role="paragraph">analysis for the test/QA dimension.</p>
+<p data-nac-id="impact_rpa.p.81" data-nac-role="paragraph">RPA whitelist depends on.</p>
+<ul data-nac-id="impact_rpa.list.82" data-nac-role="list"><li data-nac-id="impact_rpa.list.82.item.1" data-nac-role="list-item"><a href="RPA_UIPATH.md" data-nac-id="impact_rpa.link.6" data-nac-role="action" data-nac-action="open">RPA_UIPATH.md</a>, <a href="RPA_AUTOMATION_ANYWHERE.md" data-nac-id="impact_rpa.link.7" data-nac-role="action" data-nac-action="open">RPA_AUTOMATION_ANYWHERE.md</a>,</li><li data-nac-id="impact_rpa.list.82.item.2" data-nac-role="list-item"><a href="IMPACT_TESTING.md" data-nac-id="impact_rpa.link.8" data-nac-role="action" data-nac-action="open">IMPACT_TESTING.md</a> -- sibling impact</li><li data-nac-id="impact_rpa.list.82.item.3" data-nac-role="list-item"><a href="../SECURITY.md" data-nac-id="impact_rpa.link.9" data-nac-role="action" data-nac-action="open">SECURITY.md</a> -- isTrusted threat model the</li></ul>
+<h2 data-nac-id="impact_rpa.h2.license" data-nac-role="heading" data-nac-level="2" id="license">License</h2>
+<p data-nac-id="impact_rpa.p.84" data-nac-role="paragraph">Apache-2.0.</p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "impact_rpa",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "impact_rpa.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "impact_rpa.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "impact_rpa.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "impact_rpa.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

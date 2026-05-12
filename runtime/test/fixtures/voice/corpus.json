@@ -1,0 +1,58 @@
+{
+  "_doc": "Voice test corpus -- 30 prompts in 10 locales. Each entry is (locale, expected_action, prompt). The TTS-generated audio at <locale>/<id>.mp3 is what a real STT would have heard; the test injects the text directly (Capa A) and optionally plays the audio through a mocked SpeechRecognition (Capa B).",
+  "_voices": {
+    "es": "es-ES-Standard-A",
+    "en": "en-US-Wavenet-D",
+    "pt": "pt-BR-Standard-A",
+    "fr": "fr-FR-Standard-A",
+    "it": "it-IT-Standard-A",
+    "de": "de-DE-Standard-A",
+    "ja": "ja-JP-Standard-A",
+    "zh": "cmn-CN-Standard-A",
+    "hi": "hi-IN-Standard-A",
+    "ar": "ar-XA-Standard-A"
+  },
+  "prompts": [
+    { "id": "es-save",     "locale": "es", "text": "guarda la factura",     "expected_verb": "save"   },
+    { "id": "es-cancel",   "locale": "es", "text": "cancela",                "expected_verb": "cancel" },
+    { "id": "es-tab",      "locale": "es", "text": "ve a permisos",          "expected_kind": "tab"    },
+    { "id": "es-bug",      "locale": "es", "text": "cambia de pestana",      "expected_no_locale_switch": true },
+    { "id": "es-bug2",     "locale": "es", "text": "cambia precio de mouse 40", "expected_no_locale_switch": true },
+
+    { "id": "en-save",     "locale": "en", "text": "save the invoice",       "expected_verb": "save"   },
+    { "id": "en-cancel",   "locale": "en", "text": "cancel",                  "expected_verb": "cancel" },
+    { "id": "en-tab",      "locale": "en", "text": "go to permissions",       "expected_kind": "tab"    },
+    { "id": "en-fill",     "locale": "en", "text": "set name to alice",       "expected_kind": "fill"   },
+
+    { "id": "pt-save",     "locale": "pt", "text": "salvar a fatura",         "expected_verb": "save"   },
+    { "id": "pt-cancel",   "locale": "pt", "text": "cancelar",                "expected_verb": "cancel" },
+
+    { "id": "fr-save",     "locale": "fr", "text": "enregistrer la facture",  "expected_verb": "save"   },
+    { "id": "fr-cancel",   "locale": "fr", "text": "annuler",                  "expected_verb": "cancel" },
+
+    { "id": "it-save",     "locale": "it", "text": "salva la fattura",         "expected_verb": "save"   },
+    { "id": "it-cancel",   "locale": "it", "text": "annulla",                   "expected_verb": "cancel" },
+
+    { "id": "de-save",     "locale": "de", "text": "rechnung speichern",       "expected_verb": "save"   },
+    { "id": "de-cancel",   "locale": "de", "text": "abbrechen",                 "expected_verb": "cancel" },
+
+    { "id": "ja-save",     "locale": "ja", "text": "請求書を保存",                "expected_verb": "save"   },
+    { "id": "ja-cancel",   "locale": "ja", "text": "キャンセル",                  "expected_verb": "cancel" },
+
+    { "id": "zh-save",     "locale": "zh", "text": "保存发票",                   "expected_verb": "save"   },
+    { "id": "zh-cancel",   "locale": "zh", "text": "取消",                       "expected_verb": "cancel" },
+
+    { "id": "hi-save",     "locale": "hi", "text": "invoice ko sahej do",       "expected_verb": "save"   },
+    { "id": "hi-cancel",   "locale": "hi", "text": "cancel karo",                "expected_verb": "cancel" },
+
+    { "id": "ar-save",     "locale": "ar", "text": "احفظ الفاتورة",              "expected_verb": "save"   },
+    { "id": "ar-cancel",   "locale": "ar", "text": "إلغاء",                      "expected_verb": "cancel" },
+
+    { "id": "lang-en",     "locale": "es", "text": "switch to english",        "expected_kind": "change_locale", "expected_locale": "en" },
+    { "id": "lang-de",     "locale": "es", "text": "cambia a aleman",          "expected_kind": "change_locale", "expected_locale": "de" },
+    { "id": "lang-trap",   "locale": "es", "text": "cambia de pestana",        "expected_no_locale_switch": true },
+
+    { "id": "noise-1",     "locale": "es", "text": "hola",                     "expected_kind": "say" },
+    { "id": "noise-2",     "locale": "en", "text": "thank you",                "expected_kind": "say" }
+  ]
+}

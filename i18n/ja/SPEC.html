@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 -- Native Agent Contract -- NAC3</title>
+<meta name="nac3-doc-slug" content="spec" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="spec" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="spec.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="spec.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/spec.mp3" data-nac-id="spec.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="spec.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="spec.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="spec.main" data-nac-role="region">
+<hr />
+<p data-nac-id="spec.p.1" data-nac-role="paragraph">translation_source: SPEC.md translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76 translation_quality: machine_v1 translation_lang: ja translation_date: 2026-05-11T13:03:11.000777+00:00</p>
+<hr />
+<h1 data-nac-id="spec.h1.nac3-native-agent-contract" data-nac-role="heading" data-nac-level="1" id="nac3-native-agent-contract">NAC3 -- Native Agent Contract</h1>
+<p data-nac-id="spec.p.4" data-nac-role="paragraph"><strong>Version:</strong> 2.2.0 <strong>Status:</strong> Stable <strong>License:</strong> Apache-2.0 <strong>Editor:</strong> Yujin (rpaforce.com)</p>
+<hr />
+<h2 data-nac-id="spec.h2.0-目的" data-nac-role="heading" data-nac-level="2" id="0-目的">0. 目的</h2>
+<p data-nac-id="spec.p.7" data-nac-role="paragraph">NAC3 は、Web UI とそれを操作するエージェントの間のコントラクトです。 エージェントには、音声ランナー、LLM 仲介、RPA ボット、 アクセシビリティツール、エンドツーエンドテストランナーが含まれます。このコントラクトは以下を規定します：</p>
+<ol data-nac-id="spec.list.8" data-nac-role="list"><li data-nac-id="spec.list.8.item.1" data-nac-role="list-item"><strong>要素の命名方法</strong> -- エージェントが「保存ボタンをクリック」と要求したとき、単一の DOM ノードに解決できるようにする。</li><li data-nac-id="spec.list.8.item.2" data-nac-role="list-item"><strong>動詞の適用方法</strong> -- エージェントがアプリごとのグルーコードなしに <code data-nac-role="code-inline">NAC.click(id)</code>、<code data-nac-role="code-inline">NAC.fill(id, value)</code>、<code data-nac-role="code-inline">NAC.tab(plugin, key)</code> などを呼び出せるようにする。</li><li data-nac-id="spec.list.8.item.3" data-nac-role="list-item"><strong>完了の通知方法</strong> -- ロールごとに決定論的なイベントファミリーを用いて、エージェントがステップの完了を認識できるようにする。</li><li data-nac-id="spec.list.8.item.4" data-nac-role="list-item"><strong>来歴の保持方法</strong> -- 下流システムが実際のユーザー操作と合成操作を区別できるようにする。</li></ol>
+<p data-nac-id="spec.p.9" data-nac-role="paragraph">NAC3 は、既存のレンダリングフレームワークの上に薄いレイヤーを追加するものです。ARIA、React、Vue、またはデザインシステムを置き換えるものではありません。</p>
+<hr />
+<h2 data-nac-id="spec.h2.1-ロール" data-nac-role="heading" data-nac-level="2" id="1-ロール">1. ロール</h2>
+<p data-nac-id="spec.p.12" data-nac-role="paragraph">エージェントが関与するすべての DOM 要素は <code data-nac-role="code-inline">data-nac-role</code> を持ちます。標準ロールは以下のとおりです：</p>
+<p data-nac-id="spec.p.13" data-nac-role="paragraph">| ロール | 意味 | 例 | |--------|------|----| | <code data-nac-role="code-inline">plugin</code> | 自己完結した UI モジュール（ページ、パネル、ウィジェット集合）。 | <code data-nac-role="code-inline">&lt;article data-nac-plugin="invoice"&gt;</code> | | <code data-nac-role="code-inline">section</code> | プラグイン内のランドマーク（ヘッダー、ボディ、フッター、サイドバー）。 | <code data-nac-role="code-inline">&lt;section data-nac-role="section"&gt;</code> | | <code data-nac-role="code-inline">region</code> | セクション内の名前付きエリア（カードクラスター、結果リストなど）。 | <code data-nac-role="code-inline">&lt;div data-nac-role="region"&gt;</code> | | <code data-nac-role="code-inline">action</code> | 動詞をトリガーするクリック可能なウィジェット（ボタン、ボタンとして機能するリンク）。 | <code data-nac-role="code-inline">&lt;button data-nac-role="action" data-nac-action="save"&gt;</code> | | <code data-nac-role="code-inline">field</code> | ユーザーが入力またはトグルする入力要素（テキスト、数値、チェックボックス、ラジオ、日付、ファイル）。 | <code data-nac-role="code-inline">&lt;input data-nac-role="field"&gt;</code> | | <code data-nac-role="code-inline">option</code> | フィールド内の選択可能なオプション（コンボボックス / セレクト / ラジオグループの子要素）。 | <code data-nac-role="code-inline">&lt;li data-nac-role="option"&gt;</code> | | <code data-nac-role="code-inline">tab</code> | 切り替え可能なパネルセレクター。<strong><code data-nac-role="code-inline">data-nac-id</code> が <code data-nac-role="code-inline">^tab\.</code> にマッチする場合は必須。</strong> | <code data-nac-role="code-inline">&lt;button data-nac-role="tab" data-nac-id="tab.lines"&gt;</code> | | <code data-nac-role="code-inline">breadcrumb-item</code> | パンくずリストのホップ。 | <code data-nac-role="code-inline">&lt;a data-nac-role="breadcrumb-item"&gt;</code> | | <code data-nac-role="code-inline">accordion-toggle</code> | 展開/折りたたみコントロール。 | <code data-nac-role="code-inline">&lt;button data-nac-role="accordion-toggle"&gt;</code> | | <code data-nac-role="code-inline">step</code> | ウィザードのステップインジケーター。 | <code data-nac-role="code-inline">&lt;li data-nac-role="step"&gt;</code> | | <code data-nac-role="code-inline">pagination-item</code> | ページネーションリストのページジャンプコントロール。 | <code data-nac-role="code-inline">&lt;button data-nac-role="pagination-item"&gt;</code> | | <code data-nac-role="code-inline">confirm-button</code> | 確認ダイアログ内の確認/キャンセルボタン。 | <code data-nac-role="code-inline">&lt;button data-nac-role="confirm-button"&gt;</code> | | <code data-nac-role="code-inline">sort-control</code> | 列ソートヘッダー。 | <code data-nac-role="code-inline">&lt;th data-nac-role="sort-control"&gt;</code> | | <code data-nac-role="code-inline">filter-control</code> | 列フィルタートリガー。 | <code data-nac-role="code-inline">&lt;button data-nac-role="filter-control"&gt;</code> | | <code data-nac-role="code-inline">data-table</code> | データテーブルのホスト要素（v2.1）。 | <code data-nac-role="code-inline">&lt;table data-nac-role="data-table"&gt;</code> | | <code data-nac-role="code-inline">navigation</code> | ランドマークナビゲーション領域。<strong>タブではありません。</strong> | <code data-nac-role="code-inline">&lt;nav data-nac-role="navigation"&gt;</code> | | <code data-nac-role="code-inline">confirm-dialog</code> | 確認要求のモーダル。 | <code data-nac-role="code-inline">&lt;div data-nac-role="confirm-dialog"&gt;</code> |</p>
+<p data-nac-id="spec.p.14" data-nac-role="paragraph">このリスト以外のロールは将来の使用のために予約されています。NAC-strict ランタイムは、登録時に未知のロールを拒否すべきです（SHOULD）（v2.2）。NAC-permissive ランタイムは、後方互換性のために未知のロールを <code data-nac-role="code-inline">action</code> として扱ってもかまいません（MAY）（v1.9 および v2.0 のデフォルト）。</p>
+<hr />
+<h2 data-nac-id="spec.h2.2-名前" data-nac-role="heading" data-nac-level="2" id="2-名前">2. 名前</h2>
+<p data-nac-id="spec.p.17" data-nac-role="paragraph">エージェントが解決可能なすべての要素は <code data-nac-role="code-inline">data-nac-id</code> を持ちます。ID は以下の特性を持ちます：</p>
+<p data-nac-id="spec.p.18" data-nac-role="paragraph">ドットはセマンティックレベルを区切ります。ランタイムはこれを解釈しませんが、人間と LLM は解釈します。</p>
+<ul data-nac-id="spec.list.19" data-nac-role="list"><li data-nac-id="spec.list.19.item.1" data-nac-role="list-item"><strong>ドット区切りのパス</strong>（例：<code data-nac-role="code-inline">deals.list.row.42.actions.delete</code>）。</li><li data-nac-id="spec.list.19.item.2" data-nac-role="list-item"><strong><code data-nac-role="code-inline">data-nac-plugin</code> スコープ内でグローバルに一意。</strong> 異なる 2 つのプラグインが同じ ID を持つことは許可されます（MAY）。ランタイムは <code data-nac-role="code-inline">(plugin, id)</code> のペアで解決します。</li><li data-nac-id="spec.list.19.item.3" data-nac-role="list-item"><strong>再レンダリングをまたいで安定。</strong> レンダリングごとに新しい ID を生成するフレームワーク（ランダムハッシュ、インスタンスカウンターなど）はこのコントラクトを破壊します。</li><li data-nac-id="spec.list.19.item.4" data-nac-role="list-item"><strong>UI 再設計をまたいで安定。</strong> ボタンがツールバーからドロップダウンに移動しても、その ID は変更してはなりません（MUST）。</li></ul>
+<p data-nac-id="spec.p.20" data-nac-role="paragraph">予約済み ID プレフィックス（v2.1）：</p>
+<p data-nac-id="spec.p.21" data-nac-role="paragraph">| プレフィックス | 予約用途 | |----------------|----------| | <code data-nac-role="code-inline">tab.</code> | タブボタン。ロールは <code data-nac-role="code-inline">tab</code> でなければなりません（MUST）。 | | <code data-nac-role="code-inline">modal.</code> | モーダルスコープの要素。ロールはリーフウィジェットのロールになります。 | | <code data-nac-role="code-inline">field.</code> | フォームフィールドの省略形。ロールは <code data-nac-role="code-inline">field</code> または <code data-nac-role="code-inline">option</code> でなければなりません（MUST）。 | | <code data-nac-role="code-inline">confirm.</code> | 確認ダイアログ。 |</p>
+<hr />
+<h2 data-nac-id="spec.h2.3-動詞" data-nac-role="heading" data-nac-level="2" id="3-動詞">3. 動詞</h2>
+<p data-nac-id="spec.p.24" data-nac-role="paragraph"><code data-nac-role="code-inline">data-nac-role="action"</code> 要素は、その動作を示す <code data-nac-role="code-inline">data-nac-action="&lt;verb&gt;"</code> を持つことができます（MAY）。動詞は、ホストとエージェントの間で合意されたスネークケースの自由形式識別子です。一般的な動詞：</p>
+<p data-nac-id="spec.p.25" data-nac-role="paragraph"><code data-nac-role="code-inline">save</code>, <code data-nac-role="code-inline">cancel</code>, <code data-nac-role="code-inline">submit</code>, <code data-nac-role="code-inline">delete</code>, <code data-nac-role="code-inline">edit</code>, <code data-nac-role="code-inline">view</code>, <code data-nac-role="code-inline">create</code>, <code data-nac-role="code-inline">approve</code>, <code data-nac-role="code-inline">reject</code>, <code data-nac-role="code-inline">send</code>, <code data-nac-role="code-inline">download</code>, <code data-nac-role="code-inline">upload</code>, <code data-nac-role="code-inline">refresh</code>, <code data-nac-role="code-inline">expand</code>, <code data-nac-role="code-inline">collapse</code>, <code data-nac-role="code-inline">open</code>, <code data-nac-role="code-inline">close</code>, <code data-nac-role="code-inline">add_row</code>, <code data-nac-role="code-inline">remove_row</code>.</p>
+<p data-nac-id="spec.p.26" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> は、動詞をそのプラグイン配下の一意のアクションに解決してクリックします。1 つのプラグイン内で複数のアクションが同じ動詞を共有することはマニフェストエラーです（lint: <code data-nac-role="code-inline">duplicate_verb</code>）。</p>
+<hr />
+<h2 data-nac-id="spec.h2.4-マニフェスト" data-nac-role="heading" data-nac-level="2" id="4-マニフェスト">4. マニフェスト</h2>
+<p data-nac-id="spec.p.29" data-nac-role="paragraph">すべてのプラグインは、以下の方法でマニフェストを登録することができます（MAY）：</p>
+<pre data-nac-id="spec.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
+  plugin_slug: &#x27;invoice&#x27;,
+  version:     &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.1&#x27;,
+  elements: [
+    { id: &#x27;invoice.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{ verb: &#x27;save&#x27;, label_i18n: { es: &#x27;Guardar&#x27;, en: &#x27;Save&#x27;, ... } }],
+      label_i18n: { es: &#x27;Guardar factura&#x27;, en: &#x27;Save invoice&#x27;, ... } },
+    ...
+  ],
+  tabs: [
+    { nac_id: &#x27;tab.lines&#x27;, label_i18n: { es: &#x27;Lineas&#x27;, en: &#x27;Lines&#x27; } },
+    ...
+  ],
+  fields: [
+    { id: &#x27;field.client_name&#x27;, type: &#x27;text&#x27;, required: true,
+      label_i18n: { es: &#x27;Cliente&#x27;, en: &#x27;Customer&#x27; } },
+    ...
+  ],
+  data_tables: [...]
+});</code></pre>
+<p data-nac-id="spec.p.31" data-nac-role="paragraph">マニフェストはエージェント向けの信頼できる情報源です。「ユーザーが『guardar』と言った」と判断した LLM 仲介は、プラグインマニフェストを参照して動詞 <code data-nac-role="code-inline">save</code> を見つけ、<code data-nac-role="code-inline">NAC.click_by_verb('invoice', 'save')</code> を発行します。</p>
+<h3 data-nac-id="spec.h3.41-必須フィールド" data-nac-role="heading" data-nac-level="3" id="41-必須フィールド">4.1 必須フィールド</h3>
+<ul data-nac-id="spec.list.33" data-nac-role="list"><li data-nac-id="spec.list.33.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">plugin_slug</code> -- ホスト要素の <code data-nac-role="code-inline">data-nac-plugin</code> と一致する必要があります。</li><li data-nac-id="spec.list.33.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac_version</code> -- このマニフェストが準拠を主張する NAC3 のバージョン。ランタイムは、自身のバージョンより高いバージョンを主張するマニフェストを拒否します。</li></ul>
+<h3 data-nac-id="spec.h3.42-オプションフィールド" data-nac-role="heading" data-nac-level="3" id="42-オプションフィールド">4.2 オプションフィールド</h3>
+<ul data-nac-id="spec.list.35" data-nac-role="list"><li data-nac-id="spec.list.35.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">elements[]</code> -- 名前付きウィジェットのカタログ。各エントリは <code data-nac-role="code-inline">id</code> と <code data-nac-role="code-inline">role</code> を持たなければなりません（MUST）。</li><li data-nac-id="spec.list.35.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tabs[]</code> -- タブ専用のトップレベル配列。<code data-nac-role="code-inline">role:'tab'</code> を持つ <code data-nac-role="code-inline">elements[]</code> エントリと同等です。どちらの形式も有効です。</li><li data-nac-id="spec.list.35.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code>、<code data-nac-role="code-inline">kpis[]</code>、<code data-nac-role="code-inline">data_tables[]</code> -- 型付きサブコレクション。ロールでフィルタリングされた <code data-nac-role="code-inline">elements[]</code> と同じセマンティクスを持ちます。デモでは人間が読みやすい形式を選択します。</li></ul>
+<h3 data-nac-id="spec.h3.43-i18n" data-nac-role="heading" data-nac-level="3" id="43-i18n">4.3 i18n</h3>
+<p data-nac-id="spec.p.37" data-nac-role="paragraph">すべての <code data-nac-role="code-inline">label_i18n</code> は NAC3 の 10 ロケールをすべてカバーしなければなりません（MUST）：</p>
+<pre data-nac-id="spec.code.2" data-nac-role="code" data-nac-lang="text"><code>es, en, pt, fr, ja, zh, hi, ar, de, it</code></pre>
+<p data-nac-id="spec.p.39" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.autoRegister.watch()</code> の <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> を指定すると、ブラウンフィールド移行中に部分的なカバレッジを許可します。本番マニフェストは 10 ロケールをすべて含めるべきです。</p>
+<hr />
+<h2 data-nac-id="spec.h2.5-パブリック-api" data-nac-role="heading" data-nac-level="2" id="5-パブリック-api">5. パブリック API</h2>
+<h3 data-nac-id="spec.h3.51-命令型" data-nac-role="heading" data-nac-level="3" id="51-命令型">5.1 命令型</h3>
+<pre data-nac-id="spec.code.3" data-nac-role="code" data-nac-lang="ts"><code>NAC.click(nac_id: string, opts?: ClickOpts): Promise&lt;{ok: true}&gt;
+NAC.click_by_verb(plugin: string|null, verb: string, opts?): Promise&lt;...&gt;
+NAC.fill(nac_id: string, value: string|number|boolean): Promise&lt;...&gt;
+NAC.select(nac_id: string, value: string): Promise&lt;...&gt;
+NAC.tab(plugin: string, tab_key: string): Promise&lt;...&gt;
+NAC.tab_by_label(plugin: string|null, label: string): Promise&lt;...&gt;
+NAC.go_to_section(nac_id: string): Promise&lt;...&gt;
+NAC.drag_drop(source_id, target_id, opts?: {to_index?: number}): Promise&lt;...&gt;
+NAC.set_mode(mode: &#x27;modal&#x27;|&#x27;maximized&#x27;|&#x27;new_tab&#x27;|&#x27;new_window&#x27;): void
+NAC.screenshot(): Promise&lt;string&gt;  // data URL
+NAC.bindAction(el, handler, {plugin, action_id}): () =&gt; void  // v2.2</code></pre>
+<h3 data-nac-id="spec.h3.511-適合ヘルパー-v22" data-nac-role="heading" data-nac-level="3" id="511-適合ヘルパー-v22">5.1.1 適合ヘルパー (v2.2)</h3>
+<p data-nac-id="spec.p.45" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> は、クリックハンドラーを接続するための仕様準拠の方法です。ハンドラーの実行後（同期・例外・Promise のいずれの場合も）、<code data-nac-role="code-inline">nac:action:succeeded</code>（または <code data-nac-role="code-inline">:failed</code>）を自動的に発行します。アンバインダーを返します。ホストが対応している場合は、生の <code data-nac-role="code-inline">addEventListener('click', ...)</code> の代わりにこちらを使用してください。既存のブラウンフィールドコードは、従来どおり手動でイベントを発行することも引き続き可能です。</p>
+<h3 data-nac-id="spec.h3.513-フィールドエディター-v23-プレビュー" data-nac-role="heading" data-nac-level="3" id="513-フィールドエディター-v23-プレビュー">5.1.3 フィールドエディター (v2.3 プレビュー)</h3>
+<p data-nac-id="spec.p.47" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.edit_field(nac_id)</code> は、ユーザー（またはその代理エージェント）が Word スタイルのツールを使って任意のテキストフィールドを編集できるモーダルを開きます。</p>
+<pre data-nac-id="spec.code.4" data-nac-role="code" data-nac-lang="ts"><code>NAC.edit_field(nac_id: string): Promise&lt;{ok:true}&gt;</code></pre>
+<p data-nac-id="spec.p.49" data-nac-role="paragraph">このモーダルは <code data-nac-role="code-inline">plugin_slug='nac_editor'</code> として登録され、以下の NAC-3 呼び出し可能な verb を持ちます。</p>
+<p data-nac-id="spec.p.50" data-nac-role="paragraph">| Verb | 効果 | |------|--------| | <code data-nac-role="code-inline">select_word</code> | キャレット位置の単語を選択する | | <code data-nac-role="code-inline">select_sentence</code> | キャレット位置の文を選択する | | <code data-nac-role="code-inline">select_all</code> | エディター内で Ctrl-A を実行する | | <code data-nac-role="code-inline">replace</code> | 選択範囲を指定テキストで置換する | | <code data-nac-role="code-inline">delete_selection</code> | 現在の選択範囲を削除する | | <code data-nac-role="code-inline">ai_correct_syntax</code> | システムプロンプト「fix grammar + spelling, return only fixed text」とともに現在の値を LLM 仲介者に POST し、レスポンスで値を置換する | | <code data-nac-role="code-inline">save</code> | ソースフィールドに書き戻し、input + change イベントをディスパッチして閉じる | | <code data-nac-role="code-inline">cancel</code> | 変更を破棄して閉じる |</p>
+<p data-nac-id="spec.p.51" data-nac-role="paragraph">Esc でキャンセル終了、Ctrl/Cmd+Enter で保存。オーバーレイの背景をクリックするとキャンセルされます。</p>
+<p data-nac-id="spec.p.52" data-nac-role="paragraph">仕様のセクション 13 で v2.3 における契約が正式化される予定ですが、v2.2 ランタイムには動作するリファレンス実装が同梱されているため、採用者は今すぐ組み込むことができます。任意のフィールドで以下のように利用できます。</p>
+<pre data-nac-id="spec.code.5" data-nac-role="code" data-nac-lang="js"><code>NAC.edit_field(&#x27;invoice.client_name&#x27;);
+// または仲介者経由:
+NAC.click_by_verb(&#x27;myplugin&#x27;, &#x27;edit_field&#x27;, { nac_id: &#x27;invoice.client_name&#x27; });</code></pre>
+<h3 data-nac-id="spec.h3.512-厳格バリデーションフラグ-v22" data-nac-role="heading" data-nac-level="3" id="512-厳格バリデーションフラグ-v22">5.1.2 厳格バリデーションフラグ (v2.2)</h3>
+<p data-nac-id="spec.p.55" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code>（boolean、v2.2 のデフォルトは <code data-nac-role="code-inline">false</code>）。<code data-nac-role="code-inline">true</code> に設定すると、以下のいずれかの条件に該当した場合に <code data-nac-role="code-inline">NAC.register()</code> が <code data-nac-role="code-inline">code='strict_validation'</code> と <code data-nac-role="code-inline">findings</code> 配列を持つ <code data-nac-role="code-inline">Error</code> をスローします。</p>
+<ul data-nac-id="spec.list.56" data-nac-role="list"><li data-nac-id="spec.list.56.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- エントリーのロールが正規セット外である。</li><li data-nac-id="spec.list.56.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tab_id_manifest_role_drift</code> -- id が <code data-nac-role="code-inline">^tab\.</code> にマッチするが、ロールが <code data-nac-role="code-inline">'tab'</code> でない。</li><li data-nac-id="spec.list.56.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- マウントされた DOM 要素の <code data-nac-role="code-inline">data-nac-role</code> がマニフェストエントリーのロールと異なる。</li></ul>
+<p data-nac-id="spec.p.57" data-nac-role="paragraph">v2.3 ではデフォルトが <code data-nac-role="code-inline">true</code> に変更されます。v3.0 ではこのフラグは削除され、厳格モードのみになります。</p>
+<p data-nac-id="spec.p.58" data-nac-role="paragraph">すべての非同期メソッドは、以下のいずれかの <code data-nac-role="code-inline">code</code> を持つ <code data-nac-role="code-inline">NacError</code> で reject します。</p>
+<ul data-nac-id="spec.list.59" data-nac-role="list"><li data-nac-id="spec.list.59.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">not_found</code> -- 指定された要素・ロール・verb が DOM に存在しない。</li><li data-nac-id="spec.list.59.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">invalid</code> -- 引数の形式が不正である。</li><li data-nac-id="spec.list.59.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">timeout</code> -- 副作用はディスパッチされたが、適合確認イベントが 5 秒以内に届かなかった。<strong>タイムアウトは実際の失敗を意味します</strong>。ハンドラーがハングした、ack が接続されていない、ネットワーク競合が発生した可能性があります。別のチャネルで副作用の証拠がない限り、呼び出し元はタイムアウトを失敗として扱わなければなりません。</li></ul>
+<h3 data-nac-id="spec.h3.52-イントロスペクション" data-nac-role="heading" data-nac-level="3" id="52-イントロスペクション">5.2 イントロスペクション</h3>
+<pre data-nac-id="spec.code.6" data-nac-role="code" data-nac-lang="ts"><code>NAC.describe():    { active: string|null, plugins: PluginSnap[] }
+NAC.describe_v2(): { v2_scope_entries: [...], sitemap: ..., data_tables: [...] }
+NAC.manifest(plugin_slug: string): Manifest|null
+NAC.validate_global(opts?: {probe?: boolean}): Findings[]</code></pre>
+<h3 data-nac-id="spec.h3.53-データテーブル-v21" data-nac-role="heading" data-nac-level="3" id="53-データテーブル-v21">5.3 データテーブル (v2.1)</h3>
+<pre data-nac-id="spec.code.7" data-nac-role="code" data-nac-lang="ts"><code>NAC.registerDataTable(spec: DataTableSpec): void
+NAC.dt_add_row(table_id, values): {ok, row_id}
+NAC.dt_remove_row(table_id, row_id): {ok}
+NAC.dt_edit_cell(table_id, row_id, column, value): {ok} | {ok:false, error}
+NAC.dt_set_cell(table_id, row, col, value): {ok} | {ok:false, error}
+NAC.dt_select(table_id, target): {ok}
+NAC.dt_commit(table_id): {ok, final_state} | {ok:false, errors:[...]}
+NAC.dt_discard(table_id): {ok}
+NAC.dt_state(table_id): TableState
+NAC.dt_read_aggregate(table_id, agg_key, column): number|null
+NAC.registerDataTableComputed(table_id, column, fn): void</code></pre>
+<p data-nac-id="spec.p.64" data-nac-role="paragraph">データテーブルには <code data-nac-role="code-inline">subkind</code> があります。</p>
+<ul data-nac-id="spec.list.65" data-nac-role="list"><li data-nac-id="spec.list.65.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">collection</code> -- オプションのトランザクションコミットを持つ順序付き行。請求書明細、カートアイテム、ログエントリーなどに使用。</li><li data-nac-id="spec.list.65.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">matrix</code> -- すべてのセルが値を持つ行×列グリッド。権限マトリクス、スケジュールグリッドなどに使用。</li><li data-nac-id="spec.list.65.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">matrix-singletree</code> -- 各行がツリーに折りたたまれるマトリクス（まれなケース）。</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.6-イベント" data-nac-role="heading" data-nac-level="2" id="6-イベント">6. イベント</h2>
+<p data-nac-id="spec.p.68" data-nac-role="paragraph">すべてのアクションは確定的な完了イベントを発行します。ランタイムの <code data-nac-role="code-inline">NAC.click()</code> はこのイベントをポーリングし、発火時に resolve します。</p>
+<p data-nac-id="spec.p.69" data-nac-role="paragraph">| ロール | 成功イベント | 失敗イベント | |------|---------------|---------------| | <code data-nac-role="code-inline">action</code> | <code data-nac-role="code-inline">nac:action:succeeded</code> | <code data-nac-role="code-inline">nac:action:failed</code> | | <code data-nac-role="code-inline">field</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">option</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">nac:tab:activated</code> | -- | | <code data-nac-role="code-inline">breadcrumb-item</code> | <code data-nac-role="code-inline">nac:breadcrumb:navigated</code> | -- | | <code data-nac-role="code-inline">accordion-toggle</code> | <code data-nac-role="code-inline">nac:accordion:expanded</code> / <code data-nac-role="code-inline">:collapsed</code> | -- | | <code data-nac-role="code-inline">step</code> | <code data-nac-role="code-inline">nac:step:advanced</code> | -- | | <code data-nac-role="code-inline">pagination-item</code> | <code data-nac-role="code-inline">nac:table:page_changed</code> | -- | | <code data-nac-role="code-inline">confirm-button</code> | <code data-nac-role="code-inline">nac:confirm:resolved</code> / <code data-nac-role="code-inline">:cancelled</code> | -- | | <code data-nac-role="code-inline">sort-control</code> | <code data-nac-role="code-inline">nac:table:sort_changed</code> | -- | | <code data-nac-role="code-inline">filter-control</code> | <code data-nac-role="code-inline">nac:table:filter_changed</code> | -- |</p>
+<h3 data-nac-id="spec.h3.61-イベント-detail-の形式" data-nac-role="heading" data-nac-level="3" id="61-イベント-detail-の形式">6.1 イベント detail の形式</h3>
+<p data-nac-id="spec.p.71" data-nac-role="paragraph">すべてのイベント detail は、正規の id フィールドと <code data-nac-role="code-inline">plugin</code> を含みます。</p>
+<pre data-nac-id="spec.code.8" data-nac-role="code" data-nac-lang="js"><code>nac:action:succeeded {
+  detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27;, ... }
+}
+nac:tab:activated {
+  detail: { plugin: &#x27;invoice_edit_modal&#x27;, tab_id: &#x27;tab.lines&#x27;, ... }
+}
+nac:field:changed {
+  detail: { plugin: &#x27;invoice&#x27;, field_id: &#x27;field.client_name&#x27;,
+            value: &#x27;Acme Corp&#x27;, ... }
+}</code></pre>
+<h3 data-nac-id="spec.h3.62-ホストハンドラーからのイベント発行" data-nac-role="heading" data-nac-level="3" id="62-ホストハンドラーからのイベント発行">6.2 ホストハンドラーからのイベント発行</h3>
+<p data-nac-id="spec.p.74" data-nac-role="paragraph">クリックハンドラーは、同期的な副作用の完了後に対応する成功イベントを発行しなければなりません。</p>
+<pre data-nac-id="spec.code.9" data-nac-role="code" data-nac-lang="js"><code>button.addEventListener(&#x27;click&#x27;, function (ev) {
+  // ... 処理を実行 ...
+  document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
+    detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
+  }));
+});</code></pre>
+<p data-nac-id="spec.p.76" data-nac-role="paragraph">処理が非同期の場合は、resolve 後に発行してください。処理が失敗した場合は、<code data-nac-role="code-inline">{detail: {plugin, action_id, error: &lt;message&gt;}}</code> とともに <code data-nac-role="code-inline">nac:action:failed</code> を発行してください。</p>
+<p data-nac-id="spec.p.77" data-nac-role="paragraph">v2.2 ランタイムでは、<code data-nac-role="code-inline">addEventListener</code> をラップして自動的にイベントを発行する <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> が提供されます。</p>
+<h3 data-nac-id="spec.h3.63-クリックイベント自体を使わない理由" data-nac-role="heading" data-nac-level="3" id="63-クリックイベント自体を使わない理由">6.3 クリックイベント自体を使わない理由</h3>
+<p data-nac-id="spec.p.79" data-nac-role="paragraph">DOM の <code data-nac-role="code-inline">click</code> イベントはハンドラーの実行前に発火します。NAC3 の契約では、クリックが開始されたタイミングではなく、<strong>副作用が完了した</strong>タイミングを把握する必要があります。そのため、専用のイベントファミリーが設けられています。</p>
+<hr />
+<h2 data-nac-id="spec.h2.7-出所provenance" data-nac-role="heading" data-nac-level="2" id="7-出所provenance">7. 出所（Provenance）</h2>
+<h3 data-nac-id="spec.h3.71-istrusted" data-nac-role="heading" data-nac-level="3" id="71-istrusted">7.1 isTrusted</h3>
+<p data-nac-id="spec.p.83" data-nac-role="paragraph"><code data-nac-role="code-inline">event.isTrusted</code> は、ユーザーが起点のクリック（実際のマウス操作、実際のキー押下、スクリーンリーダーによる操作）の場合は <code data-nac-role="code-inline">true</code>、合成クリック（<code data-nac-role="code-inline">element.click()</code>、組み込み MouseEvent の dispatchEvent、自動化ツール）の場合は <code data-nac-role="code-inline">false</code> になります。</p>
+<p data-nac-id="spec.p.84" data-nac-role="paragraph">NAC3 は、この値を成功イベントの <code data-nac-role="code-inline">event.detail.is_trusted</code> として公開しなければなりません（MUST）。決済や削除などのセキュリティ上重要な操作を行うホストは、<code data-nac-role="code-inline">is_trusted === true</code> を必須条件とし、合成クリックを拒否してもかまいません（MAY）。リファレンスデモ <code data-nac-role="code-inline">example-v20-full.php</code> には、この違いを示すボタンペア（<code data-nac-role="code-inline">v20_panel.istrusted_real</code> と <code data-nac-role="code-inline">v20_panel.istrusted_fake</code>）が含まれています。</p>
+<h3 data-nac-id="spec.h3.72-hmac-署名付きマニフェスト" data-nac-role="heading" data-nac-level="3" id="72-hmac-署名付きマニフェスト">7.2 HMAC 署名付きマニフェスト</h3>
+<p data-nac-id="spec.p.86" data-nac-role="paragraph">マニフェストには <code data-nac-role="code-inline">provenance</code> ブロックを含めることができます（MAY）：</p>
+<pre data-nac-id="spec.code.10" data-nac-role="code" data-nac-lang="js"><code>NAC.set_provenance_secret(&#x27;your-tenant-secret&#x27;);
+NAC.register({
+  plugin_slug: &#x27;invoice&#x27;,
+  ...,
+  provenance: {
+    signed_at: &#x27;2026-05-09T10:00:00Z&#x27;,
+    signed_by: &#x27;tenant-X&#x27;,
+    signature: &#x27;&lt;HMAC-SHA256 of manifest body&gt;&#x27;
+  }
+});</code></pre>
+<p data-nac-id="spec.p.88" data-nac-role="paragraph">ランタイムは、マニフェスト本体（署名自体を除く）の安定したシリアライズに対して期待される HMAC を計算し、署名が一致しないマニフェストを拒否します。これは、マルチテナント環境において、あるテナントが別のテナントのマニフェストを偽装することを防ぐために使用されます。</p>
+<h3 data-nac-id="spec.h3.73-脅威モデル" data-nac-role="heading" data-nac-level="3" id="73-脅威モデル">7.3 脅威モデル</h3>
+<p data-nac-id="spec.p.90" data-nac-role="paragraph">完全な脅威モデルについては <code data-nac-role="code-inline">SECURITY.md</code> を参照してください。要点は以下のとおりです：</p>
+<ul data-nac-id="spec.list.91" data-nac-role="list"><li data-nac-id="spec.list.91.item.1" data-nac-role="list-item">NAC3 は<strong>ユーザー</strong>を認証しません。それは認証レイヤーの役割です。</li><li data-nac-id="spec.list.91.item.2" data-nac-role="list-item">NAC3 は<strong>マニフェスト</strong>を認証します（HMAC）。</li><li data-nac-id="spec.list.91.item.3" data-nac-role="list-item">NAC3 は実際のクリックと合成クリックを区別します（isTrusted）。これにより、ホストはセキュリティ上重要な操作に対して後者を拒否できます。</li><li data-nac-id="spec.list.91.item.4" data-nac-role="list-item">NAC3 は、ユーザーレベルのアクセス権で動作する悪意のあるエージェントからは保護しません。そのようなエージェントは、ユーザーが行えることをすべて実行できます。</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.8-適合レベル" data-nac-role="heading" data-nac-level="2" id="8-適合レベル">8. 適合レベル</h2>
+<p data-nac-id="spec.p.94" data-nac-role="paragraph">以下の条件を満たすページは <strong>NAC-1 適合</strong>です：</p>
+<ul data-nac-id="spec.list.95" data-nac-role="list"><li data-nac-id="spec.list.95.item.1" data-nac-role="list-item">エージェントが操作すべきすべてのクリック可能なウィジェットに <code data-nac-role="code-inline">data-nac-id</code> と <code data-nac-role="code-inline">data-nac-role</code> が付与されている。</li><li data-nac-id="spec.list.95.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role="action"</code> のすべての要素が、副作用の後に <code data-nac-role="code-inline">nac:action:succeeded</code> を発火する。</li><li data-nac-id="spec.list.95.item.3" data-nac-role="list-item">ページが <code data-nac-role="code-inline">NAC.register()</code> を通じて少なくとも1つのプラグインマニフェストを登録している。</li><li data-nac-id="spec.list.95.item.4" data-nac-role="list-item">公開されているすべての id に対して <code data-nac-role="code-inline">NAC.click(id)</code> が機能する。</li></ul>
+<p data-nac-id="spec.p.96" data-nac-role="paragraph">以下の条件も満たすページは <strong>NAC-2 適合</strong>です：</p>
+<ul data-nac-id="spec.list.97" data-nac-role="list"><li data-nac-id="spec.list.97.item.1" data-nac-role="list-item">マニフェスト内で <code data-nac-role="code-inline">tabs[]</code>、<code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code> 配列を明示的に登録している（DOM からの推論ではない）。</li><li data-nac-id="spec.list.97.item.2" data-nac-role="list-item">すべてのユーザー向けラベルについて、NAC3 の全 10 ロケールをカバーする <code data-nac-role="code-inline">label_i18n</code> を提供している。</li><li data-nac-id="spec.list.97.item.3" data-nac-role="list-item">v2.0 ブラウンフィールドプリミティブ（スコープツリー、エフェメラルキャプチャ、autoRegister.watch）を実装している。</li><li data-nac-id="spec.list.97.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.validate_global({probe: false})</code> を <code data-nac-role="code-inline">error</code> 重大度の指摘ゼロで通過する。</li></ul>
+<p data-nac-id="spec.p.98" data-nac-role="paragraph">以下の条件も満たすページは <strong>NAC-3 適合</strong>です：</p>
+<ul data-nac-id="spec.list.99" data-nac-role="list"><li data-nac-id="spec.list.99.item.1" data-nac-role="list-item">HMAC 署名付きマニフェストを持つ。</li><li data-nac-id="spec.list.99.item.2" data-nac-role="list-item">セキュリティ上重要な操作に対して <code data-nac-role="code-inline">isTrusted</code> を区別する。</li><li data-nac-id="spec.list.99.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.validate_global({probe: true})</code> を指摘ゼロで通過する。</li></ul>
+<p data-nac-id="spec.p.100" data-nac-role="paragraph">NPM パッケージの CLI（<code data-nac-role="code-inline">npx @nac3/runtime validate &lt;url&gt;</code>）は、ページが到達している最高レベルを報告します。</p>
+<hr />
+<h2 data-nac-id="spec.h2.9-バージョニング" data-nac-role="heading" data-nac-level="2" id="9-バージョニング">9. バージョニング</h2>
+<p data-nac-id="spec.p.103" data-nac-role="paragraph">NAC3 は semver に従います：</p>
+<ul data-nac-id="spec.list.104" data-nac-role="list"><li data-nac-id="spec.list.104.item.1" data-nac-role="list-item"><strong>メジャー</strong>バンプ：公開 API またはワイヤーフォーマットへの破壊的変更。採用者はコードを修正する必要があります。</li><li data-nac-id="spec.list.104.item.2" data-nac-role="list-item"><strong>マイナー</strong>バンプ：後方互換性のある新機能の追加。既存のコードはそのまま動作します。</li><li data-nac-id="spec.list.104.item.3" data-nac-role="list-item"><strong>パッチ</strong>バンプ：バグ修正、ドキュメントのみの変更。</li></ul>
+<p data-nac-id="spec.p.105" data-nac-role="paragraph">廃止ポリシー：バージョン <code data-nac-role="code-inline">X.Y.0</code> で <code data-nac-role="code-inline">@deprecated</code> とマークされた機能は、<code data-nac-role="code-inline">(X+1).0.0</code> より前には削除されません。リリースノートにはすべての削除が明示的に記載されます。</p>
+<p data-nac-id="spec.p.106" data-nac-role="paragraph">NPM パッケージのバージョンはスペックバージョンと対応しています：<code data-nac-role="code-inline">@nac3/runtime@2.1.3</code> は NAC3 v2.1 を3つのパッチリビジョンで実装しています。</p>
+<hr />
+<h2 data-nac-id="spec.h2.10-バリデーター" data-nac-role="heading" data-nac-level="2" id="10-バリデーター">10. バリデーター</h2>
+<h3 data-nac-id="spec.h3.101-ランタイムnacvalidate_global" data-nac-role="heading" data-nac-level="3" id="101-ランタイムnacvalidate_global">10.1 ランタイム：<code data-nac-role="code-inline">NAC.validate_global()</code></h3>
+<p data-nac-id="spec.p.110" data-nac-role="paragraph">ライブ DOM、登録済みマニフェスト、i18n カタログを走査し、指摘事項の配列を返します：</p>
+<pre data-nac-id="spec.code.11" data-nac-role="code" data-nac-lang="ts"><code>{
+  severity: &#x27;error&#x27; | &#x27;warn&#x27; | &#x27;info&#x27;,
+  code:     string,                     // e.g. &#x27;tab_role_drift&#x27;
+  nac_id:   string | null,
+  message:  string,
+  detail:   Record&lt;string, any&gt;
+}</code></pre>
+<p data-nac-id="spec.p.112" data-nac-role="paragraph">指摘コードはパッチリリース間で安定しています。新しいコードはマイナーバンプでのみ追加されます。</p>
+<h3 data-nac-id="spec.h3.102-clinpx-yujinnac-validate-target" data-nac-role="heading" data-nac-level="3" id="102-clinpx-yujinnac-validate-target">10.2 CLI：<code data-nac-role="code-inline">npx @nac3/runtime validate &lt;target&gt;</code></h3>
+<p data-nac-id="spec.p.114" data-nac-role="paragraph"><code data-nac-role="code-inline">validate_global</code> に加え、HTML とマニフェストの整合性に関する静的リントを実行します。終了コード：</p>
+<ul data-nac-id="spec.list.115" data-nac-role="list"><li data-nac-id="spec.list.115.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">0</code> -- 設定されたしきい値以上の重大度の指摘なし。</li><li data-nac-id="spec.list.115.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">1</code> -- 指摘あり。</li><li data-nac-id="spec.list.115.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">2</code> -- ターゲット自体の読み込みに失敗。</li></ul>
+<p data-nac-id="spec.p.116" data-nac-role="paragraph">CI での使用例：<code data-nac-role="code-inline">npx @nac3/runtime validate ./dist/index.html --severity=error</code></p>
+<hr />
+<h2 data-nac-id="spec.h2.11-nac3-を取り巻くシステム" data-nac-role="heading" data-nac-level="2" id="11-nac3-を取り巻くシステム">11. NAC3 を取り巻くシステム</h2>
+<p data-nac-id="spec.p.119" data-nac-role="paragraph">NAC3 はコントラクトレイヤーです。NAC 適合ページを音声駆動アプリに変えるには、以下も必要です：</p>
+<ol data-nac-id="spec.list.120" data-nac-role="list"><li data-nac-id="spec.list.120.item.1" data-nac-role="list-item"><strong>音声認識ソース</strong>（ブラウザの SpeechRecognition、Whisper API など）。</li><li data-nac-id="spec.list.120.item.2" data-nac-role="list-item"><strong>LLM 仲介レイヤー</strong>：ユーザーのテキスト、ページの <code data-nac-role="code-inline">NAC.describe()</code> スナップショット、i18n ヒントを受け取り、構造化されたアクションを出力します：<code data-nac-role="code-inline">[{kind: 'click', nac_id: 'X'}, {kind: 'fill', nac_id: 'Y', value: 'Z'}]</code>。<code data-nac-role="code-inline">guides/LLM_WIRING.md</code> を参照してください。</li><li data-nac-id="spec.list.120.item.3" data-nac-role="list-item"><strong>チャットクライアント</strong>：会話を保持し、アクションをディスパッチします。リファレンス実装は <code data-nac-role="code-inline">js/nac-chat-client.js</code> です。</li><li data-nac-id="spec.list.120.item.4" data-nac-role="list-item"><strong>音声合成シンク</strong>：音声による返答のため（ブラウザの SpeechSynthesis、ElevenLabs など）。</li></ol>
+<p data-nac-id="spec.p.121" data-nac-role="paragraph">NAC3 が標準化するのは、ステップ 2 の入出力形式（<code data-nac-role="code-inline">NAC.describe()</code> スナップショットとアクション形式）のみです。ステップ 1、3、4 はスペックの対象外であり、自由に組み合わせることができます。</p>
+<hr />
+<h2 data-nac-id="spec.h2.12-安定性の保証" data-nac-role="heading" data-nac-level="2" id="12-安定性の保証">12. 安定性の保証</h2>
+<p data-nac-id="spec.p.124" data-nac-role="paragraph">このスペックが約束すること：</p>
+<ol data-nac-id="spec.list.125" data-nac-role="list"><li data-nac-id="spec.list.125.item.1" data-nac-role="list-item">セクション 1 の正規ロールのセットは縮小しません。新しいロールはマイナーバージョンで追加される場合があります（MAY）。</li><li data-nac-id="spec.list.125.item.2" data-nac-role="list-item">セクション 6 のイベントファミリーは名称変更されません。新しいイベントはマイナーバージョンで追加される場合があります（MAY）。</li><li data-nac-id="spec.list.125.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click</code>、<code data-nac-role="code-inline">NAC.fill</code> などの動詞は、マイナーバージョンで形式が変わりません。新しいオプションの <code data-nac-role="code-inline">opts</code> フィールドが追加される場合があります（MAY）。</li><li data-nac-id="spec.list.125.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global</code> の指摘コードは、マイナーバージョン間で異なる条件に再利用されません。</li></ol>
+<p data-nac-id="spec.p.126" data-nac-role="paragraph">このスペックが約束しないこと：</p>
+<ol data-nac-id="spec.list.127" data-nac-role="list"><li data-nac-id="spec.list.127.item.1" data-nac-role="list-item">エラーメッセージの正確な文言（これらは i18n カタログ文字列であり、ローカライズは変わる場合があります）。</li><li data-nac-id="spec.list.127.item.2" data-nac-role="list-item">要素を検索するための DOM 戦略（現在は <code data-nac-role="code-inline">querySelector</code>；後により高速なインデックスに移行する可能性があります）。</li><li data-nac-id="spec.list.127.item.3" data-nac-role="list-item">内部マニフェストキャッシュのレイアウト。マニフェストはホスト側からは書き込み専用、エージェント側からは読み取り専用として扱ってください。</li></ol>
+<hr />
+<h2 data-nac-id="spec.h2.13-未解決の問題別途追跡中" data-nac-role="heading" data-nac-level="2" id="13-未解決の問題別途追跡中">13. 未解決の問題（別途追跡中）</h2>
+<ul data-nac-id="spec.list.130" data-nac-role="list"><li data-nac-id="spec.list.130.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role="navigation"</code> はタブとして解決されるべきか？現時点ではノー（v2.1）。v22 ロードマップではより厳格な拒否を主張しています。</li><li data-nac-id="spec.list.130.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click()</code> は相対 id（例：<code data-nac-role="code-inline">'./save'</code> でアクティブなプラグイン配下の「save」を意味する）を受け入れるべきか？v2.1 では対象外；v2.3 で検討される可能性があります。</li><li data-nac-id="spec.list.130.item.3" data-nac-role="list-item">マニフェストはプラグイン間での継承・拡張（1つのベースマニフェストをテナントが拡張する）をサポートすべきか？v3.0 候補として追跡中。</li></ul>
+<hr />
+<h2 data-nac-id="spec.h2.135-ガバナンス" data-nac-role="heading" data-nac-level="2" id="135-ガバナンス">13.5 ガバナンス</h2>
+<p data-nac-id="spec.p.133" data-nac-role="paragraph">NAC3 は現在 Yujin によって管理されています。スペックは Apache 2.0 の下で公開されており、リファレンスランタイムは MIT の下で公開されています。Yujin は、採用状況がニュートラルなガバナンスを正当化する場合、NAC3 をニュートラルな財団（W3C コミュニティグループ、Linux Foundation、または同等の業界団体）に移管することを約束します。それまでの間、スペックの変更は <code data-nac-role="code-inline">CONTRIBUTING.md</code> に記載された RFC プロセスに従い、公開 API またはワイヤーフォーマットに影響する変更については少なくとも 14 日間のパブリックコメント期間が設けられます。</p>
+<p data-nac-id="spec.p.134" data-nac-role="paragraph">採用者へ：Apache 2.0 と MIT のライセンスの組み合わせにより、スペックとランタイムは Yujin の企業状況がいかなる変化を遂げても存続することが保証されます。どちらもフォーク、実行、配布が可能であり、現在も将来も同様です。このドキュメントはその約束を明示的に記録するものであり、存続への道筋を暗黙のものではなく明確なものとします。</p>
+<hr />
+<h2 data-nac-id="spec.h2.14-リファレンス実装" data-nac-role="heading" data-nac-level="2" id="14-リファレンス実装">14. リファレンス実装</h2>
+<p data-nac-id="spec.p.137" data-nac-role="paragraph">正規の実装は、NPM パッケージ <code data-nac-role="code-inline">@nac3/runtime</code> として配布されるリファレンスランタイムです。このランタイムは v2.1 に対して機能完全であり、以下を含みます：</p>
+<ul data-nac-id="spec.list.138" data-nac-role="list"><li data-nac-id="spec.list.138.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac.js</code> -- v1.9 ベース + セクション 5 の公開 API。</li><li data-nac-id="spec.list.138.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-v2-extensions.js</code> -- v2.0 ブラウンフィールドプリミティブ（スコープツリー、エフェメラルキャプチャ、autoRegister、HMAC、isTrusted）。</li><li data-nac-id="spec.list.138.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-chat-client.js</code> -- 音声、LLM、ディスパッチャーを接続するリファレンスチャットクライアント。</li></ul>
+<p data-nac-id="spec.p.139" data-nac-role="paragraph">他の実装も歓迎します（ネイティブ自動化ランナー向けの Python、組み込みエージェント向けの Rust など）。権威はスペックにあり、JS コードにはありません。</p>
+<hr />
+<p data-nac-id="spec.p.141" data-nac-role="paragraph"><em>このドキュメントは NAC3 v2.1 の正規仕様書です。このファイルへの編集はスペック変更を構成するものであり、RFC が必要です。<code data-nac-role="code-inline">CONTRIBUTING.md</code> を参照してください。</em></p>
+<hr />
+<p data-nac-id="spec.p.143" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/SPEC.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "spec",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "spec.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "spec.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "spec.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "spec.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

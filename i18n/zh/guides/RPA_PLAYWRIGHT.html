@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NAC3 + Playwright 集成指南 -- NAC3</title>
+<meta name="nac3-doc-slug" content="rpa_playwright" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="rpa_playwright" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="rpa_playwright.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="rpa_playwright.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/rpa_playwright.mp3" data-nac-id="rpa_playwright.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="rpa_playwright.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="rpa_playwright.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="rpa_playwright.main" data-nac-role="region">
+<hr />
+<p data-nac-id="rpa_playwright.p.1" data-nac-role="paragraph">translation_source: guides/RPA_PLAYWRIGHT.md translation_source_hash: c90a4cc097a692f6fd51ae96eed88a67cadbd94b52bed4bba18af184a4b915bf translation_quality: machine_v1 translation_lang: zh translation_date: 2026-05-11T14:55:38.749158+00:00</p>
+<hr />
+<h1 data-nac-id="rpa_playwright.h1.nac3-playwright-集成指南" data-nac-role="heading" data-nac-level="1" id="nac3-playwright-集成指南">NAC3 + Playwright 集成指南</h1>
+<p data-nac-id="rpa_playwright.p.4" data-nac-role="paragraph"><strong>NAC3 版本：</strong> 2.2（含 v2.3 互操作预览） <strong>状态：</strong> 稳定。已针对 Playwright 1.47 + chromium / firefox / webkit 完成测试。</p>
+<p data-nac-id="rpa_playwright.p.5" data-nac-role="paragraph">Playwright 是当今浏览器自动化的事实标准，广泛用于 QA 团队的端到端测试以及无人值守的轻量级 RPA 流程。引入 NAC3 后，你的 Playwright 脚本不再需要针对 CSS 选择器或 XPath，而是通过页面的 NAC3 契约进行调度——这套契约同样被语音运行器、无障碍工具、智能体 LLM 工作流以及本系列指南中的其他 RPA 平台所共用。</p>
+<p data-nac-id="rpa_playwright.p.6" data-nac-role="paragraph">Yujin 参考测试套件（<code data-nac-role="code-inline">tests/e2e-nac/specs/*.spec.ts</code>）是最权威的示例。</p>
+<h2 data-nac-id="rpa_playwright.h2.为什么选择-nac3-playwright" data-nac-role="heading" data-nac-level="2" id="为什么选择-nac3-playwright">为什么选择 NAC3 + Playwright</h2>
+<p data-nac-id="rpa_playwright.p.8" data-nac-role="paragraph">| 当前痛点 | NAC3 解决方案 | |--------------|---------| | <code data-nac-role="code-inline">page.click('button.save')</code> 在 CSS 类名重命名后失效 | <code data-nac-role="code-inline">page.evaluate(() =&gt; window.NAC.click('invoice.save'))</code> 保持稳定 | | <code data-nac-role="code-inline">page.getByRole('button', {name: 'Save'})</code> 在本地化后失效 | 按 id 调度，而非标签；label_i18n 是 LLM 关心的事 | | <code data-nac-role="code-inline">waitForSelector</code> 轮询 DOM，在异步 UI 上容易出现不稳定 | <code data-nac-role="code-inline">nac:action:succeeded</code> 是确定性事件 | | Page Object 模式与应用 UI 结构重复 | NAC3 清单本身就是 Page Object——在测试与应用之间共享 | | 视觉测试因外观重设计而频繁变动 | 基于 NAC3 id 的行为测试在重设计后依然有效 |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.两种集成路径" data-nac-role="heading" data-nac-level="2" id="两种集成路径">两种集成路径</h2>
+<h3 data-nac-id="rpa_playwright.h3.路径-apageevaluate-注入推荐" data-nac-role="heading" data-nac-level="3" id="路径-apageevaluate-注入推荐">路径 A——<code data-nac-role="code-inline">page.evaluate</code> 注入（推荐）</h3>
+<p data-nac-id="rpa_playwright.p.12" data-nac-role="paragraph">最简单的模式：所有交互都通过在页面上下文中执行的 <code data-nac-role="code-inline">window.NAC</code> 完成。</p>
+<pre data-nac-id="rpa_playwright.code.1" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;@playwright/test&#x27;;
+
+test(&#x27;save an invoice&#x27;, async ({ page }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+
+  // Wait for NAC3 to mount.
+  await page.waitForFunction(() =&gt; window.NAC?.describe);
+
+  // Fill a field.
+  await page.evaluate(() =&gt;
+    window.NAC.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;)
+  );
+
+  // Click an action + wait for its ack.
+  const ackPromise = page.evaluate(() =&gt;
+    new Promise(resolve =&gt; {
+      document.addEventListener(
+        &#x27;nac:action:succeeded&#x27;,
+        e =&gt; resolve(e.detail),
+        { once: true }
+      );
+    })
+  );
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;invoice.save&#x27;)
+  );
+  const ack = await ackPromise;
+
+  expect(ack).toMatchObject({
+    plugin: &#x27;invoice&#x27;,
+    action_id: &#x27;invoice.save&#x27;
+  });
+});</code></pre>
+<h3 data-nac-id="rpa_playwright.h3.路径-b封装-nac-的自定义-fixtures" data-nac-role="heading" data-nac-level="3" id="路径-b封装-nac-的自定义-fixtures">路径 B——封装 NAC 的自定义 fixtures</h3>
+<p data-nac-id="rpa_playwright.p.15" data-nac-role="paragraph">将样板代码封装到 Playwright fixture 中：</p>
+<pre data-nac-id="rpa_playwright.code.2" data-nac-role="code" data-nac-lang="ts"><code>// tests/fixtures/nac.ts
+import { test as base, Page } from &#x27;@playwright/test&#x27;;
+
+type NacApi = {
+  click: (id: string) =&gt; Promise&lt;void&gt;;
+  fill:  (id: string, value: string) =&gt; Promise&lt;void&gt;;
+  tab:   (plugin: string, tabKey: string) =&gt; Promise&lt;void&gt;;
+  describe: () =&gt; Promise&lt;any&gt;;
+  waitForAck: () =&gt; Promise&lt;any&gt;;
+};
+
+export const test = base.extend&lt;{ nac: NacApi }&gt;({
+  nac: async ({ page }, use) =&gt; {
+    await page.waitForFunction(() =&gt; window.NAC?.describe);
+    const api: NacApi = {
+      click:  id =&gt; page.evaluate(i =&gt; window.NAC.click(i), id),
+      fill:   (id, v) =&gt; page.evaluate(
+        ([i, val]) =&gt; window.NAC.fill(i, val), [id, v]
+      ),
+      tab:    (p, k) =&gt; page.evaluate(
+        ([pl, key]) =&gt; window.NAC.tab(pl, key), [p, k]
+      ),
+      describe: () =&gt; page.evaluate(() =&gt; window.NAC.describe()),
+      waitForAck: () =&gt; page.evaluate(() =&gt;
+        new Promise(resolve =&gt; {
+          document.addEventListener(
+            &#x27;nac:action:succeeded&#x27;,
+            e =&gt; resolve(e.detail),
+            { once: true }
+          );
+        })
+      )
+    };
+    await use(api);
+  }
+});
+
+export { expect } from &#x27;@playwright/test&#x27;;</code></pre>
+<p data-nac-id="rpa_playwright.p.17" data-nac-role="paragraph">这样你的测试读起来就像应用本身在说话：</p>
+<pre data-nac-id="rpa_playwright.code.3" data-nac-role="code" data-nac-lang="ts"><code>import { test, expect } from &#x27;./fixtures/nac&#x27;;
+
+test(&#x27;save flow&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+
+  const ackPromise = nac.waitForAck();
+  await nac.click(&#x27;invoice.save&#x27;);
+  const ack = await ackPromise;
+
+  expect(ack.action_id).toBe(&#x27;invoice.save&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.19" data-nac-role="paragraph">Yujin 参考套件采用路径 B（参见 <code data-nac-role="code-inline">tests/e2e-nac/specs/01-landing.spec.ts</code>）。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.基于动词的调度跨应用复用的首选方式" data-nac-role="heading" data-nac-level="2" id="基于动词的调度跨应用复用的首选方式">基于动词的调度（跨应用复用的首选方式）</h2>
+<p data-nac-id="rpa_playwright.p.22" data-nac-role="paragraph">当同一个 Playwright 套件需要在多个部署环境（不同租户、不同品牌、相同契约）中运行时，优先使用动词而非 id：</p>
+<pre data-nac-id="rpa_playwright.code.4" data-nac-role="code" data-nac-lang="ts"><code>await nac.clickByVerb(&#x27;invoice&#x27;, &#x27;save&#x27;);</code></pre>
+<p data-nac-id="rpa_playwright.p.24" data-nac-role="paragraph">辅助函数：</p>
+<pre data-nac-id="rpa_playwright.code.5" data-nac-role="code" data-nac-lang="ts"><code>clickByVerb: (plugin: string, verb: string) =&gt;
+  page.evaluate(
+    ([p, v]) =&gt; window.NAC.click_by_verb(p, v),
+    [plugin, verb]
+  )</code></pre>
+<p data-nac-id="rpa_playwright.p.26" data-nac-role="paragraph">清单契约：每个租户将 <code data-nac-role="code-inline">invoice.save</code>（或其选择的本地 id）映射到动词 <code data-nac-role="code-inline">save</code>。测试无需知道本地 id。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.等待-ackwaitforselector-的确定性替代方案" data-nac-role="heading" data-nac-level="2" id="等待-ackwaitforselector-的确定性替代方案">等待 ack（<code data-nac-role="code-inline">waitForSelector</code> 的确定性替代方案）</h2>
+<p data-nac-id="rpa_playwright.p.29" data-nac-role="paragraph">传统 Playwright 写法：</p>
+<pre data-nac-id="rpa_playwright.code.6" data-nac-role="code" data-nac-lang="ts"><code>await page.click(&#x27;button.save&#x27;);
+await page.waitForSelector(&#x27;.toast-success&#x27;, { timeout: 5000 });</code></pre>
+<p data-nac-id="rpa_playwright.p.31" data-nac-role="paragraph">这种写法很脆弱：toast 的任何 UI 变更都会导致测试失败。</p>
+<p data-nac-id="rpa_playwright.p.32" data-nac-role="paragraph">NAC3 感知写法：</p>
+<pre data-nac-id="rpa_playwright.code.7" data-nac-role="code" data-nac-lang="ts"><code>const ack = await new Promise(resolve =&gt; {
+  page.on(&#x27;console&#x27;, msg =&gt; { /* optional log */ });
+  page.evaluate(() =&gt; new Promise(r =&gt;
+    document.addEventListener(&#x27;nac:action:succeeded&#x27;,
+      e =&gt; r(e.detail), { once: true }
+    )));
+}).then(...);
+
+// 或使用 fixture：
+const ackPromise = nac.waitForAck();
+await nac.click(&#x27;invoice.save&#x27;);
+const ack = await ackPromise;</code></pre>
+<p data-nac-id="rpa_playwright.p.34" data-nac-role="paragraph">该事件是契约的一部分，在副作用完成时触发，而不是在某个任意的 toast 渲染时触发。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.自动发现测试用例" data-nac-role="heading" data-nac-level="2" id="自动发现测试用例">自动发现测试用例</h2>
+<p data-nac-id="rpa_playwright.p.37" data-nac-role="paragraph">NAC3 的 <code data-nac-role="code-inline">describe()</code> 返回完整的元素目录，可用于自动为每个 action 生成测试脚手架：</p>
+<pre data-nac-id="rpa_playwright.code.8" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;smoke -- click every action&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+
+  for (const plugin of tree.plugins) {
+    for (const el of plugin.elements) {
+      if (el.role !== &#x27;action&#x27;) continue;
+      console.log(&#x27;smoke clicking&#x27;, el.id);
+      await page.evaluate(id =&gt;
+        window.NAC.click(id), el.id
+      );
+    }
+  }
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.39" data-nac-role="paragraph">一个测试，覆盖所有 action，零维护成本。与规范中的 <code data-nac-role="code-inline">validate_global({probe: true})</code> 完美配合。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.多语言运行" data-nac-role="heading" data-nac-level="2" id="多语言运行">多语言运行</h2>
+<p data-nac-id="rpa_playwright.p.42" data-nac-role="paragraph">Playwright 矩阵运行非常简单：契约与语言无关。</p>
+<pre data-nac-id="rpa_playwright.code.9" data-nac-role="code" data-nac-lang="ts"><code>const locales = [&#x27;es&#x27;, &#x27;en&#x27;, &#x27;pt&#x27;, &#x27;fr&#x27;, &#x27;de&#x27;, &#x27;ja&#x27;,
+                 &#x27;zh&#x27;, &#x27;hi&#x27;, &#x27;ar&#x27;, &#x27;it&#x27;];
+
+for (const lang of locales) {
+  test(`save invoice -- ${lang}`, async ({ page, nac }) =&gt; {
+    await page.goto(`https://your-app.example.com/?lang=${lang}`);
+    await nac.fill(&#x27;invoice.amount&#x27;, &#x27;1500&#x27;);
+    const ack = nac.waitForAck();
+    await nac.click(&#x27;invoice.save&#x27;);
+    expect((await ack).action_id).toBe(&#x27;invoice.save&#x27;);
+  });
+}</code></pre>
+<p data-nac-id="rpa_playwright.p.44" data-nac-role="paragraph">同一套测试，10 种语言。页面内的 label_i18n 发生了变化，契约没有。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.快照用于视觉回归测试" data-nac-role="heading" data-nac-level="2" id="快照用于视觉回归测试">快照用于视觉回归测试</h2>
+<p data-nac-id="rpa_playwright.p.47" data-nac-role="paragraph">NAC3 树本身就是结构快照，可跨版本进行比对：</p>
+<pre data-nac-id="rpa_playwright.code.10" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;structural snapshot&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://your-app.example.com/&#x27;);
+  const tree = await nac.describe();
+  expect(tree).toMatchSnapshot(&#x27;app-tree.json&#x27;);
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.49" data-nac-role="paragraph">将按钮移动 200px 的重设计<strong>不会</strong>产生快照差异。<strong>删除</strong>按钮的重设计才会。这正是行为级回归测试所需的粒度。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.跨域-互操作测试v23-预览" data-nac-role="heading" data-nac-level="2" id="跨域-互操作测试v23-预览">跨域 / 互操作测试（v2.3 预览）</h2>
+<pre data-nac-id="rpa_playwright.code.11" data-nac-role="code" data-nac-lang="ts"><code>test(&#x27;interop import remote app&#x27;, async ({ page, nac }) =&gt; {
+  await page.goto(&#x27;https://app-a.example.com/&#x27;);
+  await page.evaluate(() =&gt; window.NAC.import_remote_tree({
+    url: &#x27;https://app-b.example.com/nac/export&#x27;,
+    bearer: &#x27;TEST_TOKEN&#x27;,
+    namespace: &#x27;b&#x27;
+  }));
+  const remotes = await page.evaluate(() =&gt;
+    window.NAC.list_remote_apps()
+  );
+  expect(remotes).toContainEqual(
+    expect.objectContaining({ namespace: &#x27;b&#x27; })
+  );
+
+  // Now dispatch into the remote app via the local NAC:
+  await page.evaluate(() =&gt;
+    window.NAC.click(&#x27;remote:b:invoice.save&#x27;)
+  );
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.53" data-nac-role="paragraph"><code data-nac-role="code-inline">remote:</code> 前缀通过互操作层进行路由，详见 <code data-nac-role="code-inline">docs/NAC_INTEROP_MCP.md</code>。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.故障模式与调试" data-nac-role="heading" data-nac-level="2" id="故障模式与调试">故障模式与调试</h2>
+<p data-nac-id="rpa_playwright.p.56" data-nac-role="paragraph">| 现象 | 诊断 | |---------|-----------| | <code data-nac-role="code-inline">window.NAC is undefined</code> | 页面未引入 nac.js——检查 <code data-nac-role="code-inline">&lt;script&gt;</code> 标签 | | <code data-nac-role="code-inline">NAC.click(...)</code> 返回 <code data-nac-role="code-inline">{ok: false, error: 'not_found'}</code> | id 不在清单中；运行 <code data-nac-role="code-inline">NAC.validate_global()</code> 查找拼写错误 | | Ack 始终不触发（测试卡在 waitForAck） | 处理器缺少 <code data-nac-role="code-inline">dispatchEvent(new CustomEvent('nac:action:succeeded',...))</code> ——迁移到 <code data-nac-role="code-inline">NAC.bindAction()</code>（V22-02） | | 某个语言的标签相关测试失败 | label_i18n 缺少该语言——规范验证器会捕获此问题 | | 跨域测试在 CORS 预检时失败 | 远端节点必须在其 CORS 配置中允许 <code data-nac-role="code-inline">Origin: &lt;your-test-host&gt;</code> |</p>
+<p data-nac-id="rpa_playwright.p.57" data-nac-role="paragraph">如需深入调试，添加以下代码：</p>
+<pre data-nac-id="rpa_playwright.code.12" data-nac-role="code" data-nac-lang="ts"><code>await page.evaluate(() =&gt; {
+  document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt;
+    console.log(&#x27;[ACK]&#x27;, e.detail));
+  document.addEventListener(&#x27;nac:action:failed&#x27;, e =&gt;
+    console.warn(&#x27;[ACK-FAIL]&#x27;, e.detail));
+});</code></pre>
+<p data-nac-id="rpa_playwright.p.59" data-nac-role="paragraph">然后以 <code data-nac-role="code-inline">--headed</code> 模式运行并观察控制台输出。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.yujin-参考套件" data-nac-role="heading" data-nac-level="2" id="yujin-参考套件">Yujin 参考套件</h2>
+<p data-nac-id="rpa_playwright.p.62" data-nac-role="paragraph">Yujin 示例附带了完整的 Playwright 套件，位于 <code data-nac-role="code-inline">tests/e2e-nac/specs/</code>。按以下顺序阅读以学习各种模式：</p>
+<p data-nac-id="rpa_playwright.p.63" data-nac-role="paragraph">| 规范文件 | 模式 | |------|---------| | <code data-nac-role="code-inline">01-landing.spec.ts</code> | 基本页面加载 + 自动驾驶启动 | | <code data-nac-role="code-inline">02-demo-v19.spec.ts</code> | 遍历所有组件的冒烟测试 | | <code data-nac-role="code-inline">03-demo-v20.spec.ts</code> | v20 面板按钮 + bindAction ack | | <code data-nac-role="code-inline">04-demo-v21.spec.ts</code> | 数据表 dt_* 调度 | | <code data-nac-role="code-inline">05-demo-v22-interop.spec.ts</code> | v2.3 互操作完整握手 | | <code data-nac-role="code-inline">06-demo-react.spec.ts</code> | 通过聊天的 React 案例研究 | | <code data-nac-role="code-inline">07-demo-angular.spec.ts</code> | 通过聊天的 Angular 案例研究 | | <code data-nac-role="code-inline">08-pipeline-end-to-end.spec.ts</code> | 聊天 -&gt; LLM -&gt; 调度 -&gt; ack | | <code data-nac-role="code-inline">09-diagnostic.spec.ts</code> | 故障注入 + 恢复 | | <code data-nac-role="code-inline">10-deep-discovery.spec.ts</code> | 自主发现循环 |</p>
+<p data-nac-id="rpa_playwright.p.64" data-nac-role="paragraph">全部 16 个规范文件可通过 <code data-nac-role="code-inline">bash tools/nac/test-launch.sh</code> 运行，在干净的代码检出环境下 15 秒内完成。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.ci-集成" data-nac-role="heading" data-nac-level="2" id="ci-集成">CI 集成</h2>
+<p data-nac-id="rpa_playwright.p.67" data-nac-role="paragraph">将以下内容添加到 <code data-nac-role="code-inline">.github/workflows/e2e.yml</code>：</p>
+<pre data-nac-id="rpa_playwright.code.13" data-nac-role="code" data-nac-lang="yaml"><code>name: e2e
+on: [push, pull_request]
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          BASE_URL: https://staging.your-app.example.com</code></pre>
+<p data-nac-id="rpa_playwright.p.69" data-nac-role="paragraph">跨语言 / 浏览器 / 租户的矩阵运行：</p>
+<pre data-nac-id="rpa_playwright.code.14" data-nac-role="code" data-nac-lang="yaml"><code>strategy:
+  matrix:
+    locale: [es, en, pt, fr, de, ja, zh, hi, ar, it]
+    browser: [chromium, firefox, webkit]</code></pre>
+<p data-nac-id="rpa_playwright.p.71" data-nac-role="paragraph">10 种语言 × 3 种浏览器 = 30 个任务，全部复用同一套 NAC3 调度的测试代码。</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.与传统-playwright-测试的对比" data-nac-role="heading" data-nac-level="2" id="与传统-playwright-测试的对比">与传统 Playwright 测试的对比</h2>
+<p data-nac-id="rpa_playwright.p.74" data-nac-role="paragraph">一个典型的 100 页企业应用通常维护约 500–800 个 Playwright 测试，UI 重设计后的不稳定率约为 20%。引入 NAC3 后：</p>
+<p data-nac-id="rpa_playwright.p.75" data-nac-role="paragraph">| 指标 | 传统方式 | NAC3 支持 | |--------|-------------|-------------| | 相同覆盖率所需测试数量 | ~500 | ~100（基于动词） | | 重设计后的不稳定率 | ~20% | ~2%（仅在契约真正变更时） | | <code data-nac-role="code-inline">&lt;button&gt;</code> 替换为 <code data-nac-role="code-inline">&lt;a&gt;</code> 后的维护成本 | 重写选择器 | 无——id 保持稳定 | | 新增语言支持 | 重写所有基于标签的选择器 | 无——与语言无关 | | 跨租户复用 | 不可能（选择器各不相同） | 轻而易举（基于动词） |</p>
+<hr />
+<h2 data-nac-id="rpa_playwright.h2.另请参阅" data-nac-role="heading" data-nac-level="2" id="另请参阅">另请参阅</h2>
+<ul data-nac-id="rpa_playwright.list.78" data-nac-role="list"><li data-nac-id="rpa_playwright.list.78.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">tests/e2e-nac/specs/</code> —— 参考套件。</li><li data-nac-id="rpa_playwright.list.78.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tools/nac/test-launch.sh</code> —— 编排工具。</li><li data-nac-id="rpa_playwright.list.78.item.3" data-nac-role="list-item"><a href="IMPACT_TESTING.md" data-nac-id="rpa_playwright.link.1" data-nac-role="action" data-nac-action="open">IMPACT_TESTING.md</a> —— 面向 QA 团队的更广泛影响分析。</li><li data-nac-id="rpa_playwright.list.78.item.4" data-nac-role="list-item"><a href="LLM_WIRING.md" data-nac-id="rpa_playwright.link.2" data-nac-role="action" data-nac-action="open">LLM_WIRING.md</a> —— LLM 智能体使用的相同调度契约。</li><li data-nac-id="rpa_playwright.list.78.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">docs/NAC_TEST_MANUAL.md</code> —— 标准化测试手册。</li></ul>
+<h2 data-nac-id="rpa_playwright.h2.许可证" data-nac-role="heading" data-nac-level="2" id="许可证">许可证</h2>
+<p data-nac-id="rpa_playwright.p.80" data-nac-role="paragraph">Apache-2.0。</p>
+<hr />
+<p data-nac-id="rpa_playwright.p.82" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/RPA_PLAYWRIGHT.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "rpa_playwright",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "rpa_playwright.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "rpa_playwright.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "rpa_playwright.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "rpa_playwright.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

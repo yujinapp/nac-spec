@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>دليل الذكاء الاصطناعي -- ترحيل مشروع قائم إلى NAC3 -- NAC3</title>
+<meta name="nac3-doc-slug" content="ai_playbook_migration" />
+<meta name="nac3-spec-version" content="2.2" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  body { font-family: var(--font-sans, -apple-system, sans-serif);
+         max-width: 760px; margin: 0 auto; padding: 40px 22px;
+         line-height: 1.6; color: var(--color-text, #1f1f1f); }
+  h1, h2, h3, h4 { font-family: var(--font-display, var(--font-sans));
+                   line-height: 1.3; margin-top: 1.8em; }
+  h1 { margin-top: 0; }
+  code { background: var(--color-bg-subtle, #f5f2ea); padding: 1px 6px;
+          border-radius: 4px; font-size: 0.92em; }
+  pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
+         border-radius: 6px; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; }
+  .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
+                       background: rgba(255,253,247,0.95);
+                       backdrop-filter: blur(6px);
+                       padding: 8px 0; margin: -8px -22px 22px -22px;
+                       border-bottom: 1px solid var(--color-border-subtle, #e6e3da);
+                       display: flex; gap: 10px; align-items: center;
+                       padding-left: 22px; padding-right: 22px;
+                       font-size: 13px; flex-wrap: wrap; }
+  .nac3-doc-toolbar a { color: var(--color-accent, #4f5b87);
+                         text-decoration: none; }
+  .nac3-doc-toolbar a:hover { text-decoration: underline; }
+  .nac3-doc-toolbar .badge { padding: 2px 8px;
+                              background: var(--color-bg-surface, #fff);
+                              border: 1px solid var(--color-border-subtle, #e6e3da);
+                              border-radius: 4px; }
+</style>
+</head>
+<body data-nac-plugin="ai_playbook_migration" data-nac-doc="true">
+
+<nav class="nac3-doc-toolbar" data-nac-id="ai_playbook_migration.toolbar" data-nac-role="region">
+  <span class="badge">NAC3 v2.2</span>
+  <a href="/nac-spec/" data-nac-id="ai_playbook_migration.toolbar.home"
+     data-nac-role="action" data-nac-action="open">Spec home</a>
+  <a href="audio:/nac-spec/audio/en/ai_playbook_migration.mp3" data-nac-id="ai_playbook_migration.toolbar.audio"
+     data-nac-role="action" data-nac-action="play_audio_version">Audio</a>
+  <a href="#" onclick="window.scrollTo(0,0); return false;"
+     data-nac-id="ai_playbook_migration.toolbar.top"
+     data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  <a href="#" onclick="window.print(); return false;"
+     data-nac-id="ai_playbook_migration.toolbar.print"
+     data-nac-role="action" data-nac-action="print">Print</a>
+</nav>
+
+<main data-nac-id="ai_playbook_migration.main" data-nac-role="region">
+<hr />
+<p data-nac-id="ai_playbook_migration.p.1" data-nac-role="paragraph">translation_source: guides/AI_PLAYBOOK_MIGRATION.md translation_source_hash: f49b65c798ab36923cab79511851c64a81ad6609a1c37d4936d4c6c0542cc706 translation_quality: machine_v1 translation_lang: ar translation_date: 2026-05-11T15:14:04.215917+00:00</p>
+<hr />
+<h1 data-nac-id="ai_playbook_migration.h1.دليل-الذكاء-الاصطناعي-ترحيل-مشروع-قائم-إلى-nac3" data-nac-role="heading" data-nac-level="1" id="دليل-الذكاء-الاصطناعي-ترحيل-مشروع-قائم-إلى-nac3">دليل الذكاء الاصطناعي -- ترحيل مشروع قائم إلى NAC3</h1>
+<p data-nac-id="ai_playbook_migration.p.4" data-nac-role="paragraph"><strong>إصدار NAC3:</strong> 2.2 مستقر + معاينة التوافق v2.3. <strong>الجمهور المستهدف:</strong> أي وكيل ذكاء اصطناعي (Claude، GPT، Gemini، نموذج محلي) مكلّف بترحيل تطبيق ويب قائم إلى مطابقة NAC-3. <strong>الصيغة:</strong> دليل تشغيل خطوة بخطوة يتضمن لكل خطوة: ماذا، وكيف، والتحقق.</p>
+<p data-nac-id="ai_playbook_migration.p.5" data-nac-role="paragraph">حين يقول المستخدم <strong>"لنرحّل هذا المشروع إلى NAC-3"</strong> يجب على وكيل الذكاء الاصطناعي الذي يقرأ هذا الملف تنفيذ الخطوات أدناه بالترتيب. الترحيل من مشاريع قائمة أصعب من البناء من الصفر، لأنك لا تستطيع تعطيل التطبيق الجاري. كل خطوة تُشحن بشكل <strong>مستقل</strong>.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-0-تحديد-النطاق-بوابات-الأمان" data-nac-role="heading" data-nac-level="2" id="الخطوة-0-تحديد-النطاق-بوابات-الأمان">الخطوة 0 -- تحديد النطاق + بوابات الأمان</h2>
+<h3 data-nac-id="ai_playbook_migration.h3.01-أسئلة-تطرح-على-المستخدم" data-nac-role="heading" data-nac-level="3" id="01-أسئلة-تطرح-على-المستخدم">0.1 أسئلة تُطرح على المستخدم</h3>
+<ol data-nac-id="ai_playbook_migration.list.9" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.9.item.1" data-nac-role="list-item"><strong>هامش المخاطرة</strong>: هل التطبيق في بيئة الإنتاج؟ إذا نعم، يجري الترحيل شاشةً بشاشة خلف feature flags. أما في بيئة التجهيز فيمكنك أن تكون أكثر جرأة.</li><li data-nac-id="ai_playbook_migration.list.9.item.2" data-nac-role="list-item"><strong>الإطار البرمجي</strong>: استنتجه من <code data-nac-role="code-inline">package.json</code> / <code data-nac-role="code-inline">composer.json</code> / شجرة المشروع، ثم أكّد مع المستخدم.</li><li data-nac-id="ai_playbook_migration.list.9.item.3" data-nac-role="list-item"><strong>أهم 10 أفعال</strong>: اطلب من المستخدم سرد الإجراءات العشرة الأكثر استخدامًا في تطبيقه (حفظ، إلغاء، بحث، تصفية، إلخ). هذه تُرحَّل أولًا.</li><li data-nac-id="ai_playbook_migration.list.9.item.4" data-nac-role="list-item"><strong>خلفية المحادثة</strong>: هل ستعيد استخدام بنية محادثة قائمة (Yujin chat على <code data-nac-role="code-inline">/yujin/nac-demo</code>، أو وسيط LLM خاص بك)؟</li><li data-nac-id="ai_playbook_migration.list.9.item.5" data-nac-role="list-item"><strong>تغطية الاختبارات الحالية</strong>: هل يوجد Playwright / Cypress / Jest؟ ستضيف اختبارات NAC3 بجانبها، لا بديلًا عنها.</li><li data-nac-id="ai_playbook_migration.list.9.item.6" data-nac-role="list-item"><strong>مكتبة المكوّنات</strong>: shadcn / MUI / PrimeNG / Mantine / مخصصة؟ بعض المكتبات تبتلع خصائص <code data-nac-role="code-inline">data-*</code>؛ ستحتاج إلى غلافات (انظر الخطوة 5).</li></ol>
+<h3 data-nac-id="ai_playbook_migration.h3.02-التحقق-المبدئي-من-git" data-nac-role="heading" data-nac-level="3" id="02-التحقق-المبدئي-من-git">0.2 التحقق المبدئي من git</h3>
+<pre data-nac-id="ai_playbook_migration.code.1" data-nac-role="code" data-nac-lang="bash"><code>git status              # MUST be clean before starting
+git checkout -b feat/nac3-migration</code></pre>
+<p data-nac-id="ai_playbook_migration.p.12" data-nac-role="paragraph">كل خطوة ترحيل في NAC تعيش في commit مستقل حتى يتمكن المستخدم من مراجعة كل شريحة والتراجع عنها.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-1-تثبيت-وقت-التشغيل-إنشاء-وحدة-التشغيل" data-nac-role="heading" data-nac-level="2" id="الخطوة-1-تثبيت-وقت-التشغيل-إنشاء-وحدة-التشغيل">الخطوة 1 -- تثبيت وقت التشغيل + إنشاء وحدة التشغيل</h2>
+<pre data-nac-id="ai_playbook_migration.code.2" data-nac-role="code" data-nac-lang="bash"><code>npm install @nac3/runtime@^2.2.0</code></pre>
+<p data-nac-id="ai_playbook_migration.p.16" data-nac-role="paragraph">أنشئ <code data-nac-role="code-inline">src/nac/boot.ts</code> (أو ما يعادله في إطارك البرمجي):</p>
+<pre data-nac-id="ai_playbook_migration.code.3" data-nac-role="code" data-nac-lang="ts"><code>import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;
+// import &#x27;@nac3/runtime/chat-client&#x27;;  // uncomment when ready for chat
+
+declare global { interface Window { NAC?: any; NacChat?: any; } }</code></pre>
+<p data-nac-id="ai_playbook_migration.p.18" data-nac-role="paragraph">استورده مرة واحدة من نقطة الدخول الجذرية لتطبيقك (<code data-nac-role="code-inline">main.tsx</code>، <code data-nac-role="code-inline">app.module.ts</code>، أو أعلى سكريبت <code data-nac-role="code-inline">&lt;head&gt;</code> في HTML).</p>
+<p data-nac-id="ai_playbook_migration.p.19" data-nac-role="paragraph"><strong>التحقق:</strong> <code data-nac-role="code-inline">window.NAC</code> معرَّف في وحدة تحكم المتصفح؛ <code data-nac-role="code-inline">window.NAC.version</code> يُرجع <code data-nac-role="code-inline">'2.2.0'</code> (أو أعلى).</p>
+<p data-nac-id="ai_playbook_migration.p.20" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 1 -- install runtime + boot module</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-2-تزيين-غلاف-التطبيق" data-nac-role="heading" data-nac-level="2" id="الخطوة-2-تزيين-غلاف-التطبيق">الخطوة 2 -- تزيين غلاف التطبيق</h2>
+<p data-nac-id="ai_playbook_migration.p.23" data-nac-role="paragraph">أضف <code data-nac-role="code-inline">data-nac-plugin="&lt;app-slug&gt;"</code> إلى الحاوية <strong>الأخارجية</strong> التي تلفّ واجهتك الرئيسية. هذه هي أهم سمة في عملية الترحيل -- بدونها تكون لقطة وسيط LLM فارغة (درس مستفاد من حالات React + Angular، الخطأ رقم 1، موثّق في <code data-nac-role="code-inline">docs/CASE_STUDIES_DISCOVERY.md</code>).</p>
+<h3 data-nac-id="ai_playbook_migration.h3.مثال-react" data-nac-role="heading" data-nac-level="3" id="مثال-react">مثال React</h3>
+<pre data-nac-id="ai_playbook_migration.code.4" data-nac-role="code" data-nac-lang="tsx"><code>return (
+  &lt;div className=&quot;app&quot; data-nac-plugin=&quot;my-app&quot;&gt;
+    ...
+  &lt;/div&gt;
+);</code></pre>
+<h3 data-nac-id="ai_playbook_migration.h3.مثال-angular" data-nac-role="heading" data-nac-level="3" id="مثال-angular">مثال Angular</h3>
+<pre data-nac-id="ai_playbook_migration.code.5" data-nac-role="code" data-nac-lang="html"><code>&lt;div class=&quot;app&quot; data-nac-plugin=&quot;my-app&quot;&gt;
+  ...
+&lt;/div&gt;</code></pre>
+<h3 data-nac-id="ai_playbook_migration.h3.تصيير-من-الخادم-php-rails-django" data-nac-role="heading" data-nac-level="3" id="تصيير-من-الخادم-php-rails-django">تصيير من الخادم (PHP / Rails / Django)</h3>
+<pre data-nac-id="ai_playbook_migration.code.6" data-nac-role="code" data-nac-lang="html"><code>&lt;body data-nac-plugin=&quot;my-app&quot;&gt;
+  ...
+&lt;/body&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.30" data-nac-role="paragraph"><strong>التحقق:</strong> من وحدة تحكم المتصفح: <code data-nac-role="code-inline">NAC.describe().plugins.length &gt;= 1</code>.</p>
+<p data-nac-id="ai_playbook_migration.p.31" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 2 -- root data-nac-plugin attribute</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-3-تزيين-أزرار-الأفعال-العشرة-الأولى" data-nac-role="heading" data-nac-level="2" id="الخطوة-3-تزيين-أزرار-الأفعال-العشرة-الأولى">الخطوة 3 -- تزيين أزرار الأفعال العشرة الأولى</h2>
+<p data-nac-id="ai_playbook_migration.p.34" data-nac-role="paragraph">خذ الإجراءات العشرة الأكثر استخدامًا من الخطوة 0.3. لكل زر:</p>
+<pre data-nac-id="ai_playbook_migration.code.7" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;&lt;plugin&gt;.&lt;verb&gt;&quot;
+  data-nac-role=&quot;action&quot;
+  data-nac-action=&quot;&lt;verb&gt;&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.36" data-nac-role="paragraph"><strong>اصطلاحات المعرّفات:</strong></p>
+<p data-nac-id="ai_playbook_migration.p.37" data-nac-role="paragraph"><code data-nac-role="code-inline">dashboard.invoice.list.row.42.delete</code>.</p>
+<ul data-nac-id="ai_playbook_migration.list.38" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.38.item.1" data-nac-role="list-item">مُسبوقة باسم الإضافة: <code data-nac-role="code-inline">invoice.save</code>، لا <code data-nac-role="code-inline">save</code> وحدها.</li><li data-nac-id="ai_playbook_migration.list.38.item.2" data-nac-role="list-item">حروف صغيرة مع شرطة سفلية: <code data-nac-role="code-inline">add_row</code>، لا <code data-nac-role="code-inline">AddRow</code> ولا <code data-nac-role="code-inline">add-row</code>.</li><li data-nac-id="ai_playbook_migration.list.38.item.3" data-nac-role="list-item">الفعل في النهاية إن كان فعلًا عامًا للتطبيق؛ وإلا يكون متداخلًا:</li></ul>
+<p data-nac-id="ai_playbook_migration.p.39" data-nac-role="paragraph">لا تلمس <code data-nac-role="code-inline">onclick</code> الحالي / معالج الحدث -- التزيين إضافي فقط.</p>
+<p data-nac-id="ai_playbook_migration.p.40" data-nac-role="paragraph"><strong>التحقق:</strong> من وحدة التحكم:</p>
+<pre data-nac-id="ai_playbook_migration.code.8" data-nac-role="code" data-nac-lang="js"><code>NAC.describe().plugins[0].elements.length  // &gt;= 10
+NAC.list_registered_plugins()                // includes your plugin</code></pre>
+<p data-nac-id="ai_playbook_migration.p.42" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 3 -- top-10 buttons decorated</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-4-إضافة-manifest-مبسط" data-nac-role="heading" data-nac-level="2" id="الخطوة-4-إضافة-manifest-مبسط">الخطوة 4 -- إضافة manifest مبسّط</h2>
+<p data-nac-id="ai_playbook_migration.p.45" data-nac-role="paragraph">لا تحاول تغطية كل عنصر في اليوم الأول. غطِّ أزرار الأفعال العشرة الأولى من الخطوة 3 مع <code data-nac-role="code-inline">label_i18n</code> مناسب:</p>
+<pre data-nac-id="ai_playbook_migration.code.9" data-nac-role="code" data-nac-lang="ts"><code>// src/nac/manifest.ts
+const li = (es:string,en:string,pt:string,fr:string,it:string,
+            de:string,ja:string,zh:string,hi:string,ar:string) =&gt;
+  ({ es, en, pt, fr, it, de, ja, zh, hi, ar });
+
+export const APP_MANIFEST = {
+  plugin_slug: &#x27;my-app&#x27;,
+  version: &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.2&#x27;,
+  elements: [
+    {
+      id: &#x27;my-app.save&#x27;, role: &#x27;action&#x27;,
+      actions: [{
+        verb: &#x27;save&#x27;,
+        label_i18n: li(&#x27;Guardar&#x27;,&#x27;Save&#x27;,&#x27;Salvar&#x27;,&#x27;Sauver&#x27;,&#x27;Salva&#x27;,
+                       &#x27;Speichern&#x27;,&#x27;保存&#x27;,&#x27;保存&#x27;,&#x27;sahejna&#x27;,&#x27;حفظ&#x27;)
+      }],
+      label_i18n: li(/* same */)
+    },
+    // ... 9 more ...
+  ]
+};</code></pre>
+<p data-nac-id="ai_playbook_migration.p.47" data-nac-role="paragraph">سجّله عند التشغيل:</p>
+<pre data-nac-id="ai_playbook_migration.code.10" data-nac-role="code" data-nac-lang="ts"><code>window.NAC?.register(APP_MANIFEST);</code></pre>
+<p data-nac-id="ai_playbook_migration.p.49" data-nac-role="paragraph">إن لم تستطع شحن 10 لغات في اليوم الأول، استخدم <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> على مسار autoRegister.watch. هذا حلٌّ مؤقت؛ سيُصدر المدقق الصارم لـ NAC3 v2.2 في الإنتاج تحذيرات عند نقص الترجمات.</p>
+<p data-nac-id="ai_playbook_migration.p.50" data-nac-role="paragraph"><strong>التحقق:</strong></p>
+<pre data-nac-id="ai_playbook_migration.code.11" data-nac-role="code" data-nac-lang="js"><code>NAC.list_registered_plugins()           // [&#x27;my-app&#x27;]
+await NAC.click_by_verb(&#x27;my-app&#x27;,&#x27;save&#x27;)  // resolves</code></pre>
+<p data-nac-id="ai_playbook_migration.p.52" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 4 -- manifest with top-10 verbs</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-5-التعامل-مع-مكتبة-المكونات-إن-وجدت" data-nac-role="heading" data-nac-level="2" id="الخطوة-5-التعامل-مع-مكتبة-المكونات-إن-وجدت">الخطوة 5 -- التعامل مع مكتبة المكوّنات (إن وُجدت)</h2>
+<p data-nac-id="ai_playbook_migration.p.55" data-nac-role="paragraph">إذا كان تطبيقك يستخدم MUI / Mantine / PrimeNG / إلخ وكانت الأزرار تبتلع خصائص <code data-nac-role="code-inline">data-*</code>، اكتب غلافًا خفيفًا:</p>
+<pre data-nac-id="ai_playbook_migration.code.12" data-nac-role="code" data-nac-lang="tsx"><code>// src/nac/NacButton.tsx
+import { Button as MuiButton } from &#x27;@mui/material&#x27;;
+import { useEffect, useRef } from &#x27;react&#x27;;
+
+export function NacButton({ nacId, verb, plugin, children, ...rest }) {
+  const ref = useRef(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    el.setAttribute(&#x27;data-nac-id&#x27;, nacId);
+    el.setAttribute(&#x27;data-nac-role&#x27;, &#x27;action&#x27;);
+    el.setAttribute(&#x27;data-nac-action&#x27;, verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest}&gt;{children}&lt;/MuiButton&gt;;
+}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.57" data-nac-role="paragraph">استبدل <code data-nac-role="code-inline">&lt;Button&gt;</code> بـ <code data-nac-role="code-inline">&lt;NacButton nacId="..." verb="..."&gt;</code> للأزرار العشرة الأولى. افعل ذلك تدريجيًا.</p>
+<p data-nac-id="ai_playbook_migration.p.58" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 5 -- component library wrapper</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-6-إصدار-عقد-الإقرار" data-nac-role="heading" data-nac-level="2" id="الخطوة-6-إصدار-عقد-الإقرار">الخطوة 6 -- إصدار عقد الإقرار</h2>
+<p data-nac-id="ai_playbook_migration.p.61" data-nac-role="paragraph">مساعد <code data-nac-role="code-inline">bindAction</code> في v2.2 هو المسار الأنظف:</p>
+<pre data-nac-id="ai_playbook_migration.code.13" data-nac-role="code" data-nac-lang="ts"><code>import { useRef, useEffect } from &#x27;react&#x27;;
+
+export function useNacAction(plugin: string, actionId: string) {
+  const ref = useRef&lt;HTMLElement&gt;(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el || !window.NAC) return;
+    return window.NAC.bindAction(el, () =&gt; {}, { plugin, action_id: actionId });
+  }, [plugin, actionId]);
+  return ref;
+}</code></pre>
+<pre data-nac-id="ai_playbook_migration.code.14" data-nac-role="code" data-nac-lang="tsx"><code>function SaveButton({ onSave }) {
+  const ref = useNacAction(&#x27;my-app&#x27;, &#x27;my-app.save&#x27;);
+  return &lt;button ref={ref} onClick={onSave}&gt;Save&lt;/button&gt;;
+}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.64" data-nac-role="paragraph">تُطلق طبقة bindAction حدث <code data-nac-role="code-inline">nac:action:succeeded</code> تلقائيًا بعد انتهاء <code data-nac-role="code-inline">onClick</code> الخاص بالمستخدم. لا مزيد من رسائل "لم أتمكن من تنفيذ X: انتهت المهلة".</p>
+<p data-nac-id="ai_playbook_migration.p.65" data-nac-role="paragraph"><strong>التحقق:</strong> من وحدة التحكم:</p>
+<pre data-nac-id="ai_playbook_migration.code.15" data-nac-role="code" data-nac-lang="js"><code>document.addEventListener(&#x27;nac:action:succeeded&#x27;, e =&gt; console.log(e.detail));
+await NAC.click(&#x27;my-app.save&#x27;);
+// Should print {plugin: &#x27;my-app&#x27;, action_id: &#x27;my-app.save&#x27;, ...}</code></pre>
+<p data-nac-id="ai_playbook_migration.p.67" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 6 -- bindAction ack contract</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-7-إضافة-الحقول-والتبويبات" data-nac-role="heading" data-nac-level="2" id="الخطوة-7-إضافة-الحقول-والتبويبات">الخطوة 7 -- إضافة الحقول والتبويبات</h2>
+<p data-nac-id="ai_playbook_migration.p.70" data-nac-role="paragraph">لكل حقل إدخال يكتب فيه المستخدم:</p>
+<pre data-nac-id="ai_playbook_migration.code.16" data-nac-role="code" data-nac-lang="html"><code>&lt;input data-nac-id=&quot;my-app.field_x&quot; data-nac-role=&quot;field&quot; ...&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.72" data-nac-role="paragraph">لكل تبويب في مكوّنات شريط التبويبات:</p>
+<pre data-nac-id="ai_playbook_migration.code.17" data-nac-role="code" data-nac-lang="html"><code>&lt;button
+  data-nac-id=&quot;tab.&lt;key&gt;&quot;
+  data-nac-role=&quot;tab&quot;
+  onclick=&quot;...&quot;&gt;
+  ...
+&lt;/button&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.74" data-nac-role="paragraph"><strong>تنبيه مهم (قاعدة المدقق الصارم v2.2):</strong> أي معرّف يطابق <code data-nac-role="code-inline">^tab\.</code> يجب أن يحمل الدور <code data-nac-role="code-inline">tab</code>. عدم التطابق يُنتج نتيجة <code data-nac-role="code-inline">tab_id_manifest_role_drift</code> ولن يتمكن وقت التشغيل من إيجاد التبويب عبر <code data-nac-role="code-inline">NAC.tab()</code>.</p>
+<p data-nac-id="ai_playbook_migration.p.75" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 7 -- fields + tabs decorated</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-8-إضافة-لوحة-المحادثة-اختياري-قابل-للتأجيل" data-nac-role="heading" data-nac-level="2" id="الخطوة-8-إضافة-لوحة-المحادثة-اختياري-قابل-للتأجيل">الخطوة 8 -- إضافة لوحة المحادثة (اختياري، قابل للتأجيل)</h2>
+<p data-nac-id="ai_playbook_migration.p.78" data-nac-role="paragraph">أدرج مرجع <code data-nac-role="code-inline">nac-chat-client.js</code>:</p>
+<pre data-nac-id="ai_playbook_migration.code.18" data-nac-role="code" data-nac-lang="html"><code>&lt;aside class=&quot;chat&quot; data-nac-plugin=&quot;chat&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;div id=&quot;chat-log&quot; data-nac-id=&quot;chat.log&quot; data-nac-role=&quot;region&quot;&gt;&lt;/div&gt;
+  &lt;input id=&quot;chat-input&quot; data-nac-id=&quot;chat.input&quot; data-nac-role=&quot;field&quot;&gt;
+  &lt;button id=&quot;chat-send&quot; data-nac-id=&quot;chat.send&quot; data-nac-role=&quot;action&quot;&gt;send&lt;/button&gt;
+&lt;/aside&gt;
+
+&lt;script src=&quot;https://yujin.app/nac-spec/js/nac-chat-client.js?v=v22&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+NacChat.init({
+  endpoint: &#x27;/your-llm-intermediary&#x27;,   // or &#x27;/crm/api/v1/yujin/nac-demo&#x27;
+  chatLog: document.getElementById(&#x27;chat-log&#x27;),
+  input:   document.getElementById(&#x27;chat-input&#x27;),
+  sendBtn: document.getElementById(&#x27;chat-send&#x27;)
+});
+&lt;/script&gt;</code></pre>
+<p data-nac-id="ai_playbook_migration.p.80" data-nac-role="paragraph">بديلًا عن ذلك، <strong>أجّل المحادثة كليًا</strong> وأخبر المستخدمين بتثبيت Yujin Pilot (<code data-nac-role="code-inline">yujin.app/pilot</code>) الذي يكتشف تطبيقك عبر MCP ويتحكم فيه من لوحة قيادة مركزية.</p>
+<p data-nac-id="ai_playbook_migration.p.81" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 8 -- chat panel</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-9-إضافة-مجموعة-اختبارات-nac3" data-nac-role="heading" data-nac-level="2" id="الخطوة-9-إضافة-مجموعة-اختبارات-nac3">الخطوة 9 -- إضافة مجموعة اختبارات NAC3</h2>
+<p data-nac-id="ai_playbook_migration.p.84" data-nac-role="paragraph">انسخ بنية الاختبارات المرجعية من Yujin:</p>
+<pre data-nac-id="ai_playbook_migration.code.19" data-nac-role="code" data-nac-lang="bash"><code>mkdir -p test/nac3
+cp /path/to/rpaforce-crm/packages/nac/test/stage*.mjs ./test/nac3/
+cp /path/to/rpaforce-crm/tools/nac/test-launch.sh ./test/nac3/</code></pre>
+<p data-nac-id="ai_playbook_migration.p.86" data-nac-role="paragraph">كيّف slug الإضافة ومرجع manifest. ثم شغّل:</p>
+<pre data-nac-id="ai_playbook_migration.code.20" data-nac-role="code" data-nac-lang="bash"><code>bash ./test/nac3/test-launch.sh</code></pre>
+<p data-nac-id="ai_playbook_migration.p.88" data-nac-role="paragraph"><strong>التحقق:</strong> جميع الطبقات خضراء.</p>
+<p data-nac-id="ai_playbook_migration.p.89" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 9 -- NAC3 test corpus</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.الخطوة-10-الترقية-إلى-مطابقة-nac-3" data-nac-role="heading" data-nac-level="2" id="الخطوة-10-الترقية-إلى-مطابقة-nac-3">الخطوة 10 -- الترقية إلى مطابقة NAC-3</h2>
+<pre data-nac-id="ai_playbook_migration.code.21" data-nac-role="code" data-nac-lang="bash"><code># In your CI:
+npx @nac3/runtime validate ./src --severity=error  # exit 0 required
+NAC.validate_global({probe: true})              # zero findings required</code></pre>
+<p data-nac-id="ai_playbook_migration.p.93" data-nac-role="paragraph">اضبط <code data-nac-role="code-inline">NAC.STRICT_VALIDATION = true</code> في تشغيل الإنتاج لفرض تماسك الأدوار عند التسجيل.</p>
+<p data-nac-id="ai_playbook_migration.p.94" data-nac-role="paragraph"><strong>Commit:</strong> <code data-nac-role="code-inline">feat(nac3-migration): step 10 -- NAC-3 conformance gate</code></p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.ترتيب-الترحيل-عبر-الشاشات" data-nac-role="heading" data-nac-level="2" id="ترتيب-الترحيل-عبر-الشاشات">ترتيب الترحيل عبر الشاشات</h2>
+<p data-nac-id="ai_playbook_migration.p.97" data-nac-role="paragraph">في تطبيق إنتاجي يضم شاشات كثيرة، لا تحاول ترحيلها دفعة واحدة:</p>
+<ol data-nac-id="ai_playbook_migration.list.98" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.98.item.1" data-nac-role="list-item"><strong>الشاشة الأكثر استخدامًا أولًا</strong> (مثل تسجيل الدخول + لوحة التحكم).</li><li data-nac-id="ai_playbook_migration.list.98.item.2" data-nac-role="list-item"><strong>الشاشة الأعلى قيمة تاليًا</strong> (التي يقضي فيها مستخدموك المتمرسون معظم وقتهم).</li><li data-nac-id="ai_playbook_migration.list.98.item.3" data-nac-role="list-item"><strong>الشاشات العامة</strong> (المرئية لحركة المرور المجهولة).</li><li data-nac-id="ai_playbook_migration.list.98.item.4" data-nac-role="list-item"><strong>شاشات الإدارة</strong> أخيرًا (حركة مرور منخفضة، قبول أعمق).</li></ol>
+<p data-nac-id="ai_playbook_migration.p.99" data-nac-role="paragraph">كل شاشة تحصل على PR مستقل. كل PR يُشحن خلف feature flag إن توفّر؛ التراجع يكون بقلب الـ flag.</p>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.أخطاء-الترحيل-الشائعة" data-nac-role="heading" data-nac-level="2" id="أخطاء-الترحيل-الشائعة">أخطاء الترحيل الشائعة</h2>
+<ol data-nac-id="ai_playbook_migration.list.102" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.102.item.1" data-nac-role="list-item"><strong>نسيان <code data-nac-role="code-inline">data-nac-plugin</code> على العنصر الجذري.</strong> الـ manifest مسجَّل لكن LLM لا يراه. <strong>العَرَض:</strong> المحادثة تقول "كيف يمكنني مساعدتك" بشكل عام دون إجراءات. الحل: أضف السمة. (الخطأ رقم 1 من دراسات الحالة.)</li><li data-nac-id="ai_playbook_migration.list.102.item.2" data-nac-role="list-item"><strong>إغلاق stale closure لحالة React في onChatAction.</strong> استخدم refs والمحدِّدات الدالية. (الخطأ رقم 2 من دراسات الحالة.)</li><li data-nac-id="ai_playbook_migration.list.102.item.3" data-nac-role="list-item"><strong>معرّف تبويب بدور غير tab.</strong> نتيجة من المدقق الصارم v2.2. <code data-nac-role="code-inline">^tab\.</code> يجب أن يحمل الدور <code data-nac-role="code-inline">tab</code>.</li><li data-nac-id="ai_playbook_migration.list.102.item.4" data-nac-role="list-item"><strong>إعادة استخدام المعرّفات بعد إعادة الهيكلة.</strong> زر انتقل إلى دور دلالي جديد يجب أن يحصل على معرّف جديد. إعادة الاستخدام تكسر الأتمتة اللاحقة.</li><li data-nac-id="ai_playbook_migration.list.102.item.5" data-nac-role="list-item">*<em>مكتبة المكوّنات تبتلع data-</em>.** اكتشف ذلك مبكرًا؛ اكتب غلافًا (الخطوة 5).</li><li data-nac-id="ai_playbook_migration.list.102.item.6" data-nac-role="list-item"><strong>معالج النقر لا يُصدر إقرارًا.</strong> استخدم <code data-nac-role="code-inline">bindAction</code>. بدونه، <code data-nac-role="code-inline">NAC.click()</code> ينتهي بمهلة 5 ثوانٍ حتى لو نجح التأثير الجانبي.</li></ol>
+<hr />
+<h2 data-nac-id="ai_playbook_migration.h2.انظر-أيضا" data-nac-role="heading" data-nac-level="2" id="انظر-أيضا">انظر أيضًا</h2>
+<ul data-nac-id="ai_playbook_migration.list.105" data-nac-role="list"><li data-nac-id="ai_playbook_migration.list.105.item.1" data-nac-role="list-item"><a href="AI_PLAYBOOK_NEW_PROJECT.md" data-nac-id="ai_playbook_migration.link.1" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_NEW_PROJECT.md</a> -- للمشاريع الجديدة من الصفر.</li><li data-nac-id="ai_playbook_migration.list.105.item.2" data-nac-role="list-item"><a href="REACT.md" data-nac-id="ai_playbook_migration.link.2" data-nac-role="action" data-nac-action="open">REACT.md</a> / <a href="ANGULAR.md" data-nac-id="ai_playbook_migration.link.3" data-nac-role="action" data-nac-action="open">ANGULAR.md</a> -- تعمّق في الأطر البرمجية.</li><li data-nac-id="ai_playbook_migration.list.105.item.3" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="ai_playbook_migration.link.4" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- دليل الاختبار بعد الترحيل.</li><li data-nac-id="ai_playbook_migration.list.105.item.4" data-nac-role="list-item"><a href="../docs/CASE_STUDIES_DISCOVERY.md" data-nac-id="ai_playbook_migration.link.5" data-nac-role="action" data-nac-action="open">CASE_STUDIES_DISCOVERY.md</a> -- أخطاء اكتُشفت خلال ترحيل مرجع Yujin.</li></ul>
+<h2 data-nac-id="ai_playbook_migration.h2.الرخصة" data-nac-role="heading" data-nac-level="2" id="الرخصة">الرخصة</h2>
+<p data-nac-id="ai_playbook_migration.p.107" data-nac-role="paragraph">Apache-2.0.</p>
+<hr />
+<p data-nac-id="ai_playbook_migration.p.109" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/guides/AI_PLAYBOOK_MIGRATION.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+</main>
+
+<script src="/nac-spec/js/nac.js?v=v22"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script>
+(function () {
+  if (!window.NAC || !window.NAC.register) return;
+  var manifest = {
+    plugin_slug: "ai_playbook_migration",
+    version: "1.0.0",
+    nac_version: "2.2",
+    elements: [
+      { id: "ai_playbook_migration.toolbar.home",  role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },
+      { id: "ai_playbook_migration.toolbar.audio", role: "action",
+         actions: [{ verb: "play_audio_version" }],
+         label_i18n: { es: "Audio", en: "Audio", pt: "Audio", fr: "Audio", it: "Audio", de: "Audio", ja: "オーディオ", zh: "音频", hi: "ऑडियो", ar: "صوت" } },
+      { id: "ai_playbook_migration.toolbar.top",   role: "action",
+         actions: [{ verb: "scroll_to_top" }],
+         label_i18n: { es: "Arriba", en: "Top", pt: "Topo", fr: "Haut", it: "Alto", de: "Oben", ja: "トップ", zh: "顶部", hi: "ऊपर", ar: "أعلى" } },
+      { id: "ai_playbook_migration.toolbar.print", role: "action",
+         actions: [{ verb: "print" }],
+         label_i18n: { es: "Imprimir", en: "Print", pt: "Imprimir", fr: "Imprimer", it: "Stampa", de: "Drucken", ja: "印刷", zh: "打印", hi: "प्रिंट", ar: "طباعة" } }
+    ]
+  };
+  try { window.NAC.register(manifest); } catch (e) { console.warn("[nac3-doc] register failed", e); }
+})();
+</script>
+</body>
+</html>

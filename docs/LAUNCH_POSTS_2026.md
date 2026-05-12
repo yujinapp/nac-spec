@@ -56,19 +56,30 @@ Show HN: An ad that closes the sale itself -- and the open standard behind it
 ### Body
 
 ```
-For 40 years we built UIs assuming one operator: humans, mouse +
-keyboard, looking at a screen. The metaphor has not changed since
-1984.
+NAC3 is an open standard (Apache 2.0) that puts humans and AI on
+equal footing on the same web surfaces. Five HTML attributes. The
+button a human clicks is the same button an agent, a voice
+runner, a screen reader, an RPA bot, or a Playwright spec calls
+by name -- one contract, five callers.
 
-We are now adding a second species of operator -- AI agents, voice
-runners, RPA bots, screen readers, browser-based assistants. Today
-they reverse-engineer meaning from screenshots, DOM scraping,
-accessibility trees, brittle selectors. They guess wrong, often,
-expensively.
+Why this primitive was missing:
 
-NAC3 (Native Agent Contract) is a small public spec that lets a
-web UI declare itself. Think of what Captain Picard's interface
-has that ours does not: a contract between the human and the
+Human communication is rich, layered, ambiguous. Frontends were
+built to absorb that ambiguity -- and inherited it. Every label,
+every tooltip, every form field is interpretable five different
+ways. We rely on context and intuition to disambiguate; the
+system does not help us, we help the system.
+
+That is the structural reason bots, autotests, AI agents, and
+code-writing LLMs are great at backends and bad at frontends.
+Backends got explicit contracts decades ago: schemas, types,
+REST, GraphQL. A non-human can reason about an API without
+guessing. Frontends never got that treatment. The "schema" of a
+button today is that it says "Save" in 14px gray, three divs
+deep.
+
+NAC3 closes that gap. Think of what Captain Picard's interface
+has that ours does not: a contract between the operator and the
 ship, on shared ground. "Warp speed" works not because of voice
 magic, but because the ship's surface is contractually
 addressable. NAC3 is that surface for web UIs.
@@ -326,13 +337,15 @@ ending. (6/12)
 **Tweet 7 -- the philosophy:**
 
 ```
-The web is about to be driven by more than humans, in bulk.
+NAC3 in one line: humans and AI on equal footing, same web
+surfaces.
 
-Today every AI agent that touches a website is reverse-
-engineering DOM trees and guessing semantics from screenshots.
-Expensive, brittle, slow.
+Why this primitive was missing: frontends inherited the
+ambiguity of human language. Backends got explicit contracts
+decades ago -- schemas, types, REST. A bot can reason about an
+API without guessing. Frontends never did.
 
-NAC3 says: stop guessing. Let the UI declare itself. (7/12)
+NAC3 ends the guessing. (7/12)
 ```
 
 **Tweet 8 -- the surface:**
@@ -429,11 +442,27 @@ normally type into is the SAME field the agent fills. Voice agent,
 screen reader, RPA bot, human cursor -- all driving the same
 surface through the same protocol.
 
-We just published the protocol. It is called NAC3 (Native Agent
-Contract). Think of what Captain Picard's interface has that ours
-does not: a contract between operator and machine, on shared
-ground. "Warp speed" works not because of voice magic, but because
-the ship's surface is contractually addressable. NAC3 is that
+What this is, in one line: NAC3 (Native Agent Contract) is an
+open standard that lets humans and AI agents drive the same web
+surfaces, on equal footing.
+
+Now the why:
+
+Human communication is rich, layered, ambiguous. Frontends were
+built to absorb that ambiguity -- and inherited it. We
+disambiguate labels and layouts from context; the system does
+not help us, we help the system. That is why current AI-in-the-
+browser is screenshot-OCR and brittle CSS selectors. They guess
+from pixels.
+
+Backends got explicit contracts decades ago -- schemas, types,
+REST. A bot reasons about an API without guessing. Frontends
+never got the same treatment. NAC3 closes that gap.
+
+Think of what Captain Picard's interface has that ours does not:
+a contract between operator and machine, on shared ground.
+"Warp speed" works not because of voice magic, but because the
+ship's surface is contractually addressable. NAC3 is that
 surface for web UIs.
 
 Three lines of HTML to make any element agent-addressable:
@@ -516,12 +545,17 @@ We published an open standard that lets web UIs be driven by humans and AI agent
 ### Body
 
 ```
-**TL;DR**: NAC3 is a small public spec (5 HTML attributes) that
-lets a web UI declare what it accepts and what it emits. The
-same contract dispatches from a human cursor, an LLM tool call,
-a screen reader, a Playwright spec, an RPA bot. Apache 2.0.
-~20kb runtime on npm, optional (the attributes ARE the
-standard, the runtime is convenience).
+**TL;DR**: NAC3 is an open standard that lets humans and AI
+agents drive the same web surfaces, on equal footing. Five HTML
+attributes. Apache 2.0.
+
+Backends got explicit contracts (schemas, types, REST) decades
+ago. Frontends inherited the ambiguity of human language and
+never did. NAC3 closes that gap -- the button a human clicks is
+the same button an LLM, a screen reader, a Playwright spec, or
+an RPA bot calls by name. One contract, five callers. ~20kb
+runtime on npm, optional (the attributes ARE the standard, the
+runtime is convenience).
 
 Spec: yujin.app/nac-spec
 Source: github.com/yujinapp/nac-spec
@@ -582,14 +616,34 @@ Five HTML attributes to make your web UI driveable by AI agents
 ### Body (skeleton -- to be extended day-of)
 
 ```
-## Part 1 -- The visitor isn't always human anymore
+## Part 1 -- Humans and AI on equal web surfaces
 
-[Open with the Atlas Pro voice ad demo embed. Three paragraphs
-on what just happened, what didn't have to happen (no chatbot
-hack, no widget injection, no shadow DOM), and what the contract
-is between the agent and the page. End with the Captain Picard
+NAC3 (Native Agent Contract) is an open standard, Apache 2.0,
+that lets humans and AI agents drive the same web surfaces, on
+equal footing.
+
+[Open with the Atlas Pro voice ad demo embed -- the visceral
+proof. Then the structural argument:]
+
+Human communication is rich, layered, ambiguous. Frontends were
+built to absorb that ambiguity -- and inherited it. Every label,
+every tooltip, every form field is interpretable five different
+ways. We disambiguate from context; the system does not help us,
+we help the system.
+
+That is the structural reason bots, autotests, AI agents, and
+code-writing LLMs are great at backends and bad at frontends.
+Backends got explicit contracts decades ago: schemas, types,
+REST, GraphQL, OpenAPI. A non-human can reason about an API
+without guessing. Frontends never got that treatment. The
+"schema" of a button today is that it says "Save" in 14px gray,
+three divs deep. AI-in-the-browser approaches involve screenshot-
+OCR, brittle CSS selectors, DOM scraping, accessibility-tree
+heuristics. None of those scale.
+
+NAC3 is the missing primitive. End with the Captain Picard
 anchor: the ship's surface has to be addressable for "warp speed"
-to work. NAC3 is that surface.]
+to work. NAC3 is that surface for web UIs.
 
 ## Part 2 -- The standard, five attributes
 
@@ -734,6 +788,15 @@ reader + agent + Playwright + RPA.
 
 ## Changelog
 
+- v3.2 (2026-05-12): structural reframing. Each post now leads
+  with the one-line answer to 'what is NAC3' ('humans and AI on
+  equal footing on the same web surfaces') so a reader who
+  bounces after line 1 still knows what it is. The philosophical
+  argument (frontends inherited the ambiguity of human language;
+  backends got explicit contracts; NAC3 closes the gap) is the
+  WHY underneath, not the opener. Captain Picard anchor preserved
+  as the bridge from why -> what. Replaces the 1984/'one species
+  of operator' opener that buried the lede.
 - v3.1 (2026-05-11): Cal.com adopter claim removed from every
   channel (migration cancelled / postponed). Use cases now: meeting
   schedulers (generic), ERP forms, dashboards, multi-step

@@ -5008,7 +5008,7 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.2.0',
+    version:      '2.2.1',
     spec_version: '2.2',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
@@ -5195,8 +5195,7 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
   };
 
   /* v2.2.1: guard browser-only init so this module is importable in
-     Node / SSR / test contexts without crashing. The work still runs
-     in the browser; in Node it is a silent no-op. */
+     Node / SSR / test contexts without crashing. */
   if (typeof document !== 'undefined') {
     document.dispatchEvent(new CustomEvent('nac:installed', {
       detail: { version: global.NAC.version, spec: global.NAC.spec_version },

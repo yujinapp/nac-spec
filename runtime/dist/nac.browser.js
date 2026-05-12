@@ -5007,7 +5007,7 @@
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.2.0',
+    version:      '2.2.1',
     spec_version: '2.2',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
@@ -5191,7 +5191,9 @@
     },
     /* errors */
     NacError:        NacError,
-  };  /* v2.2.1: guard browser-only init so this module is importable in
+  };
+
+  /* v2.2.1: guard browser-only init so this module is importable in
      Node / SSR / test contexts without crashing. */
   if (typeof document !== 'undefined') {
     document.dispatchEvent(new CustomEvent('nac:installed', {

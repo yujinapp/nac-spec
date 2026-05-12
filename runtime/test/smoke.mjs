@@ -77,7 +77,7 @@ try {
   const out = execSync('node ' + JSON.stringify(path.join(DIST_DIR, 'cli.js')) + ' --version', {
     encoding: 'utf8', timeout: 5000
   });
-  check('cli --version', out.includes('@nac3/runtime CLI 2.2.0'));
+  check('cli --version', out.includes('@nac3/runtime CLI 2.2.1'));
 } catch (e) {
   check('cli --version', false, e.message);
 }
@@ -107,7 +107,7 @@ try {
 try {
   const pkg = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
   check('pkg name',     pkg.name === '@nac3/runtime');
-  check('pkg version',  pkg.version === '2.2.0');
+  check('pkg version',  pkg.version === '2.2.1');
   check('pkg license',  pkg.license === 'Apache-2.0');
   check('pkg has bin',  pkg.bin && pkg.bin.nac);
   check('pkg has main', pkg.main && pkg.main.endsWith('.cjs'));

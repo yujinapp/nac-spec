@@ -222,10 +222,14 @@
       document.addEventListener(n, handler, { capture: true, passive: true });
     });
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _captureGestureFromDom);
-  } else {
-    _captureGestureFromDom();
+  /* v2.2.1: guard browser-only DOM hookup so this bundle is
+     importable in Node / SSR / test contexts. */
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _captureGestureFromDom);
+    } else {
+      _captureGestureFromDom();
+    }
   }
 
   /* v2.0-rc3: _readGestureAttested now requires the element being
@@ -2089,8 +2093,12 @@
   NAC.version_v2      = '2.1.0-rc1';
   NAC.spec_version_v2 = '2.1';
 
-  document.dispatchEvent(new CustomEvent('nac:v2_installed', {
-    detail: { version: '2.0.0' }, bubbles: true
-  }));
+  /* v2.2.1: guard browser-only dispatch so this bundle is importable
+     in Node / SSR / test contexts. */
+  if (typeof document !== 'undefined') {
+    document.dispatchEvent(new CustomEvent('nac:v2_installed', {
+      detail: { version: '2.0.0' }, bubbles: true
+    }));
+  }
 })(typeof window !== 'undefined' ? window : globalThis);
 

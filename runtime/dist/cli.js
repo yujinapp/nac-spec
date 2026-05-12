@@ -27,7 +27,7 @@ function showHelp() {
 }
 
 function showVersion() {
-  console.log('@nac3/runtime CLI 2.2.0 (Native Agent Contract v2.2)');
+  console.log('@nac3/runtime CLI 2.2.1 (Native Agent Contract v2.2)');
 }
 
 if (!cmd || cmd === '--help' || cmd === '-h') { showHelp(); process.exit(0); }

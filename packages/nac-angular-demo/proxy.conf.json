@@ -1,0 +1,8 @@
+{
+  "/crm": {
+    "target": "https://yujin.app",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info"
+  }
+}

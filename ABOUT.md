@@ -99,6 +99,36 @@ runtime survive any change in Yujin's corporate status.
 Adopters can fork either, run either, and ship either, today
 and after Yujin no longer exists.
 
+## Where NAC3 sits in the agent stack
+
+**NAC3 is the client-side half of agent-driven software. MCP is
+the server-side half.** Use both together for full-stack agents:
+MCP exposes your business logic to the model; NAC3 exposes your
+UI to whatever caller dispatches the next step (voice, chat,
+RPA, test runner, accessibility tool).
+
+NAC3 does not compete with MCP, ARIA, `data-testid`, or AG-UI.
+It overlaps in narrow ways and is meant to coexist:
+
+- **MCP** (Anthropic) handles server-side tool calls; NAC3
+  handles the UI half. v2.3 preview adds an MCP bridge for
+  cross-app routing.
+- **ARIA** describes the accessibility tree; NAC3 describes the
+  agent tree. They sit side by side on the same elements.
+- **`data-testid`** solves stable selectors for tests. NAC3
+  covers that case plus voice, RPA, LLM and i18n with one
+  attribute, at a higher mental cost. If you only need tests,
+  stay on `data-testid`.
+- **AG-UI** (CopilotKit) is an adjacent bet on the same problem
+  space, focused on chat-driven UIs inside the CopilotKit
+  framework. NAC3 is framework-neutral and earlier-stage.
+
+The honest read: NAC3 starts paying back when you have
+**multiple callers** (voice + chat + RPA + tests) or
+**cross-app** workflows, or when you want **vendor-portable**
+agent integrations. For a single app talking to a single agent
+vendor, MCP + ARIA already covers most cases.
+
 ## Authorship
 
 NAC3 is authored and maintained by Yujin (yujin.app).

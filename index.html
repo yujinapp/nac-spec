@@ -628,6 +628,41 @@
     .hero .kanji-bg { font-size: 140px; top: 60px; }
     section { padding: 40px 0; }
   }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .compare-table th,
+  .compare-table td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: top;
+  }
+  .compare-table th {
+    font-weight: 600;
+    color: var(--color-text);
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 2px solid var(--color-border);
+  }
+  .compare-table td {
+    color: var(--color-text-2);
+  }
+  .compare-table td:first-child,
+  .compare-table td strong { color: var(--color-text); }
+  .compare-table code {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12.5px;
+  }
+  @media (max-width: 800px) {
+    .compare-table { font-size: 13px; }
+    .compare-table th,
+    .compare-table td { padding: 10px; }
+  }
 </style>
 </head>
 <body data-nac-plugin="nac_landing">
@@ -637,7 +672,7 @@
   <div class="container">
     <span class="kanji" aria-hidden="true">&#27005;</span>
     <span class="brand">NAC<small>Native Agent Contract</small></span>
-    <span class="pill">v2.2 stable</span>
+    <span class="pill">v2.2 &middot; experimental</span>
     <button class="icon-btn"
             id="autopilot-toggle"
             data-nac-id="nac_landing.autopilot.toggle"
@@ -1059,15 +1094,62 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     <h2>Why NAC, why now</h2>
     <p>Voice assistants, LLM chat agents, and accessibility tools all face the same problem: <strong>they need stable names for the things they want to act on</strong>. CSS selectors break when you redesign the UI. ARIA was designed for human-driven assistive tech, not agent-driven automation, and its contract stops at "this is a button" rather than "this button has a verb the agent can call".</p>
     <p>Today every team builds its own per-app glue: a custom voice grammar, a hand-written automation script, a one-off accessibility shim. That work does not transfer between apps, between teams, or between agent vendors.</p>
-    <p>NAC is the small contract that lets all those agents talk to all those apps without per-pair integration. It is what ARIA would have been if it had been designed in 2026 with LLMs in mind.</p>
+    <p>NAC is a small experimental contract that lets those agents talk to those apps without per-pair integration. ARIA stays in place for the accessibility tree; NAC adds a parallel agent tree on the same elements.</p>
+  </div>
+</section>
+
+<!-- Where NAC3 fits -->
+<section data-nac-id="nac_landing.section.where_fits" data-nac-role="section">
+  <div class="container">
+    <h2>Where NAC3 fits in the agent stack</h2>
+    <p class="section-lede"><strong>NAC3 is the client-side half of agent-driven software. MCP is the server-side half. Use both for full-stack agents: MCP exposes your business logic, NAC3 exposes your UI.</strong></p>
+    <p>NAC3 does not compete with any of these tools -- it overlaps in narrow ways and complements in others. If you only have one of the problems below, use the dedicated tool. If you have several, NAC3 unifies the contract.</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Layer</th><th>What it solves</th><th>Where it stops</th><th>NAC3 relationship</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MCP</strong> (Anthropic)</td>
+          <td>Agent calls server-side tools / functions</td>
+          <td>Does not touch the UI; agent cannot navigate, fill forms, or read on-screen state</td>
+          <td><strong>Complement.</strong> Use MCP for backend ops, NAC3 for the UI half. v2.3 preview adds an MCP bridge to route between NAC3 apps.</td>
+        </tr>
+        <tr>
+          <td><strong>ARIA</strong></td>
+          <td>Accessibility tree for screen readers + switch devices</td>
+          <td>Stops at "this is a button named Save"; no verb the agent can call, no completion event</td>
+          <td><strong>Sits next to.</strong> Keep your ARIA roles. Many adopters end up with <code>role="button"</code> and <code>data-nac-role="action"</code> on the same element.</td>
+        </tr>
+        <tr>
+          <td><strong><code>data-testid</code></strong></td>
+          <td>Stable selectors for test runners (Cypress, Playwright)</td>
+          <td>Test-only; no manifest, no event family, no provenance, no i18n</td>
+          <td><strong>Superset.</strong> NAC3 covers the testing case + voice + RPA + LLM with the same attribute, but at a higher mental cost. If you only need tests, <code>data-testid</code> is fine.</td>
+        </tr>
+        <tr>
+          <td><strong>AG-UI</strong> (CopilotKit)</td>
+          <td>Agent-to-app protocol for chat-driven UIs</td>
+          <td>Tied to the CopilotKit framework + JS runtime; less focus on RPA / a11y / cross-vendor LLMs</td>
+          <td><strong>Adjacent.</strong> Different bet on the same space. AG-UI has Series A funding and an existing ecosystem; NAC3 is open and framework-agnostic but earlier-stage. Pick AG-UI if you build on CopilotKit; NAC3 if you want a framework-neutral surface.</td>
+        </tr>
+        <tr>
+          <td><strong>Computer Use</strong> / browser-use (vision-based)</td>
+          <td>Agent reads pixels, reasons over screenshots</td>
+          <td>Slow, expensive, brittle on dynamic content; depends entirely on the LLM</td>
+          <td><strong>Fallback layer.</strong> Vision is what the agent uses when NAC3 is not there. NAC3 turns a 3-second pixel-reasoning round into a 30 ms named dispatch.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Honest read:</strong> if you are inside a single app with a single agent vendor, MCP (server) + a screen-reader-grade ARIA pass (client) covers most cases. NAC3 starts paying back when you have <strong>multiple callers</strong> (voice + chat + RPA + tests), <strong>cross-app</strong> workflows, or you want <strong>vendor-portable</strong> integrations.</p>
   </div>
 </section>
 
 <section class="section" id="governance" data-nac-id="nac_landing.governance" data-nac-role="section">
   <div class="container">
-    <h2>Open standard, open governance</h2>
-    <p class="section-lede">NAC3 is currently stewarded by Yujin. The spec is Apache 2.0; the reference runtime is MIT. We commit to moving NAC3 to a neutral foundation (W3C community group, Linux Foundation, or equivalent) if and when adoption justifies neutral governance.</p>
-    <p>Spec changes follow an RFC process with at least 14 days of public comment for any change to the public API or wire format. The Apache 2.0 + MIT licensing guarantees that the spec and runtime survive any change in Yujin's corporate status -- adopters can fork either, run either, and ship either, today and after we are gone.</p>
+    <h2>Governance</h2>
+    <p class="section-lede">NAC3 is stewarded by Yujin today -- one company, not a foundation. We say this up front because the difference matters: NAC3 is not yet an industry standard the way ARIA or MCP are. It is a vendor-authored contract published under permissive licenses (Apache 2.0 spec + MIT runtime) so adopters do not depend on Yujin's continuity.</p>
+    <p>Spec changes follow an RFC process with at least 14 days of public comment for any change to the public API or wire format. We commit to moving NAC3 to a neutral foundation (W3C community group, Linux Foundation, or equivalent) if and when adoption justifies neutral governance. Until then, the Apache 2.0 + MIT licensing is what guarantees portability -- adopters can fork either, run either, and ship either, today and after we are gone.</p>
     <p>Read the full statement in <a href="ABOUT.md" data-nac-id="nac_landing.gov.about" data-nac-role="action" data-nac-action="open">ABOUT.md</a> + <a href="CONTRIBUTING.md" data-nac-id="nac_landing.gov.contributing" data-nac-role="action" data-nac-action="open">CONTRIBUTING.md</a>. Accessibility commitment in <a href="docs/ACCESSIBILITY.md" data-nac-id="nac_landing.gov.accessibility" data-nac-role="action" data-nac-action="open">docs/ACCESSIBILITY.md</a>.</p>
   </div>
 </section>

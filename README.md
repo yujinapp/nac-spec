@@ -4,24 +4,29 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-stable-success)](https://yujin.app/nac-spec/)
+[![Status: experimental](https://img.shields.io/badge/status-experimental-orange)](https://yujin.app/nac-spec/)
 [![Spec: v2.2](https://img.shields.io/badge/spec-v2.2-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
-[![Tests: passing](https://img.shields.io/badge/tests-passing-success)](docs/COVERAGE_REPORT_2026_05_10.md)
-[![Coverage: ~95%](https://img.shields.io/badge/coverage-95%25-success)](docs/TEST_COVERAGE_MATRIX.md)
 
 ---
 
 ## What
 
-NAC3 is what ARIA would have been if it had been designed in
-2026 with LLMs in mind. A handful of HTML attributes
-(`data-nac-id`, `data-nac-role`, `data-nac-action`) plus an
-optional JS manifest let any caller -- a voice runner, a
-Playwright spec, an LLM intermediary, a screen reader, an RPA
-bot -- address the same UI by name, not by visual coordinate or
-CSS selector.
+NAC3 is an experimental contract for driving web UIs from AI
+agents, voice runners, RPA bots, and accessibility tools --
+without per-app glue code.
+
+A handful of HTML attributes (`data-nac-id`, `data-nac-role`,
+`data-nac-action`) plus an optional JS manifest let any caller
+address the page by name, not by CSS selector or visual
+coordinate. The runtime resolves names to elements and emits
+deterministic events when each action finishes.
+
+Single-vendor today (Yujin) with Apache 2.0 + MIT licensing so
+adopters can fork, run, and ship without depending on Yujin's
+continuity. See [governance](#governance) for the plan to move
+to neutral stewardship as adoption grows.
 
 ## Quick install
 
@@ -57,7 +62,33 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | Locale-dependent label selectors break across translations | Dispatch by id, not label; label_i18n is the LLM's concern |
 | Screen readers + voice control + RPA all need separate integrations | One contract; every caller speaks the same verbs |
 | LLM agents hallucinate DOM structure | Manifest declares exactly what the page accepts |
-| Cross-app workflows need per-pair glue | v2.3 interop layer routes between NAC3 apps |
+| Cross-app workflows need per-pair glue | v2.3 (preview) interop layer routes between NAC3 apps |
+
+## Where NAC3 fits in the agent stack
+
+**NAC3 is the client-side half of agent-driven software. MCP is
+the server-side half. Use both for full-stack agents: MCP
+exposes your business logic, NAC3 exposes your UI.**
+
+NAC3 does not compete with any of these -- it overlaps in
+narrow ways and complements in others. If you only have one
+of the problems below, use the dedicated tool. If you have
+several, NAC3 unifies the contract.
+
+| Layer | What it solves | Where it stops | NAC3 relationship |
+|-------|----------------|----------------|-------------------|
+| **MCP** (Anthropic) | Agent calls server-side tools / functions | Doesn't touch the UI; agent can't navigate, fill forms, or read on-screen state | **Complement.** Use MCP for backend ops, NAC3 for the UI half. v2.3 preview adds an MCP bridge to route between NAC3 apps. |
+| **ARIA** | Accessibility tree for screen readers + switch devices | Stops at "this is a button named Save"; no verb the agent can call, no completion event | **Sits next to.** Keep your ARIA roles. Many adopters end up with `role="button"` and `data-nac-role="action"` on the same element. |
+| **`data-testid`** | Stable selectors for test runners (Cypress, Playwright) | Test-only; no manifest, no event family, no provenance, no i18n | **Superset.** NAC3 covers the testing case + voice + RPA + LLM with the same attribute, but at a higher mental cost. If you only need tests, `data-testid` is fine. |
+| **AG-UI** (CopilotKit) | Agent-to-app protocol for chat-driven UIs | Tied to the CopilotKit framework + JS runtime; less focus on RPA / a11y / cross-vendor LLMs | **Adjacent.** Different bet on the same problem space. AG-UI has Series A funding and an existing ecosystem; NAC3 is open + framework-agnostic but earlier-stage. Pick AG-UI if you're building on CopilotKit; NAC3 if you want a framework-neutral surface. |
+| **Computer Use / Browser Use** (vision-based agents) | Agent reads pixels, reasons over screenshots | Slow, expensive, and brittle on dynamic content; depends entirely on the LLM | **Fallback layer.** Vision is what the agent uses when NAC3 isn't there. NAC3 turns a 3-second pixel-reasoning round into a 30 ms named dispatch. |
+
+**Honest read of the trade:** if you're inside a single app with
+a single agent vendor, MCP (server side) + a screen-reader-grade
+ARIA pass (client side) gets you most of the way. NAC3 starts
+paying back when you have **multiple callers** (voice + chat +
+RPA + tests) or **cross-app** workflows, or when you want
+**vendor-portable** agent integrations.
 
 ## Made with NAC3
 
@@ -68,12 +99,13 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.2 |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
-## Status: stable
+## Status
 
 - **v2.2** -- shipped 2026-05-10. `NAC.register` strict
   validator, `bindAction` helper, locale-detector hardening.
-  Production-ready. This is what `npm install @nac3/runtime`
-  delivers today.
+  This is what `npm install @nac3/runtime` delivers today.
+  Used in production inside Yujin's own CRM; outside adopters
+  are early and few -- see [Made with NAC3](#made-with-nac3).
 - **v2.3** -- preview branch with cross-NAC3 interop (MCP
   bridge for cross-origin + cross-device). Tested in-page; GA
   after one full cross-origin real-world test cycle.
@@ -101,20 +133,27 @@ Full docs in 10 languages (es, en, pt, fr, it, de, ja, zh, hi,
 ar) under `i18n/` -- machine-translated baseline +
 native-speaker reviewed for ja/zh/ar/hi.
 
-## Open standard, open governance
+## Governance
 
-NAC3 is currently stewarded by Yujin. The spec is Apache 2.0;
-the reference runtime is MIT. Yujin commits to moving NAC3 to a
-neutral foundation (W3C community group, Linux Foundation, or
-equivalent) if and when adoption justifies neutral governance.
-Spec changes follow the RFC process in
-[CONTRIBUTING.md](CONTRIBUTING.md) with at least 14 days of
-public comment for any public API or wire-format change.
+NAC3 is stewarded by Yujin today -- one company, not a
+foundation. We say this up front because the difference matters:
+NAC3 is not yet an industry standard the way ARIA or MCP are.
+It is a vendor-authored contract published under permissive
+licenses so adopters don't depend on Yujin's continuity.
 
-The Apache 2.0 + MIT licensing guarantees the spec + runtime
-survive any change in Yujin's corporate status. Adopters can
-fork either, run either, and ship either, today and after
-Yujin no longer exists.
+- Spec: Apache 2.0.
+- Reference runtime (`packages/nac/`): MIT.
+- Spec changes follow the RFC process in
+  [CONTRIBUTING.md](CONTRIBUTING.md) with at least 14 days of
+  public comment for any change to the public API or wire
+  format.
+
+Yujin commits to moving NAC3 to a neutral foundation (W3C
+community group, Linux Foundation, or equivalent industry body)
+if and when adoption justifies neutral governance. Until then,
+the Apache 2.0 + MIT licensing is what guarantees portability:
+adopters can fork either, run either, and ship either, today
+and after Yujin no longer exists.
 
 ## Roadmap, commercial tools
 

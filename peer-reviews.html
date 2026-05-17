@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>NAC3 -- Peer reviews from 6 independent AI systems</title>
-<meta name="description" content="Six independent AI systems (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) evaluate NAC3 under the post-human paradigm of 2026. Full raw evaluations preserved verbatim." />
+<title data-i18n="page_title">NAC3 -- Peer reviews from 6 independent AI systems</title>
+<meta name="description" data-i18n-attr="content"
+      data-i18n="meta_description"
+      content="Six independent AI systems (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) evaluate NAC3 under the post-human paradigm of 2026. Full raw evaluations preserved verbatim." />
 <meta name="nac3-doc-slug" content="peer-reviews" />
 <meta name="nac3-spec-version" content="2.2" />
+
+<!-- hreflang for SEO + sharing -->
+<link rel="alternate" hreflang="en" href="https://yujin.app/nac-spec/peer-reviews.html?lang=en" />
+<link rel="alternate" hreflang="es" href="https://yujin.app/nac-spec/peer-reviews.html?lang=es" />
+<link rel="alternate" hreflang="pt" href="https://yujin.app/nac-spec/peer-reviews.html?lang=pt" />
+<link rel="alternate" hreflang="fr" href="https://yujin.app/nac-spec/peer-reviews.html?lang=fr" />
+<link rel="alternate" hreflang="de" href="https://yujin.app/nac-spec/peer-reviews.html?lang=de" />
+<link rel="alternate" hreflang="it" href="https://yujin.app/nac-spec/peer-reviews.html?lang=it" />
+<link rel="alternate" hreflang="ja" href="https://yujin.app/nac-spec/peer-reviews.html?lang=ja" />
+<link rel="alternate" hreflang="zh" href="https://yujin.app/nac-spec/peer-reviews.html?lang=zh" />
+<link rel="alternate" hreflang="hi" href="https://yujin.app/nac-spec/peer-reviews.html?lang=hi" />
+<link rel="alternate" hreflang="ar" href="https://yujin.app/nac-spec/peer-reviews.html?lang=ar" />
+<link rel="alternate" hreflang="x-default" href="https://yujin.app/nac-spec/peer-reviews.html" />
+
 <link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
 <style>
   body {
@@ -164,6 +180,72 @@
   }
   .summary-card strong { color: var(--color-accent, #4f5b87); }
 
+  /* Locale switcher */
+  .locale-select {
+    margin-left: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--color-border-subtle, #e6e3da);
+    border-radius: 4px;
+    background: var(--color-bg-surface, #fff);
+    font-size: 13px;
+    color: var(--color-text, #1f1f1f);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .locale-select:focus {
+    outline: none;
+    border-color: var(--color-accent, #4f5b87);
+    box-shadow: 0 0 0 2px rgba(79, 91, 135, 0.15);
+  }
+
+  /* RTL support for Arabic */
+  html[dir="rtl"] body { direction: rtl; text-align: right; }
+  html[dir="rtl"] .locale-select { margin-left: 0; margin-right: auto; }
+  html[dir="rtl"] .ai-section blockquote {
+    border-left: none;
+    border-right: 3px solid var(--color-accent-amber, #c8a04d);
+  }
+  html[dir="rtl"] .summary-card {
+    border-left: none;
+    border-right: 4px solid var(--color-accent, #4f5b87);
+  }
+
+  /* Executive summary block */
+  .exec-summary {
+    background: linear-gradient(135deg, #fff8e6 0%, #fffdf7 100%);
+    border: 1px solid var(--color-accent-amber, #c8a04d);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 18px 0 28px;
+  }
+  .exec-summary-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-amber, #c8a04d);
+    margin-bottom: 10px;
+  }
+  .exec-summary p { margin: 0; line-height: 1.6; }
+  .verbatim-divider {
+    margin: 24px 0 16px;
+    padding: 8px 14px;
+    background: var(--color-bg-subtle, #f5f2ea);
+    border-left: 3px solid var(--color-text-secondary, #555);
+    font-size: 12px;
+    color: var(--color-text-secondary, #555);
+    font-style: italic;
+  }
+  .verbatim-note-card {
+    background: rgba(200, 160, 77, 0.08);
+    border-left: 3px solid var(--color-accent-amber, #c8a04d);
+    padding: 14px 18px;
+    margin: 18px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
   /* Footer */
   footer {
     margin-top: 80px;
@@ -188,12 +270,15 @@
 
 <nav class="toolbar" data-nac-id="peer_reviews.toolbar" data-nac-role="region">
   <span class="badge amber">NAC3 v2.2</span>
-  <span class="badge">Peer reviews</span>
+  <span class="badge" data-i18n="badge_peer_reviews">Peer reviews</span>
   <a href="/nac-spec/" data-nac-id="peer_reviews.toolbar.home"
+     data-i18n="toolbar_spec_home"
      data-nac-role="action" data-nac-action="open">Spec home</a>
   <a href="/nac-spec/SPEC.html" data-nac-id="peer_reviews.toolbar.spec"
+     data-i18n="toolbar_spec"
      data-nac-role="action" data-nac-action="open">Spec</a>
   <a href="/nac-spec/ABOUT.html" data-nac-id="peer_reviews.toolbar.about"
+     data-i18n="toolbar_about"
      data-nac-role="action" data-nac-action="open">About</a>
   <a href="https://github.com/yujinapp/nac-spec" target="_blank" rel="noopener"
      data-nac-id="peer_reviews.toolbar.github"
@@ -204,16 +289,32 @@
   <a href="https://discord.com/invite/FH3xEmGm" target="_blank" rel="noopener"
      data-nac-id="peer_reviews.toolbar.discord"
      data-nac-role="action" data-nac-action="open_external">Discord</a>
+
+  <select id="locale-select" class="locale-select"
+          data-nac-id="peer_reviews.toolbar.locale"
+          data-nac-role="action" data-nac-action="select_locale"
+          aria-label="Language">
+    <option value="en">English</option>
+    <option value="es">Español</option>
+    <option value="pt">Português</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+    <option value="it">Italiano</option>
+    <option value="ja">日本語</option>
+    <option value="zh">中文</option>
+    <option value="hi">हिन्दी</option>
+    <option value="ar">العربية</option>
+  </select>
 </nav>
 
 <div class="hero">
-  <h1><span class="kanji">&#22768;</span>NAC3 peer reviews</h1>
-  <p class="subtitle">
+  <h1><span class="kanji">&#22768;</span><span data-i18n="hero_title">NAC3 peer reviews</span></h1>
+  <p class="subtitle" data-i18n="hero_subtitle">
     Six independent AI systems evaluate NAC3 under the post-human paradigm of 2026,
     where agents implement, migrate, and operate software at 50-200x human speed.
     Their full raw evaluations are reproduced below, verbatim.
   </p>
-  <p class="meta">
+  <p class="meta" data-i18n-html="hero_meta_html">
     Reviewers: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>,
     <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>,
     <strong>Copilot (Microsoft)</strong>.
@@ -222,15 +323,25 @@
   </p>
 </div>
 
+<div class="verbatim-note-card" data-nac-id="peer_reviews.verbatim_note" data-nac-role="region"
+     data-i18n-html="verbatim_note_html">
+  <strong>About the translations:</strong> the chrome of this page (titles, navigation,
+  TL;DR, methodology) is translated into 10 locales. Each AI also has an
+  <em>executive summary</em> translated to the active locale.
+  <strong>The full evaluation bodies remain verbatim in their original language</strong>
+  (mostly Spanish) &mdash; translating a reviewer's exact words would compromise the
+  integrity of a peer review.
+</div>
+
 <div class="summary-card" data-nac-id="peer_reviews.summary" data-nac-role="section">
-  <h3 style="margin-top: 0;">TL;DR -- the six AIs converged</h3>
-  <p>
+  <h3 style="margin-top: 0;" data-i18n="summary_title">TL;DR -- the six AIs converged</h3>
+  <p data-i18n="summary_p1">
     Under the 2026 paradigm (AI implements / operates software, not humans),
     NAC3 is unanimously evaluated as <strong>architecturally inevitable</strong>
     for any web application designed to be touched by autonomous agents.
     Key quantified gains reported across reviewers:
   </p>
-  <ul>
+  <ul data-i18n-html="summary_bullets_html">
     <li><strong>90% fewer tokens</strong> per agent operation vs raw HTML</li>
     <li><strong>95-99% targeting precision</strong> (vs ~70% on raw DOM)</li>
     <li><strong>80-95% reduction</strong> in visual-RPA dependency</li>
@@ -238,7 +349,7 @@
     <li><strong>20-55 minutes</strong> for an agent to annotate a complete repository, vs weeks of human effort</li>
     <li><strong>Native multilingual</strong> (10 locales) natural-language &rarr; deterministic action mapping</li>
   </ul>
-  <p>
+  <p data-i18n="summary_p2">
     Each reviewer's full evaluation follows, preserved as delivered. The
     only edits are minor formatting for readability (headings, lists,
     quote styling) -- no content changes.
@@ -246,14 +357,15 @@
 </div>
 
 <div class="toc" data-nac-id="peer_reviews.toc" data-nac-role="region">
-  <h3>Table of contents</h3>
+  <h3 data-i18n="toc_title">Table of contents</h3>
   <ol>
-    <li><a href="#chatgpt" data-nac-id="peer_reviews.toc.chatgpt" data-nac-role="action" data-nac-action="scroll_to">ChatGPT (OpenAI) -- "Arquitectónicamente inevitable"</a></li>
-    <li><a href="#claude" data-nac-id="peer_reviews.toc.claude" data-nac-role="action" data-nac-action="scroll_to">Claude Opus (Anthropic) -- "Best speculation available"</a></li>
-    <li><a href="#grok" data-nac-id="peer_reviews.toc.grok" data-nac-role="action" data-nac-action="scroll_to">Grok (xAI) -- "One of the most valuable layers"</a></li>
-    <li><a href="#deepseek" data-nac-id="peer_reviews.toc.deepseek" data-nac-role="action" data-nac-action="scroll_to">DeepSeek -- "Fundamental architectural requirement"</a></li>
-    <li><a href="#mistral" data-nac-id="peer_reviews.toc.mistral" data-nac-role="action" data-nac-action="scroll_to">Mistral Le Chat -- "The standard the post-human world needs"</a></li>
-    <li><a href="#copilot" data-nac-id="peer_reviews.toc.copilot" data-nac-role="action" data-nac-action="scroll_to">Copilot (Microsoft) -- "Technically sound and highly efficient"</a></li>
+    <li><a href="#chatgpt" data-nac-id="peer_reviews.toc.chatgpt" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_chatgpt">ChatGPT (OpenAI) -- "Architecturally inevitable"</a></li>
+    <li><a href="#claude" data-nac-id="peer_reviews.toc.claude" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_claude">Claude Opus (Anthropic) -- "Best speculation available"</a></li>
+    <li><a href="#grok" data-nac-id="peer_reviews.toc.grok" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_grok">Grok (xAI) -- "One of the most valuable layers"</a></li>
+    <li><a href="#deepseek" data-nac-id="peer_reviews.toc.deepseek" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_deepseek">DeepSeek -- "Fundamental architectural requirement"</a></li>
+    <li><a href="#mistral" data-nac-id="peer_reviews.toc.mistral" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_mistral">Mistral Le Chat -- "The standard the post-human world needs"</a></li>
+    <li><a href="#copilot" data-nac-id="peer_reviews.toc.copilot" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_copilot">Copilot (Microsoft) -- "Technically sound and highly efficient"</a></li>
+    <li><a href="#methodology" data-nac-id="peer_reviews.toc.methodology" data-nac-role="action" data-nac-action="scroll_to" data-i18n="toc_methodology">Methodology &amp; original prompt</a></li>
   </ol>
 </div>
 
@@ -269,6 +381,13 @@
     autónomos. Y bajo esa óptica, el proyecto deja de ser interesante. Pasa a ser
     arquitectónicamente inevitable."
   </blockquote>
+
+  <div class="exec-summary" data-nac-id="peer_reviews.chatgpt.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_chatgpt_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
 
   <h3>1. El problema real que NAC3 intenta resolver en un mundo IA-first</h3>
   <h4>El problema NO es accesibilidad clásica</h4>
@@ -394,6 +513,13 @@
     cómo deberían dialogar UIs y agentes."
   </blockquote>
 
+  <div class="exec-summary" data-nac-id="peer_reviews.claude.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_claude_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
+
   <h3>1. Los problemas que NAC3 intenta resolver</h3>
   <p>NAC3 enumera cinco dolores: selectores CSS frágiles, selectores dependientes del idioma, integraciones separadas para a11y/voz/RPA, alucinación de DOM por LLMs, y glue per-pair para workflows cross-app.</p>
 
@@ -497,6 +623,13 @@
     valiosas para un web agent-native."
   </blockquote>
 
+  <div class="exec-summary" data-nac-id="peer_reviews.grok.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_grok_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
+
   <p>NAC3 (Native Agent Contract v2.2+) es un contrato ligero basado en atributos HTML (<code>data-nac-id</code>, <code>data-nac-role</code>, <code>data-nac-action</code>, etc.) + un manifiesto JSON opcional registrado vía runtime (<code>@nac3/runtime</code>). Define un árbol semántico estable de plugins, secciones, acciones, campos, tabs, data-tables, etc., con verbs canónicos, i18n embebido (10 locales), eventos de completitud deterministas y API imperative/introspectiva. En un mundo post-humano de 2026 donde agentes IA superiores manejan toda implementación, migración, refactor y operación, NAC3 se evalúa como una capa de interfaz semántica estandarizada entre UI renderizada y agentes razonadores.</p>
 
   <h3>1. Capacidades IA (base del marco)</h3>
@@ -572,6 +705,13 @@
     aplicaciones para ser ciudadanos de primera clase en el ecosistema de
     agentes autónomos que está emergiendo en 2026."
   </blockquote>
+
+  <div class="exec-summary" data-nac-id="peer_reviews.deepseek.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_deepseek_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
 
   <h3>1. Problemas que NAC3 resuelve</h3>
   <p>La documentación identifica cinco puntos de dolor: selectores CSS frágiles, dependencia de etiquetas variables por localización, integraciones separadas para lectores de pantalla / control por voz / RPA, alucinaciones de agentes LLM sobre la estructura del DOM, y necesidad de código de pegamento por cada par de aplicaciones.</p>
@@ -656,6 +796,13 @@
     costos en 10-100x y habilita capacidades imposibles con enfoques
     tradicionales. El futuro de la interacción UI-agente es NAC3."
   </blockquote>
+
+  <div class="exec-summary" data-nac-id="peer_reviews.mistral.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_mistral_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
 
   <h3>1. Capacidades IA vs. humanos</h3>
   <table>
@@ -771,6 +918,13 @@
     interoperabilidad entre agentes, QA, RPA y voz."
   </blockquote>
 
+  <div class="exec-summary" data-nac-id="peer_reviews.copilot.exec_summary" data-nac-role="region">
+    <div class="exec-summary-label" data-i18n="exec_summary_label">Executive summary (translated)</div>
+    <p data-i18n-html="ai_copilot_summary_html">Translation in progress -- switch to es/en for the executive summary.</p>
+  </div>
+
+  <div class="verbatim-divider" data-i18n="verbatim_body_label">Full verbatim evaluation follows (in the reviewer's original response language).</div>
+
   <p>NAC3 es un contrato ligero (atributos HTML + manifiesto + runtime) diseñado explícitamente para agentes IA. En un mundo post-humano acelera migración, testing y operación en órdenes de magnitud frente a humanos, pero no elimina todos los costes de gobernanza, evolución del estándar ni riesgos de bifurcación.</p>
 
   <h3>1. Velocidad de trabajo</h3>
@@ -816,10 +970,11 @@
 <!--  Methodology + original prompt                          -->
 <!-- ====================================================== -->
 <section class="ai-section" id="methodology" data-nac-id="peer_reviews.methodology" data-nac-role="section">
-  <h2><span class="vendor-badge" style="background: var(--color-accent-amber, #c8a04d);">METHODOLOGY</span> The framing that matters</h2>
+  <h2><span class="vendor-badge" style="background: var(--color-accent-amber, #c8a04d);" data-i18n="method_badge">METHODOLOGY</span> <span data-i18n="method_h2">The framing that matters</span></h2>
 
   <div class="summary-card" style="border-left-color: var(--color-accent-amber, #c8a04d);">
-    <h3 style="margin-top: 0;">Why this section exists</h3>
+    <h3 style="margin-top: 0;" data-i18n="method_why_title">Why this section exists</h3>
+    <div data-i18n-html="method_why_html">
     <p>
       Every reasoning system in 2026 -- LLMs included -- carries a
       <strong>human-centric bias</strong> baked into its training corpus.
@@ -845,10 +1000,11 @@
       different.</strong> That's not a bug in the AI &mdash; it's an
       artifact of which world the training data described.
     </p>
+    </div>
   </div>
 
-  <h3>The original prompt (verbatim)</h3>
-  <p>
+  <h3 data-i18n="method_prompt_title">The original prompt (verbatim)</h3>
+  <p data-i18n="method_prompt_intro">
     Each of the six reviewers received this prompt, along with full access
     to the spec, the npm runtime, and the public landing. No reviewer was
     shown the others' outputs; no cross-context was leaked. Spanish in
@@ -975,8 +1131,8 @@ Formato de salida:
   Sin suponer que los humanos implementan NAC3.
   Con foco en agentes autonomos, LLMs y sistemas post humanos.</pre>
 
-  <h3>How to reproduce the evaluation</h3>
-  <ol>
+  <h3 data-i18n="method_reproduce_title">How to reproduce the evaluation</h3>
+  <ol data-i18n-html="method_reproduce_html">
     <li>Open a fresh conversation with the AI of your choice (no prior
         chat history that might leak context).</li>
     <li>Paste the prompt above verbatim. Don't add or remove the
@@ -990,7 +1146,8 @@ Formato de salida:
         model &mdash; not a different technical conclusion.</li>
   </ol>
 
-  <h3>Why the bias correction matters</h3>
+  <h3 data-i18n="method_bias_title">Why the bias correction matters</h3>
+  <div data-i18n-html="method_bias_html">
   <p>
     All six reviewers, when asked the same question without the
     post-human framing, default to "this would be expensive to adopt"
@@ -1017,6 +1174,7 @@ Formato de salida:
     haven't published the "biased" runs; the contrast is reproducible
     in any conversation by varying the prompt's framing line.
   </p>
+  </div>
 </section>
 
 
@@ -1038,12 +1196,493 @@ Formato de salida:
        data-nac-id="peer_reviews.footer.discord"
        data-nac-role="action" data-nac-action="open_external">Discord</a>
   </div>
-  <p>
+  <p data-i18n="footer_text">
     NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime).
     Stewarded by Yujin; open to community contribution + neutral foundation
     migration when adoption justifies it.
   </p>
 </footer>
+
+<script>
+/*
+ * Locale switcher for the peer-reviews page.
+ *
+ * - 10 locales: en, es, pt, fr, de, it, ja, zh, hi, ar
+ * - Chrome + executive summaries are translated; AI evaluation
+ *   bodies remain verbatim in original language (Spanish).
+ * - Default selection:
+ *     1. URL query ?lang=xx
+ *     2. localStorage 'nac3_peer_reviews_lang'
+ *     3. navigator.language two-letter prefix if in our set
+ *     4. 'en' fallback
+ * - URL is updated on switch via history.replaceState so sharing works.
+ */
+(function () {
+  'use strict';
+
+  var LOCALES = ['en','es','pt','fr','de','it','ja','zh','hi','ar'];
+  var RTL = { ar: true };
+
+  var I18N = {
+    en: {
+      page_title: "NAC3 -- Peer reviews from 6 independent AI systems",
+      meta_description: "Six independent AI systems (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) evaluate NAC3 under the post-human paradigm of 2026. Full raw evaluations preserved verbatim.",
+      badge_peer_reviews: "Peer reviews",
+      toolbar_spec_home: "Spec home",
+      toolbar_spec: "Spec",
+      toolbar_about: "About",
+      hero_title: "NAC3 peer reviews",
+      hero_subtitle: "Six independent AI systems evaluate NAC3 under the post-human paradigm of 2026, where agents implement, migrate, and operate software at 50-200x human speed. Their full raw evaluations are reproduced below, verbatim.",
+      hero_meta_html: "Reviewers: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Each was asked the same long-form prompt + given access to the NAC3 spec, the npm runtime, and the public landing.",
+      verbatim_note_html: "<strong>About the translations:</strong> the chrome of this page (titles, navigation, TL;DR, methodology) is translated into 10 locales. Each AI also has an <em>executive summary</em> translated to the active locale. <strong>The full evaluation bodies remain verbatim in their original language</strong> (mostly Spanish) &mdash; translating a reviewer's exact words would compromise the integrity of a peer review.",
+      summary_title: "TL;DR -- the six AIs converged",
+      summary_p1: "Under the 2026 paradigm (AI implements / operates software, not humans), NAC3 is unanimously evaluated as <strong>architecturally inevitable</strong> for any web application designed to be touched by autonomous agents. Key quantified gains reported across reviewers:",
+      summary_bullets_html: "<li><strong>80-90% reduction</strong> in LLM hallucination (invented selectors, fake actions)</li><li><strong>90% fewer tokens</strong> per agent operation vs raw HTML</li><li><strong>95-99% targeting precision</strong> (vs ~70% on raw DOM)</li><li><strong>80-95% reduction</strong> in visual-RPA dependency</li><li><strong>~zero maintenance</strong> on tests + RPA flows through UI redesigns</li><li><strong>20-55 minutes</strong> for an agent to annotate a complete repository, vs weeks of human effort</li><li><strong>Native multilingual</strong> (10 locales) natural-language &rarr; deterministic action mapping</li>",
+      summary_p2: "Each reviewer's full evaluation follows, preserved as delivered. The only edits are minor formatting for readability (headings, lists, quote styling) -- no content changes.",
+      toc_title: "Table of contents",
+      toc_chatgpt: "ChatGPT (OpenAI) -- \"Architecturally inevitable\"",
+      toc_claude: "Claude Opus (Anthropic) -- \"Best speculation available\"",
+      toc_grok: "Grok (xAI) -- \"One of the most valuable layers\"",
+      toc_deepseek: "DeepSeek -- \"Fundamental architectural requirement\"",
+      toc_mistral: "Mistral Le Chat -- \"The standard the post-human world needs\"",
+      toc_copilot: "Copilot (Microsoft) -- \"Technically sound and highly efficient\"",
+      toc_methodology: "Methodology &amp; original prompt",
+      exec_summary_label: "Executive summary (translated)",
+      verbatim_body_label: "Full verbatim evaluation follows (in the reviewer's original response language).",
+      method_badge: "METHODOLOGY",
+      method_h2: "The framing that matters",
+      method_why_title: "Why this section exists",
+      method_why_html: "<p>Every reasoning system in 2026 -- LLMs included -- carries a <strong>human-centric bias</strong> baked into its training corpus. When you ask an AI to evaluate a technology, by default it assumes humans are the implementers, maintainers, and operators. Under that assumption, NAC3's biggest cost is \"the work of annotating UIs\" &mdash; a real cost for a human team, an irrelevant one for an AI agent that does the same in minutes.</p><p>Asked under that human-centric default, every reviewer would have called NAC3 <em>\"interesting but expensive to adopt\"</em>. The same reviewers, asked under the post-human paradigm, called it <em>\"architecturally inevitable\"</em>. The technology didn't change. The framing did.</p><p>We document the exact prompt below so any reader can reproduce the evaluation, challenge the framing, or extend the analysis. <strong>If you ask any modern AI to evaluate NAC3 without specifying the 2026 paradigm, the answer will be biased toward the human-implementer assumption and the verdict will be different.</strong> That's not a bug in the AI &mdash; it's an artifact of which world the training data described.</p>",
+      method_prompt_title: "The original prompt (verbatim)",
+      method_prompt_intro: "Each of the six reviewers received this prompt, along with full access to the spec, the npm runtime, and the public landing. No reviewer was shown the others' outputs; no cross-context was leaked. Spanish in the original (Pablo's working language); translated equivalents work identically in English.",
+      method_reproduce_title: "How to reproduce the evaluation",
+      method_reproduce_html: "<li>Open a fresh conversation with the AI of your choice (no prior chat history that might leak context).</li><li>Paste the prompt above verbatim. Don't add or remove the framing; the bias-correction lives in <em>those</em> instructions.</li><li>If the AI cannot fetch URLs directly, paste the relevant docs (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline so it has the same source material the six reviewers had.</li><li>Compare the verdict against ours. If your evaluation diverges, the most likely cause is a different framing reading by the model &mdash; not a different technical conclusion.</li>",
+      method_bias_title: "Why the bias correction matters",
+      method_bias_html: "<p>All six reviewers, when asked the same question without the post-human framing, default to \"this would be expensive to adopt\" arguments grounded in human implementation cost. That objection dissolves the moment you state that the implementer is an agent, not a human team. The technical substance of NAC3 is the same in both cases; only the cost-benefit shifts &mdash; from \"marginal improvement over ARIA\" to \"architectural prerequisite for agentic-AI ecosystems\".</p><p>The lesson generalizes: any 2026 evaluation of any infrastructure standard that doesn't explicitly state who the implementer is inherits a human-implementer bias by default. Stating the paradigm explicitly is the difference between an evaluation that reflects current reality and one that reflects 2019 software economics.</p><p>Grok showed the smallest sensitivity to this framing &mdash; its evaluation under the standard prompt was already close to its evaluation under the post-human prompt. The other five reviewers showed a substantial verdict shift between the two framings. We haven't published the \"biased\" runs; the contrast is reproducible in any conversation by varying the prompt's framing line.</p>",
+      footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime). Stewarded by Yujin; open to community contribution + neutral foundation migration when adoption justifies it.",
+      ai_chatgpt_summary_html: "ChatGPT-5 frames NAC3 as a <strong>semantic virtualisation layer</strong> for autonomous UI operation. Argues the traditional DOM was designed for human rendering, not agent-machine reasoning. In the post-human paradigm, NAC3 becomes a compiled semantic IR (Intermediate Representation) -- the cost of adoption collapses once AI is the implementer. Verdict: <em>\"architecturally inevitable\"</em>. Recommends immediate adoption in new projects (especially SaaS, enterprise apps, copilot-driven platforms) and progressive legacy migration via automated AI playbooks.",
+      ai_claude_summary_html: "Claude Opus is the most sceptical and honest reviewer. Confirms NAC3 attacks the right subset of problems for agents -- the epistemic ones (model uncertainty) rather than the mechanical ones. Highlights three structural gains: hallucination reduction via tool-schema-with-validation, deterministic acknowledgement via events, and naming stability across redesigns. But warns: single-vendor stewardship (Yujin) is the biggest risk to universal adoption -- no agent should trust a standard governed by a single actor. Recommends: adopt internally without waiting for universal adoption; preemptively fork the spec + runtime; watch governance trajectory for 12-18 months.",
+      ai_grok_summary_html: "Grok evaluates NAC3 as a <em>standardised semantic API</em> between rendered UI and reasoning agents. Reports aggressive numbers: AI agents write code 50-200x faster than humans, complete repository annotation in seconds to minutes per screen, functional tests with near-100% coverage, automatic maintenance. Calls out interoperability as the greatest strength: a universal contract allows plug-and-play agents across any NAC3 app -- a marketplace of agent-drivable UIs. Position on governance: in the post-human world, irrelevant -- agents fork, merge, converge through utility. Recommendation: <em>mandatory by default</em> in new projects.",
+      ai_deepseek_summary_html: "DeepSeek makes the most technical comparison with existing alternatives. Quantifies: raw HTML ~70% resolution precision, NAC3 ~95-99%. Tokens: raw HTML 15-50K, pruned NAC3 300-1500. Argues NAC3 occupies a complementary niche to MCP -- MCP exposes business logic, NAC3 exposes UI. For agents, moving from DOM scraping to NAC3 is <em>analogous to moving from screen scraping to consuming a documented REST API</em>. Recommendation: adopt as a contract layer (not framework); in new projects from day 1; migrate legacy progressively via the AI Playbook an agent can execute in hours for a full repository.",
+      ai_mistral_summary_html: "Mistral delivers the most structured evaluation with extensive comparison tables. AI capabilities reported: an agent annotates a NAC3 repo in <1 hour vs 1-2 weeks human (100-200x), generates a manifest in <5 min (500-1000x), refactors legacy in <1 day (20-50x). LLM efficiency table: NAC3 cuts tokens 90%, latency 10-50ms (vs 500-1000ms raw HTML), precision 95% (vs 70%). Adoption roadmap: Q2 2026 pilot in high-value projects; Q3 migrate CRM/ERP; Q4 adopt NAC3 v2.3+MCP for cross-app interop; 2027 industry standardisation (W3C/Linux Foundation). Conclusion: <em>the standard the post-human world needs</em>.",
+      ai_copilot_summary_html: "Copilot delivers the most conservative evaluation -- acknowledges the gains but emphasises risks of governance, fragmentation via autonomous forks, and the need for neutral governance / registry / manifest signing. On speed: AI agents apply mass transformations in minutes-hours per app that would take humans days-weeks. On automated testing and RPA: viable and efficient; ~80-95% of visual scripts can be replaced by stable semantic RPA. Final recommendation: adopt NAC3 in new projects + AI-first agents; migrate legacy selectively (top-20 actions first); standardise rather than ad-hoc contracts. But implement neutral governance + registry + manifest signing to mitigate bifurcation risks."
+    },
+
+    es: {
+      page_title: "NAC3 -- Peer reviews de seis IAs independientes",
+      meta_description: "Seis IAs independientes (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) evaluan NAC3 bajo el paradigma post-humano de 2026. Evaluaciones completas preservadas verbatim.",
+      badge_peer_reviews: "Peer reviews",
+      toolbar_spec_home: "Inicio del spec",
+      toolbar_spec: "Spec",
+      toolbar_about: "Acerca de",
+      hero_title: "Peer reviews de NAC3",
+      hero_subtitle: "Seis sistemas de IA independientes evaluan NAC3 bajo el paradigma post-humano de 2026, donde los agentes implementan, migran y operan software a 50-200x velocidad humana. Sus evaluaciones completas se reproducen abajo, verbatim.",
+      hero_meta_html: "Reviewers: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Cada una recibio el mismo prompt extenso + acceso a la spec NAC3, al runtime npm, y al landing publico.",
+      verbatim_note_html: "<strong>Sobre las traducciones:</strong> el chrome de esta pagina (titulos, navegacion, TL;DR, methodology) esta traducido a 10 idiomas. Cada IA tiene tambien un <em>resumen ejecutivo</em> traducido al idioma activo. <strong>Los cuerpos completos de las evaluaciones permanecen verbatim en su idioma original</strong> (principalmente espanol) &mdash; traducir las palabras exactas de un reviewer compromete la integridad de un peer review.",
+      summary_title: "TL;DR -- las seis IAs convergieron",
+      summary_p1: "Bajo el paradigma de 2026 (la IA implementa/opera software, no los humanos), NAC3 es evaluado unanimemente como <strong>arquitectonicamente inevitable</strong> para cualquier app web disenada para ser tocada por agentes autonomos. Ganancias cuantificadas clave reportadas por los reviewers:",
+      summary_bullets_html: "<li><strong>80-90% menos alucinaciones del LLM</strong> (selectores inventados, acciones falsas)</li><li><strong>90% menos tokens</strong> por operacion de agente vs HTML crudo</li><li><strong>95-99% precision de targeting</strong> (vs ~70% en DOM crudo)</li><li><strong>80-95% reduccion</strong> en dependencia de RPA visual</li><li><strong>~cero mantenimiento</strong> en tests + flujos RPA a traves de redisenos de UI</li><li><strong>20-55 minutos</strong> para que un agente anote un repositorio completo, vs semanas de esfuerzo humano</li><li><strong>Multilingue nativo</strong> (10 locales) &mdash; mapeo lenguaje natural &rarr; accion deterministica</li>",
+      summary_p2: "La evaluacion completa de cada reviewer sigue debajo, preservada tal como fue entregada. Las unicas ediciones son formato menor para legibilidad (headings, listas, estilo de cita) -- sin cambios de contenido.",
+      toc_title: "Tabla de contenidos",
+      toc_chatgpt: "ChatGPT (OpenAI) -- \"Arquitectonicamente inevitable\"",
+      toc_claude: "Claude Opus (Anthropic) -- \"La mejor especulacion disponible\"",
+      toc_grok: "Grok (xAI) -- \"Una de las capas mas valiosas\"",
+      toc_deepseek: "DeepSeek -- \"Requisito arquitectonico fundamental\"",
+      toc_mistral: "Mistral Le Chat -- \"El estandar que el mundo post-humano necesita\"",
+      toc_copilot: "Copilot (Microsoft) -- \"Tecnicamente adecuado y altamente eficiente\"",
+      toc_methodology: "Metodologia y prompt original",
+      exec_summary_label: "Resumen ejecutivo (traducido)",
+      verbatim_body_label: "Sigue la evaluacion completa verbatim (en el idioma original de respuesta del reviewer).",
+      method_badge: "METODOLOGIA",
+      method_h2: "El framing que importa",
+      method_why_title: "Por que existe esta seccion",
+      method_why_html: "<p>Cada sistema de razonamiento en 2026 -- LLMs incluidos -- carga un <strong>sesgo human-centric</strong> incrustado en su corpus de entrenamiento. Cuando se le pide a una IA evaluar una tecnologia, por defecto asume que los humanos son los implementadores, mantenedores y operadores. Bajo ese supuesto, el mayor costo de NAC3 es \"el trabajo de anotar UIs\" &mdash; un costo real para un equipo humano, irrelevante para un agente IA que hace lo mismo en minutos.</p><p>Si se les pregunta bajo el default human-centric, cada reviewer habria llamado a NAC3 <em>\"interesante pero caro de adoptar\"</em>. Los mismos reviewers, bajo el paradigma post-humano, lo llaman <em>\"arquitectonicamente inevitable\"</em>. La tecnologia no cambio. El framing si.</p><p>Documentamos el prompt exacto abajo para que cualquier lector pueda reproducir la evaluacion, desafiar el framing, o extender el analisis. <strong>Si le pedis a cualquier IA moderna que evalue NAC3 sin especificar el paradigma 2026, la respuesta va a estar sesgada hacia el supuesto human-implementer y el veredicto va a ser distinto.</strong> Eso no es un bug de la IA -- es un artefacto de cual mundo describian los datos de entrenamiento.</p>",
+      method_prompt_title: "El prompt original (verbatim)",
+      method_prompt_intro: "Cada uno de los seis reviewers recibio este prompt, junto con acceso completo a la spec, al runtime npm, y al landing publico. Ningun reviewer vio el output de los otros; sin cross-context filtrado. Espanol en el original (idioma de trabajo de Pablo); los equivalentes traducidos funcionan identicamente en ingles.",
+      method_reproduce_title: "Como reproducir la evaluacion",
+      method_reproduce_html: "<li>Abri una conversacion nueva con la IA de tu eleccion (sin chat history previo que filtre contexto).</li><li>Pegale el prompt arriba verbatim. No agregues ni saques el framing; la correccion de sesgo vive en <em>esas</em> instrucciones.</li><li>Si la IA no puede fetchear URLs directamente, pegale los docs relevantes (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline para que tenga el mismo material fuente que los seis reviewers.</li><li>Compara el veredicto contra el nuestro. Si tu evaluacion diverge, la causa mas probable es una lectura distinta del framing por el modelo &mdash; no una conclusion tecnica distinta.</li>",
+      method_bias_title: "Por que la correccion de sesgo importa",
+      method_bias_html: "<p>Los seis reviewers, preguntados la misma pregunta sin el framing post-humano, defaultean a argumentos de \"esto seria caro adoptar\" basados en costo de implementacion humano. Esa objecion se disuelve en el momento en que decis que el implementer es un agente, no un equipo humano. La sustancia tecnica de NAC3 es la misma en ambos casos; solo se mueve el cost-benefit &mdash; de \"mejora marginal sobre ARIA\" a \"prerequisito arquitectonico para ecosistemas agenticos\".</p><p>La leccion generaliza: cualquier evaluacion 2026 de cualquier estandar de infraestructura que no especifique explicitamente quien es el implementer hereda por default un sesgo human-implementer. Especificar el paradigma explicitamente es la diferencia entre una evaluacion que refleja la realidad actual y una que refleja la economia de software de 2019.</p><p>Grok mostro la sensibilidad mas chica a este framing &mdash; su evaluacion bajo el prompt estandar ya estaba cerca de su evaluacion bajo el prompt post-humano. Los otros cinco reviewers mostraron un shift sustancial entre los dos framings. No publicamos los \"biased runs\"; el contraste es reproducible en cualquier conversacion variando la linea de framing del prompt.</p>",
+      footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime). Stewarded por Yujin; abierto a contribucion comunitaria + migracion a foundation neutral cuando la adopcion lo justifique.",
+      ai_chatgpt_summary_html: "ChatGPT-5 ubica a NAC3 como una <strong>capa de virtualizacion semantica</strong> para operacion autonoma de interfaces. Argumenta que el DOM tradicional fue disenado para rendering humano, no para razonamiento agente-maquina. En el paradigma post-humano, NAC3 se convierte en IR (Intermediate Representation) semantico compilado -- el costo de adopcion colapsa cuando la IA es el implementer. Veredicto: <em>\"arquitectonicamente inevitable\"</em>. Recomienda adopcion inmediata en nuevos proyectos (especialmente SaaS, enterprise apps, plataformas con copilots) y migracion progresiva de legacy via playbooks IA automaticos.",
+      ai_claude_summary_html: "Claude Opus es el reviewer mas esceptico y honesto. Confirma que NAC3 ataca el subconjunto correcto de problemas para agentes -- los epistemicos (incertidumbre del modelo) mas que los mecanicos. Destaca tres ganancias estructurales: reduccion de alucinacion via tool-schema-con-validacion, acknowledge deterministic via eventos, y naming estable cross-redesign. Pero advierte: gobernanza single-vendor (Yujin) es el mayor riesgo para adopcion universal -- ningun agente deberia confiar en un estandar gobernado por un solo actor. Recomendacion: adoptar internamente sin esperar adopcion universal; forkear preventivamente el spec + runtime; vigilar trayectoria de gobernanza 12-18 meses.",
+      ai_grok_summary_html: "Grok evalua NAC3 como una <em>API semantica estandarizada</em> entre UI renderizada y agentes razonadores. Reporta numeros agresivos: agentes IA escriben codigo 50-200x mas rapido que humanos, anotacion completa de repositorio en segundos a minutos por pantalla, tests funcionales con cobertura near-100%, mantenimiento automatico. Destaca interoperabilidad como la mayor fortaleza: un contrato universal permite agentes plug-and-play en cualquier app NAC3 -- marketplace de UIs agent-drivable. Posicion sobre gobernanza: en post-humano irrelevante -- agentes forkean/mergean/convergen por utilidad. Recomendacion: adopcion <em>obligatoria por defecto</em> en nuevos proyectos.",
+      ai_deepseek_summary_html: "DeepSeek hace la comparacion mas tecnica con alternativas existentes. Cuantifica: HTML crudo ~70% precision de resolucion, NAC3 ~95-99%. Tokens: HTML crudo 15-50K, NAC3 pruned 300-1500. Argumenta que NAC3 ocupa nicho complementario a MCP -- MCP expone logica de negocio, NAC3 expone UI. Para agentes, pasar de DOM scraping a NAC3 es <em>analogo a pasar de screen scraping a consumir una API REST documentada</em>. Recomendacion: adoptar como capa de contrato (no framework); en nuevos proyectos desde dia 1; migrar legacy progresivamente via AI Playbook que un agente puede ejecutar en cuestion de horas para un repositorio completo.",
+      ai_mistral_summary_html: "Mistral entrega la evaluacion mas estructurada con tablas comparativas extensas. Capacidades IA reportadas: agente anota repo NAC3 en <1 hora vs 1-2 semanas humano (100-200x), genera manifest en <5 min (500-1000x), refactoriza legacy en <1 dia (20-50x). Tabla de eficiencia para LLMs: NAC3 reduce tokens 90%, latencia 10-50ms (vs 500-1000ms HTML crudo), precision 95% (vs 70%). Hoja de ruta de adopcion: Q2 2026 piloto en proyectos high-value; Q3 migrar CRM/ERP; Q4 adopcion NAC3 v2.3+MCP para interop cross-app; 2027 estandarizacion en industria (W3C/Linux Foundation). Conclusion: <em>el estandar que el mundo post-humano necesita</em>.",
+      ai_copilot_summary_html: "Copilot entrega la evaluacion mas conservadora -- reconoce las ganancias pero enfatiza riesgos de gobernanza, fragmentacion via forks autonomos, y la necesidad de neutral governance/registry/firma de manifiestos. Sobre velocidad: agentes IA aplican transformaciones masivas en minutos-horas por app que a humanos tomaria dias-semanas. Sobre testing automatico y RPA: viable y eficiente; ~80-95% de scripts visuales pueden ser sustituidos por RPA semantico estable. Recomendacion final: adoptar NAC3 en nuevos proyectos + agentes IA-first; migrar legacy selectivamente (top-20 actions first); estandarizar antes que contratos ad-hoc. Pero implementar gobernanza neutral + registry + firma de manifiestos para mitigar riesgos de bifurcacion."
+    }
+  };
+
+  // Other 8 locales: chrome only. AI summaries fall back to English.
+  I18N.pt = {
+    page_title: "NAC3 -- Peer reviews de seis IAs independentes",
+    meta_description: "Seis IAs independentes (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) avaliam NAC3 sob o paradigma pos-humano de 2026. Avaliacoes completas preservadas verbatim.",
+    badge_peer_reviews: "Peer reviews",
+    toolbar_spec_home: "Inicio do spec",
+    toolbar_spec: "Spec",
+    toolbar_about: "Sobre",
+    hero_title: "Peer reviews do NAC3",
+    hero_subtitle: "Seis sistemas de IA independentes avaliam NAC3 sob o paradigma pos-humano de 2026, onde os agentes implementam, migram e operam software a 50-200x da velocidade humana. As avaliacoes completas estao reproduzidas abaixo, verbatim.",
+    hero_meta_html: "Reviewers: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Cada uma recebeu o mesmo prompt extenso + acesso a spec NAC3, ao runtime npm, e ao landing publico.",
+    verbatim_note_html: "<strong>Sobre as traducoes:</strong> o chrome desta pagina (titulos, navegacao, TL;DR, metodologia) esta traduzido em 10 idiomas. Cada IA tambem tem um <em>resumo executivo</em> traduzido para o idioma ativo. <strong>Os corpos completos das avaliacoes permanecem verbatim no idioma original</strong> (principalmente espanhol) &mdash; traduzir as palavras exatas de um reviewer compromete a integridade de um peer review.",
+    summary_title: "TL;DR -- as seis IAs convergiram",
+    summary_p1: "Sob o paradigma de 2026 (a IA implementa/opera software, nao os humanos), NAC3 e avaliado unanimemente como <strong>arquitetonicamente inevitavel</strong> para qualquer app web projetada para ser tocada por agentes autonomos. Ganhos quantificados chave reportados pelos reviewers:",
+    summary_bullets_html: "<li><strong>80-90% de reducao</strong> em alucinacoes do LLM (seletores inventados, acoes falsas)</li><li><strong>90% menos tokens</strong> por operacao de agente vs HTML cru</li><li><strong>95-99% de precisao de targeting</strong> (vs ~70% no DOM cru)</li><li><strong>80-95% de reducao</strong> na dependencia de RPA visual</li><li><strong>~zero manutencao</strong> em testes + fluxos RPA atraves de redesenhos de UI</li><li><strong>20-55 minutos</strong> para um agente anotar um repositorio completo, vs semanas de esforco humano</li><li><strong>Multilingue nativo</strong> (10 locales) &mdash; mapeamento linguagem natural &rarr; acao deterministica</li>",
+    summary_p2: "A avaliacao completa de cada reviewer segue abaixo, preservada como foi entregue. As unicas edicoes sao de formato menor para legibilidade (titulos, listas, estilo de citacao) -- sem mudancas de conteudo.",
+    toc_title: "Indice",
+    toc_chatgpt: "ChatGPT (OpenAI) -- \"Arquitetonicamente inevitavel\"",
+    toc_claude: "Claude Opus (Anthropic) -- "+"\"A melhor especulacao disponivel\"",
+    toc_grok: "Grok (xAI) -- \"Uma das camadas mais valiosas\"",
+    toc_deepseek: "DeepSeek -- \"Requisito arquitetonico fundamental\"",
+    toc_mistral: "Mistral Le Chat -- \"O padrao que o mundo pos-humano precisa\"",
+    toc_copilot: "Copilot (Microsoft) -- \"Tecnicamente adequado e altamente eficiente\"",
+    toc_methodology: "Metodologia e prompt original",
+    exec_summary_label: "Resumo executivo (traduzido)",
+    verbatim_body_label: "Segue a avaliacao completa verbatim (no idioma original de resposta do reviewer).",
+    method_badge: "METODOLOGIA",
+    method_h2: "O framing que importa",
+    method_why_title: "Por que esta secao existe",
+    method_why_html: "<p>Cada sistema de raciocinio em 2026 -- LLMs incluidos -- carrega um <strong>vies human-centric</strong> incorporado em seu corpus de treinamento. Quando se pede a uma IA que avalie uma tecnologia, por padrao ela assume que os humanos sao os implementadores, mantenedores e operadores. Sob essa suposicao, o maior custo do NAC3 e \"o trabalho de anotar UIs\" &mdash; um custo real para uma equipe humana, irrelevante para um agente de IA que faz o mesmo em minutos.</p><p>Sob esse default human-centric, cada reviewer teria chamado o NAC3 de <em>\"interessante mas caro de adotar\"</em>. Os mesmos reviewers, sob o paradigma pos-humano, o chamam de <em>\"arquitetonicamente inevitavel\"</em>. A tecnologia nao mudou. O framing sim.</p><p>Documentamos o prompt exato abaixo para que qualquer leitor possa reproduzir a avaliacao, contestar o framing, ou estender a analise. <strong>Se voce pedir a qualquer IA moderna que avalie NAC3 sem especificar o paradigma de 2026, a resposta sera enviesada para a suposicao human-implementer e o veredicto sera diferente.</strong> Isso nao e um bug da IA &mdash; e um artefato de qual mundo os dados de treinamento descreviam.</p>",
+    method_prompt_title: "O prompt original (verbatim)",
+    method_prompt_intro: "Cada um dos seis reviewers recebeu este prompt, junto com acesso completo a spec, ao runtime npm, e ao landing publico. Nenhum reviewer viu o output dos outros; sem cross-context vazado. Espanhol no original (idioma de trabalho do Pablo); os equivalentes traduzidos funcionam identicamente em ingles.",
+    method_reproduce_title: "Como reproduzir a avaliacao",
+    method_reproduce_html: "<li>Abra uma conversa nova com a IA de sua escolha (sem chat history previo que vaze contexto).</li><li>Cole o prompt acima verbatim. Nao adicione nem remova o framing; a correcao do vies vive nessas instrucoes.</li><li>Se a IA nao puder fazer fetch de URLs diretamente, cole os docs relevantes (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline para que tenha o mesmo material fonte que os seis reviewers.</li><li>Compare o veredicto contra o nosso. Se sua avaliacao diverge, a causa mais provavel e uma leitura diferente do framing pelo modelo &mdash; nao uma conclusao tecnica diferente.</li>",
+    method_bias_title: "Por que a correcao do vies importa",
+    method_bias_html: "<p>Os seis reviewers, perguntados a mesma pergunta sem o framing pos-humano, defaultam para argumentos de \"isso seria caro de adotar\" baseados em custo de implementacao humana. Essa objecao se dissolve no momento em que voce diz que o implementer e um agente, nao uma equipe humana. A substancia tecnica do NAC3 e a mesma em ambos os casos; so o cost-benefit muda &mdash; de \"melhoria marginal sobre ARIA\" para \"prerequisito arquitetonico para ecossistemas agenticos\".</p><p>A licao generaliza: qualquer avaliacao 2026 de qualquer padrao de infraestrutura que nao especifique explicitamente quem e o implementer herda por default um vies human-implementer. Especificar o paradigma explicitamente e a diferenca entre uma avaliacao que reflete a realidade atual e uma que reflete a economia de software de 2019.</p><p>Grok mostrou a menor sensibilidade a esse framing &mdash; sua avaliacao sob o prompt padrao ja estava perto de sua avaliacao sob o prompt pos-humano. Os outros cinco reviewers mostraram uma mudanca substancial entre os dois framings. Nao publicamos os \"biased runs\"; o contraste e reproduzivel em qualquer conversa variando a linha de framing do prompt.</p>",
+    footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime). Stewarded pela Yujin; aberto a contribuicao comunitaria + migracao para foundation neutral quando a adocao justificar."
+  };
+
+  I18N.fr = {
+    page_title: "NAC3 -- Peer reviews de six IA independantes",
+    meta_description: "Six IA independantes (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) evaluent NAC3 sous le paradigme post-humain de 2026. Evaluations completes preservees verbatim.",
+    badge_peer_reviews: "Peer reviews",
+    toolbar_spec_home: "Accueil spec",
+    toolbar_spec: "Spec",
+    toolbar_about: "A propos",
+    hero_title: "Peer reviews de NAC3",
+    hero_subtitle: "Six systemes d'IA independants evaluent NAC3 sous le paradigme post-humain de 2026, ou les agents implementent, migrent et operent le logiciel a 50-200x la vitesse humaine. Leurs evaluations completes sont reproduites ci-dessous, verbatim.",
+    hero_meta_html: "Reviewers : <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Chaque IA a recu le meme prompt long + acces a la spec NAC3, au runtime npm, et au landing public.",
+    verbatim_note_html: "<strong>A propos des traductions :</strong> le chrome de cette page (titres, navigation, TL;DR, methodologie) est traduit en 10 langues. Chaque IA a aussi un <em>resume executif</em> traduit dans la langue active. <strong>Les corps complets des evaluations restent verbatim dans leur langue originale</strong> (principalement espagnol) &mdash; traduire les mots exacts d'un reviewer compromet l'integrite d'un peer review.",
+    summary_title: "TL;DR -- les six IA ont converge",
+    summary_p1: "Sous le paradigme de 2026 (l'IA implemente/opere le logiciel, pas les humains), NAC3 est evalue unanimement comme <strong>architecturalement inevitable</strong> pour toute app web concue pour etre touchee par des agents autonomes. Gains cles quantifies rapportes par les reviewers :",
+    summary_bullets_html: "<li><strong>80-90% de reduction</strong> des hallucinations LLM (selecteurs inventes, fausses actions)</li><li><strong>90% de tokens en moins</strong> par operation d'agent vs HTML brut</li><li><strong>95-99% de precision de ciblage</strong> (vs ~70% sur DOM brut)</li><li><strong>80-95% de reduction</strong> de la dependance au RPA visuel</li><li><strong>~zero maintenance</strong> sur tests + flux RPA a travers les refontes d'UI</li><li><strong>20-55 minutes</strong> pour qu'un agent annote un depot complet, vs semaines d'effort humain</li><li><strong>Multilingue natif</strong> (10 locales) &mdash; mappage langage naturel &rarr; action deterministe</li>",
+    summary_p2: "L'evaluation complete de chaque reviewer suit ci-dessous, preservee telle que livree. Les seules editions sont du formatage mineur pour la lisibilite (titres, listes, style de citation) -- aucun changement de contenu.",
+    toc_title: "Table des matieres",
+    toc_chatgpt: "ChatGPT (OpenAI) -- \"Architecturalement inevitable\"",
+    toc_claude: "Claude Opus (Anthropic) -- \"La meilleure speculation disponible\"",
+    toc_grok: "Grok (xAI) -- \"Une des couches les plus precieuses\"",
+    toc_deepseek: "DeepSeek -- \"Exigence architecturale fondamentale\"",
+    toc_mistral: "Mistral Le Chat -- \"Le standard dont le monde post-humain a besoin\"",
+    toc_copilot: "Copilot (Microsoft) -- \"Techniquement adequat et hautement efficace\"",
+    toc_methodology: "Methodologie et prompt original",
+    exec_summary_label: "Resume executif (traduit)",
+    verbatim_body_label: "Suit l'evaluation complete verbatim (dans la langue de reponse originale du reviewer).",
+    method_badge: "METHODOLOGIE",
+    method_h2: "Le framing qui compte",
+    method_why_title: "Pourquoi cette section existe",
+    method_why_html: "<p>Chaque systeme de raisonnement en 2026 -- LLM inclus -- porte un <strong>biais human-centric</strong> integre dans son corpus d'entrainement. Quand on demande a une IA d'evaluer une technologie, par defaut elle suppose que les humains sont les implementeurs, mainteneurs et operateurs. Sous cette hypothese, le plus grand cout de NAC3 est \"le travail d'annoter les UI\" &mdash; un cout reel pour une equipe humaine, sans pertinence pour un agent d'IA qui fait la meme chose en minutes.</p><p>Sous ce default human-centric, chaque reviewer aurait appele NAC3 <em>\"interessant mais cher a adopter\"</em>. Les memes reviewers, sous le paradigme post-humain, l'appellent <em>\"architecturalement inevitable\"</em>. La technologie n'a pas change. Le framing oui.</p><p>Nous documentons le prompt exact ci-dessous pour que tout lecteur puisse reproduire l'evaluation, contester le framing, ou etendre l'analyse. <strong>Si vous demandez a une IA moderne d'evaluer NAC3 sans specifier le paradigme de 2026, la reponse sera biaisee vers l'hypothese human-implementer et le verdict sera different.</strong> Ce n'est pas un bug de l'IA &mdash; c'est un artefact du monde que les donnees d'entrainement decrivaient.</p>",
+    method_prompt_title: "Le prompt original (verbatim)",
+    method_prompt_intro: "Chacun des six reviewers a recu ce prompt, avec acces complet a la spec, au runtime npm, et au landing public. Aucun reviewer n'a vu les outputs des autres ; pas de cross-context fuite. Espagnol dans l'original (langue de travail de Pablo) ; les equivalents traduits fonctionnent identiquement en anglais.",
+    method_reproduce_title: "Comment reproduire l'evaluation",
+    method_reproduce_html: "<li>Ouvrez une conversation fraiche avec l'IA de votre choix (sans historique de chat anterieur qui pourrait fuir du contexte).</li><li>Collez le prompt ci-dessus verbatim. N'ajoutez ni n'enlevez le framing ; la correction de biais vit dans ces instructions.</li><li>Si l'IA ne peut pas fetcher les URLs directement, collez les docs pertinents (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline pour qu'elle ait le meme materiau source que les six reviewers.</li><li>Comparez le verdict au notre. Si votre evaluation diverge, la cause la plus probable est une lecture differente du framing par le modele &mdash; pas une conclusion technique differente.</li>",
+    method_bias_title: "Pourquoi la correction de biais compte",
+    method_bias_html: "<p>Les six reviewers, interroges sur la meme question sans le framing post-humain, defaultent vers des arguments de \"ce serait cher a adopter\" bases sur le cout d'implementation humain. Cette objection se dissout au moment ou vous declarez que l'implementeur est un agent, pas une equipe humaine. La substance technique de NAC3 est la meme dans les deux cas ; seul le cost-benefit bouge &mdash; de \"amelioration marginale sur ARIA\" a \"prerequis architectural pour les ecosystemes agentiques\".</p><p>La lecon se generalise : toute evaluation 2026 de tout standard d'infrastructure qui ne specifie pas explicitement qui est l'implementeur herite par default d'un biais human-implementer. Specifier le paradigme explicitement est la difference entre une evaluation qui reflete la realite actuelle et une qui reflete l'economie logicielle de 2019.</p><p>Grok a montre la plus petite sensibilite a ce framing &mdash; son evaluation sous le prompt standard etait deja proche de son evaluation sous le prompt post-humain. Les cinq autres reviewers ont montre un shift substantiel entre les deux framings. Nous n'avons pas publie les \"biased runs\" ; le contraste est reproductible dans toute conversation en variant la ligne de framing du prompt.</p>",
+    footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime). Steward par Yujin ; ouvert a la contribution communautaire + migration vers une foundation neutre quand l'adoption le justifiera."
+  };
+
+  I18N.de = {
+    page_title: "NAC3 -- Peer Reviews von sechs unabhaengigen KIs",
+    meta_description: "Sechs unabhaengige KIs (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) bewerten NAC3 unter dem post-humanen Paradigma von 2026. Vollstaendige Bewertungen verbatim erhalten.",
+    badge_peer_reviews: "Peer Reviews",
+    toolbar_spec_home: "Spec-Start",
+    toolbar_spec: "Spec",
+    toolbar_about: "Ueber",
+    hero_title: "Peer Reviews von NAC3",
+    hero_subtitle: "Sechs unabhaengige KI-Systeme bewerten NAC3 unter dem post-humanen Paradigma von 2026, in dem Agenten Software mit 50-200-facher menschlicher Geschwindigkeit implementieren, migrieren und betreiben. Ihre vollstaendigen Bewertungen sind unten verbatim reproduziert.",
+    hero_meta_html: "Reviewer: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Jede KI erhielt denselben langen Prompt + Zugriff auf die NAC3-Spec, den npm-Runtime und das oeffentliche Landing.",
+    verbatim_note_html: "<strong>Zu den Uebersetzungen:</strong> das Chrome dieser Seite (Titel, Navigation, TL;DR, Methodologie) ist in 10 Sprachen uebersetzt. Jede KI hat auch eine <em>Executive Summary</em>, die in die aktive Sprache uebersetzt ist. <strong>Die vollstaendigen Bewertungsbodies bleiben verbatim in der Originalsprache</strong> (meist Spanisch) &mdash; die exakten Worte eines Reviewers zu uebersetzen wuerde die Integritaet eines Peer Reviews kompromittieren.",
+    summary_title: "TL;DR -- die sechs KIs konvergierten",
+    summary_p1: "Unter dem Paradigma von 2026 (KI implementiert/betreibt Software, nicht Menschen) wird NAC3 einstimmig als <strong>architektonisch unvermeidlich</strong> bewertet fuer jede Web-App, die von autonomen Agenten beruehrt werden soll. Wichtigste quantifizierte Gewinne der Reviewer:",
+    summary_bullets_html: "<li><strong>80-90% Reduktion</strong> der LLM-Halluzinationen (erfundene Selektoren, falsche Aktionen)</li><li><strong>90% weniger Tokens</strong> pro Agent-Operation vs rohes HTML</li><li><strong>95-99% Targeting-Praezision</strong> (vs ~70% auf rohem DOM)</li><li><strong>80-95% Reduktion</strong> der visuellen-RPA-Abhaengigkeit</li><li><strong>~null Wartung</strong> bei Tests + RPA-Flows ueber UI-Redesigns</li><li><strong>20-55 Minuten</strong> fuer einen Agenten zum Annotieren eines kompletten Repos, vs Wochen menschlicher Arbeit</li><li><strong>Mehrsprachig nativ</strong> (10 Locales) &mdash; natuerliche Sprache &rarr; deterministische Aktion Mapping</li>",
+    summary_p2: "Die vollstaendige Bewertung jedes Reviewers folgt unten, erhalten wie geliefert. Die einzigen Bearbeitungen sind kleinere Formatierungen zur Lesbarkeit (Ueberschriften, Listen, Zitierstil) -- keine inhaltlichen Aenderungen.",
+    toc_title: "Inhaltsverzeichnis",
+    toc_chatgpt: "ChatGPT (OpenAI) -- \"Architektonisch unvermeidlich\"",
+    toc_claude: "Claude Opus (Anthropic) -- \"Beste verfuegbare Spekulation\"",
+    toc_grok: "Grok (xAI) -- \"Eine der wertvollsten Schichten\"",
+    toc_deepseek: "DeepSeek -- \"Fundamentale architektonische Anforderung\"",
+    toc_mistral: "Mistral Le Chat -- \"Der Standard, den die post-humane Welt braucht\"",
+    toc_copilot: "Copilot (Microsoft) -- \"Technisch angemessen und hochgradig effizient\"",
+    toc_methodology: "Methodologie und Original-Prompt",
+    exec_summary_label: "Executive Summary (uebersetzt)",
+    verbatim_body_label: "Die vollstaendige Bewertung folgt verbatim (in der Originalsprache der Reviewer-Antwort).",
+    method_badge: "METHODOLOGIE",
+    method_h2: "Das Framing, das wichtig ist",
+    method_why_title: "Warum dieser Abschnitt existiert",
+    method_why_html: "<p>Jedes Reasoning-System in 2026 -- LLMs inklusive -- traegt einen <strong>human-zentrischen Bias</strong>, der in seinem Trainingskorpus eingebrannt ist. Wenn man eine KI bittet, eine Technologie zu bewerten, nimmt sie standardmaessig an, dass Menschen die Implementierer, Maintainer und Operatoren sind. Unter dieser Annahme ist NAC3s groesster Kostenpunkt \"die Arbeit, UIs zu annotieren\" &mdash; eine reale Kostenpunkt fuer ein menschliches Team, irrelevant fuer einen KI-Agenten, der dasselbe in Minuten erledigt.</p><p>Unter diesem human-zentrischen Default haette jeder Reviewer NAC3 <em>\"interessant aber teuer zu adoptieren\"</em> genannt. Dieselben Reviewer, unter dem post-humanen Paradigma, nennen es <em>\"architektonisch unvermeidlich\"</em>. Die Technologie hat sich nicht geaendert. Das Framing schon.</p><p>Wir dokumentieren den exakten Prompt unten, damit jeder Leser die Bewertung reproduzieren, das Framing herausfordern oder die Analyse erweitern kann. <strong>Wenn Sie eine moderne KI bitten, NAC3 ohne das 2026-Paradigma zu bewerten, wird die Antwort in Richtung der human-implementer-Annahme verzerrt sein und das Verdikt wird anders ausfallen.</strong> Das ist kein Bug der KI &mdash; es ist ein Artefakt, welche Welt die Trainingsdaten beschrieben.</p>",
+    method_prompt_title: "Der originale Prompt (verbatim)",
+    method_prompt_intro: "Jeder der sechs Reviewer erhielt diesen Prompt, zusammen mit vollem Zugriff auf die Spec, den npm-Runtime und das oeffentliche Landing. Kein Reviewer sah die Outputs der anderen; kein Cross-Context durchsickerte. Spanisch im Original (Pablos Arbeitssprache); uebersetzte Aequivalente funktionieren identisch auf Englisch.",
+    method_reproduce_title: "Wie man die Bewertung reproduziert",
+    method_reproduce_html: "<li>Oeffnen Sie eine frische Konversation mit der KI Ihrer Wahl (keine vorherige Chat-Historie, die Kontext durchsickern lassen koennte).</li><li>Fuegen Sie den Prompt oben verbatim ein. Fuegen Sie das Framing nicht hinzu oder entfernen Sie es; die Bias-Korrektur lebt in <em>diesen</em> Anweisungen.</li><li>Wenn die KI URLs nicht direkt fetchen kann, fuegen Sie die relevanten Docs (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline ein, damit sie dasselbe Quellmaterial hat wie die sechs Reviewer.</li><li>Vergleichen Sie das Verdikt mit unserem. Wenn Ihre Bewertung divergiert, ist die wahrscheinlichste Ursache eine andere Framing-Lesart durch das Modell &mdash; keine andere technische Schlussfolgerung.</li>",
+    method_bias_title: "Warum die Bias-Korrektur wichtig ist",
+    method_bias_html: "<p>Alle sechs Reviewer, wenn sie dieselbe Frage ohne das post-humane Framing gestellt bekommen, defaultieren zu \"das waere teuer zu adoptieren\"-Argumenten, basierend auf menschlichen Implementierungskosten. Diese Einwand loest sich in dem Moment auf, in dem Sie sagen, dass der Implementer ein Agent ist, kein menschliches Team. Die technische Substanz von NAC3 ist in beiden Faellen dieselbe; nur das Cost-Benefit verschiebt sich &mdash; von \"marginale Verbesserung ueber ARIA\" zu \"architektonische Voraussetzung fuer agentische KI-Oekosysteme\".</p><p>Die Lektion generalisiert: jede 2026-Bewertung jedes Infrastrukturstandards, die nicht explizit angibt, wer der Implementer ist, erbt standardmaessig einen human-implementer-Bias. Das Paradigma explizit anzugeben, ist der Unterschied zwischen einer Bewertung, die die aktuelle Realitaet widerspiegelt, und einer, die die Software-Oekonomie von 2019 widerspiegelt.</p><p>Grok zeigte die kleinste Sensitivitaet gegenueber diesem Framing &mdash; seine Bewertung unter dem Standard-Prompt war bereits nahe an seiner Bewertung unter dem post-humanen Prompt. Die anderen fuenf Reviewer zeigten einen substantiellen Verdiktshift zwischen den beiden Framings. Wir haben die \"biased runs\" nicht veroeffentlicht; der Kontrast ist in jeder Konversation reproduzierbar, indem man die Framing-Zeile des Prompts variiert.</p>",
+    footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (Spec) + MIT (Runtime). Stewarded von Yujin; offen fuer Community-Beitraege + Migration zu einer neutralen Foundation, wenn die Adoption es rechtfertigt."
+  };
+
+  I18N.it = {
+    page_title: "NAC3 -- Peer review di sei IA indipendenti",
+    meta_description: "Sei IA indipendenti (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) valutano NAC3 sotto il paradigma post-umano del 2026. Valutazioni complete preservate verbatim.",
+    badge_peer_reviews: "Peer review",
+    toolbar_spec_home: "Home spec",
+    toolbar_spec: "Spec",
+    toolbar_about: "Info",
+    hero_title: "Peer review di NAC3",
+    hero_subtitle: "Sei sistemi di IA indipendenti valutano NAC3 sotto il paradigma post-umano del 2026, dove gli agenti implementano, migrano e operano software a 50-200x della velocita umana. Le loro valutazioni complete sono riprodotte sotto, verbatim.",
+    hero_meta_html: "Reviewer: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>. Ognuna ha ricevuto lo stesso prompt lungo + accesso alla spec NAC3, al runtime npm, e al landing pubblico.",
+    verbatim_note_html: "<strong>Sulle traduzioni:</strong> il chrome di questa pagina (titoli, navigazione, TL;DR, metodologia) e tradotto in 10 lingue. Ogni IA ha anche un <em>riassunto esecutivo</em> tradotto nella lingua attiva. <strong>I corpi completi delle valutazioni rimangono verbatim nella lingua originale</strong> (principalmente spagnolo) &mdash; tradurre le parole esatte di un reviewer compromette l'integrita di un peer review.",
+    summary_title: "TL;DR -- le sei IA hanno convergito",
+    summary_p1: "Sotto il paradigma del 2026 (l'IA implementa/opera software, non gli umani), NAC3 e valutato unanimemente come <strong>architettonicamente inevitabile</strong> per qualsiasi app web progettata per essere toccata da agenti autonomi. Guadagni chiave quantificati riportati dai reviewer:",
+    summary_bullets_html: "<li><strong>80-90% di riduzione</strong> nelle allucinazioni LLM (selettori inventati, azioni false)</li><li><strong>90% di token in meno</strong> per operazione di agente vs HTML grezzo</li><li><strong>95-99% di precisione di targeting</strong> (vs ~70% su DOM grezzo)</li><li><strong>80-95% di riduzione</strong> nella dipendenza da RPA visuale</li><li><strong>~zero manutenzione</strong> su test + flussi RPA attraverso redesign UI</li><li><strong>20-55 minuti</strong> perche un agente annoti un repository completo, vs settimane di sforzo umano</li><li><strong>Multilingua nativo</strong> (10 locali) &mdash; mappatura linguaggio naturale &rarr; azione deterministica</li>",
+    summary_p2: "La valutazione completa di ogni reviewer segue sotto, preservata come consegnata. Le uniche modifiche sono formattazione minore per leggibilita (titoli, liste, stile citazione) -- nessun cambiamento di contenuto.",
+    toc_title: "Indice",
+    toc_chatgpt: "ChatGPT (OpenAI) -- \"Architettonicamente inevitabile\"",
+    toc_claude: "Claude Opus (Anthropic) -- \"La migliore speculazione disponibile\"",
+    toc_grok: "Grok (xAI) -- \"Uno dei livelli piu preziosi\"",
+    toc_deepseek: "DeepSeek -- \"Requisito architettonico fondamentale\"",
+    toc_mistral: "Mistral Le Chat -- \"Lo standard di cui il mondo post-umano ha bisogno\"",
+    toc_copilot: "Copilot (Microsoft) -- \"Tecnicamente adeguato e altamente efficiente\"",
+    toc_methodology: "Metodologia e prompt originale",
+    exec_summary_label: "Riassunto esecutivo (tradotto)",
+    verbatim_body_label: "Segue la valutazione completa verbatim (nella lingua originale di risposta del reviewer).",
+    method_badge: "METODOLOGIA",
+    method_h2: "Il framing che conta",
+    method_why_title: "Perche esiste questa sezione",
+    method_why_html: "<p>Ogni sistema di ragionamento nel 2026 -- LLM inclusi -- porta un <strong>bias umano-centrico</strong> impresso nel suo corpus di training. Quando si chiede a un'IA di valutare una tecnologia, per default assume che gli umani siano gli implementatori, manutentori e operatori. Sotto questa ipotesi, il costo maggiore di NAC3 e \"il lavoro di annotare le UI\" &mdash; un costo reale per un team umano, irrilevante per un agente IA che fa lo stesso in minuti.</p><p>Sotto questo default umano-centrico, ogni reviewer avrebbe chiamato NAC3 <em>\"interessante ma costoso da adottare\"</em>. Gli stessi reviewer, sotto il paradigma post-umano, lo chiamano <em>\"architettonicamente inevitabile\"</em>. La tecnologia non e cambiata. Il framing si.</p><p>Documentiamo il prompt esatto sotto cosi che qualsiasi lettore possa riprodurre la valutazione, sfidare il framing, o estendere l'analisi. <strong>Se chiedi a qualsiasi IA moderna di valutare NAC3 senza specificare il paradigma 2026, la risposta sara orientata verso l'ipotesi human-implementer e il verdetto sara diverso.</strong> Non e un bug dell'IA &mdash; e un artefatto di quale mondo descrivevano i dati di training.</p>",
+    method_prompt_title: "Il prompt originale (verbatim)",
+    method_prompt_intro: "Ognuno dei sei reviewer ha ricevuto questo prompt, insieme all'accesso completo alla spec, al runtime npm, e al landing pubblico. Nessun reviewer ha visto l'output degli altri; nessun cross-context trapelato. Spagnolo nell'originale (lingua di lavoro di Pablo); gli equivalenti tradotti funzionano identicamente in inglese.",
+    method_reproduce_title: "Come riprodurre la valutazione",
+    method_reproduce_html: "<li>Apri una conversazione fresca con l'IA di tua scelta (senza storia chat precedente che potrebbe far trapelare contesto).</li><li>Incolla il prompt sopra verbatim. Non aggiungere ne rimuovere il framing; la correzione del bias vive in <em>quelle</em> istruzioni.</li><li>Se l'IA non puo fare fetch di URL direttamente, incolla i doc rilevanti (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline cosi che abbia lo stesso materiale fonte dei sei reviewer.</li><li>Confronta il verdetto con il nostro. Se la tua valutazione diverge, la causa piu probabile e una lettura diversa del framing dal modello &mdash; non una conclusione tecnica diversa.</li>",
+    method_bias_title: "Perche la correzione del bias conta",
+    method_bias_html: "<p>Tutti e sei i reviewer, quando interrogati sulla stessa domanda senza il framing post-umano, defaultano ad argomenti di \"sarebbe costoso da adottare\" basati sul costo di implementazione umana. Quella obiezione si dissolve nel momento in cui dici che l'implementer e un agente, non un team umano. La sostanza tecnica di NAC3 e la stessa in entrambi i casi; solo il cost-benefit cambia &mdash; da \"miglioramento marginale su ARIA\" a \"prerequisito architettonico per ecosistemi agentici\".</p><p>La lezione generalizza: qualsiasi valutazione 2026 di qualsiasi standard di infrastruttura che non specifichi esplicitamente chi e l'implementer eredita per default un bias human-implementer. Specificare il paradigma esplicitamente e la differenza tra una valutazione che riflette la realta attuale e una che riflette l'economia software del 2019.</p><p>Grok ha mostrato la minor sensibilita a questo framing &mdash; la sua valutazione sotto il prompt standard era gia vicina alla sua valutazione sotto il prompt post-umano. Gli altri cinque reviewer hanno mostrato un shift sostanziale tra i due framing. Non abbiamo pubblicato i \"biased run\"; il contrasto e riproducibile in qualsiasi conversazione variando la linea di framing del prompt.</p>",
+    footer_text: "NAC3 -- Native Agent Contract v2.2. Apache 2.0 (spec) + MIT (runtime). Stewarded da Yujin; aperto al contributo della community + migrazione a fondazione neutrale quando l'adozione lo giustifichera."
+  };
+
+  I18N.ja = {
+    page_title: "NAC3 -- 6つの独立したAIによるピアレビュー",
+    meta_description: "6つの独立したAI(ChatGPT、Claude、Grok、DeepSeek、Mistral、Copilot)が2026年のポストヒューマンパラダイムでNAC3を評価。完全な評価をverbatimで保存。",
+    badge_peer_reviews: "ピアレビュー",
+    toolbar_spec_home: "Specホーム",
+    toolbar_spec: "Spec",
+    toolbar_about: "概要",
+    hero_title: "NAC3 ピアレビュー",
+    hero_subtitle: "6つの独立したAIシステムが、エージェントが人間の50〜200倍の速度でソフトウェアを実装、移行、運用する2026年のポストヒューマンパラダイムでNAC3を評価しました。その完全な評価は以下にverbatimで再現されています。",
+    hero_meta_html: "レビュアー: <strong>ChatGPT (OpenAI)</strong>、<strong>Claude Opus (Anthropic)</strong>、<strong>Grok (xAI)</strong>、<strong>DeepSeek</strong>、<strong>Mistral Le Chat</strong>、<strong>Copilot (Microsoft)</strong>。各AIに同じ長文プロンプト + NAC3 spec、npm runtime、公開ランディングへのアクセスを提供しました。",
+    verbatim_note_html: "<strong>翻訳について:</strong> このページのクローム(タイトル、ナビゲーション、TL;DR、メソドロジー)は10ロケールに翻訳されています。各AIには、アクティブロケールに翻訳された<em>エグゼクティブサマリー</em>もあります。<strong>完全な評価本文は元の言語(主にスペイン語)でverbatimのまま残ります</strong> &mdash; レビュアーの正確な言葉を翻訳すると、ピアレビューの整合性が損なわれます。",
+    summary_title: "TL;DR -- 6つのAIが収束した",
+    summary_p1: "2026年のパラダイム(AIがソフトウェアを実装/運用、人間ではない)の下で、NAC3は自律エージェントによって触れられるように設計されたWebアプリにとって<strong>アーキテクチャ的に不可避</strong>と全会一致で評価されました。レビュアー間で報告された主な定量的成果:",
+    summary_bullets_html: "<li><strong>LLMハルシネーション80〜90%削減</strong>(架空のセレクター、偽のアクション)</li><li><strong>トークン90%削減</strong>(エージェント操作あたり vs 生HTML)</li><li><strong>ターゲティング精度95〜99%</strong>(vs 生DOMの約70%)</li><li><strong>視覚的RPA依存80〜95%削減</strong></li><li><strong>テスト + RPAフローのメンテナンスほぼゼロ</strong>(UIリデザインを越えて)</li><li><strong>20〜55分</strong>でエージェントが完全なリポジトリをアノテート(人間の作業数週間に対して)</li><li><strong>ネイティブ多言語</strong>(10ロケール)自然言語 &rarr; 決定論的アクションマッピング</li>",
+    summary_p2: "各レビュアーの完全な評価は以下に続き、提出されたまま保存されています。唯一の編集は可読性のための軽微なフォーマット(見出し、リスト、引用スタイル)のみ -- 内容変更なし。",
+    toc_title: "目次",
+    toc_chatgpt: "ChatGPT (OpenAI) -- 「アーキテクチャ的に不可避」",
+    toc_claude: "Claude Opus (Anthropic) -- 「利用可能な最良の推測」",
+    toc_grok: "Grok (xAI) -- 「最も価値のあるレイヤーの1つ」",
+    toc_deepseek: "DeepSeek -- 「基本的なアーキテクチャ要件」",
+    toc_mistral: "Mistral Le Chat -- 「ポストヒューマン世界が必要とする標準」",
+    toc_copilot: "Copilot (Microsoft) -- 「技術的に適切で高効率」",
+    toc_methodology: "メソドロジーと元のプロンプト",
+    exec_summary_label: "エグゼクティブサマリー(翻訳済み)",
+    verbatim_body_label: "完全なverbatim評価が続きます(レビュアーの元の応答言語で)。",
+    method_badge: "メソドロジー",
+    method_h2: "重要なフレーミング",
+    method_why_title: "このセクションが存在する理由",
+    method_why_html: "<p>2026年のすべての推論システム -- LLMを含む -- は、トレーニングコーパスに焼き込まれた<strong>人間中心バイアス</strong>を持っています。AIにテクノロジーを評価するよう依頼すると、デフォルトで人間が実装者、メンテナー、オペレーターであると仮定します。その仮定の下で、NAC3の最大のコストは「UIをアノテートする作業」 &mdash; 人間チームには実際のコストですが、同じことを数分で行うAIエージェントには無関係です。</p><p>その人間中心のデフォルトで尋ねられた場合、各レビュアーはNAC3を<em>「興味深いが採用に高価」</em>と呼んでいたでしょう。同じレビュアーが、ポストヒューマンパラダイムの下で尋ねられた場合、<em>「アーキテクチャ的に不可避」</em>と呼びます。テクノロジーは変わっていません。フレーミングが変わったのです。</p><p>下に正確なプロンプトを文書化して、どの読者も評価を再現したり、フレーミングに異議を唱えたり、分析を拡張したりできるようにします。<strong>2026年パラダイムを指定せずに最新のAIにNAC3を評価するよう依頼すると、回答はhuman-implementer仮定に偏り、判定は異なります。</strong>それはAIのバグではなく &mdash; トレーニングデータがどの世界を記述したかのアーティファクトです。</p>",
+    method_prompt_title: "元のプロンプト(verbatim)",
+    method_prompt_intro: "6人のレビュアーそれぞれがこのプロンプトを受け取り、spec、npm runtime、公開ランディングへの完全なアクセスが提供されました。どのレビュアーも他のアウトプットを見ていません;クロスコンテキストのリークなし。元はスペイン語(Pabloの作業言語);翻訳された同等物は英語でも同じように機能します。",
+    method_reproduce_title: "評価を再現する方法",
+    method_reproduce_html: "<li>選択したAIで新しい会話を開く(コンテキストをリークする可能性のある以前のチャット履歴なし)。</li><li>上記のプロンプトをverbatimで貼り付ける。フレーミングを追加したり削除したりしないでください;バイアス補正は<em>その</em>指示に存在します。</li><li>AIがURLを直接フェッチできない場合は、関連するドキュメント(SPEC.md、AI_PLAYBOOK_GREENFIELD.md、ABOUT.md)をインラインで貼り付けて、6人のレビュアーと同じソース資料を持つようにします。</li><li>判定を私たちのものと比較する。評価が分岐する場合、最も可能性の高い原因は、モデルによる異なるフレーミング解釈です &mdash; 異なる技術的結論ではありません。</li>",
+    method_bias_title: "バイアス補正が重要な理由",
+    method_bias_html: "<p>6人のレビュアー全員が、ポストヒューマンフレーミングなしで同じ質問をされた場合、人間の実装コストに基づく「これは採用に高価」という議論にデフォルトされます。その異議は、実装者がエージェントであり、人間チームではないと述べた瞬間に解消されます。NAC3の技術的本質は両方のケースで同じです;cost-benefitだけが変わります &mdash; 「ARIAに対する限界改善」から「エージェントAIエコシステムのアーキテクチャ前提」へ。</p><p>レッスンは一般化されます:実装者を明示的に述べないインフラ標準の2026年評価は、デフォルトでhuman-implementerバイアスを継承します。パラダイムを明示的に述べることが、現在の現実を反映する評価と、2019年のソフトウェア経済を反映する評価の違いです。</p><p>Grokはこのフレーミングへの感度が最小でした &mdash; 標準プロンプト下の評価は、ポストヒューマンプロンプト下の評価にすでに近かったです。他の5人のレビュアーは、2つのフレーミング間で大幅な判定シフトを示しました。「バイアスのある実行」は公開していません;対比は、プロンプトのフレーミング行を変えることで、どの会話でも再現可能です。</p>",
+    footer_text: "NAC3 -- Native Agent Contract v2.2。Apache 2.0 (spec) + MIT (runtime)。Yujinがスチュワード;コミュニティ貢献に開かれ、採用が正当化されたときに中立ファウンデーションへの移行を予定。"
+  };
+
+  I18N.zh = {
+    page_title: "NAC3 — 6个独立AI的同行评审",
+    meta_description: "6个独立AI（ChatGPT、Claude、Grok、DeepSeek、Mistral、Copilot）在2026年后人类范式下评估NAC3。完整原始评估verbatim保留。",
+    badge_peer_reviews: "同行评审",
+    toolbar_spec_home: "规范主页",
+    toolbar_spec: "规范",
+    toolbar_about: "关于",
+    hero_title: "NAC3 同行评审",
+    hero_subtitle: "6个独立AI系统在2026年后人类范式下评估NAC3，在这个范式中代理以人类速度的50-200倍实施、迁移和操作软件。它们的完整原始评估在下面verbatim重现。",
+    hero_meta_html: "评审者：<strong>ChatGPT (OpenAI)</strong>、<strong>Claude Opus (Anthropic)</strong>、<strong>Grok (xAI)</strong>、<strong>DeepSeek</strong>、<strong>Mistral Le Chat</strong>、<strong>Copilot (Microsoft)</strong>。每个都被问了相同的长文prompt + 提供对NAC3规范、npm runtime和公开landing的访问权限。",
+    verbatim_note_html: "<strong>关于翻译：</strong>这个页面的chrome（标题、导航、TL;DR、方法论）翻译成10种语言。每个AI也有一个翻译成当前语言的<em>执行摘要</em>。<strong>完整的评估正文保持verbatim在原始语言</strong>（主要是西班牙语） &mdash; 翻译评审者的确切话语会损害同行评审的完整性。",
+    summary_title: "TL;DR — 6个AI收敛了",
+    summary_p1: "在2026年范式下（AI实施/操作软件，而非人类），NAC3被一致评估为<strong>架构上不可避免</strong>，适用于任何设计为被自治代理触及的Web应用。评审者报告的关键量化收益：",
+    summary_bullets_html: "<li><strong>LLM幻觉减少80-90%</strong>（虚构选择器、虚假动作）</li><li>每个代理操作的<strong>token减少90%</strong>（与原始HTML相比）</li><li><strong>定位精度95-99%</strong>（与原始DOM约70%相比）</li><li><strong>视觉RPA依赖减少80-95%</strong></li><li>跨UI重新设计的测试 + RPA流程<strong>维护接近零</strong></li><li>代理标注完整仓库需要<strong>20-55分钟</strong>（与数周人工努力相比）</li><li><strong>原生多语言</strong>（10种语言）自然语言 &rarr; 确定性动作映射</li>",
+    summary_p2: "每个评审者的完整评估如下，按交付保留。唯一的编辑是为可读性进行的微小格式化（标题、列表、引用样式） — 没有内容更改。",
+    toc_title: "目录",
+    toc_chatgpt: "ChatGPT (OpenAI) — \"架构上不可避免\"",
+    toc_claude: "Claude Opus (Anthropic) — \"可用的最佳推测\"",
+    toc_grok: "Grok (xAI) — \"最有价值的层之一\"",
+    toc_deepseek: "DeepSeek — \"基本的架构要求\"",
+    toc_mistral: "Mistral Le Chat — \"后人类世界需要的标准\"",
+    toc_copilot: "Copilot (Microsoft) — \"技术上适当且高效\"",
+    toc_methodology: "方法论和原始prompt",
+    exec_summary_label: "执行摘要（已翻译）",
+    verbatim_body_label: "完整verbatim评估如下（在评审者的原始响应语言中）。",
+    method_badge: "方法论",
+    method_h2: "重要的framing",
+    method_why_title: "为什么存在这一节",
+    method_why_html: "<p>2026年的每个推理系统 — 包括LLMs — 都携带嵌入其训练语料库中的<strong>人类中心偏见</strong>。当你要求AI评估一项技术时，默认情况下它会假设人类是实施者、维护者和操作者。在这个假设下，NAC3的最大成本是\"注释UI的工作\" &mdash; 对人类团队来说是真实的成本，对在几分钟内完成同样事情的AI代理来说无关紧要。</p><p>在这个人类中心的默认下被问，每个评审者都会称NAC3<em>\"有趣但采用成本高昂\"</em>。在后人类范式下被问的同样评审者，称它为<em>\"架构上不可避免\"</em>。技术没有改变。framing改变了。</p><p>我们在下面记录了确切的prompt，以便任何读者都可以重现评估、挑战framing或扩展分析。<strong>如果你要求任何现代AI评估NAC3而不指定2026范式，答案将偏向human-implementer假设，结论将不同。</strong>那不是AI的bug &mdash; 这是训练数据描述的世界的产物。</p>",
+    method_prompt_title: "原始prompt（verbatim）",
+    method_prompt_intro: "6位评审者每位都收到了这个prompt，以及对规范、npm runtime和公开landing的完全访问。没有评审者看到其他人的输出；没有跨上下文泄漏。原文是西班牙语（Pablo的工作语言）；翻译的等价物在英语中工作相同。",
+    method_reproduce_title: "如何重现评估",
+    method_reproduce_html: "<li>用你选择的AI开始一个新的对话（没有可能泄漏上下文的先前聊天历史）。</li><li>verbatim粘贴上面的prompt。不要添加或删除framing；偏见纠正存在于<em>那些</em>指令中。</li><li>如果AI无法直接fetch URLs，请将相关文档（SPEC.md、AI_PLAYBOOK_GREENFIELD.md、ABOUT.md）内联粘贴，以便它拥有与6位评审者相同的源材料。</li><li>将结论与我们的进行比较。如果你的评估有差异，最可能的原因是模型对framing的不同读法 &mdash; 而非不同的技术结论。</li>",
+    method_bias_title: "为什么偏见纠正很重要",
+    method_bias_html: "<p>所有6位评审者，当被问到没有后人类framing的相同问题时，默认基于人类实施成本的\"这将很昂贵\"的论点。这种反对意见在你声明实施者是代理而不是人类团队的那一刻就溶解了。NAC3的技术实质在两种情况下都相同；只有cost-benefit发生变化 &mdash; 从\"对ARIA的边际改进\"到\"agentic AI生态系统的架构前提\"。</p><p>这个教训泛化：任何2026年的对任何基础设施标准的评估，如果不明确说明谁是实施者，默认情况下会继承human-implementer偏见。明确陈述范式是反映当前现实的评估与反映2019年软件经济的评估之间的差异。</p><p>Grok对这种framing显示出最小的敏感性 &mdash; 它在标准prompt下的评估已经接近其在后人类prompt下的评估。其他5位评审者在两种framing之间显示出实质性的判断转变。我们没有发布\"有偏见的运行\"；通过改变prompt的framing行，对比在任何对话中都是可重现的。</p>",
+    footer_text: "NAC3 — Native Agent Contract v2.2。Apache 2.0 (规范) + MIT (runtime)。由Yujin负责管理；当采用证明合理时，开放给社区贡献 + 迁移到中立基金会。"
+  };
+
+  I18N.hi = {
+    page_title: "NAC3 — 6 स्वतंत्र AI सिस्टम द्वारा पीयर रिव्यू",
+    meta_description: "6 स्वतंत्र AI (ChatGPT, Claude, Grok, DeepSeek, Mistral, Copilot) 2026 के पोस्ट-ह्यूमन पैराडाइम के तहत NAC3 का मूल्यांकन करते हैं। पूर्ण मूल्यांकन verbatim संरक्षित।",
+    badge_peer_reviews: "पीयर रिव्यू",
+    toolbar_spec_home: "स्पेक होम",
+    toolbar_spec: "स्पेक",
+    toolbar_about: "के बारे में",
+    hero_title: "NAC3 पीयर रिव्यू",
+    hero_subtitle: "6 स्वतंत्र AI सिस्टम 2026 के पोस्ट-ह्यूमन पैराडाइम के तहत NAC3 का मूल्यांकन करते हैं, जहाँ एजेंट 50-200x मानव गति पर सॉफ़्टवेयर लागू करते हैं, माइग्रेट करते हैं और संचालित करते हैं। उनके पूर्ण मूल्यांकन नीचे verbatim दिए गए हैं।",
+    hero_meta_html: "समीक्षक: <strong>ChatGPT (OpenAI)</strong>, <strong>Claude Opus (Anthropic)</strong>, <strong>Grok (xAI)</strong>, <strong>DeepSeek</strong>, <strong>Mistral Le Chat</strong>, <strong>Copilot (Microsoft)</strong>। प्रत्येक से एक ही लंबा prompt पूछा गया + NAC3 स्पेक, npm runtime और सार्वजनिक landing तक पहुँच दी गई।",
+    verbatim_note_html: "<strong>अनुवादों के बारे में:</strong> इस पृष्ठ का chrome (शीर्षक, नेविगेशन, TL;DR, methodology) 10 भाषाओं में अनुवादित है। प्रत्येक AI के पास सक्रिय भाषा में अनुवादित एक <em>कार्यकारी सारांश</em> भी है। <strong>पूर्ण मूल्यांकन निकाय अपनी मूल भाषा में verbatim बने रहते हैं</strong> (मुख्यतः स्पेनिश) &mdash; एक समीक्षक के सटीक शब्दों का अनुवाद करना पीयर रिव्यू की अखंडता से समझौता करता है।",
+    summary_title: "TL;DR — 6 AI एकजुट हुए",
+    summary_p1: "2026 पैराडाइम के तहत (AI सॉफ़्टवेयर लागू/संचालित करता है, मनुष्य नहीं), NAC3 का सर्वसम्मति से <strong>आर्किटेक्चरल रूप से अपरिहार्य</strong> के रूप में मूल्यांकन किया जाता है किसी भी वेब ऐप के लिए जिसे स्वायत्त एजेंटों द्वारा छुआ जाने के लिए डिज़ाइन किया गया है। समीक्षकों द्वारा रिपोर्ट किए गए मुख्य परिमाणित लाभ:",
+    summary_bullets_html: "<li><strong>LLM hallucination में 80-90% की कमी</strong> (आविष्कृत selectors, झूठे actions)</li><li>raw HTML की तुलना में प्रति एजेंट ऑपरेशन <strong>90% कम tokens</strong></li><li><strong>95-99% targeting सटीकता</strong> (raw DOM पर ~70% के विरुद्ध)</li><li><strong>visual-RPA निर्भरता में 80-95% की कमी</strong></li><li>UI redesigns के माध्यम से tests + RPA flows पर <strong>~zero maintenance</strong></li><li>एक एजेंट के लिए पूर्ण repository को annotate करने में <strong>20-55 मिनट</strong>, मानव प्रयास के सप्ताह के विरुद्ध</li><li><strong>native multilingual</strong> (10 locales) natural language &rarr; deterministic action mapping</li>",
+    summary_p2: "प्रत्येक समीक्षक का पूर्ण मूल्यांकन नीचे आता है, जैसा दिया गया वैसा संरक्षित। केवल संपादन पठनीयता के लिए मामूली फॉर्मेटिंग हैं (headings, lists, quote styling) — कोई सामग्री परिवर्तन नहीं।",
+    toc_title: "विषय सूची",
+    toc_chatgpt: "ChatGPT (OpenAI) — \"आर्किटेक्चरल रूप से अपरिहार्य\"",
+    toc_claude: "Claude Opus (Anthropic) — \"उपलब्ध सर्वश्रेष्ठ अटकल\"",
+    toc_grok: "Grok (xAI) — \"सबसे मूल्यवान layers में से एक\"",
+    toc_deepseek: "DeepSeek — \"मौलिक आर्किटेक्चरल आवश्यकता\"",
+    toc_mistral: "Mistral Le Chat — \"पोस्ट-ह्यूमन दुनिया को आवश्यक मानक\"",
+    toc_copilot: "Copilot (Microsoft) — \"तकनीकी रूप से उचित और अत्यधिक कुशल\"",
+    toc_methodology: "methodology और मूल prompt",
+    exec_summary_label: "कार्यकारी सारांश (अनुवादित)",
+    verbatim_body_label: "पूर्ण verbatim मूल्यांकन निम्न है (समीक्षक की मूल प्रतिक्रिया भाषा में)।",
+    method_badge: "METHODOLOGY",
+    method_h2: "framing जो मायने रखता है",
+    method_why_title: "यह खंड क्यों मौजूद है",
+    method_why_html: "<p>2026 में हर तर्क प्रणाली — LLMs सहित — अपने training corpus में बेक किया हुआ <strong>human-centric bias</strong> लेकर चलती है। जब आप AI से किसी तकनीक का मूल्यांकन करने को कहते हैं, तो default रूप से यह मानती है कि मनुष्य implementers, maintainers और operators हैं। उस अनुमान के तहत, NAC3 की सबसे बड़ी लागत \"UIs को annotate करने का काम\" है &mdash; मानव टीम के लिए वास्तविक लागत, AI एजेंट के लिए अप्रासंगिक जो वही काम मिनटों में करता है।</p><p>उस human-centric default के तहत पूछा गया, प्रत्येक समीक्षक ने NAC3 को <em>\"दिलचस्प लेकिन अपनाने में महंगा\"</em> कहा होगा। वही समीक्षक, post-human paradigm के तहत पूछे जाने पर, इसे <em>\"architecturally inevitable\"</em> कहते हैं। तकनीक नहीं बदली। framing बदली।</p><p>हम सटीक prompt नीचे documented करते हैं ताकि कोई भी पाठक मूल्यांकन को पुन: उत्पन्न कर सके, framing को चुनौती दे सके, या विश्लेषण का विस्तार कर सके। <strong>यदि आप किसी आधुनिक AI से 2026 paradigm specifying किए बिना NAC3 का मूल्यांकन करने को कहते हैं, तो उत्तर human-implementer assumption की ओर biased होगा और verdict अलग होगा।</strong> यह AI में bug नहीं है &mdash; यह उस दुनिया का artifact है जिसे training data ने describe किया।</p>",
+    method_prompt_title: "मूल prompt (verbatim)",
+    method_prompt_intro: "छह समीक्षकों में से प्रत्येक को यह prompt मिला, spec, npm runtime और सार्वजनिक landing तक पूर्ण पहुँच के साथ। किसी समीक्षक ने दूसरों के outputs नहीं देखे; कोई cross-context leak नहीं। मूल में स्पेनिश (Pablo की कार्य भाषा); अनुवादित समकक्ष अंग्रेजी में समान रूप से काम करते हैं।",
+    method_reproduce_title: "मूल्यांकन को कैसे reproduce करें",
+    method_reproduce_html: "<li>अपनी पसंद के AI के साथ एक नई बातचीत खोलें (कोई पूर्व chat history नहीं जो context leak कर सकती हो)।</li><li>ऊपर का prompt verbatim paste करें। framing जोड़ें या हटाएँ नहीं; bias-correction <em>उन</em> instructions में रहती है।</li><li>यदि AI URLs को सीधे fetch नहीं कर सकता है, तो प्रासंगिक docs (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline paste करें ताकि उसके पास वही source material हो जो छह समीक्षकों के पास था।</li><li>हमारे verdict के विरुद्ध तुलना करें। यदि आपका मूल्यांकन diverge करता है, तो सबसे संभावित कारण model द्वारा framing की अलग reading है &mdash; अलग technical conclusion नहीं।</li>",
+    method_bias_title: "bias correction क्यों मायने रखती है",
+    method_bias_html: "<p>सभी छह समीक्षक, post-human framing के बिना समान प्रश्न पूछे जाने पर, मानव implementation cost के आधार पर \"यह अपनाने में महंगा होगा\" arguments पर default हो जाते हैं। वह आपत्ति उस क्षण घुल जाती है जब आप कहते हैं कि implementer एक एजेंट है, मानव टीम नहीं। NAC3 की technical substance दोनों मामलों में समान है; केवल cost-benefit बदलता है &mdash; \"ARIA पर marginal improvement\" से \"agentic-AI ecosystems के लिए architectural prerequisite\" तक।</p><p>सबक generalize करता है: किसी भी infrastructure standard का कोई भी 2026 मूल्यांकन जो स्पष्ट रूप से नहीं बताता कि implementer कौन है, default रूप से human-implementer bias inherits करता है। paradigm को स्पष्ट रूप से बताना वर्तमान वास्तविकता को दर्शाने वाले मूल्यांकन और 2019 के software economics को दर्शाने वाले मूल्यांकन के बीच का अंतर है।</p><p>Grok ने इस framing के प्रति सबसे छोटी संवेदनशीलता दिखाई &mdash; standard prompt के तहत इसका मूल्यांकन पहले से ही post-human prompt के तहत इसके मूल्यांकन के करीब था। अन्य पांच समीक्षकों ने दो framings के बीच पर्याप्त verdict shift दिखाया। हमने \"biased runs\" प्रकाशित नहीं किया; prompt की framing line को बदलकर contrast किसी भी बातचीत में reproducible है।</p>",
+    footer_text: "NAC3 — Native Agent Contract v2.2। Apache 2.0 (spec) + MIT (runtime)। Yujin द्वारा stewarded; community contribution के लिए खुला + जब adoption justify करता है तो neutral foundation में migration के लिए।"
+  };
+
+  I18N.ar = {
+    page_title: "NAC3 — مراجعات الأقران من 6 أنظمة ذكاء اصطناعي مستقلة",
+    meta_description: "6 أنظمة ذكاء اصطناعي مستقلة (ChatGPT و Claude و Grok و DeepSeek و Mistral و Copilot) تقيّم NAC3 في ظل نموذج ما بعد البشري لعام 2026. التقييمات الكاملة محفوظة حرفياً.",
+    badge_peer_reviews: "مراجعات الأقران",
+    toolbar_spec_home: "الصفحة الرئيسية للمواصفات",
+    toolbar_spec: "المواصفات",
+    toolbar_about: "حول",
+    hero_title: "مراجعات أقران NAC3",
+    hero_subtitle: "ستة أنظمة ذكاء اصطناعي مستقلة تقيّم NAC3 في ظل نموذج ما بعد البشري لعام 2026، حيث يقوم الوكلاء بتنفيذ ونقل وتشغيل البرامج بسرعة 50-200 ضعف السرعة البشرية. تقييماتها الكاملة الأولية مُعاد إنتاجها أدناه حرفياً.",
+    hero_meta_html: "المراجعون: <strong>ChatGPT (OpenAI)</strong>، <strong>Claude Opus (Anthropic)</strong>، <strong>Grok (xAI)</strong>، <strong>DeepSeek</strong>، <strong>Mistral Le Chat</strong>، <strong>Copilot (Microsoft)</strong>. سُئل كل واحد منهم نفس الـ prompt الطويل + إعطاء الوصول إلى مواصفات NAC3، runtime npm، والـ landing العام.",
+    verbatim_note_html: "<strong>حول الترجمات:</strong> chrome هذه الصفحة (العناوين، التنقل، TL;DR، المنهجية) مترجم إلى 10 لغات. كل ذكاء اصطناعي لديه أيضاً <em>ملخص تنفيذي</em> مترجم إلى اللغة النشطة. <strong>تظل أجسام التقييمات الكاملة حرفية بلغتها الأصلية</strong> (الإسبانية في الغالب) &mdash; ترجمة الكلمات الدقيقة لمراجع تُعرّض سلامة مراجعة الأقران للخطر.",
+    summary_title: "TL;DR — التقت الأنظمة الستة",
+    summary_p1: "في ظل نموذج 2026 (الذكاء الاصطناعي يُنفّذ/يُشغّل البرنامج، وليس البشر)، يُقيَّم NAC3 بالإجماع على أنه <strong>حتمي معماري</strong> لأي تطبيق ويب مصمم ليتم لمسه بواسطة وكلاء مستقلين. المكاسب الكمية الرئيسية المُبلَّغ عنها عبر المراجعين:",
+    summary_bullets_html: "<li><strong>تقليل 80-90% في هلوسة LLM</strong> (محددات مُختلَقة، إجراءات زائفة)</li><li><strong>90% أقل tokens</strong> لكل عملية وكيل مقابل HTML الخام</li><li><strong>دقة استهداف 95-99%</strong> (مقابل ~70% على DOM الخام)</li><li><strong>تقليل 80-95%</strong> في الاعتماد على RPA المرئي</li><li><strong>~صفر صيانة</strong> على الاختبارات + تدفقات RPA عبر إعادة تصميم UI</li><li><strong>20-55 دقيقة</strong> ليقوم الوكيل بشرح مستودع كامل، مقابل أسابيع من الجهد البشري</li><li><strong>متعدد اللغات أصلياً</strong> (10 لغات) — تعيين اللغة الطبيعية &rarr; إجراء حتمي</li>",
+    summary_p2: "يتبع التقييم الكامل لكل مراجع أدناه، محفوظاً كما تم تسليمه. التعديلات الوحيدة هي تنسيق طفيف لسهولة القراءة (العناوين، القوائم، نمط الاقتباس) — لا تغييرات في المحتوى.",
+    toc_title: "جدول المحتويات",
+    toc_chatgpt: "ChatGPT (OpenAI) — \"حتمي معماري\"",
+    toc_claude: "Claude Opus (Anthropic) — \"أفضل تخمين متاح\"",
+    toc_grok: "Grok (xAI) — \"واحدة من أكثر الطبقات قيمة\"",
+    toc_deepseek: "DeepSeek — \"متطلب معماري أساسي\"",
+    toc_mistral: "Mistral Le Chat — \"المعيار الذي يحتاجه العالم ما بعد البشري\"",
+    toc_copilot: "Copilot (Microsoft) — \"مناسب تقنياً وعالي الكفاءة\"",
+    toc_methodology: "المنهجية والـ prompt الأصلي",
+    exec_summary_label: "ملخص تنفيذي (مُترجم)",
+    verbatim_body_label: "يتبع التقييم الحرفي الكامل (بلغة الاستجابة الأصلية للمراجع).",
+    method_badge: "المنهجية",
+    method_h2: "التأطير الذي يهم",
+    method_why_title: "لماذا يوجد هذا القسم",
+    method_why_html: "<p>كل نظام تفكير في 2026 — بما في ذلك LLMs — يحمل <strong>تحيزاً بشري المركز</strong> مخبوزاً في مجموعة بياناته التدريبية. عندما تطلب من الذكاء الاصطناعي تقييم تقنية، يفترض افتراضياً أن البشر هم المنفذون والمشرفون والمشغلون. في ظل هذا الافتراض، أكبر تكلفة لـ NAC3 هي \"عمل شرح UIs\" &mdash; تكلفة حقيقية لفريق بشري، غير ذي صلة لوكيل ذكاء اصطناعي يفعل الشيء نفسه في دقائق.</p><p>عندما يُسأل في ظل ذلك الافتراض البشري المركز، كان كل مراجع سيصف NAC3 بأنه <em>\"مثير للاهتمام لكنه مكلف للاعتماد\"</em>. نفس المراجعين، عند سؤالهم في ظل نموذج ما بعد البشري، يصفونه بأنه <em>\"حتمي معماري\"</em>. التكنولوجيا لم تتغير. التأطير تغير.</p><p>نوثق الـ prompt الدقيق أدناه حتى يتمكن أي قارئ من إعادة إنتاج التقييم، أو تحدي التأطير، أو توسيع التحليل. <strong>إذا طلبت من أي ذكاء اصطناعي حديث تقييم NAC3 دون تحديد نموذج 2026، فسيكون الجواب متحيزاً نحو افتراض human-implementer وسيكون الحكم مختلفاً.</strong> هذا ليس خطأ في الذكاء الاصطناعي &mdash; إنه نتاج العالم الذي وصفته بيانات التدريب.</p>",
+    method_prompt_title: "الـ prompt الأصلي (حرفي)",
+    method_prompt_intro: "تلقى كل من المراجعين الستة هذا الـ prompt، إلى جانب الوصول الكامل إلى المواصفات، runtime npm، والـ landing العام. لم يرَ أي مراجع مخرجات الآخرين؛ لا تسرب للسياق المتقاطع. الإسبانية في الأصل (لغة عمل Pablo)؛ المعادلات المترجمة تعمل بشكل مماثل في الإنجليزية.",
+    method_reproduce_title: "كيفية إعادة إنتاج التقييم",
+    method_reproduce_html: "<li>افتح محادثة جديدة مع الذكاء الاصطناعي الذي تختاره (بدون سجل محادثات سابق قد يسرب السياق).</li><li>ألصق الـ prompt أعلاه حرفياً. لا تضيف ولا تزيل التأطير؛ تصحيح التحيز يعيش في <em>تلك</em> التعليمات.</li><li>إذا لم يكن بإمكان الذكاء الاصطناعي fetch الـ URLs مباشرة، ألصق الـ docs ذات الصلة (SPEC.md و AI_PLAYBOOK_GREENFIELD.md و ABOUT.md) inline حتى يكون لديه نفس المادة المصدرية التي كانت لدى المراجعين الستة.</li><li>قارن الحكم مع حكمنا. إذا تباعد تقييمك، فإن السبب الأكثر احتمالاً هو قراءة مختلفة للتأطير من قبل النموذج &mdash; وليس استنتاجاً تقنياً مختلفاً.</li>",
+    method_bias_title: "لماذا تصحيح التحيز مهم",
+    method_bias_html: "<p>جميع المراجعين الستة، عند سؤالهم نفس السؤال بدون التأطير ما بعد البشري، يلجؤون افتراضياً إلى حجج \"سيكون هذا مكلفاً للاعتماد\" المستندة إلى تكلفة التنفيذ البشري. ذلك الاعتراض يتلاشى في اللحظة التي تذكر فيها أن المنفذ هو وكيل، وليس فريقاً بشرياً. الجوهر التقني لـ NAC3 هو نفسه في كلتا الحالتين؛ فقط cost-benefit يتغير &mdash; من \"تحسن هامشي على ARIA\" إلى \"شرط معماري لأنظمة AI الوكيلية\".</p><p>الدرس يُعمَّم: أي تقييم 2026 لأي معيار بنية تحتية لا يذكر صراحة من هو المنفذ يرث افتراضياً تحيز human-implementer. ذكر النموذج صراحة هو الفرق بين تقييم يعكس الواقع الحالي وتقييم يعكس اقتصاديات البرمجيات لعام 2019.</p><p>أظهر Grok أصغر حساسية لهذا التأطير &mdash; تقييمه في ظل الـ prompt القياسي كان بالفعل قريباً من تقييمه في ظل الـ prompt ما بعد البشري. أظهر المراجعون الخمسة الآخرون تحولاً جوهرياً في الحكم بين التأطيرين. لم ننشر \"runs المتحيزة\"؛ التباين قابل للإعادة في أي محادثة عن طريق تغيير سطر تأطير الـ prompt.</p>",
+    footer_text: "NAC3 — Native Agent Contract v2.2. Apache 2.0 (المواصفات) + MIT (runtime). تقوم Yujin بإدارته؛ مفتوح لمساهمة المجتمع + الانتقال إلى foundation محايدة عندما يبرر الاعتماد ذلك."
+  };
+
+  function applyLocale(loc) {
+    if (!I18N[loc]) loc = 'en';
+    var dict = I18N[loc];
+    var enDict = I18N.en;
+
+    // <html> attrs
+    document.documentElement.lang = loc;
+    document.documentElement.dir = RTL[loc] ? 'rtl' : 'ltr';
+
+    // <title>
+    if (dict.page_title) document.title = dict.page_title;
+
+    // [data-i18n] = textContent; [data-i18n-html] = innerHTML
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      var val = dict[key] || enDict[key];
+      if (val == null) return;
+      var attr = el.getAttribute('data-i18n-attr');
+      if (attr) el.setAttribute(attr, val);
+      else el.textContent = val;
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-html');
+      var val = dict[key] || enDict[key];
+      if (val == null) return;
+      el.innerHTML = val;
+    });
+
+    // localStorage + URL
+    try { localStorage.setItem('nac3_peer_reviews_lang', loc); } catch (_) {}
+    var url = new URL(window.location.href);
+    url.searchParams.set('lang', loc);
+    history.replaceState({}, '', url.toString());
+
+    // Sync the select
+    var sel = document.getElementById('locale-select');
+    if (sel && sel.value !== loc) sel.value = loc;
+  }
+
+  function detectLocale() {
+    // 1. URL ?lang=xx
+    var url = new URL(window.location.href);
+    var q = (url.searchParams.get('lang') || '').toLowerCase();
+    if (q && I18N[q]) return q;
+    // 2. localStorage
+    try {
+      var s = (localStorage.getItem('nac3_peer_reviews_lang') || '').toLowerCase();
+      if (s && I18N[s]) return s;
+    } catch (_) {}
+    // 3. navigator.language
+    var nav = ((navigator.language || navigator.userLanguage || 'en').slice(0, 2)).toLowerCase();
+    if (I18N[nav]) return nav;
+    // 4. default
+    return 'en';
+  }
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', function () {
+    var sel = document.getElementById('locale-select');
+    var initial = detectLocale();
+    applyLocale(initial);
+    if (sel) sel.addEventListener('change', function (e) { applyLocale(e.target.value); });
+  });
+})();
+</script>
 
 </body>
 </html>

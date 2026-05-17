@@ -813,6 +813,214 @@
 
 
 <!-- ====================================================== -->
+<!--  Methodology + original prompt                          -->
+<!-- ====================================================== -->
+<section class="ai-section" id="methodology" data-nac-id="peer_reviews.methodology" data-nac-role="section">
+  <h2><span class="vendor-badge" style="background: var(--color-accent-amber, #c8a04d);">METHODOLOGY</span> The framing that matters</h2>
+
+  <div class="summary-card" style="border-left-color: var(--color-accent-amber, #c8a04d);">
+    <h3 style="margin-top: 0;">Why this section exists</h3>
+    <p>
+      Every reasoning system in 2026 -- LLMs included -- carries a
+      <strong>human-centric bias</strong> baked into its training corpus.
+      When you ask an AI to evaluate a technology, by default it assumes
+      humans are the implementers, maintainers, and operators. Under that
+      assumption, NAC3's biggest cost is "the work of annotating UIs"
+      &mdash; a real cost for a human team, an irrelevant one for an
+      AI agent that does the same in minutes.
+    </p>
+    <p>
+      Asked under that human-centric default, every reviewer would have
+      called NAC3 <em>"interesting but expensive to adopt"</em>. The
+      same reviewers, asked under the post-human paradigm, called it
+      <em>"architecturally inevitable"</em>. The technology didn't change.
+      The framing did.
+    </p>
+    <p>
+      We document the exact prompt below so any reader can reproduce
+      the evaluation, challenge the framing, or extend the analysis.
+      <strong>If you ask any modern AI to evaluate NAC3 without
+      specifying the 2026 paradigm, the answer will be biased toward
+      the human-implementer assumption and the verdict will be
+      different.</strong> That's not a bug in the AI &mdash; it's an
+      artifact of which world the training data described.
+    </p>
+  </div>
+
+  <h3>The original prompt (verbatim)</h3>
+  <p>
+    Each of the six reviewers received this prompt, along with full access
+    to the spec, the npm runtime, and the public landing. No reviewer was
+    shown the others' outputs; no cross-context was leaked. Spanish in
+    the original (Pablo's working language); translated equivalents work
+    identically in English.
+  </p>
+
+  <pre style="background: var(--color-bg-subtle, #f5f2ea); padding: 20px 24px; border-radius: 8px; font-size: 0.88em; line-height: 1.55; white-space: pre-wrap;">Quiero que analices el proyecto NAC3 desde la perspectiva de un
+arquitecto de sistemas en un mundo post humano, donde la
+implementacion, migracion, mantenimiento y operacion de software
+la realizan agentes de IA con capacidades superiores a las humanas.
+
+No evalues NAC3 bajo el paradigma humano tradicional. Evalualo bajo
+el paradigma real de 2026, donde:
+
+Primero:
+  Recorre toda la documentacion y fuentes necesarios de NAC para
+  cumplir tu tarea.
+  La listo:
+    Github:  https://github.com/yujinapp/nac-spec
+    npm:     https://www.npmjs.com/package/@nac3/runtime
+    landing: https://www.yujin.app/nac-spec/
+
+Luego:
+  Analiza cuanto mas rapido que un humano la IA puede escribir,
+    migrar y refactorizar codigo.
+  Analiza en que tiempo la IA puede anotar un repositorio completo
+    con NAC3.
+  Analiza si la IA puede generar manifests NAC3 automaticamente a
+    partir del DOM, del codigo o del design system.
+  Analiza si la IA puede generar y mantener los tests funcionales a
+    partir del arbol NAC3.
+  Analiza si la IA puede operar la UI directamente a traves del
+    contrato NAC3 sin depender de heuristicas.
+  Analiza si la IA puede mantener un fork propio del estandar y
+    evolucionarlo sin depender del autor original.
+
+Una vez cumplidos los analisis anteriores, tendras un marco
+conceptual para resolver tu siguiente tarea:
+
+Producir una evaluacion profunda, critica y tecnica del estandar
+NAC3 considerando este mundo post humano.
+
+Incluye obligatoriamente:
+
+1. Analisis de los problemas que NAC3 intenta resolver
+   Evalua si esos problemas existen para agentes de IA, no para
+     humanos.
+   Evalua si NAC3 es la solucion correcta para agentes que operan
+     UIs, generan codigo y razonan sobre arboles semanticos.
+
+2. Evaluacion de la efectividad de NAC3
+   El contrato NAC3 reduce alucinacion, ambiguedad y errores de
+     razonamiento en agentes?
+   El arbol NAC3 es una representacion optima para LLMs y agentes
+     autonomos?
+   Es mejor que HTML crudo, ARIA, tool schemas ad-hoc o JSON UI
+     models generados por IA?
+
+3. Comparacion de costo vs alternativas en un mundo donde la IA
+   implementa
+   Cuanto cuesta obtener las mismas capacidades sin NAC3 si la IA
+     genera contratos adhoc?
+   Es mejor estandarizar o dejar que cada app genere su propio
+     contrato?
+   Que pasa con la interoperabilidad entre agentes, QA, RPA, voz y
+     copilots?
+
+4. Impacto en accesibilidad y discapacidad
+   Evalua como NAC3 habilita accesibilidad asistida por IA, no
+     accesibilidad clasica.
+   Considera agentes que operan la UI en nombre del usuario.
+
+5. Impacto en tokens, latencia y desambiguacion del lenguaje natural
+   Compara en una tabla que considere todas las alternativas y
+     permita una comparativa.
+   Evalua cual es mas eficiente para LLMs en terminos de:
+     tokens, latencia, precision, reduccion de alucinacion.
+   Alternativas a comparar:
+     HTML crudo
+     DOM parseado
+     JSON UI models
+     Tool schemas
+     NAC3 (arbol semantico)
+
+6. Impacto en testing automatico
+   Evalua si NAC3 permite:
+     generacion automatica de tests,
+     cobertura funcional completa,
+     mantenimiento cero,
+     smoke tests deterministas,
+     validacion de constraints.
+
+7. Impacto en RPA
+   Evalua en que proporcion NAC3 elimina la necesidad de RPA visual.
+   Evalua en que proporcion NAC3 permite RPA semantico estable y
+     durable.
+   Evalua en que proporcion NAC3 reduce el costo de implementacion
+     de RPA.
+
+8. Impacto en testing de voz y agentes conversacionales
+   Evalua si NAC3 permite mapear lenguaje natural -> acciones
+     deterministas.
+   Evalua si simplifica el testing de voz a un nivel sin
+     precedentes.
+
+9. Riesgos y limites
+   Evalua riesgos reales en un mundo donde la IA puede mantener un
+     fork del estandar.
+   Evalua riesgos de gobernanza, naming, estabilidad del contrato,
+     etc.
+
+10. Recomendacion final
+    Debe NAC3 adoptarse como estandar universal de interaccion
+      UI-para-agentes?
+    Debe adoptarse en nuevos proyectos?
+    Debe migrarse legacy?
+    Que estrategia maximiza el ROI en un mundo IA first?
+
+Formato de salida:
+  Respuesta estructurada, tecnica y profunda.
+  Sin sesgos antropocentricos.
+  Sin evaluar costos humanos.
+  Sin suponer que los humanos implementan NAC3.
+  Con foco en agentes autonomos, LLMs y sistemas post humanos.</pre>
+
+  <h3>How to reproduce the evaluation</h3>
+  <ol>
+    <li>Open a fresh conversation with the AI of your choice (no prior
+        chat history that might leak context).</li>
+    <li>Paste the prompt above verbatim. Don't add or remove the
+        framing; the bias-correction lives in <em>those</em>
+        instructions.</li>
+    <li>If the AI cannot fetch URLs directly, paste the relevant docs
+        (SPEC.md, AI_PLAYBOOK_GREENFIELD.md, ABOUT.md) inline so it has
+        the same source material the six reviewers had.</li>
+    <li>Compare the verdict against ours. If your evaluation diverges,
+        the most likely cause is a different framing reading by the
+        model &mdash; not a different technical conclusion.</li>
+  </ol>
+
+  <h3>Why the bias correction matters</h3>
+  <p>
+    All six reviewers, when asked the same question without the
+    post-human framing, default to "this would be expensive to adopt"
+    arguments grounded in human implementation cost. That objection
+    dissolves the moment you state that the implementer is an agent,
+    not a human team. The technical substance of NAC3 is the same in
+    both cases; only the cost-benefit shifts &mdash; from "marginal
+    improvement over ARIA" to "architectural prerequisite for
+    agentic-AI ecosystems".
+  </p>
+  <p>
+    The lesson generalizes: any 2026 evaluation of any infrastructure
+    standard that doesn't explicitly state who the implementer is
+    inherits a human-implementer bias by default. Stating the
+    paradigm explicitly is the difference between an evaluation that
+    reflects current reality and one that reflects 2019 software
+    economics.
+  </p>
+  <p>
+    Grok showed the smallest sensitivity to this framing &mdash; its
+    evaluation under the standard prompt was already close to its
+    evaluation under the post-human prompt. The other five reviewers
+    showed a substantial verdict shift between the two framings. We
+    haven't published the "biased" runs; the contrast is reproducible
+    in any conversation by varying the prompt's framing line.
+  </p>
+</section>
+
+
+<!-- ====================================================== -->
 <!--  Footer                                                  -->
 <!-- ====================================================== -->
 <footer data-nac-id="peer_reviews.footer" data-nac-role="region">

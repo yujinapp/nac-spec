@@ -207,6 +207,98 @@
     max-width: 640px;
   }
 
+  /* Peer reviews featured callout (between hero + "How small") */
+  .peer-callout {
+    padding: 0 0 56px 0;
+  }
+  .peer-card {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    text-decoration: none;
+    color: inherit;
+    background: linear-gradient(135deg, #fff8e6 0%, #ffffff 70%);
+    border: 2px solid var(--color-accent);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .peer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(200, 160, 77, 0.25);
+  }
+  .peer-card-left {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--color-accent);
+    color: #fff;
+    width: 120px;
+    flex-shrink: 0;
+  }
+  .peer-kanji {
+    font-family: var(--font-serif);
+    font-size: 80px;
+    line-height: 1;
+    opacity: 0.95;
+  }
+  .peer-card-body {
+    flex: 1;
+    padding: 24px 28px;
+  }
+  .peer-card-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    margin-bottom: 8px;
+  }
+  .peer-card-title {
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 0 0 12px 0;
+    color: var(--color-text);
+  }
+  .peer-card-quote {
+    font-size: 14px;
+    color: var(--color-text-2);
+    margin: 0 0 12px 0;
+    line-height: 1.6;
+  }
+  .peer-card-quote strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+  .peer-card-stats {
+    font-size: 13px;
+    color: var(--color-text-2);
+    margin: 0 0 14px 0;
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .peer-card-stats strong {
+    color: var(--color-indigo);
+    font-weight: 600;
+  }
+  .peer-stat-sep { opacity: 0.4; }
+  .peer-card-cta {
+    display: inline-block;
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.15s ease;
+  }
+  .peer-card:hover .peer-card-cta {
+    border-bottom-color: var(--color-accent);
+  }
+  @media (max-width: 700px) {
+    .peer-card { flex-direction: column; }
+    .peer-card-left { width: 100%; padding: 18px 0; }
+    .peer-kanji { font-size: 56px; }
+    .peer-card-title { font-size: 18px; }
+    .peer-card-stats { font-size: 12px; flex-direction: column; gap: 4px; }
+    .peer-stat-sep { display: none; }
+  }
+
   /* Demos */
   .demos {
     display: grid;
@@ -700,6 +792,11 @@
     </p>
     <div class="ctas">
       <a class="cta primary"
+         href="peer-reviews.html"
+         data-nac-id="nac_landing.cta.peer_reviews"
+         data-nac-role="action"
+         data-nac-action="open_peer_reviews">6 AIs say it's inevitable &rarr;</a>
+      <a class="cta secondary"
          href="SPEC.md"
          data-nac-id="nac_landing.cta.spec"
          data-nac-role="action"
@@ -709,12 +806,54 @@
          data-nac-id="nac_landing.cta.demo"
          data-nac-role="action"
          data-nac-action="open_demo">Try the demo</a>
-      <a class="cta secondary"
+      <a class="cta tertiary"
          href="https://www.npmjs.com/package/@nac3/runtime"
          data-nac-id="nac_landing.cta.npm"
          data-nac-role="action"
          data-nac-action="open_npm">npm install</a>
     </div>
+  </div>
+</section>
+
+<!-- Peer reviews featured callout -->
+<section class="peer-callout"
+         data-nac-id="nac_landing.section.peer_reviews"
+         data-nac-role="section">
+  <div class="container">
+    <a class="peer-card"
+       href="peer-reviews.html"
+       data-nac-id="nac_landing.peer_card.link"
+       data-nac-role="action"
+       data-nac-action="open_peer_reviews">
+      <div class="peer-card-left">
+        <span class="peer-kanji" aria-hidden="true">&#22768;</span>
+      </div>
+      <div class="peer-card-body">
+        <div class="peer-card-eyebrow">PEER REVIEWS &middot; 2026-05</div>
+        <h2 class="peer-card-title">
+          Six independent AI systems just evaluated NAC under the 2026 post-human paradigm.
+        </h2>
+        <p class="peer-card-quote">
+          <strong>"Architecturally inevitable."</strong> &mdash; ChatGPT-5
+          &nbsp;&middot;&nbsp;
+          <strong>"Right problems, right primitives."</strong> &mdash; Claude Opus
+          &nbsp;&middot;&nbsp;
+          <strong>"Not a luxury &mdash; a fundamental requirement."</strong> &mdash; DeepSeek
+        </p>
+        <p class="peer-card-stats">
+          <span><strong>80&ndash;90%</strong> less LLM hallucination</span>
+          <span class="peer-stat-sep">&middot;</span>
+          <span><strong>90%</strong> fewer tokens vs raw HTML</span>
+          <span class="peer-stat-sep">&middot;</span>
+          <span><strong>80&ndash;95%</strong> less visual RPA</span>
+          <span class="peer-stat-sep">&middot;</span>
+          <span><strong>~0</strong> test maintenance</span>
+        </p>
+        <span class="peer-card-cta">
+          Read the full peer reviews &rarr;
+        </span>
+      </div>
+    </a>
   </div>
 </section>
 

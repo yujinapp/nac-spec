@@ -83,8 +83,11 @@ ONLY edited X.html in canonical, you only need to copy X.html to mirror.
 ```bash
 cd C:/nac-spec-yujinapp
 git status --short
-# Only your edited files should appear -- if 26 deleted "packages/..."
-# rows are present, IGNORE THEM (those are Pablo's old WIP, not yours)
+# Only your edited files should appear. If you see 26 deleted
+# "packages/..." rows, do NOT commit them -- those demos are
+# indispensable for external developers to evaluate NAC3
+# (rpaforce-crm is private; nac-spec is the only public source).
+# Run: git checkout HEAD -- packages/  to restore them locally.
 
 git add path/to/file1 path/to/file2  # explicit paths, not git add -A
 git commit -m "type(scope): short title
@@ -160,6 +163,105 @@ Expect `HTTP/1.1 200 OK`. The `.htaccess` in the deployed nac-spec
 sets `Cache-Control: max-age=300`, so a 404 cached from before
 the deploy may stick for 5 minutes — hard reload (Ctrl+Shift+R) in
 browser to bust.
+
+---
+
+## A.2 Reverse mirror — demo sources from rpaforce to nac-spec
+
+The two folders under `packages/` in `nac-spec-yujinapp`
+(`nac-react-demo`, `nac-angular-demo`) are NOT canonical here. The
+SSOT lives in `C:/rpaforce/packages/` (private repo). nac-spec is
+the public mirror so external developers can read the demo source
+when evaluating NAC3 adoption.
+
+**Direction is reversed compared to workflow A:** changes start in
+`rpaforce/packages/` and propagate to `nac-spec/packages/`.
+
+### When to run this workflow
+
+After any commit in `C:/rpaforce/` that touches
+`packages/nac-react-demo/` or `packages/nac-angular-demo/`. Detect
+with:
+
+```bash
+cd C:/rpaforce
+git log --since="1 week ago" --name-only -- packages/nac-react-demo packages/nac-angular-demo \
+  | head -40
+```
+
+If you see commits whose hash is newer than the latest mirror sync
+commit in `nac-spec`, the mirror is stale.
+
+### Step-by-step
+
+#### 1. Identify the drift
+
+```bash
+diff -rq --exclude=node_modules --exclude=dist --exclude=package-lock.json \
+  C:/rpaforce/packages/nac-react-demo/ \
+  C:/nac-spec-yujinapp/packages/nac-react-demo/
+
+diff -rq --exclude=node_modules --exclude=dist --exclude=package-lock.json \
+  C:/rpaforce/packages/nac-angular-demo/ \
+  C:/nac-spec-yujinapp/packages/nac-angular-demo/
+```
+
+Lines that say `Files ... differ` are candidates. **Always exclude
+`node_modules/`, `dist/`, `package-lock.json`** — those are build
+artefacts and should never enter the mirror.
+
+#### 2. Copy only sources
+
+For each differing file (typically `src/*.tsx`, `src/*.ts`,
+`*.json` config, `*.html`, README):
+
+```bash
+cp C:/rpaforce/packages/nac-react-demo/src/App.tsx \
+   C:/nac-spec-yujinapp/packages/nac-react-demo/src/App.tsx
+```
+
+Or copy a whole tree (only if you're sure):
+
+```bash
+cp -r C:/rpaforce/packages/nac-react-demo/src/ \
+      C:/nac-spec-yujinapp/packages/nac-react-demo/src/
+```
+
+#### 3. Commit + push the mirror
+
+```bash
+cd C:/nac-spec-yujinapp
+git add packages/
+git status --short  # sanity check: no dist/, no node_modules/
+git commit -m "mirror(packages): sync nac-react-demo + nac-angular-demo from monorepo
+
+Source: rpaforce-crm @ <short-sha-of-latest-rpaforce-commit>
+
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>"
+git push
+```
+
+#### 4. Verify on GitHub
+
+External devs land here:
+
+```
+https://github.com/yujinapp/nac-spec/tree/main/packages/nac-react-demo
+https://github.com/yujinapp/nac-spec/tree/main/packages/nac-angular-demo
+```
+
+Confirm the latest commit timestamp matches what you just pushed,
+and that the changed files reflect your edits.
+
+### Things to never do in this workflow
+
+- Never commit `node_modules/`, `dist/`, `.next/`, or
+  `package-lock.json` to nac-spec — bloat + leaks build metadata.
+- Never edit `packages/` directly in nac-spec. Edit in rpaforce
+  first, then mirror. Bidirectional drift is impossible to resolve
+  cleanly.
+- Never delete `packages/` from nac-spec to "clean up". External
+  developers depend on these files being publicly accessible.
 
 ---
 

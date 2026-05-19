@@ -456,6 +456,645 @@
     document.body.insertBefore(div, document.body.firstChild);
   }
 
+  /* ==================================================================
+     v2.4 / RFC V24-04: Snapshot versioning + optimistic concurrency
+     ==================================================================
+
+     Promotes NAC3 from a decoration-and-verb contract to a real
+     agentic concurrency protocol. See docs/RFC_V24-04.md for the
+     full design + Appendix C for agent best practices. Three
+     primitives, in order an agent should typically use them:
+
+       plugin_version       primary; per-plugin monotonic; ignores noise
+                            outside the targeted plugin.
+       element_state_hash   content-aware; 128-bit SHA-256 truncated.
+       tree_version         escape hatch; global monotonic.
+
+     All three are returned by describe(); all three are honored as
+     expected_* parameters on every mutating API; mismatches reject
+     with NacError('snapshot_stale', { reason, ... }) and the side
+     effect does not occur.
+  */
+
+  /* ---- Internal state ---- */
+
+  let _tree_version = 0;
+  const _plugin_versions = new Map();   /* key: `${slug}|${instance_id||''}` */
+  const _version_history = [];           /* circular buffer, max 500 */
+  const _plugin_scope_cache = (typeof WeakMap !== 'undefined')
+    ? new WeakMap()                      /* Element -> { slug, instance_id } */
+    : null;
+  let _hydration_complete = false;
+  let _hydration_fallback_timer = null;
+  let _mutation_observer = null;
+
+  /* STRICT_VERSIONING + eager_hashing + HARD_DEDUP are exposed via
+     the NAC export (bottom of the module) so hosts can flip them
+     before / after install. Internal mirrors keep hot-path checks
+     property-access-free in the most common cases. */
+  function _strictVersioningOn() {
+    return (typeof window !== 'undefined' && window.NAC &&
+            window.NAC.STRICT_VERSIONING === true);
+  }
+  function _eagerHashingOn() {
+    return (typeof window !== 'undefined' && window.NAC &&
+            window.NAC.eager_hashing === true);
+  }
+
+  /* ---- Plugin scope resolver (RFC sec 5.1.1) ----
+
+     "Plugin scope is logical, not physical." An element belongs to
+     the plugin declared by its nearest [data-nac-plugin] ancestor.
+     Portals/teleports that carry the attribute on their portaled
+     root inherit the right scope regardless of DOM hierarchy.
+
+     Cached per element via WeakMap to avoid O(depth) walks on every
+     mutation in high-rate paths (drag-drop, autocomplete filtering).
+     Cache entries invalidate naturally when the element is GC'd; we
+     also clear them on attribute mutations of data-nac-plugin* in
+     the observer below. */
+  function _resolvePluginScope(el) {
+    if (!el || el.nodeType !== 1) return null;
+    if (_plugin_scope_cache && _plugin_scope_cache.has(el)) {
+      return _plugin_scope_cache.get(el);
+    }
+    let cur = el;
+    while (cur && cur.nodeType === 1) {
+      if (cur.hasAttribute && cur.hasAttribute('data-nac-plugin')) {
+        const scope = {
+          slug: cur.getAttribute('data-nac-plugin') || '',
+          instance_id: cur.getAttribute('data-nac-plugin-id') || null,
+        };
+        if (_plugin_scope_cache) _plugin_scope_cache.set(el, scope);
+        return scope;
+      }
+      cur = cur.parentElement;
+    }
+    if (_plugin_scope_cache) _plugin_scope_cache.set(el, null);
+    return null;
+  }
+
+  function _pluginKey(slug, instance_id) {
+    return slug + '|' + (instance_id || '');
+  }
+  function _pluginVersionFor(slug, instance_id) {
+    return 'v_' + (_plugin_versions.get(_pluginKey(slug, instance_id)) || 0);
+  }
+  function _treeVersionStr() { return 'v_' + _tree_version; }
+
+  /* ---- Bump functions (RFC sec 8.1) ---- */
+
+  function _bumpTreeVersion(trigger, affected_plugins) {
+    _tree_version += 1;
+    _version_history.push({
+      at: Date.now(),
+      tree_version: _treeVersionStr(),
+      trigger: trigger,
+      affected_plugins: affected_plugins || [],
+    });
+    while (_version_history.length > 500) _version_history.shift();
+    if (typeof document !== 'undefined') {
+      document.dispatchEvent(new CustomEvent('nac:tree:invalidated', {
+        detail: {
+          from_version: 'v_' + (_tree_version - 1),
+          to_version: _treeVersionStr(),
+          trigger: trigger,
+          affected_plugins: affected_plugins || [],
+        },
+      }));
+    }
+  }
+
+  function _bumpPluginVersion(slug, instance_id, trigger) {
+    if (!slug) return;
+    const key = _pluginKey(slug, instance_id);
+    const prev = _plugin_versions.get(key) || 0;
+    const next = prev + 1;
+    _plugin_versions.set(key, next);
+    /* Tree version bumps along with every plugin version bump. */
+    _bumpTreeVersion(trigger, [{ slug: slug, instance_id: instance_id || null }]);
+    if (typeof document !== 'undefined') {
+      document.dispatchEvent(new CustomEvent('nac:plugin:invalidated', {
+        detail: {
+          plugin_slug: slug,
+          plugin_instance_id: instance_id || null,
+          from_version: 'v_' + prev,
+          to_version: 'v_' + next,
+          trigger: trigger,
+        },
+      }));
+    }
+  }
+
+  /* Helper invoked from data-table primitives + syncPlugin to bump
+     versions without needing a mutation observer round-trip. */
+  function _markStructuralChange(slug, instance_id, trigger) {
+    _bumpPluginVersion(slug, instance_id, trigger || 'syncPlugin');
+  }
+
+  /* ---- Mutation observer (RFC sec 8.2) ----
+
+     Single observer rooted at document.body, filters mutations to
+     elements inside any [data-nac-plugin] subtree, coalesces all
+     mutations in a single microtask into one bump per affected
+     plugin. Structural changes (add/remove [data-nac-*] elements,
+     attribute changes to data-nac-id/role/action/plugin*, visibility
+     transitions) bump; pure state changes (value/textContent/focus)
+     do not. */
+  const _NAC_ATTRS_STRUCTURAL = new Set([
+    'data-nac-id', 'data-nac-role', 'data-nac-action',
+    'data-nac-plugin', 'data-nac-plugin-id', 'data-nac-verb',
+    'aria-hidden', 'hidden', 'style',
+  ]);
+
+  function _scopeOfMutation(mutation) {
+    /* attributes: target is the element itself.
+       childList: walk added/removed nodes; each contributes a scope. */
+    const scopes = [];
+    if (mutation.type === 'attributes' && mutation.target) {
+      const s = _resolvePluginScope(mutation.target);
+      if (s) scopes.push(s);
+    } else if (mutation.type === 'childList') {
+      const collect = function (nl) {
+        for (let i = 0; i < nl.length; i++) {
+          const n = nl[i];
+          if (n.nodeType !== 1) continue;
+          /* Only nodes that themselves carry a data-nac-* attribute,
+             or that contain one, are agent-relevant. */
+          let relevant = false;
+          if (n.hasAttribute && (n.hasAttribute('data-nac-id') ||
+              n.hasAttribute('data-nac-role') ||
+              n.hasAttribute('data-nac-plugin'))) {
+            relevant = true;
+          }
+          if (!relevant && n.querySelector) {
+            relevant = !!n.querySelector('[data-nac-id],[data-nac-role],[data-nac-plugin]');
+          }
+          if (relevant) {
+            /* Resolve scope from the mutation parent (where the node
+               was inserted/removed), since the removed node may no
+               longer be in the tree. */
+            const s = _resolvePluginScope(mutation.target);
+            if (s) scopes.push(s);
+          }
+        }
+      };
+      collect(mutation.addedNodes);
+      collect(mutation.removedNodes);
+    }
+    return scopes;
+  }
+
+  function _isStructuralAttrChange(mutation) {
+    if (mutation.type !== 'attributes') return false;
+    return _NAC_ATTRS_STRUCTURAL.has(mutation.attributeName || '');
+  }
+
+  function _handleMutationRecords(records) {
+    /* Coalesce: collect every affected (slug, instance_id) and emit
+       exactly one bump per pair per microtask flush. */
+    const affected = new Map();
+    for (let i = 0; i < records.length; i++) {
+      const r = records[i];
+      let structural = false;
+      if (r.type === 'childList') structural = true;
+      else if (r.type === 'attributes' && _isStructuralAttrChange(r)) structural = true;
+      else if (r.type === 'attributes' &&
+               (r.attributeName === 'data-nac-plugin' ||
+                r.attributeName === 'data-nac-plugin-id') &&
+               _plugin_scope_cache && r.target) {
+        /* Plugin scope changed -- invalidate cache for this element. */
+        try { _plugin_scope_cache.delete(r.target); } catch (_) {}
+      }
+      if (!structural) continue;
+      const scopes = _scopeOfMutation(r);
+      for (let j = 0; j < scopes.length; j++) {
+        const k = _pluginKey(scopes[j].slug, scopes[j].instance_id);
+        if (!affected.has(k)) {
+          affected.set(k, { slug: scopes[j].slug, instance_id: scopes[j].instance_id });
+        }
+      }
+    }
+    if (affected.size === 0) return;
+    affected.forEach(function (scope) {
+      _bumpPluginVersion(scope.slug, scope.instance_id, 'mutation');
+    });
+  }
+
+  function _installMutationObserver() {
+    if (_mutation_observer || typeof MutationObserver === 'undefined' ||
+        typeof document === 'undefined' || !document.body) return;
+    _mutation_observer = new MutationObserver(_handleMutationRecords);
+    _mutation_observer.observe(document.body, {
+      childList: true,
+      subtree:   true,
+      attributes: true,
+      attributeFilter: ['data-nac-id', 'data-nac-role', 'data-nac-action',
+                        'data-nac-plugin', 'data-nac-plugin-id', 'data-nac-verb',
+                        'data-nac-state', 'aria-hidden', 'hidden', 'disabled',
+                        'style'],
+    });
+  }
+
+  /* ---- element_state_hash (RFC sec 5.2) ----
+
+     The hash covers exactly 5 keys (visible, disabled, value, text,
+     custom) per the canonical mini-spec. Truncation at 256 chars on
+     value+text is normative. Serializer emits keys alphabetically,
+     non-ASCII escaped as \uXXXX lowercase, no whitespace. SHA-256
+     over the canonical bytes, truncated to the leading 128 bits
+     (16 bytes), encoded as 32 lowercase hex chars. */
+
+  function _hashIsEffectivelyVisible(el) {
+    /* Cheap visibility check: offsetParent + style.display +
+       style.visibility + aria-hidden. */
+    if (!el || el.nodeType !== 1) return false;
+    if (el.getAttribute && el.getAttribute('aria-hidden') === 'true') return false;
+    if (typeof el.offsetParent === 'object' && el.offsetParent === null) {
+      /* position:fixed escapes offsetParent=null. Use rect fallback. */
+      if (typeof el.getBoundingClientRect === 'function') {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) return false;
+      } else {
+        return false;
+      }
+    }
+    if (typeof window !== 'undefined' && window.getComputedStyle) {
+      const cs = window.getComputedStyle(el);
+      if (cs && (cs.display === 'none' || cs.visibility === 'hidden')) return false;
+    }
+    return true;
+  }
+
+  function _hashReadValue(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const tag = (el.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') {
+      const t = (el.type || '').toLowerCase();
+      if (t === 'checkbox' || t === 'radio') return el.checked ? 'true' : 'false';
+      return el.value == null ? null : String(el.value).slice(0, 256);
+    }
+    if (tag === 'select') {
+      return el.value == null ? null : String(el.value).slice(0, 256);
+    }
+    /* role=option fallback: aria-selected. */
+    if (el.getAttribute && el.getAttribute('aria-selected') === 'true') return 'selected';
+    return null;
+  }
+
+  function _jsonStringCanonical(s) {
+    /* RFC 8259 string encoding + the V24-04 normative rule: non-ASCII
+       escaped as \uXXXX lowercase. Eliminates engine divergence. */
+    let out = '"';
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      if (c === 0x22) out += '\\"';
+      else if (c === 0x5C) out += '\\\\';
+      else if (c === 0x08) out += '\\b';
+      else if (c === 0x0C) out += '\\f';
+      else if (c === 0x0A) out += '\\n';
+      else if (c === 0x0D) out += '\\r';
+      else if (c === 0x09) out += '\\t';
+      else if (c < 0x20 || c > 0x7E) {
+        let hex = c.toString(16);
+        while (hex.length < 4) hex = '0' + hex;
+        out += '\\u' + hex.toLowerCase();
+      } else {
+        out += s.charAt(i);
+      }
+    }
+    out += '"';
+    return out;
+  }
+
+  function _canonicalSerializeState(obj) {
+    /* Keys in alphabetical order: custom, disabled, text, value, visible. */
+    return '{'
+      + '"custom":'   + (obj.custom   === null ? 'null' : _jsonStringCanonical(obj.custom))   + ','
+      + '"disabled":' + (obj.disabled ? 'true' : 'false') + ','
+      + '"text":'     + (obj.text     === null ? 'null' : _jsonStringCanonical(obj.text))     + ','
+      + '"value":'    + (obj.value    === null ? 'null' : _jsonStringCanonical(obj.value))    + ','
+      + '"visible":'  + (obj.visible  ? 'true' : 'false')
+      + '}';
+  }
+
+  function _bytesToHexLower(bytes) {
+    let out = '';
+    for (let i = 0; i < bytes.length; i++) {
+      const v = bytes[i];
+      out += (v < 16 ? '0' : '') + v.toString(16);
+    }
+    return out;
+  }
+
+  /* Synchronous SHA-256 fallback. Used in non-secure contexts where
+     crypto.subtle is unavailable (HTTP iframes, legacy embeds).
+     Reference implementation (~80 LOC). Produces byte-identical
+     digests to crypto.subtle.digest('SHA-256', ...). */
+  function _sha256Sync(bytes) {
+    const K = [
+      0x428a2f98|0,0x71374491|0,0xb5c0fbcf|0,0xe9b5dba5|0,0x3956c25b|0,0x59f111f1|0,0x923f82a4|0,0xab1c5ed5|0,
+      0xd807aa98|0,0x12835b01|0,0x243185be|0,0x550c7dc3|0,0x72be5d74|0,0x80deb1fe|0,0x9bdc06a7|0,0xc19bf174|0,
+      0xe49b69c1|0,0xefbe4786|0,0x0fc19dc6|0,0x240ca1cc|0,0x2de92c6f|0,0x4a7484aa|0,0x5cb0a9dc|0,0x76f988da|0,
+      0x983e5152|0,0xa831c66d|0,0xb00327c8|0,0xbf597fc7|0,0xc6e00bf3|0,0xd5a79147|0,0x06ca6351|0,0x14292967|0,
+      0x27b70a85|0,0x2e1b2138|0,0x4d2c6dfc|0,0x53380d13|0,0x650a7354|0,0x766a0abb|0,0x81c2c92e|0,0x92722c85|0,
+      0xa2bfe8a1|0,0xa81a664b|0,0xc24b8b70|0,0xc76c51a3|0,0xd192e819|0,0xd6990624|0,0xf40e3585|0,0x106aa070|0,
+      0x19a4c116|0,0x1e376c08|0,0x2748774c|0,0x34b0bcb5|0,0x391c0cb3|0,0x4ed8aa4a|0,0x5b9cca4f|0,0x682e6ff3|0,
+      0x748f82ee|0,0x78a5636f|0,0x84c87814|0,0x8cc70208|0,0x90befffa|0,0xa4506ceb|0,0xbef9a3f7|0,0xc67178f2|0,
+    ];
+    let H = [0x6a09e667|0,0xbb67ae85|0,0x3c6ef372|0,0xa54ff53a|0,0x510e527f|0,0x9b05688c|0,0x1f83d9ab|0,0x5be0cd19|0];
+    /* Padding */
+    const ml = bytes.length;
+    const bits = ml * 8;
+    const padlen = (((ml + 9 + 63) >> 6) << 6) - ml;
+    const buf = new Uint8Array(ml + padlen);
+    buf.set(bytes, 0);
+    buf[ml] = 0x80;
+    /* big-endian 64-bit length, low 32 bits in the last 4 bytes */
+    buf[buf.length - 4] = (bits >>> 24) & 0xff;
+    buf[buf.length - 3] = (bits >>> 16) & 0xff;
+    buf[buf.length - 2] = (bits >>>  8) & 0xff;
+    buf[buf.length - 1] =  bits         & 0xff;
+    const W = new Int32Array(64);
+    function ROTR(x, n) { return (x >>> n) | (x << (32 - n)); }
+    for (let chunk = 0; chunk < buf.length; chunk += 64) {
+      for (let i = 0; i < 16; i++) {
+        W[i] = (buf[chunk + i*4    ] << 24) |
+               (buf[chunk + i*4 + 1] << 16) |
+               (buf[chunk + i*4 + 2] <<  8) |
+               (buf[chunk + i*4 + 3]);
+      }
+      for (let i = 16; i < 64; i++) {
+        const s0 = ROTR(W[i-15], 7) ^ ROTR(W[i-15], 18) ^ (W[i-15] >>> 3);
+        const s1 = ROTR(W[i-2], 17) ^ ROTR(W[i-2], 19) ^ (W[i-2] >>> 10);
+        W[i] = (W[i-16] + s0 + W[i-7] + s1) | 0;
+      }
+      let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+      for (let i = 0; i < 64; i++) {
+        const S1 = ROTR(e,6) ^ ROTR(e,11) ^ ROTR(e,25);
+        const ch = (e & f) ^ ((~e) & g);
+        const t1 = (h + S1 + ch + K[i] + W[i]) | 0;
+        const S0 = ROTR(a,2) ^ ROTR(a,13) ^ ROTR(a,22);
+        const mj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + mj) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0;
+        d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      H[0]=(H[0]+a)|0; H[1]=(H[1]+b)|0; H[2]=(H[2]+c)|0; H[3]=(H[3]+d)|0;
+      H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+h)|0;
+    }
+    const out = new Uint8Array(32);
+    for (let i = 0; i < 8; i++) {
+      out[i*4    ] = (H[i] >>> 24) & 0xff;
+      out[i*4 + 1] = (H[i] >>> 16) & 0xff;
+      out[i*4 + 2] = (H[i] >>>  8) & 0xff;
+      out[i*4 + 3] =  H[i]         & 0xff;
+    }
+    return out;
+  }
+
+  async function _sha256(bytes) {
+    if (typeof crypto !== 'undefined' && crypto.subtle && crypto.subtle.digest) {
+      const buf = await crypto.subtle.digest('SHA-256', bytes);
+      return new Uint8Array(buf);
+    }
+    return _sha256Sync(bytes);
+  }
+
+  function _buildHashState(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const role = (el.getAttribute && (el.getAttribute('data-nac-role') || '')) || '';
+    let text = null;
+    if (role === 'action' || role === 'tab') {
+      const t = (el.textContent || '').trim();
+      text = t.slice(0, 256);
+    }
+    let value = null;
+    if (role === 'field' || role === 'option') {
+      value = _hashReadValue(el);
+    }
+    return {
+      custom: (el.getAttribute && el.getAttribute('data-nac-state')) || null,
+      disabled: el.disabled === true ||
+                (el.getAttribute && el.getAttribute('aria-disabled') === 'true'),
+      text: text,
+      value: value,
+      visible: _hashIsEffectivelyVisible(el),
+    };
+  }
+
+  function _encodeCanonical(canonical) {
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(canonical);
+    const b = new Uint8Array(canonical.length);
+    for (let i = 0; i < canonical.length; i++) b[i] = canonical.charCodeAt(i) & 0xff;
+    return b;
+  }
+
+  /* Async variant -- uses WebCrypto when available (faster on long
+     strings); falls back to the sync implementation in non-secure
+     contexts. Awaited by _resolveVersionExpectations on the hash
+     check path. */
+  async function _stateHashOf(el) {
+    const state = _buildHashState(el);
+    if (!state) return null;
+    const enc = _encodeCanonical(_canonicalSerializeState(state));
+    const digest = await _sha256(enc);
+    return _bytesToHexLower(digest.slice(0, 16));
+  }
+
+  /* Sync variant -- always uses _sha256Sync. Used by describe() so
+     the public read API stays synchronous. ~0.5-1ms per element on
+     modern V8; acceptable up to a few hundred elements per describe.
+     Hosts with thousands of elements should pre-cache via the
+     eager_hashing flag (future optimization). */
+  function _stateHashOfSync(el) {
+    const state = _buildHashState(el);
+    if (!state) return null;
+    const enc = _encodeCanonical(_canonicalSerializeState(state));
+    const digest = _sha256Sync(enc);
+    return _bytesToHexLower(digest.slice(0, 16));
+  }
+
+  /* ---- markHydrationComplete + 100ms fallback (RFC sec 5.10) ---- */
+
+  function _completeHydration(triggered_by) {
+    if (_hydration_complete) return;
+    _hydration_complete = true;
+    if (_hydration_fallback_timer) {
+      clearTimeout(_hydration_fallback_timer);
+      _hydration_fallback_timer = null;
+    }
+    /* Enumerate every registered plugin instance and emit per-plugin
+       events with from_version=null, plus a global tree event. */
+    const affected = [];
+    _plugin_versions.forEach(function (_n, key) {
+      const i = key.indexOf('|');
+      const slug = key.slice(0, i);
+      const inst = key.slice(i + 1) || null;
+      affected.push({ slug: slug, instance_id: inst });
+    });
+    /* Tree bump tagged as hydration_complete. */
+    _bumpTreeVersion('hydration_complete', affected.slice());
+    if (typeof document !== 'undefined') {
+      for (let i = 0; i < affected.length; i++) {
+        const a = affected[i];
+        const key = _pluginKey(a.slug, a.instance_id);
+        const curN = _plugin_versions.get(key) || 0;
+        document.dispatchEvent(new CustomEvent('nac:plugin:invalidated', {
+          detail: {
+            plugin_slug: a.slug,
+            plugin_instance_id: a.instance_id,
+            from_version: null,
+            to_version: 'v_' + curN,
+            trigger: 'hydration_complete',
+          },
+        }));
+      }
+    }
+  }
+
+  function markHydrationComplete() {
+    if (_hydration_complete) return;
+    _completeHydration('explicit');
+  }
+
+  function _armHydrationFallback() {
+    if (typeof document === 'undefined') return;
+    const start = function () {
+      _hydration_fallback_timer = setTimeout(function () {
+        if (!_hydration_complete) _completeHydration('fallback_100ms');
+      }, 100);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start, { once: true });
+    } else {
+      start();
+    }
+  }
+
+  /* ---- versionHistory devtools surface (RFC sec 5.9) ---- */
+
+  function versionHistory(limit) {
+    const n = (typeof limit === 'number' && limit > 0)
+      ? Math.min(limit, _version_history.length)
+      : Math.min(50, _version_history.length);
+    return _version_history.slice(-n).reverse();
+  }
+
+  /* ---- Resolver helper for expected_* checks (RFC sec 5.4 + 8.3) ----
+
+     Returns Promise<void>. Throws NacError on mismatch / tier reject /
+     STRICT-without-expectation. Cheap-to-expensive order:
+       1. STRICT gate
+       2. NAC-3 (non-versioned) tier rejects ANY expected_*
+       3. expected_plugin_version (integer compare)
+       4. expected_tree_version (integer compare)
+       5. expected_element_state_hash (SHA-256, awaited last)
+  */
+  async function _resolveVersionExpectations(opts, el) {
+    const o = opts || {};
+    const hasAny = ('expected_plugin_version' in o) ||
+                   ('expected_tree_version'   in o) ||
+                   ('expected_element_state_hash' in o);
+    if (_strictVersioningOn() && !hasAny) {
+      throw NacError('version_required',
+        'STRICT_VERSIONING is on; at least one expected_* required.',
+        { method: (o && o.method) || undefined });
+    }
+    /* Tier reject -- conformance_tier is exposed on the NAC export,
+       and a runtime that declares NAC-3 must NOT silently honor any
+       expected_*. */
+    const tier = (typeof window !== 'undefined' && window.NAC &&
+                  window.NAC.conformance_tier) || 'NAC-3-versioned';
+    if (tier === 'NAC-3' && hasAny) {
+      throw NacError('feature_not_supported',
+        'Runtime tier is NAC-3 (non-versioned); expected_* parameters are not honored.',
+        { tier: 'NAC-3', requested_feature: 'versioning' });
+    }
+    /* Plugin version */
+    if ('expected_plugin_version' in o) {
+      const scope = _resolvePluginScope(el);
+      if (scope) {
+        const cur = _pluginVersionFor(scope.slug, scope.instance_id);
+        if (o.expected_plugin_version !== cur) {
+          /* RFC V24-04 sec 5.5: extras nested under .detail.
+             NacError() flattens by default; mirror under detail
+             for the new versioning error class so agents reading
+             the RFC can use err.detail.reason directly. */
+          const detail = {
+            reason: 'plugin_changed',
+            plugin_slug: scope.slug,
+            plugin_instance_id: scope.instance_id,
+            expected_plugin_version: o.expected_plugin_version,
+            current_plugin_version: cur,
+          };
+          throw NacError('snapshot_stale',
+            'expected_plugin_version=' + o.expected_plugin_version +
+            ' current_plugin_version=' + cur,
+            Object.assign({ detail: detail }, detail));
+        }
+      }
+    }
+    /* Tree version */
+    if ('expected_tree_version' in o) {
+      const cur = _treeVersionStr();
+      if (o.expected_tree_version !== cur) {
+        const detail = {
+          reason: 'tree_changed',
+          expected_tree_version: o.expected_tree_version,
+          current_tree_version: cur,
+        };
+        throw NacError('snapshot_stale',
+          'expected_tree_version=' + o.expected_tree_version +
+          ' current_tree_version=' + cur,
+          Object.assign({ detail: detail }, detail));
+      }
+    }
+    /* Element state hash (awaited last) */
+    if ('expected_element_state_hash' in o) {
+      const cur = await _stateHashOf(el);
+      if (o.expected_element_state_hash !== cur) {
+        const detail = {
+          reason: 'element_changed',
+          expected_element_state_hash: o.expected_element_state_hash,
+          current_element_state_hash: cur,
+        };
+        throw NacError('snapshot_stale',
+          'expected_element_state_hash=' + o.expected_element_state_hash +
+          ' current_element_state_hash=' + cur,
+          Object.assign({ detail: detail }, detail));
+      }
+    }
+  }
+
+  /* Read back the post-dispatch versions. Used by every mutating API
+     after the side effect lands. Pair with _flushObserverQueue() to
+     guarantee MutationObserver records have been integrated. */
+  function _atVersionsFor(el) {
+    const scope = _resolvePluginScope(el);
+    return {
+      at_plugin_version: scope ? _pluginVersionFor(scope.slug, scope.instance_id) : null,
+      at_tree_version:   _treeVersionStr(),
+    };
+  }
+
+  /* Flush pending MutationObserver records into version bumps before
+     resolving the promise (RFC sec 5.8). queueMicrotask is enough --
+     the observer fires once per microtask flush. */
+  function _flushObserverQueue() {
+    return new Promise(function (resolve) {
+      if (typeof queueMicrotask === 'function') {
+        queueMicrotask(resolve);
+      } else {
+        Promise.resolve().then(resolve);
+      }
+    });
+  }
+
+  /* ==================================================================
+     End of v2.4 / RFC V24-04 foundation block.
+     ================================================================== */
+
   /* ---------- v1.8.0: skip-validate, command-events, dedup ------- */
 
   /* Spec sec 5: data-nac-validate="skip" marks a subtree (typically
@@ -1703,12 +2342,19 @@
     const plugins = Array.prototype.slice.call(
       document.querySelectorAll('[data-nac-plugin]')
     ).map(function (root) {
+      const slug = root.getAttribute('data-nac-plugin');
+      const instance_id = root.getAttribute('data-nac-plugin-id') || null;
       return {
-        plugin:       root.getAttribute('data-nac-plugin'),
-        plugin_state: root.getAttribute('data-nac-plugin-state') || 'idle',
-        elements:     Array.prototype.slice.call(
+        plugin:              slug,
+        plugin_instance_id:  instance_id,
+        plugin_state:        root.getAttribute('data-nac-plugin-state') || 'idle',
+        /* v2.4 / RFC V24-04 (sec 5.1): per-plugin monotonic version
+           token. Primary tool for agents -- ignore noise outside the
+           targeted plugin by passing expected_plugin_version on dispatch. */
+        plugin_version:      _pluginVersionFor(slug, instance_id),
+        elements:            Array.prototype.slice.call(
           root.querySelectorAll('[data-nac-id]')
-        ).map(_serializeElement),
+        ).map(_serializeElementWithHash),
       };
     });
     return {
@@ -1717,7 +2363,21 @@
       url:         location.href,
       active:      _activePlugin(),
       plugins:     plugins,
+      /* v2.4 / RFC V24-04 (sec 5.3): global monotonic version token.
+         Escape hatch for cross-plugin orchestration; prefer
+         plugin_version for single-plugin plans. */
+      tree_version: _treeVersionStr(),
     };
+  }
+
+  /* v2.4 / RFC V24-04 (sec 5.2): serialize + attach element_state_hash.
+     Sync compute; ~0.5-1ms per element. NULL when the element does not
+     carry a role that contributes to the hash. */
+  function _serializeElementWithHash(el) {
+    const base = _serializeElement(el);
+    if (!base) return base;
+    base.element_state_hash = _stateHashOfSync(el);
+    return base;
   }
 
   function list(role) {
@@ -1945,8 +2605,18 @@
        races real lifecycle events against a configurable timeout
        and rejects with NacError('timeout', ...) if none fire.
        Default timeout 5000ms; override via opts.timeout.
-       v1.6.3: success-event family is role-aware (see _CLICK_EVENT_FAMILY). */
+       v1.6.3: success-event family is role-aware (see _CLICK_EVENT_FAMILY).
+       v2.4 / RFC V24-04: optional version + state-hash expectation
+       gate runs BEFORE side effect; reject snapshot_stale on mismatch. */
     const el = _findElement(nac_id, opts);
+    if (el && opts && (opts.expected_plugin_version ||
+                       opts.expected_tree_version ||
+                       opts.expected_element_state_hash)) {
+      await _resolveVersionExpectations(opts, el);
+    } else if (_strictVersioningOn()) {
+      /* STRICT mode requires expectations even with no opts */
+      await _resolveVersionExpectations(opts || {}, el);
+    }
     if (!el) {
       /* v1.8.0: emit nac:command:rejected so an AI agent or audit
          pipeline can hear about every silent miss instead of just
@@ -2205,6 +2875,14 @@
 
   async function fill(nac_id, value, opts) {
     const el = _findElement(nac_id, opts);
+    /* v2.4 / RFC V24-04: optional version expectation gate. */
+    if (el && opts && (opts.expected_plugin_version ||
+                       opts.expected_tree_version ||
+                       opts.expected_element_state_hash)) {
+      await _resolveVersionExpectations(opts, el);
+    } else if (_strictVersioningOn()) {
+      await _resolveVersionExpectations(opts || {}, el);
+    }
     if (!el) {
       _emitCommandRejected({
         command_method: 'fill',
@@ -2267,6 +2945,14 @@
 
   async function select(nac_id, option, opts) {
     const el = _findElement(nac_id, opts);
+    /* v2.4 / RFC V24-04: optional version expectation gate. */
+    if (el && opts && (opts.expected_plugin_version ||
+                       opts.expected_tree_version ||
+                       opts.expected_element_state_hash)) {
+      await _resolveVersionExpectations(opts, el);
+    } else if (_strictVersioningOn()) {
+      await _resolveVersionExpectations(opts || {}, el);
+    }
     if (!el) throw NacError('not_found', 'No select with nac_id=' + nac_id);
     _focusElement(el);
     if (el.tagName === 'SELECT') {
@@ -2288,13 +2974,21 @@
     throw NacError('not_found', 'option ' + option + ' not present in ' + nac_id);
   }
 
-  async function tab(plugin, tab_key) {
+  async function tab(plugin, tab_key, opts) {
     const root = document.querySelector('[data-nac-plugin="' + plugin + '"]');
     if (!root) throw NacError('not_found', 'plugin ' + plugin + ' not mounted');
     const tabEl = root.querySelector(
       '[data-nac-role="tab"][data-nac-id="' + tab_key + '"]'
     );
     if (!tabEl) throw NacError('not_found', 'tab ' + tab_key + ' missing');
+    /* v2.4 / RFC V24-04: optional version expectation gate. */
+    if (opts && (opts.expected_plugin_version ||
+                 opts.expected_tree_version ||
+                 opts.expected_element_state_hash)) {
+      await _resolveVersionExpectations(opts, tabEl);
+    } else if (_strictVersioningOn()) {
+      await _resolveVersionExpectations(opts || {}, tabEl);
+    }
     _focusElement(tabEl);
     tabEl.click();
     try {
@@ -5359,6 +6053,29 @@
     /* v2.4 -- programmatic access to the same scan validate_global()
        and register() use. Returns [] on a clean DOM. */
     scan_plugin_instances:        _scanPluginInstances,
+    /* v2.4 / RFC V24-04 -- snapshot versioning + optimistic concurrency.
+       See docs/RFC_V24-04.md sections 5.1-5.12 + Appendix C. */
+    /* Self-describing conformance tier. NAC-3-versioned exposes
+       plugin_version + tree_version + element_state_hash + invalidation
+       events + markHydrationComplete + STRICT_VERSIONING gate. */
+    conformance_tier:             'NAC-3-versioned',
+    /* When true, every mutating call (click, fill, select, tab, ...)
+       without at least one expected_* parameter rejects with
+       NacError('version_required'). Default false in v2.4; flips to
+       true in v3.0; flag removed in v3.1. */
+    STRICT_VERSIONING:            false,
+    /* When true, element_state_hash is recomputed eagerly on every
+     state mutation (vs lazily on describe()). Default false. The
+     current describe() impl uses the sync hash directly so the flag
+     is a placeholder for the eager-cache optimization (future). */
+    eager_hashing:                false,
+    /* Explicit hydration signal. SSR with deferred hydration MUST
+       call this after hydration finishes; simple SPAs can rely on
+       the 100ms DOMContentLoaded fallback. */
+    markHydrationComplete:        markHydrationComplete,
+    /* Devtools surface for inspecting recent version bumps when
+       debugging snapshot_stale errors. */
+    versionHistory:               versionHistory,
     /* errors */
     NacError:        NacError,
   };
@@ -5381,6 +6098,17 @@
        Runs after install so existing host-level aria-describedby
        values are preserved (we append, not overwrite). */
     _installA11yHintBridge();
+
+    /* v2.4 / RFC V24-04: install the MutationObserver that drives
+       plugin_version + tree_version bumps. Single observer, coalesced
+       per microtask flush (sec 8.2). Idempotent -- second install
+       is a no-op. */
+    _installMutationObserver();
+
+    /* v2.4 / RFC V24-04: arm the 100ms hydration fallback. SSR
+       hosts MUST call NAC.markHydrationComplete() explicitly after
+       hydration; simple SPAs let the fallback fire (sec 5.10.1). */
+    _armHydrationFallback();
   }
 
   /* v1.9.0: auto-replay any window.__NAC_PENDING__ buffer the

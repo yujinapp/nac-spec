@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RFC V24-04 -- Snapshot versioning + optimistic concurrency control -- NAC3</title>
+<meta name="nac3-doc-slug" content="rfc_v24_04" />
+<meta name="nac3-spec-version" content="2.4" />
+<meta name="nac3-rfc-status" content="Final" />
+<link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
+<style>
+  :root {
+    --washi-50:   #FBF8F2;
+    --washi-100:  #F4EFE3;
+    --washi-200:  #E9DFC8;
+    --washi-300:  #D4C5A0;
+    --washi-400:  #B8A47D;
+    --ink-700:    #2B2620;
+    --ink-500:    #4A4138;
+    --ink-300:    #7A6E5F;
+    --ink-200:    #ABA194;
+    --rose-500:   #C24A4A;
+    --amber-400:  #D8932B;
+    --indigo-500: #4F5DAA;
+    --teal-400:   #4D9A8E;
+    --gold-300:   #C9A961;
+    --bg-paper:   #FBF8F2;
+    --bg-surface: #FFFFFF;
+    --bg-subtle:  #F4EFE3;
+    --border-subtle:  #E9DFC8;
+    --border-default: #D4C5A0;
+    --text-primary:   #2B2620;
+    --text-secondary: #4A4138;
+    --text-tertiary:  #7A6E5F;
+    --font-sans:    "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: "Noto Serif JP", "DM Sans", serif;
+    --font-mono:    ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg-paper); }
+  body {
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    background: var(--bg-paper);
+    margin: 0;
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 48px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(251, 248, 242, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 12px 28px;
+    margin-bottom: 24px;
+  }
+  .toolbar-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .toolbar a { color: var(--indigo-500); text-decoration: none; }
+  .toolbar a:hover { text-decoration: underline; }
+  .toolbar-kanji {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--ink-700);
+    letter-spacing: -0.5px;
+    margin-right: 6px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+  .badge-final {
+    background: var(--teal-400);
+    border-color: var(--teal-400);
+    color: white;
+    font-weight: 600;
+  }
+  .badge-spec { background: var(--indigo-500); border-color: var(--indigo-500); color: white; }
+  .badge-version { background: var(--amber-400); border-color: var(--amber-400); color: white; }
+
+  aside.toc {
+    position: sticky;
+    top: 80px;
+    align-self: start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding: 18px 14px;
+    border-right: 1px solid var(--border-subtle);
+    font-size: 13.5px;
+  }
+  aside.toc h4 {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+  }
+  aside.toc ol { padding-left: 18px; margin: 0 0 16px; }
+  aside.toc ol ol { padding-left: 14px; margin-top: 4px; }
+  aside.toc li { margin: 4px 0; line-height: 1.4; }
+  aside.toc a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: inline-block;
+    padding: 1px 0;
+  }
+  aside.toc a:hover { color: var(--indigo-500); }
+
+  main {
+    padding: 8px 0 80px;
+    max-width: 760px;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    color: var(--ink-700);
+    letter-spacing: -0.4px;
+  }
+  h1 .kanji {
+    color: var(--rose-500);
+    font-size: 0.7em;
+    margin-right: 12px;
+    vertical-align: 4px;
+  }
+  .lede {
+    color: var(--text-tertiary);
+    font-size: 15px;
+    margin: 0 0 28px;
+    font-style: italic;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.3;
+    margin: 56px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--ink-700);
+    scroll-margin-top: 80px;
+  }
+  h2 .num {
+    color: var(--ink-300);
+    margin-right: 12px;
+    font-weight: 400;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 17.5px;
+    margin: 30px 0 10px;
+    color: var(--ink-700);
+    scroll-margin-top: 80px;
+  }
+  h3 .num { color: var(--ink-300); margin-right: 10px; font-weight: 400; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--ink-500); scroll-margin-top: 80px; }
+  p { margin: 0 0 14px; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin: 4px 0; }
+  strong { color: var(--ink-700); font-weight: 600; }
+  em { font-style: italic; color: var(--text-secondary); }
+
+  code {
+    font-family: var(--font-mono);
+    background: var(--bg-subtle);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--ink-500);
+  }
+  pre {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 0 0 18px;
+  }
+  pre code { background: transparent; padding: 0; color: var(--ink-700); }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 0 18px;
+    font-size: 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    color: var(--ink-700);
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.2px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(244, 239, 227, 0.35); }
+
+  .meta-table th { width: 32%; }
+  .meta-table { margin-bottom: 8px; }
+
+  blockquote {
+    border-left: 3px solid var(--gold-300);
+    background: var(--bg-subtle);
+    padding: 12px 16px;
+    margin: 0 0 16px;
+    color: var(--text-secondary);
+    border-radius: 0 6px 6px 0;
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+
+  .callout {
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--indigo-500);
+    background: var(--bg-surface);
+    padding: 14px 16px;
+    margin: 16px 0;
+    border-radius: 4px 6px 6px 4px;
+  }
+  .callout-warn { border-left-color: var(--amber-400); }
+  .callout-danger { border-left-color: var(--rose-500); }
+  .callout-good { border-left-color: var(--teal-400); }
+  .callout h4 { margin-top: 0; }
+
+  a.anchor {
+    color: var(--ink-200);
+    text-decoration: none;
+    margin-left: 8px;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor { opacity: 1; }
+
+  .rfc-status {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--teal-400);
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    margin: 36px 0;
+  }
+  .footer-mark {
+    text-align: center;
+    margin: 60px 0 20px;
+    color: var(--ink-200);
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 4px;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; padding: 0 18px; }
+    aside.toc { display: none; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 19px; }
+  }
+</style>
+</head>
+<body data-nac-plugin="rfc_v24_04" data-nac-doc="true">
+
+<nav class="toolbar" data-nac-id="rfc_v24_04.toolbar" data-nac-role="region">
+  <div class="toolbar-inner">
+    <span class="toolbar-kanji" title="contract">契約</span>
+    <span class="badge badge-spec">NAC3 v2.4</span>
+    <span class="badge badge-version">RFC V24-04</span>
+    <span class="badge badge-final">Final</span>
+    <a href="/nac-spec/" data-nac-id="rfc_v24_04.toolbar.home" data-nac-role="action" data-nac-action="open">Spec home</a>
+    <a href="/nac-spec/SPEC.html" data-nac-id="rfc_v24_04.toolbar.spec" data-nac-role="action" data-nac-action="open">SPEC.md</a>
+    <a href="/nac-spec/docs/RFC_V24-04.md" data-nac-id="rfc_v24_04.toolbar.md" data-nac-role="action" data-nac-action="download">Markdown source</a>
+    <a href="#" onclick="window.scrollTo(0,0);return false;" data-nac-id="rfc_v24_04.toolbar.top" data-nac-role="action" data-nac-action="scroll_to_top">Top</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+<aside class="toc" data-nac-id="rfc_v24_04.toc" data-nac-role="region" aria-label="Table of contents">
+  <h4>Contents</h4>
+  <ol>
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#sec-1">Motivation</a></li>
+    <li><a href="#sec-2">Goals</a></li>
+    <li><a href="#sec-3">Non-goals</a></li>
+    <li><a href="#sec-4">Design overview</a></li>
+    <li><a href="#sec-5">Detailed design</a>
+      <ol>
+        <li><a href="#sec-5-1"><code>plugin_version</code></a></li>
+        <li><a href="#sec-5-2"><code>element_state_hash</code></a></li>
+        <li><a href="#sec-5-3"><code>tree_version</code></a></li>
+        <li><a href="#sec-5-4">Mutation API</a></li>
+        <li><a href="#sec-5-5"><code>snapshot_stale</code></a></li>
+        <li><a href="#sec-5-6">Invalidation events</a></li>
+        <li><a href="#sec-5-7"><code>STRICT_VERSIONING</code></a></li>
+        <li><a href="#sec-5-8"><code>at_*</code> ordering</a></li>
+        <li><a href="#sec-5-9"><code>versionHistory()</code></a></li>
+        <li><a href="#sec-5-10"><code>markHydrationComplete()</code></a></li>
+        <li><a href="#sec-5-11"><code>conformance_tier</code></a></li>
+        <li><a href="#sec-5-12">SSR, iframes, portals</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-6">Conformance levels</a></li>
+    <li><a href="#sec-7">Backward compatibility</a></li>
+    <li><a href="#sec-8">Reference implementation</a></li>
+    <li><a href="#sec-9">V24-01, V24-02, walker boundary</a></li>
+    <li><a href="#sec-10">Alternatives considered</a></li>
+    <li><a href="#sec-11">Open questions</a></li>
+    <li><a href="#sec-12">Status</a></li>
+    <li><a href="#app-a">Appendix A -- why this scales</a></li>
+    <li><a href="#app-b">Appendix B -- changes across drafts</a></li>
+    <li><a href="#app-c">Appendix C -- agent best practices</a></li>
+  </ol>
+</aside>
+
+<main data-nac-id="rfc_v24_04.main" data-nac-role="region">
+
+<h1><span class="kanji">改</span>RFC V24-04 -- Snapshot versioning &amp; optimistic concurrency control</h1>
+<p class="lede">Promotes NAC3 from a decoration-and-verb contract to a full agentic concurrency protocol. The runtime becomes the arbiter of agent-host coherence; mutations are versioned or fire-and-forget, never silently stale.</p>
+
+<table class="meta-table">
+  <tr><th>RFC number</th><td>V24-04</td></tr>
+  <tr><th>Status</th><td><span class="rfc-status">Final</span></td></tr>
+  <tr><th>Target version</th><td>NAC3 v2.4.0</td></tr>
+  <tr><th>Editor</th><td>Yujin</td></tr>
+  <tr><th>Created</th><td>2026-05-19 (draft v1 &rarr; v2 &rarr; v3 &rarr; Final, same day)</td></tr>
+  <tr><th>Public comment period</th><td>None &mdash; see <em>Notes on process</em> below.</td></tr>
+  <tr><th>Depends on</th><td>V24-01 (plugin slug uniqueness), V24-02 (<code>syncPlugin</code> idempotent)</td></tr>
+  <tr><th>Out of scope</th><td>Automatic decoration (walker). Treated as host responsibility; tooling left to product layer.</td></tr>
+</table>
+
+<div class="callout callout-warn">
+  <h4>Notes on process</h4>
+  <p>The standard NAC3 RFC process (<code>CONTRIBUTING.md</code>) requires a 14-day public comment period. This RFC was authored at a moment when <strong>no third-party implementations of NAC3 v2.3 existed</strong> &mdash; no forks, no adopter implementations, no published agents &mdash; so the comment period would have surfaced no external feedback. Internal review across four iterations (v1 &rarr; v2 &rarr; v3 &rarr; Final) covered the gaps the public process would have caught. Future RFCs MUST follow the standard 14-day window; this one ships Final to lock the v2.4 contract before the first adopter arrives.</p>
+</div>
+
+<h2 id="abstract">Abstract <a href="#abstract" class="anchor">#</a></h2>
+
+<p>This RFC promotes NAC3 from a decoration-and-verb contract to a full agentic concurrency protocol. It introduces per-plugin and global version tokens as first-class fields of <code>NAC.describe()</code>, makes mutating APIs version-aware via optional <code>expected_*</code> parameters, defines a new error class (<code>snapshot_stale</code>) and event family (<code>nac:plugin:invalidated</code>, <code>nac:tree:invalidated</code>), specifies a deterministic content-hash primitive for element-level coherence checks, exposes an explicit hydration-complete signal, exposes a runtime self-describing conformance tier, and establishes the runtime as the arbiter of agent-host coherence rather than relying on host discipline.</p>
+
+<p>The default tool for agents is <code>expected_plugin_version</code> &mdash; scoped, narrow, ignores noise outside the targeted plugin. <code>expected_tree_version</code> is a documented escape hatch for cross-plugin orchestration. Element-level hashes are an optional third tool for content-aware checks; all three are honored at the NAC-3-versioned conformance tier.</p>
+
+<p>All version parameters are optional at the v2.4 API boundary. A new conformance tier (NAC-3-versioned) marks adoption; a strict mode (NAC-3-strict) requires version expectations on every mutation. v3.0 will flip the strict default; v3.1 removes the unversioned path.</p>
+
+<p>This positions NAC3 as the first-mover protocol with explicit agentic concurrency primitives &mdash; a category that MCP intentionally does not address and that Computer Use sidesteps via screenshot polling.</p>
+
+<h2 id="sec-1"><span class="num">1.</span>Motivation <a href="#sec-1" class="anchor">#</a></h2>
+
+<h3 id="sec-1-1"><span class="num">1.1</span>Empirical evidence</h3>
+
+<p>The 2026-05-18 three-way benchmark (NAC3 vs MCP vs raw DOM, four reliable models, four tasks, partial N=15 at the time of writing) surfaced three independent bugs in less than 48 hours. All three belong to the same class:</p>
+
+<table>
+  <tr><th>Bug</th><th>Manifestation</th><th>Cause</th></tr>
+  <tr><td>V24-01</td><td><code>click_by_verb</code> resolves to wrong root non-deterministically</td><td>Multiple DOM roots share a slug without <code>data-nac-plugin-id</code></td></tr>
+  <tr><td>V24-02</td><td>Sonnet T_MCP1 NAC3 success 47% &mdash; planning on stale manifest</td><td><code>NAC.register()</code> is append-only; re-registration accumulates stale entries</td></tr>
+  <tr><td>V24-04 (this)</td><td>Any plan made against <code>describe()</code> output may be silently invalidated by intervening DOM changes</td><td>No coherence contract between snapshot and dispatch</td></tr>
+</table>
+
+<p>V24-01 and V24-02 are tactical fixes addressing specific manifestations of a systemic gap. <strong>V24-04 names the gap.</strong> The agent receives a snapshot at time <code>t0</code>, plans against it, and dispatches at time <code>t1</code>. Between <code>t0</code> and <code>t1</code> the page may rerender &mdash; WebSocket push, concurrent edit by another user, framework remount, validation logic changing visibility, anything. The current contract has nothing to say about this interval.</p>
+
+<h3 id="sec-1-2"><span class="num">1.2</span>The three failure modes the current contract permits</h3>
+
+<p>Without coherence semantics, an agent's dispatch can:</p>
+
+<ol>
+  <li><strong>Fail with <code>not_found</code></strong> &mdash; the <code>nac_id</code> referenced in the plan no longer exists in the DOM. Visible to the agent, recoverable by re-describing.</li>
+  <li><strong>Resolve to the wrong element</strong> &mdash; the <code>nac_id</code> still exists but now refers to a different concrete entity (rows reordered, the "fifth row" in the plan is no longer the keyboard). Invisible to the agent. Silent damage.</li>
+  <li><strong>Resolve to the correct element in the wrong state</strong> &mdash; the button is still there, but the confirm dialog the agent expected is already closed. The action is semantically wrong even though syntactically valid.</li>
+</ol>
+
+<div class="callout callout-danger">
+  <p>The third mode is the most insidious &mdash; the agent believes it accomplished the task, the page records an unintended side effect. <strong>In production this is the failure mode that ends agentic deployments.</strong> The 2026-05-18 benchmark surfaced an instance of exactly this in T_MCP1 NAC3.</p>
+</div>
+
+<h3 id="sec-1-3"><span class="num">1.3</span>Why this is foundational for NAC3's positioning</h3>
+
+<p>The protocols NAC3 is implicitly compared against (MCP, raw DOM via Computer Use, agent-to-app glue layers) all sidestep this question rather than solve it. MCP relies on backend transactions; the UI state question doesn't arise because there is no shared UI state. Computer Use re-screenshots before every action, accepting the latency cost as the price of safety. Glue layers either tolerate inconsistency silently or rebuild the world before every dispatch.</p>
+
+<p>NAC3 has the opportunity to be the contract that <strong>answers the question directly</strong>: agents and hosts share a versioned view of the surface, mutations are explicitly versioned or explicitly fire-and-forget, the runtime is the arbiter. This is what separates a decoration library from a concurrency protocol. It is also what allows NAC3 to be cited alongside MCP not as a competitor but as the layer MCP intentionally does not address.</p>
+
+<p>If NAC3 v2.4 ships without this, the first production adopter operating an SPA with live data will encounter the failure modes above and write a parallel coherence layer on top. That parallel layer will be ad-hoc, incompatible across adopters, and will become the de facto standard the SPEC failed to define. <strong>Versioning is what prevents fragmentation.</strong></p>
+
+<h2 id="sec-2"><span class="num">2.</span>Goals <a href="#sec-2" class="anchor">#</a></h2>
+
+<ol>
+  <li>Make every <code>describe()</code> output carry version tokens sufficient to detect intervening change at two granularities (per-plugin and global).</li>
+  <li>Allow every mutating API call to be conditioned on an expected version, failing fast with a structured error when stale.</li>
+  <li>Provide push-side invalidation events so long-running agents can detect change without polling.</li>
+  <li>Distinguish structural change (affects planning) from state change (may or may not affect the specific plan) at the version level.</li>
+  <li>Define a deterministic content-hash primitive for elements so agents can verify "the row I'm about to act on still has the content I planned against."</li>
+  <li>Provide an explicit host-driven signal for hydration completion, so versioning is robust under SSR.</li>
+  <li>Provide a runtime self-describing conformance tier so agents and validators can adapt without behavioural probing.</li>
+  <li>Remain backward compatible with existing v2.3 callers: all new parameters and events are opt-in at the v2.4 API boundary.</li>
+  <li>Specify behavior precisely enough that an alternative implementation (Python automation runner, Rust embedded agent) generates identical version tokens and identical hashes for identical DOM states.</li>
+</ol>
+
+<h2 id="sec-3"><span class="num">3.</span>Non-goals <a href="#sec-3" class="anchor">#</a></h2>
+
+<ol>
+  <li><strong>Server-side reconciliation.</strong> The runtime detects and reports staleness; it does not attempt to re-resolve the agent's intent. That responsibility stays with the agent. See section 11.3.</li>
+  <li><strong>Transactional multi-action dispatch.</strong> The version model is per-action, not per-plan. Atomic multi-step transactions are out of scope; SPEC sec 5.3 (data-tables) already provides transactional semantics within a table.</li>
+  <li><strong>Cross-tab synchronization.</strong> If the same user has the app open in two tabs, version tokens are per-tab. Cross-tab coherence is a host concern.</li>
+  <li><strong>Crypto-grade integrity.</strong> Versions are integrity-of-state indicators, not provenance proofs. HMAC manifests (SPEC sec 7.2) remain the provenance layer.</li>
+  <li><strong>Automatic decoration of undecorated DOM.</strong> Element naming is the host's responsibility. Tooling that automates decoration is a product-layer concern, not a runtime concern. See section 9.</li>
+</ol>
+
+<h2 id="sec-4"><span class="num">4.</span>Design overview <a href="#sec-4" class="anchor">#</a></h2>
+
+<p>The runtime maintains version state at three granularities, listed in the order an agent should typically use them:</p>
+
+<ul>
+  <li><strong><code>plugin_version</code></strong> &mdash; a per-plugin-instance monotonic token bumped when something inside that plugin instance changes structurally. <strong>This is the primary tool for agents.</strong> Most plans are scoped to a single plugin; passing <code>expected_plugin_version</code> on a dispatch ignores noise from elsewhere in the page.</li>
+  <li><strong><code>element_state_hash</code></strong> &mdash; an optional content hash exposed per element, summarizing the observable state of that single element. Used by agents that need content-level coherence (e.g., "delete this row only if its description is still what I planned against").</li>
+  <li><strong><code>tree_version</code></strong> &mdash; a global monotonic token bumped on any structural change anywhere. <strong>Escape hatch</strong> for cross-plugin orchestration.</li>
+</ul>
+
+<p>Mutating APIs (<code>click</code>, <code>fill</code>, <code>select</code>, <code>tab</code>, <code>dt_*</code>, <code>edit_field</code>) accept optional <code>expected_plugin_version</code>, <code>expected_element_state_hash</code>, and <code>expected_tree_version</code>. If any is provided and does not match the runtime's current value at dispatch time, the call rejects with <code>NacError('snapshot_stale', {...})</code> and the side effect does not occur.</p>
+
+<p><code>NAC.STRICT_VERSIONING</code> (boolean, default <code>false</code> in v2.4) enforces that every mutating call carries at least one <code>expected_*</code> parameter. Mutating calls without expectations reject with <code>NacError('version_required', ...)</code>.</p>
+
+<p>Push-side invalidation is exposed via two events: <code>nac:plugin:invalidated</code> and <code>nac:tree:invalidated</code>.</p>
+
+<p>A new lifecycle primitive, <code>NAC.markHydrationComplete()</code>, lets SSR-driven hosts signal explicitly when the post-hydration DOM is stable. The runtime emits the initial invalidation event at that moment.</p>
+
+<p>A new runtime property, <code>NAC.conformance_tier</code>, lets agents and validators read the runtime's declared conformance level without probing behaviour.</p>
+
+<h2 id="sec-5"><span class="num">5.</span>Detailed design <a href="#sec-5" class="anchor">#</a></h2>
+
+<h3 id="sec-5-1"><span class="num">5.1</span><code>plugin_version</code> (primary primitive)</h3>
+
+<p>Each plugin entry in <code>describe()</code> output carries a <code>plugin_version</code> field, of the form <code>v_&lt;integer&gt;</code> where <code>&lt;integer&gt;</code> is a 64-bit monotonic counter scoped to that <code>(plugin_slug, plugin_instance_id)</code> pair. The starting value is <code>v_0</code> at plugin registration time.</p>
+
+<p>The counter increments when a structural change touches an element scoped to that plugin instance:</p>
+
+<table>
+  <tr><th>Trigger (scoped to plugin X)</th><th>Increment X.plugin_version?</th></tr>
+  <tr><td><code>NAC.register(spec)</code> for X</td><td>Yes</td></tr>
+  <tr><td><code>NAC.syncPlugin(spec)</code> for X when manifest content differs</td><td>Yes</td></tr>
+  <tr><td><code>NAC.syncPlugin(spec)</code> for X when content is byte-identical</td><td>No</td></tr>
+  <tr><td><code>NAC.removePlugin(X, instance_id)</code></td><td>Plugin removed; downstream <code>expected_plugin_version</code> rejects with <code>not_found</code></td></tr>
+  <tr><td><code>dt_add_row</code>, <code>dt_remove_row</code>, <code>dt_commit</code>, <code>dt_discard</code> on table owned by X</td><td>Yes</td></tr>
+  <tr><td>Mutation: <code>data-nac-*</code> element added inside X subtree</td><td>Yes</td></tr>
+  <tr><td>Mutation: <code>data-nac-*</code> element removed inside X subtree</td><td>Yes</td></tr>
+  <tr><td>Mutation: <code>data-nac-id</code>/<code>role</code>/<code>action</code>/<code>plugin*</code> attribute changes inside X subtree</td><td>Yes</td></tr>
+  <tr><td>Mutation: effective visibility of element inside X subtree changes</td><td>Yes</td></tr>
+  <tr><td>Mutation: element's <code>value</code>, <code>textContent</code>, <code>disabled</code>, focus state changes</td><td>No &mdash; state-only, see <code>element_state_hash</code></td></tr>
+</table>
+
+<div class="callout">
+  <p>The distinction between "structural" (yes) and "state" (no) is the cornerstone of the design. If every keystroke in a field incremented <code>plugin_version</code>, no plan could survive a typing user. The rule: <strong>a change increments <code>plugin_version</code> if and only if it could invalidate a plan that does not target the specific element changed.</strong></p>
+</div>
+
+<h4 id="sec-5-1-1">5.1.1 &nbsp; Plugin scope is logical, not physical</h4>
+
+<p>An element carrying <code>data-nac-plugin="X"</code> belongs to plugin X regardless of its DOM position. A modal rendered via portal at <code>document.body</code> but carrying <code>data-nac-plugin="deals"</code> bumps <code>deals.plugin_version</code> on mutation, not the version of whatever plugin owns the DOM region it is physically inserted into. This matters for React/Vue portal patterns, Stripe Checkout iframes, third-party widget embeds, and any framework that decouples logical scope from DOM tree position.</p>
+
+<p>The runtime determines plugin scope by walking ancestors of every <code>[data-nac-*]</code> element for the nearest <code>[data-nac-plugin]</code> attribute. A portal that does not carry the attribute on the portaled root inherits no scope and is invisible to versioning.</p>
+
+<p><strong>Implementation guidance.</strong> Naive ancestor walks are O(depth) per mutation, which is a significant cost at high mutation rates (drag-drop, autocomplete with live filtering). Implementations SHOULD cache plugin scope per element via <code>WeakMap&lt;Element, {slug, instance_id}&gt;</code>, invalidating cache entries when the element or its ancestors mutate their <code>data-nac-plugin*</code> attributes. The reference implementation does this and reports per-operation overhead in <code>docs/PERF.md</code>.</p>
+
+<h3 id="sec-5-2"><span class="num">5.2</span><code>element_state_hash</code></h3>
+
+<p>Optional at the API surface, but <strong>required at the NAC-3-versioned conformance tier</strong>. Each element in <code>describe()</code> output MAY carry an <code>element_state_hash</code> field &mdash; a 32-character hex string (128 bits) computed deterministically from the element's observable state.</p>
+
+<p>The hash is for content-level coherence checks. An agent planning "delete row 5 where description is 'monitor LCD'" can pass <code>expected_element_state_hash</code> on the <code>dt_remove_row</code> call. If the row was edited between describe and dispatch, the hash differs and the dispatch rejects, even though the structural <code>nac_id</code> of row 5 is unchanged.</p>
+
+<h4>5.2.1 &nbsp; Hash inputs</h4>
+
+<p>The hash covers the following observable state, and nothing else:</p>
+
+<pre><code>{
+  visible: boolean,        // effective visibility (offsetParent + display + visibility + aria-hidden)
+  disabled: boolean,       // .disabled or aria-disabled
+  value: string | null,    // for role=field/option; null otherwise; truncated to 256 chars
+  text: string | null,     // for role=action/tab; el.textContent.trim() truncated to 256 chars; null otherwise
+  custom: string | null    // data-nac-state attribute, opaque to the runtime
+}</code></pre>
+
+<p>Truncation at 256 chars is normative. Implementations MUST truncate. Agents that need to verify long content (e.g., full document bodies) MUST use other channels &mdash; the hash is not a content equality proof for arbitrary-length content.</p>
+
+<h4>5.2.2 &nbsp; Canonical serialization</h4>
+
+<p>The input object is serialized as follows, byte-for-byte:</p>
+
+<ol>
+  <li>Keys appear in alphabetical order: <code>custom</code>, <code>disabled</code>, <code>text</code>, <code>value</code>, <code>visible</code>.</li>
+  <li>Strings are encoded as JSON strings per RFC 8259 sec 7, with one normative additional rule: <strong>non-ASCII characters are escaped using <code>\uXXXX</code> lowercase</strong>, never represented as raw UTF-8 bytes. This eliminates the V8/Spidermonkey/Hermes divergence on escape format.</li>
+  <li>Booleans appear as <code>true</code> or <code>false</code>.</li>
+  <li><code>null</code> appears as <code>null</code>.</li>
+  <li>No whitespace between tokens.</li>
+</ol>
+
+<pre><code>function _canonicalSerialize(obj) {
+  return '{'
+    + '"custom":'  + (obj.custom  === null ? 'null' : _jsonString(obj.custom)) + ','
+    + '"disabled":' + (obj.disabled ? 'true' : 'false') + ','
+    + '"text":'    + (obj.text    === null ? 'null' : _jsonString(obj.text))    + ','
+    + '"value":'   + (obj.value   === null ? 'null' : _jsonString(obj.value))   + ','
+    + '"visible":' + (obj.visible ? 'true' : 'false')
+    + '}';
+}</code></pre>
+
+<p>This mini-spec is intentionally narrow &mdash; five known keys, five known types &mdash; so that two implementations cannot diverge.</p>
+
+<h4>5.2.3 &nbsp; Hash algorithm</h4>
+
+<p>The hash is <strong>SHA-256 over the canonical serialization, truncated to the leading 128 bits</strong> (16 bytes), encoded as 32 lowercase hex characters. At 128 bits, collision probability for an app with 10<sup>4</sup> elements is &lt; 2<sup>-96</sup>. The truncation is normative.</p>
+
+<h4>5.2.4 &nbsp; When the hash is computed</h4>
+
+<p>Implementations choose between eager (compute on every state change, store on element) and lazy (compute on <code>describe()</code> call). Both are conformant. The runtime exposes <code>NAC.eager_hashing</code> (boolean, default <code>false</code>).</p>
+
+<h3 id="sec-5-3"><span class="num">5.3</span><code>tree_version</code> (escape hatch)</h3>
+
+<p><code>tree_version</code> is a global 64-bit monotonic counter, returned at the top level of <code>describe()</code>. It increments on every structural change anywhere in the agent-relevant DOM &mdash; the union of every <code>plugin_version</code> increment.</p>
+
+<p>For single-plugin plans, agents SHOULD prefer <code>expected_plugin_version</code>. <code>expected_tree_version</code> will reject on changes that do not affect the plan; this is correct behavior but creates more retry traffic than necessary.</p>
+
+<h3 id="sec-5-4"><span class="num">5.4</span>Extended mutation API</h3>
+
+<p>All mutating methods grow optional version parameters. Listed in recommended-order-of-use:</p>
+
+<pre><code>type VersionOpts = {
+  expected_plugin_version?: string;       // primary
+  expected_element_state_hash?: string;   // content-aware secondary
+  expected_tree_version?: string;         // escape hatch for cross-plugin plans
+};
+
+NAC.click(nac_id, opts?: ClickOpts &amp; VersionOpts):
+  Promise&lt;{ok: true, at_plugin_version: string, at_tree_version: string}&gt;;
+
+NAC.click_by_verb(plugin, verb, args?, opts?: VersionOpts):  Promise&lt;{...}&gt;;
+NAC.fill(nac_id, value, opts?: VersionOpts):                 Promise&lt;{...}&gt;;
+NAC.select(nac_id, value, opts?: VersionOpts):               Promise&lt;{...}&gt;;
+NAC.tab(plugin, tab_key, opts?: VersionOpts):                Promise&lt;{...}&gt;;
+NAC.dt_add_row(table_id, values, opts?: VersionOpts):        Promise&lt;{..., row_id}&gt;;
+NAC.dt_remove_row(table_id, row_id, opts?: VersionOpts):     Promise&lt;{...}&gt;;
+NAC.dt_edit_cell(table_id, row_id, column, value, opts?):    Promise&lt;{...}&gt;;
+NAC.dt_commit(table_id, opts?: VersionOpts):                 Promise&lt;{..., final_state}&gt;;
+NAC.edit_field(nac_id, opts?: VersionOpts):                  Promise&lt;{...}&gt;;</code></pre>
+
+<p>Resolution rules, applied in order:</p>
+
+<ol>
+  <li>If <code>NAC.STRICT_VERSIONING === true</code> and no <code>expected_*</code> parameter is provided, reject synchronously with <code>NacError('version_required', ...)</code>.</li>
+  <li>If a runtime at NAC-3 (non-versioned) tier receives any <code>expected_*</code> parameter, reject with <code>NacError('feature_not_supported', {tier: 'NAC-3', requested_feature: 'versioning'})</code>. <strong>Silently ignoring expectations is non-conformant.</strong></li>
+  <li>If <code>expected_plugin_version</code> is provided, compare against the targeted plugin's current <code>plugin_version</code>. Mismatch &rarr; reject with <code>snapshot_stale</code>, <code>reason: 'plugin_changed'</code>.</li>
+  <li>If <code>expected_tree_version</code> is provided, compare against current <code>tree_version</code>. Mismatch &rarr; reject with <code>snapshot_stale</code>, <code>reason: 'tree_changed'</code>.</li>
+  <li>If <code>expected_element_state_hash</code> is provided, compute the current hash of the target element. Mismatch &rarr; reject with <code>snapshot_stale</code>, <code>reason: 'element_changed'</code>.</li>
+  <li>If all checks pass, dispatch the side effect.</li>
+  <li>Before resolving the promise, flush any pending mutation observer microtasks. See section 5.8.</li>
+</ol>
+
+<p>Check order matters: cheaper checks (integer comparisons) run before hash computation.</p>
+
+<h3 id="sec-5-5"><span class="num">5.5</span><code>snapshot_stale</code> error</h3>
+
+<pre><code>NacError {
+  code: 'snapshot_stale',
+  message: string,
+  detail: {
+    nac_id?: string,
+    method?: string,
+    expected_plugin_version?: string,
+    current_plugin_version?: string,
+    plugin_slug?: string,
+    plugin_instance_id?: string,
+    expected_tree_version?: string,
+    current_tree_version?: string,
+    expected_element_state_hash?: string,
+    current_element_state_hash?: string,
+    reason: 'plugin_changed' | 'tree_changed' | 'element_changed',
+    last_change_trigger?: 'syncPlugin' | 'syncDataTable' | 'mutation' | 'register' | 'remove' | 'hydration_complete',
+    affected_plugins?: Array&lt;{slug: string, instance_id?: string}&gt;
+  }
+}</code></pre>
+
+<p>Agents implementing recovery typically follow:</p>
+
+<ol>
+  <li>Receive <code>snapshot_stale</code>.</li>
+  <li>Inspect <code>reason</code>. If <code>plugin_changed</code> and the plugin is the one targeted, re-describe scoped to that plugin and replan.</li>
+  <li>If <code>tree_changed</code> but the agent was using <code>expected_tree_version</code> as a coarse check, re-describe and decide whether to replan based on which plugins changed (<code>affected_plugins</code>).</li>
+  <li>If <code>element_changed</code>, the structural plan is still valid but the specific element's state differs from expected &mdash; the agent decides whether to retry or abort based on its semantic intent.</li>
+</ol>
+
+<h3 id="sec-5-6"><span class="num">5.6</span><code>nac:plugin:invalidated</code> and <code>nac:tree:invalidated</code></h3>
+
+<pre><code>'nac:plugin:invalidated' detail: {
+  plugin_slug, plugin_instance_id?,
+  from_version, to_version,
+  trigger: 'syncPlugin' | 'syncDataTable' | 'mutation' | 'register' | 'remove' | 'hydration_complete'
+}
+
+'nac:tree:invalidated' detail: {
+  from_version, to_version,
+  trigger,
+  affected_plugins: Array&lt;{slug, instance_id?}&gt;
+}</code></pre>
+
+<p>Both events are dispatched on <code>document</code>. The runtime guarantees the events fire <strong>after</strong> the corresponding internal counters have been updated; a listener calling <code>NAC.describe()</code> synchronously inside the handler observes the new versions.</p>
+
+<p><code>affected_plugins</code> is currently always length-1 in v2.4 implementations (one structural change &rarr; one affected plugin &rarr; one event pair). The array shape is forward-compatible: future RFCs may introduce batch invalidation primitives that emit length-N arrays from a single event. Agents SHOULD iterate over the array rather than assume length-1.</p>
+
+<h3 id="sec-5-7"><span class="num">5.7</span><code>NAC.STRICT_VERSIONING</code></h3>
+
+<p>Boolean flag, default <code>false</code> in v2.4. When <code>true</code>, every mutating call without an <code>expected_*</code> parameter rejects synchronously with <code>NacError('version_required', ...)</code>. <code>describe()</code> is unaffected.</p>
+
+<p><strong>Migration plan:</strong></p>
+
+<table>
+  <tr><th>Version</th><th>Default</th><th>Behaviour</th></tr>
+  <tr><td>v2.4</td><td><code>false</code></td><td>Flag exists; hosts opt in for production.</td></tr>
+  <tr><td>v2.5</td><td><code>false</code></td><td>Flag exists; runtime <code>console.warn</code> on fire-and-forget mutations.</td></tr>
+  <tr><td>v3.0</td><td><strong><code>true</code></strong></td><td>Default flips. Hosts that need legacy behaviour set <code>false</code> explicitly.</td></tr>
+  <tr><td>v3.1</td><td>&mdash;</td><td>Flag removed. All mutations must carry expectations.</td></tr>
+</table>
+
+<p>Four-minor-release migration window.</p>
+
+<h3 id="sec-5-8"><span class="num">5.8</span><code>at_plugin_version</code> and <code>at_tree_version</code> &mdash; ordering semantics</h3>
+
+<p>Every mutating API response includes <code>at_plugin_version</code> and <code>at_tree_version</code>. These are the values of the targeted plugin's version and the global tree version <strong>after</strong> the synchronous side effect of this dispatch has been integrated.</p>
+
+<p>The runtime MUST, before resolving the promise:</p>
+
+<ol>
+  <li>Apply the side effect (click handler, fill, etc.).</li>
+  <li>Allow the click handler's synchronous mutations to occur.</li>
+  <li>Flush the pending <code>MutationObserver</code> microtask queue.</li>
+  <li>Read the post-flush <code>plugin_version</code> and <code>tree_version</code> values.</li>
+  <li>Include them as <code>at_plugin_version</code> and <code>at_tree_version</code> in the response.</li>
+</ol>
+
+<p>This guarantees the agent's next dispatch can use the returned <code>at_*</code> values as <code>expected_*</code> without an additional <code>describe()</code> round-trip &mdash; <strong>for handlers whose effects are fully synchronous.</strong></p>
+
+<h4 id="sec-5-8-1">5.8.1 &nbsp; Limitation: async handlers</h4>
+
+<p>The flush-before-resolve guarantee captures mutations emitted synchronously by the side effect handler. Handlers that perform <code>await fetch()</code> or schedule mutations beyond the initial microtask cycle emit mutations that arrive <strong>after</strong> the runtime has resolved:</p>
+
+<pre><code>button.onclick = async () =&gt; {
+  setLoading(true);           // synchronous mutation -- captured
+  await fetch('/api/...');    // async gap -- runtime has already resolved
+  setData(data);              // post-async mutation -- NOT in at_plugin_version
+};</code></pre>
+
+<div class="callout callout-warn">
+  <p>In this case, the returned <code>at_plugin_version</code> reflects only the synchronous portion (<code>setLoading(true)</code>). An agent using <code>at_plugin_version</code> as <code>expected_plugin_version</code> on its next dispatch will receive <code>snapshot_stale</code> when the post-async mutation lands.</p>
+  <p>This is fundamentally unresolvable from the runtime: it cannot know when a logically-asynchronous side effect has completed. The contract is:</p>
+  <ul>
+    <li><strong>For synchronous handlers</strong>, <code>at_*</code> is a reliable substitute for re-describing.</li>
+    <li><strong>For async handlers</strong>, agents MUST NOT use <code>at_*</code> blindly. Instead, agents subscribe to <code>nac:plugin:invalidated</code> for the targeted plugin and wait for the post-async invalidation event. <strong>See Appendix C.4</strong> for the monotonic-version filter pattern that avoids capturing unrelated intermediate invalidations.</li>
+  </ul>
+</div>
+
+<p>Hosts that wrap async work should expose this fact in the manifest where possible (e.g., via a convention like <code>data-nac-async="true"</code> on actions that trigger async side effects). A formal manifest field is deferred to a future RFC.</p>
+
+<h3 id="sec-5-9"><span class="num">5.9</span><code>NAC.versionHistory(limit?)</code> &mdash; devtools surface</h3>
+
+<pre><code>NAC.versionHistory(limit?: number): Array&lt;{
+  at: number,                                // unix epoch ms
+  tree_version: string,
+  trigger: string,
+  affected_plugins: Array&lt;{slug, instance_id?}&gt;
+}&gt;;</code></pre>
+
+<p>Returns the most recent N version bumps (default 50, configurable, max 500) as a circular buffer. Used by developers debugging <code>snapshot_stale</code> errors. The buffer is in-memory only, not persisted.</p>
+
+<h3 id="sec-5-10"><span class="num">5.10</span><code>NAC.markHydrationComplete()</code> &mdash; explicit hydration signal</h3>
+
+<pre><code>NAC.markHydrationComplete(): void</code></pre>
+
+<p>Idempotent. Callable once per page lifecycle. Signals to the runtime that the host has completed its hydration phase and the agent-relevant DOM is stable.</p>
+
+<p>On the first call (and only the first), the runtime:</p>
+
+<ol>
+  <li>Performs a full scan of all registered plugins and re-computes <code>plugin_version</code> and <code>tree_version</code> from the current DOM state.</li>
+  <li>Emits <code>nac:tree:invalidated</code> with <code>from_version: null</code>, <code>trigger: 'hydration_complete'</code>, and <code>affected_plugins</code> listing every registered plugin.</li>
+  <li>Emits <code>nac:plugin:invalidated</code> for each plugin with <code>from_version: null</code>.</li>
+  <li>Transitions internal state from "hydrating" to "stable." Subsequent calls are no-ops.</li>
+</ol>
+
+<h4 id="sec-5-10-1">5.10.1 &nbsp; The 100ms fallback</h4>
+
+<p>If the host does not call <code>markHydrationComplete()</code> within 100ms after <code>DOMContentLoaded</code> fires, the runtime invokes it implicitly as a fallback.</p>
+
+<div class="callout callout-warn">
+  <p>The fallback is <strong>an acknowledged heuristic</strong>. Section 10.6 rejects implicit hydration detection on the grounds that all heuristics produce false positives or false negatives in real frameworks. The 100ms fallback is the minimum viable concession to developer experience for simple SPAs that have no concept of "hydration" &mdash; the implicit call lets them ship without learning the API. <strong>It is not a substitute for explicit signalling.</strong></p>
+</div>
+
+<ul>
+  <li><strong>Simple SPAs with no SSR</strong> require no code changes; the fallback fires shortly after page load. The risk of false positives is low.</li>
+  <li><strong>SSR with deferred hydration</strong> (React Suspense, Next.js streaming, Astro islands, Vue Suspense) <strong>MUST</strong> call <code>markHydrationComplete()</code> explicitly. The 100ms fallback WILL fire mid-hydration on slow devices or networks and produce version tokens against transitional state. Hosts in this category that omit the explicit call are non-conformant.</li>
+</ul>
+
+<p>The 100ms value is normative; implementations MUST NOT use shorter or longer values. Calibration: (a) allow synchronous hydration to complete on a low-end device baseline, (b) not delay agent operation on simple pages. If telemetry shows the fallback firing before hydration completes, the host MUST migrate to explicit signalling.</p>
+
+<h3 id="sec-5-11"><span class="num">5.11</span><code>NAC.conformance_tier</code> &mdash; self-describing runtime tier</h3>
+
+<pre><code>NAC.conformance_tier: 'NAC-3' | 'NAC-3-versioned' | 'NAC-3-strict'</code></pre>
+
+<p>Read-only property, available synchronously at any time after the runtime script has loaded (no need to wait for hydration).</p>
+
+<div class="callout callout-good">
+  <p>Implementations MUST set this property to the highest tier the runtime fully supports. The property MUST NOT change during the page lifecycle &mdash; the tier is a static property of the runtime build, not a runtime configuration. Setting <code>NAC.STRICT_VERSIONING = true</code> does <strong>not</strong> promote the tier from <code>NAC-3-versioned</code> to <code>NAC-3-strict</code>; the tier is determined by the implementation.</p>
+</div>
+
+<p>Agents and validators consume this property:</p>
+
+<ul>
+  <li><strong>Agents</strong> read it at boot to decide whether to pass <code>expected_*</code> parameters at all. <code>NAC-3</code> runtime &rarr; degrade to fire-and-forget. <code>NAC-3-versioned</code> &rarr; use the version contract. <code>NAC-3-strict</code> &rarr; runtime will reject any unversioned mutation; adjust.</li>
+  <li><strong>Validators</strong> (<code>npx @nac3/runtime validate &lt;url&gt;</code>) cross-check declared tier against observed behaviour (does the runtime actually emit <code>plugin_version</code>? does it actually reject <code>feature_not_supported</code> at NAC-3?). Mismatch &rarr; <code>tier_misrepresentation</code> finding.</li>
+</ul>
+
+<p>For backward compatibility: v2.3 runtimes do not expose this property. Agents detecting <code>typeof NAC.conformance_tier === 'undefined'</code> should treat the runtime as <code>NAC-3</code>.</p>
+
+<h3 id="sec-5-12"><span class="num">5.12</span>Special contexts: SSR, iframes, portals</h3>
+
+<p><strong>Server-side rendering and hydration.</strong> Covered by 5.10. Re-describe after <code>trigger === 'hydration_complete'</code>.</p>
+
+<p><strong>Iframes.</strong> Each frame loads its own runtime instance and maintains independent <code>plugin_version</code> and <code>tree_version</code> counters. Version tokens from one frame are not valid in another. Agents operating across frames MUST subscribe to <code>nac:tree:invalidated</code> on each frame's <code>document</code> independently. Cross-frame coherence (a global "app version" spanning multiple frames) is deferred to a future RFC.</p>
+
+<p><strong>Portals and teleports.</strong> Plugin scope is logical (see 5.1.1). Authors using React Portals, Vue Teleport, or equivalent MUST ensure the portaled root carries the appropriate <code>data-nac-plugin</code> attribute. The runtime cannot infer scope from logical component hierarchy when the DOM hierarchy diverges.</p>
+
+<h2 id="sec-6"><span class="num">6.</span>Conformance levels <a href="#sec-6" class="anchor">#</a></h2>
+
+<p>V24-04 introduces two new tiers stacked on the v2.3 baseline.</p>
+
+<table>
+  <tr><th>Tier</th><th>Requirements</th></tr>
+  <tr><td><strong>NAC-3</strong><br/><span class="badge">v2.3 baseline</span></td><td>Unchanged from main SPEC sec 8. <code>NAC.conformance_tier = 'NAC-3'</code>. Mutating calls carrying <code>expected_*</code> MUST be rejected with <code>feature_not_supported</code> (silent-ignore is non-conformant).</td></tr>
+  <tr><td><strong>NAC-3-versioned</strong><br/><span class="badge badge-version">v2.4 target</span></td><td>Returns <code>plugin_version</code>, <code>tree_version</code>, and <code>element_state_hash</code> in <code>describe()</code>. Emits <code>nac:plugin:invalidated</code>, <code>nac:tree:invalidated</code>, and the hydration completion event. Honors all three <code>expected_*</code> on every mutating call. <code>NAC.conformance_tier = 'NAC-3-versioned'</code>.</td></tr>
+  <tr><td><strong>NAC-3-strict</strong><br/><span class="badge badge-final">production posture</span></td><td>Sets <code>NAC.STRICT_VERSIONING = true</code> before any agent interaction. Rejects every mutating call without at least one <code>expected_*</code>. <code>NAC.conformance_tier = 'NAC-3-strict'</code>.</td></tr>
+</table>
+
+<p>The tiering simplification compared to earlier drafts: <code>element_state_hash</code> was moved from the strict tier to the versioned tier. Strict mode now differs from versioned mode only in <strong>enforcement</strong> (requiring expectations), not in <strong>features exposed</strong> (hash support). This eliminates the silent-ignore failure mode where a NAC-3-versioned runtime received <code>expected_element_state_hash</code> and discarded it.</p>
+
+<p>The CLI validator (<code>npx @nac3/runtime validate &lt;url&gt;</code>) reads <code>NAC.conformance_tier</code> and cross-checks against observed behaviour; the highest tier the page actually reaches is the reported result.</p>
+
+<h2 id="sec-7"><span class="num">7.</span>Backward compatibility <a href="#sec-7" class="anchor">#</a></h2>
+
+<p>All additions are opt-in at the API boundary. A v2.3 agent calling v2.4 runtime works unchanged: it doesn't pass version parameters, the runtime doesn't enforce them.</p>
+
+<p>A v2.4 agent calling v2.3 runtime degrades gracefully via two paths:</p>
+
+<ol>
+  <li><strong>Preferred</strong>: the agent reads <code>NAC.conformance_tier</code> at boot. <code>undefined</code> &rarr; v2.3 &rarr; degrade. Explicit detection path, SHOULD be used by every v2.4-aware agent.</li>
+  <li><strong>Fallback</strong>: if for any reason the agent did not check <code>conformance_tier</code>, the v2.3 runtime silently ignores the unknown <code>expected_*</code> opt keys (per the v2.1 convention). The mutation proceeds fire-and-forget. The agent observes <code>at_plugin_version</code> is missing from the response and concludes the runtime is v2.3.</li>
+</ol>
+
+<p><strong>Note:</strong> the silent-ignore behaviour is the v2.3 runtime's existing pattern. v2.4 runtimes do NOT silently ignore &mdash; see resolution rule 2 in section 5.4. The asymmetry is intentional: v2.4 has tier reporting + explicit rejection, v2.3 does not.</p>
+
+<p>The only breaking change in the family is the <code>STRICT_VERSIONING</code> default flip in v3.0, with the four-minor-release migration window in 5.7.</p>
+
+<h2 id="sec-8"><span class="num">8.</span>Reference implementation guidance <a href="#sec-8" class="anchor">#</a></h2>
+
+<h3 id="sec-8-1">8.1 &nbsp; Internal state</h3>
+
+<pre><code>let _tree_version = 0;
+const _plugin_versions = new Map();   // key: `${slug}|${instance_id || ''}`
+const _version_history = [];           // circular buffer for versionHistory()
+const _plugin_scope_cache = new WeakMap();   // Element -&gt; {slug, instance_id}
+let _hydration_complete = false;
+let _hydration_fallback_timer = null;
+
+function _bumpPluginVersion(slug, instance_id, trigger) {
+  const key = `${slug}|${instance_id || ''}`;
+  const prev = _plugin_versions.get(key) || 0;
+  const next = prev + 1;
+  _plugin_versions.set(key, next);
+  _bumpTreeVersion(trigger, [{slug, instance_id}]);
+  document.dispatchEvent(new CustomEvent('nac:plugin:invalidated', {
+    detail: { plugin_slug: slug, plugin_instance_id: instance_id,
+              from_version: `v_${prev}`, to_version: `v_${next}`, trigger }
+  }));
+}
+
+function _bumpTreeVersion(trigger, affected_plugins) {
+  _tree_version += 1;
+  _version_history.push({ at: Date.now(), tree_version: `v_${_tree_version}`,
+                          trigger, affected_plugins });
+  while (_version_history.length &gt; 500) _version_history.shift();
+  document.dispatchEvent(new CustomEvent('nac:tree:invalidated', {
+    detail: { from_version: `v_${_tree_version - 1}`,
+              to_version: `v_${_tree_version}`, trigger, affected_plugins }
+  }));
+}</code></pre>
+
+<h3 id="sec-8-2">8.2 &nbsp; Mutation observer</h3>
+
+<p>A single <code>MutationObserver</code> rooted at <code>document.body</code> observes attribute and childList changes filtered to elements within <code>[data-nac-plugin]</code> subtrees. The handler categorizes each mutation as structural or state and bumps versions accordingly.</p>
+
+<p>The observer fires once per microtask flush. Coalesced bumps share a single increment &mdash; five DOM mutations in the same tick produce one <code>plugin_version</code> increment for the affected plugin, not five.</p>
+
+<p>Performance MUST be benchmarked per implementation. The reference implementation publishes its numbers in <code>docs/PERF.md</code> after release; this RFC does not assert performance targets.</p>
+
+<h3 id="sec-8-3">8.3 &nbsp; Resolution order in mutation API</h3>
+
+<pre><code>async function _resolveExpectations(opts, target_el, target_plugin) {
+  // Rule 1: STRICT mode requires at least one expectation.
+  if (NAC.STRICT_VERSIONING) {
+    const has_any = opts.expected_plugin_version || opts.expected_tree_version
+                 || opts.expected_element_state_hash;
+    if (!has_any) throw NacError('version_required', {...});
+  }
+  // Rule 2: NAC-3 (non-versioned) tier rejects any expectation.
+  if (NAC.conformance_tier === 'NAC-3') {
+    const has_any = opts.expected_plugin_version || opts.expected_tree_version
+                 || opts.expected_element_state_hash;
+    if (has_any) throw NacError('feature_not_supported', {
+      tier: 'NAC-3', requested_feature: 'versioning'
+    });
+  }
+  // Rules 3-5: version + hash checks (cheap-to-expensive).
+  if (opts.expected_plugin_version) {
+    const key = `${target_plugin.slug}|${target_plugin.instance_id || ''}`;
+    const cur = `v_${_plugin_versions.get(key) || 0}`;
+    if (opts.expected_plugin_version !== cur)
+      throw NacError('snapshot_stale', { reason: 'plugin_changed', ... });
+  }
+  if (opts.expected_tree_version) {
+    const cur = `v_${_tree_version}`;
+    if (opts.expected_tree_version !== cur)
+      throw NacError('snapshot_stale', { reason: 'tree_changed', ... });
+  }
+  if (opts.expected_element_state_hash) {
+    const cur = await _stateHashOf(target_el);  // ASYNC -- see 8.5
+    if (opts.expected_element_state_hash !== cur)
+      throw NacError('snapshot_stale', { reason: 'element_changed', ... });
+  }
+}</code></pre>
+
+<p>Plugin version check runs before tree version check because it is the recommended primary tool and rejects more narrowly. Hash check runs last, after structural checks pass &mdash; and crucially is awaited, because <code>_stateHashOf</code> returns a Promise (see 8.5).</p>
+
+<h3 id="sec-8-4">8.4 &nbsp; Microtask flush in mutating APIs</h3>
+
+<pre><code>async function _dispatchAndFlush(target_el, sideEffect, target_plugin, opts) {
+  await _resolveExpectations(opts, target_el, target_plugin);
+  await sideEffect();   // applies the click/fill/etc.
+  await new Promise(resolve =&gt; queueMicrotask(resolve));  // flush observer
+  const at_plugin = `v_${_plugin_versions.get(_pluginKey(target_plugin)) || 0}`;
+  const at_tree = `v_${_tree_version}`;
+  return { ok: true, at_plugin_version: at_plugin, at_tree_version: at_tree };
+}</code></pre>
+
+<p><code>at_*</code> values reflect only the synchronous portion of the side effect. See 5.8.1 for the async-handler limitation.</p>
+
+<h3 id="sec-8-5">8.5 &nbsp; Element state hash</h3>
+
+<pre><code>async function _stateHashOf(el) {
+  const role = el.getAttribute('data-nac-role') || '';
+  const state = {
+    custom: el.getAttribute('data-nac-state'),
+    disabled: el.disabled === true || el.getAttribute('aria-disabled') === 'true',
+    text: (role === 'action' || role === 'tab')
+      ? (el.textContent || '').trim().slice(0, 256) : null,
+    value: (role === 'field' || role === 'option') ? _readValue(el) : null,
+    visible: _isEffectivelyVisible(el)
+  };
+  const canonical = _canonicalSerialize(state);
+  const digest = await _sha256(new TextEncoder().encode(canonical));
+  return _bytesToHex(digest.slice(0, 16));
+}
+
+async function _sha256(bytes) {
+  // Prefer WebCrypto when available
+  if (typeof crypto !== 'undefined' &amp;&amp; crypto.subtle) {
+    const buf = await crypto.subtle.digest('SHA-256', bytes);
+    return new Uint8Array(buf);
+  }
+  return _sha256Sync(bytes);   // mandatory fallback for non-secure contexts
+}</code></pre>
+
+<p><strong>WebCrypto availability constraint.</strong> <code>crypto.subtle.digest</code> requires a secure context (HTTPS or <code>localhost</code>). Apps embedded in iframes served over HTTP cannot use WebCrypto. Implementations MUST provide a synchronous SHA-256 fallback that produces byte-identical digests. Acceptable libraries: <code>js-sha256</code> (MIT), embedded reference impl, etc. The choice is implementation-specific; only the digest value is normative.</p>
+
+<h2 id="sec-9"><span class="num">9.</span>Interaction with V24-01, V24-02, and out-of-scope tooling <a href="#sec-9" class="anchor">#</a></h2>
+
+<p><strong>V24-01 (plugin slug uniqueness):</strong> the <code>(slug, instance_id)</code> pair that V24-01 establishes as the canonical instance key is the same key used to scope <code>plugin_version</code>. The two RFCs share the data model.</p>
+
+<p><strong>V24-02 (<code>syncPlugin</code> idempotent):</strong> <code>syncPlugin</code> bumps <code>plugin_version</code> if and only if the new manifest differs from the prior one. Byte-identical re-registration is a no-op and does not invalidate agent plans.</p>
+
+<div class="callout callout-warn">
+  <h4>Automatic decoration tooling (out of scope, normative)</h4>
+  <p>Tools that generate <code>data-nac-*</code> attributes for undecorated DOM (sometimes informally called "walkers") are explicitly out of scope for the NAC3 runtime. <strong>The runtime does not generate IDs.</strong> Decoration is the host's responsibility, whether produced manually, by a build-time tool, by a framework integration, or by a commercial product.</p>
+  <p>This boundary is normative. Implementations of the runtime MUST NOT include logic that synthesizes <code>nac_id</code> for elements without <code>data-nac-id</code>. Decoration tooling lives outside the runtime, free to evolve independently, and is not bound by the version-determinism requirements of this RFC.</p>
+  <p>The rationale is twofold. First, version determinism requires <code>nac_id</code> stability across rerenders; a tool that generates IDs from DOM topology can violate that property in subtle ways that would compromise the entire concurrency contract. Second, decoration is a product surface &mdash; different adopters want different tradeoffs between automation and control &mdash; and the standard should not bake in a single tradeoff.</p>
+  <p>The reference decoration tooling is <strong>Yujin Forge</strong> (<a href="https://github.com/yujinapp/yujin-forge">github.com/yujinapp/yujin-forge</a>), distributed under the MIT license. Forge offers both build-time AST transforms (for <code>.tsx</code>/<code>.jsx</code>/<code>.html</code>) and an assisted interactive mode (CLI prompts with verb/role classification + confidence scoring). Other decoration tools are welcome and competing implementations are a healthy signal for the protocol; the runtime remains agnostic.</p>
+</div>
+
+<h2 id="sec-10"><span class="num">10.</span>Alternatives considered <a href="#sec-10" class="anchor">#</a></h2>
+
+<h3>10.1 &nbsp; Hash-based versioning (rejected)</h3>
+<p>Compute <code>tree_version</code> as a hash of the full manifest state. Rejected because hashing on every change is expensive for large manifests; monotonic counters are sufficient ("is this the version I saw?" not "is this the same state I saw earlier?"); content-level coherence is already served by <code>element_state_hash</code>.</p>
+
+<h3>10.2 &nbsp; Per-element versioning (rejected)</h3>
+<p>Give every element its own version counter. Rejected because administrative cost is too high; per-plugin scoping plus <code>element_state_hash</code> covers the practical use cases.</p>
+
+<h3>10.3 &nbsp; Server-side reconciliation (rejected)</h3>
+<p>The runtime re-resolves agent intent against the current tree on stale dispatch. Rejected because the runtime does not know the agent's semantic intent; reconciliation introduces non-determinism the agent cannot audit; this is the failure mode the RFC exists to prevent. Equivalent decisions in HTTP (If-Match), Git (no auto-merge on conflict), and SQL (no implicit row reselection) all chose explicit failure.</p>
+
+<h3>10.4 &nbsp; RFC 8785 JCS for canonical serialization (rejected for v2.4)</h3>
+<p>Rejected because the hash input domain in 5.2.1 is fixed and small; a narrow mini-spec (5.2.2) is sufficient and tractable.</p>
+
+<h3>10.5 &nbsp; Transactional multi-action dispatch (deferred)</h3>
+<p>Rejected for v2.4: true rollback in the DOM is hard; the version model is sufficient for the agent to implement its own retry loop at the plan level.</p>
+
+<h3>10.6 &nbsp; Implicit hydration detection without explicit signal (rejected)</h3>
+<p>Earlier drafts allowed the runtime to detect hydration completion automatically (via DOMContentLoaded, idle callbacks, or mutation observer quiet periods). Rejected because all heuristics produce false positives or false negatives in real frameworks (React 18 streaming, Vue Suspense, Astro islands). The explicit <code>markHydrationComplete()</code> API gives hosts control with a documented fallback (sec 5.10.1) for the simple-SPA case.</p>
+
+<h3>10.7 &nbsp; Behavioural tier detection (rejected)</h3>
+<p>Earlier drafts left tier detection to validators inferring tier from runtime behaviour (does it emit <code>plugin_version</code>? does it reject <code>feature_not_supported</code>?). Rejected for v2.4 because behavioural probing is fragile: it requires the validator to issue a mutation, which has side effects; misconfigured runtimes can produce ambiguous results. Explicit self-reporting via <code>NAC.conformance_tier</code> (sec 5.11) is unambiguous, side-effect-free, and validator-friendly.</p>
+
+<h2 id="sec-11"><span class="num">11.</span>Open questions <a href="#sec-11" class="anchor">#</a></h2>
+
+<ol>
+  <li><strong>Eager vs lazy hashing default.</strong> Section 5.2.4 leaves the choice to implementations. Resolved: no mandate; both are conformant.</li>
+  <li><strong>Async-handler manifest declaration.</strong> Section 5.8.1 suggests <code>data-nac-async="true"</code>. Resolved: deferred &mdash; gather adopter feedback before formalizing.</li>
+  <li><strong>Cross-frame coherence.</strong> Deferred to a future RFC if production use cases materialize.</li>
+  <li><strong>Walker integration with versioning.</strong> Closed: out of scope (sec 9).</li>
+  <li><strong>Performance targets.</strong> No assertions in this RFC; reference implementation publishes in <code>docs/PERF.md</code>.</li>
+  <li><strong>WebCrypto fallback library.</strong> Implementation-specific; only the digest is normative.</li>
+</ol>
+
+<h2 id="sec-12"><span class="num">12.</span>Status <a href="#sec-12" class="anchor">#</a></h2>
+
+<table>
+  <tr><th>Phase</th><th>Date</th><th>Status</th></tr>
+  <tr><td>Draft v1</td><td>2026-05-19</td><td>Superseded</td></tr>
+  <tr><td>Draft v2</td><td>2026-05-19</td><td>Superseded</td></tr>
+  <tr><td>Draft v3</td><td>2026-05-19</td><td>Superseded</td></tr>
+  <tr><td><strong>Final</strong></td><td><strong>2026-05-19</strong></td><td><strong>This document</strong></td></tr>
+  <tr><td>Reference impl in <code>js/nac.js</code></td><td>2026-05-19 onward</td><td>Pending</td></tr>
+  <tr><td>Spec patches (SPEC.md sec 5.2, 5.5, 6.1, 8 conformance)</td><td>2026-05-19 onward</td><td>Pending</td></tr>
+  <tr><td>Ship in v2.4.0</td><td>TBD</td><td>Pending</td></tr>
+</table>
+
+<p>This RFC is Final. No public comment period was conducted (see <em>Notes on process</em> at the top). The reference implementation in <code>js/nac.js</code>, the corresponding spec patches in <code>SPEC.md</code>, and the CLI validator update follow this RFC.</p>
+
+<h2 id="app-a">Appendix A &mdash; Why this is the contract that scales <a href="#app-a" class="anchor">#</a></h2>
+
+<p>NAC3 v2.1 was a decoration vocabulary. v2.2 added a strict validator. v2.3 added the field editor primitive and named MCP as the cross-app transport. <strong>v2.4 is the version that makes NAC3 a real concurrency protocol.</strong></p>
+
+<p>The bar for "reference contract" is not low. It requires two independent implementations to produce identical version tokens for identical DOM states. It requires failure modes to be precisely enumerated and recovery defined for each. It requires backward compatibility as a design constraint. It requires the wire format to be small enough for token economics to make sense for cheap models. It requires the runtime to do its job and leave the rest to layers above.</p>
+
+<p>This RFC tries to clear each bar.</p>
+
+<p>The benchmark that produced V24-01, V24-02, and this RFC ran in less than a week. It found three structural gaps that production adoption would have found later, more expensively. <strong>That is the case for benchmarks.</strong></p>
+
+<h2 id="app-b">Appendix B &mdash; Changes across drafts <a href="#app-b" class="anchor">#</a></h2>
+
+<h3>Draft v1 &rarr; v2</h3>
+<ol>
+  <li>Reordering: <code>plugin_version</code> promoted to primary, <code>tree_version</code> to escape hatch.</li>
+  <li><code>element_state_hash</code> strengthened: SHA-256/128-bit + canonical mini-spec.</li>
+  <li><code>at_*</code> ordering made explicit (flush-before-resolve).</li>
+  <li>Performance assertions removed.</li>
+  <li>SSR, iframes, and portals addressed.</li>
+  <li>Error renamed: <code>strict_versioning_required</code> &rarr; <code>version_required</code>.</li>
+  <li>Counter rollover section removed (64-bit normative).</li>
+  <li><code>NAC.versionHistory(limit?)</code> added.</li>
+  <li>Walker removed from scope (sec 9 reframed as normative boundary).</li>
+  <li>Plugin scope is logical, not physical, made explicit.</li>
+  <li><code>plugin_version</code> triggers scoped per-plugin explicitly.</li>
+</ol>
+
+<h3>Draft v2 &rarr; v3</h3>
+<ol>
+  <li>Async handler limitation (sec 5.8.1) documented explicitly.</li>
+  <li><code>element_state_hash</code> moved from NAC-3-strict to NAC-3-versioned tier.</li>
+  <li>Non-versioned runtimes MUST reject <code>expected_*</code> parameters.</li>
+  <li><code>NAC.markHydrationComplete()</code> API added.</li>
+  <li>Pseudocode bug in 8.3 fixed (<code>await _stateHashOf</code>).</li>
+  <li>WebCrypto HTTP fallback (sec 8.5).</li>
+  <li>WeakMap caching guidance (sec 5.1.1).</li>
+  <li><code>affected_plugins</code> length-1 note (sec 5.6).</li>
+  <li>Appendix C added &mdash; best practices for agent implementers.</li>
+  <li>Reference walker mentioned (later reframed as Yujin Forge).</li>
+  <li>Sec 11 open questions trimmed.</li>
+</ol>
+
+<h3>Draft v3 &rarr; Final</h3>
+<ol>
+  <li><strong><code>NAC.conformance_tier</code> runtime property added (sec 5.11).</strong> Replaces behavioural tier detection. Runtime self-describes its conformance level synchronously, allowing agents and validators to adapt without probing. Sec 7 updated: agents detect v2.3 via <code>typeof NAC.conformance_tier === 'undefined'</code>. Conformance levels in sec 6 require implementations to declare their tier. Validator behaviour (sec 6, sec 11) updated to cross-check declared tier against observed behaviour and emit <code>tier_misrepresentation</code> on mismatch. Alternative considered + rejected (behavioural probing) recorded in sec 10.7.</li>
+  <li><strong>Hydration fallback (sec 5.10.1) reframed as acknowledged heuristic.</strong> Earlier drafts described the 100ms fallback as equivalent to explicit <code>markHydrationComplete()</code>. Final draft makes the trade-off explicit: the fallback is a minimum viable concession to DX for simple SPAs; SSR with deferred hydration MUST call explicitly and is non-conformant if it does not. The 100ms calibration rationale recorded for future tuning.</li>
+  <li><strong>Appendix C.4 Pattern A race documented (sec 5.8.1 + C.7).</strong> The naive listener pattern &mdash; subscribe to <code>nac:plugin:invalidated</code>, treat the first matching event as the ack &mdash; captures any intermediate invalidation, not necessarily the one caused by the dispatch. Final draft cross-references the monotonic-version filter pattern in C.4 from sec 5.8.1 and adds it as a Common Mistake in C.7. The fix is to filter by <code>ev.detail.to_version &gt; expected_plugin_version_at_dispatch</code>, not just by plugin slug.</li>
+  <li><strong>Notes on process</strong> added to header. Documents that this RFC was authored before any third-party implementations existed, that the standard 14-day public comment period would have surfaced no external feedback, and that future RFCs MUST follow the standard window.</li>
+  <li><strong>Yujin Forge cited as reference decoration tooling (sec 9).</strong> Previously sec 9 mentioned <code>tools/reference-walker/</code>; Final draft points to <code>github.com/yujinapp/yujin-forge</code> as the canonical reference, distributed under MIT, with both build-time AST transforms and assisted interactive mode.</li>
+</ol>
+
+<h2 id="app-c">Appendix C &mdash; Best practices for agent implementers <a href="#app-c" class="anchor">#</a></h2>
+
+<p><em>This appendix is non-normative.</em> It describes patterns the editor recommends for agents consuming a NAC-3-versioned runtime.</p>
+
+<h3 id="app-c-1">C.1 &nbsp; The basic loop</h3>
+
+<pre><code>// 0. Detect tier at boot.
+const tier = NAC.conformance_tier;
+if (typeof tier === 'undefined') return runLegacyMode();    // v2.3 runtime
+if (tier === 'NAC-3') return runLegacyMode();                // base tier
+
+// 1. Describe to get the current state.
+const snap = await NAC.describe();
+const target_plugin = snap.plugins.find(p =&gt; p.slug === 'invoice_app');
+const expected_v = target_plugin.plugin_version;
+
+// 2. Plan against the snapshot.
+const action = planAction(snap, userRequest);
+
+// 3. Dispatch with the expected version.
+try {
+  const result = await NAC.click_by_verb(action.plugin, action.verb, action.args, {
+    expected_plugin_version: expected_v
+  });
+  next_expected = result.at_plugin_version;   // only safe if handler synchronous
+} catch (err) {
+  if (err.code === 'snapshot_stale') return handleStale(err);
+  if (err.code === 'feature_not_supported') return runLegacyMode();
+  throw err;
+}</code></pre>
+
+<h3 id="app-c-2">C.2 &nbsp; Handling <code>snapshot_stale</code></h3>
+
+<pre><code>function handleStale(err) {
+  switch (err.detail.reason) {
+    case 'plugin_changed':
+      return rePlanScoped(err.detail.plugin_slug);
+
+    case 'tree_changed':
+      if (err.detail.affected_plugins.some(p =&gt; p.slug === our_target))
+        return rePlanScoped(our_target);
+      return retryWithFreshVersion();
+
+    case 'element_changed':
+      return askUserOrAbort();   // structural plan still valid, entity differs
+  }
+}</code></pre>
+
+<h3 id="app-c-3">C.3 &nbsp; Choosing among <code>expected_*</code> parameters</h3>
+
+<table>
+  <tr><th>Use case</th><th>Recommended</th></tr>
+  <tr><td>Single-plugin plan, structural-only sensitivity</td><td><code>expected_plugin_version</code></td></tr>
+  <tr><td>Cross-plugin orchestration</td><td><code>expected_tree_version</code></td></tr>
+  <tr><td>"Act on this row only if its content is still X"</td><td><code>expected_plugin_version</code> + <code>expected_element_state_hash</code></td></tr>
+  <tr><td>Coarse "anything changed?"</td><td><code>expected_tree_version</code> alone</td></tr>
+  <tr><td>Fire-and-forget (legacy mode)</td><td>None &mdash; runtime may reject if STRICT or tier=NAC-3</td></tr>
+</table>
+
+<p>Recommended default for new agents: <code>expected_plugin_version</code> always; add <code>expected_element_state_hash</code> for destructive actions (delete, cancel, irreversible mutations) where targeting the wrong entity would be costly.</p>
+
+<h3 id="app-c-4">C.4 &nbsp; Synchronous vs async handlers (monotonic filter)</h3>
+
+<p>Agents cannot tell from <code>describe()</code> output alone whether an action's handler is synchronous or async.</p>
+
+<p><strong>Pattern A &mdash; assume async, wait for the next post-dispatch invalidation event. Filter by monotonic version increase:</strong></p>
+
+<pre><code>// Capture the plugin_version at dispatch time.
+const v_at_dispatch = currentVersionOfPlugin(target_plugin.slug);
+
+const invalidationPromise = new Promise(resolve =&gt; {
+  document.addEventListener('nac:plugin:invalidated', function once(ev) {
+    if (ev.detail.plugin_slug !== target_plugin.slug) return;
+    // CRITICAL: filter by version, not just slug. Otherwise an unrelated
+    // intermediate invalidation (e.g., WebSocket push bumping the same
+    // plugin while we wait) captures the listener before the dispatch's
+    // own effect lands.
+    if (versionGt(ev.detail.to_version, v_at_dispatch)) {
+      document.removeEventListener('nac:plugin:invalidated', once);
+      resolve(ev.detail.to_version);
+    }
+  });
+});
+
+await NAC.click_by_verb(plugin, verb, args, {
+  expected_plugin_version: v_at_dispatch
+});
+
+next_expected = await Promise.race([
+  invalidationPromise,
+  new Promise((_, rej) =&gt; setTimeout(() =&gt; rej(new Error('timeout')), 5000))
+]);
+
+function versionGt(a, b) {
+  // 'v_42' &gt; 'v_41' lexically would fail at 'v_10' vs 'v_9'; compare the
+  // integer suffix instead.
+  return parseInt(a.slice(2), 10) &gt; parseInt(b.slice(2), 10);
+}</code></pre>
+
+<p>Safer; slightly higher latency.</p>
+
+<p><strong>Pattern B &mdash; trust <code>at_*</code> for known-synchronous handlers:</strong></p>
+
+<pre><code>const result = await NAC.click('invoice.save', {
+  expected_plugin_version: v
+});
+next_expected = result.at_plugin_version;   // safe only if save is sync</code></pre>
+
+<p>Faster; risky if the handler turns out to be async. Most agents should default to Pattern A and use Pattern B only for actions known a priori to be synchronous (tab switches, local filters).</p>
+
+<h3 id="app-c-5">C.5 &nbsp; Event subscription patterns</h3>
+
+<p>For long-running plans, subscribe to invalidation events at plan start:</p>
+
+<pre><code>class InvalidationTracker {
+  constructor(plugins) {
+    this.plugins = new Set(plugins);
+    this.versions = new Map();
+    this.handler = this.handler.bind(this);
+  }
+  start() {
+    document.addEventListener('nac:plugin:invalidated', this.handler);
+    NAC.describe().plugins
+      .filter(p =&gt; this.plugins.has(p.slug))
+      .forEach(p =&gt; this.versions.set(p.slug, p.plugin_version));
+  }
+  handler(ev) {
+    if (this.plugins.has(ev.detail.plugin_slug))
+      this.versions.set(ev.detail.plugin_slug, ev.detail.to_version);
+  }
+  currentVersion(slug) { return this.versions.get(slug); }
+  stop() { document.removeEventListener('nac:plugin:invalidated', this.handler); }
+}</code></pre>
+
+<p>Avoids the cost of a <code>describe()</code> round-trip on every dispatch.</p>
+
+<h3 id="app-c-6">C.6 &nbsp; Hydration</h3>
+
+<p>Agents that may be invoked during page load SHOULD wait for the hydration event before issuing plans:</p>
+
+<pre><code>function waitForHydration() {
+  return new Promise(resolve =&gt; {
+    document.addEventListener('nac:tree:invalidated', function once(ev) {
+      if (ev.detail.trigger === 'hydration_complete') {
+        document.removeEventListener('nac:tree:invalidated', once);
+        resolve();
+      }
+    });
+  });
+}
+
+await waitForHydration();
+const snap = await NAC.describe();
+// ... plan ...</code></pre>
+
+<p>Skipping this step on SSR pages with deferred hydration produces snapshots against transitional state.</p>
+
+<h3 id="app-c-7">C.7 &nbsp; Common mistakes</h3>
+
+<ul>
+  <li><strong>Using <code>at_tree_version</code> instead of <code>at_plugin_version</code> for next-dispatch.</strong> The plugin version rejects more narrowly; tree version forces retries on changes that don't affect the plan.</li>
+  <li><strong>Subscribing to <code>nac:plugin:invalidated</code> without filtering by version.</strong> Captures unrelated intermediate invalidations (WebSocket pushes, concurrent edits) instead of the dispatch's own effect. Always compare <code>ev.detail.to_version</code> against the version captured at dispatch time &mdash; see C.4.</li>
+  <li><strong>Hashing comparison for content equality verification.</strong> The hash is for "did this element's observable state change?" not "is this element semantically equivalent?" Truncation at 256 chars means long content equality is not preserved.</li>
+  <li><strong>Ignoring <code>feature_not_supported</code>.</strong> If the runtime returns this error, the agent is talking to a NAC-3 (non-versioned) host or has asked for a feature the runtime declared unavailable via <code>conformance_tier</code>. Degrade gracefully or refuse to operate.</li>
+  <li><strong>Skipping the <code>conformance_tier</code> check at boot.</strong> Detecting runtime version by response-shape inspection works but is fragile; the explicit property exists exactly to avoid this.</li>
+  <li><strong>Polling <code>describe()</code> instead of subscribing to events.</strong> Subscription is push-based and zero-cost when the page is idle; polling wastes tokens and cycles.</li>
+</ul>
+
+<hr/>
+
+<div class="footer-mark">墨 &middot; sumi</div>
+
+</main>
+
+</div>
+
+</body>
+</html>

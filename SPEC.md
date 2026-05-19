@@ -69,9 +69,10 @@ Every agent-resolvable element carries `data-nac-id`. The id is:
 - **A dotted path** (e.g. `deals.list.row.42.actions.delete`).
   Dots separate semantic levels; the runtime does not interpret
   them, but humans and LLMs do.
-- **Globally unique within a `data-nac-plugin` scope.** Two
-  different plugins MAY share an id; the runtime resolves by
-  `(plugin, id)` pair.
+- **Globally unique within a `(data-nac-plugin, data-nac-plugin-id)`
+  instance scope.** Two different plugins MAY share an id; the
+  runtime resolves by `(plugin, plugin_instance_id, id)` pair.
+  See sec 7.4 for the plugin slug uniqueness contract.
 - **Stable across re-renders.** Frameworks that produce a new id
   per render (random hashes, instance counters) break the contract.
 - **Stable across UI redesigns.** A button moves from the toolbar
@@ -408,6 +409,66 @@ See `SECURITY.md` for the full threat model. Short version:
   (isTrusted) so a host can refuse the latter for sensitive verbs.
 - NAC3 does not protect against a malicious agent running with
   user-level access. Such an agent can do anything the user can.
+
+### 7.4 Plugin slug uniqueness (v2.4)
+
+A `data-nac-plugin="<slug>"` attribute identifies a plugin
+**instance** in the DOM. The runtime resolves
+`(plugin, nac_id)` pairs against these scopes, so the host MUST
+guarantee unambiguous resolution.
+
+**Rules.**
+
+1. A given plugin slug MAY appear on more than one DOM root
+   simultaneously (a "list view + side panel" combo for the same
+   plugin family, a topbar mirror of an action that also lives in
+   the body, etc).
+2. **When the slug appears more than once, every root carrying it
+   MUST also carry a unique `data-nac-plugin-id` attribute.** The
+   pair `(data-nac-plugin, data-nac-plugin-id)` is the canonical
+   instance key.
+3. A single-root slug MAY omit `data-nac-plugin-id`; in that case
+   `(slug, null)` is the instance key.
+
+**Runtime enforcement (v2.4).**
+
+- The constructor `NAC.register(manifest)` rejects the call
+  synchronously with `NacError('duplicate_plugin_no_instance_id',
+  ...)` when the DOM already contains multiple roots with the
+  registered slug and any of them omits / duplicates
+  `data-nac-plugin-id`.
+- A boot-time pass (`nac:dom-ready` listener installed by the
+  runtime) performs the same check across every `[data-nac-plugin]`
+  root in the document. On the first violation it dispatches
+  `nac:fatal` with `code='duplicate_plugin_no_instance_id'`,
+  inserts a visible red banner at the top of `<body>`, and
+  throws. The runtime then refuses every subsequent
+  `describe`/`click`/`click_by_verb`/`tab` call.
+- `NAC.click_by_verb` resolves verbs against the manifest first.
+  When the manifest does not declare a top-level `actions[]` and
+  the runtime falls back to DOM scanning, the scan iterates
+  **every** `[data-nac-plugin="<slug>"]` root (not just the
+  first), matching the first descendant `[data-nac-action="<verb>"]`
+  it finds.
+- `NAC.validate_global()` continues to emit
+  `duplicate_plugin_no_instance_id` as a structured finding for CI
+  pipelines that prefer non-fatal reporting.
+
+**Migration from v2.3.**
+
+The boot-time throw is enabled by default in v2.4. Authors who
+need a one-release migration window can set
+`NAC.HARD_DEDUP = false` before the runtime's
+`DOMContentLoaded` listener fires. The flag is removed in v2.5.
+
+**Why "throw" not "warn".**
+
+Multiple roots sharing a slug without instance ids make every
+`(plugin, nac_id)` lookup first-match-wins by document order.
+That is non-deterministic across DOM rearrangements (drag-drop
+sorts, conditional render order, framework re-mounts) and the
+agent has no way to know which root won. v2.3 surfaced this only
+through opt-in lint; v2.4 makes it a build-time gate.
 
 ---
 

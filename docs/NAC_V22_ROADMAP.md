@@ -241,6 +241,68 @@ matcher behaviour.
 
 ---
 
+## V24-01 -- Plugin slug uniqueness becomes a fatal contract
+
+**Problem class.** A page may decorate two DOM roots with
+`data-nac-plugin="<same-slug>"` (a topbar mirror of an action
+that also lives in the main wrap, a side-panel that re-mounts
+a list plugin, an SSR + hydration race that double-mounts). Until
+v2.3 the runtime accepts both silently. `NAC.describe()` returns
+two plugin entries with the same slug; `NAC.click_by_verb()`'s
+DOM fallback uses `querySelector` (singular), grabs the first
+root in document order, and fails to find verbs that live on the
+second. The agent receives `not_found` for an element that very
+clearly exists. We saw this exact failure in the 2026-05-18
+3-way pilot: 4/4 reliable models failed `T_MCP4_create_invoice_full`
+on NAC3 because `click_by_verb('invoice_app','new_invoice')`
+matched the topbar root first (no `new_invoice` inside) instead
+of the main wrap.
+
+The sec 8.5 lint inside `_v22StrictValidate` already classified
+this as `severity: 'error'` with code
+`duplicate_plugin_no_instance_id`, but with two gaps:
+
+1. The lint runs only for plugins that called `NAC.register()`.
+   Plugins decorated entirely via HTML (no JS manifest) are
+   invisible to the validator.
+2. Even when the lint fires, it pushes a finding to
+   `validate_global()` instead of throwing. CI pipelines that do
+   not gate on `validate_global()` ship the bug.
+
+**Proposed contract change for v2.4.** Promote
+`duplicate_plugin_no_instance_id` from opt-in lint to runtime gate.
+
+1. `NAC.register(manifest)` checks the live DOM at registration
+   time. If the slug is mounted on more than one root and any
+   root omits or duplicates `data-nac-plugin-id`, the call throws
+   `NacError('duplicate_plugin_no_instance_id', ...)` synchronously
+   and the manifest is NOT stored.
+2. The runtime installs a `DOMContentLoaded` listener that walks
+   every `[data-nac-plugin]` root, groups by slug, and applies the
+   same rule. On the first violation it dispatches
+   `nac:fatal` with the finding, inserts a visible red banner at
+   the top of `<body>`, and throws. The banner copy explains the
+   fix in the document language.
+3. `NAC.click_by_verb`'s DOM fallback is rewritten to iterate
+   **every** `[data-nac-plugin="<slug>"]` root (not just the first),
+   so legitimate multi-instance mounts with unique
+   `data-nac-plugin-id` work.
+
+Add `NAC.HARD_DEDUP` flag (default `true` in v2.4; removable in
+v2.5) so adopters can opt out for the migration window.
+
+**Spec updates.** `SPEC.md` sec 7.4 ("Plugin slug uniqueness")
+ships in this minor; sec 2 ("Names") cross-references it. The
+implementation note in `nac.js` that says "spec sec 7.4" now
+points to a real section.
+
+**Status.** Runtime + spec patches landed 2026-05-19 in
+`vendor/nac-spec/{js/nac.js,SPEC.md}`. Bench fixture
+`bench/fixtures/invoice-app/pages/skeleton.html` updated in the
+same commit so the canonical demo passes the new gate.
+
+---
+
 ## Out of scope for v2.2 (deferred to v2.3+)
 
 - Composable role hierarchies (`role:'tab.primary'` vs

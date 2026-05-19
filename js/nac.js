@@ -323,6 +323,139 @@
     return e;
   }
 
+  /* ---------- v2.4: plugin slug uniqueness gate (spec sec 7.4) --- */
+
+  /* _scanPluginInstances() walks the live DOM and groups every
+     [data-nac-plugin] root by its slug. For each group of >1 root,
+     it requires every root to carry a non-empty data-nac-plugin-id
+     AND for those ids to be pairwise unique. The function never
+     throws; it returns a structured findings array. Callers
+     (register, the DOM-ready listener, validate_global) decide how
+     to react. */
+  function _scanPluginInstances() {
+    if (typeof document === 'undefined') return [];
+    const findings = [];
+    const bySlug = {};
+    const all = document.querySelectorAll('[data-nac-plugin]');
+    for (let i = 0; i < all.length; i++) {
+      const el = all[i];
+      const slug = el.getAttribute('data-nac-plugin') || '';
+      if (!slug) continue;
+      (bySlug[slug] = bySlug[slug] || []).push(el);
+    }
+    for (const slug in bySlug) {
+      if (!Object.prototype.hasOwnProperty.call(bySlug, slug)) continue;
+      const roots = bySlug[slug];
+      if (roots.length < 2) continue;
+      const ids = [];
+      const missing = [];
+      for (let r = 0; r < roots.length; r++) {
+        const id = roots[r].getAttribute('data-nac-plugin-id') || '';
+        if (!id) missing.push(roots[r]); else ids.push(id);
+      }
+      const dupIds = [];
+      const seen = {};
+      for (let j = 0; j < ids.length; j++) {
+        if (seen[ids[j]]) dupIds.push(ids[j]);
+        else seen[ids[j]] = 1;
+      }
+      if (missing.length > 0 || dupIds.length > 0) {
+        findings.push({
+          /* v2.4: symbolic code on every finding so CI integrations
+             can filter by code without parsing message text. Matches
+             the code thrown by register() + the boot gate. */
+          code: 'duplicate_plugin_no_instance_id',
+          severity: 'error',
+          slug: slug,
+          instance_count: roots.length,
+          missing_instance_id_count: missing.length,
+          duplicate_instance_ids: dupIds,
+          message: roots.length + ' DOM roots carry data-nac-plugin="'
+            + slug + '" but '
+            + (missing.length
+                ? missing.length + ' lack data-nac-plugin-id'
+                : 'two share data-nac-plugin-id "' + dupIds[0] + '"')
+            + '. Per SPEC sec 7.4, every root sharing a slug MUST '
+            + 'carry a unique data-nac-plugin-id.',
+        });
+      }
+    }
+    return findings;
+  }
+
+  /* _checkPluginSlugUniqueOrThrow(slug) is the synchronous gate used
+     by NAC.register(). It throws the first finding for the registered
+     slug as NacError('duplicate_plugin_no_instance_id', ...). Other
+     slugs found in the same scan are ignored here -- the DOM-ready
+     pass below catches them globally. */
+  function _checkPluginSlugUniqueOrThrow(slug) {
+    const all = _scanPluginInstances();
+    for (let i = 0; i < all.length; i++) {
+      if (all[i].slug !== slug) continue;
+      throw NacError('duplicate_plugin_no_instance_id', all[i].message, {
+        slug: slug,
+        instance_count: all[i].instance_count,
+        missing_instance_id_count: all[i].missing_instance_id_count,
+        duplicate_instance_ids: all[i].duplicate_instance_ids,
+      });
+    }
+  }
+
+  /* _installPluginDedupBootGate() runs once at DOMContentLoaded and
+     enforces the same contract across every slug. On the first
+     violation it dispatches nac:fatal, paints a visible red banner
+     so the human can see what broke even if their devtools are
+     closed, and throws. Subsequent runtime calls fail with the same
+     NacError surfaced through the runtime state flag. */
+  let _bootDedupFatal = null;
+  function _installPluginDedupBootGate() {
+    if (typeof document === 'undefined') return;
+    const run = function () {
+      if (typeof NAC !== 'undefined' && NAC && NAC.HARD_DEDUP === false) return;
+      const findings = _scanPluginInstances();
+      if (findings.length === 0) return;
+      const f = findings[0];
+      const err = NacError('duplicate_plugin_no_instance_id', f.message, {
+        slug: f.slug,
+        instance_count: f.instance_count,
+        missing_instance_id_count: f.missing_instance_id_count,
+        duplicate_instance_ids: f.duplicate_instance_ids,
+        all_findings: findings,
+      });
+      _bootDedupFatal = err;
+      try {
+        document.dispatchEvent(new CustomEvent('nac:fatal', {
+          detail: { code: 'duplicate_plugin_no_instance_id',
+                    slug: f.slug, message: f.message,
+                    findings: findings },
+        }));
+      } catch (_) {}
+      try { _paintFatalBanner(err); } catch (_) {}
+      /* Re-throw asynchronously so the script that loaded NAC does
+         not silently swallow the error. window.onerror picks it up,
+         test harnesses catch it, real browsers print it red. */
+      setTimeout(function () { throw err; }, 0);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  }
+
+  function _paintFatalBanner(err) {
+    if (typeof document === 'undefined' || !document.body) return;
+    if (document.getElementById('__nac_fatal_banner__')) return;
+    const div = document.createElement('div');
+    div.id = '__nac_fatal_banner__';
+    div.setAttribute('role', 'alert');
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;'
+      + 'background:#DC2626;color:#fff;font:600 14px/1.4 system-ui,sans-serif;'
+      + 'padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+    div.textContent = '[NAC3 FATAL] ' + err.code + ': ' + err.message;
+    document.body.insertBefore(div, document.body.firstChild);
+  }
+
   /* ---------- v1.8.0: skip-validate, command-events, dedup ------- */
 
   /* Spec sec 5: data-nac-validate="skip" marks a subtree (typically
@@ -1310,6 +1443,16 @@
          throw-trampoline. */
     }
 
+    /* v2.4 (spec sec 7.4): hard dedup gate. The slug being registered
+       cannot already be on multiple DOM roots without unique
+       data-nac-plugin-id values. _checkPluginSlugUniqueOrThrow throws
+       NacError('duplicate_plugin_no_instance_id', ...) on the first
+       offending slug. Gated by NAC.HARD_DEDUP (default true in v2.4,
+       removable in v2.5). */
+    if (NAC.HARD_DEDUP) {
+      _checkPluginSlugUniqueOrThrow(slug);
+    }
+
     _manifests[slug] = manifest;
     /* v1.9.0 (sec 13.5): apply manifest.attention_profile preset.
        Sets the matching CSS custom properties on the plugin root
@@ -2185,15 +2328,24 @@
       }
     }
     if (!matched) {
-      /* Fallback: scan DOM within plugin scope for [data-nac-action]. */
-      const root = targetPlugin
-        ? document.querySelector('[data-nac-plugin="' + targetPlugin + '"]')
-        : document;
-      if (root) {
-        const el = root.querySelector(
+      /* v2.4 (spec sec 7.4): a plugin slug may legitimately mount on
+         multiple DOM roots when each carries a unique
+         data-nac-plugin-id. Iterate ALL matching roots instead of
+         picking the first one in document order -- otherwise the
+         topbar-then-main pattern (common: nav + content panes) makes
+         click_by_verb resolve to the wrong root non-deterministically.
+         The first descendant [data-nac-action="<verb>"] across any
+         root wins. */
+      const roots = targetPlugin
+        ? Array.prototype.slice.call(
+            document.querySelectorAll('[data-nac-plugin="' + targetPlugin + '"]'))
+        : [document];
+      for (let ri = 0; ri < roots.length; ri++) {
+        const el = roots[ri].querySelector(
           '[data-nac-action="' + verb + '"]');
         if (el && el.getAttribute('data-nac-id')) {
           matched = { nac_id: el.getAttribute('data-nac-id'), verb: verb };
+          break;
         }
       }
     }
@@ -2837,12 +2989,23 @@
       });
     }
 
-    out.ok = !out.duplicates.length;
+    /* v2.4 (spec sec 7.4): surface every DOM root that violates the
+       plugin slug uniqueness contract, including HTML-only plugins
+       that never called NAC.register(). This complements the
+       register-time + DOM-ready gates: CI pipelines that prefer the
+       structured-findings path (skipping HARD_DEDUP throws) still
+       catch the violations. */
+    out.duplicate_plugin_instances = _scanPluginInstances();
+
+    out.ok = !out.duplicates.length
+          && (out.duplicate_plugin_instances.length === 0);
     /* v1.6.1: explicit has_errors flag for CI integration. Drift
        findings (duplicates) are hard-errors per spec sec 7.3.2;
        orphans + unmounted + convention_violations stay informative
-       unless the host explicitly opts in via tolerance config. */
-    out.has_errors = out.duplicates.length > 0;
+       unless the host explicitly opts in via tolerance config. v2.4
+       adds duplicate_plugin_instances as a hard-error class. */
+    out.has_errors = out.duplicates.length > 0
+                  || out.duplicate_plugin_instances.length > 0;
     return out;
   }
 
@@ -5188,6 +5351,14 @@
     config: {
       default_timeout_ms: 5000,
     },
+    /* v2.4 (spec sec 7.4) -- plugin slug uniqueness toggle.
+       Defaults to true. Set to false BEFORE the runtime's
+       DOMContentLoaded listener fires for a one-release migration
+       window; flag is removed in v2.5. */
+    HARD_DEDUP:                   true,
+    /* v2.4 -- programmatic access to the same scan validate_global()
+       and register() use. Returns [] on a clean DOM. */
+    scan_plugin_instances:        _scanPluginInstances,
     /* errors */
     NacError:        NacError,
   };
@@ -5198,6 +5369,12 @@
     document.dispatchEvent(new CustomEvent('nac:installed', {
       detail: { version: global.NAC.version, spec: global.NAC.spec_version },
     }));
+
+    /* v2.4 (spec sec 7.4): plugin slug uniqueness gate. Runs at
+       DOMContentLoaded (or immediately if the document is already
+       parsed) and throws on duplicate-without-instance-id, after
+       painting a visible banner + dispatching nac:fatal. */
+    _installPluginDedupBootGate();
 
     /* v1.9.0: install the ARIA bridge for data-nac-a11y-hint so
        screen readers actually consume the hints today (sec 3.1).

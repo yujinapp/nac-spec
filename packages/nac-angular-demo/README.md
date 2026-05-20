@@ -18,7 +18,7 @@ demo: keyboard, chat ("agrega tomar agua"), voice mic, autopilot.
 
 | File | Purpose |
 |---|---|
-| `package.json` | Angular 17 standalone + `@nac3/runtime@^2.2.0` |
+| `package.json` | Angular 17 standalone + `@nac3/runtime@^2.3.0` |
 | `angular.json` | Vite-style application builder + dev proxy |
 | `proxy.conf.json` | Routes `/crm/*` to `https://yujin.app` so the chat backend works in dev |
 | `src/main.ts` | `bootstrapApplication(AppComponent)` + imports `@nac3/runtime` (runtime + extensions + chat client) |

@@ -410,8 +410,13 @@ function main() {
   console.log('built: cli.js + cli-lint.mjs');
 
   // Copy SPEC.md + LICENSE for npm publish (files: dist/ + tracked).
-  const specSrc = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'SPEC.md');
-  const licSrc  = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'LICENSE');
+  // Same fallback logic as SRC_DIR: prefer monorepo layout, fall back to repo-root.
+  const specSrcMonorepo = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'SPEC.md');
+  const licSrcMonorepo  = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'LICENSE');
+  const specSrcRepo     = path.resolve(__dirname, '..', 'SPEC.md');
+  const licSrcRepo      = path.resolve(__dirname, '..', 'LICENSE');
+  const specSrc = fs.existsSync(specSrcMonorepo) ? specSrcMonorepo : specSrcRepo;
+  const licSrc  = fs.existsSync(licSrcMonorepo)  ? licSrcMonorepo  : licSrcRepo;
   if (fs.existsSync(specSrc))  write(path.join(__dirname, 'SPEC.md'),  read(specSrc));
   if (fs.existsSync(licSrc))   write(path.join(__dirname, 'LICENSE'),  read(licSrc));
   console.log('synced: SPEC.md + LICENSE');

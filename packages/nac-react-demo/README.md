@@ -8,7 +8,7 @@ example.
 
 | File | Purpose |
 |---|---|
-| `package.json` | Vite + React 18 + `@nac3/runtime@^2.2.0` |
+| `package.json` | Vite + React 18 + `@nac3/runtime@^2.3.0` |
 | `src/manifest.ts` | Two manifests: `todos` plugin + `chat` plugin, full 10-locale labels |
 | `src/useNAC.ts` | `useNACManifest`, `useNACAction`, `useNacChat`, `useAutopilot` hooks |
 | `src/App.tsx` | Todos UI + chat panel + autopilot toggle, all decorated with `data-nac-*` |

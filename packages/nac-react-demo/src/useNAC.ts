@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-/* React hooks that wrap the NAC v2.2 runtime in idiomatic shape.
-   These will ship as part of @nac3/runtime/react in v2.3; for now we
-   inline them here so the study case is self-contained. */
+/* React hooks that wrap the NAC v2.3 runtime in idiomatic shape.
+   These will ship as part of @nac3/runtime/react in a future release;
+   for now we inline them here so the study case is self-contained. */
 
 /** Register a manifest once, on mount. */
 export function useNACManifest(manifest: any) {

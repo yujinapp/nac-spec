@@ -1,8 +1,14 @@
 # How to publish `@nac3/runtime` to npm (one-time action by Pablo)
 
-The package is fully prepared (`packages/nac/`, version 2.2.0,
+The package is fully prepared (`runtime/`, version **2.3.0**,
 dist/ built, README, LICENSE, types). It only needs the npm
 account + scope to be created, then a single `npm publish`.
+
+> **Current pending release: 2.3.0** -- the runtime validated by
+> the 600-run benchmark at `benchmark/` ships with `syncPlugin`
+> idempotent registration + `data-nac-plugin-id` instance
+> uniqueness. The `nac3-runtime-2.3.0.tgz` tarball is generated
+> from `npm pack --dry-run`. See `CHANGELOG.md` for what's in it.
 
 ## Pre-flight checklist (one-time)
 
@@ -67,11 +73,13 @@ Common causes:
   the command above).
 - **E403 You cannot publish over the previously published
   versions**: version already taken; bump
-  `package.json` "version" to the next patch (e.g. 2.2.1) and
+  `package.json` "version" to the next patch (e.g. 2.3.1) and
   retry.
 
 ## Once published, update the landing
 
-The `nac-spec/index.html` Quick Install section already says
-`npm install @nac3/runtime@^2.2.0`. After successful publish, that
-command Just Works for any visitor of the landing.
+The `nac-spec/index.html` Quick Install section already points
+at `npm install @nac3/runtime`. After successful publish, that
+command Just Works for any visitor of the landing. Confirm the
+landing's version badge + benchmark section reflect the
+published version (currently 2.3.0).

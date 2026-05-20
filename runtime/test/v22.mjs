@@ -16,8 +16,10 @@ import path from 'node:path';
 import url  from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const RUNTIME_PATH = path.resolve(__dirname, '..', '..', '..',
+const RUNTIME_MONO = path.resolve(__dirname, '..', '..', '..',
   'yujin.app', 'nac-spec', 'js', 'nac.js');
+const RUNTIME_REPO = path.resolve(__dirname, '..', '..', 'js', 'nac.js');
+const RUNTIME_PATH = fs.existsSync(RUNTIME_MONO) ? RUNTIME_MONO : RUNTIME_REPO;
 
 let failures = 0;
 const errorLog = [];   /* every console.error / console.warn observed */
@@ -173,7 +175,7 @@ loadRuntime();
 const NAC = globalThis.NAC;
 
 assert('NAC installed',                typeof NAC === 'object');
-assert('NAC.version v2.2.x',           /^2\.2\.\d+$/.test(NAC.version));
+assert('NAC.version v2.3.x',           /^2\.3\.\d+$/.test(NAC.version));
 assert('NAC.bindAction exists',        typeof NAC.bindAction === 'function');
 assert('NAC.STRICT_VALIDATION default false', NAC.STRICT_VALIDATION === false);
 

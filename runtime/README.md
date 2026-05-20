@@ -117,9 +117,14 @@ import '@nac3/runtime/chat-client';    // reference voice + chat client
 
 ## Status
 
-- v2.1 stable.
-- v2.2 in design (constructor becomes a strict validator -- see
-  `docs/NAC_V22_ROADMAP.md` in the spec repo).
+- **v2.3 stable** (current). `syncPlugin` idempotent registration,
+  `data-nac-plugin-id` instance uniqueness. Validated across a
+  600-run benchmark across 5 models x 3 protocols. See
+  [`yujinapp/nac-spec/benchmark/`](https://github.com/yujinapp/nac-spec/tree/main/benchmark/).
+- v2.4 in RFC (snapshot versioning + agent authority). Code for V24-04
+  is merged with enforcement opt-in (`STRICT_VERSIONING=false` by
+  default). See
+  [`yujinapp/nac-spec/rfcs/`](https://github.com/yujinapp/nac-spec/tree/main/rfcs/).
 
 ## Spec
 

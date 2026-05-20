@@ -392,13 +392,17 @@ npm install
 npx playwright install chromium</span>
         </li>
         <li>
-          <strong>Configure API keys.</strong>
+          <strong>Configure API keys — replace the fictional placeholder values with your real keys.</strong>
 <span class="codeblock">cp .env.example .env
-<span class="comment"># edit .env with your keys:</span>
-<span class="comment"># ANTHROPIC_API_KEY=sk-ant-…</span>
-<span class="comment"># OPENAI_API_KEY=sk-…</span>
-<span class="comment"># DEEPSEEK_API_KEY=sk-…</span>
-<span class="comment"># GEMINI_API_KEY=…</span></span>
+<span class="comment"># The .env.example ships with fictional placeholders like</span>
+<span class="comment">#   ANTHROPIC_API_KEY=sk-ant-api03-FAKE_az302_…_replace_with_real_xxxx</span>
+<span class="comment"># Open .env in your editor and REPLACE every "FAKE_..." value with</span>
+<span class="comment"># the actual API key from your provider dashboard:</span>
+<span class="comment">#   ANTHROPIC_API_KEY=&lt;your real key from console.anthropic.com&gt;</span>
+<span class="comment">#   OPENAI_API_KEY=&lt;your real key from platform.openai.com&gt;</span>
+<span class="comment">#   DEEPSEEK_API_KEY=&lt;your real key from platform.deepseek.com&gt;</span>
+<span class="comment">#   GEMINI_API_KEY=&lt;your real key from aistudio.google.com&gt;</span>
+<span class="comment"># The harness exits with an auth error if it sees a placeholder value.</span></span>
         </li>
         <li>
           <strong>Start the fixture server.</strong>

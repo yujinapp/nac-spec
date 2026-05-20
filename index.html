@@ -299,6 +299,67 @@
     .peer-stat-sep { display: none; }
   }
 
+  /* Benchmark callout -- empirical-evidence variant of peer-callout */
+  .bench-callout { padding: 0 0 56px 0; }
+  .bench-card {
+    display: flex; align-items: stretch; gap: 0;
+    text-decoration: none; color: inherit;
+    background: linear-gradient(135deg, #e7f1ef 0%, #ffffff 70%);
+    border: 2px solid var(--color-indigo);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .bench-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(45, 99, 87, 0.25);
+  }
+  .bench-card-left {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--color-indigo); color: #fff;
+    width: 120px; flex-shrink: 0;
+  }
+  .bench-kanji {
+    font-family: var(--font-serif); font-size: 80px;
+    line-height: 1; opacity: 0.95;
+  }
+  .bench-card-body { flex: 1; padding: 24px 28px; }
+  .bench-card-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--color-indigo); margin-bottom: 8px;
+  }
+  .bench-card-title {
+    font-size: 22px; line-height: 1.3; margin: 0 0 12px 0;
+    color: var(--color-text);
+  }
+  .bench-card-quote {
+    font-size: 14px; color: var(--color-text-2);
+    margin: 0 0 12px 0; line-height: 1.6;
+  }
+  .bench-card-quote strong { color: var(--color-indigo); font-weight: 700; }
+  .bench-card-stats {
+    font-size: 13px; color: var(--color-text-2);
+    margin: 0 0 14px 0; display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .bench-card-stats strong { color: var(--color-text); font-weight: 600; }
+  .bench-stat-sep { opacity: 0.4; }
+  .bench-card-cta {
+    display: inline-block; color: var(--color-indigo);
+    font-weight: 600; font-size: 14px;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.15s ease;
+  }
+  .bench-card:hover .bench-card-cta { border-bottom-color: var(--color-indigo); }
+  @media (max-width: 700px) {
+    .bench-card { flex-direction: column; }
+    .bench-card-left { width: 100%; padding: 18px 0; }
+    .bench-kanji { font-size: 56px; }
+    .bench-card-title { font-size: 18px; }
+    .bench-card-stats { font-size: 12px; flex-direction: column; gap: 4px; }
+    .bench-stat-sep { display: none; }
+  }
+
   /* Demos */
   .demos {
     display: grid;
@@ -811,6 +872,11 @@
          data-nac-id="nac_landing.cta.npm"
          data-nac-role="action"
          data-nac-action="open_npm">npm install</a>
+      <a class="cta tertiary"
+         href="benchmark/"
+         data-nac-id="nac_landing.cta.benchmark"
+         data-nac-role="action"
+         data-nac-action="open_benchmark">600-run benchmark &rarr;</a>
     </div>
   </div>
 </section>
@@ -851,6 +917,48 @@
         </p>
         <span class="peer-card-cta">
           Read the full peer reviews &rarr;
+        </span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Benchmark callout -->
+<section class="bench-callout"
+         data-nac-id="nac_landing.section.benchmark"
+         data-nac-role="section">
+  <div class="container">
+    <a class="bench-card"
+       href="benchmark/"
+       data-nac-id="nac_landing.bench_card.link"
+       data-nac-role="action"
+       data-nac-action="open_benchmark">
+      <div class="bench-card-left">
+        <span class="bench-kanji" aria-hidden="true">&#35430;</span>
+      </div>
+      <div class="bench-card-body">
+        <div class="bench-card-eyebrow">EMPIRICAL BENCHMARK &middot; 2026-05</div>
+        <h2 class="bench-card-title">
+          600 runs across 5 models and 3 protocols. NAC3 caught zero phantom selectors; Raw DOM passed CI with broken selectors on 15% of runs.
+        </h2>
+        <p class="bench-card-quote">
+          <strong>95.5%</strong> NAC3 success
+          &nbsp;&middot;&nbsp;
+          <strong>0/200</strong> silent damage (vs 30/200 in Raw)
+          &nbsp;&middot;&nbsp;
+          <strong>3.5&times;</strong> fewer round-trips than MCP
+        </p>
+        <p class="bench-card-stats">
+          <span><strong>5 models</strong> tested</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>~US$15</strong> to re-run</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>1h 23min</strong> wall-clock</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>fully reproducible</strong> · bundle included</span>
+        </p>
+        <span class="bench-card-cta">
+          See results &amp; methodology &rarr;
         </span>
       </div>
     </a>

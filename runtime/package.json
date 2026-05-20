@@ -1,6 +1,6 @@
 {
   "name": "@nac3/runtime",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Native Agent Contract -- spec + reference runtime that lets web UIs be driven by AI agents, voice runners, and accessibility tools.",
   "keywords": [
     "nac",
@@ -65,10 +65,10 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build":   "node ./build.mjs",
-    "test":    "node ./test/smoke.mjs && node ./test/v22.mjs",
+    "build": "node ./build.mjs",
+    "test": "node ./test/smoke.mjs && node ./test/v22.mjs",
     "test:smoke": "node ./test/smoke.mjs",
-    "test:v22":   "node ./test/v22.mjs",
+    "test:v22": "node ./test/v22.mjs",
     "prepublishOnly": "npm run build && npm test"
   },
   "engines": {

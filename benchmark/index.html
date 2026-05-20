@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NAC3 v2.3 — Benchmark · 600 runs across 3 protocols</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #18181b;
+    --ink-soft: #3f3f46;
+    --ink-mute: #71717a;
+    --paper: #faf8f3;
+    --paper-warm: #f3efe6;
+    --rule: #1a1a1a;
+    --accent: #b8390a;
+    --accent-soft: #d8651e;
+    --teal: #2d6357;
+    --gold: #9a7a1e;
+    --red-bg: rgba(184, 57, 10, 0.06);
+    --teal-bg: rgba(45, 99, 87, 0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184, 57, 10, 0.03), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(45, 99, 87, 0.03), transparent 40%);
+  }
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.4; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  }
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+  .topbar {
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0 16px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .topbar a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  .topbar .meta { color: var(--ink-mute); }
+
+  .hero {
+    padding: 80px 0 60px;
+    border-bottom: 2px solid var(--rule);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--accent); margin-bottom: 28px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300; font-size: clamp(48px, 7vw, 88px);
+    line-height: 1.02; letter-spacing: -0.02em;
+    margin-bottom: 32px; font-variation-settings: 'opsz' 144;
+  }
+  h1 em {
+    font-style: italic; color: var(--accent);
+    font-weight: 400;
+  }
+  .standfirst {
+    font-size: 22px; line-height: 1.5;
+    max-width: 760px; color: var(--ink-soft);
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+  .hero-meta {
+    margin-top: 48px; display: grid;
+    grid-template-columns: repeat(4, 1fr); gap: 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-mute); border-top: 1px dashed var(--ink-mute);
+    padding-top: 28px;
+  }
+  .hero-meta strong { display: block; font-size: 13px;
+    color: var(--ink); text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 6px; font-weight: 600; }
+
+  .ctas {
+    margin-top: 56px; display: flex; flex-wrap: wrap; gap: 14px;
+  }
+  .cta {
+    display: inline-block; padding: 14px 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    text-decoration: none; transition: all 0.18s;
+  }
+  .cta.primary {
+    background: var(--accent); color: var(--paper);
+    border: 1px solid var(--accent);
+  }
+  .cta.primary:hover { background: var(--ink); border-color: var(--ink); }
+  .cta.secondary {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .cta.secondary:hover { background: var(--ink); color: var(--paper); }
+
+  .bignums {
+    padding: 56px 0; border-bottom: 1px solid var(--rule);
+  }
+  .bignums-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
+  }
+  .bignum {
+    border-top: 2px solid var(--ink);
+    padding-top: 16px;
+  }
+  .bignum .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-mute); margin-bottom: 12px;
+  }
+  .bignum .value {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: clamp(36px, 5vw, 56px); line-height: 1;
+    letter-spacing: -0.02em; color: var(--ink);
+    margin-bottom: 8px; font-variation-settings: 'opsz' 144;
+  }
+  .bignum .value.teal { color: var(--teal); }
+  .bignum .value.accent { color: var(--accent); }
+  .bignum .sublabel {
+    font-size: 13px; color: var(--ink-soft); line-height: 1.4;
+  }
+
+  .body { padding: 80px 0; }
+  .section-head { margin-bottom: 36px; }
+  .section-head .number {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.18em;
+    margin-bottom: 16px;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(36px, 4.5vw, 52px); line-height: 1.05;
+    letter-spacing: -0.015em; font-variation-settings: 'opsz' 144;
+  }
+  .section-head h2 em {
+    font-style: italic; color: var(--accent); font-weight: 400;
+  }
+  .section-lede {
+    font-size: 19px; line-height: 1.55; max-width: 760px;
+    color: var(--ink-soft); margin-bottom: 40px;
+  }
+  .section-lede strong { color: var(--ink); }
+
+  .doc-cards {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px;
+    margin-bottom: 48px;
+  }
+  .doc-card {
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    padding: 36px 32px;
+    display: flex; flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .doc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0 var(--rule);
+  }
+  .doc-card .doc-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em;
+    margin-bottom: 14px;
+  }
+  .doc-card h3 {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 32px; line-height: 1.1; margin-bottom: 18px;
+    font-variation-settings: 'opsz' 100;
+  }
+  .doc-card h3 em { font-style: italic; color: var(--accent); }
+  .doc-card p {
+    font-size: 16px; color: var(--ink-soft); margin-bottom: 24px;
+    flex-grow: 1;
+  }
+  .doc-card .doc-cta {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--ink); padding-bottom: 2px;
+    align-self: flex-start;
+  }
+  .doc-card .doc-cta:hover { color: var(--accent); border-color: var(--accent); }
+
+  .download-block {
+    background: var(--teal-bg);
+    border: 1px solid var(--teal);
+    padding: 40px 36px;
+    border-radius: 0;
+  }
+  .download-block h3 {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 28px; margin-bottom: 16px; color: var(--teal);
+    font-variation-settings: 'opsz' 100;
+  }
+  .download-block ol {
+    list-style: none; counter-reset: stepc;
+    margin-top: 24px;
+  }
+  .download-block ol li {
+    counter-increment: stepc;
+    position: relative;
+    padding: 12px 0 12px 48px;
+    border-top: 1px dashed var(--ink-mute);
+    font-size: 15px;
+  }
+  .download-block ol li::before {
+    content: counter(stepc);
+    position: absolute; left: 0; top: 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent); font-weight: 700;
+    width: 32px; text-align: right;
+  }
+  .download-block code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--paper); padding: 2px 8px;
+    border: 1px solid var(--ink-mute); color: var(--accent);
+  }
+  .download-block .codeblock {
+    display: block; padding: 16px 20px;
+    background: var(--ink); color: var(--paper);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    line-height: 1.6; margin: 14px 0; overflow-x: auto;
+    border: none;
+  }
+  .download-block .codeblock .comment { color: var(--ink-mute); }
+  .download-block .codeblock .accent { color: var(--accent-soft); }
+
+  .versions-note {
+    background: rgba(154, 122, 30, 0.08);
+    border-left: 4px solid var(--gold);
+    padding: 20px 24px; margin: 32px 0;
+    font-size: 15px; color: var(--ink-soft);
+  }
+  .versions-note strong { color: var(--gold); }
+
+  .foot {
+    padding: 60px 0 40px;
+    border-top: 2px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-mute); text-align: left;
+  }
+  .foot a {
+    color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none;
+  }
+  .foot a:hover { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 760px) {
+    .hero-meta, .bignums-grid { grid-template-columns: repeat(2, 1fr); }
+    .doc-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Benchmark</div>
+    <div class="meta">
+      <a href="../index.html">← spec home</a>
+      &nbsp;·&nbsp;
+      <span>2026-05-19</span>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Empirical benchmark · 600 runs · 5 models · 3 protocols</div>
+    <h1>NAC3 vs MCP vs Raw DOM<br/><em>at production scale.</em></h1>
+    <p class="standfirst">
+      Five LLMs, three protocols, four tasks, ten iterations each — the largest public comparison of agentic UI protocols to date. <strong>Zero phantom-selector silent damage</strong> under NAC3, <strong>15% under Raw DOM</strong>, <strong>3.5× fewer round-trips</strong> than MCP. Full reproducibility: every JSONL row carries runtime version and manifest checksum, the entire test bundle is downloadable from this repo, and the cost of re-running the full benchmark is under <strong>US$15</strong>.
+    </p>
+
+    <div class="hero-meta">
+      <div><strong>5 models</strong>Sonnet 4.6 · Haiku 4.5 · DeepSeek · Gemini 3.1 Flash Lite · GPT-4o-mini</div>
+      <div><strong>3 protocols</strong>NAC3 · MCP · Raw DOM</div>
+      <div><strong>4 tasks</strong>atomic · exploratory · compound · async</div>
+      <div><strong>600 runs</strong>10 iter × 4 tasks × 3 conds × 5 models</div>
+    </div>
+
+    <div class="ctas">
+      <a class="cta primary" href="results.html">Read the results &rarr;</a>
+      <a class="cta secondary" href="methodology.html">How it was built</a>
+      <a class="cta secondary" href="#reproduce">Re-run the benchmark</a>
+    </div>
+  </header>
+
+  <section class="bignums">
+    <div class="bignums-grid">
+      <div class="bignum">
+        <div class="label">NAC3 success</div>
+        <div class="value teal">95.5<span style="font-size: 0.5em;">%</span></div>
+        <div class="sublabel">191/200 runs · vs 91% Raw · vs 78.5% MCP</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Silent damage</div>
+        <div class="value teal">0<span style="font-size: 0.5em;">/200</span></div>
+        <div class="sublabel">NAC3 · vs 30/200 in Raw DOM (15%)</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Round-trips</div>
+        <div class="value">1.0</div>
+        <div class="sublabel">NAC3 · vs 3.5 for MCP</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Cheap-model unlock</div>
+        <div class="value accent">100<span style="font-size: 0.5em;">%</span></div>
+        <div class="sublabel">Gemini Flash Lite + GPT-4o-mini under NAC3</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 01</div>
+      <h2>Two documents,<br/><em>one dataset.</em></h2>
+    </div>
+    <p class="section-lede">
+      The benchmark output is split into two artifacts. <strong>Results</strong> is the public report — what we measured and what it means. <strong>Methodology</strong> is the audit trail — how the numbers were actually made, what fixes were applied along the way, and what the dataset deliberately does not say. Both share the same 600-row JSONL dataset.
+    </p>
+
+    <div class="doc-cards">
+      <div class="doc-card">
+        <div class="doc-eyebrow">§ Findings</div>
+        <h3>Benchmark <em>results.</em></h3>
+        <p>The public report. Hero numbers, hallucination breakdown by category, success per (model × condition × task), cost-latency trade-off, failure modes, model fit. Eight sections covering what 600 runs revealed about agentic UI protocols in production.</p>
+        <a class="doc-cta" href="results.html">Open results &rarr;</a>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-eyebrow">§ How it was built</div>
+        <h3>Benchmark <em>methodology.</em></h3>
+        <p>The audit document. Setup &amp; scale (600/600 verified), the five fixes applied iteratively during development, anti-bias controls (one prompt, one fixture, ten iterations per cell), traceability (runtime version + manifest checksum per row), and explicit limitations.</p>
+        <a class="doc-cta" href="methodology.html">Open methodology &rarr;</a>
+      </div>
+    </div>
+
+    <div class="versions-note">
+      <strong>Runtime provenance.</strong>
+      All 600 runs executed against <code>@nac3/runtime</code> at commit-equivalent of v2.3.0 (the npm constant exposes <code>2.2.1</code>, kept for backwards compat — see methodology §07 for the equivalence). Manifest checksum <code>67db3eef3658</code> across all rows. The benchmark dataset does <strong>not</strong> test the v2.4 RFCs (snapshot versioning and authority) — those have their own benchmark, separately, when the runtime ships them.
+    </div>
+  </section>
+
+  <section class="body" id="reproduce" style="padding-top: 0;">
+    <div class="section-head">
+      <div class="number">§ 02</div>
+      <h2>Re-run the entire benchmark<br/><em>in under two hours.</em></h2>
+    </div>
+    <p class="section-lede">
+      The complete test harness — fixture app, 4 task definitions, 5 model bindings, 3 condition runners, scoring, and reporting scripts — is bundled into a single tarball downloadable from this directory. Cost to re-run the full 600 runs: roughly US$15 in API credits. Wall-clock: 1h 23min on commodity hardware. Bring your own API keys.
+    </p>
+
+    <div class="download-block">
+      <h3>Re-running the benchmark</h3>
+      <p style="font-size: 15px; color: var(--ink-soft);">
+        Bring API keys for the five providers in your <code>.env</code>: Anthropic, OpenAI, DeepSeek, Google Gemini. The harness reads them at boot. No credentials ship with the bundle.
+      </p>
+
+      <ol>
+        <li>
+          <strong>Download the bundle.</strong><br/>
+          <a class="doc-cta" href="nac3-benchmark-v2.3.tar.gz" style="margin-top: 8px; display: inline-block;">Download nac3-benchmark-v2.3.tar.gz &rarr;</a>
+          &nbsp;or clone the source tree at <code>benchmark/bundle/</code> in this repo.
+        </li>
+        <li>
+          <strong>Extract and install.</strong>
+<span class="codeblock">tar -xzf nac3-benchmark-v2.3.tar.gz
+cd nac3-benchmark-v2.3
+npm install
+npx playwright install chromium</span>
+        </li>
+        <li>
+          <strong>Configure API keys.</strong>
+<span class="codeblock">cp .env.example .env
+<span class="comment"># edit .env with your keys:</span>
+<span class="comment"># ANTHROPIC_API_KEY=sk-ant-…</span>
+<span class="comment"># OPENAI_API_KEY=sk-…</span>
+<span class="comment"># DEEPSEEK_API_KEY=sk-…</span>
+<span class="comment"># GEMINI_API_KEY=…</span></span>
+        </li>
+        <li>
+          <strong>Start the fixture server.</strong>
+<span class="codeblock">node fixtures/invoice-app/server.ts &
+<span class="comment"># serves the test fixture at http://127.0.0.1:8080</span></span>
+        </li>
+        <li>
+          <strong>Run the full 600-cell benchmark.</strong>
+<span class="codeblock">bash scripts/run_final_600.sh
+<span class="comment"># 5 models × 3 conds × 4 tasks × 10 iter</span>
+<span class="comment"># ~1h 23min, ~US$15</span></span>
+        </li>
+        <li>
+          <strong>Generate the unified report.</strong>
+<span class="codeblock">RESULTS_DIR=results/N10_final \
+  node scripts/unified_report.mjs \
+  --since=2026-05-19T23 > docs/MY_REPORT.md</span>
+        </li>
+        <li>
+          <strong>Subset the run.</strong> Skip the full sweep and target specific cells:
+<span class="codeblock">MODEL=gemini-3.1-flash-lite \
+PILOT_CONDITIONS=nac3 \
+PILOT_TASK_IDS=T1_add_monitor \
+PILOT_ITER=3 \
+PILOT_OUT_DIR=results/quick \
+npx tsx src/harness_3way.ts</span>
+        </li>
+        <li>
+          <strong>Verify provenance.</strong> Every row in the resulting JSONL carries <code>runtime_version</code>, <code>bench_version</code>, and <code>manifest_checksum</code>. If your <code>manifest_checksum</code> differs from <code>67db3eef3658</code>, the fixture diverged from the published baseline.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="body" style="padding-top: 0;">
+    <div class="section-head">
+      <div class="number">§ 03</div>
+      <h2>What the dataset <em>does not say.</em></h2>
+    </div>
+    <p class="section-lede">
+      A benchmark is a measurement, not a verdict. NAC3 caught zero silent damage <em>in this dataset</em> — that is not a guarantee for arbitrary production deployments. A model can still emit a semantically wrong plan with all-valid <code>nac_id</code>s; the protocol only blocks <strong>structural</strong> hallucinations (phantom selectors). The full list of intentional limitations — one fixture, one language, five models, four task shapes — is in <a href="methodology.html#limitations" style="color: var(--accent); border-bottom: 1px solid var(--accent); text-decoration: none;">methodology §08</a>.
+    </p>
+  </section>
+
+  <footer class="foot">
+    <div>
+      Dataset · 600 runs · published 2026-05-19 ·
+      <a href="results.html">results</a> ·
+      <a href="methodology.html">methodology</a> ·
+      <a href="nac3-benchmark-v2.3.tar.gz">download bundle</a>
+    </div>
+    <div style="margin-top: 12px; opacity: 0.7;">
+      Published under Apache 2.0 + MIT · NAC3 spec at
+      <a href="https://github.com/yujinapp/nac-spec">github.com/yujinapp/nac-spec</a>
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>

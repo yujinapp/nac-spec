@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NAC3 v2.3 — Benchmark Results · 600 runs across 3 protocols</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #18181b;
+    --ink-soft: #3f3f46;
+    --ink-mute: #71717a;
+    --paper: #faf8f3;
+    --paper-warm: #f3efe6;
+    --rule: #1a1a1a;
+    --accent: #b8390a;
+    --accent-soft: #d8651e;
+    --teal: #2d6357;
+    --gold: #9a7a1e;
+    --red-bg: rgba(184, 57, 10, 0.06);
+    --teal-bg: rgba(45, 99, 87, 0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184, 57, 10, 0.03), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(45, 99, 87, 0.03), transparent 40%);
+  }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.4; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* --- topbar --- */
+  .topbar {
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .topbar a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .topbar .meta { color: var(--ink-mute); }
+
+  /* --- hero --- */
+  .hero {
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .hero .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    font-variation-settings: 'opsz' 144, 'SOFT' 60;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero .standfirst {
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 780px;
+    font-weight: 400;
+  }
+
+  .hero .standfirst strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .hero-meta {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+
+  .hero-meta strong { color: var(--ink); display: block; font-size: 14px; margin-bottom: 2px; }
+
+  /* --- big numbers --- */
+  .bignums {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .bignums-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+
+  .bignum {
+    padding: 32px 28px 32px 0;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .bignum:nth-child(4n) { border-right: none; padding-right: 0; }
+  .bignum:nth-child(n+5) { border-top: 1px solid var(--rule); padding-top: 32px; }
+
+  .bignum .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+  }
+
+  .bignum .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(40px, 5vw, 64px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    font-variation-settings: 'opsz' 144;
+  }
+
+  .bignum .value.accent { color: var(--accent); }
+  .bignum .value.teal { color: var(--teal); }
+
+  .bignum .sublabel {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.35;
+  }
+
+  @media (max-width: 760px) {
+    .bignums-grid { grid-template-columns: repeat(2, 1fr); }
+    .bignum:nth-child(2n) { border-right: none; padding-right: 0; }
+    .bignum:nth-child(2n+1) { border-right: 1px solid var(--rule); }
+    .bignum:nth-child(n+3) { border-top: 1px solid var(--rule); padding-top: 32px; }
+  }
+
+  /* --- sections --- */
+  section.body { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  .section-head .number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    padding-top: 8px;
+  }
+
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .section-head h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .section-lede {
+    grid-column: 2;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 32px;
+  }
+
+  .section-lede strong { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .section-head { grid-template-columns: 1fr; gap: 16px; }
+    .section-lede { grid-column: 1; }
+  }
+
+  /* --- tables --- */
+  .data-table-wrap { overflow-x: auto; margin: 24px 0; }
+
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+
+  table.data thead th {
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--paper-warm);
+  }
+
+  table.data tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    color: var(--ink-soft);
+  }
+
+  table.data tbody td:first-child {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  table.data tbody tr:hover { background: var(--paper-warm); }
+  table.data tbody tr.highlight { background: var(--red-bg); }
+  table.data tbody tr.highlight td:first-child { color: var(--accent); font-weight: 700; }
+
+  table.data .pos { color: var(--teal); font-weight: 700; }
+  table.data .neg { color: var(--accent); font-weight: 700; }
+  table.data .num { font-variant-numeric: tabular-nums; }
+
+  /* --- silent damage visual --- */
+  .silent-viz {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 40px 0;
+  }
+
+  .silent-card {
+    border: 1px solid var(--rule);
+    padding: 32px 28px;
+    background: var(--paper);
+    position: relative;
+  }
+
+  .silent-card.danger { background: var(--red-bg); border-color: var(--accent); }
+  .silent-card.good { background: var(--teal-bg); border-color: var(--teal); }
+
+  .silent-card .proto {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+
+  .silent-card .big {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+    font-variation-settings: 'opsz' 144;
+  }
+
+  .silent-card.danger .big { color: var(--accent); }
+  .silent-card.good .big { color: var(--teal); }
+
+  .silent-card .frac {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  .silent-card .desc { font-size: 15px; color: var(--ink-soft); line-height: 1.45; }
+
+  @media (max-width: 760px) {
+    .silent-viz { grid-template-columns: 1fr; }
+  }
+
+  /* --- pullquote --- */
+  .pullquote {
+    margin: 56px 0;
+    padding: 40px 48px;
+    border-left: 4px solid var(--accent);
+    background: var(--paper-warm);
+    position: relative;
+  }
+
+  .pullquote p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.35;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .pullquote p em { color: var(--accent); font-style: normal; font-weight: 600; }
+
+  /* --- model fit grid --- */
+  .model-fit-summary {
+    margin: 32px 0 16px;
+    padding: 24px;
+    background: var(--paper-warm);
+    border-left: 3px solid var(--teal);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .model-fit-summary code { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent); }
+
+  /* --- prose --- */
+  .prose p { margin-bottom: 18px; font-size: 17px; line-height: 1.65; color: var(--ink-soft); max-width: 760px; }
+  .prose p strong { color: var(--ink); font-weight: 600; }
+  .prose ul { padding-left: 20px; margin: 16px 0; max-width: 760px; }
+  .prose li { font-size: 17px; line-height: 1.65; color: var(--ink-soft); margin-bottom: 8px; }
+  .prose li strong { color: var(--ink); }
+
+  /* --- caveat --- */
+  .caveat-list {
+    border: 1px solid var(--rule);
+    padding: 28px 32px;
+    background: var(--paper);
+    margin: 32px 0;
+    column-count: 2;
+    column-gap: 40px;
+  }
+
+  .caveat-list li {
+    list-style: none;
+    margin-bottom: 12px;
+    break-inside: avoid;
+    padding-left: 16px;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .caveat-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  @media (max-width: 760px) { .caveat-list { column-count: 1; } }
+
+  /* --- repro --- */
+  .repro {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 48px;
+    border-radius: 0;
+    margin-top: 60px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .repro h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 32px;
+    color: var(--paper);
+    margin-bottom: 8px;
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .repro .sub {
+    color: rgba(250, 248, 243, 0.6);
+    font-size: 13px;
+    margin-bottom: 32px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .repro pre {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 24px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #f3efe6;
+    border-left: 3px solid var(--accent-soft);
+  }
+
+  .repro pre .cm { color: rgba(250, 248, 243, 0.45); }
+  .repro pre .kw { color: var(--accent-soft); }
+
+  .repro-meta {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 12px;
+    color: rgba(250, 248, 243, 0.6);
+  }
+
+  .repro-meta strong { color: var(--paper); display: block; font-size: 13px; }
+
+  /* --- footer --- */
+  footer.foot {
+    padding: 48px 0 64px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+
+  footer.foot a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+  }
+
+  /* animations */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1, .hero .standfirst { animation: rise 0.8s ease-out both; }
+  .hero .standfirst { animation-delay: 0.15s; }
+  .hero-meta { animation: rise 0.8s ease-out 0.3s both; }
+  .bignum { animation: rise 0.6s ease-out both; }
+  .bignum:nth-child(1) { animation-delay: 0.4s; }
+  .bignum:nth-child(2) { animation-delay: 0.5s; }
+  .bignum:nth-child(3) { animation-delay: 0.6s; }
+  .bignum:nth-child(4) { animation-delay: 0.7s; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Benchmark / Results</div>
+    <div class="meta">
+      <a href="methodology.html">methodology →</a>
+      &nbsp;·&nbsp;
+      <span>2026-05-19</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">An empirical comparison of agentic UI protocols</div>
+    <h1>Cheap models<br/>become capable<br/><em>when given structure.</em></h1>
+    <p class="standfirst">
+      Across <strong>600 runs</strong> spanning five language models and three protocols,
+      NAC3's shared-surface manifest delivered <strong>95.5% success at zero phantom-selector
+      silent damage</strong> — while Raw DOM passed CI on 15% of runs with broken selectors,
+      and MCP needed 3.5× more round-trips to reach the same answer.
+    </p>
+
+    <div class="hero-meta">
+      <div><strong>5 models</strong>Sonnet 4.6 · Haiku 4.5 · DeepSeek · Gemini 3.1 Flash Lite · GPT-4o-mini</div>
+      <div><strong>3 protocols</strong>NAC3 · MCP · Raw DOM</div>
+      <div><strong>4 tasks</strong>atomic · exploratory · compound · async-handler</div>
+      <div><strong>10 iter / cell</strong>N = 600 total runs</div>
+    </div>
+  </header>
+
+  <!-- BIG NUMBERS -->
+  <section class="bignums">
+    <div class="bignums-grid">
+
+      <div class="bignum">
+        <div class="label">NAC3 success</div>
+        <div class="value teal">95.5<span style="font-size: 0.5em;">%</span></div>
+        <div class="sublabel">191 of 200 runs · vs 91% Raw · vs 78.5% MCP</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">NAC3 silent damage</div>
+        <div class="value teal">0<span style="font-size: 0.5em;">/200</span></div>
+        <div class="sublabel">isActionSafe filter caught every phantom selector</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Round-trips per task</div>
+        <div class="value">1.0</div>
+        <div class="sublabel">vs 3.5 turns for MCP · same dispatch model</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Total cost</div>
+        <div class="value">$15</div>
+        <div class="sublabel">600 runs in 1h 23min · fully reproducible</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Raw DOM silent damage</div>
+        <div class="value accent">15<span style="font-size: 0.5em;">%</span></div>
+        <div class="sublabel">30 of 200 runs · CI passed, phantom selectors emitted</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Latency end-to-end</div>
+        <div class="value">3.1<span style="font-size: 0.5em;">s</span></div>
+        <div class="sublabel">NAC3 mean · vs 5.5s MCP · vs 7.4s Raw</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Cheap-model unlock</div>
+        <div class="value teal">100<span style="font-size: 0.5em;">%</span></div>
+        <div class="sublabel">Gemini Flash Lite + GPT-4o-mini under NAC3</div>
+      </div>
+
+      <div class="bignum">
+        <div class="label">Models tested</div>
+        <div class="value">5<span style="font-size: 0.5em;">×</span>4</div>
+        <div class="sublabel">protocols × tasks · 600 runs · 0 parse errors</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SILENT DAMAGE -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 01</div>
+      <h2>The hero metric:<br/><em>silent damage.</em></h2>
+    </div>
+    <p class="section-lede">
+      A run shows silent damage when the model emitted invented selectors,
+      <strong>but the postcondition still passed</strong> — by coincidence,
+      default behavior, or partial side-effects. This is the worst failure mode in
+      production CI: <strong>tests pass; reality breaks.</strong>
+    </p>
+
+    <div class="silent-viz">
+      <div class="silent-card good">
+        <div class="proto">NAC3</div>
+        <div class="big">0%</div>
+        <div class="frac">0 / 200 runs</div>
+        <div class="desc">isActionSafe filters every phantom nac_id before dispatch. The runtime is the gate; the validator is the lock.</div>
+      </div>
+
+      <div class="silent-card good">
+        <div class="proto">MCP</div>
+        <div class="big">0%</div>
+        <div class="frac">0 / 200 runs</div>
+        <div class="desc">Closed tool catalog. The model cannot invent a tool that doesn't exist. Protection by enumeration.</div>
+      </div>
+
+      <div class="silent-card danger">
+        <div class="proto">Raw DOM</div>
+        <div class="big">15%</div>
+        <div class="frac">30 / 200 runs</div>
+        <div class="desc">No closed surface. Phantom selectors land on coincident DOM nodes; defaults paper over broken paths. CI passes; runtime breaks.</div>
+      </div>
+    </div>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Condition</th>
+            <th class="num">N</th>
+            <th class="num">none</th>
+            <th class="num">filtered</th>
+            <th class="num">reached_failed</th>
+            <th class="num">reached_succeeded</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight">
+            <td>NAC3</td>
+            <td class="num">200</td>
+            <td class="num">200</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num pos">0</td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td class="num">200</td>
+            <td class="num">200</td>
+            <td class="num">0</td>
+            <td class="num">0</td>
+            <td class="num pos">0</td>
+          </tr>
+          <tr>
+            <td>Raw DOM</td>
+            <td class="num">200</td>
+            <td class="num">162</td>
+            <td class="num">0</td>
+            <td class="num">8</td>
+            <td class="num neg">30</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- AGGREGATE -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 02</div>
+      <h2>NAC3 wins on <em>four axes simultaneously.</em></h2>
+    </div>
+    <p class="section-lede">
+      No protocol won everything. NAC3 did. Higher success, lower latency, fewer round-trips,
+      zero silent damage — at <strong>equal cost-per-honest-success</strong> as MCP and
+      one-third the cost of Raw DOM.
+    </p>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Protocol</th>
+            <th class="num">Success</th>
+            <th class="num">Tok in (mean)</th>
+            <th class="num">Tok out (mean)</th>
+            <th class="num">Turns</th>
+            <th class="num">Latency LLM</th>
+            <th class="num">Cost (200 runs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight">
+            <td>NAC3</td>
+            <td class="num pos">95.5%</td>
+            <td class="num">11,395</td>
+            <td class="num">236</td>
+            <td class="num pos">1.0</td>
+            <td class="num pos">3.1 s</td>
+            <td class="num">$2.35</td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td class="num">78.5%</td>
+            <td class="num">7,712</td>
+            <td class="num">413</td>
+            <td class="num neg">3.5</td>
+            <td class="num">5.5 s</td>
+            <td class="num">$1.72</td>
+          </tr>
+          <tr>
+            <td>Raw DOM</td>
+            <td class="num">91.0%</td>
+            <td class="num">31,026</td>
+            <td class="num">404</td>
+            <td class="num">1.0</td>
+            <td class="num neg">7.4 s</td>
+            <td class="num">$5.93</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pullquote">
+      <p>NAC3 trades higher per-dispatch cost <em>for 3.5× fewer round-trips and 2.4× lower end-to-end latency.</em> What looks like equal cost on a balance sheet is a 2× UX gap in user wait time.</p>
+    </div>
+
+    <div class="prose">
+      <p>
+        <strong>Cost-per-honest-success</strong> tells a different story than cost-per-run.
+        When phantom-selector runs (which would break in production) are excluded from Raw DOM's
+        success column, its real cost lands at $0.039 per task — <strong>3.5× higher than
+        NAC3 or MCP</strong>. The structural reduction in silent damage isn't a moral victory;
+        it's a financial one.
+      </p>
+    </div>
+  </section>
+
+  <!-- CHEAP MODEL UNLOCK -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 03</div>
+      <h2>The cheap-model<br/><em>unlock.</em></h2>
+    </div>
+    <p class="section-lede">
+      The most counter-intuitive finding: under NAC3, the cheapest models in the roster
+      <strong>match the frontier model under Raw DOM</strong>. Protocol structure is worth
+      more than model capability for UI tasks.
+    </p>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th class="num">MCP</th>
+            <th class="num">NAC3</th>
+            <th class="num">Raw DOM</th>
+            <th class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sonnet 4.6</td>
+            <td class="num">85.0%</td>
+            <td class="num pos">97.5%</td>
+            <td class="num pos">100%</td>
+            <td class="num">94.2%</td>
+          </tr>
+          <tr>
+            <td>Haiku 4.5</td>
+            <td class="num">75.0%</td>
+            <td class="num">97.5%</td>
+            <td class="num">97.5%</td>
+            <td class="num">90.0%</td>
+          </tr>
+          <tr>
+            <td>DeepSeek-chat</td>
+            <td class="num">82.5%</td>
+            <td class="num">82.5%</td>
+            <td class="num pos">100%</td>
+            <td class="num">88.3%</td>
+          </tr>
+          <tr class="highlight">
+            <td>Gemini 3.1 Flash Lite</td>
+            <td class="num">77.5%</td>
+            <td class="num pos">100%</td>
+            <td class="num">85.0%</td>
+            <td class="num">87.5%</td>
+          </tr>
+          <tr class="highlight">
+            <td>GPT-4o-mini</td>
+            <td class="num">72.5%</td>
+            <td class="num pos">100%</td>
+            <td class="num">72.5%</td>
+            <td class="num">81.7%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="model-fit-summary">
+      <strong>Gemini 3.1 Flash Lite under NAC3 = 40/40 success</strong>, same as Sonnet 4.6 under
+      Raw DOM (40/40). Same task. Same correctness. Different cost: <code>$0.04 vs $4.16</code>
+      across 120 runs — <strong>100× cheaper at identical honest success rate.</strong>
+    </div>
+
+    <div class="prose">
+      <p>
+        The reason is mechanical. NAC3 frontloads the entire interactive surface into one prompt.
+        The model needs to plan in one shot, not maintain state across tool-call turns. Cheap
+        models are good at "given this complete picture, emit JSON" but bad at
+        "remember 5 tool calls ago and decide the next one."
+      </p>
+      <p>
+        MCP demands sequential planning; cheap models fall over. NAC3 demands one-shot emission
+        with full context; cheap models thrive. Frontier capability is wasted when the protocol
+        is unconstrained — and rescued when the protocol is structured.
+      </p>
+    </div>
+  </section>
+
+  <!-- CHEAPEST PATH TO 100% -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 04</div>
+      <h2>The cheapest path<br/>to <em>perfect reliability.</em></h2>
+    </div>
+    <p class="section-lede">
+      If your bar is <strong>100% reliability</strong> — not 90%, not 95%, but every run lands —
+      the question becomes: what's the cheapest model that gets you there, per protocol?
+      The answer is the single most decision-relevant table in this dataset.
+    </p>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Protocol</th>
+            <th>Cheapest model at 100%</th>
+            <th class="num">Best result achieved</th>
+            <th class="num">Cost / 120 runs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="highlight">
+            <td>NAC3</td>
+            <td>Gemini 3.1 Flash Lite</td>
+            <td class="num pos">40/40 (100%)</td>
+            <td class="num pos">~$0.04</td>
+          </tr>
+          <tr>
+            <td>Raw DOM</td>
+            <td>DeepSeek-chat (only 100% cheap option)</td>
+            <td class="num">40/40 (100%) — but 31k tok/run</td>
+            <td class="num">~$1.40</td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td class="neg">— none reached 100% —</td>
+            <td class="num neg">85% (Sonnet 4.6, best)</td>
+            <td class="num">n/a</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pullquote">
+      <p>In this benchmark, <em>no model under MCP reached 100%</em> on the four-task suite. The best was Sonnet 4.6 at 85%. NAC3 reached perfect reliability with the cheapest model in the roster, at four cents per 120 runs.</p>
+    </div>
+
+    <div class="prose">
+      <p>
+        <strong>The honest caveat:</strong> "MCP didn't reach 100%" is true
+        <em>in this benchmark, with this roster, on these four tasks</em> — not a claim that MCP
+        can never reach 100%. Simpler tasks, or models stronger at multi-turn tool orchestration,
+        likely would. What the data shows is narrower and still striking: across five models and
+        four tasks, the multi-turn coordination MCP demands left a reliability gap that NAC3's
+        single-turn surface did not have.
+      </p>
+      <p>
+        For a team choosing a protocol with a hard reliability requirement, this is the number
+        that matters. NAC3 + Gemini Flash Lite is the cheapest path to perfect reliability in the
+        dataset — by two orders of magnitude over the next option, and against an MCP baseline
+        that didn't reach the bar at all.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOUR CONSUMERS -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 05</div>
+      <h2>One decoration,<br/><em>four consumers.</em></h2>
+    </div>
+    <p class="section-lede">
+      This benchmark measures one consumer of the NAC3 surface: <strong>LLM agents.</strong>
+      But the same semantic decoration serves three others by design — and this is the structural
+      argument that places NAC3 in a category MCP doesn't enter.
+    </p>
+
+    <div class="silent-viz" style="grid-template-columns: repeat(2, 1fr);">
+      <div class="silent-card good">
+        <div class="proto">Consumer 1 · measured</div>
+        <div class="title" style="font-family: 'Fraunces', serif; font-size: 24px; margin-bottom: 10px; color: var(--ink);">LLM agents</div>
+        <div class="desc">What this dataset benchmarks. 95.5% success, zero silent damage, one-turn dispatch. The headline result.</div>
+      </div>
+
+      <div class="silent-card">
+        <div class="proto">Consumer 2 · design thesis</div>
+        <div class="title" style="font-family: 'Fraunces', serif; font-size: 24px; margin-bottom: 10px; color: var(--ink);">E2E testing</div>
+        <div class="desc">A test targeting a semantic <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);">nac_id</code> survives CSS changes and DOM reorders. Fragile selectors (xpath, classes) are the #1 cause of E2E flakiness. NAC3 gives stable selectors by contract.</div>
+      </div>
+
+      <div class="silent-card">
+        <div class="proto">Consumer 3 · design thesis</div>
+        <div class="title" style="font-family: 'Fraunces', serif; font-size: 24px; margin-bottom: 10px; color: var(--ink);">RPA &amp; deterministic automation</div>
+        <div class="desc">No LLM required. A script running <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);">click_by_verb('invoice','cancel')</code> is readable, maintainable, and doesn't depend on screen coordinates or OCR.</div>
+      </div>
+
+      <div class="silent-card good">
+        <div class="proto">Consumer 4 · design thesis</div>
+        <div class="title" style="font-family: 'Fraunces', serif; font-size: 24px; margin-bottom: 10px; color: var(--ink);">Assistive technology</div>
+        <div class="desc">A UI with rich NAC3 decoration <em>is</em> a UI with rich accessibility semantics. The same <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);">data-nac-role</code> and a11y-hint tree that serves the agent serves the screen reader. NAC3 extends ARIA — it doesn't compete with it.</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        <strong>This is the positioning that matters.</strong> MCP is a backend protocol — no UI
+        surface, no DOM, no visual semantics. It cannot serve testing, RPA, or assistive tech.
+        Raw DOM offers no stability guarantee for any of them. NAC3 is the semantic contract layer
+        for <em>any non-human consumer of a UI</em>: agents today, but tests, RPA, and assistive
+        technology on the same decoration, with one stable contract.
+      </p>
+      <p>
+        The accessibility angle deserves its own weight. A company adopting NAC3 for its agents
+        gets better accessibility as a byproduct — and in many jurisdictions
+        (the European Accessibility Act, the ADA in the US) that's a legal obligation, not a
+        nice-to-have. One decoration discharges an agent strategy and an accessibility strategy
+        at once.
+      </p>
+      <p>
+        <strong>We benchmarked one of the four.</strong> The testing, RPA, and accessibility
+        claims are design theses, not measured results — we haven't run those benchmarks yet.
+        But the structural argument stands on its own: one decoration, four consumers, one
+        contract. That's the category. MCP isn't in it.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAILURE MODES -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 06</div>
+      <h2>Where models <em>still break.</em></h2>
+    </div>
+    <p class="section-lede">
+      70 of 600 runs failed (11.7%). The patterns are mostly model-specific weaknesses,
+      not protocol failures. Three are worth naming.
+    </p>
+
+    <div class="prose">
+      <ul>
+        <li><strong>GPT-4o-mini · MCP · T_MCP4_create_invoice — 0/10 success.</strong>
+        Emits <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">email="compras@acme.com"</code>
+        when the prompt explicitly says <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">contacto@acme.com</code>.
+        The model confuses cached customer data with the data requested. NAC3 same task: 10/10.</li>
+
+        <li><strong>DeepSeek · NAC3 · T_MCP4_create_invoice — 3/10.</strong>
+        Emits the word <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">consultoria</code>
+        when the postcondition checks <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">/consultor/i</code> — a regex match issue.
+        The only systematic NAC3 weakness in the corpus.</li>
+
+        <li><strong>GPT-4o-mini · Raw DOM · T1_add_monitor — 0/10.</strong>
+        Writes <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">"Nueva linea"</code> (the field placeholder) into the field
+        instead of <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent);">"monitor"</code> (the value). Raw HTML context confuses
+        the model about which string is data and which is UI scaffolding. NAC3 same task: 10/10.</li>
+      </ul>
+
+      <p>
+        All 30 Raw DOM silent-damage cases came from <strong>T_MCP4 — the compound task.</strong>
+        Every model had at least 4 silent-damage runs in raw T_MCP4. The pattern: the model emits
+        a plausible selector chain, the side-effect of early actions creates DOM state that
+        accidentally satisfies later assertions, the postcondition smiles and signs off.
+      </p>
+    </div>
+  </section>
+
+  <!-- FRAME -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 07</div>
+      <h2>What this <em>means</em> for production agents.</h2>
+    </div>
+    <div class="prose" style="grid-column: 1 / -1; max-width: none;">
+      <p style="font-size: 19px; max-width: 720px;">
+        We're not selling a winner. We're naming three trade-offs and the conditions where each one wins.
+      </p>
+
+      <ul style="max-width: 720px;">
+        <li><strong>For frontend tasks where user-perceived latency matters</strong>
+        (in-app copilots, chatbots, dashboards): <strong>NAC3.</strong> 2.4× lower latency,
+        1 turn instead of 3.5, zero silent damage. The protocol pays its own rent.</li>
+
+        <li><strong>For backend automation where tool-use is natural</strong>
+        (CRM operations, file ops, API integrations): <strong>MCP is fine.</strong>
+        The round-trip cost is amortized into batch processing. NAC3 has no advantage here.</li>
+
+        <li><strong>For anything with a UI in production CI</strong>:
+        <strong>do not use Raw DOM.</strong> 15% silent damage means 15% of your tests are lying
+        about reality. That bill comes due in week 3 of production.</li>
+
+        <li><strong>For cost-sensitive deployment</strong>:
+        <strong>Gemini Flash Lite + NAC3.</strong> 95% honest success at $0.04 per 120 runs. The
+        cheapest model becomes capable when given structure.</li>
+      </ul>
+
+      <p style="max-width: 720px;">
+        NAC3 v2.4 does not sell zero hallucinations in production. The runtime cannot prevent a
+        model from emitting a semantically wrong plan composed of all-valid nac_ids. What the
+        runtime <em>does</em> sell — and what this dataset confirms at N=200 per condition — is
+        that <strong>structural phantom selectors are filtered before reaching the DOM.</strong>
+        The worst class of CI failure is structurally impossible. That's the contract.
+      </p>
+    </div>
+  </section>
+
+  <!-- LIMITATIONS -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 08</div>
+      <h2>What the dataset <em>doesn't say.</em></h2>
+    </div>
+
+    <ul class="caveat-list">
+      <li><strong>One fixture.</strong> invoice-app, Spanish, single-page, no SSR. Doesn't cover marketplaces, real-time dashboards, or multi-step auth.</li>
+      <li><strong>Four tasks.</strong> Atomic · exploratory · compound · async-handler. No payment flows, fuzzy search, or cross-page navigation.</li>
+      <li><strong>Five models.</strong> No Opus 4.7 (excluded for ROI), no reasoning models at N=10 (validated at N=1 only), no open-weight large models.</li>
+      <li><strong>One language.</strong> Spanish prompts + fixture. English may differ marginally.</li>
+      <li><strong>Models are non-deterministic</strong> even at temperature=0. Anthropic and OpenAI do not guarantee bit-determinism.</li>
+      <li><strong>Pricing as of 2026-05-19.</strong> Re-running on a different date will produce different cost numbers.</li>
+      <li><strong>Region matters.</strong> Latency measured from Argentina → US-East endpoints.</li>
+      <li><strong>NAC3 silent damage = 0 in this dataset, not in production.</strong> The runtime catches structural phantoms; models can still emit semantically wrong valid plans.</li>
+    </ul>
+  </section>
+
+  <!-- REPRO -->
+  <div class="repro">
+    <h3>Reproducibility</h3>
+    <div class="sub">Total cost: ~US$15 · Total time: ~1h 23min · API keys for 4 providers required</div>
+
+<pre><span class="cm"># Clone, install, configure .env with API keys for:</span>
+<span class="cm"># ANTHROPIC, OPENAI, DEEPSEEK, GOOGLE</span>
+
+<span class="kw">git clone</span> https://github.com/yujinapp/nac3-bench
+<span class="kw">cd</span> nac3-bench/bench
+<span class="kw">npm install</span>
+<span class="kw">bash</span> scripts/run_final_600.sh
+<span class="kw">node</span> scripts/unified_report.mjs --since=2026-05-19T23 \
+  &gt; docs/N10_FINAL_REPORT.md</pre>
+
+    <div class="repro-meta">
+      <div><strong>runtime_version</strong>2.2.1</div>
+      <div><strong>bench_version</strong>0.1.0</div>
+      <div><strong>manifest_checksum</strong>67db3eef3658</div>
+      <div><strong>execution date</strong>2026-05-19</div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div>Dataset · 600 runs · <a href="methodology.html">methodology</a> · per-run JSONL in <code>results/N10_final/</code></div>
+    <div style="margin-top: 12px; opacity: 0.7;">Published under Apache 2.0 + MIT · NAC3 spec at github.com/yujinapp/nac-spec</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

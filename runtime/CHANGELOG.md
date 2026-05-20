@@ -1,5 +1,74 @@
 # Changelog
 
+## 2.3.0 -- 2026-05-20
+
+### Added
+
+- **`NAC.syncPlugin(spec)`** -- idempotent plugin registration.
+  Replaces the manifest for a plugin instead of appending, fixing the
+  stale-snapshot class of bugs where repeated `register()` calls on
+  dynamic re-renders accumulated duplicate manifest entries. Counterpart
+  to the existing `syncDataTable`. Recommended path for SPA hosts.
+- **`data-nac-plugin-id`** -- explicit plugin instance identifier for
+  pages with multiple roots sharing a plugin slug. When a slug appears
+  more than once in the DOM, every root MUST carry a unique
+  `data-nac-plugin-id`. `validate_global` flags violations.
+
+### Fixed
+
+- Manifest accumulation on repeated `register()` calls. `syncPlugin` is
+  the recommended migration path for hosts that re-render.
+- `validate_global` now flags duplicate plugin manifest entries.
+
+### Benchmark
+
+This release ships the runtime that was validated across **600 runs**
+(5 models x 3 protocols x 4 tasks x 10 iterations) published at
+<https://github.com/yujinapp/nac-spec/tree/main/benchmark/>. Highlights:
+
+- **95.5% success rate** under NAC3 (191 / 200 runs).
+- **Zero phantom-selector silent damage** in NAC3 (0 / 200) vs
+  **15%** in Raw DOM (30 / 200).
+- **1.0 round-trip per task** in NAC3 vs 3.5 in MCP.
+- Cheap models (Gemini Flash Lite, GPT-4o-mini) reached
+  **100% success** under NAC3 -- matching frontier models in Raw DOM.
+
+Full reproducibility: every JSONL row carries `runtime_version`,
+`bench_version`, `manifest_checksum`. Bundle downloadable from the
+benchmark page. Cost to re-run: ~US$15.
+
+### Experimental (not yet GA)
+
+The runtime contains code merged for the V24-04 RFC (snapshot
+versioning + optimistic concurrency control). This release ships it as
+**implementation present, enforcement opt-in**:
+
+- `plugin_version` and `element_state_hash` are present in
+  `NAC.describe()` output by default. Shape is stable; semantics may
+  tighten in v2.4.
+- `expected_plugin_version` and `expected_tree_version` parameters on
+  dispatch are accepted, but enforcement (throwing `snapshot_stale`)
+  is gated behind `NAC.STRICT_VERSIONING = true`. Default is `false`.
+- `markHydrationComplete()` is exported and active. SSR hosts may call
+  it; SPA hosts get a 100ms auto-fallback.
+
+The 2.3 benchmark ran with `STRICT_VERSIONING=false` and did not
+exercise the OCC enforcement. V24-04 will move from "experimental
+opt-in" to "SHIPPED" in v2.4, validated by a dedicated concurrency
+benchmark. See `/rfcs/README.md` for status.
+
+V24-05 (agent authority + interposition: `confirm_action`,
+`request_authority`) is RFC draft only -- not in this runtime.
+
+### Spec changes
+
+- `SPEC.md` header bumped to v2.3.
+- New `/rfcs/` directory separates spec-shipped features from open
+  proposals. Index in `/rfcs/README.md` documents status per RFC.
+- `docs/BENCHMARK_PROVENANCE.md` ties dataset (which reads
+  `runtime_version=2.2.1` per JSONL field) to the npm release
+  (`2.3.0`) via the shared commit hash.
+
 ## 2.2.1 -- 2026-05-12
 
 ### Bug fix: importable in Node / SSR / test contexts

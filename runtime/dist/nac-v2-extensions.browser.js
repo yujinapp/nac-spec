@@ -1531,6 +1531,37 @@
     return 'agent';
   }
 
+  /* v2.3: drainable data-table registration.
+
+     Hosts that register a data-table from an async chain
+     (fetch().then(refresh) -> render -> registerDataTable) expose a
+     race window where an agent action plan can dispatch dt_* against a
+     table_id whose owner panel has rendered visually but whose
+     `_dataTables[table_id]` entry has not been seeded yet. The dt_*
+     primitives stay synchronous (`throw` on missing); v2.3 adds
+     `awaitDataTable(table_id, timeoutMs)` so dispatchers can await
+     registration before invoking the sync primitive.
+
+     Returns Promise<boolean>: true once the table is registered,
+     false on timeout. timeoutMs defaults to NAC.DT_AWAIT_MS (600). */
+  function awaitDataTable(table_id, timeoutMs) {
+    var ms = (typeof timeoutMs === 'number')
+      ? timeoutMs
+      : (typeof NAC.DT_AWAIT_MS === 'number' ? NAC.DT_AWAIT_MS : 600);
+    return new Promise(function (resolve) {
+      if (_dataTables[table_id]) return resolve(true);
+      if (!(ms > 0)) return resolve(false);
+      var elapsed = 0;
+      var step = 25;
+      (function poll() {
+        if (_dataTables[table_id]) return resolve(true);
+        elapsed += step;
+        if (elapsed >= ms) return resolve(false);
+        setTimeout(poll, step);
+      })();
+    });
+  }
+
   function _dtCheckColumnValue(col, value) {
     if (value === null || value === undefined) {
       if (col.required) return { ok: false, error: 'required_missing' };
@@ -1711,6 +1742,46 @@
       delete _dataTables[table_id];
       _dtEmit('nac:dt:unregistered', { table_id: table_id });
     }
+  }
+
+  /* v2.3: upsert variant of registerDataTable.
+
+     Real hosts re-run their NAC sync logic on every state render
+     (the documented __nacSync pattern in LLM_WIRING sec 5). Calling
+     registerDataTable twice for the same table_id throws
+     "already registered", which forces every host author to either
+     (a) hand-roll a registered-set + skip re-register guard
+     (state drift risk -- rows fed from server stop refreshing),
+     or (b) wrap each call in try/catch (silent failure if the call
+     was inside a multi-statement sync function -- exactly the bug
+     that hid invoice_edit_modal.lines under the v2.1 contract).
+
+     syncDataTable(spec) is the documented idempotent path: it
+     unregisters the prior entry (if any) and registers the new spec
+     atomically. Any in-progress dt_commit / dt_discard transactional
+     state on the prior entry is discarded -- callers that care about
+     drafts must commit first. Emits nac:dt:resynced after the
+     register so audit pipelines can distinguish a fresh register
+     from a host-driven refresh.
+
+     Compatible with the legacy register/unregister pair: if a host
+     prefers explicit lifecycle, those exports still work unchanged. */
+  function syncDataTable(spec) {
+    if (!spec || typeof spec !== 'object') {
+      throw new Error('[NAC v2.3] syncDataTable: spec must be an object');
+    }
+    if (typeof spec.table_id !== 'string' || !spec.table_id) {
+      throw new Error('[NAC v2.3] syncDataTable: table_id required');
+    }
+    var was_registered = !!_dataTables[spec.table_id];
+    if (was_registered) {
+      delete _dataTables[spec.table_id];
+    }
+    var ret = registerDataTable(spec);
+    if (was_registered) {
+      _dtEmit('nac:dt:resynced', { table_id: spec.table_id });
+    }
+    return ret;
   }
 
   function registerDataTableComputed(table_id, column_key, fn) {
@@ -2070,9 +2141,125 @@
     return out;
   }
 
+  /* v2.4 (V24-02): NAC.describe() snapshot consolidation.
+
+     Multi-instance plugins (the same slug carried by multiple DOM
+     roots disambiguated via data-nac-plugin-id, per SPEC sec 7.4)
+     are a legitimate construct -- a single plugin can split its UI
+     across a topbar root + a main root + a footer root.
+
+     v2.1 describe() returned one plugins[] entry per DOM root.
+     Snapshot consumers (LLM agents, in particular) then saw the
+     same nac_id appearing multiple times in plugins[*].elements[*]
+     -- once per root, sometimes with contradictory visibility
+     flags after the v2.3 wrapper synth's manifest-declared but
+     DOM-absent elements into every entry that shares the slug.
+
+     Empirical evidence (pilot 2026-05-19, see V24-02 in
+     CHANGELOG): Sonnet T_MCP1 NAC3 7/15 (47%); MCP + Raw both
+     4/4 on the same model + task. Trace shows Sonnet's CoT
+     explicitly verbalising "the confirm dialog is already
+     active" because it integrated the contradiction between two
+     visibility states for the same nac_id.
+
+     v2.4 contract: NAC.describe() output guarantees every nac_id
+     appears at most once across plugins[*].elements[*]. Multi-
+     instance plugins consolidate into one entry per slug; the
+     element list is deduped by nac_id with visible:true winning
+     over visible:false. Per-instance state is exposed via
+     plugins[].instances[] for hosts that care.
+
+     validate_global() ('duplicate_nac_id_in_snapshot') enforces
+     this at lint time; the runtime guarantee makes it always
+     pass on a fresh snapshot. */
+  function _consolidatePluginEntries(rawPlugins) {
+    if (!Array.isArray(rawPlugins) || rawPlugins.length === 0) return rawPlugins || [];
+    var bySlug = Object.create(null);
+    var order = [];
+    for (var i = 0; i < rawPlugins.length; i++) {
+      var p = rawPlugins[i];
+      if (!p) continue;
+      var slug = p.plugin || p.plugin_slug || p.slug;
+      if (!slug) continue;
+      var b = bySlug[slug];
+      if (!b) {
+        b = { plugin: slug, elements: [], indexById: Object.create(null), instances: [] };
+        bySlug[slug] = b;
+        order.push(slug);
+      }
+      var inst = { plugin_state: p.plugin_state || p.state || 'idle' };
+      /* Surface the instance discriminator when the host followed
+         SPEC sec 7.4 and tagged each root with data-nac-plugin-id.
+         describe() does not expose the attribute today, but if a
+         downstream wrapper attaches it (e.g. installVisibilityHints)
+         we forward it. */
+      if (p.instance_id) inst.instance_id = p.instance_id;
+      b.instances.push(inst);
+      var els = p.elements || [];
+      for (var j = 0; j < els.length; j++) {
+        var e = els[j];
+        if (!e) continue;
+        var id = e.nac_id || e.id;
+        if (!id) {
+          /* No nac_id -> not agent-addressable. Keep as-is; dedup
+             does not apply. */
+          b.elements.push(e);
+          continue;
+        }
+        var prev = b.indexById[id];
+        if (prev == null) {
+          b.indexById[id] = b.elements.length;
+          b.elements.push(e);
+          continue;
+        }
+        /* Same nac_id seen in a different root for the same slug.
+           Prefer the entry that reports visible:true -- the element
+           IS reachable somewhere, so the snapshot should advertise
+           that. Otherwise keep the first occurrence. */
+        var prevEl = b.elements[prev];
+        var prevVisible = prevEl.visible !== false;
+        var thisVisible = e.visible !== false;
+        if (thisVisible && !prevVisible) {
+          b.elements[prev] = e;
+        }
+      }
+    }
+    var out = [];
+    for (var k = 0; k < order.length; k++) {
+      var slug2 = order[k];
+      var bucket = bySlug[slug2];
+      var entry = { plugin: bucket.plugin, elements: bucket.elements };
+      if (bucket.instances.length === 1) {
+        if (bucket.instances[0].plugin_state) entry.plugin_state = bucket.instances[0].plugin_state;
+      } else {
+        entry.plugin_state = bucket.instances[0].plugin_state;
+        entry.instances = bucket.instances;
+      }
+      out.push(entry);
+    }
+    return out;
+  }
+
+  function installSnapshotConsolidation() {
+    if (typeof NAC === 'undefined' || NAC === null) return;
+    if (NAC.__snapshot_consolidation_v24) return;
+    var origDescribe = NAC.describe;
+    if (typeof origDescribe !== 'function') return;
+    NAC.describe = function () {
+      var base = origDescribe.apply(this, arguments) || {};
+      var consolidated = _consolidatePluginEntries(base.plugins || []);
+      var out = {};
+      for (var bk in base) if (Object.prototype.hasOwnProperty.call(base, bk)) out[bk] = base[bk];
+      out.plugins = consolidated;
+      return out;
+    };
+    NAC.__snapshot_consolidation_v24 = true;
+  }
+
   /* Exports for v2.1 data-table primitive. */
   NAC.registerDataTable           = registerDataTable;
   NAC.unregisterDataTable         = unregisterDataTable;
+  NAC.syncDataTable               = syncDataTable;
   NAC.registerDataTableComputed   = registerDataTableComputed;
   NAC.dt_state                    = dt_state;
   NAC.dt_add_row                  = dt_add_row;
@@ -2085,13 +2272,15 @@
   NAC.dt_get_cell                 = dt_get_cell;
   NAC.dt_commit                   = dt_commit;
   NAC.dt_discard                  = dt_discard;
+  NAC.awaitDataTable              = awaitDataTable;
+  if (typeof NAC.DT_AWAIT_MS !== 'number') NAC.DT_AWAIT_MS = 600;
   /* Exposed for tests + describe_v2 extension. */
   NAC.__v2_dataTables             = _dataTables;
   NAC.__v2_dtSummariseAll         = _dtSummariseAll;
 
   /* Bump version constants */
-  NAC.version_v2      = '2.1.0-rc1';
-  NAC.spec_version_v2 = '2.1';
+  NAC.version_v2      = '2.3.0-rc1';
+  NAC.spec_version_v2 = '2.3';
 
   /* v2.2.1: guard browser-only dispatch so this bundle is importable
      in Node / SSR / test contexts. */

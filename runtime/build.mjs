@@ -14,7 +14,12 @@ import path from 'node:path';
 import url from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const SRC_DIR  = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'js');
+/* Source resolution: prefer monorepo layout (../../yujin.app/nac-spec/js)
+   used by the in-Yujin deploy; fall back to repo-root layout (../js)
+   used by yujinapp/nac-spec where runtime/ lives as a sibling of js/. */
+const MONOREPO_SRC = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'js');
+const REPO_SRC     = path.resolve(__dirname, '..', 'js');
+const SRC_DIR  = fs.existsSync(MONOREPO_SRC) ? MONOREPO_SRC : REPO_SRC;
 const DIST_DIR = path.resolve(__dirname, 'dist');
 
 const ENTRIES = [

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NAC3 v2.3 — Methodology · How the 600-run benchmark was built</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #18181b;
+    --ink-soft: #3f3f46;
+    --ink-mute: #71717a;
+    --paper: #faf8f3;
+    --paper-warm: #f3efe6;
+    --rule: #1a1a1a;
+    --accent: #b8390a;
+    --accent-soft: #d8651e;
+    --teal: #2d6357;
+    --gold: #9a7a1e;
+    --red-bg: rgba(184, 57, 10, 0.06);
+    --teal-bg: rgba(45, 99, 87, 0.07);
+    --gold-bg: rgba(154, 122, 30, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 80% 5%, rgba(184, 57, 10, 0.03), transparent 35%),
+      radial-gradient(circle at 10% 90%, rgba(45, 99, 87, 0.03), transparent 35%);
+  }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.4; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* topbar */
+  .topbar {
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .topbar a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  .topbar .meta { color: var(--ink-mute); }
+
+  /* hero */
+  .hero { padding: 80px 0 60px; border-bottom: 1px solid var(--rule); }
+  .hero .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 88px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    font-variation-settings: 'opsz' 144, 'SOFT' 60;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .hero .standfirst {
+    font-size: 22px; line-height: 1.45; color: var(--ink-soft);
+    max-width: 780px; font-weight: 400;
+  }
+  .hero .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  /* index */
+  .index {
+    margin-top: 56px; padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .index-item {
+    padding: 24px 24px 24px 0;
+    border-right: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.15s;
+  }
+  .index-item:nth-child(3n) { border-right: none; padding-right: 0; }
+  .index-item:nth-child(n+4) { border-top: 1px solid var(--rule); padding-top: 24px; }
+  .index-item:hover { background: var(--paper-warm); }
+
+  .index-item .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .index-item .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .index-item .sub {
+    font-size: 13px;
+    color: var(--ink-mute);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 760px) {
+    .index { grid-template-columns: 1fr; }
+    .index-item { border-right: none !important; padding-right: 0 !important; padding-left: 0; }
+    .index-item:nth-child(n+2) { border-top: 1px solid var(--rule); padding-top: 24px; }
+  }
+
+  /* sections */
+  section.body { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  .section-head .number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    padding-top: 8px;
+  }
+
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .section-head h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+
+  .section-lede {
+    grid-column: 2;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 32px;
+  }
+  .section-lede strong { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .section-head { grid-template-columns: 1fr; gap: 16px; }
+    .section-lede { grid-column: 1; }
+  }
+
+  /* prose */
+  .prose p {
+    margin-bottom: 18px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    max-width: 760px;
+  }
+  .prose p strong { color: var(--ink); font-weight: 600; }
+  .prose code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    background: var(--red-bg);
+    padding: 1px 6px;
+    border-radius: 2px;
+  }
+  .prose ul, .prose ol { padding-left: 24px; margin: 16px 0; max-width: 760px; }
+  .prose li {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .prose li strong { color: var(--ink); }
+
+  /* tables */
+  .data-table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  table.data thead th {
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--paper-warm);
+  }
+  table.data tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    color: var(--ink-soft);
+  }
+  table.data tbody td:first-child { color: var(--ink); font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; }
+
+  /* fix timeline */
+  .timeline {
+    margin: 32px 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .timeline li {
+    padding: 24px 0 24px 60px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    margin: 0;
+  }
+
+  .timeline li::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    top: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .timeline li h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 8px;
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .timeline li p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 4px;
+  }
+
+  .timeline li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  .timeline li .status {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    padding: 2px 8px;
+    background: var(--teal-bg);
+    border: 1px solid var(--teal);
+  }
+
+  /* condition cards */
+  .conditions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0;
+    margin: 32px 0;
+  }
+
+  .condition {
+    padding: 28px 24px 28px 0;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .condition:last-child { border-right: none; padding-right: 0; }
+  .condition .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .condition .title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 80;
+  }
+  .condition .body-text {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  .condition .status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+  .condition .status.pending { color: var(--gold); }
+
+  @media (max-width: 760px) {
+    .conditions { grid-template-columns: 1fr; }
+    .condition { border-right: none !important; padding-right: 0 !important; border-bottom: 1px solid var(--rule); padding-bottom: 28px; }
+    .condition:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+
+  /* anti-bias matrix */
+  .anti-bias-matrix {
+    margin: 32px 0;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .matrix-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .matrix-row:last-child { border-bottom: none; }
+
+  .matrix-row .axis {
+    padding: 20px 24px;
+    background: var(--paper-warm);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    font-weight: 700;
+    border-right: 1px solid var(--rule);
+  }
+
+  .matrix-row .content {
+    padding: 20px 24px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  .matrix-row .content strong { color: var(--ink); font-weight: 600; }
+  .matrix-row .content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+
+  @media (max-width: 760px) {
+    .matrix-row { grid-template-columns: 1fr; }
+    .matrix-row .axis { border-right: none; border-bottom: 1px solid var(--rule); }
+  }
+
+  /* pullquote */
+  .pullquote {
+    margin: 48px 0;
+    padding: 36px 44px;
+    border-left: 4px solid var(--accent);
+    background: var(--paper-warm);
+  }
+  .pullquote p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.35;
+    color: var(--ink);
+    font-variation-settings: 'opsz' 80;
+  }
+  .pullquote p em { color: var(--accent); font-style: normal; font-weight: 600; }
+
+  /* repro */
+  .repro {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 48px;
+    margin-top: 60px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .repro h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 32px;
+    color: var(--paper);
+    margin-bottom: 8px;
+    font-variation-settings: 'opsz' 80;
+  }
+
+  .repro .sub {
+    color: rgba(250, 248, 243, 0.6);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  .repro pre {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 24px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #f3efe6;
+    border-left: 3px solid var(--accent-soft);
+  }
+
+  .repro pre .cm { color: rgba(250, 248, 243, 0.45); }
+  .repro pre .kw { color: var(--accent-soft); }
+
+  .repro-meta {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 12px;
+    color: rgba(250, 248, 243, 0.6);
+  }
+
+  .repro-meta strong { color: var(--paper); display: block; font-size: 13px; margin-bottom: 2px; }
+
+  /* footer */
+  footer.foot {
+    padding: 48px 0 64px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+  }
+  footer.foot a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  footer.foot code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* animations */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero h1, .hero .standfirst { animation: rise 0.8s ease-out both; }
+  .hero .standfirst { animation-delay: 0.15s; }
+  .index { animation: rise 0.8s ease-out 0.3s both; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Benchmark / Methodology</div>
+    <div class="meta">
+      <a href="results.html">← results</a>
+      &nbsp;·&nbsp;
+      <span>2026-05-19</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">Anti-bias controls · trazability · reproducibility</div>
+    <h1>How the<br/>numbers were<br/><em>actually made.</em></h1>
+    <p class="standfirst">
+      A benchmark is only as honest as its instrument. This document records every fix
+      applied to the harness, every anti-bias control imposed on the runs, and every
+      shortcut the dataset does <strong>not</strong> take. It also names what the dataset
+      cannot say.
+    </p>
+
+    <nav class="index">
+      <a class="index-item" href="#setup">
+        <div class="num">§ 01</div>
+        <div class="title">Setup</div>
+        <div class="sub">Models, protocols, tasks, scale</div>
+      </a>
+      <a class="index-item" href="#design">
+        <div class="num">§ 02</div>
+        <div class="title">The 5 conditions, the 3 we ran</div>
+        <div class="sub">Why Forge was deferred</div>
+      </a>
+      <a class="index-item" href="#fixes">
+        <div class="num">§ 03</div>
+        <div class="title">Five fixes, applied iteratively</div>
+        <div class="sub">Validated empirically each time</div>
+      </a>
+      <a class="index-item" href="#bias">
+        <div class="num">§ 04</div>
+        <div class="title">Anti-bias controls</div>
+        <div class="sub">Cross-protocol and cross-model</div>
+      </a>
+      <a class="index-item" href="#prov">
+        <div class="num">§ 05</div>
+        <div class="title">Trazability</div>
+        <div class="sub">Runtime, manifest, bench version</div>
+      </a>
+      <a class="index-item" href="#repro">
+        <div class="num">§ 06</div>
+        <div class="title">Reproducing the dataset</div>
+        <div class="sub">$15 · 1.5 hours · 4 API keys</div>
+      </a>
+    </nav>
+  </header>
+
+  <!-- SETUP -->
+  <section class="body" id="setup">
+    <div class="section-head">
+      <div class="number">§ 01</div>
+      <h2>Setup &amp; <em>scale.</em></h2>
+    </div>
+    <p class="section-lede">
+      600 runs total. The cell — defined by (model × protocol × task) — has N=10 iterations.
+      Every cell carries the same setup, the same prompt template, the same harness, executed
+      against the same fixture state initialized fresh per run.
+    </p>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Value</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Models (5)</td>
+            <td class="num">claude-sonnet-4-6 · claude-haiku-4-5 · deepseek-chat · gemini-3.1-flash-lite · gpt-4o-mini</td>
+            <td>Frontier · mid · cheap (3) — no Opus 4.7, no reasoners</td>
+          </tr>
+          <tr>
+            <td>Protocols (3)</td>
+            <td class="num">NAC3 · MCP · Raw DOM</td>
+            <td>Shared surface · tool calls · serialized HTML</td>
+          </tr>
+          <tr>
+            <td>NAC3 runtime</td>
+            <td class="num">2.3.0 (commit ≡ 2.2.1 at exec)</td>
+            <td>Decoration + verbs + syncPlugin + isActionSafe. NOT v2.4 RFCs.</td>
+          </tr>
+          <tr>
+            <td>Tasks (4)</td>
+            <td class="num">T1 · T_MCP1 · T_MCP4 · T_V23</td>
+            <td>Atomic · exploratory · compound · async-handler</td>
+          </tr>
+          <tr>
+            <td>Iterations</td>
+            <td class="num">10 per cell</td>
+            <td>5 × 3 × 4 × 10 = 600 runs</td>
+          </tr>
+          <tr>
+            <td>temperature</td>
+            <td class="num">0 where supported</td>
+            <td>Minimum-supported fallback otherwise</td>
+          </tr>
+          <tr>
+            <td>max_completion_tokens</td>
+            <td class="num">8192 / 2048</td>
+            <td>Reasoners / non-reasoners (see § 03 · Fix A)</td>
+          </tr>
+          <tr>
+            <td>max_turns</td>
+            <td class="num">10</td>
+            <td>Sufficient for compound tasks</td>
+          </tr>
+          <tr>
+            <td>timeout</td>
+            <td class="num">90 s per LLM call</td>
+            <td>Conservative</td>
+          </tr>
+          <tr>
+            <td>Retries</td>
+            <td class="num">≤ 2 if api_error or timeout</td>
+            <td>Never for parse_error or post_condition_failed</td>
+          </tr>
+          <tr>
+            <td>Execution order</td>
+            <td class="num">by iteration</td>
+            <td>All models in iter 1, then iter 2, etc.</td>
+          </tr>
+          <tr>
+            <td>Concurrency</td>
+            <td class="num">serial</td>
+            <td>Avoids fixture state contamination</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 5 CONDITIONS -->
+  <section class="body" id="design">
+    <div class="section-head">
+      <div class="number">§ 02</div>
+      <h2>Five conditions planned,<br/><em>three executed.</em></h2>
+    </div>
+    <p class="section-lede">
+      The original design proposed five conditions including two Forge-decorated variants of NAC3.
+      Forge wasn't ready in time. We chose to publish the protocol benchmark now and run
+      the Forge benchmark separately when the product matures.
+    </p>
+
+    <div class="conditions">
+      <div class="condition">
+        <div class="name">Condition 1</div>
+        <div class="title">MCP</div>
+        <div class="body-text">Tool-calling protocol. Tool catalog enumerated. Multi-turn orchestration. Closed surface by design.</div>
+        <div class="status">RUN · 200 runs</div>
+      </div>
+      <div class="condition">
+        <div class="name">Condition 2</div>
+        <div class="title">NAC3</div>
+        <div class="body-text">Shared surface manifest. <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">describe()</code> returns the full agent-relevant DOM. Validator filters phantom nac_ids.</div>
+        <div class="status">RUN · 200 runs</div>
+      </div>
+      <div class="condition">
+        <div class="name">Condition 3</div>
+        <div class="title">Raw DOM</div>
+        <div class="body-text">Serialized HTML in prompt. No surface contract. Open selectors. Closed only by the model's own discipline.</div>
+        <div class="status">RUN · 200 runs</div>
+      </div>
+      <div class="condition" style="opacity: 0.45;">
+        <div class="name">Condition 4</div>
+        <div class="title">NAC3 + Forge silent</div>
+        <div class="body-text">Manifest generated automatically by Forge inferring roles from code. Measures Forge's silent-mode quality.</div>
+        <div class="status pending">DEFERRED · Forge MVP not ready</div>
+      </div>
+      <div class="condition" style="opacity: 0.45;">
+        <div class="name">Condition 5</div>
+        <div class="title">NAC3 + Forge assisted</div>
+        <div class="body-text">Manifest generated by Forge in dialogue with user. Measures Forge's assisted-mode quality.</div>
+        <div class="status pending">DEFERRED · Forge MVP not ready</div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Conditions 4 and 5 measure a product (Forge), not the protocol. Mixing them into this
+        dataset would couple the benchmark's credibility to a commercial product still in
+        development. Cleaner to publish the protocol benchmark on its own — and run a
+        Forge-specific benchmark with the same methodology when Forge reaches stable beta.
+      </p>
+      <p>
+        <strong>What this means for the published numbers:</strong> the NAC3 results in this
+        dataset reflect <em>manifest decorated by hand</em> — the realistic state of adoption
+        today. Forge variants will be measured against this baseline separately.
+      </p>
+    </div>
+  </section>
+
+  <!-- FIVE FIXES -->
+  <section class="body" id="fixes">
+    <div class="section-head">
+      <div class="number">§ 03</div>
+      <h2>Five fixes,<br/><em>applied iteratively.</em></h2>
+    </div>
+    <p class="section-lede">
+      Each fix was motivated by a failure pattern observed in an earlier run and validated empirically before being applied to the next iteration. The dataset documents not only the final numbers but the path that produced them.
+    </p>
+
+    <ul class="timeline">
+
+      <li data-label="FIX A">
+        <h4>Token cap: 8192 for reasoners, 2048 for non-reasoners</h4>
+        <p>
+          The pilot N=1 run produced 6 <code>parse_error</code> failures from o4-mini and GPT-5.5
+          on the compound task — all with <code>tok_out = 3072</code> (the cap). Reasoning models
+          consume tokens internally and ran out of budget for the final JSON. Fix: raise the cap
+          for reasoners to 8192; raise non-reasoner default to 2048 in the final run after Haiku
+          hit the old 1024 cap on compound tasks.
+        </p>
+        <div class="status">Validated · 0 parse_error in 600 runs</div>
+      </li>
+
+      <li data-label="FIX B">
+        <h4>V23_EDITOR async handler: <code>waitForFunction(300ms)</code></h4>
+        <p>
+          The grammar-correction handler in the fixture is asynchronous (~150ms from click to DOM
+          update). The postcondition was reading the DOM before the update landed. Three models
+          (Opus, GPT-5.5, gpt-4o-mini) failed for this reason alone. Fix: wait up to 300ms for
+          the textarea to actually change before evaluating postcondition. This is a harness
+          correction, not a protocol change.
+        </p>
+        <div class="status">Validated · Opus 12/12 perfect in paso 9 v2</div>
+      </li>
+
+      <li data-label="FIX C">
+        <h4>MCP system prompt: anti-halt + output contract</h4>
+        <p>
+          GPT-4o-mini in MCP mode was halting prematurely, asking the user for IDs that tools
+          could fetch. We added an explicit instruction: <em>"call tools first; never claim
+          success unless the corresponding tool call was emitted."</em> The second sentence
+          turned out to be critical — without it, Haiku (a small model) interpreted the prompt
+          as license to declare success without acting.
+        </p>
+        <div class="status">Validated · GPT-4o-mini MCP 1→3 wins · Haiku stabilized with second clause</div>
+      </li>
+
+      <li data-label="FIX D">
+        <h4>Hallucination categorization in 4 buckets</h4>
+        <p>
+          Reporting <code>hallucinated_target = true/false</code> obscures the worst case in
+          production: phantom selectors that <em>pass</em> CI. Split into four categories:
+          <code>none</code>, <code>filtered</code> (NAC3 isActionSafe caught it),
+          <code>reached_failed</code> (dispatch failed visibly),
+          <code>reached_succeeded</code> (postcondition accepted phantom side-effect).
+          The last is silent damage. This is the metric the benchmark exists to expose.
+        </p>
+        <div class="status">Validated · 30 silent damage in Raw, 0 in NAC3 and MCP</div>
+      </li>
+
+      <li data-label="FIX D2">
+        <h4>Validator <code>tab</code> action: prefix-aware, like <code>tab_by_label</code></h4>
+        <p>
+          Tier 1 N=10 exposed 4 silent-damage cases in NAC3 — all DeepSeek + T_MCP4. Investigation
+          revealed the cause was not the model: the harness validator rejected
+          <code>kind='tab'</code> actions because it looked up <code>tab_key</code> as if it were
+          a <code>nac_id</code> in <code>plugin.elements[]</code>. But tab keys are wizard metadata,
+          not nac_ids. The validator was over-strict by inconsistency: <code>tab_by_label</code>
+          was permissive; <code>tab</code> was not.
+          Fix: align <code>tab</code> with <code>tab_by_label</code> — defer to runtime,
+          accept if <code>plugin</code> and <code>tab_key</code> are present.
+        </p>
+        <div class="status">Validated · NAC3 silent damage 4/200 → 0/200 in final 600-run dataset</div>
+      </li>
+
+    </ul>
+
+    <div class="pullquote">
+      <p>Three times in this benchmark, what looked like model failure turned out to be <em>harness over-strictness.</em> The instrument of measurement is code we wrote — it deserves the same skepticism we'd give the model.</p>
+    </div>
+  </section>
+
+  <!-- ANTI-BIAS -->
+  <section class="body" id="bias">
+    <div class="section-head">
+      <div class="number">§ 04</div>
+      <h2>Anti-bias <em>controls.</em></h2>
+    </div>
+    <p class="section-lede">
+      For protocol comparisons to mean anything, the variable being measured must be the protocol
+      itself — not differences in prompts, models, or execution conditions. These are the controls
+      imposed on every run.
+    </p>
+
+    <div class="anti-bias-matrix">
+
+      <div class="matrix-row">
+        <div class="axis">Model identity</div>
+        <div class="content">Same <code>model_id</code> exact across conditions of the same logical run. Same <code>temperature</code> (0 where supported). Same <code>max_turns</code> (10). Same <code>timeout</code> (90s).</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Token cap</div>
+        <div class="content">Dynamic by family: <strong>8192</strong> for reasoners (o4-mini, gpt-5.5), <strong>2048</strong> for others. Identical setting across the 3 protocols for the same model.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Task prompt</div>
+        <div class="content">Verbatim identical across conditions. The prompt never mentions which protocol is being used. The protocol-specific section sits in the system prompt, isolated.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">System prompt</div>
+        <div class="content"><strong>Common section identical</strong> (role, JSON output format, anti-hallucination rules). <strong>Protocol section differs</strong> (NAC3 verbs vs MCP tools vs Raw HTML). Anti-halt instruction added to MCP only (justified in § 03 · Fix C).</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Fixture state</div>
+        <div class="content">Reset to identical snapshot before every run. No run can affect a subsequent one. Verified by isolation checks during development.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Postcondition</div>
+        <div class="content">Same evaluation code across conditions for the same task. V23_EDITOR uses <code>waitForFunction(300ms)</code> in all three conditions (not just NAC3).</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Execution order</div>
+        <div class="content"><strong>By iteration, not by model.</strong> Iteration 1 runs all 60 cells (5 models × 3 cond × 4 tasks). Then iteration 2. This distributes API load and provider drift evenly.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Concurrency</div>
+        <div class="content">Serial. One run at a time. Never two conditions of the same model in parallel — would contaminate fixture state.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Retry policy</div>
+        <div class="content">Up to 2 retries on <code>api_error</code> or <code>timeout</code>. <strong>Never retry</strong> on <code>parse_error</code> or <code>post_condition_failed</code> — those are legitimate signal.</div>
+      </div>
+
+      <div class="matrix-row">
+        <div class="axis">Pricing snapshot</div>
+        <div class="content">Provider rates captured at execution time (2026-05-19). Cost calculations use input + output tokens against that snapshot. Future runs may have different costs as providers change rates.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROVENANCE -->
+  <section class="body" id="prov">
+    <div class="section-head">
+      <div class="number">§ 05</div>
+      <h2>Trazability:<br/>every row knows<br/><em>where it came from.</em></h2>
+    </div>
+    <p class="section-lede">
+      For a benchmark to be auditable, every result must be traceable back to the exact code
+      and configuration that produced it. Every JSONL row in the dataset carries three identity
+      fields beyond the standard metrics.
+    </p>
+
+    <div class="data-table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>runtime_version</td>
+            <td class="num">2.2.1</td>
+            <td>NAC3 runtime library version at execution time</td>
+          </tr>
+          <tr>
+            <td>bench_version</td>
+            <td class="num">0.1.0</td>
+            <td>Harness version (this benchmark codebase)</td>
+          </tr>
+          <tr>
+            <td>manifest_checksum</td>
+            <td class="num">67db3eef3658</td>
+            <td>SHA-256 of fixture manifest, truncated to 12 chars</td>
+          </tr>
+          <tr>
+            <td>started_at / ended_at</td>
+            <td class="num">ISO 8601</td>
+            <td>Per-run timing for replay and audit</td>
+          </tr>
+          <tr>
+            <td>run_id</td>
+            <td class="num">timestamp__model__task__cond__iter</td>
+            <td>Globally unique identifier</td>
+          </tr>
+          <tr>
+            <td>Playwright trace.zip</td>
+            <td class="num">per-run</td>
+            <td>Full execution trace for any run, replayable in Playwright DevTools</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        If a reviewer asks <em>"are you sure the manifest was the same in all 600 runs?"</em> —
+        the answer is literally in every JSONL row. <code>manifest_checksum = 67db3eef3658</code>,
+        constant. If a row had a different checksum, it would prove a mid-run change.
+      </p>
+      <p>
+        This is what makes the dataset auditable. Not <em>"trust us"</em> — <em>"verify it."</em>
+      </p>
+
+      <p style="margin-top: 28px; padding: 24px; background: var(--gold-bg); border-left: 3px solid var(--gold);">
+        <strong>A note on version numbers.</strong> The JSONL field reads
+        <code>runtime_version = 2.2.1</code> — the package.json string at execution time. The same
+        commit ships to npm as <strong>2.3.0 stable</strong>: the benchmark validated the
+        decoration + verb + idempotency layer (including the new <code>syncPlugin</code> API and
+        plugin-instance uniqueness), which is a backward-compatible minor release over 2.2.x.
+        The git commit SHA in the repo ties the published 2.3.0 to the exact code that produced
+        these numbers. <strong>This dataset does not test the v2.4 RFCs</strong> (snapshot
+        versioning, agent authority) — those are unimplemented roadmap, not part of the runtime
+        measured here.
+      </p>
+    </div>
+  </section>
+
+  <!-- REPRO -->
+  <section id="repro">
+    <div class="repro">
+      <h3>Reproducing the dataset</h3>
+      <div class="sub">$15 · ~1h 23min · API keys for ANTHROPIC, OPENAI, DEEPSEEK, GOOGLE</div>
+
+<pre><span class="cm"># Clone, install, configure .env with all four API keys</span>
+<span class="kw">git clone</span> https://github.com/yujinapp/nac3-bench
+<span class="kw">cd</span> nac3-bench/bench
+<span class="kw">npm install</span>
+
+<span class="cm"># Run all 600 cells in one execution</span>
+<span class="kw">bash</span> scripts/run_final_600.sh
+
+<span class="cm"># Aggregate per-run JSONL into a single report</span>
+<span class="kw">node</span> scripts/unified_report.mjs --since=2026-05-19T23 \
+  &gt; docs/N10_FINAL_REPORT.md
+
+<span class="cm"># Optionally verify the manifest checksum matches:</span>
+<span class="kw">sha256sum</span> fixtures/invoice-app/manifest.json | <span class="kw">head -c</span> 12</pre>
+
+      <div class="repro-meta">
+        <div><strong>runtime_version</strong>2.2.1</div>
+        <div><strong>bench_version</strong>0.1.0</div>
+        <div><strong>manifest_checksum</strong>67db3eef3658</div>
+        <div><strong>execution date</strong>2026-05-19</div>
+        <div><strong>total runs</strong>600 / 600 ✓</div>
+        <div><strong>retries used</strong>&lt; 0.5% of runs</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT IT CANT SAY -->
+  <section class="body">
+    <div class="section-head">
+      <div class="number">§ 07</div>
+      <h2>What the dataset <em>cannot say.</em></h2>
+    </div>
+
+    <div class="prose">
+      <p>
+        Every benchmark trades off scope for depth. This one chose depth — five fixes applied, six
+        criteria verified, full per-run audit trail. The cost is scope.
+      </p>
+
+      <ul>
+        <li><strong>One fixture.</strong> An invoice-app in Spanish. Single-page, no SSR, no auth.
+        We don't claim generalization to marketplaces, real-time dashboards, or multi-step flows.
+        We claim that within this fixture, the protocols behave as measured.</li>
+
+        <li><strong>Four tasks.</strong> Atomic add, exploratory cancel, compound create,
+        async-handler grammar fix. We chose them to span complexity classes — but they're four
+        points on a curve, not the whole curve.</li>
+
+        <li><strong>Five models.</strong> No Opus 4.7 (excluded for ROI), no reasoning models at
+        N=10 (validated at N=1 only), no open-weight models. The cheap-model unlock claim
+        applies to Gemini Flash Lite and GPT-4o-mini specifically.</li>
+
+        <li><strong>One language.</strong> Spanish. Some failures (DeepSeek's
+        <code>consultoria</code> regex mismatch, GPT-4o-mini's <em>"Nueva linea"</em> confusion)
+        are likely language-sensitive.</li>
+
+        <li><strong>Non-determinism.</strong> <code>temperature=0</code> doesn't guarantee
+        identical outputs on re-run. Anthropic and OpenAI explicitly do not commit to bit-identity.
+        Some marginal variance across re-runs is expected.</li>
+
+        <li><strong>One region.</strong> Latency measured from Argentina → US-East endpoints.
+        Customers in EU, APAC, or US-West will see different absolute numbers
+        (relative comparisons should hold).</li>
+
+        <li><strong>One execution date.</strong> 2026-05-19. Provider pricing, model snapshots,
+        and runtime behavior all evolve. Re-running in 6 months may produce different absolute
+        numbers — but the methodology (controls, fixes, trazability) is designed to be valid
+        across time.</li>
+      </ul>
+
+      <p>
+        Finally, the dataset reports what happened with <em>this</em> instrument on <em>these</em>
+        runs. We make no claim about NAC3, MCP, or Raw DOM in production at scale — only that
+        within the controlled conditions of this benchmark, the patterns observed were as
+        documented. Extending the claims requires extending the benchmark.
+      </p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>NAC3 v2.4 benchmark methodology · <a href="results.html">results →</a></div>
+    <div style="margin-top: 12px; opacity: 0.7;">Apache 2.0 + MIT · github.com/yujinapp/nac-spec · contact: yujin@example.com</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,9 +1,11 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.2.0
-**Status:** Stable
+**Version:** 2.3.0
+**Status:** Stable (npm `@nac3/runtime@2.3.0`)
+**Benchmark:** 600 runs across 5 models x 3 protocols -- [results](./benchmark/)
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
+**RFCs in flight:** see [/rfcs/](./rfcs/) for V24-04 (snapshot versioning, enforcement opt-in in 2.3.0) and V24-05 (authority, draft for 2.4).
 
 ---
 

@@ -4,8 +4,9 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: experimental](https://img.shields.io/badge/status-experimental-orange)](https://yujin.app/nac-spec/)
-[![Spec: v2.2](https://img.shields.io/badge/spec-v2.2-blue)](SPEC.md)
+[![Status: stable](https://img.shields.io/badge/status-stable-brightgreen)](https://yujin.app/nac-spec/)
+[![Spec: v2.3](https://img.shields.io/badge/spec-v2.3-blue)](SPEC.md)
+[![Benchmark: 600 runs](https://img.shields.io/badge/benchmark-600%20runs-teal)](./benchmark/)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 
@@ -94,21 +95,24 @@ RPA + tests) or **cross-app** workflows, or when you want
 
 | App | Type | NAC3 version |
 |-----|------|--------------|
-| [Yujin CRM](https://yujin.app) | Production reference | v2.2 |
-| [Reference demos](https://yujin.app/nac-spec/) | Live, 8 examples (vanilla, React, Angular, data-table, interop, voice ad) | v2.2 |
-| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.2 |
+| [Yujin CRM](https://yujin.app) | Production reference | v2.3 |
+| [Reference demos](https://yujin.app/nac-spec/) | Live, 8 examples (vanilla, React, Angular, data-table, interop, voice ad) | v2.3 |
+| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.3 |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
 ## Status
 
-- **v2.2** -- shipped 2026-05-10. `NAC.register` strict
+- **v2.3** -- shipped 2026-05-20. `NAC.syncPlugin` (idempotent
+  registration), `data-nac-plugin-id` (plugin instance uniqueness).
+  Validated across a 600-run benchmark across 5 models x 3 protocols --
+  see [/benchmark/](./benchmark/). This is what `npm install @nac3/runtime`
+  delivers today.
+- **v2.2** -- shipped 2026-05-12. `NAC.register` strict
   validator, `bindAction` helper, locale-detector hardening.
-  This is what `npm install @nac3/runtime` delivers today.
-  Used in production inside Yujin's own CRM; outside adopters
-  are early and few -- see [Made with NAC3](#made-with-nac3).
-- **v2.3** -- preview branch with cross-NAC3 interop (MCP
-  bridge for cross-origin + cross-device). Tested in-page; GA
-  after one full cross-origin real-world test cycle.
+- **v2.4** -- in RFC. Snapshot versioning + OCC (V24-04, code merged
+  but enforcement opt-in in 2.3), agent authority + interposition
+  (V24-05, draft). Targeting GA after a dedicated concurrency benchmark.
+  See [/rfcs/](./rfcs/) for status per RFC.
 - **v3.0** -- roadmap. Mobile-native dialect
   (`accessibilityIdentifier` on iOS, `contentDescription` on
   Android) for non-DOM widgets.

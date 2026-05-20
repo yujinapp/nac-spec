@@ -199,7 +199,7 @@ Promise). Returns an unbinder. Use this instead of raw
 `addEventListener('click', ...)` whenever the host supports it;
 brownfield code can still emit the event manually as before.
 
-### 5.1.3 Field editor (v2.3 preview)
+### 5.1.3 Field editor (v2.3)
 
 `NAC.edit_field(nac_id)` opens a modal that lets a user (or an
 agent on their behalf) edit any text field with Word-style tools:
@@ -225,8 +225,9 @@ NAC-3 callable verbs:
 Esc closes (cancel). Ctrl/Cmd+Enter saves. Click on overlay
 backdrop cancels.
 
-Spec sec 13 will formalise the contract in v2.3; the v2.2 runtime
-ships a working reference impl so adopters can wire it today.
+The v2.3 runtime ships a working reference impl and the contract is
+stable. The 600-run benchmark exercises `ai_correct_syntax` + `save`
+under the V23_EDITOR_fix_monitor task.
 Available on any field via:
 
 ```js

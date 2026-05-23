@@ -84,10 +84,10 @@ that diverged during May 2026 are unified here:
 - **Line B** (rpaforce-crm, contract track): V25-01 plugin extension
   contract for canvas+API surfaces (Blocks A 8 backends complete).
 
-Both lines now live in this single source tree. After 2.5.0-alpha.1
-publishes and validates, the rpaforce-crm copies of `packages/nac/` and
-`yujin.app/nac-spec/` are deleted, and `yujinapp/nac-spec` becomes the
-single source of truth for NAC3.
+Both lines now live in this single source tree. The rpaforce-crm
+copies of `packages/nac/` and `yujin.app/nac-spec/` were deleted on
+2026-05-23 (commit `0ff3afa`), and `yujinapp/nac-spec` is now the
+sole source of truth for NAC3.
 
 ---
 

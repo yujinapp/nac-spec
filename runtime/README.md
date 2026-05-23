@@ -137,9 +137,9 @@ Apache-2.0. See `LICENSE`.
 
 ## Repository
 
-[github.com/pkuschnirof/rpaforce-crm](https://github.com/pkuschnirof/rpaforce-crm)
-(directory: `packages/nac`)
+[github.com/yujinapp/nac-spec](https://github.com/yujinapp/nac-spec)
+(directory: `runtime/`)
 
 ## Author
 
-[Yujin](https://rpaforce.com)
+[Yujin](https://yujin.app)

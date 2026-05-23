@@ -170,8 +170,10 @@ Bounty program for adopters:
 ## License
 
 - Specification + docs: Apache-2.0.
-- Reference runtime (`packages/nac/`): MIT.
-- Demos in `nac-spec/`: Apache-2.0.
+- Reference runtime (`runtime/`): Apache-2.0 (was tagged MIT in the
+  pre-2.5 dual-repo era; harmonised to Apache-2.0 across all NAC3
+  artefacts as of the 2026-05-23 consolidation).
+- Demos at the repo root + under `demos/`: Apache-2.0.
 
 ## See also
 

@@ -1,7 +1,7 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.0-alpha.1 (consolidation alpha: Block A canvas+API + V24-01/02/05 RFCs alongside v2.4 strict resolution)
-**Status:** v2.5.0-alpha.1 alpha -- consolidates parallel dev lines, V24-04 OCC still in implementation for alpha.2
+**Version:** 2.5.0-alpha.2 (alpha.1 + V24-04 OCC foundation: tree_version + plugin_version + element_state_hash + markHydrationComplete + versionHistory)
+**Status:** v2.5.0-alpha.2 alpha -- V24-04 foundation SHIPPED, dispatch enforcement hooks pending for alpha.3
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
 

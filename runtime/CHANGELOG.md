@@ -1,5 +1,105 @@
 # Changelog
 
+## 2.5.0-alpha.2 -- 2026-05-23
+
+NAC3 v2.5.0-alpha.2 lands the V24-04 OCC foundation that was
+deferred from alpha.1. This is an additive release on top of
+alpha.1 -- everything that worked in alpha.1 still works.
+
+### Added (V24-04 -- foundation SHIPPED)
+
+The snapshot versioning + optimistic concurrency framework from
+RFC V24-04 lands as a foundation layer:
+
+- `_tree_version` + `_plugin_versions` Map -- per-(slug, instance_id)
+  monotonic version counters. Bumped on every structural mutation
+  observed by the runtime MutationObserver + on every syncPlugin
+  call.
+- `_resolvePluginScope(el)` walks ancestor [data-nac-plugin] roots
+  with WeakMap caching to avoid O(depth) walks on every mutation.
+- `_bumpPluginVersion(slug, instance_id, trigger)` + `_bumpTreeVersion`
+  atomic helpers: increment counter, push to `_version_history`
+  (capped at 500), dispatch `nac:plugin:invalidated` +
+  `nac:tree:invalidated` events.
+- Single document-rooted MutationObserver that filters mutations to
+  data-nac-* attribute changes + addNodes/removeNodes that contain
+  data-nac-* descendants. Pure value/text changes do NOT bump.
+- `element_state_hash` (128-bit SHA-256 truncated) over a canonical
+  5-key state (visible, disabled, value, text, custom). Sync impl
+  + async crypto.subtle path when available. Byte-identical digests
+  across paths.
+- `markHydrationComplete()` + 100ms fallback for SSR-then-hydrate
+  scenarios. Tagged trigger='hydration_complete' on the resulting
+  bump events.
+- `versionHistory(limit?)` devtools surface -- last N bumps, most
+  recent first.
+
+### Added (V24-04 -- describe() additions)
+
+- `describe()` output now carries `tree_version` at the root +
+  `plugin_version` + `plugin_instance_id` per plugin entry +
+  `element_state_hash` per element entry. All three are read-only
+  observers; consuming them is opt-in.
+
+### Added (V24-04 -- NAC.* surface)
+
+- `NAC.STRICT_VERSIONING` (default **false** in alpha.2; will flip to
+  true in alpha.3 after one soak window). When true,
+  every mutating API call without `expected_*` parameters throws
+  `NacError('version_required', ...)`.
+- `NAC.eager_hashing` (default false) -- placeholder flag for future
+  cache-the-hash-on-mutate optimization.
+- `NAC.conformance_tier` (default `'NAC-3-versioned'`). Runtimes that
+  declare the legacy `'NAC-3'` tier explicitly reject `expected_*`
+  parameters with `NacError('feature_not_supported', ...)`.
+- `NAC.markHydrationComplete()` -- explicit hydration ack.
+- `NAC.versionHistory(limit?)` -- devtools.
+
+### V24-02 syncPlugin consolidation
+
+syncPlugin's version stamp now uses the V24-04 `_bumpPluginVersion`
+machinery instead of the alpha.1 per-call timestamp string. The
+return shape (`{replaced, slug, version}`) is unchanged, but the
+`version` value is now `v_<N>` instead of `v_<base36-ts>_<seq>`.
+Tests pass either format (just check the `v_` prefix and that
+versions differ across calls).
+
+### Pending for 2.5.0-alpha.3
+
+- **Dispatch enforcement hooks.** `click` / `click_by_verb` / `tab` /
+  `tab_by_label` / `fill` / `select` / `invoke` accept
+  `expected_plugin_version` / `expected_tree_version` /
+  `expected_element_state_hash` parameters and reject with
+  `NacError('snapshot_stale', ...)` on mismatch via
+  `_resolveVersionExpectations()` (the helper is already in this
+  release; the hooks are not yet wired into the dispatch verbs).
+- **`STRICT_VERSIONING` default flip** from false to true. Gated on
+  the dispatch hooks landing.
+- **V25-02/03/04 drafts** -- tree navigation, asistive labels,
+  effect detection. Target subsequent 2.5.x patches.
+
+### Tests
+
+`runtime/test/` adds stage12-snapshot-versioning.mjs (23 PASS):
+API surface, describe() additions, syncPlugin bump events, version
+history, markHydrationComplete idempotency, hydration trigger
+tagging.
+
+Suite total: **377 PASS / 0 FAIL** across 14 stage suites.
+
+### Migration notes
+
+- Code consuming `describe()` output that did NOT expect
+  `tree_version` / `plugin_version` / `element_state_hash` keys is
+  unaffected: those keys are additive. Code that explicitly checked
+  describe().plugins[i] for an enumerated key set might fail; the
+  fix is to ignore unknown keys (forward-compatible default).
+- syncPlugin's `result.version` value format changed (see V24-02
+  section above). Tests that asserted the exact alpha.1 format
+  string would need to relax to a prefix-only check.
+
+---
+
 ## 2.5.0-alpha.1 -- 2026-05-23
 
 NAC3 v2.5.0-alpha.1 is a **consolidation release**. Two parallel

@@ -1,10 +1,34 @@
-# NAC3 v2.2 launch posts -- drafts (v3: demo-first, Picard preserved)
+# NAC3 launch posts -- drafts (v4.0: v2.3 stable, voice-ads-first)
 
-**Target launch date:** TBD (after Atlas Pro voice ad videos + key rotation + GitHub org transfer).
+**Released version at launch:**
+- **NAC3 v2.3.0** -- stable, current release. The everyday
+  contract: 5 HTML attributes + click/fill/tab/select verbs
+  (carried over from v2.2) + new payload-bearing actions
+  (`NAC.invoke` + `NAC.utter`) + open Shadow DOM resolution +
+  closed Shadow DOM voluntary exposure API +
+  auth-aware `requires_capability` gate + strict validation by
+  default. Three reference adopters: Atlas Pro voice ad
+  (production), React demo, Angular demo. Live multi-language
+  E2E verified across en/es/zh on 2026-05-13.
+
+**Target launch date:** TBD (after Atlas Pro voice ad videos done + key rotation + GitHub org transfer).
 **Time-of-day:** 9:00 AM US East (peak HN traffic).
 **Coordinate:** HN -> X 30min -> LinkedIn same time -> Reddit 2hr after -> dev.to/Hashnode day +1 -> Discord cross-posts after HN tracks.
 
-**Editorial principles (v3, locked 2026-05-11):**
+**Primary use cases at launch (Pablo locked 2026-05-12, in priority order):**
+
+1. **Voice ads that listen + close sales** -- a new ad category. Atlas Pro is the live reference: visitor speaks, agent fills the order form against a NAC3 manifest, lead lands in CRM in <3 seconds, ten languages. Three demo videos (EN/ES/ZH) embedded in landing.
+2. **Voice as input medium for humans, universally** -- hands-busy, eyes-busy, non-typers, kids, elderly, factories. The web becomes voice-operable without per-site Alexa Skill code.
+3. **Accessibility as first-class citizen** -- the screen reader IS a NAC3 agent. No "accessible version" parallel UI.
+4. **Multilingual without rewrites** -- payloads are locale-independent; the page accepts intent in any of the 10 supported locales without re-templating the UI.
+
+**Secondary (cascade) capabilities:**
+
+5. Asynchronous agents acting on behalf of humans (Forge/Pilot, Q3 2026 roadmap).
+6. RPA + E2E test runners without screen-scraping.
+7. **Agent-to-agent commerce** -- the "wow" demo: two AI agents (one buyer = Claude Opus injecting `@nac3/runtime@2.3.0` from npm, one seller = Atlas Pro's own backend) transacting a purchase end-to-end via voice, in three languages, with no clicks. **Recorded and embedded as headline showcase** -- but it is the N-th derivative of (1)-(4), not the tesis.
+
+**Editorial principles (v3, locked 2026-05-11; refined 2026-05-12):**
 
 1. **Voice ad is the hook, not the product.** The Atlas Pro demo is the
    most visceral proof of NAC3 -- so we lead with it. But every post
@@ -35,6 +59,19 @@
 8. **Yujin as company, NAC3 as product.** Yujin is the company
    shipping frontier tech. NAC3 is the first open-source release.
    Forge / Pilot are teased only as "what's next".
+9. **Voice ads are the commercial play, not "AI demos."** (2026-05-12.)
+   Atlas Pro is the productized first-customer case. The agent-to-
+   agent transaction video is showcase-grade but the wedge for
+   monetization is replacing low-CTR display advertising with
+   high-conversion voice conversations. Lead every channel with
+   the voice-ad use case, NOT with "two AIs talking to each other"
+   (that lands as gimmick to non-technical readers).
+10. **v2.3 is the product.** (2026-05-13.) Stable cut shipped.
+    Payload-bearing actions (`NAC.invoke`, `NAC.utter`), Shadow
+    DOM open + closed exposure, auth-aware capabilities, strict
+    validation by default. Three reference adopters (Atlas Pro
+    + React + Angular). Multi-language E2E verified live across
+    en/es/zh. No "preview" or "alpha" framing in any post.
 
 ---
 
@@ -109,21 +146,62 @@ of 10 languages, fills the order form against a NAC3 manifest,
 submits the lead to the seller's CRM in under three seconds.
 Zero typing, zero clicking.
 
-But the voice ad is just the smallest, most visceral demo. The
-same five attributes work for:
+Three recorded conversations (different agents driving the same
+NAC3 surface, three languages, all unedited):
 
-  - A meeting scheduler -- an LLM books the slot while the user
-    listens hands-free.
-  - An ERP invoicing form -- an agent issues an invoice the same
-    way a human clicks "Save".
-  - A dashboard with filters -- an LLM asks for "last quarter,
-    enterprise tier only" and the agent flips three toggles.
-  - A multi-step checkout -- voice runner walks the visitor
-    through the flow hands-free.
-  - An admin panel -- RPA bot performs the daily reconciliation
-    instead of a person.
-  - A field-service mobile form -- a worker dictates the
-    inspection, the form fills, the geo-tag attaches.
+  https://yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4   1:55 -- English
+  https://yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4   2:21 -- Spanish (rioplatense)
+  https://yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4   1:57 -- Mandarin
+
+The buyer is Claude Opus 4.7 injected as an external agent that
+imports @nac3/runtime@2.3.0 from npm and drives the page via
+NAC.utter (v2.3, new in this release -- see below). The seller's
+brain is Atlas Pro's own backend. Two LLMs negotiate a purchase
+through the NAC3 contract -- different vendors, different
+prompts, one protocol. Voice ad is the wedge; agent-to-agent
+commerce is the cascade.
+
+v2.3 ships today as the **stable** release. It adds:
+
+  await NAC.utter('atlas_pro_ad.mic', { text: 'size 42 in midnight' })
+  // host listens for nac:action:requested, processes the payload
+  // with whatever logic it wants (its own LLM, regex, lookup table)
+  // emits nac:action:succeeded echoing the request_id back.
+
+  // Generic version is NAC.invoke(id, payload). 'utter' is just
+  // the first concrete adopter. The same primitive carries search
+  // queries, file uploads, image/video analysis requests, schedule
+  // dates -- anything the host declares an interest in receiving.
+
+The voice ad is the most visceral commercial demo -- a new
+ad format where the agent talks the visitor into the purchase
+without the visitor ever typing. But the same five attributes
+unlock the broader voice-first web for any human:
+
+  - Hands-busy: kitchen, car, factory floor, gym, surgery,
+    field service. The web becomes a microphone away.
+  - Eyes-busy: drivers, line cooks, electricians up a ladder.
+    No glance at the screen required.
+  - Non-typers: kids who can't keyboard yet, elderly with
+    arthritis, low-literacy users in emerging markets, anyone
+    in a language whose keyboard layout is awkward.
+  - Accessibility: blind users via screen reader, motor-impaired
+    users via switch-controlled agent. Same web page, same
+    contract, no parallel "accessible version."
+  - Multilingual: the visitor speaks Hindi, the page accepts
+    structured intent in any of the 10 supported locales without
+    re-templating the UI.
+
+And in the cascade, the same surface is also operable by:
+
+  - An LLM tool-call from a chat product -- "book me the
+    nearest slot," and the agent flips the calendar.
+  - An RPA bot -- the daily reconciliation runs without a
+    seat license per worker.
+  - A Playwright spec -- the E2E test calls the same names
+    the screen reader announces.
+  - A second AI agent -- which is what the three demo videos
+    above prove end-to-end.
 
 If a human can click it, a non-human can call it. Same protocol.
 
@@ -170,7 +248,7 @@ Try the demo, read the spec, install the runtime:
 
 Fork it, break it, improve it. AMA in the comments.
 ```
-
+https://hn.algolia.com/?query=Show%20HN%3A%20NAC3%20%E2%80%93%2080%20lines%20of%20HTML%20to%20make%20a%20UI%20driveable%20by%20humans%20and%20AI&type=story&dateRange=all&sort=byDate&storyText=false&prefix&page=0
 ### Pre-emptive reply drafts (top expected HN objections)
 
 **"This is just ARIA / WAI-ARIA repackaged."**
@@ -293,17 +371,14 @@ Apache 2.0. Eighty lines for a non-trivial app. (3/12)
 **Tweet 4 -- the same primitive at other scales:**
 
 ```
-Atlas Pro is one ad. Easy demo.
+Voice ads are the commercial wedge. The same five attributes
+unlock voice-first web for any human:
 
-The same five attributes work for:
-
-- Meeting schedulers + booking flows
-- ERP invoicing forms
-- Dashboards with filters
-- Multi-step checkouts
-- Admin panels
-- Field-service mobile forms
-- Internal tools nobody but ops uses
+- Hands-busy: cars, kitchens, factories
+- Eyes-busy: drivers, line cooks, climbers
+- Non-typers: kids, elderly, low-literacy
+- Accessibility: screen reader = NAC3 agent
+- Multilingual: payload-level, not template-level
 
 If a human can click it, a non-human can call it. (4/12)
 ```
@@ -363,14 +438,20 @@ That is the standard. No Turing-complete extension point.
 Hard to fragment a surface that small. (8/12)
 ```
 
-**Tweet 9 -- where to start:**
+**Tweet 9 -- where to start + the agent-to-agent cascade:**
 
 ```
-The runtime: @nac3/runtime on npm.
-The spec: yujin.app/nac-spec
-The source: github.com/yujinapp/nac-spec
-Live demo: yujin.app/nac-spec/ads-demo/atlas-pro/
-Community: discord.gg/FH3xEmGm
+The wow cascade: two AI agents transacting a purchase by voice,
+end-to-end, three languages, no clicks.
+
+EN:  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4 (1:55)
+ES:  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4 (2:21)
+ZH:  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4 (1:57)
+
+Runtime: npm i @nac3/runtime
+Spec: yujin.app/nac-spec
+Source: github.com/yujinapp/nac-spec
+Discord: discord.gg/FH3xEmGm
 
 Apache 2.0. ~20kb gzipped. No deps. (9/12)
 ```
@@ -388,17 +469,20 @@ If you ship a web app -- agency, indie, hobbyist, enterprise
 implementation. (10/12)
 ```
 
-**Tweet 11 -- the long term:**
+**Tweet 11 -- the long term + v2.3 stable:**
 
 ```
 Standards win by adoption, not control.
 
-We're publishing this and stepping back. The registry is
-opening. The Discord is live. The spec is at v2.2 with a
-governance doc explaining how changes get made.
+Publishing today: NAC3 v2.3.0 stable. Adds NAC.invoke + NAC.utter
+(payload-bearing actions: search, upload, image, video, schedule
+all plug into the same event protocol), open Shadow DOM walks
+automatically, closed Shadow DOM has a voluntary exposure API,
+auth-aware capability gates. Three reference adopters: Atlas Pro
+(voice ad), React demo, Angular demo. Open registry, open Discord,
+governance doc explains how changes get made.
 
-If you see the value, ship NAC3 attributes on your app.
-We'll list it. (11/12)
+If you ship a web app, fork it. We'll list it. (11/12)
 ```
 
 **Tweet 12 -- the company:**
@@ -476,20 +560,38 @@ Apache 2.0. The runtime (~20kb gzipped) is on npm as
 @nac3/runtime. The spec, adoption guides, and reference
 implementations are at yujin.app/nac-spec.
 
-The voice ad is the visible case. The bigger story is everything
-else NAC3 unlocks:
+The voice ad is the commercial wedge. The bigger story is what
+the same surface unlocks for any human in any context:
 
-  - Meeting schedulers where the AI books the slot for you while
-    you listen with your hands full.
-  - ERP invoicing where the agent issues the invoice the same way
-    a human clicks "Save".
-  - Dashboards where an LLM filters the view by speaking, not by
-    clicking three nested menus.
-  - Admin panels where an RPA bot replaces the nightly chore.
-  - Field-service forms where a worker dictates the inspection.
-  - Accessibility -- the same attributes that let an agent dispatch
-    a button let a screen reader announce it correctly. We did not
-    design for this. It emerges from the protocol.
+  - Hands-busy work -- a field-service tech dictates an inspection
+    while installing equipment, a chef adds an item to the next
+    delivery order without putting down a pan, a driver books a
+    meeting at red lights without taking eyes off the road.
+  - Multilingual conversion -- the same UI accepts intent in 10
+    languages without re-templating. The visitor speaks Hindi,
+    the page understands.
+  - Accessibility as first-class -- the screen reader is a NAC3
+    agent. Blind users get the same product as everyone else, no
+    parallel "accessible version". We did not engineer for this.
+    It falls out of the protocol.
+  - Async agents on behalf of humans -- an LLM books the meeting
+    while you're in another tab. An RPA bot replaces the nightly
+    reconciliation. A Playwright spec exercises the same names.
+
+And, as a cascade -- this is the wow but not the wedge -- two AI
+agents transacting an entire purchase by voice, in three
+languages, with no clicks. Recorded end-to-end:
+
+  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4   1:55 English
+  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4   2:21 Spanish (rioplatense)
+  yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4   1:57 Mandarin
+
+The buyer is an external agent driven by Claude Opus 4.7 importing
+@nac3/runtime@2.3.0 from npm and calling the new
+NAC.utter('atlas_pro_ad.mic', { text, lang }) primitive. The
+seller's brain is Atlas Pro's own backend. Different vendors,
+different prompts, one open protocol carrying the dialogue
+between them.
 
 Three reasons this matters at scale.
 
@@ -570,15 +672,34 @@ two pairs, delivery to home"), the agent parses the order
 against a NAC3 manifest, fills the form, validates, submits the
 lead to a CRM. Three seconds. Ten languages. Live.
 
-But the voice ad is just one use case. Same five attributes also
-work for:
+Three recorded conversations across the same surface (different
+agent vendor each, three languages):
 
-- Meeting schedulers + booking flows
-- ERP forms an agent can issue invoices through
-- Dashboards an LLM can filter by speaking
-- Multi-step checkouts with full voice walkthrough
-- Admin panels an RPA bot drives
-- Screen readers (accessibility falls out for free)
+- yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4 (English, 1:55)
+- yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4 (Spanish, 2:21)
+- yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4 (Mandarin, 1:57)
+
+Voice ad is the commercial wedge. The same five attributes also
+unlock:
+
+- Voice as input medium for any human in any context
+  (hands-busy, eyes-busy, non-typers, accessibility, multilingual)
+- Async agents that act on behalf of humans
+- RPA bots + Playwright + screen readers driving the same names
+- Agent-to-agent commerce (the videos above show two AIs
+  transacting via voice, end-to-end, no clicks)
+
+**v2.3.0 stable (shipping today):**
+adds payload-bearing actions via NAC.invoke / NAC.utter so
+agents can pass STRUCTURED data with their requests (utterances,
+search queries, file uploads, image/video references, schedule
+dates). The host's nac:action:requested listener processes the
+payload with whatever logic it wants and emits succeeded/failed
+echoing the request_id back. Plus: open Shadow DOM walks
+automatically (Web Components are now first-class), closed
+Shadow DOM has a voluntary `el.nac3` exposure contract, and
+auth-aware capability gates short-circuit unauthorised calls
+before they hit the host. Backwards-compatible with v2.2.
 
 **Why post here:** I expect this community to be skeptical, which
 is what I want. The standard wins or loses based on whether
@@ -616,6 +737,37 @@ Five HTML attributes to make your web UI driveable by AI agents
 ### Body (skeleton -- to be extended day-of)
 
 ```
+## Part 0 -- What you're seeing (open with the three videos)
+
+Three recorded conversations. The same NAC3-compliant page
+(Atlas Pro voice ad). Three languages. Three different "buyer"
+agents. One protocol.
+
+- EN: yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4  (1:55)
+- ES: yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4  (2:21)
+- ZH: yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4  (1:57)
+
+In each one, the visitor (whose voice was synthesised with Google
+Neural2 TTS for this article -- a real human would sound the
+same to the protocol) speaks. The agent listens, disambiguates,
+fills the order form, handles interruptions ("una... no, dos
+zapatillas"), confirms, and submits the lead. Three primary use
+cases compressed into a single video:
+
+1. **Voice ads that close sales** -- a new ad category. The
+   visitor never types. The wedge for monetization is replacing
+   low-CTR display advertising with high-conversion voice
+   conversations.
+2. **Voice as input medium for humans** -- hands-busy, eyes-
+   busy, non-typers, multilingual. The web becomes a microphone
+   away.
+3. **Agent-to-agent commerce** -- the "wow" cascade. Two AI
+   agents transacting end-to-end via voice with no clicks. This
+   is the headline but NOT the primary commercial play.
+
+The contract carrying all three is **NAC3** (Native Agent Contract).
+Apache 2.0. v2.3.0 stable shipping today.
+
 ## Part 1 -- Humans and AI on equal web surfaces
 
 NAC3 (Native Agent Contract) is an open standard, Apache 2.0,
@@ -684,9 +836,21 @@ that nobody had to write extra code for this.]
 
 ## Part 7 -- What's next
 
-[Yujin's roadmap, sober. Developer tools (Forge), distribution
-(Pilot), registry. No prices, no signups. Spec governance. How
-to participate.]
+[Yujin's roadmap, sober:
+  - v2.3.0 stable ships today (this release). Adds
+    `NAC.invoke(id, payload)` and `NAC.utter(id, {text, lang})`
+    -- payload-bearing actions. The first concrete use is
+    conversational input (Atlas Pro `utter` verb). The same
+    protocol carries search queries, file uploads, image and
+    video references, schedule dates -- anything a host
+    declares an interest in receiving. Plus Shadow DOM
+    (open + closed via voluntary exposure), auth-aware
+    capability gates, and a strict-validation default.
+  - Forge (BYOK developer tools) and Pilot (registry browser +
+    agent runtime) are in design, Q3 2026 target.
+  - Public registry at yujin.app/registry once D1-D6 land.
+  - Spec governance is open (GOVERNANCE.md); contributors
+    welcomed via PR. No prices, no signups, no platform tax.]
 
 ## Part 8 -- The invitation
 
@@ -698,18 +862,33 @@ Send PRs. Fork if you want a counter-implementation.]
 
 ## 6. Assets needed (Pablo to produce / approve)
 
-### a) Hero video (Tamara recording -- in production)
+### a) Hero videos (DELIVERED 2026-05-12 via the video-gen pipeline)
 
-- Atlas Pro voice ad demo, screen recording + clean mic capture.
-- Three variants planned:
-  1. Ideal case (all slots fill in one sentence; agent confirms).
-  2. Mid-conversation slot change ("midnight, not beige").
-  3. Barge-in -- visitor interrupts the agent.
-- Two languages each (es + en). Six files total or three bilingual.
-- 60-90 seconds per video.
-- 1920x1080 export, h264, ~5-8 MB per file.
-- Drops at: `yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-{lang}.mp4`
-- The yujin.app landing video frame auto-detects them via HEAD probe.
+The three videos that ship with the launch were generated by
+`tools/video-gen/` -- a Playwright-driven recorder that has an
+external agent (Claude Opus 4.7) inject @nac3/runtime from npm
+and drive Atlas Pro via NAC.utter calls in three languages, with
+overlay tracing each NAC3 verb in real time. ffmpeg burn-in adds
+visitor-side subtitles. Sources, scripts, and the report are in
+`tools/video-gen/REPORT.md`. To regenerate, see that README.
+
+- EN: `yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-en.mp4`  (1:55, 5.9 MB)
+- ES: `yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-es.mp4`  (2:21, 7.4 MB)
+- ZH: `yujin.app/nac-spec/ads-demo/atlas-pro/videos/atlas-pro-agent-zh.mp4`  (1:57, 6.0 MB)
+
+Each video shows:
+- Surface discovery via `[data-nac-id]` (14 elements).
+- Agent injects `@nac3/runtime@2.3.0` from unpkg.
+- 8 visitor turns with disambiguation (vague size, ambiguous
+  color among 3 options) and mid-flow interruption (qty change).
+- Real-time overlay showing `NAC.utter -> nac:action:requested
+  -> /parse -> /tts -> nac:action:succeeded` for each turn.
+- Final `NAC.click_by_verb('atlas_pro_ad','submit')` succeeds.
+- Slots filled correctly: 42.5 / midnight / 2 / pickup.
+
+Tamara recordings remain on the table as a human-narrated variant
+once available; the agent-driven versions ship as the day-1
+artefact.
 
 ### b) Code diff "before / after" (Carbon.now.sh screenshot)
 
@@ -788,6 +967,33 @@ reader + agent + Playwright + RPA.
 
 ## Changelog
 
+- v4.0 (2026-05-13): NAC3 **v2.3.0 stable** ships. NAC.invoke +
+  NAC.utter (payload-bearing actions), open + closed Shadow DOM,
+  auth-aware capabilities, strict validation by default,
+  edit_field GA. Three reference adopters: Atlas Pro (production
+  voice ad), React demo, Angular demo. Multi-language E2E
+  39/39 GREEN against live deploy (en/es/zh). Posts updated to
+  drop all alpha/preview framing; runtime version stamp 2.3.0.
+
+- v3.4 (2026-05-12, late): NAC3 v2.3.0-alpha.1 preview landed
+  alongside v2.2.x stable (NAC.invoke + NAC.utter -- payload-
+  bearing actions). Three demo videos delivered (EN/ES/ZH) via
+  the tools/video-gen/ pipeline; agent driving via NAC.utter
+  end-to-end, with overlay tracing each NAC3 verb in real time.
+  Each channel post now references the three video URLs +
+  introduces NAC.utter. Editorial principle #9 added: voice
+  ads are the commercial play, not "AI demos"; lead each
+  channel with the voice-ad use case rather than the agent-to-
+  agent gimmick (which lands wrong to non-technical readers).
+  Editorial principle #10 added: frame v2.3 as "and v2.3
+  preview lands today" -- positive flag without forcing
+  adopters off v2.2.
+- v3.3 (2026-05-12, early): primary use case order locked by
+  Pablo: (a) voice ads that close sales, (b) voice as universal
+  human input, (c) accessibility first-class, (d) multilingual,
+  THEN as cascade (e) async agents, (f) RPA/test, (g) agent-
+  to-agent. Recorded as the new "Primary use cases at launch"
+  section at top of this doc.
 - v3.2 (2026-05-12): structural reframing. Each post now leads
   with the one-line answer to 'what is NAC3' ('humans and AI on
   equal footing on the same web surfaces') so a reader who

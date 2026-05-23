@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calc</title>
+<link rel="stylesheet" href="calc.css">
+<script src="nac.browser.js"></script>
+</head>
+<body data-nac-plugin="calc">
+
+<main class="calc" data-nac-id="calc.region.main" data-nac-role="region">
+  <div class="display" id="display"
+       data-nac-id="calc.field.display"
+       data-nac-role="field"
+       data-nac-value-source="display">0</div>
+  <div class="history" id="history"
+       data-nac-id="calc.field.history"
+       data-nac-role="field"
+       data-nac-value-source="history"></div>
+
+  <div class="pad" data-nac-id="calc.region.keypad" data-nac-role="region">
+    <button class="btn op clear" onclick="clearAll()"
+            data-nac-id="calc.action.clear"
+            data-nac-role="action"
+            data-nac-action="clear">C</button>
+    <button class="btn op back" onclick="backspace()"
+            data-nac-id="calc.action.backspace"
+            data-nac-role="action"
+            data-nac-action="backspace">&larr;</button>
+    <button class="btn op pct" onclick="percent()"
+            data-nac-id="calc.action.percent"
+            data-nac-role="action"
+            data-nac-action="percent">%</button>
+    <button class="btn op" onclick="setOp('/')"
+            data-nac-id="calc.action.op_divide"
+            data-nac-role="action"
+            data-nac-action="divide">/</button>
+
+    <button class="btn num" onclick="digit('7')"
+            data-nac-id="calc.action.digit_7"
+            data-nac-role="action"
+            data-nac-action="digit_7">7</button>
+    <button class="btn num" onclick="digit('8')"
+            data-nac-id="calc.action.digit_8"
+            data-nac-role="action"
+            data-nac-action="digit_8">8</button>
+    <button class="btn num" onclick="digit('9')"
+            data-nac-id="calc.action.digit_9"
+            data-nac-role="action"
+            data-nac-action="digit_9">9</button>
+    <button class="btn op" onclick="setOp('*')"
+            data-nac-id="calc.action.op_multiply"
+            data-nac-role="action"
+            data-nac-action="multiply">x</button>
+
+    <button class="btn num" onclick="digit('4')"
+            data-nac-id="calc.action.digit_4"
+            data-nac-role="action"
+            data-nac-action="digit_4">4</button>
+    <button class="btn num" onclick="digit('5')"
+            data-nac-id="calc.action.digit_5"
+            data-nac-role="action"
+            data-nac-action="digit_5">5</button>
+    <button class="btn num" onclick="digit('6')"
+            data-nac-id="calc.action.digit_6"
+            data-nac-role="action"
+            data-nac-action="digit_6">6</button>
+    <button class="btn op" onclick="setOp('-')"
+            data-nac-id="calc.action.op_subtract"
+            data-nac-role="action"
+            data-nac-action="subtract">-</button>
+
+    <button class="btn num" onclick="digit('1')"
+            data-nac-id="calc.action.digit_1"
+            data-nac-role="action"
+            data-nac-action="digit_1">1</button>
+    <button class="btn num" onclick="digit('2')"
+            data-nac-id="calc.action.digit_2"
+            data-nac-role="action"
+            data-nac-action="digit_2">2</button>
+    <button class="btn num" onclick="digit('3')"
+            data-nac-id="calc.action.digit_3"
+            data-nac-role="action"
+            data-nac-action="digit_3">3</button>
+    <button class="btn op" onclick="setOp('+')"
+            data-nac-id="calc.action.op_add"
+            data-nac-role="action"
+            data-nac-action="add">+</button>
+
+    <button class="btn num zero" onclick="digit('0')"
+            data-nac-id="calc.action.digit_0"
+            data-nac-role="action"
+            data-nac-action="digit_0">0</button>
+    <button class="btn num" onclick="dot()"
+            data-nac-id="calc.action.dot"
+            data-nac-role="action"
+            data-nac-action="dot">.</button>
+    <button class="btn equals" onclick="equals()"
+            data-nac-id="calc.action.equals"
+            data-nac-role="action"
+            data-nac-action="equals">=</button>
+  </div>
+</main>
+
+<script src="calc.js"></script>
+<script src="nac-bridge.js"></script>
+<script>
+  (function () {
+    var manifest = {"plugin_slug":"calc","version":"1.0.0","nac_version":"1.0","label_i18n":{"es":"Calculadora","en":"Calculator"},"elements":[{"id":"calc.region.main","role":"region","label_i18n":{"es":"Calculadora","en":"Calculator"}},{"id":"calc.region.keypad","role":"region","label_i18n":{"es":"Teclado","en":"Keypad"}},{"id":"calc.field.display","role":"field","label_i18n":{"es":"Pantalla principal","en":"Main display"}},{"id":"calc.field.history","role":"field","label_i18n":{"es":"Historial","en":"History"}},{"id":"calc.action.digit_0","role":"action","actions":[{"verb":"digit_0","label_i18n":{"es":"Digito 0","en":"Digit 0"}}]},{"id":"calc.action.digit_1","role":"action","actions":[{"verb":"digit_1","label_i18n":{"es":"Digito 1","en":"Digit 1"}}]},{"id":"calc.action.digit_2","role":"action","actions":[{"verb":"digit_2","label_i18n":{"es":"Digito 2","en":"Digit 2"}}]},{"id":"calc.action.digit_3","role":"action","actions":[{"verb":"digit_3","label_i18n":{"es":"Digito 3","en":"Digit 3"}}]},{"id":"calc.action.digit_4","role":"action","actions":[{"verb":"digit_4","label_i18n":{"es":"Digito 4","en":"Digit 4"}}]},{"id":"calc.action.digit_5","role":"action","actions":[{"verb":"digit_5","label_i18n":{"es":"Digito 5","en":"Digit 5"}}]},{"id":"calc.action.digit_6","role":"action","actions":[{"verb":"digit_6","label_i18n":{"es":"Digito 6","en":"Digit 6"}}]},{"id":"calc.action.digit_7","role":"action","actions":[{"verb":"digit_7","label_i18n":{"es":"Digito 7","en":"Digit 7"}}]},{"id":"calc.action.digit_8","role":"action","actions":[{"verb":"digit_8","label_i18n":{"es":"Digito 8","en":"Digit 8"}}]},{"id":"calc.action.digit_9","role":"action","actions":[{"verb":"digit_9","label_i18n":{"es":"Digito 9","en":"Digit 9"}}]},{"id":"calc.action.dot","role":"action","actions":[{"verb":"dot","label_i18n":{"es":"Punto decimal","en":"Decimal point"}}]},{"id":"calc.action.equals","role":"action","actions":[{"verb":"equals","label_i18n":{"es":"Calcular resultado","en":"Compute result"}}]},{"id":"calc.action.op_add","role":"action","actions":[{"verb":"add","label_i18n":{"es":"Sumar","en":"Add"}}]},{"id":"calc.action.op_subtract","role":"action","actions":[{"verb":"subtract","label_i18n":{"es":"Restar","en":"Subtract"}}]},{"id":"calc.action.op_multiply","role":"action","actions":[{"verb":"multiply","label_i18n":{"es":"Multiplicar","en":"Multiply"}}]},{"id":"calc.action.op_divide","role":"action","actions":[{"verb":"divide","label_i18n":{"es":"Dividir","en":"Divide"}}]},{"id":"calc.action.clear","role":"action","actions":[{"verb":"clear","label_i18n":{"es":"Limpiar todo","en":"Clear all"}}]},{"id":"calc.action.backspace","role":"action","actions":[{"verb":"backspace","label_i18n":{"es":"Borrar ultimo digito","en":"Backspace"}}]},{"id":"calc.action.percent","role":"action","actions":[{"verb":"percent","label_i18n":{"es":"Porcentaje","en":"Percent"}}]}]};
+    function reg() {
+      if (window.NAC && window.NAC.register) {
+        try { window.NAC.register(manifest); }
+        catch (e) { if (window.console) console.error('NAC.register failed', e); }
+      }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reg);
+    else reg();
+  })();
+</script>
+<link rel="stylesheet" href="pilot.css">
+<script src="pilot.bundle.js"></script>
+</body>
+</html>

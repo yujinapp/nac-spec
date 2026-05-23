@@ -825,7 +825,7 @@
   <div class="container">
     <span class="kanji" aria-hidden="true">&#27005;</span>
     <span class="brand">NAC<small>Native Agent Contract</small></span>
-    <span class="pill">v2.2 &middot; experimental</span>
+    <span class="pill">v2.4.0 &middot; stable</span>
     <button class="icon-btn"
             id="autopilot-toggle"
             data-nac-id="nac_landing.autopilot.toggle"
@@ -955,10 +955,90 @@
           <span class="bench-stat-sep">&middot;</span>
           <span><strong>1h 23min</strong> wall-clock</span>
           <span class="bench-stat-sep">&middot;</span>
-          <span><strong>fully reproducible</strong> · bundle included</span>
+          <span><strong>fully reproducible</strong> &middot; bundle included</span>
         </p>
         <span class="bench-card-cta">
           See results &amp; methodology &rarr;
+        </span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Conduit case study callout -->
+<section class="bench-callout"
+         data-nac-id="nac_landing.section.conduit"
+         data-nac-role="section">
+  <div class="container">
+    <a class="bench-card"
+       href="conduit/"
+       data-nac-id="nac_landing.conduit_card.link"
+       data-nac-role="action"
+       data-nac-action="open_conduit">
+      <div class="bench-card-left">
+        <span class="bench-kanji" aria-hidden="true">&#26085;</span>
+      </div>
+      <div class="bench-card-body">
+        <div class="bench-card-eyebrow">CASE STUDY &middot; 2026-05 &middot; CONDUIT (REALWORLD)</div>
+        <h2 class="bench-card-title">
+          Forge migrated Conduit -- 47 React components, $0.46, ~70 seconds -- and auto-generated 66 e2e tests across 4 frameworks. 4.7&times; more cases than the fork's hand-written Cypress.
+        </h2>
+        <p class="bench-card-quote">
+          <strong>--ai-apply</strong> walks JSX with Claude
+          &nbsp;&middot;&nbsp;
+          <strong>59 manifest elements</strong>, semantic IDs + imperative verbs
+          &nbsp;&middot;&nbsp;
+          <strong>4 frameworks</strong> (Playwright/Cypress/Vitest/WDIO)
+        </p>
+        <p class="bench-card-stats">
+          <span><strong>47 files</strong> scanned, 34 decorated</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>~$0.50</strong> end-to-end</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>SPA-aware</strong> bridge (MutationObserver on route change)</span>
+        </p>
+        <span class="bench-card-cta">
+          Read the Conduit case study &rarr;
+        </span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Migration paper callout -->
+<section class="bench-callout"
+         data-nac-id="nac_landing.section.migration"
+         data-nac-role="section">
+  <div class="container">
+    <a class="bench-card"
+       href="migration/"
+       data-nac-id="nac_landing.migration_card.link"
+       data-nac-role="action"
+       data-nac-action="open_migration">
+      <div class="bench-card-left">
+        <span class="bench-kanji" aria-hidden="true">&#22411;</span>
+      </div>
+      <div class="bench-card-body">
+        <div class="bench-card-eyebrow">MIGRATION PAPER &middot; 2026-05</div>
+        <h2 class="bench-card-title">
+          One vanilla calculator, three NAC3 decoration paths -- Forge silent, Forge assisted, Sumi manual. All three hit 5/5 functional. The reading is in the deltas.
+        </h2>
+        <p class="bench-card-quote">
+          <strong>$0.045</strong> per decoration via Forge
+          &nbsp;&middot;&nbsp;
+          <strong>15/15</strong> dispatch tasks OK
+          &nbsp;&middot;&nbsp;
+          <strong>+24%</strong> manual i18n bloat
+        </p>
+        <p class="bench-card-stats">
+          <span><strong>3 decorations</strong> compared</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>byte-by-byte</strong> diff</span>
+          <span class="bench-stat-sep">&middot;</span>
+          <span><strong>live demos</strong> &middot; drive each calc with Pilot</span>
+        </p>
+        <span class="bench-card-cta">
+          Read the migration paper &rarr;
         </span>
       </div>
     </a>
@@ -1059,6 +1139,19 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
            data-nac-id="nac_landing.democard.v23editor.open"
            data-nac-role="action"
            data-nac-action="open">Try the editor &rarr;</a>
+      </div>
+
+      <div class="demo-card" data-nac-id="nac_landing.democard.v24disambig" data-nac-role="region">
+        <div class="head">
+          <span class="file">example-v24-disambiguation.php</span>
+          <span class="version">v2.4 stable</span>
+        </div>
+        <p>Strict resolution + disambiguation contract. Two reservations share the suffix <code>__urgent</code>. A "cancel urgent" call would have silently picked the first match under the v2.3 lenient indexOf fallback. v2.4 throws <code>ambiguous_qualifier</code> with <code>err.candidates</code> + emits <code>nac:disambiguation_requested</code> so the chat / voice host can prompt "did you mean A or B?". The lenient-simulation button shows the silent damage path for contrast.</p>
+        <a class="open"
+           href="example-v24-disambiguation.php"
+           data-nac-id="nac_landing.democard.v24disambig.open"
+           data-nac-role="action"
+           data-nac-action="open">Try disambiguation &rarr;</a>
       </div>
 
       <div class="demo-card" data-nac-id="nac_landing.democard.react" data-nac-role="region">
@@ -1417,7 +1510,7 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     <a href="https://rpaforce.com"
        data-nac-id="nac_landing.footer.yujin"
        data-nac-role="action" data-nac-action="open">Yujin</a>
-    <span style="margin-left: auto; color: var(--color-text-3);">v2.2.0 &middot; 2026-05-10</span>
+    <span style="margin-left: auto; color: var(--color-text-3);">v2.4.0 &middot; 2026-05-23</span>
   </div>
 </footer>
 
@@ -1484,9 +1577,9 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
 </aside>
 
 <!-- ============== NAC runtime + chat ============== -->
-<script src="js/nac.js?v=v22-2026-05-10b"></script>
-<script src="js/nac-v2-extensions.js?v=v22-2026-05-10b"></script>
-<script src="js/nac-chat-client.js?v=v22-2026-05-10b"></script>
+<script src="js/nac.js?v=v24-2026-05-23"></script>
+<script src="js/nac-v2-extensions.js?v=v24-2026-05-23"></script>
+<script src="js/nac-chat-client.js?v=v24-2026-05-23"></script>
 
 <!-- ============== Landing wiring ============== -->
 <script>
@@ -1508,8 +1601,8 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
 
     NAC.register({
       plugin_slug: 'nac_landing',
-      version: '2.2.0',
-      nac_version: '2.2',
+      version: '2.4.0',
+      nac_version: '2.4',
       elements: [
         /* Topbar */
         { id: 'nac_landing.topbar', role: 'region',
@@ -1620,8 +1713,8 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     /* Chat plugin manifest -- registered separately so chat is its own plugin scope. */
     NAC.register({
       plugin_slug: 'chat',
-      version: '2.2.0',
-      nac_version: '2.2',
+      version: '2.4.0',
+      nac_version: '2.4',
       elements: [
         { id: 'chat.lang', role: 'field',
           label_i18n: li('Idioma del chat','Chat language','Idioma do chat','Langue du chat','Lingua del chat','Chat-Sprache','チャット言語','聊天语言','chat ki bhasha','لغة المحادثة') },

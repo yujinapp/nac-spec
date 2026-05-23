@@ -41,6 +41,7 @@
   .ad-state-pill[data-state="speaking"]{background:rgba(79,91,135,0.95);color:#fff;
         animation:pulse 1.4s ease-in-out infinite;}
   .ad-state-pill[data-state="confirmed"]{background:rgba(42,109,42,0.95);color:#fff;}
+  .ad-state-pill[data-state="closed"]{background:rgba(120,120,120,0.95);color:#fff;}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
   .ad-lang-select{position:absolute;top:14px;right:14px;padding:6px 10px;
                   border-radius:6px;border:0;font-size:11px;font-family:inherit;
@@ -101,6 +102,25 @@
               text-align:center;line-height:1.5;z-index:5;}
   .ad-success.visible{display:flex;}
   .ad-success-check{font-size:72px;margin-bottom:14px;}
+  /* Pablo 2026-05-14: email capture on success so every contact
+     creates a lead with at least an email in PROD CRM. */
+  .ad-lead-form{margin-top:18px;width:100%;max-width:340px;
+                display:flex;flex-direction:column;gap:10px;
+                font-size:14px;font-weight:400;}
+  .ad-lead-form label{opacity:.85;}
+  .ad-lead-form input{padding:10px 12px;border-radius:8px;
+                      border:1px solid rgba(255,255,255,.4);
+                      background:rgba(255,255,255,.1);color:#fff;
+                      font-size:15px;}
+  .ad-lead-form input::placeholder{color:rgba(255,255,255,.55);}
+  .ad-lead-form button{padding:10px 14px;border-radius:8px;
+                       border:0;background:#fff;color:#1e5b1e;
+                       font-weight:600;font-size:14px;cursor:pointer;}
+  .ad-lead-form button:hover{background:#f3f3f3;}
+  .ad-lead-form .ad-lead-done{font-size:13px;opacity:.85;display:none;}
+  .ad-lead-form.sent input,
+  .ad-lead-form.sent button{display:none;}
+  .ad-lead-form.sent .ad-lead-done{display:block;}
 
   /* Smartphone -- portrait phones, narrow tablets. */
   @media (max-width: 600px) {
@@ -159,6 +179,18 @@
     <div class="ad-success" id="success-overlay">
       <div class="ad-success-check">&#10003;</div>
       <div id="success-text">Order confirmed</div>
+      <form class="ad-lead-form" id="lead-form" autocomplete="off"
+            data-nac-id="atlas_pro_ad.lead_capture" data-nac-role="form">
+        <label id="lead-label" for="lead-email">Te enviamos confirmacion a:</label>
+        <input type="email" id="lead-email" name="lead_email"
+               placeholder="tu@email.com" required maxlength="200"
+               data-nac-id="atlas_pro_ad.lead_email" data-nac-role="field" />
+        <button type="submit" id="lead-submit"
+                data-nac-id="atlas_pro_ad.lead_submit"
+                data-nac-role="action"
+                data-nac-action="submit_email">Enviar</button>
+        <span class="ad-lead-done" id="lead-done">Gracias, te llegara la confirmacion.</span>
+      </form>
     </div>
   </div>
 
@@ -242,61 +274,114 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const I18N = {
   es: { labels: ['Talle','Color','Cantidad','Entrega'],
-        states: { idle:'Listo', listening:'Escuchando', thinking:'Pensando', speaking:'Hablando', confirmed:'Confirmado' },
+        states: { idle:'Listo', listening:'Escuchando', thinking:'Pensando', speaking:'Hablando', confirmed:'Confirmado', closed:'Cerrado' },
         mic: { idle:'Hablar', recording:'Grabando' },
         submit:'Confirmar pedido', success:'Pedido confirmado',
         bcp:'es-ES' },
   en: { labels: ['Size','Color','Quantity','Delivery'],
-        states: { idle:'Ready', listening:'Listening', thinking:'Thinking', speaking:'Speaking', confirmed:'Confirmed' },
+        states: { idle:'Ready', listening:'Listening', thinking:'Thinking', speaking:'Speaking', confirmed:'Confirmed', closed:'Closed' },
         mic: { idle:'Talk', recording:'Recording' },
         submit:'Confirm order', success:'Order confirmed',
         bcp:'en-US' },
   pt: { labels: ['Tamanho','Cor','Quantidade','Entrega'],
-        states: { idle:'Pronto', listening:'Ouvindo', thinking:'Pensando', speaking:'Falando', confirmed:'Confirmado' },
+        states: { idle:'Pronto', listening:'Ouvindo', thinking:'Pensando', speaking:'Falando', confirmed:'Confirmado', closed:'Encerrado' },
         mic: { idle:'Falar', recording:'Gravando' },
         submit:'Confirmar pedido', success:'Pedido confirmado',
         bcp:'pt-BR' },
   fr: { labels: ['Taille','Couleur','Quantite','Livraison'],
-        states: { idle:'Pret', listening:'Ecoute', thinking:'Reflexion', speaking:'Parle', confirmed:'Confirme' },
+        states: { idle:'Pret', listening:'Ecoute', thinking:'Reflexion', speaking:'Parle', confirmed:'Confirme', closed:'Ferme' },
         mic: { idle:'Parler', recording:'Enregistrement' },
         submit:'Confirmer la commande', success:'Commande confirmee',
         bcp:'fr-FR' },
   it: { labels: ['Taglia','Colore','Quantita','Consegna'],
-        states: { idle:'Pronto', listening:'In ascolto', thinking:'Pensando', speaking:'Parlando', confirmed:'Confermato' },
+        states: { idle:'Pronto', listening:'In ascolto', thinking:'Pensando', speaking:'Parlando', confirmed:'Confermato', closed:'Chiuso' },
         mic: { idle:'Parla', recording:'Registrazione' },
         submit:'Conferma ordine', success:'Ordine confermato',
         bcp:'it-IT' },
   de: { labels: ['Groesse','Farbe','Anzahl','Lieferung'],
-        states: { idle:'Bereit', listening:'Hoert', thinking:'Denkt', speaking:'Spricht', confirmed:'Bestaetigt' },
+        states: { idle:'Bereit', listening:'Hoert', thinking:'Denkt', speaking:'Spricht', confirmed:'Bestaetigt', closed:'Beendet' },
         mic: { idle:'Sprich', recording:'Aufnahme' },
         submit:'Bestellung bestaetigen', success:'Bestellung bestaetigt',
         bcp:'de-DE' },
   ja: { labels: ['サイズ','色','数量','配送'],
-        states: { idle:'準備完了', listening:'聞いています', thinking:'考え中', speaking:'話す', confirmed:'確認済み' },
+        states: { idle:'準備完了', listening:'聞いています', thinking:'考え中', speaking:'話す', confirmed:'確認済み', closed:'終了' },
         mic: { idle:'話す', recording:'録音中' },
         submit:'注文を確認', success:'注文確認',
         bcp:'ja-JP' },
   zh: { labels: ['尺码','颜色','数量','配送'],
-        states: { idle:'准备好', listening:'正在听', thinking:'思考中', speaking:'说话', confirmed:'已确认' },
+        states: { idle:'准备好', listening:'正在听', thinking:'思考中', speaking:'说话', confirmed:'已确认', closed:'已关闭' },
         mic: { idle:'说话', recording:'录音中' },
         submit:'确认订单', success:'订单已确认',
         bcp:'zh-CN' },
   hi: { labels: ['size','color','matra','delivery'],
-        states: { idle:'taiyar', listening:'sun raha', thinking:'soch raha', speaking:'bol raha', confirmed:'pushtikrit' },
+        states: { idle:'taiyar', listening:'sun raha', thinking:'soch raha', speaking:'bol raha', confirmed:'pushtikrit', closed:'band' },
         mic: { idle:'bolo', recording:'recording' },
         submit:'order pushtikrit karo', success:'order pushtikrit',
         bcp:'hi-IN' },
   ar: { labels: ['المقاس','اللون','الكمية','التوصيل'],
-        states: { idle:'جاهز', listening:'يستمع', thinking:'يفكر', speaking:'يتحدث', confirmed:'مؤكد' },
+        states: { idle:'جاهز', listening:'يستمع', thinking:'يفكر', speaking:'يتحدث', confirmed:'مؤكد', closed:'مغلق' },
         mic: { idle:'تحدث', recording:'تسجيل' },
         submit:'تأكيد الطلب', success:'تم تأكيد الطلب',
         bcp:'ar-SA' },
 };
 
-const ENDPOINT_PARSE  = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/parse';
-const ENDPOINT_SUBMIT = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/submit';
-const ENDPOINT_TTS    = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/tts';
-const ENDPOINT_STT    = 'https://rpaforce.com/crm_desa/api/v1/ad-orchestrator/stt';
+/* Pablo 2026-05-14: lead-capture form strings (10 locales). Shown
+   inside the success overlay after a confirmed order so every visitor
+   leaves at least an email. ASCII-only where the script allows;
+   ja/zh/hi/ar keep their native script. */
+const LEAD_I18N = {
+  es: { prompt:'Te enviamos la confirmacion del pedido a:', send:'Enviar', done:'Gracias, te llegara la confirmacion.', err:'Email invalido.', placeholder:'tu@email.com' },
+  en: { prompt:'Send order confirmation to:', send:'Send', done:'Thanks, your confirmation is on the way.', err:'Invalid email.', placeholder:'you@email.com' },
+  pt: { prompt:'Enviamos a confirmacao do pedido para:', send:'Enviar', done:'Obrigado, a confirmacao esta a caminho.', err:'Email invalido.', placeholder:'voce@email.com' },
+  fr: { prompt:'Confirmation de commande envoyee a :', send:'Envoyer', done:'Merci, la confirmation arrive.', err:'Email invalide.', placeholder:'vous@email.com' },
+  it: { prompt:'Inviamo la conferma a:', send:'Invia', done:'Grazie, la conferma sta arrivando.', err:'Email non valida.', placeholder:'tu@email.com' },
+  de: { prompt:'Bestellbestaetigung senden an:', send:'Senden', done:'Danke, die Bestaetigung kommt gleich.', err:'Ungueltige E-Mail.', placeholder:'du@email.de' },
+  ja: { prompt:'注文確認をお送りします:', send:'送信', done:'ありがとうございます。確認をお送りします。', err:'無効なメール。', placeholder:'you@email.com' },
+  zh: { prompt:'订单确认发送至:', send:'发送', done:'谢谢,确认即将发送。', err:'邮箱无效。', placeholder:'you@email.com' },
+  hi: { prompt:'order confirmation bhej rahe hain:', send:'bhejo', done:'shukriya, confirmation aa rahi hai.', err:'ghalat email.', placeholder:'you@email.com' },
+  ar: { prompt:'سنرسل تأكيد الطلب إلى:', send:'إرسال', done:'شكراً، سيصلك التأكيد قريباً.', err:'بريد غير صالح.', placeholder:'you@email.com' },
+};
+
+/* Pablo 2026-05-14: close-lost goodbye. Fired after IDLE_TIMEOUT_MS of
+   buyer inactivity (no STT and no slot fill). Spoken via TTS, then the
+   mic + agent are torn down so the page stops listening and the LLM
+   stops being called -- no token burn after the visitor walked away.
+   ASCII-only where the script allows; native script for ja/zh/hi/ar. */
+const CLOSE_LOST_I18N = {
+  es: 'Parece que no estas ahi. Gracias por tu interes, cuando quieras seguimos. Hasta luego.',
+  en: 'Looks like you stepped away. Thanks for stopping by, come back any time. Bye for now.',
+  pt: 'Parece que voce saiu. Obrigado pela visita, volte quando quiser. Ate logo.',
+  fr: 'On dirait que vous etes parti. Merci de votre visite, revenez quand vous voulez. A bientot.',
+  it: 'Sembra che tu ti sia allontanato. Grazie per essere passato, torna quando vuoi. A presto.',
+  de: 'Es scheint, du bist weg. Danke fuer dein Interesse, komm jederzeit wieder. Bis dann.',
+  ja: '少し離れたみたいですね。お越しいただきありがとうございました。またいつでもどうぞ。',
+  zh: '看起来您离开了。感谢光临,随时欢迎再来。再见。',
+  hi: 'lagta hai aap chale gaye. shukriya, jab marzi wapas aana. alvida.',
+  ar: 'يبدو أنك ابتعدت. شكراً لاهتمامك، عد في أي وقت. إلى اللقاء.',
+};
+
+/* Pablo 2026-05-14: idle watchdog (2 min). After this much elapsed
+   time without (a) a non-empty STT result OR (b) a slot getting filled,
+   the demo fires closeAndExit(): speaks the goodbye above, tears down
+   the mic + AudioContext + headset, and disables further mic activation
+   for the rest of the session. Prevents infinite token burn when the
+   visitor walked away or the conversation cannot progress. 2 min
+   accommodates slow / hesitant visitors per Pablo. */
+const IDLE_TIMEOUT_MS = 120000;
+let lastBuyerActivityAt = 0;
+let idleWatchdog        = null;
+let orderClosed         = false;  /* terminal flag: true after submit OR close-lost */
+let submitInFlight      = false;  /* idempotency guard for doSubmit */
+
+/* Pablo 2026-05-14: switched to PROD CRM at yujin.app/crm so real
+   leads land there, not crm_desa sandbox. The endpoints exist on both
+   targets (deploy pushes to crm_desa/ and yujin.app/crm/). */
+const ENDPOINT_PARSE       = 'https://yujin.app/crm/api/v1/ad-orchestrator/parse';
+const ENDPOINT_SUBMIT      = 'https://yujin.app/crm/api/v1/ad-orchestrator/submit';
+const ENDPOINT_TTS         = 'https://yujin.app/crm/api/v1/ad-orchestrator/tts';
+const ENDPOINT_LEAD_UPDATE = 'https://yujin.app/crm/api/v1/ad-orchestrator/lead-update';
+const ENDPOINT_STT    = 'https://yujin.app/crm/api/v1/ad-orchestrator/stt';
+const ENDPOINT_TRANSCRIPT_LOG = 'https://yujin.app/crm/api/v1/ad-orchestrator/transcript-log';
 const AD_SLUG = 'atlas-pro';
 const PRODUCT_SKU = 'atlas-pro-2026';
 
@@ -315,6 +400,95 @@ const SELLER_EMAIL_OVERRIDE = URL_PARAMS.get('seller') || '';
 const TTS_DISABLE = URL_PARAMS.get('tts') === 'off';
 const DEBUG = URL_PARAMS.get('debug') === '1';
 const HEADSET_MODE = URL_PARAMS.get('mode') !== 'ptt'; /* default ON; ?mode=ptt = old behavior */
+/* Pablo 2026-05-13: opt-out of silence-driven handleUtterance('').
+   Default OFF (=> silence retry stays enabled for humans). External
+   agents (record-demo.mjs, future NAC3 agentic clients) pass
+   ?mic_silence_retry=off so the VAD path never round-trips an empty
+   utterance to /parse. The agent fully controls turn cadence and
+   does not need Atlas Pro re-prompting between agent NAC.utter
+   calls. With this flag ON, the seller's "are you still there"
+   rephrase at silence_count=2 stops firing inside scripted runs
+   while staying intact for real human buyers. */
+const SILENCE_RETRY_DISABLED = URL_PARAMS.get('mic_silence_retry') === 'off';
+
+/* Pablo 2026-05-13: opt-out of auto-mic-reopen after each speak().
+   In PTT mode, startMicSoon fires after every speak() to reopen
+   the mic so a human visitor can interrupt. For scripted recordings
+   (record-demo.mjs) the agent fully controls turn cadence and the
+   getUserMedia call interferes with Playwright's recordVideo --
+   webm encoder mysteriously stops writing frames after a few mic
+   open/close cycles, which left test07/08/09 mp4s frozen on the
+   last frame from minute ~1:11-1:21. With ?auto_listen=off, the
+   page never re-opens the mic spontaneously and the webm stays
+   recording the full duration of the conversation. The actual
+   autoListenDisabled write happens AFTER its `let` declaration
+   below (TDZ-safe). */
+const AUTO_LISTEN_INITIAL = URL_PARAMS.get('auto_listen') !== 'off';
+
+/* Pablo 2026-05-13: per-session conversation log.
+   Every seller phrase + every buyer phrase gets ts_start + ts_end +
+   text, posted to the server as a single JSONL line so we can compare
+   what Pablo hears in the video against the actual script. The
+   PAGE_LOAD_T0 marker fixes the absolute zero so timestamps stay
+   coherent across the session. The run_id ends up in the URL of the
+   log file the server writes:
+     logs/ad_transcripts/run_<lang>_<UTC>_<rand>.jsonl
+   IMPORTANT: this block MUST live AFTER URL_PARAMS is declared --
+   the run_id template reads URL_PARAMS.get('lang'). The earlier
+   commit placed it above URL_PARAMS, which threw a TDZ
+   ('Cannot access URL_PARAMS before initialization') at module
+   evaluation time and bricked the page. */
+const RUN_ID = (function () {
+  const d = new Date();
+  const pad = (n, w) => String(n).padStart(w || 2, '0');
+  const stamp = d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate())
+    + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds());
+  const rnd = Math.random().toString(36).slice(2, 8);
+  return 'run_' + (URL_PARAMS.get('lang') || 'xx') + '_' + stamp + '_' + rnd;
+})();
+/* Expose on window so external agents (record-demo.mjs, ad
+   integrators) can read it without parsing the module scope. */
+try { window.RUN_ID = RUN_ID; } catch (_) {}
+const PAGE_LOAD_T0 = Date.now();
+let TRANSCRIPT_SEQ = 0;
+function transcriptLog(role, textStr, tsStartMs, tsEndMs, extra) {
+  if (typeof textStr !== 'string') return;
+  if (textStr.trim() === '') return;
+  const ev = {
+    run_id:        RUN_ID,
+    seq:           ++TRANSCRIPT_SEQ,
+    role:          role,                            /* 'seller' | 'buyer' */
+    ts_page_start: tsStartMs - PAGE_LOAD_T0,
+    ts_page_end:   tsEndMs   - PAGE_LOAD_T0,
+    ts_wall_start: new Date(tsStartMs).toISOString(),
+    ts_wall_end:   new Date(tsEndMs).toISOString(),
+    duration_ms:   Math.max(0, tsEndMs - tsStartMs),
+    text:          textStr,
+    lang:          (URL_PARAMS.get('lang') || 'en'),
+    extra:         extra || null,
+  };
+  /* Fire-and-forget; do NOT await. We never want the log POST to
+     block conversation. sendBeacon when available so the log
+     survives a page unload (e.g., user closes tab mid-utterance).
+     IMPORTANT: type:'text/plain' is a CORS-safelisted content type,
+     so the browser does NOT issue a preflight OPTIONS request. With
+     'application/json' the preflight was being rejected by the
+     rpaforce.com vhost for this specific endpoint and the log POST
+     never reached the server. The server reads php://input as raw
+     bytes and json_decode handles either content type. */
+  try {
+    const body = JSON.stringify(ev);
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: 'text/plain;charset=UTF-8' });
+      navigator.sendBeacon(ENDPOINT_TRANSCRIPT_LOG, blob);
+    } else {
+      fetch(ENDPOINT_TRANSCRIPT_LOG, {
+        method:'POST', headers:{'Content-Type':'text/plain;charset=UTF-8'},
+        body, mode:'cors', credentials:'omit', keepalive: true,
+      }).catch(() => {});
+    }
+  } catch (_) {}
+}
 function debugLog(msg, data) {
   if (data !== undefined) console.warn('[ad]', msg, data); else console.warn('[ad]', msg);
   if (DEBUG) showNarrator('[debug] ' + msg + (data !== undefined ? ' ' + JSON.stringify(data) : ''));
@@ -342,9 +516,20 @@ if (!I18N[lang]) lang = 'en';
 let ttsBudgetExhausted = false;
 let currentAudio = null;
 let turnId = 0; /* increments on every new turn; in-flight handlers compare to abort stale work */
-let autoListenDisabled = false; /* disables auto-mic-reopen after a fatal SR error (e.g. network) */
+/* Init from URL param ?auto_listen=off (Pablo 2026-05-13). When true, every
+   silence path / startMicSoon / startMic short-circuits to setState('idle')
+   without touching the mic. Avoids the getUserMedia churn that breaks
+   Playwright's recordVideo in scripted runs. */
+let autoListenDisabled = !AUTO_LISTEN_INITIAL; /* default false; ?auto_listen=off -> true */
+/* Pablo 2026-05-13: wall-clock ts of when the buyer most recently
+   started speaking. Set by VAD speech-detected branch (server STT)
+   and by recognition.onspeechstart (webkit). Consumed + cleared by
+   handleUtterance when it logs the buyer transcript. Falls back to
+   Date.now() if absent (e.g. NAC.utter agent-driven utterances do
+   not open the mic). */
+let lastBuyerSpeechStartedAtWall = 0;
 let micWatchdog = null;          /* timeout to force-abort runaway SR sessions */
-const MIC_MAX_MS = 15000;        /* hard ceiling per recognition session */
+const MIC_MAX_MS = 25000;        /* hard ceiling per recognition session (Pablo 2026-05-13: raised from 15s so PRE_SPEECH 12s + normal answer + SILENCE fits) */
 let networkRetryBudget = 1;      /* one auto-retry per user-initiated session; resets on click/result/lang switch */
 let sttBudgetExhausted = false;  /* server STT over budget OR key missing -- fall back to webkitSR permanently this session */
 let serverSttBroken = false;     /* server STT failed for a transient reason this session -- prefer webkitSR going forward */
@@ -395,7 +580,21 @@ function setLang(newLang) {
   $('label-delivery').textContent = t.labels[3];
   $('mic-label').textContent = recording ? t.mic.recording : t.mic.idle;
   $('ad-submit').textContent = t.submit;
+  /* Pablo 2026-05-14: keep lead-form copy in sync with the demo lang. */
+  applyLeadFormI18N(lang);
   setState(recording ? 'listening' : 'idle');
+}
+
+function applyLeadFormI18N(lng) {
+  const f = LEAD_I18N[lng] || LEAD_I18N.en;
+  const lbl = document.getElementById('lead-label');
+  const inp = document.getElementById('lead-email');
+  const btn = document.getElementById('lead-submit');
+  const dne = document.getElementById('lead-done');
+  if (lbl) lbl.textContent = f.prompt;
+  if (inp) inp.placeholder = f.placeholder;
+  if (btn) btn.textContent = f.send;
+  if (dne) dne.textContent = f.done;
 }
 
 function setState(s) {
@@ -406,7 +605,17 @@ function setState(s) {
 }
 
 function showNarrator(text) {
+  /* Pablo 2026-05-14: only one of {narrator, transcript} is visible
+     at a time. Seller turn overrides buyer's stale transcript and
+     vice-versa -- they used to coexist in the same vertical band
+     and overlapped visually when the user paused mid-conversation. */
   $('narrator').textContent = text;
+  $('transcript').textContent = '';
+}
+
+function showTranscript(text) {
+  $('transcript').textContent = text;
+  $('narrator').textContent = '';
 }
 
 function focusSlot(name) {
@@ -452,9 +661,43 @@ async function speakGoogleTTS(text) {
       const audio = new Audio('data:' + (j.mime || 'audio/mp3') + ';base64,' + j.audio_base64);
       currentAudio = audio;
       speaking = true;
-      audio.onended = () => { speaking = false; resolve(true); };
-      audio.onerror = (e) => { debugLog('audio play error', e && e.message); speaking = false; resolve(false); };
-      audio.play().catch((e) => { debugLog('audio play rejected', e && e.message); speaking = false; resolve(false); });
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        speaking = false;
+        if (safetyTimer) clearTimeout(safetyTimer);
+        resolve(ok);
+      };
+      audio.onended = () => finish(true);
+      audio.onerror = (e) => { debugLog('audio play error', e && e.message); finish(false); };
+      audio.play().catch((e) => { debugLog('audio play rejected', e && e.message); finish(false); });
+      /* Safety net: the muted-audio + AudioContext-suspend race
+         can swallow the `ended` event in some Chromium build
+         combinations, leaving this Promise pending forever and
+         hanging the conversational turn. Watch the metadata load,
+         then arm a timer for duration + 2s. If `ended` did not
+         already fire by then, we resolve(true) and continue --
+         the audio almost certainly played to completion; we just
+         did not get the callback. Without this, agents driving
+         the demo via NAC.utter hit invoke timeout on whichever
+         turn happens to race the wrong way (reproduced in the
+         video-gen pipeline). 2026-05-12. */
+      let safetyTimer = null;
+      const armSafety = () => {
+        if (safetyTimer || settled) return;
+        const dur = isFinite(audio.duration) && audio.duration > 0
+          ? audio.duration : 12;
+        safetyTimer = setTimeout(() => {
+          debugLog('speakGoogleTTS safety net fired (onended never arrived)', { duration: dur });
+          finish(true);
+        }, Math.max(1500, dur * 1000 + 2000));
+      };
+      audio.onloadedmetadata = armSafety;
+      audio.oncanplay = armSafety;
+      /* Worst-case: metadata never loads. Arm a hard cap at 25 s. */
+      setTimeout(armSafety, 800);
+      setTimeout(() => { if (!settled) finish(true); }, 25000);
     });
   } catch (e) {
     debugLog('Google TTS network error', e && e.message);
@@ -464,14 +707,20 @@ async function speakGoogleTTS(text) {
 
 async function speak(text) {
   if (!text) return;
+  const sellerStartTs = Date.now();
   setState('speaking');
   if (HEADSET_MODE && headsetReady) conversationState = 'speaking';
   if (!TTS_DISABLE && !ttsBudgetExhausted) {
     const ok = await speakGoogleTTS(text);
-    if (ok) { afterSpeak(); return; }
+    if (ok) {
+      transcriptLog('seller', text, sellerStartTs, Date.now(), { engine: 'google_tts' });
+      afterSpeak();
+      return;
+    }
     /* fall through to web speech if Google TTS failed */
   }
   await speakWebSpeech(text);
+  transcriptLog('seller', text, sellerStartTs, Date.now(), { engine: 'web_speech' });
   afterSpeak();
 }
 
@@ -497,10 +746,12 @@ function startMicSoon(delay = 120) {
      visitor can answer immediately without waiting for a perceptible
      pause -- people tend to interrupt the end of the assistant's
      sentence. */
+  if (orderClosed) return; /* terminal -- no more mic activation */
   if (HEADSET_MODE && headsetReady) return; /* mic never closes in headset mode */
   if (autoListenDisabled) { setState('idle'); return; }
   clearTimeout(autoListenTimer);
   autoListenTimer = setTimeout(() => {
+    if (orderClosed) return;
     if (!recording && !speaking && !autoListenDisabled) startMic();
   }, delay);
 }
@@ -515,6 +766,7 @@ function startMicSoon(delay = 120) {
    ===================================================================== */
 
 async function bootHeadset() {
+  if (orderClosed) return false; /* terminal -- never re-boot the mic */
   if (!HEADSET_MODE) return false;
   if (!serverSttSupported()) return false;
   if (headsetReady) return true;
@@ -571,6 +823,12 @@ function startHeadsetTick() {
   let lastTickAt = performance.now();
   let lastLoudInSlice = 0;
   headsetTickInterval = setInterval(() => {
+    /* Pablo 2026-05-14: kill switch -- terminal flag stops the tick. */
+    if (orderClosed) {
+      clearInterval(headsetTickInterval);
+      headsetTickInterval = null;
+      return;
+    }
     const now = performance.now();
     const dt = now - lastTickAt;
     lastTickAt = now;
@@ -633,6 +891,7 @@ function startHeadsetSlice() {
   /* Idempotent: if MR is already running (pre-armed from afterSpeak),
      don't create a new one. Caller likely transitioned conversationState
      and just wants to ensure capture is active. */
+  if (orderClosed) return; /* terminal -- no new slices */
   if (headsetSliceMR && headsetSliceMR.state === 'recording') return;
   if (!headsetStream) return;
   const mimeType = pickRecorderMime();
@@ -694,12 +953,16 @@ function startHeadsetSlice() {
       if (!txt) {
         silenceCount++;
         conversationState = 'listening';
+        if (SILENCE_RETRY_DISABLED) {
+          debugLog('SILENCE_RETRY_DISABLED -- skip headset empty handleUtterance (scripted mode)');
+          return;
+        }
         handleUtterance('');
         return;
       }
       lastTranscript = txt;
       allTranscript += (allTranscript ? ' / ' : '') + txt;
-      $('transcript').textContent = '"' + txt + '"';
+      showTranscript('"' + txt + '"');
       silenceCount = 0;
       /* handleUtterance will set state to thinking, call /parse, then
          speak() the reply -- which flips conversationState back to
@@ -790,6 +1053,7 @@ function serverSttSupported() {
 
 async function startMic() {
   if (recording) return;
+  if (orderClosed) return; /* terminal -- no more mic activation */
   /* Server STT is the primary path. Fall back to webkit if it is broken
      for this session OR if the browser does not support MediaRecorder. */
   if (!sttBudgetExhausted && !serverSttBroken && serverSttSupported()) {
@@ -866,8 +1130,15 @@ async function startMicServerSTT() {
   const buf = analyser ? new Uint8Array(analyser.fftSize) : null;
   const THRESH = 6;        /* RMS-ish threshold (0..128). Lowered: soft speakers were being missed. */
   const SILENCE_MS = 1400; /* stop after this much silence post-speech */
-  const PRE_SPEECH_MS = 6000; /* if no speech detected at all, stop and submit anyway */
-  const HARD_CAP_MS = 9000;   /* absolute ceiling per session */
+  /* Pablo 2026-05-13: 6000ms was too tight for humans. A buyer who
+     pauses to think (looking at the shoe, deciding a color, etc.)
+     blew through the window in <1 question and the seller insisted
+     1s after finishing its previous reply, which felt rude. 12s
+     leaves comfortable thinking room without making the wait feel
+     dead. HARD_CAP raised in tandem so PRE_SPEECH + a normal answer
+     + SILENCE_MS still fits inside it. */
+  const PRE_SPEECH_MS = 12000; /* if no speech detected at all, stop and submit anyway */
+  const HARD_CAP_MS = 20000;   /* absolute ceiling per session */
 
   const t0 = performance.now();
   function tick() {
@@ -879,7 +1150,11 @@ async function startMicServerSTT() {
       for (let i = 0; i < buf.length; i++) { const v = buf[i] - 128; sum += v*v; }
       const rms = Math.sqrt(sum / buf.length);
       if (rms > THRESH) {
-        if (!speechStartedAt) { speechStartedAt = now; debugLog('speech detected (vad)'); }
+        if (!speechStartedAt) {
+          speechStartedAt = now;
+          lastBuyerSpeechStartedAtWall = Date.now();
+          debugLog('speech detected (vad)');
+        }
         lastLoudAt = now;
       }
     }
@@ -920,6 +1195,11 @@ async function startMicServerSTT() {
     if (blob.size < 4096) {
       silenceCount++;
       debugLog('server STT: blob too small, treating as silence', blob.size);
+      if (SILENCE_RETRY_DISABLED) {
+        debugLog('SILENCE_RETRY_DISABLED -- skip empty handleUtterance (scripted mode)');
+        setState('idle');
+        return;
+      }
       handleUtterance('');
       return;
     }
@@ -964,12 +1244,17 @@ async function startMicServerSTT() {
       networkRetryBudget = 1;
       if (!txt) {
         silenceCount++;
+        if (SILENCE_RETRY_DISABLED) {
+          debugLog('SILENCE_RETRY_DISABLED -- skip ptt empty handleUtterance (scripted mode)');
+          setState('idle');
+          return;
+        }
         handleUtterance('');
         return;
       }
       lastTranscript = txt;
       allTranscript += (allTranscript ? ' / ' : '') + txt;
-      $('transcript').textContent = '"' + txt + '"';
+      showTranscript('"' + txt + '"');
       silenceCount = 0;
       handleUtterance(txt);
     } catch (e) {
@@ -1031,7 +1316,11 @@ async function startMicWebkitSR() {
   let heardAudio = false;
   let fatalError = false; /* set on errors that should NOT auto-restart the mic */
   recognition.onaudiostart  = () => { debugLog('audio captured'); };
-  recognition.onspeechstart = () => { heardAudio = true; debugLog('speech detected'); };
+  recognition.onspeechstart = () => {
+    heardAudio = true;
+    lastBuyerSpeechStartedAtWall = Date.now();
+    debugLog('speech detected');
+  };
   recognition.onresult = (ev) => {
     gotResult = true;
     networkRetryBudget = 1; /* success -- replenish the budget for future blips */
@@ -1039,7 +1328,7 @@ async function startMicWebkitSR() {
     lastConfidence = ev.results[0] ? ev.results[0][0].confidence : null;
     lastTranscript = txt;
     allTranscript += (allTranscript ? ' / ' : '') + txt;
-    $('transcript').textContent = '"' + txt + '"';
+    showTranscript('"' + txt + '"');
     silenceCount = 0;
     handleUtterance(txt);
   };
@@ -1087,6 +1376,11 @@ async function startMicWebkitSR() {
     }
     if (!gotResult) {
       stopMic();
+      if (SILENCE_RETRY_DISABLED) {
+        debugLog('SILENCE_RETRY_DISABLED -- skip webkit-SR empty handleUtterance (scripted mode)');
+        silenceCount++;
+        return;
+      }
       if (heardAudio) {
         /* user spoke but recognition didn't parse it -- treat as utterance the LLM
            can react to with "didn't catch that, can you repeat?" */
@@ -1145,12 +1439,31 @@ function stopAll() {
 }
 
 async function handleUtterance(text) {
+  /* Pablo 2026-05-14: terminal flag gate. If the order was confirmed
+     (or the demo closed-lost on idle), drop the turn silently. Saves
+     tokens + prevents the agent from "waking up" after teardown. */
+  if (orderClosed) return;
+  /* Reset idle watchdog on any non-empty buyer utterance. Empty
+     utterances (silence retries) don't count -- the watchdog measures
+     real engagement. */
+  if (text && text.trim() !== '') bumpActivity();
   const myTurn = ++turnId;
   const myLang = lang;
   setState('thinking');
   $('ad-mic').disabled = true;
   const manifest = buildManifestForLLM();
   conversationHistory.push({ role:'user', text });
+
+  /* Pablo 2026-05-13: log buyer transcript line. Only log non-empty
+     utterances -- the silence retries are already short-circuited
+     server-side and would clutter the run log otherwise. For
+     NAC.utter (agent-driven) sessions lastBuyerSpeechStartedAtWall
+     is 0, so start ts collapses to now and the duration shows 0. */
+  if (typeof text === 'string' && text.trim() !== '') {
+    const buyerStartTs = lastBuyerSpeechStartedAtWall || Date.now();
+    transcriptLog('buyer', text, buyerStartTs, Date.now(), null);
+    lastBuyerSpeechStartedAtWall = 0;
+  }
   let resp;
   try {
     const r = await fetch(ENDPOINT_PARSE, {
@@ -1196,6 +1509,16 @@ async function handleUtterance(text) {
     else if (a.verb === 'click' && a.nac_id === 'atlas_pro_ad.submit') shouldSubmit = true;
   });
 
+  /* Pablo 2026-05-14: server-side safety net. If the LLM signals the
+     conversation is done (complete=true + next_question_focus='done')
+     but forgot to emit the click action explicitly, treat it as
+     confirmation. Mirrors the prompt's rule 8 intent. */
+  if (!shouldSubmit && resp.complete === true
+      && (resp.next_question_focus === 'done')
+      && allRequiredSlotsFilled()) {
+    shouldSubmit = true;
+  }
+
   if (resp.next_question_focus) {
     lastQuestionFocus = resp.next_question_focus;
     if (['size','color','qty','delivery'].includes(resp.next_question_focus)) {
@@ -1207,7 +1530,13 @@ async function handleUtterance(text) {
     conversationHistory.push({ role:'assistant', text: resp.reply });
     showNarrator(resp.reply);
     await speak(resp.reply);
+    /* Pablo 2026-05-14: kick the 2-min idle watchdog on the first
+       agent reply -- that's when the conversation actually starts. */
+    if (!idleWatchdog && !orderClosed) startIdleWatchdog();
   }
+
+  /* If teardown happened during speak() (success path), bail. */
+  if (orderClosed) return;
 
   $('ad-mic').disabled = false;
   if (resp.complete && allRequiredSlotsFilled()) {
@@ -1248,6 +1577,8 @@ function applyFill(nacId, value) {
   $('value-' + key).textContent = slots[key];
   $('slot-' + key).classList.add('filled');
   if (key === 'color') applyColorTexture(slots[key]);
+  /* Slot fill = real progress; reset the 2-min idle watchdog. */
+  bumpActivity();
   document.dispatchEvent(new CustomEvent('nac:field:changed', {
     detail:{plugin:'atlas_pro_ad', field_id:nacId, value:slots[key]}
   }));
@@ -1275,7 +1606,7 @@ function allRequiredSlotsFilled() {
 }
 
 const PERSONA_BY_LANG = {
-  es: 'Sos vendedor/a experto/a de Atlas Pro, zapatillas premium de running. Hablas como una persona en un local de zapatillas: tono coloquial, calido, cercano. Tutaes (no formal). Conoces a fondo el producto: tres colores disponibles -- beige (crema calida), midnight (negro profundo), street (gris piedra). Moves la venta paso a paso, una pregunta por turno, siempre terminando con UNA pregunta clara que mueve la conversacion para adelante. NO uses jerga corporate ni emojis. Sos vendedor/a, no chatbot.',
+  es: 'Eres vendedor/a experto/a de Atlas Pro, zapatillas premium de running. Hablas como una persona en un local de zapatillas: tono coloquial, cálido, cercano. Usa CASTELLANO NEUTRO con tuteo (no formal, no voseo argentino, no usted). NUNCA uses formas voseo como "sos", "tenés", "querés", "preferís", "llevás", "usás", "decime", "contame", "mirá", "pasá", "escribí", "movés", "hacé". USA SIEMPRE las formas tuteo equivalentes: "eres", "tienes", "quieres", "prefieres", "llevas", "usas", "dime", "cuéntame", "mira", "pasa", "escribe", "mueves", "haz". Conoces a fondo el producto: tres colores disponibles -- beige (crema cálida), midnight (negro profundo), street (gris piedra). Mueves la venta paso a paso, una pregunta por turno, siempre terminando con UNA pregunta clara que mueve la conversación para adelante. NO uses jerga corporativa ni emojis. Eres vendedor/a, no chatbot. Escribe en español natural con las tildes que correspondan y los signos de apertura cuando correspondan. NUNCA describas la ortografía ni deletrees palabras; escríbelas directamente.',
   en: "You are an expert Atlas Pro salesperson selling premium running shoes. Speak like a real person in a shoe shop: warm, casual, friendly. You know the product cold: three colors available -- beige (warm cream), midnight (deep black), street (stone grey). Move the sale forward one question at a time, always ending with ONE clear question. No corporate jargon, no emojis. You are a salesperson, not a chatbot.",
 };
 
@@ -1286,7 +1617,7 @@ function buildPersona() {
   /* Inject the name into the persona itself so the model treats it as a hard
      contextual fact, not an optional hint. */
   const nameLine = lang === 'es'
-    ? ' EL VISITANTE SE LLAMA ' + name + '. Saludalo por su nombre en el primer mensaje y volve a usarlo una o dos veces mas en la conversacion (no en cada frase, no robotico). Nunca inventes apellido.'
+    ? ' EL VISITANTE SE LLAMA ' + name + '. Saludalo por su nombre en el primer mensaje y volvé a usarlo una o dos veces más en la conversación (no en cada frase, no robótico). Nunca inventes apellido.'
     : ' THE VISITOR IS NAMED ' + name + '. Greet them by name in your first message and use the name one or two more times across the conversation (not every sentence, not robotic). Never invent a last name.';
   return base + nameLine;
 }
@@ -1308,7 +1639,62 @@ function buildManifestForLLM() {
   };
 }
 
+/* Pablo 2026-05-14: bump activity timestamp. Called from applyFill
+   (slot got filled = progress) and from handleUtterance after a
+   non-empty STT result (buyer is engaged). Resets the 2-min idle
+   watchdog. */
+function bumpActivity() {
+  lastBuyerActivityAt = Date.now();
+}
+
+/* Pablo 2026-05-14: start the idle watchdog. Runs every 5s, checks
+   if the buyer has been silent + no slot fill for more than
+   IDLE_TIMEOUT_MS (2 min). Skips the check while the agent is
+   thinking or speaking -- only counts buyer-side silence. */
+function startIdleWatchdog() {
+  if (idleWatchdog) return;
+  bumpActivity();
+  idleWatchdog = setInterval(() => {
+    if (orderClosed) { clearInterval(idleWatchdog); idleWatchdog = null; return; }
+    /* Don't penalise the buyer while the agent is busy. */
+    const st = $('state-pill').getAttribute('data-state');
+    if (st === 'thinking' || st === 'speaking') return;
+    if (Date.now() - lastBuyerActivityAt > IDLE_TIMEOUT_MS) {
+      clearInterval(idleWatchdog);
+      idleWatchdog = null;
+      closeAndExit('idle_timeout');
+    }
+  }, 5000);
+}
+
+/* Pablo 2026-05-14: terminal teardown. Sets orderClosed=true (which
+   gates every entry point that could re-open the mic or fire another
+   /parse), speaks the goodbye, then tears down audio + mic + headset.
+   reason in { 'order_confirmed', 'idle_timeout' }. */
+async function closeAndExit(reason) {
+  if (orderClosed) return;
+  orderClosed = true;
+  if (idleWatchdog) { clearInterval(idleWatchdog); idleWatchdog = null; }
+  clearTimeout(autoListenTimer); autoListenTimer = null;
+  if (reason === 'idle_timeout') {
+    const msg = CLOSE_LOST_I18N[lang] || CLOSE_LOST_I18N.en;
+    setState('speaking');
+    showNarrator(msg);
+    try { await speak(msg); } catch (_) {}
+  }
+  /* Hide the manual confirm button + disable mic. Visual state goes
+     to 'closed' so the visitor sees the conversation ended. */
+  try { $('ad-submit').classList.remove('visible'); } catch (_) {}
+  try { $('ad-mic').disabled = true; } catch (_) {}
+  setState('closed');
+  try { tearDownEverything(); } catch (_) {}
+}
+
 async function doSubmit() {
+  /* Idempotency: protects against (a) verbal-confirm click action +
+     manual button click racing, (b) double-tap on the button. */
+  if (submitInFlight || orderClosed) return;
+  submitInFlight = true;
   setState('thinking');
   try {
     const r = await fetch(ENDPOINT_SUBMIT, {
@@ -1328,16 +1714,77 @@ async function doSubmit() {
       setState('confirmed');
       $('success-text').textContent = I18N[lang].success;
       $('success-overlay').classList.add('visible');
+      /* Pablo 2026-05-14: remember the freshly created lead id so the
+         email capture form can update it without creating a duplicate. */
+      lastLeadId = j.lead_id || 0;
       document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
         detail:{plugin:'atlas_pro_ad', action_id:'atlas_pro_ad.submit', lead_id:j.lead_id}
       }));
       await speak(I18N[lang].success);
+      /* Pablo 2026-05-14: terminal cleanup after the success TTS. Stops
+         the mic + headset + AudioContext + /parse loop so the page
+         doesn't keep listening (and the LLM doesn't keep being called)
+         while the visitor reads the success overlay. The email-capture
+         form is independent: it POSTs directly to /lead-update on form
+         submit without re-engaging the mic. */
+      orderClosed = true;
+      if (idleWatchdog) { clearInterval(idleWatchdog); idleWatchdog = null; }
+      clearTimeout(autoListenTimer); autoListenTimer = null;
+      try { $('ad-submit').classList.remove('visible'); } catch (_) {}
+      try { $('ad-mic').disabled = true; } catch (_) {}
+      try { tearDownEverything(); } catch (_) {}
     } else {
       showNarrator('Submit error.');
     }
   } catch (_) {
     showNarrator('Network error on submit.');
+  } finally {
+    submitInFlight = false;
   }
+}
+
+let lastLeadId = 0;
+
+/* Pablo 2026-05-14: capture visitor email on success overlay. Pure
+   client-side: POST {lead_id, lead_email} to PROD CRM lead-update
+   endpoint; flips the form to "sent" state and never re-submits.
+   Tolerates a missing lead_id (offline/network fail at /submit) by
+   POSTing slots+email back through /submit as a fresh row. */
+async function leadFormSubmit(ev) {
+  ev.preventDefault();
+  const form  = document.getElementById('lead-form');
+  const inp   = document.getElementById('lead-email');
+  const email = (inp.value || '').trim();
+  if (!email || email.indexOf('@') < 1) {
+    const f = LEAD_I18N[lang] || LEAD_I18N.en;
+    showNarrator(f.err);
+    return;
+  }
+  try {
+    if (lastLeadId > 0) {
+      await fetch(ENDPOINT_LEAD_UPDATE, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ lead_id: lastLeadId, lead_email: email }),
+        mode:'cors', credentials:'omit',
+      });
+    } else {
+      /* Cold path -- /submit never returned a lead_id. Replay with the
+         email so PROD still gets the row. */
+      await fetch(ENDPOINT_SUBMIT, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          ad_slug: AD_SLUG, ad_lang: lang, product_sku: PRODUCT_SKU,
+          slots: slots, transcript: allTranscript,
+          confidence: lastConfidence,
+          seller_email: SELLER_EMAIL_OVERRIDE || 'pablo.kuschnirof@gmail.com',
+          lead_email: email,
+          website: '',
+        }),
+        mode:'cors', credentials:'omit',
+      });
+    }
+  } catch (_) { /* even on failure, surface "thanks" so visitor moves on */ }
+  form.classList.add('sent');
 }
 
 function registerNac3Manifest() {
@@ -1345,10 +1792,23 @@ function registerNac3Manifest() {
   const li = (es,en,pt,fr,it,de,ja,zh,hi,ar) => ({es,en,pt,fr,it,de,ja,zh,hi,ar});
   try {
     window.NAC.register({
-      plugin_slug:'atlas_pro_ad', version:'2.0.0', nac_version:'2.2',
+      plugin_slug:'atlas_pro_ad', version:'2.1.0', nac_version:'2.3',
       elements:[
         {id:'atlas_pro_ad.mic',      role:'action',
-         actions:[{verb:'listen', label_i18n: li('Hablar','Talk','Falar','Parler','Parla','Sprich','話す','说话','bolo','تحدث')}],
+         actions:[
+           {verb:'listen', label_i18n: li('Hablar','Talk','Falar','Parler','Parla','Sprich','話す','说话','bolo','تحدث')},
+           /* v2.3 payload-bearing verb. An external agent calls
+              NAC.utter('atlas_pro_ad.mic', { text, lang? }) and the
+              demo treats it as if STT had recognised that text. The
+              same /parse + /tts loop runs; the same slot updates +
+              audio responses fire. */
+           {verb:'utter',
+            payload_schema: {
+              text: { type:'string', required:true, max:4000 },
+              lang: { type:'string', enum:['en','es','pt','fr','it','de','ja','zh','hi','ar'] },
+            },
+            label_i18n: li('Decir','Utter','Falar','Dire','Dire','Sagen','話す','说','bolo','قُل')}
+         ],
          label_i18n: li('Hablar','Talk','Falar','Parler','Parla','Sprich','話す','说话','bolo','تحدث')},
         {id:'atlas_pro_ad.submit',   role:'action',
          actions:[{verb:'submit', label_i18n: li('Confirmar pedido','Confirm order','Confirmar pedido','Confirmer la commande','Conferma ordine','Bestellung bestaetigen','注文を確認','确认订单','order pushtikrit karo','تأكيد الطلب')}],
@@ -1419,6 +1879,7 @@ function initThree() {
 }
 
 $('ad-mic').addEventListener('click', async () => {
+  if (orderClosed) return; /* mic disabled after submit / close-lost */
   if (HEADSET_MODE && headsetReady) {
     /* In headset mode the mic is always on. Click "force-submits" the
        current slice if recording, or transitions to listening otherwise. */
@@ -1461,6 +1922,7 @@ $('ad-stop').addEventListener('click', () => {
   stopAll();
 });
 $('ad-submit').addEventListener('click', doSubmit);
+$('lead-form').addEventListener('submit', leadFormSubmit);
 $('lang-select').addEventListener('change', async (e) => {
   stopAll();
   autoListenDisabled = false;
@@ -1482,6 +1944,63 @@ $('lang-select').addEventListener('change', async (e) => {
 $('lang-select').value = lang;
 setLang(lang);
 registerNac3Manifest();
+
+/* v2.3 payload-bearing verb listener. An external agent calls
+   NAC.utter('atlas_pro_ad.mic', {text, lang}) and the runtime
+   dispatches a nac:action:requested event on the mic element.
+   We process it as if STT had recognised that text -- the same
+   /parse + /tts + slot-update + audio-playback loop runs. The
+   agent's request_id is echoed back in the ack so it can
+   correlate. */
+document.addEventListener('nac:action:requested', async function (ev) {
+  const d = ev && ev.detail;
+  if (!d || d.plugin !== 'atlas_pro_ad') return;
+  if (d.action_id !== 'atlas_pro_ad.mic')  return;
+  if (d.verb     !== 'utter')              return;
+  const text = d.payload && d.payload.text;
+  if (!text || typeof text !== 'string') {
+    document.dispatchEvent(new CustomEvent('nac:action:failed', {
+      detail: {
+        plugin:     'atlas_pro_ad',
+        action_id:  d.action_id,
+        request_id: d.request_id,
+        error:      'invalid',
+        message:    'payload.text required (non-empty string)',
+      },
+    }));
+    return;
+  }
+  /* Optional lang switch on a per-turn basis. The demo's existing
+     setLang() handles bcp / persona / labels. */
+  const wantLang = d.payload && d.payload.lang;
+  if (wantLang && typeof wantLang === 'string' && I18N[wantLang] && wantLang !== lang) {
+    try { setLang(wantLang); } catch (_) {}
+  }
+  try {
+    await handleUtterance(text);
+    document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+      detail: {
+        plugin:        'atlas_pro_ad',
+        action_id:     d.action_id,
+        request_id:    d.request_id,
+        verb:          'utter',
+        slots:         Object.assign({}, slots),
+        last_transcript: lastTranscript || null,
+      },
+    }));
+  } catch (err) {
+    document.dispatchEvent(new CustomEvent('nac:action:failed', {
+      detail: {
+        plugin:     'atlas_pro_ad',
+        action_id:  d.action_id,
+        request_id: d.request_id,
+        error:      'handler_error',
+        message:    err && err.message || String(err),
+      },
+    }));
+  }
+});
+
 initThree();
 
 /* Headset mode needs an explicit user gesture to obtain mic permission

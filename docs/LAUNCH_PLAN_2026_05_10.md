@@ -1,5 +1,7 @@
 # NAC3 v2.2 launch plan -- autonomous Sumi run, 2026-05-10
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 This file is the canonical playbook for the autonomous launch
 session of 2026-05-10. It documents what got built, why, in what
 order, and what is still required before prod.
@@ -209,7 +211,7 @@ cancel further wakeups until told otherwise.
 
 Every commit during the session lands on `main` and triggers the
 deploy.yml pipeline -- the public yujin.app/nac-spec/ updates
-automatically. The repository at github.com/yujinapp/nac-spec
+automatically. The repository at github.com/pkuschnirof/rpaforce-crm
 is the single source of truth.
 
 Time-stamps and commit SHAs are this doc's job. Update it

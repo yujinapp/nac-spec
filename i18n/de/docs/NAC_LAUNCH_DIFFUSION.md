@@ -1,3 +1,5 @@
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 ---
 translation_source: docs/NAC_LAUNCH_DIFFUSION.md
 translation_source_hash: cbdf7b9e5ec3ed43a39111aab16fbe59c222a05a835429ea43148036320fc5cf
@@ -104,7 +106,7 @@ Ein 6-Tweet-Thread:
 3. „Wie klein: 3 HTML-Attribute pro Element. (Code-Screenshot)"
 4. „Was du bekommst: stabile Namen, deterministische Completion-Events, 10-Locale i18n out of the box, Provenance via HMAC + isTrusted, Auto-Validierung."
 5. „Live-Demo unter yujin.app/nac-spec -- vier Demos, eine davon mit einem Claude Sonnet Chat-Backend verbunden. Sprich damit."
-6. „React + Angular Adoptionsleitfäden + funktionierende Fallstudien unter github.com/yujinapp/nac-spec. Spec unter yujin.app/nac-spec/SPEC.md."
+6. „React + Angular Adoptionsleitfäden + funktionierende Fallstudien unter github.com/pkuschnirof/rpaforce-crm. Spec unter yujin.app/nac-spec/SPEC.md."
 
 ### LinkedIn
 
@@ -156,7 +158,7 @@ Auf YouTube + Vimeo veröffentlicht.
 ## Zu messende Metriken
 
 - Wöchentliche npm-Downloads von `@nac3/runtime`.
-- GitHub-Stars + Forks auf `yujinapp/nac-spec` und
+- GitHub-Stars + Forks auf `pkuschnirof/rpaforce-crm` und
   `pkuschnirof/yujin`.
 - Demo-Seitenaufrufe unter yujin.app/nac-spec/ (Server-Zugriffslogs).
 - Anzahl eröffneter GitHub-Issues (Proxy für Engagement).

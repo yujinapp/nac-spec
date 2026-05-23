@@ -1,0 +1,313 @@
+/* Yujin Pilot -- embeddable chat + voice cockpit for NAC3 apps.
+   Yujin design tokens, sumi-e accent. All classes scoped under .yp-. */
+
+.yp-root, .yp-root * { box-sizing: border-box; }
+
+.yp-root {
+  --yp-ink:       #1a1a1a;
+  --yp-paper:     #fafaf7;
+  --yp-paper-2:   #f0eee8;
+  --yp-line:      #2a2a2a;
+  --yp-soft:      #888;
+  --yp-amber:     #f5a623;
+  --yp-indigo:    #5b6cff;
+  --yp-teal:      #2bb39f;
+  --yp-success:   #4caf50;
+  --yp-danger:    #e74c3c;
+  --yp-font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--yp-font);
+  color: var(--yp-ink);
+}
+
+/* ---------- floating button ---------- */
+.yp-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #d0d0c8;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483600;
+  transition: transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.yp-fab:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+.yp-fab.yp-off { opacity: 0.35; filter: grayscale(1); }
+.yp-fab svg { width: 36px; height: 36px; }
+
+.yp-fab-menu {
+  position: absolute;
+  bottom: 64px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #d0d0c8;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  padding: 6px 0;
+  min-width: 180px;
+  display: none;
+  z-index: 2147483601;
+}
+.yp-fab-menu.yp-open { display: block; }
+.yp-fab-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  color: var(--yp-ink);
+}
+.yp-fab-menu button:hover { background: var(--yp-paper-2); }
+.yp-fab-menu hr { border: 0; border-top: 1px solid #e8e6e0; margin: 4px 0; }
+
+/* ---------- chat panel (small mode) ---------- */
+.yp-panel {
+  position: fixed;
+  bottom: 88px;
+  right: 20px;
+  width: 360px;
+  max-height: 60vh;
+  background: #fff;
+  border: 1px solid #d0d0c8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 2147483600;
+  overflow: hidden;
+}
+.yp-panel.yp-open { display: flex; }
+
+.yp-panel.yp-mode-large {
+  width: 720px;
+  max-height: 80vh;
+  bottom: 88px;
+  right: 20px;
+}
+
+.yp-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e8e6e0;
+  background: var(--yp-paper);
+}
+.yp-header .yp-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+}
+.yp-header .yp-model {
+  font-size: 11px;
+  color: var(--yp-soft);
+  margin-right: 8px;
+}
+.yp-header button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: var(--yp-soft);
+  font-size: 14px;
+  line-height: 1;
+}
+.yp-header button:hover { color: var(--yp-ink); }
+
+.yp-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.yp-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.yp-msg {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.yp-msg-role {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--yp-soft);
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.yp-msg-text {
+  background: var(--yp-paper);
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.yp-msg.yp-user .yp-msg-text { background: var(--yp-indigo); color: #fff; align-self: flex-end; max-width: 90%; }
+.yp-msg.yp-user .yp-msg-role { text-align: right; }
+.yp-msg.yp-assistant .yp-msg-text { background: var(--yp-paper-2); }
+.yp-msg.yp-system .yp-msg-text { background: #fff2dc; border: 1px solid #f3d490; color: #6b4a00; }
+.yp-msg.yp-error .yp-msg-text { background: #fde8e8; border: 1px solid #f8b6b6; color: #7a1c1c; }
+
+.yp-actions-trace {
+  font-size: 11px;
+  color: var(--yp-soft);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  margin-top: 2px;
+}
+
+.yp-input-row {
+  display: flex;
+  border-top: 1px solid #e8e6e0;
+  padding: 8px;
+  background: var(--yp-paper);
+  gap: 6px;
+  align-items: center;
+}
+.yp-input-row textarea {
+  flex: 1;
+  font: inherit;
+  resize: none;
+  border: 1px solid #d8d5cc;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background: #fff;
+  min-height: 32px;
+  max-height: 100px;
+}
+.yp-input-row textarea:focus { outline: none; border-color: var(--yp-indigo); }
+.yp-input-row .yp-btn {
+  border: 0;
+  background: var(--yp-indigo);
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.yp-input-row .yp-btn:hover { filter: brightness(1.1); }
+.yp-input-row .yp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.yp-input-row .yp-mic {
+  background: #fff;
+  color: var(--yp-ink);
+  border: 1px solid #d8d5cc;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.yp-input-row .yp-mic.yp-listening { background: var(--yp-danger); color: #fff; border-color: var(--yp-danger); }
+
+/* ---------- large mode: pizarra ---------- */
+.yp-pizarra {
+  border-top: 1px solid #e8e6e0;
+  padding: 10px 12px;
+  background: var(--yp-paper);
+  max-height: 30vh;
+  overflow-y: auto;
+  display: none;
+}
+.yp-mode-large .yp-pizarra { display: block; }
+.yp-pizarra h4 { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; color: var(--yp-soft); letter-spacing: 0.05em; }
+.yp-pizarra-block { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: #fff; padding: 6px 8px; border-radius: 4px; margin-bottom: 4px; }
+.yp-pizarra-block.yp-ok    { border-left: 3px solid var(--yp-success); }
+.yp-pizarra-block.yp-fail  { border-left: 3px solid var(--yp-danger); }
+
+/* ---------- settings modal ---------- */
+.yp-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 2147483602;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.yp-modal-backdrop.yp-open { display: flex; }
+.yp-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 560px;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+}
+.yp-modal-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e8e6e0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.yp-modal-header .yp-title { flex: 1; font-size: 15px; }
+.yp-modal-header button { background: none; border: 0; cursor: pointer; font-size: 18px; color: var(--yp-soft); }
+.yp-modal-body { overflow-y: auto; padding: 14px 16px; font-size: 13px; }
+.yp-modal-body section { margin-bottom: 18px; }
+.yp-modal-body h3 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--yp-soft); }
+.yp-modal-body label { display: block; margin-bottom: 8px; font-size: 12px; color: var(--yp-ink); }
+.yp-modal-body label .yp-lbl-text { display: block; margin-bottom: 3px; font-weight: 500; }
+.yp-modal-body input[type="text"],
+.yp-modal-body input[type="password"],
+.yp-modal-body select,
+.yp-modal-body textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid #d8d5cc;
+  border-radius: 6px;
+  background: #fff;
+}
+.yp-modal-body input:focus,
+.yp-modal-body select:focus { outline: none; border-color: var(--yp-indigo); }
+.yp-modal-body .yp-hint { font-size: 11px; color: var(--yp-soft); margin-top: 2px; }
+.yp-modal-body .yp-warn-box {
+  background: #fff8e6;
+  border: 1px solid #f3d490;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #6b4a00;
+  margin-bottom: 16px;
+}
+.yp-modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e8e6e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: var(--yp-paper);
+}
+.yp-modal-footer .yp-btn {
+  border: 0;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.yp-modal-footer .yp-btn-primary { background: var(--yp-indigo); color: #fff; }
+.yp-modal-footer .yp-btn-cancel  { background: #e8e6e0; color: var(--yp-ink); }
+.yp-modal-footer .yp-btn:hover   { filter: brightness(1.08); }

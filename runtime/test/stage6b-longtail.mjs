@@ -21,7 +21,7 @@ import path from 'node:path';
 import url  from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const NAC_PATH = path.resolve(__dirname, '..', '..', '..', 'yujin.app', 'nac-spec', 'js', 'nac.js');
+const NAC_PATH = path.resolve(__dirname, '..', '..', 'js', 'nac.js');
 
 let failures = 0;
 function assert(name, ok, detail) {

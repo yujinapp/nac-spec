@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NAC3 v2.3 — Migration paper · Forge silent vs assisted vs manual</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700;9..144,900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #18181b; --ink-soft: #3f3f46; --ink-mute: #71717a;
+    --paper: #faf8f3; --paper-warm: #f3efe6;
+    --rule: #1a1a1a; --accent: #b8390a; --accent-soft: #d8651e;
+    --teal: #2d6357; --gold: #9a7a1e;
+    --red-bg: rgba(184, 57, 10, 0.06); --teal-bg: rgba(45, 99, 87, 0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; line-height: 1.6;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'onum' 1;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(184, 57, 10, 0.03), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(45, 99, 87, 0.03), transparent 40%);
+  }
+  .grain { position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.4; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+  .topbar { border-bottom: 1px solid var(--rule); padding: 18px 0 16px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.12em; }
+  .topbar a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  .topbar .meta { color: var(--ink-mute); }
+
+  .hero { padding: 80px 0 60px; border-bottom: 2px solid var(--rule); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--accent); margin-bottom: 28px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(48px, 7vw, 88px);
+    line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 32px; font-variation-settings: 'opsz' 144; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .standfirst { font-size: 22px; line-height: 1.5; max-width: 760px; color: var(--ink-soft); }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+  .hero-meta { margin-top: 48px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-mute); border-top: 1px dashed var(--ink-mute); padding-top: 28px; }
+  .hero-meta strong { display: block; font-size: 13px; color: var(--ink);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+  .ctas { margin-top: 56px; display: flex; flex-wrap: wrap; gap: 14px; }
+  .cta { display: inline-block; padding: 14px 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    text-decoration: none; transition: all 0.18s; }
+  .cta.primary { background: var(--accent); color: var(--paper); border: 1px solid var(--accent); }
+  .cta.primary:hover { background: var(--ink); border-color: var(--ink); }
+  .cta.secondary { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .cta.secondary:hover { background: var(--ink); color: var(--paper); }
+
+  .bignums { padding: 56px 0; border-bottom: 1px solid var(--rule); }
+  .bignums-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  .bignum { border-top: 2px solid var(--ink); padding-top: 16px; }
+  .bignum .label { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink-mute); margin-bottom: 12px; }
+  .bignum .value { font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: clamp(36px, 5vw, 56px); line-height: 1; letter-spacing: -0.02em;
+    color: var(--ink); margin-bottom: 8px; font-variation-settings: 'opsz' 144; }
+  .bignum .value.teal { color: var(--teal); }
+  .bignum .value.accent { color: var(--accent); }
+  .bignum .sublabel { font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+
+  .body { padding: 80px 0; }
+  .section-head { margin-bottom: 36px; }
+  .section-head .number { font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 16px; }
+  .section-head h2 { font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: clamp(36px, 4.5vw, 52px); line-height: 1.05;
+    letter-spacing: -0.015em; font-variation-settings: 'opsz' 144; }
+  .section-head h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .section-lede { font-size: 19px; line-height: 1.55; max-width: 760px;
+    color: var(--ink-soft); margin-bottom: 40px; }
+  .section-lede strong { color: var(--ink); }
+
+  .doc-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px; }
+  .doc-card { background: var(--paper-warm); border: 1px solid var(--rule);
+    padding: 36px 32px; display: flex; flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s; }
+  .doc-card:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 var(--rule); }
+  .doc-card .doc-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 14px; }
+  .doc-card h3 { font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 26px; line-height: 1.1; margin-bottom: 16px;
+    font-variation-settings: 'opsz' 100; }
+  .doc-card h3 em { font-style: italic; color: var(--accent); }
+  .doc-card p { font-size: 15px; color: var(--ink-soft); margin-bottom: 22px; flex-grow: 1; }
+  .doc-card .doc-cta { font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--ink); padding-bottom: 2px; align-self: flex-start; }
+  .doc-card .doc-cta:hover { color: var(--accent); border-color: var(--accent); }
+
+  .demos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 48px; }
+  .demo-card { background: var(--paper-warm); border: 1px solid var(--rule);
+    padding: 32px 28px; }
+  .demo-card .demo-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--teal); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+  .demo-card h4 { font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 24px; margin-bottom: 12px; font-variation-settings: 'opsz' 100; }
+  .demo-card p { font-size: 15px; color: var(--ink-soft); margin-bottom: 18px; }
+  .demo-card .nota { font-size: 13px; color: var(--ink-mute); padding: 10px 14px;
+    background: var(--paper); border-left: 3px solid var(--gold); margin-bottom: 18px;
+    font-style: italic; }
+  .demo-card .open { font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--paper); background: var(--ink); padding: 10px 18px;
+    text-decoration: none; display: inline-block; transition: background 0.18s; }
+  .demo-card .open:hover { background: var(--accent); }
+
+  .summary-box { background: var(--teal-bg); border: 1px solid var(--teal);
+    padding: 32px 28px; border-radius: 0; margin-bottom: 48px; }
+  .summary-box h3 { font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 24px; margin-bottom: 14px; color: var(--teal);
+    font-variation-settings: 'opsz' 100; }
+  .summary-box p { font-size: 16px; color: var(--ink-soft); margin-bottom: 10px; }
+  .summary-box code { font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--paper); padding: 2px 8px;
+    border: 1px solid var(--ink-mute); color: var(--accent); }
+
+  .foot { padding: 60px 0 40px; border-top: 2px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mute); }
+  .foot a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+  .foot a:hover { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 760px) {
+    .hero-meta, .bignums-grid { grid-template-columns: repeat(2, 1fr); }
+    .doc-cards, .demos { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Migration paper</div>
+    <div class="meta">
+      <a href="../index.html">← spec home</a>
+      &nbsp;·&nbsp;
+      <a href="../benchmark/index.html">600-run benchmark →</a>
+      &nbsp;·&nbsp;
+      <span>2026-05-20</span>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Migration paper · 3 paths · 1 app · byte-by-byte diff</div>
+    <h1>From raw HTML to NAC3,<br/><em>three different ways.</em></h1>
+    <p class="standfirst">
+      One vanilla calculator. Three decoration paths: <strong>Forge silent</strong> (one-shot Claude Sonnet 4.6, no human input), <strong>Forge assisted</strong> (same call plus an ambiguity round), and <strong>Sumi manual</strong> (hand-decorated by Claude Code in ~30 min). All three end up <strong>5/5 functional</strong> on the same agentic-driver task set. The interesting reading is in the deltas: id naming, role taxonomy, label density, and the dollar cost of each path over thousands of dispatches.
+    </p>
+
+    <div class="hero-meta">
+      <div><strong>1 fixture</strong>vanilla calculator (16 buttons, 4 ops)</div>
+      <div><strong>3 decorations</strong>silent · assisted · manual</div>
+      <div><strong>5 driver tasks</strong>3+4 · 12+15 · 7x8 · 100/4 · clear+2+2+2</div>
+      <div><strong>15/15 OK</strong>functional success, all three</div>
+    </div>
+
+    <div class="ctas">
+      <a class="cta primary" href="results.html">Read the results →</a>
+      <a class="cta secondary" href="methodology.html">Methodology</a>
+      <a class="cta secondary" href="byte-diff.html">Byte-by-byte diff</a>
+    </div>
+  </header>
+
+  <section class="bignums">
+    <div class="bignums-grid">
+      <div class="bignum">
+        <div class="label">Decoration cost</div>
+        <div class="value accent">$0.045</div>
+        <div class="sublabel">Forge one-shot per app, Sonnet 4.6, ~25 s</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Driver cost / 5 tasks</div>
+        <div class="value">$0.028</div>
+        <div class="sublabel">Forge silent · Sonnet 4.6</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Manual vs Forge</div>
+        <div class="value teal">+24%</div>
+        <div class="sublabel">Manual's i18n bloat costs more per dispatch</div>
+      </div>
+      <div class="bignum">
+        <div class="label">Functional success</div>
+        <div class="value">15/15</div>
+        <div class="sublabel">All three drove the calc to the right answer</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="body">
+
+    <div class="section-head">
+      <div class="number">01 / The three papers</div>
+      <h2>What we measured, <em>and how to reproduce it.</em></h2>
+    </div>
+    <p class="section-lede">
+      Three paper pages. <strong>Results</strong> covers tokens, latency, success rate, and the cost of ownership over N dispatches. <strong>Methodology</strong> documents the harness, the dispatch loop, and the role-taxonomy decisions. <strong>Byte-by-byte diff</strong> is a side-by-side of every NAC attribute set on every interactive element, plus the manifest entry comparison, plus the divergence list.
+    </p>
+
+    <div class="doc-cards">
+      <a class="doc-card" href="results.html" style="text-decoration:none">
+        <div class="doc-eyebrow">Paper 01 / Results</div>
+        <h3><em>Cost · latency · functional success.</em></h3>
+        <p>Forge produces a tighter manifest than the hand-decorated reference. Both cost the same to drive functionally. Manual carries label_i18n bloat that costs +24% input tokens per dispatch without changing the success rate.</p>
+        <span class="doc-cta">Read results →</span>
+      </a>
+      <a class="doc-card" href="methodology.html" style="text-decoration:none">
+        <div class="doc-eyebrow">Paper 02 / Methodology</div>
+        <h3><em>Harness · prompts · taxonomy.</em></h3>
+        <p>How yf migrate's silent and assisted modes work; what the role taxonomy decision tree looks like (display = field, never region); how the contract bridge wires bindAction into a host app that wasn't NAC3-aware.</p>
+        <span class="doc-cta">Read methodology →</span>
+      </a>
+      <a class="doc-card" href="byte-diff.html" style="text-decoration:none">
+        <div class="doc-eyebrow">Paper 03 / Byte-by-byte diff</div>
+        <h3><em>Every attribute, <span style="white-space:nowrap">every cell.</span></em></h3>
+        <p>Side-by-side decoration of every button by its invariant onclick handler. Side-by-side manifest entries. Divergence list with one annotated row per disagreement between silent / assisted / manual.</p>
+        <span class="doc-cta">Read the diff →</span>
+      </a>
+    </div>
+
+    <div class="section-head">
+      <div class="number">02 / Live demos</div>
+      <h2>Open each decoration <em>in your browser.</em></h2>
+    </div>
+    <p class="section-lede">
+      Four pages: the raw calculator (no NAC3 at all), and the three NAC3-decorated versions. Each NAC3 build is drop-in -- includes the runtime, the nac-bridge, and <strong>Yujin Pilot</strong> (the floating chat that drives the calc via voice + multi-provider LLM). To use Pilot, click the floating sumi-e branch, open <code style="font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--paper-warm);padding:2px 6px;border:1px solid var(--ink-mute);color:var(--accent)">Configuracion</code>, paste at least one API key (Anthropic / OpenAI / Google / DeepSeek / Groq), then ask <em>"calcula 3 mas 4"</em>.
+    </p>
+
+    <div class="demos">
+
+      <div class="demo-card">
+        <div class="demo-eyebrow">Baseline / no NAC3</div>
+        <h4>calc-raw</h4>
+        <p>The original vanilla calculator. No data-nac attributes, no manifest, no runtime. Anchors what the "before" of every migration looks like.</p>
+        <div class="nota">Note: Pilot will not appear here -- this fixture is intentionally untouched. Open the other three to see the floating button.</div>
+        <a class="open" href="demos/calc-raw/index.html" target="_blank">Open calc-raw &nbsp;↗</a>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-eyebrow">Path 01 / Forge silent</div>
+        <h4>calc-forge-silent</h4>
+        <p>Output of <code style="font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--paper);padding:2px 6px;border:1px solid var(--ink-mute)">yf migrate --ai-silent</code>. Claude Sonnet 4.6 decorated the page in one shot, no questions, no human input.</p>
+        <div class="nota">Verbs are shortened (add, subtract, multiply, divide). Display and history are role=field. No label_i18n on non-action elements.</div>
+        <a class="open" href="demos/calc-forge-silent/index.html" target="_blank">Open silent demo &nbsp;↗</a>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-eyebrow">Path 02 / Forge assisted</div>
+        <h4>calc-forge-assisted</h4>
+        <p>Output of <code style="font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--paper);padding:2px 6px;border:1px solid var(--ink-mute)">yf migrate --ai-assisted</code>. Same model + tooling as silent, but allowed to flag ambiguities. For a calculator the model raised none -- output matches silent.</p>
+        <div class="nota">Assisted only diverges from silent on apps with genuine ambiguity (e.g. two buttons that could both reasonably be a "save" verb). Calc has none.</div>
+        <a class="open" href="demos/calc-forge-assisted/index.html" target="_blank">Open assisted demo &nbsp;↗</a>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-eyebrow">Path 03 / Sumi manual</div>
+        <h4>calc-sumi-manual</h4>
+        <p>Hand-decorated by Sumi (the Claude Code agent that ran this experiment). Includes the cleaner taxonomy: an explicit keypad region, label_i18n on every element including fields and regions, op-prefixed action ids.</p>
+        <div class="nota">More structurally honest, but also +24% more input tokens per dispatch. Useful as a reference for what a "by-the-book" NAC3 decoration looks like.</div>
+        <a class="open" href="demos/calc-sumi-manual/index.html" target="_blank">Open manual demo &nbsp;↗</a>
+      </div>
+
+    </div>
+
+    <div class="summary-box">
+      <h3>Reading the demos -- what to look at first</h3>
+      <p><strong>1.</strong> Open <code>calc-raw</code> in one tab + any of the three decorated demos in another. <em>The visible UI is byte-identical</em>. NAC3 is purely additive -- decoration never changes what the user sees or how the calc behaves to mouse clicks.</p>
+      <p><strong>2.</strong> Right-click → View Source on any decorated demo. Inspect the data-nac-* attributes. Notice how Forge keeps the manifest tight while Sumi-manual carries label_i18n on every element.</p>
+      <p><strong>3.</strong> Click the floating sumi-e branch (bottom-right). Open Configuracion. Paste an Anthropic API key (Claude Sonnet 4.6 default). Ask: <em>"calcula 3 mas 4"</em>. Watch the manifest verbs dispatch in the pizarra panel. Voice STT works in Chrome / Edge.</p>
+      <p><strong>4.</strong> Each demo is fully self-contained -- nac.browser.js, nac-bridge.js, pilot.bundle.js all served from the same directory. No CDN dependencies at runtime.</p>
+    </div>
+
+    <div class="section-head">
+      <div class="number">03 / The toolchain</div>
+      <h2>Forge + Pilot. <em>Build once, drive forever.</em></h2>
+    </div>
+    <p class="section-lede">
+      <strong>Yujin Forge</strong> turned <code>calc-raw</code> into <code>calc-forge-silent</code> in 23 seconds for $0.045. <strong>Yujin Pilot</strong> embeds the multi-provider chat + voice cockpit in any Forge-decorated page. Both ship today -- Forge as a CLI (<code>npm i -g @yujin/forge</code> + <code>yf migrate</code>), Pilot as a single-file IIFE bundle injected by <code>yf pilot install</code>.
+    </p>
+
+  </main>
+
+  <footer class="foot">
+    <div style="margin-bottom: 12px">
+      NAC3 v2.3.1 · Migration paper · 2026-05-20
+    </div>
+    <div>
+      <a href="../index.html">spec home</a>
+      &nbsp;·&nbsp; <a href="../benchmark/index.html">600-run benchmark</a>
+      &nbsp;·&nbsp; <a href="../SPEC.html">SPEC</a>
+      &nbsp;·&nbsp; <a href="https://github.com/yujinapp/nac-spec" target="_blank">GitHub ↗</a>
+      &nbsp;·&nbsp; <a href="https://www.npmjs.com/package/nac-spec" target="_blank">npm ↗</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

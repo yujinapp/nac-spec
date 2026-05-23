@@ -117,14 +117,14 @@ import '@nac3/runtime/chat-client';    // reference voice + chat client
 
 ## Status
 
-- **v2.3 stable** (current). `syncPlugin` idempotent registration,
-  `data-nac-plugin-id` instance uniqueness. Validated across a
-  600-run benchmark across 5 models x 3 protocols. See
-  [`yujinapp/nac-spec/benchmark/`](https://github.com/yujinapp/nac-spec/tree/main/benchmark/).
-- v2.4 in RFC (snapshot versioning + agent authority). Code for V24-04
-  is merged with enforcement opt-in (`STRICT_VERSIONING=false` by
-  default). See
-  [`yujinapp/nac-spec/rfcs/`](https://github.com/yujinapp/nac-spec/tree/main/rfcs/).
+- **v2.4.0 stable** (2026-05-21). Zero-silent-damage strict resolution
+  + disambiguation contract: `click_by_verb` / `tab` / `tab_by_label`
+  throw `NacError` with `err.candidates` and emit
+  `nac:disambiguation_requested` instead of guessing the wrong element.
+  See `CHANGELOG.md` for the full migration note.
+- Previous stable: v2.3.1 (payload-bearing actions, F1-F7).
+- Earlier: v2.2 (strict validator, bindAction), v2.1 (data-table),
+  v2.0 (scope tree + ephemeral capture).
 
 ## Spec
 
@@ -137,7 +137,7 @@ Apache-2.0. See `LICENSE`.
 
 ## Repository
 
-[github.com/yujinapp/nac-spec](https://github.com/yujinapp/nac-spec)
+[github.com/pkuschnirof/rpaforce-crm](https://github.com/pkuschnirof/rpaforce-crm)
 (directory: `packages/nac`)
 
 ## Author

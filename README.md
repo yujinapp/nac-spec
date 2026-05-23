@@ -4,30 +4,37 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-stable-brightgreen)](https://yujin.app/nac-spec/)
-[![Spec: v2.3](https://img.shields.io/badge/spec-v2.3-blue)](SPEC.md)
-[![Benchmark: 600 runs](https://img.shields.io/badge/benchmark-600%20runs-teal)](./benchmark/)
+[![Status: stable](https://img.shields.io/badge/status-stable-success)](https://yujin.app/nac-spec/)
+[![Spec: v2.4 stable](https://img.shields.io/badge/spec-v2.4_stable-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
+[![Tests: passing](https://img.shields.io/badge/tests-passing-success)](docs/COVERAGE_REPORT_2026_05_10.md)
+[![Coverage: ~95%](https://img.shields.io/badge/coverage-95%25-success)](docs/TEST_COVERAGE_MATRIX.md)
+
+> **v2.4.0 stable shipping today** (2026-05-23) -- zero-silent-damage
+> strict resolution. The lenient `indexOf` qualifier fallback is removed:
+> `click_by_verb` / `tab` / `tab_by_label` now throw `NacError` with
+> `err.candidates` and emit `nac:disambiguation_requested` on `document`
+> when a request resolves to multiple or zero elements, so reactive
+> hosts (chat UI, voice agent, screen reader) can prompt *"did you mean
+> A or B?"* instead of silently dispatching to the wrong button.
+> Validated on the Conduit H4 benchmark: 89% cheap-model success under
+> strict (vs 67% under lenient). For assistive-software use cases, where
+> a silent wrong dispatch is unrecoverable, this is the headline change.
+> See [example-v24-disambiguation.php](example-v24-disambiguation.php),
+> [SPEC.md sec 16](SPEC.md), [CHANGELOG](packages/nac/CHANGELOG.md).
 
 ---
 
 ## What
 
-NAC3 is an experimental contract for driving web UIs from AI
-agents, voice runners, RPA bots, and accessibility tools --
-without per-app glue code.
-
-A handful of HTML attributes (`data-nac-id`, `data-nac-role`,
-`data-nac-action`) plus an optional JS manifest let any caller
-address the page by name, not by CSS selector or visual
-coordinate. The runtime resolves names to elements and emits
-deterministic events when each action finishes.
-
-Single-vendor today (Yujin) with Apache 2.0 + MIT licensing so
-adopters can fork, run, and ship without depending on Yujin's
-continuity. See [governance](#governance) for the plan to move
-to neutral stewardship as adoption grows.
+NAC3 is what ARIA would have been if it had been designed in
+2026 with LLMs in mind. A handful of HTML attributes
+(`data-nac-id`, `data-nac-role`, `data-nac-action`) plus an
+optional JS manifest let any caller -- a voice runner, a
+Playwright spec, an LLM intermediary, a screen reader, an RPA
+bot -- address the same UI by name, not by visual coordinate or
+CSS selector.
 
 ## Quick install
 
@@ -63,56 +70,31 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | Locale-dependent label selectors break across translations | Dispatch by id, not label; label_i18n is the LLM's concern |
 | Screen readers + voice control + RPA all need separate integrations | One contract; every caller speaks the same verbs |
 | LLM agents hallucinate DOM structure | Manifest declares exactly what the page accepts |
-| Cross-app workflows need per-pair glue | v2.3 (preview) interop layer routes between NAC3 apps |
-
-## Where NAC3 fits in the agent stack
-
-**NAC3 is the client-side half of agent-driven software. MCP is
-the server-side half. Use both for full-stack agents: MCP
-exposes your business logic, NAC3 exposes your UI.**
-
-NAC3 does not compete with any of these -- it overlaps in
-narrow ways and complements in others. If you only have one
-of the problems below, use the dedicated tool. If you have
-several, NAC3 unifies the contract.
-
-| Layer | What it solves | Where it stops | NAC3 relationship |
-|-------|----------------|----------------|-------------------|
-| **MCP** (Anthropic) | Agent calls server-side tools / functions | Doesn't touch the UI; agent can't navigate, fill forms, or read on-screen state | **Complement.** Use MCP for backend ops, NAC3 for the UI half. v2.3 preview adds an MCP bridge to route between NAC3 apps. |
-| **ARIA** | Accessibility tree for screen readers + switch devices | Stops at "this is a button named Save"; no verb the agent can call, no completion event | **Sits next to.** Keep your ARIA roles. Many adopters end up with `role="button"` and `data-nac-role="action"` on the same element. |
-| **`data-testid`** | Stable selectors for test runners (Cypress, Playwright) | Test-only; no manifest, no event family, no provenance, no i18n | **Superset.** NAC3 covers the testing case + voice + RPA + LLM with the same attribute, but at a higher mental cost. If you only need tests, `data-testid` is fine. |
-| **AG-UI** (CopilotKit) | Agent-to-app protocol for chat-driven UIs | Tied to the CopilotKit framework + JS runtime; less focus on RPA / a11y / cross-vendor LLMs | **Adjacent.** Different bet on the same problem space. AG-UI has Series A funding and an existing ecosystem; NAC3 is open + framework-agnostic but earlier-stage. Pick AG-UI if you're building on CopilotKit; NAC3 if you want a framework-neutral surface. |
-| **Computer Use / Browser Use** (vision-based agents) | Agent reads pixels, reasons over screenshots | Slow, expensive, and brittle on dynamic content; depends entirely on the LLM | **Fallback layer.** Vision is what the agent uses when NAC3 isn't there. NAC3 turns a 3-second pixel-reasoning round into a 30 ms named dispatch. |
-
-**Honest read of the trade:** if you're inside a single app with
-a single agent vendor, MCP (server side) + a screen-reader-grade
-ARIA pass (client side) gets you most of the way. NAC3 starts
-paying back when you have **multiple callers** (voice + chat +
-RPA + tests) or **cross-app** workflows, or when you want
-**vendor-portable** agent integrations.
+| Cross-app workflows need per-pair glue | v2.3 interop layer routes between NAC3 apps |
 
 ## Made with NAC3
 
 | App | Type | NAC3 version |
 |-----|------|--------------|
-| [Yujin CRM](https://yujin.app) | Production reference | v2.3 |
-| [Reference demos](https://yujin.app/nac-spec/) | Live, 8 examples (vanilla, React, Angular, data-table, interop, voice ad) | v2.3 |
-| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.3 |
+| [Yujin CRM](https://yujin.app) | Production reference | v2.4 |
+| [Reference demos](https://yujin.app/nac-spec/) | Live, 9 examples (vanilla, React, Angular, data-table, interop, voice ad, disambiguation) | v2.4 |
+| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.4 |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
-## Status
+## Status: stable
 
-- **v2.3** -- shipped 2026-05-20. `NAC.syncPlugin` (idempotent
-  registration), `data-nac-plugin-id` (plugin instance uniqueness).
-  Validated across a 600-run benchmark across 5 models x 3 protocols --
-  see [/benchmark/](./benchmark/). This is what `npm install @nac3/runtime`
-  delivers today.
-- **v2.2** -- shipped 2026-05-12. `NAC.register` strict
-  validator, `bindAction` helper, locale-detector hardening.
-- **v2.4** -- in RFC. Snapshot versioning + OCC (V24-04, code merged
-  but enforcement opt-in in 2.3), agent authority + interposition
-  (V24-05, draft). Targeting GA after a dedicated concurrency benchmark.
-  See [/rfcs/](./rfcs/) for status per RFC.
+- **v2.4** -- shipped 2026-05-23. Zero-silent-damage strict resolution
+  + disambiguation contract. `click_by_verb` / `tab` / `tab_by_label`
+  throw `NacError` with `err.candidates` and emit
+  `nac:disambiguation_requested` instead of guessing. Headline change
+  for assistive-software callers. Backwards-compatible with code paths
+  that already supplied unambiguous arguments. **What `npm install
+  @nac3/runtime` delivers today.**
+- **v2.3** -- shipped 2026-05-13. Payload-bearing actions
+  (`NAC.invoke(id, payload)`, `NAC.utter(id, {text, lang})`), F1-F7
+  primitives (bindTab, edit_field GA, auth-aware caps).
+- **v2.2** -- shipped 2026-05-10. `NAC.register` strict validator,
+  `bindAction` helper, locale-detector hardening.
 - **v3.0** -- roadmap. Mobile-native dialect
   (`accessibilityIdentifier` on iOS, `contentDescription` on
   Android) for non-DOM widgets.
@@ -137,27 +119,20 @@ Full docs in 10 languages (es, en, pt, fr, it, de, ja, zh, hi,
 ar) under `i18n/` -- machine-translated baseline +
 native-speaker reviewed for ja/zh/ar/hi.
 
-## Governance
+## Open standard, open governance
 
-NAC3 is stewarded by Yujin today -- one company, not a
-foundation. We say this up front because the difference matters:
-NAC3 is not yet an industry standard the way ARIA or MCP are.
-It is a vendor-authored contract published under permissive
-licenses so adopters don't depend on Yujin's continuity.
+NAC3 is currently stewarded by Yujin. The spec is Apache 2.0;
+the reference runtime is MIT. Yujin commits to moving NAC3 to a
+neutral foundation (W3C community group, Linux Foundation, or
+equivalent) if and when adoption justifies neutral governance.
+Spec changes follow the RFC process in
+[CONTRIBUTING.md](CONTRIBUTING.md) with at least 14 days of
+public comment for any public API or wire-format change.
 
-- Spec: Apache 2.0.
-- Reference runtime (`packages/nac/`): MIT.
-- Spec changes follow the RFC process in
-  [CONTRIBUTING.md](CONTRIBUTING.md) with at least 14 days of
-  public comment for any change to the public API or wire
-  format.
-
-Yujin commits to moving NAC3 to a neutral foundation (W3C
-community group, Linux Foundation, or equivalent industry body)
-if and when adoption justifies neutral governance. Until then,
-the Apache 2.0 + MIT licensing is what guarantees portability:
-adopters can fork either, run either, and ship either, today
-and after Yujin no longer exists.
+The Apache 2.0 + MIT licensing guarantees the spec + runtime
+survive any change in Yujin's corporate status. Adopters can
+fork either, run either, and ship either, today and after
+Yujin no longer exists.
 
 ## Roadmap, commercial tools
 

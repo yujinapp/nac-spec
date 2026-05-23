@@ -1,6 +1,6 @@
 # Contributing to NAC3
 
-**Spec version:** 2.2 stable (+ v2.3 interop preview).
+**Spec versions:** 2.2.x stable + 2.3.0-alpha.1 preview (added `NAC.invoke` + `NAC.utter` payload-bearing actions on 2026-05-12; v2.2 contracts unchanged).
 
 ## Governance
 

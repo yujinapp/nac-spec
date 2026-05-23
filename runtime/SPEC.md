@@ -1,11 +1,9 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.3.0
-**Status:** Stable (npm `@nac3/runtime@2.3.0`)
-**Benchmark:** 600 runs across 5 models x 3 protocols -- [results](./benchmark/)
+**Version:** 2.4.0 (stable; zero silent damage via strict resolution + disambiguation contract)
+**Status:** v2.4.0 stable -- supersedes 2.3.x
 **License:** Apache-2.0
-**Editor:** Yujin (yujin.app)
-**RFCs in flight:** see [/rfcs/](./rfcs/) for V24-04 (snapshot versioning, enforcement opt-in in 2.3.0) and V24-05 (authority, draft for 2.4).
+**Editor:** Yujin (rpaforce.com)
 
 ---
 
@@ -71,10 +69,9 @@ Every agent-resolvable element carries `data-nac-id`. The id is:
 - **A dotted path** (e.g. `deals.list.row.42.actions.delete`).
   Dots separate semantic levels; the runtime does not interpret
   them, but humans and LLMs do.
-- **Globally unique within a `(data-nac-plugin, data-nac-plugin-id)`
-  instance scope.** Two different plugins MAY share an id; the
-  runtime resolves by `(plugin, plugin_instance_id, id)` pair.
-  See sec 7.4 for the plugin slug uniqueness contract.
+- **Globally unique within a `data-nac-plugin` scope.** Two
+  different plugins MAY share an id; the runtime resolves by
+  `(plugin, id)` pair.
 - **Stable across re-renders.** Frameworks that produce a new id
   per render (random hashes, instance counters) break the contract.
 - **Stable across UI redesigns.** A button moves from the toolbar
@@ -225,9 +222,8 @@ NAC-3 callable verbs:
 Esc closes (cancel). Ctrl/Cmd+Enter saves. Click on overlay
 backdrop cancels.
 
-The v2.3 runtime ships a working reference impl and the contract is
-stable. The 600-run benchmark exercises `ai_correct_syntax` + `save`
-under the V23_EDITOR_fix_monitor task.
+Spec sec 13 will formalise the contract in v2.3; the v2.2 runtime
+ships a working reference impl so adopters can wire it today.
 Available on any field via:
 
 ```js
@@ -236,11 +232,444 @@ NAC.edit_field('invoice.client_name');
 NAC.click_by_verb('myplugin', 'edit_field', { nac_id: 'invoice.client_name' });
 ```
 
-### 5.1.2 Strict validation flag (v2.2)
+### 5.1.4 Action payload + invoke (v2.3)
 
-`NAC.STRICT_VALIDATION` (boolean, default `false` in v2.2). When
-`true`, `NAC.register()` throws an `Error` with `code='strict_validation'`
-and a `findings` array on any of:
+NAC v2.2 actions are click-and-go: an agent triggers `NAC.click(id)`
+or `NAC.click_by_verb(plugin, verb)` and the host runs whatever it
+does. This works for verb-and-state actions (`save`, `cancel`,
+`submit`, `delete`) but collapses when an action needs **data**
+from the agent -- `utter(text)`, `search(query)`,
+`send_message(body)`, `upload(file)`, `schedule(date)`,
+`translate(text, target_lang)`. The host has no way to receive
+the agent's payload via a synthetic click.
+
+v2.3 closes this gap. The contract is additive: click-style
+verbs continue to work unchanged.
+
+```ts
+NAC.invoke(action_id: string, payload: object, opts?: { timeout?: number })
+  : Promise<{ok: true, request_id: string, ack: object|null}>
+
+NAC.utter(action_id: string,
+          opts: { text: string, lang?: string, voice?: string, metadata?: object })
+  : Promise<{ok: true, request_id: string, ack: object|null}>
+```
+
+`NAC.invoke` dispatches a `nac:action:requested` `CustomEvent`
+on the host element (bubbles to document) with:
+
+```ts
+detail: {
+  action_id:  string,    // canonical nac_id of the host element
+  verb:       string,    // payload.verb || el's data-nac-action
+  payload:    object,    // arbitrary, action-specific
+  plugin:     string|null,
+  request_id: string,    // correlation token assigned by the runtime
+  ts:         number,    // Date.now()
+}
+```
+
+The host listens for `nac:action:requested`, processes the
+payload, and emits `nac:action:succeeded` (or `nac:action:failed`)
+with the same `request_id` in the detail. The runtime correlates
+by `request_id` and resolves the agent's Promise.
+
+Default timeout is **30 seconds** (vs 5 s for click). Override
+with `opts.timeout`. On timeout, the Promise rejects with
+`NacError('timeout', ...)`. As with click, a timeout means real
+failure: callers MUST treat it as such unless they have side-
+effect proof via another channel.
+
+`NAC.utter(id, opts)` is the ergonomic shortcut for the most
+common payload-bearing verb. It is equivalent to:
+
+```js
+NAC.invoke(id, { verb: 'utter', text: opts.text, lang: opts.lang });
+```
+
+#### Manifest declaration
+
+A payload-bearing action declares its payload schema in the
+manifest entry for traceability and tooling:
+
+```js
+NAC.register({
+  plugin_slug: 'atlas_pro_ad',
+  version:     '2.1.0',
+  nac_version: '2.3',
+  elements: [
+    { id: 'atlas_pro_ad.mic', role: 'action',
+      actions: [
+        { verb: 'listen' },
+        { verb: 'utter',
+          payload_schema: {
+            text: { type: 'string', required: true, max: 4000 },
+            lang: { type: 'string',
+                    enum: ['en','es','pt','fr','it','de','ja','zh','hi','ar'] }
+          },
+          label_i18n: { es:'Decir', en:'Utter', /* ... 10 locales */ } }
+      ],
+      label_i18n: { /* ... */ } }
+  ]
+});
+```
+
+`payload_schema` is informational in v2.3 stable. Agents MAY
+validate before sending; runtimes MAY enforce it when
+`STRICT_VALIDATION` is `true`. Schemas are intentionally simple
+(JSON-Schema-shaped subset) so a runtime can validate without
+shipping a full JSON-Schema validator. v2.4 will formalise the
+schema grammar and turn enforcement into a default.
+
+#### Disabled-state semantics (v2.3 hotfix from alpha.2)
+
+`NAC.invoke` does NOT reject when the target element has
+`disabled` or `aria-disabled='true'` set. The `disabled` HTML
+attribute is a UX click guard; `invoke` is a logical
+payload-bearing request, not a synthetic click. Hosts that need
+to refuse an invoke based on UI state MUST do it in their
+`nac:action:requested` listener and emit `nac:action:failed`
+with a meaningful error code.
+
+`NAC.click`, by contrast, STILL rejects on disabled elements
+(click semantics preserved). Test coverage:
+`packages/nac/test/v23-invoke.mjs` T7/T8/T9.
+
+#### Conformance: hosts that support invoke MUST
+
+1. Declare `actions[].payload_schema` in the manifest entry.
+2. Listen for `nac:action:requested` (or use a generic listener
+   that filters by `detail.action_id` + `detail.verb`).
+3. Emit `nac:action:succeeded` -- with `detail.request_id`
+   echoed back -- after processing, or `nac:action:failed`
+   (with `detail.error` code) on failure.
+4. NEVER emit a `:succeeded` event with a `request_id` they did
+   not receive (prevents cross-talk between concurrent invocations).
+
+Hosts that do NOT support invoke continue to operate normally
+under `NAC.click()` and `NAC.click_by_verb()`. Agents that call
+`NAC.invoke()` against a host without an `actions[].payload_schema`
+entry will still receive a `request_id` but the runtime cannot
+guarantee delivery; the timeout fires after 30 s.
+
+#### Why this matters
+
+The full agentic surface stops being "list of buttons" and
+becomes "list of buttons + structured inputs". A voice ad becomes
+NAC.invoke-able. A search bar becomes NAC.invoke-able. A
+file upload becomes NAC.invoke-able. Same protocol, same
+provenance, same ack semantics.
+
+The first reference adopter is **Atlas Pro** -- its
+`atlas_pro_ad.mic` element declares both `listen` (click-only,
+existing) and `utter` (payload-bearing) verbs. The same
+`/parse` + `/tts` conversational loop drives in either case;
+agents that have STT call `listen`, agents that have their own
+language model call `utter`.
+
+#### Forward modalities (anticipated, no spec change required)
+
+`invoke` is intentionally modality-agnostic so future input
+families plug in without breaking the contract:
+
+| Modality | Verb (sketch)         | Payload (sketch)                                |
+|----------|-----------------------|--------------------------------------------------|
+| Text     | `utter`               | `{text, lang?}`                                  |
+| Search   | `search`              | `{query, scope?, limit?}`                        |
+| File     | `upload`              | `{filename, mime, data_url \| stream_id}`        |
+| Image    | `analyze_image`       | `{image_url \| data_url, prompt?}`               |
+| Video    | `analyze_stream`      | `{stream_url, frame_window_ms?, return?}`        |
+| Schedule | `schedule`            | `{datetime, duration_min, attendees?}`           |
+| Code     | `apply_diff`          | `{file_path, unified_diff}`                      |
+| Voice    | `transcribe`          | `{audio_url \| data_url, lang?}`                 |
+
+Each modality follows the same `nac:action:requested` ->
+`nac:action:succeeded` / `:failed` event protocol, the same
+`request_id` correlation, the same timeout semantics. The
+runtime stays small; the verb vocabulary grows by convention
+between hosts and agents. Ergonomic shortcuts (`NAC.utter`,
+`NAC.search`, `NAC.watch`, etc.) can be added later without
+re-spec because each is a thin wrapper over `invoke`.
+
+### 5.1.5 Shadow DOM resolution -- open roots (v2.3)
+
+The runtime resolves `data-nac-id` references through open
+shadow roots recursively. A page can mount Web Components
+using `attachShadow({mode:'open'})`, place
+`data-nac-*` attributes on elements inside the shadow tree,
+and any NAC3 caller (`NAC.click`, `NAC.fill`, `NAC.invoke`,
+etc.) resolves the target transparently.
+
+#### Resolution algorithm
+
+For a selector `S` (typically `[data-nac-id="..."]`) against a
+root `R` (typically `document`):
+
+1. `R.querySelector(S)` -> if non-null, return immediately.
+2. For every descendant `el` of `R`:
+   - If `el.shadowRoot` is non-null (i.e. open shadow root):
+     recurse with `R := el.shadowRoot`, depth +1.
+   - Else if `el.nac3` is an object exposing a `query` method,
+     delegate (see sec 5.1.6).
+3. The recursion is **depth-capped at 10 levels**. Targets
+   deeper than 10 are unreachable; the caller receives
+   `code='not_found'`. The cap exists to prevent pathological
+   walks; in practice no production codebase nests more than
+   3-4 shadow levels.
+4. The walk is breadth-of-DOM-order: siblings before nested
+   shadows. First match wins.
+
+#### Event propagation
+
+Events emitted by hosts inside shadow roots MUST set
+`composed: true` for document-level listeners to receive them.
+The NAC3 runtime emits all its own events with `composed:true`
+already; host code that emits manual `nac:*` events is
+responsible for the same. Without `composed:true` the event
+stops at the shadow boundary and the runtime's correlation
+machinery never sees it.
+
+#### Author responsibility
+
+The component author needs to:
+
+1. Place `data-nac-id`, `data-nac-role`, `data-nac-action` on
+   operable elements inside the shadow root.
+2. Set `composed:true` on any custom event the host emits to
+   signal a NAC3 contract (`nac:action:succeeded`,
+   `nac:field:changed`, etc.).
+3. Avoid `<slot>` for elements that need to be
+   shadow-isolated -- slotted nodes live in light DOM and are
+   resolved there instead.
+
+No manifest hint or runtime opt-in is required for open shadow
+roots; the resolution is automatic.
+
+#### Reference implementation
+
+The reference runtime exposes two internal helpers,
+`_deepQuery(selector, root)` and
+`_deepQueryAll(selector, root)`, that perform the walk. Public
+helpers `NAC.click`, `NAC.fill`, `NAC.invoke`,
+`NAC.describe`, etc. all go through the deep variants.
+
+#### Demos and tests
+
+- `example-v23-shadow-open.php` -- 1-, 2-, and 3-level nested
+  open shadow demos.
+- `packages/nac/test/v23-shadow.mjs` T1-T3, T10 -- unit
+  coverage including depth cap.
+
+### 5.1.6 Shadow DOM resolution -- closed roots, voluntary exposure (v2.3)
+
+Closed shadow roots (`attachShadow({mode:'closed'})`) are
+opaque from outside the component author's code -- a browser
+security boundary, not a NAC3 decision. NAC3 cannot reach
+inside unless the component author voluntarily exposes a
+queriable surface via the contract below.
+
+#### The `el.nac3` interface contract
+
+A custom element MAY expose an interface object on its host
+via a getter named `nac3`:
+
+```ts
+interface NAC3HostInterface {
+  query(selector: string): Element | null;        // MANDATORY
+  queryAll(selector: string): Element[];          // RECOMMENDED
+  describe?(): Array<{                            // OPTIONAL
+    id:    string;
+    role:  string;
+    action?: string;
+    label?: string;
+  }>;
+}
+```
+
+Components opt in by implementing the getter. Components that
+do NOT opt in remain inaccessible to NAC3 callers (their
+internals stay private, as the browser intends).
+
+#### Resolution semantics
+
+During `_deepQuery(selector)`, for every visited element `el`
+with `el.shadowRoot === null`:
+
+1. If `typeof el.nac3 === 'object'` and `el.nac3.query` is a
+   function, the runtime calls `el.nac3.query(selector)`:
+   - Return value is an Element -> resolved.
+   - Return value is `null` -> not a match in this shadow.
+   - Return value is anything else -> emit
+     `nac:shadow_protocol_violation` (once per host) and skip.
+   - Throws -> emit `nac:shadow_blocked` (reason
+     `'exposure_threw'`, once per host) and skip.
+2. Else if `el.hasAttribute('data-nac-shadow') === true` and
+   the attribute value is `'closed'` AND there is no `nac3`
+   interface present, the runtime emits `nac:shadow_blocked`
+   (reason `'not_exposed'`, once per host). Author opt-in to
+   the "I am a deliberately closed component" debug signal.
+3. Else: the element is treated as a normal light-DOM
+   element with no shadow root.
+
+#### Error event detail shapes
+
+`nac:shadow_blocked` detail:
+
+```ts
+{
+  host:   Element,     // the closed-shadow host
+  reason: 'exposure_threw' | 'not_exposed',
+  ts:     number       // Date.now()
+}
+```
+
+`nac:shadow_protocol_violation` detail:
+
+```ts
+{
+  host:           Element,
+  message:        string,            // diagnostic message
+  value_snapshot: string,            // truncated value preview
+  ts:             number
+}
+```
+
+Both events bubble (`bubbles: true`) and cross shadow
+boundaries (`composed: true`). Dedup is per-host via a
+WeakSet kept by the runtime; the same host emits each event
+**at most once per page load**.
+
+#### Why voluntary
+
+The browser enforces closed-shadow opacity. Even if NAC3
+defined a non-voluntary mechanism, the browser would prevent
+it. Voluntary exposure puts the component author in full
+control of what their public surface looks like for agents.
+
+The cost is per-component opt-in; the benefit is that
+NAC3-compliant agents work against design systems with closed
+shadow components (Salesforce Lightning, some GitHub Primer
+components, security-sensitive widgets) without per-component
+adapter code.
+
+#### Demos and tests
+
+- `example-v23-shadow-closed.php` -- positive
+  (`<todo-card-closed-exposed>`) and negative
+  (`<todo-card-closed-blind>`) side-by-side with verdict
+  panels + live event log.
+- `packages/nac/test/v23-shadow.mjs` T4-T9 -- unit coverage
+  for every error event family plus dedup semantics.
+- `guides/SHADOW_DOM_CLOSED.md` -- authoring guide.
+
+### 5.1.7 Auth-aware capabilities (v2.3)
+
+NAC3 v2.3 lets the manifest declare per-action capability
+requirements that gate `NAC.click` and `NAC.invoke` before
+dispatch. The agent receives a fast rejection
+(`code='capability_required'`) instead of a round-trip that
+fails server-side.
+
+#### Manifest declaration
+
+A capability requirement attaches at the element level or at
+the verb level. Verb-level wins if both are present.
+
+```js
+NAC.register({
+  plugin_slug: 'fin',
+  version:     '1.0.0',
+  nac_version: '2.3',
+  elements: [
+    // Element-level (covers all verbs on this id).
+    { id: 'fin.invoice.delete', role: 'action',
+      requires_capability: 'finance.delete_invoice',
+      actions: [{ verb: 'delete' }] },
+
+    // Verb-level (more granular).
+    { id: 'fin.invoice.edit', role: 'action',
+      actions: [
+        { verb: 'edit',
+          requires_capability: 'finance.edit_invoice' },
+        { verb: 'view',
+          /* no capability -> always allowed */ }
+      ] },
+
+    // Array value: OR semantics.
+    // ("at least one of these capabilities matches")
+    { id: 'fin.invoice.approve', role: 'action',
+      requires_capability: ['finance.approve',
+                            'finance.admin'],
+      actions: [{ verb: 'approve' }] }
+  ]
+});
+```
+
+For AND semantics ("user needs ALL of these caps"), declare
+each via separate gated actions or compose at the host level
+in the `nac:action:requested` listener.
+
+#### Public API
+
+```ts
+NAC.setCapabilities(caps: string | string[] | null): void
+NAC.grantCapability(cap: string): void
+NAC.revokeCapability(cap: string): void
+NAC.userCapabilities(): string[]
+```
+
+`setCapabilities` replaces the entire set (use for login /
+session refresh). `grantCapability` / `revokeCapability` are
+incremental. `userCapabilities` returns a snapshot array.
+`setCapabilities(null)` clears the set.
+
+Hosts call these whenever the user's role changes. The set
+lives in the runtime; no manifest reload is required.
+
+#### Gate semantics
+
+Before dispatch, `NAC.click(id)` and `NAC.invoke(id, payload)`
+look up the matching manifest entry (element + verb), read
+`requires_capability`, and call `_hasCapability`:
+
+- No requirement declared -> allow.
+- Requirement declared, current set satisfies it -> allow.
+- Requirement declared, current set does NOT satisfy -> reject
+  with `NacError('capability_required', ...)` AND emit
+  `nac:command:rejected` with `detail.reason='capability_required'`.
+
+The gate runs AFTER `not_found` / `disabled` / `hidden` checks
+on `click` so the most specific failure surfaces. On `invoke`,
+the gate runs before the request event fires (the host never
+sees an unauthorised attempt).
+
+#### Why this matters
+
+Without the gate, an agent calling `NAC.click('finance.delete')`
+either succeeds (no auth gate at all -> security hole) or
+fails server-side with a 403 several seconds later. With the
+gate, the agent learns synchronously that it lacks the
+capability and can react appropriately (request a different
+flow, ask for elevation, surface the constraint to the user).
+
+This complements -- it does not replace -- server-side
+authorisation. Hosts MUST still enforce permissions on the
+server. The client gate is a UX optimisation and an
+intent-level signal, not a security boundary.
+
+#### Demos and tests
+
+- `packages/nac/test/v23-capabilities.mjs` -- 17 assertions
+  covering set/get, grant/revoke, click gate, invoke gate,
+  verb-level vs element-level resolution, OR semantics,
+  null-clear, invalid-input rejection, regression for
+  unguarded actions.
+
+### 5.1.2 Strict validation flag (v2.2; default-flipped in v2.3)
+
+`NAC.STRICT_VALIDATION` (boolean). When `true`, `NAC.register()`
+throws an `Error` with `code='strict_validation'` and a
+`findings` array on any of:
 
 - `manifest_role_unknown` -- entry's role outside the canonical set.
 - `tab_id_manifest_role_drift` -- id matches `^tab\.` but role
@@ -248,18 +677,38 @@ and a `findings` array on any of:
 - `manifest_dom_role_mismatch` -- mounted DOM element's
   `data-nac-role` differs from manifest entry's role.
 
-In v2.3 the default flips to `true`. In v3.0 the flag is removed
-(strict is the only mode).
+**Default value:**
+
+- **v2.2.x:** `false` (warning-only). Adopters needed a migration
+  window.
+- **v2.3.x:** **`true`** (throwing). The migration window closed
+  with the v2.2 line. Adopters with drift-laden manifests opt
+  out by setting `NAC.STRICT_VALIDATION = false` BEFORE any
+  `register()` call.
+- **v3.0:** flag removed (strict is the only mode).
+
+See `guides/MIGRATION_v2.2_to_v2.3.md` for the playbook to clean
+up drift findings.
 
 All async methods reject with `NacError` whose `code` is one of:
 
 - `not_found` -- the named element/role/verb is not in the DOM.
 - `invalid` -- argument shape is wrong.
+- `disabled` -- element has `disabled` or `aria-disabled='true'`
+  (`NAC.click` only; `NAC.invoke` no longer checks per v2.3
+  hotfix, see sec 5.1.4).
+- `hidden` -- element is offscreen / `aria-hidden='true'` /
+  zero-dimension.
+- `capability_required` -- manifest declared
+  `requires_capability` and the current
+  `NAC.userCapabilities()` set does not satisfy it (v2.3, see
+  sec 5.1.7).
 - `timeout` -- side effect dispatched but the conformance ack
-  event did not arrive within 5 seconds. **A timeout means real
-  failure**: the handler may have hung, the ack was never wired,
-  a network race occurred. Callers MUST treat timeout as failure
-  unless they have proof of side effect via another channel.
+  event did not arrive within 5 seconds (30 seconds for
+  `invoke`). **A timeout means real failure**: the handler may
+  have hung, the ack was never wired, a network race occurred.
+  Callers MUST treat timeout as failure unless they have proof
+  of side effect via another channel.
 
 ### 5.2 Introspection
 
@@ -412,66 +861,6 @@ See `SECURITY.md` for the full threat model. Short version:
   (isTrusted) so a host can refuse the latter for sensitive verbs.
 - NAC3 does not protect against a malicious agent running with
   user-level access. Such an agent can do anything the user can.
-
-### 7.4 Plugin slug uniqueness (v2.4)
-
-A `data-nac-plugin="<slug>"` attribute identifies a plugin
-**instance** in the DOM. The runtime resolves
-`(plugin, nac_id)` pairs against these scopes, so the host MUST
-guarantee unambiguous resolution.
-
-**Rules.**
-
-1. A given plugin slug MAY appear on more than one DOM root
-   simultaneously (a "list view + side panel" combo for the same
-   plugin family, a topbar mirror of an action that also lives in
-   the body, etc).
-2. **When the slug appears more than once, every root carrying it
-   MUST also carry a unique `data-nac-plugin-id` attribute.** The
-   pair `(data-nac-plugin, data-nac-plugin-id)` is the canonical
-   instance key.
-3. A single-root slug MAY omit `data-nac-plugin-id`; in that case
-   `(slug, null)` is the instance key.
-
-**Runtime enforcement (v2.4).**
-
-- The constructor `NAC.register(manifest)` rejects the call
-  synchronously with `NacError('duplicate_plugin_no_instance_id',
-  ...)` when the DOM already contains multiple roots with the
-  registered slug and any of them omits / duplicates
-  `data-nac-plugin-id`.
-- A boot-time pass (`nac:dom-ready` listener installed by the
-  runtime) performs the same check across every `[data-nac-plugin]`
-  root in the document. On the first violation it dispatches
-  `nac:fatal` with `code='duplicate_plugin_no_instance_id'`,
-  inserts a visible red banner at the top of `<body>`, and
-  throws. The runtime then refuses every subsequent
-  `describe`/`click`/`click_by_verb`/`tab` call.
-- `NAC.click_by_verb` resolves verbs against the manifest first.
-  When the manifest does not declare a top-level `actions[]` and
-  the runtime falls back to DOM scanning, the scan iterates
-  **every** `[data-nac-plugin="<slug>"]` root (not just the
-  first), matching the first descendant `[data-nac-action="<verb>"]`
-  it finds.
-- `NAC.validate_global()` continues to emit
-  `duplicate_plugin_no_instance_id` as a structured finding for CI
-  pipelines that prefer non-fatal reporting.
-
-**Migration from v2.3.**
-
-The boot-time throw is enabled by default in v2.4. Authors who
-need a one-release migration window can set
-`NAC.HARD_DEDUP = false` before the runtime's
-`DOMContentLoaded` listener fires. The flag is removed in v2.5.
-
-**Why "throw" not "warn".**
-
-Multiple roots sharing a slug without instance ids make every
-`(plugin, nac_id)` lookup first-match-wins by document order.
-That is non-deterministic across DOM rearrangements (drag-drop
-sorts, conditional render order, framework re-mounts) and the
-agent has no way to know which root won. v2.3 surfaced this only
-through opt-in lint; v2.4 makes it a build-time gate.
 
 ---
 
@@ -661,6 +1050,322 @@ code, is the authority.
 
 ---
 
-*This document is the canonical NAC3 v2.1 specification. Edits to
-this file constitute spec changes and require an RFC; see
+## 15. Plugin extension contract -- canvas + API surfaces (v2.5)
+
+Sections 1-14 assume the agent-relevant surface is **DOM**. Every
+addressable element has a `data-nac-id` attribute, every verb fires
+through `el.click()`, every state read comes from
+`el.getAttribute(...)`. This works for apps whose chrome AND
+content live in DOM nodes.
+
+It does not work for apps where part of the surface is **canvas**
+(LibreOffice / Collabora Online, Figma, Excalidraw, Miro, every
+custom WebGL editor). The chrome may still be DOM (toolbars,
+dialogs), but commands often need to flow through the app's own
+public API (postMessage, plugin SDK, script bridge), and state may
+not be readable from the DOM at all.
+
+v2.5 adds a small set of primitives that let a NAC3 plugin declare
+its own routing contract to such surfaces. The runtime stays
+agnostic of any specific app -- it learns how to talk to one only
+by reading the plugin's manifest.
+
+### 15.1 Why a new primitive set
+
+DOM-only `NAC.click(id)` cannot:
+
+- Send a `Send_UNO_Command` postMessage to a sandboxed Collabora
+  iframe.
+- Call `figma.currentPage.selection = [...]` inside the Figma
+  plugin sandbox.
+- Invoke `excalidrawAPI.setElements(...)` on a React ref.
+- Read whether Bold is active on the current Collabora selection
+  (the toolbar reflects it; the canvas hides it).
+
+The fix is **not** to extend `NAC.click` with backend-detection
+heuristics. The fix is to add an explicit, agnostic verb that
+takes a plugin slug and a verb path, and lets the plugin's
+manifest declare how that verb is routed.
+
+### 15.2 The three primitives
+
+```ts
+NAC.registerPlugin(slug: string, manifest: PluginManifest): void
+NAC.call(plugin: string, verb_path: string, args?: object): Promise<any>
+NAC.read(plugin: string, state_path: string): Promise<any>
+NAC.subscribe(plugin: string, event_path: string,
+              cb: (data: any) => void): SubscriptionHandle
+NAC.unsubscribe(handle: SubscriptionHandle): void
+```
+
+- `registerPlugin(slug, manifest)` registers a v2.5 plugin. A given
+  `slug` MAY appear in both the DOM manifest registry (section 5)
+  and the v2.5 extension registry; the two coexist. v2.5 calls
+  resolve only through the v2.5 registry.
+- `call` invokes a declared verb. Routing is chosen by the
+  manifest, not by the agent. Resolves with whatever the backend
+  returned (often `undefined` / `{ok: true}`); rejects with
+  `NacError` if the verb is unknown, the backend fails, or the
+  response shape is invalid.
+- `read` returns a declared state value. The runtime walks the
+  state's fallback chain in declared order and returns the first
+  source that resolves; rejects only when every source in the
+  chain failed.
+- `subscribe` attaches a listener to a declared event. Returns a
+  handle that the caller passes to `unsubscribe` to clean up.
+  Events MAY be backed by a real upstream event source or
+  synthesised via polling / MutationObserver -- the manifest
+  declares which.
+
+All four functions are async (Promise-returning) except
+`unsubscribe`, which is synchronous and idempotent.
+
+### 15.3 Plugin manifest shape
+
+```ts
+interface PluginManifest {
+  slug: string;
+  verbs:  { [verb_path: string]: VerbBinding };
+  state:  { [state_path: string]: StateBinding[] };
+  events: { [event_path: string]: EventBinding };
+}
+
+interface VerbBinding {
+  backend:       BackendKind;
+  /* backend-specific fields (see 15.4) */
+  [k: string]: any;
+}
+
+interface StateBinding {
+  backend:       BackendKind;
+  /* backend-specific fields (see 15.4) */
+  extract?:      string;   /* extractor DSL string (see 15.5) */
+  [k: string]: any;
+}
+
+interface EventBinding {
+  backend:       BackendKind;
+  /* backend-specific fields */
+  [k: string]: any;
+}
+
+type BackendKind =
+  | 'postmessage'
+  | 'postmessage-listen'
+  | 'sdk-call'
+  | 'script-bridge'
+  | 'dom-mirror'
+  | 'same-origin-window'
+  | 'synthetic-mutation'
+  | 'synthetic-poll';
+```
+
+Manifests are pure JSON (no JS callbacks). Forge, Sumi, and any
+future tooling generates them as data; the runtime interprets the
+backend names from a fixed vocabulary.
+
+Verbs and events have **exactly one** binding. State has an
+**ordered array** of bindings: the runtime walks the chain in
+order, returning the first source that successfully resolved.
+
+### 15.4 Backend vocabulary
+
+| Kind | Used for | Required fields |
+|------|----------|-----------------|
+| `postmessage` | Verb: post a message to an iframe via `postMessage`. | `target` (CSS selector of the iframe to send to), `message` (MessageId string), `values` (object literal interpolated with args), `values_from_args` (optional array of arg keys to forward verbatim) |
+| `postmessage-listen` | Event: listen for a specific incoming `MessageId` on `window.message`. | `source` (CSS selector of the iframe to filter origin by; if omitted, accept any source), `message` (MessageId to match), `extract` (extractor DSL into the message data) |
+| `sdk-call` | Verb: call a globally-exposed JS function (e.g. Figma plugin, Excalidraw API). | `path` (dotted path into `window`, e.g. `figma.currentPage.selection`), `mode` (`assign` to set the path to the args value, `invoke` to call it as a function with the args object) |
+| `script-bridge` | Verb or state: invoke an app's scripting bridge (Collabora's `CallPythonScript`, LibreOffice UNO bridge, Google Apps Script). | `bridge` (a backend-specific identifier like `collabora.python`), `script` (script identifier), `function` (function name to run), `args` (object literal interpolated with the call args), `response_match` (for state: the response MessageId to wait on), `timeout_ms` (optional, default 5000) |
+| `dom-mirror` | State: read from a DOM element whose attribute / class / text mirrors a canvas-internal state (e.g. a toolbar button highlighted when its formatting is active on the current selection). | `selector` (CSS selector to query), `extract` (extractor DSL, see 15.5) |
+| `same-origin-window` | State: read from `iframe.contentWindow.<path>` when the iframe is same-origin. The runtime detects cross-origin and falls through. | `target` (CSS selector of the iframe), `path` (dotted path into `contentWindow`) |
+| `synthetic-mutation` | Event: synthesise an event by observing DOM mutations on one or more state sources and re-emitting when the observed value changes. | `observe` (array of state paths to watch; the runtime calls `read` on each and diffs across mutations), `throttle_ms` (optional, default 100) |
+| `synthetic-poll` | Event: synthesise an event by polling state sources. | `observe` (array of state paths), `interval_ms` (default 250) |
+
+Each backend MUST be implemented by the runtime as a self-contained
+dispatcher (`dispatch(binding, args, context) -> Promise<value>`).
+Adding a new backend type to the spec requires bumping the spec
+version; runtimes ignoring unknown backends MUST reject manifests
+that declare them (no silent skip).
+
+### 15.5 Extractor mini-DSL
+
+State backends and the `postmessage-listen` event backend often
+need to pluck a field out of a larger object. The runtime ships
+a tiny declarative DSL so manifests stay JSON-only:
+
+| Syntax | Meaning | Example input -> output |
+|--------|---------|-------------------------|
+| `field.path.to.value` | Dotted path traversal. | `{a:{b:1}}` with `a.b` -> `1` |
+| `attribute:NAME` | DOM only: read `el.getAttribute(NAME)`. | `<i data-x="hi">` with `attribute:data-x` -> `'hi'` |
+| `text` | DOM only: read `el.textContent`. | `<span>hi</span>` with `text` -> `'hi'` |
+| `classList.contains:CLASS` | DOM only: `el.classList.contains(CLASS)` -> boolean. | `<button class="active">` with `classList.contains:active` -> `true` |
+| `value` | DOM only: read `el.value`. | `<input value="x">` with `value` -> `'x'` |
+| `present` | DOM only: returns `true` if the selector resolved an element, `false` otherwise. | selector matched -> `true` |
+
+Composition is not supported in v2.5; an extractor is exactly one
+of the rows above. A manifest needing complex transformation
+declares a `script-bridge` instead.
+
+### 15.6 Fallback chain semantics for `state`
+
+`state[path]` is an array of bindings. `NAC.read(plugin, path)` walks
+the array in order. For each binding:
+
+1. The runtime invokes the backend's dispatcher.
+2. If the dispatcher resolves with a value (including `false`, `0`,
+   empty string, but NOT `undefined`), `read` returns that value.
+3. If the dispatcher rejects, or resolves with `undefined`, the
+   runtime advances to the next binding in the array.
+4. If no binding produced a value, `read` rejects with
+   `NacError('state_unreadable', ...)` whose `err.attempts: [...]`
+   carries one entry per attempted backend with `{backend, reason}`.
+
+Rationale: the chain encodes the manifest author's preference
+order. The fastest, cheapest, freshest source is declared first;
+fallbacks degrade gracefully. The runtime never silently picks an
+inferior source first.
+
+### 15.7 Provenance for synthetic actions
+
+Every `NAC.call` dispatch emits a `nac:plugin:invoked` event on
+`document` after the backend returns. The detail payload:
+
+```js
+{
+  plugin:    'collabora.writer',
+  verb_path: 'uno.Bold',
+  backend:   'postmessage',
+  request_id: 'pi_<random hex>',
+  source:    'agent',     // see sec 7
+  trusted:   false,
+  duration_ms: 12,
+  ok:        true,
+  error:     null,
+}
+```
+
+Same shape for `nac:plugin:read` (after a `read`) and
+`nac:plugin:event` (synthesised event re-emit). `source` defaults
+to `'agent'`; hosts that wrap the runtime in a user-facing UI MAY
+override via the existing `NAC.set_source(...)` mechanism (sec 7).
+
+### 15.8 Worked example -- Collabora Writer
+
+```json
+{
+  "slug": "collabora.writer",
+  "verbs": {
+    "uno.Bold": {
+      "backend": "postmessage",
+      "target":  "iframe[data-collabora-frame]",
+      "message": "Send_UNO_Command",
+      "values":  { "Command": ".uno:Bold" }
+    },
+    "doc.save": {
+      "backend": "postmessage",
+      "target":  "iframe[data-collabora-frame]",
+      "message": "Action_Save",
+      "values_from_args": ["DontTerminateEdit", "Notify"]
+    }
+  },
+  "state": {
+    "selection.isBold": [
+      { "backend": "dom-mirror",
+        "selector": "[data-nac-id='toolbar.bold']",
+        "extract":  "classList.contains:selected" },
+      { "backend": "script-bridge",
+        "bridge":   "collabora.python",
+        "script":   "yujin_state.py",
+        "function": "GetSelectionState",
+        "response_match": "CallPythonScript-Result",
+        "extract":  "Values.is_bold" }
+    ],
+    "doc.modified": [
+      { "backend": "same-origin-window",
+        "target":  "iframe[data-collabora-frame]",
+        "path":    "app.file.modified" }
+    ]
+  },
+  "events": {
+    "doc.modified": {
+      "backend": "postmessage-listen",
+      "source":  "iframe[data-collabora-frame]",
+      "message": "Doc_ModifiedStatus",
+      "extract": "Values.Modified"
+    },
+    "selection.changed": {
+      "backend":     "synthetic-mutation",
+      "observe":     ["selection.isBold", "selection.isItalic"],
+      "throttle_ms": 100
+    }
+  }
+}
+```
+
+The agent calls `NAC.call('collabora.writer', 'uno.Bold')`; the
+runtime routes through the `postmessage` backend, posts
+`Send_UNO_Command` to the iframe. To confirm the effect occurred
+(see sec 17), the agent calls
+`await NAC.read('collabora.writer', 'selection.isBold')`; the
+runtime tries the toolbar mirror first (fast, free), falls back to
+the Python script bridge if the mirror is unavailable. The agent
+never knows or cares which source answered.
+
+### 15.9 Errors
+
+`NAC.call` / `read` / `subscribe` reject with `NacError` whose `code`
+is one of:
+
+- `plugin_not_registered` -- the slug has no v2.5 manifest.
+- `verb_not_declared` -- the verb path is not in the manifest.
+- `state_not_declared` -- the state path is not in the manifest.
+- `event_not_declared` -- the event path is not in the manifest.
+- `backend_unknown` -- the manifest declares a backend the runtime
+  does not implement. Manifest MUST be rejected at register time;
+  this error only surfaces if a runtime accepts a future manifest
+  format it then cannot dispatch.
+- `backend_target_missing` -- the backend's target (iframe, JS
+  path, DOM selector) is not findable.
+- `cross_origin_blocked` -- `same-origin-window` was attempted
+  against a cross-origin iframe.
+- `state_unreadable` -- every binding in a state chain failed; see
+  15.6.
+- `timeout` -- a backend did not respond within its declared
+  `timeout_ms` (default 5000 for verbs, 1000 for state reads).
+- `invalid` -- argument shape is wrong (bad slug, malformed
+  manifest at register time, etc).
+
+---
+
+## 16. Tree navigation (v2.5 -- PLANNED, see sec 17 & 18 below)
+
+*Drafting pending. Captures `NAC.context(plugin)` (current
+breadcrumb) + `NAC.tree(plugin, rootId?)` (enumerate hijos
+navegables) + the `data-nac-opens` / `data-nac-leaf` attributes
+that let the chrome declare hierarchical relationships explicitly.*
+
+---
+
+## 17. Asistive labels (v2.5 -- PLANNED)
+
+*Drafting pending. Captures `NAC.narrate(plugin, nodeId)` (return
+the canonical human-readable label for screen reader / TTS),
+validation warnings for ordinal-shaped ids and for nodes that
+have no readable label.*
+
+---
+
+## 18. Effect detection (v2.5 -- PLANNED)
+
+*Drafting pending. Captures `NAC.expect(plugin, statePath, value,
+opts?)` (Promise that resolves when a state matches an expected
+value within a timeout) and `NAC.diff(plugin, statePath, beforeFn,
+afterFn)` (snapshot a state pre- and post- an action).*
+
+---
+
+*This document is the canonical NAC3 v2.5-draft specification.
+Sections 0-14 are unchanged from v2.4 stable. Section 15 is GA
+in v2.5; sections 16-18 are in active drafting. Edits to this
+file constitute spec changes and require an RFC; see
 `CONTRIBUTING.md`.*

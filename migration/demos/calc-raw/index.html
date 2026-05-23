@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calc</title>
+<link rel="stylesheet" href="calc.css">
+</head>
+<body>
+
+<main class="calc">
+  <div class="display" id="display">0</div>
+  <div class="history" id="history"></div>
+
+  <div class="pad">
+    <button class="btn op clear" onclick="clearAll()">C</button>
+    <button class="btn op back" onclick="backspace()">&larr;</button>
+    <button class="btn op pct" onclick="percent()">%</button>
+    <button class="btn op" onclick="setOp('/')">/</button>
+
+    <button class="btn num" onclick="digit('7')">7</button>
+    <button class="btn num" onclick="digit('8')">8</button>
+    <button class="btn num" onclick="digit('9')">9</button>
+    <button class="btn op" onclick="setOp('*')">x</button>
+
+    <button class="btn num" onclick="digit('4')">4</button>
+    <button class="btn num" onclick="digit('5')">5</button>
+    <button class="btn num" onclick="digit('6')">6</button>
+    <button class="btn op" onclick="setOp('-')">-</button>
+
+    <button class="btn num" onclick="digit('1')">1</button>
+    <button class="btn num" onclick="digit('2')">2</button>
+    <button class="btn num" onclick="digit('3')">3</button>
+    <button class="btn op" onclick="setOp('+')">+</button>
+
+    <button class="btn num zero" onclick="digit('0')">0</button>
+    <button class="btn num" onclick="dot()">.</button>
+    <button class="btn equals" onclick="equals()">=</button>
+  </div>
+</main>
+
+<script src="calc.js"></script>
+</body>
+</html>

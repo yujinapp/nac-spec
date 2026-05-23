@@ -37,6 +37,11 @@
 </style>
 </head>
 <body data-nac-plugin="launch_plan_2026_05_10" data-nac-doc="true">
+<div style="margin:16px 0;padding:14px 18px;border-left:3px solid #5b6cff;background:#f6f5ef;border-radius:6px;font:14px/1.5 system-ui,-apple-system,Segoe UI,Helvetica,sans-serif;color:#333;">
+  <strong>v2.3.0-alpha.1 preview now available</strong> (2026-05-12) -- adds <code>NAC.invoke</code> and <code>NAC.utter</code> for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See <a href="../SPEC.md">SPEC.md sec 5.1.4</a> and CHANGELOG for details.
+</div>
+
+
 
 <nav class="nac3-doc-toolbar" data-nac-id="launch_plan_2026_05_10.toolbar" data-nac-role="region">
   <span class="badge">NAC3 v2.2</span>
@@ -129,7 +134,7 @@
 <ol data-nac-id="launch_plan_2026_05_10.list.73" data-nac-role="list"><li data-nac-id="launch_plan_2026_05_10.list.73.item.1" data-nac-role="list-item">Read this file's "what just happened" + the git log since the</li><li data-nac-id="launch_plan_2026_05_10.list.73.item.2" data-nac-role="list-item">Compose a short progress email.</li><li data-nac-id="launch_plan_2026_05_10.list.73.item.3" data-nac-role="list-item">POST to <code data-nac-role="code-inline">https://yujin.app/crm/api/v1/notifications/email</code></li><li data-nac-id="launch_plan_2026_05_10.list.73.item.4" data-nac-role="list-item">Schedule the next wakeup.</li><li data-nac-id="launch_plan_2026_05_10.list.73.item.5" data-nac-role="list-item">Continue work in the queue.</li></ol>
 <p data-nac-id="launch_plan_2026_05_10.p.74" data-nac-role="paragraph">If Pablo replies during the day, switch to interactive mode and cancel further wakeups until told otherwise.</p>
 <h2 data-nac-id="launch_plan_2026_05_10.h2.audit-trail" data-nac-role="heading" data-nac-level="2" id="audit-trail">Audit trail</h2>
-<p data-nac-id="launch_plan_2026_05_10.p.76" data-nac-role="paragraph">Every commit during the session lands on <code data-nac-role="code-inline">main</code> and triggers the deploy.yml pipeline -- the public yujin.app/nac-spec/ updates automatically. The repository at github.com/yujinapp/nac-spec is the single source of truth.</p>
+<p data-nac-id="launch_plan_2026_05_10.p.76" data-nac-role="paragraph">Every commit during the session lands on <code data-nac-role="code-inline">main</code> and triggers the deploy.yml pipeline -- the public yujin.app/nac-spec/ updates automatically. The repository at github.com/pkuschnirof/rpaforce-crm is the single source of truth.</p>
 <p data-nac-id="launch_plan_2026_05_10.p.77" data-nac-role="paragraph">Time-stamps and commit SHAs are this doc's job. Update it whenever a workstream advances.</p>
 <hr />
 <p data-nac-id="launch_plan_2026_05_10.p.79" data-nac-role="paragraph"><em>Sumi runs this plan autonomously starting 2026-05-10 morning. Pablo reviews + approves the prod cutover when he returns at night.</em></p>

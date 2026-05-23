@@ -1,5 +1,7 @@
 # AI Playbook -- Start a new NAC-3 project
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 **NAC3 version:** 2.2 stable + v2.3 interop preview.
 **Audience:** Any AI agent (Claude, GPT, Gemini, local LLM) tasked
 with bootstrapping a NAC-3 conformant project from scratch.

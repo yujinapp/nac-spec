@@ -1,5 +1,7 @@
 # NAC3 v2.2 -- Tester checklist (English)
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 **For:** the human tester walking through the release.
 **Time:** ~60-90 minutes for a full pass.
 **Last updated:** 2026-05-11.

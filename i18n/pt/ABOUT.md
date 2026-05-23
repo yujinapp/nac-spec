@@ -99,7 +99,7 @@ e após a Yujin deixar de existir.
 
 ## Autoria
 
-O NAC3 é criado e mantido pela Yujin (yujin.app).
+O NAC3 é criado e mantido pela Yujin (rpaforce.com).
 Apache-2.0. Contribuições são bem-vindas -- veja `CONTRIBUTING.md`.
 
 ---

@@ -1,5 +1,7 @@
 # NAC3 + LLM intermediary
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 This guide builds the backend that turns user prompts ("guardar la
 factura", "ve a permisos", "borra el teclado") into NAC3 actions
 the chat client dispatches.

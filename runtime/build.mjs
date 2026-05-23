@@ -1,10 +1,17 @@
 /**
  * NAC npm package build.
  *
- * Single source of truth: ../../yujin.app/nac-spec/js/*.js. We do
- * NOT copy/maintain a duplicate in this package. The build reads
- * those files and produces ESM + CJS + browser + d.ts wrappers in
- * dist/.
+ * Single source of truth: ../js/*.js (one level up from this
+ * runtime/ dir, inside the yujinapp/nac-spec repo). The build
+ * reads those files and produces ESM + CJS + browser + d.ts
+ * wrappers in dist/. SPEC.md and LICENSE are likewise sourced
+ * from one level up.
+ *
+ * (Pre-2026-05-23 the SRC_DIR was ../../yujin.app/nac-spec/js
+ * because runtime lived inside the rpaforce-crm monorepo at
+ * packages/nac/ and the spec lived at yujin.app/nac-spec/. After
+ * the v2.5 consolidation the canonical repo is yujinapp/nac-spec
+ * and runtime/ is a top-level subdir.)
  *
  * Run: node ./build.mjs
  */
@@ -14,12 +21,7 @@ import path from 'node:path';
 import url from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-/* Source resolution: prefer monorepo layout (../../yujin.app/nac-spec/js)
-   used by the in-Yujin deploy; fall back to repo-root layout (../js)
-   used by yujinapp/nac-spec where runtime/ lives as a sibling of js/. */
-const MONOREPO_SRC = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'js');
-const REPO_SRC     = path.resolve(__dirname, '..', 'js');
-const SRC_DIR  = fs.existsSync(MONOREPO_SRC) ? MONOREPO_SRC : REPO_SRC;
+const SRC_DIR  = path.resolve(__dirname, '..', 'js');
 const DIST_DIR = path.resolve(__dirname, 'dist');
 
 const ENTRIES = [
@@ -161,7 +163,7 @@ export const NacChat: unknown;
 
 function buildCli() {
   return `#!/usr/bin/env node
-// NAC CLI v2.2.1
+// NAC CLI v2.3.0-alpha.2
 // Usage:
 //   nac validate <url-or-dir> [--severity=error|warn|info]
 //   nac --version
@@ -180,7 +182,7 @@ const args = process.argv.slice(2);
 const cmd = args[0];
 
 function showHelp() {
-  console.log('NAC CLI v2.2.1');
+  console.log('NAC CLI v2.3.0-alpha.2');
   console.log('');
   console.log('Usage:');
   console.log('  nac validate <url-or-dir> [--severity=error|warn|info]');
@@ -189,7 +191,7 @@ function showHelp() {
 }
 
 function showVersion() {
-  console.log('@nac3/runtime CLI 2.2.1 (Native Agent Contract v2.2)');
+  console.log('@nac3/runtime CLI 2.3.0-alpha.2 (Native Agent Contract v2.3)');
 }
 
 if (!cmd || cmd === '--help' || cmd === '-h') { showHelp(); process.exit(0); }
@@ -410,13 +412,8 @@ function main() {
   console.log('built: cli.js + cli-lint.mjs');
 
   // Copy SPEC.md + LICENSE for npm publish (files: dist/ + tracked).
-  // Same fallback logic as SRC_DIR: prefer monorepo layout, fall back to repo-root.
-  const specSrcMonorepo = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'SPEC.md');
-  const licSrcMonorepo  = path.resolve(__dirname, '..', '..', 'yujin.app', 'nac-spec', 'LICENSE');
-  const specSrcRepo     = path.resolve(__dirname, '..', 'SPEC.md');
-  const licSrcRepo      = path.resolve(__dirname, '..', 'LICENSE');
-  const specSrc = fs.existsSync(specSrcMonorepo) ? specSrcMonorepo : specSrcRepo;
-  const licSrc  = fs.existsSync(licSrcMonorepo)  ? licSrcMonorepo  : licSrcRepo;
+  const specSrc = path.resolve(__dirname, '..', 'SPEC.md');
+  const licSrc  = path.resolve(__dirname, '..', 'LICENSE');
   if (fs.existsSync(specSrc))  write(path.join(__dirname, 'SPEC.md'),  read(specSrc));
   if (fs.existsSync(licSrc))   write(path.join(__dirname, 'LICENSE'),  read(licSrc));
   console.log('synced: SPEC.md + LICENSE');

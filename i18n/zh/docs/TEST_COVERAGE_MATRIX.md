@@ -1,3 +1,5 @@
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 ---
 translation_source: docs/TEST_COVERAGE_MATRIX.md
 translation_source_hash: 378d7bf89e65b07e54f5d5dc1c62938accfe383e903468a4df028a3e2936f48d
@@ -11,7 +13,7 @@ translation_date: 2026-05-11T15:17:46.543073+00:00
 **规范版本：** 2.2 + v2.3 预览版。
 **生成日期：** 2026-05-11。
 **权威来源：** Yujin 参考仓库
-`yujinapp/nac-spec` 的 `main` 分支。
+`pkuschnirof/rpaforce-crm` 的 `main` 分支。
 
 本矩阵列出 NAC3 生态系统中的**所有**制品，并报告其自动化测试覆盖情况及手动验证关卡（"人工确认"检查清单）。
 

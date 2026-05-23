@@ -16,10 +16,7 @@ import path from 'node:path';
 import url  from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const RUNTIME_MONO = path.resolve(__dirname, '..', '..', '..',
-  'yujin.app', 'nac-spec', 'js', 'nac.js');
-const RUNTIME_REPO = path.resolve(__dirname, '..', '..', 'js', 'nac.js');
-const RUNTIME_PATH = fs.existsSync(RUNTIME_MONO) ? RUNTIME_MONO : RUNTIME_REPO;
+const RUNTIME_PATH = path.resolve(__dirname, '..', '..', 'js', 'nac.js');
 
 let failures = 0;
 const errorLog = [];   /* every console.error / console.warn observed */
@@ -30,7 +27,8 @@ const errorLog = [];   /* every console.error / console.warn observed */
    Suppress for the duration of the tests; we assert via the
    captured nac:action:failed event. */
 process.on('uncaughtException', function (err) {
-  if (err && err.message === 'boom') return;  /* T7 expected */
+  if (err && err.message === 'boom') return;       /* T7 expected */
+  if (err && err.message === 'boom_tab') return;   /* T12 expected */
   console.error('UNEXPECTED uncaughtException:', err);
   failures++;
 });
@@ -175,11 +173,19 @@ loadRuntime();
 const NAC = globalThis.NAC;
 
 assert('NAC installed',                typeof NAC === 'object');
-assert('NAC.version v2.3.x',           /^2\.3\.\d+$/.test(NAC.version));
+assert('NAC.version v2.2.x or v2.3+', /^2\.(2|3|4|[5-9]|\d{2,})\.\d+(-[a-z0-9.]+)?$/.test(NAC.version));
 assert('NAC.bindAction exists',        typeof NAC.bindAction === 'function');
-assert('NAC.STRICT_VALIDATION default false', NAC.STRICT_VALIDATION === false);
+/* v2.3+ stable: default flips to true (F3). Older runtimes (2.2.x) default
+   to false; we accept either so this test file stays cross-version. */
+assert('NAC.STRICT_VALIDATION default true in v2.3+ (false in v2.2 legacy)',
+  /^2\.(3|4|[5-9]|\d{2,})\./.test(NAC.version) ? NAC.STRICT_VALIDATION === true
+                                              : NAC.STRICT_VALIDATION === false);
 
-/* === V22-01 strict validator === */
+/* === V22-01 strict validator ===
+   T2-T4 verify the warning-only path. Force STRICT_VALIDATION=false
+   for these (works in both v2.2 default and v2.3 default-flipped). */
+const _origStrict = NAC.STRICT_VALIDATION;
+NAC.STRICT_VALIDATION = false;
 
 /* T1: clean manifest -> no error findings. */
 clearLog();
@@ -242,7 +248,7 @@ try {
 } catch (e) {
   threw = e.code === 'strict_validation';
 }
-NAC.STRICT_VALIDATION = false;
+NAC.STRICT_VALIDATION = _origStrict;
 assert('T5 STRICT_VALIDATION makes register throw', threw);
 
 /* === V22-02 bindAction === */
@@ -313,9 +319,79 @@ try {
 }
 assert('T10 bindAction rejects missing ctx', t10_threw);
 
+/* === v2.3 (F2) bindTab companion === */
+
+assert('NAC.bindTab exists', typeof NAC.bindTab === 'function');
+
+/* T11: bindTab emits nac:tab:activated after sync click. */
+const t11_tab = document.createElement('div');
+let t11_seen = false;
+document.addEventListener('nac:tab:activated', function onT11(e) {
+  if (e.detail && e.detail.tab_id === 't11.tab') {
+    t11_seen = true;
+    document.removeEventListener('nac:tab:activated', onT11);
+  }
+});
+NAC.bindTab(t11_tab, function () { /* sync work */ },
+  { plugin: 't11', tab_id: 't11.tab' });
+t11_tab.click();
+assert('T11 bindTab emits nac:tab:activated on sync', t11_seen);
+
+/* T12: bindTab emits failure event when handler throws. */
+const t12_tab = document.createElement('div');
+let t12_failed = null;
+document.addEventListener('nac:tab:activation_failed', function onT12(e) {
+  if (e.detail && e.detail.tab_id === 't12.tab') {
+    t12_failed = e.detail.error;
+    document.removeEventListener('nac:tab:activation_failed', onT12);
+  }
+});
+NAC.bindTab(t12_tab, function () { throw new Error('boom_tab'); },
+  { plugin: 't12', tab_id: 't12.tab' });
+try { t12_tab.click(); } catch (_) {}
+assert('T12 bindTab emits activation_failed on throw', t12_failed === 'boom_tab');
+
+/* T13: bindTab emits after async resolve. */
+const t13_tab = document.createElement('div');
+let t13_seen = false;
+document.addEventListener('nac:tab:activated', function onT13(e) {
+  if (e.detail && e.detail.tab_id === 't13.tab') {
+    t13_seen = true;
+    document.removeEventListener('nac:tab:activated', onT13);
+  }
+});
+NAC.bindTab(t13_tab, function () {
+  return new Promise(function (r) { setTimeout(r, 10); });
+}, { plugin: 't13', tab_id: 't13.tab' });
+t13_tab.click();
+await new Promise(r => setTimeout(r, 50));
+assert('T13 bindTab emits ack after async resolve', t13_seen);
+
+/* T14: bindTab unbinder works. */
+const t14_tab = document.createElement('div');
+let t14_count = 0;
+document.addEventListener('nac:tab:activated', function (e) {
+  if (e.detail && e.detail.tab_id === 't14.tab') t14_count++;
+});
+const tabUnbind = NAC.bindTab(t14_tab, function () {},
+  { plugin: 't14', tab_id: 't14.tab' });
+t14_tab.click();
+tabUnbind();
+t14_tab.click();
+assert('T14 bindTab unbinder stops emission', t14_count === 1);
+
+/* T15: bindTab validates required ctx. */
+let t15_threw = false;
+try {
+  NAC.bindTab(document.createElement('div'), function () {}, {});
+} catch (e) {
+  t15_threw = e.code === 'invalid';
+}
+assert('T15 bindTab rejects missing ctx', t15_threw);
+
 console.log('');
 if (failures === 0) {
-  console.log('V22 PASS (10/10)');
+  console.log('V22 PASS (15/15)');
   process.exit(0);
 } else {
   console.error('V22 FAIL (' + failures + ' failure' + (failures === 1 ? '' : 's') + ')');

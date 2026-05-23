@@ -77,7 +77,7 @@ try {
   const out = execSync('node ' + JSON.stringify(path.join(DIST_DIR, 'cli.js')) + ' --version', {
     encoding: 'utf8', timeout: 5000
   });
-  check('cli --version', out.includes('@nac3/runtime CLI 2.2.1'));
+  check('cli --version', out.includes('@nac3/runtime CLI 2.3.0-alpha.2'));
 } catch (e) {
   check('cli --version', false, e.message);
 }
@@ -86,10 +86,7 @@ try {
 //    error-severity findings (commit 0633e080 cleaned the role drift
 //    in example-v21-data-table.php; everything else was clean before).
 try {
-  /* Demo dir: prefer monorepo layout, fall back to repo-root sibling. */
-  const demoMono = path.resolve(PKG_DIR, '..', '..', 'yujin.app', 'nac-spec', 'demos');
-  const demoRepo = path.resolve(PKG_DIR, '..', 'demos');
-  const demoDir = fs.existsSync(demoMono) ? demoMono : demoRepo;
+  const demoDir = path.resolve(PKG_DIR, '..', 'demos');
   let out = '';
   try {
     out = execSync(
@@ -110,7 +107,7 @@ try {
 try {
   const pkg = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
   check('pkg name',     pkg.name === '@nac3/runtime');
-  check('pkg version',  /^2\.\d+\.\d+$/.test(pkg.version));
+  check('pkg version',  pkg.version === '2.4.0');
   check('pkg license',  pkg.license === 'Apache-2.0');
   check('pkg has bin',  pkg.bin && pkg.bin.nac);
   check('pkg has main', pkg.main && pkg.main.endsWith('.cjs'));

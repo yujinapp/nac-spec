@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Migration paper · Methodology</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#18181b; --ink-soft:#3f3f46; --ink-mute:#71717a; --paper:#faf8f3; --paper-warm:#f3efe6; --rule:#1a1a1a; --accent:#b8390a; --teal:#2d6357; --gold:#9a7a1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; line-height: 1.65;
+    background-image: radial-gradient(circle at 20% 10%, rgba(184,57,10,0.03), transparent 40%), radial-gradient(circle at 80% 80%, rgba(45,99,87,0.03), transparent 40%); }
+  .container { max-width: 920px; margin: 0 auto; padding: 0 32px; }
+  .topbar { border-bottom: 1px solid var(--rule); padding: 18px 0; display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .topbar a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  header.hero { padding: 60px 0 40px; border-bottom: 1px solid var(--rule); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 20px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(36px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 22px; font-variation-settings: 'opsz' 144; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 760px; }
+  .lede strong { color: var(--ink); }
+  main { padding: 50px 0 80px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; margin: 48px 0 18px; font-variation-settings: 'opsz' 100; }
+  h2 em { font-style: italic; color: var(--accent); }
+  h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; margin: 32px 0 12px; }
+  p { margin-bottom: 16px; color: var(--ink-soft); }
+  p strong { color: var(--ink); }
+  ul, ol { margin: 0 0 18px 24px; color: var(--ink-soft); }
+  ul li, ol li { margin-bottom: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    background: var(--paper-warm); padding: 1px 6px; border: 1px solid var(--ink-mute); color: var(--accent); }
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--ink); color: var(--paper); padding: 18px 22px; line-height: 1.55;
+    margin: 18px 0; overflow-x: auto; }
+  pre .c { color: var(--ink-mute); }
+  .note { background: rgba(154,122,30,0.08); border-left: 4px solid var(--gold);
+    padding: 16px 22px; margin: 24px 0; font-size: 15px; color: var(--ink-soft); }
+  .footer { padding: 40px 0 20px; border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mute); }
+  .footer a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Migration paper / Methodology</div>
+    <div>
+      <a href="results.html">← results</a>
+      &nbsp;·&nbsp;
+      <a href="index.html">migration home</a>
+      &nbsp;·&nbsp;
+      <a href="byte-diff.html">byte-by-byte diff →</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Paper 02 of 03 · Harness · prompts · taxonomy decisions</div>
+    <h1>How the migration was driven <em>and how to repeat it.</em></h1>
+    <p class="lede">
+      Three components: <strong>Yujin Forge</strong> as the AI decorator, the <strong>contract bridge</strong> that makes any host app NAC3-compliant without touching its JS, and <strong>Yujin Pilot</strong> as the embedded driver. The harness in <code>bench/scripts/calc_bench.mjs</code> is the test rig. The system prompt and the role taxonomy are the only places where opinions matter; everything else is plumbing.
+    </p>
+  </header>
+
+  <main>
+
+    <h2>The fixture</h2>
+    <p>Calc-raw is a 92-line vanilla calculator: 16 buttons, 4 ops, decimal, clear, backspace, percent, equals. Three files: <code>index.html</code> (51 lines), <code>calc.js</code> (92 lines, function-per-button), <code>calc.css</code> (73 lines). Zero NAC3 awareness in the source. Every button uses an inline <code>onclick="digit('7')"</code> handler; calc.js holds the state machine.</p>
+    <p>This fixture is the worst possible starting point for NAC3 -- no semantic markup, no data attributes, no contract events, no scoping. If Forge can decorate this, it can decorate anything.</p>
+
+    <h2>Path 01 -- Forge silent</h2>
+    <p><code>yf migrate &lt;dir&gt; --ai-silent</code> sends the HTML + JS companion + an optional plugin hint to Claude Sonnet 4.6. The system prompt instructs the model to:</p>
+    <ul>
+      <li>Decorate every interactive element (buttons, inputs, selects) with <code>data-nac-id</code>, <code>data-nac-role</code>, and (for actions) <code>data-nac-action</code>.</li>
+      <li>Set <code>data-nac-plugin="&lt;slug&gt;"</code> on <code>&lt;body&gt;</code>.</li>
+      <li>Use a snake_case dotted id pattern <code>&lt;slug&gt;.&lt;role&gt;.&lt;thing&gt;</code>.</li>
+      <li>Prefer short imperative verbs (<code>add</code>, <code>subtract</code>) over redundant prefixes (<code>set_op_add</code>).</li>
+      <li>Classify value-holding elements as <code>role=field</code> (never <code>region</code>).</li>
+      <li>Output a single JSON object with <code>decorated_html</code> + <code>plugin_slug</code> + <code>manifest_json</code> + <code>ambiguities: []</code>.</li>
+    </ul>
+    <p>Forge then post-processes the returned HTML to: ensure <code>data-nac-plugin</code> on body (idempotent), inject the NAC3 runtime <code>&lt;script&gt;</code> in <code>&lt;head&gt;</code>, emit <code>nac-bridge.js</code> next to <code>index.html</code>, and inject inline <code>NAC.register(manifest)</code> before <code>&lt;/body&gt;</code>. With the <code>--with-pilot</code> flag, the Pilot bundle is copied + linked too. After this pass the output is drop-in NAC3-ready: open <code>index.html</code> in any browser, the runtime loads, the manifest registers, and an LLM driver can call <code>NAC.click_by_verb('calc', 'digit_3')</code> against it.</p>
+
+    <h2>Path 02 -- Forge assisted</h2>
+    <p>Same call as silent, but the system prompt grows a clause: <em>"if more than one verb / role / id is plausible, populate an `ambiguities` array with concrete questions and best-guess option lists."</em> The CLI then prompts the user for each question. For the calculator the model returns <code>ambiguities: []</code> -- the verb intent is unambiguous because the inline onclick handlers reveal it: <code>onclick="digit('7')"</code> can only mean <code>digit_7</code>.</p>
+    <p>Assisted mode earns its keep on apps with semantic overlap -- a CRM modal with both "Save draft" and "Submit", a settings panel where a button could be <code>apply</code> or <code>save</code>. Those are the cases worth a clarification round.</p>
+
+    <h2>Path 03 -- Sumi manual</h2>
+    <p>Hand-decorated by Sumi (the Claude Code agent that ran this whole experiment) over ~30 min. Differences from Forge silent:</p>
+    <ul>
+      <li>Adds an explicit <code>calc.region.keypad</code> wrapper around the button grid.</li>
+      <li>Carries <code>label_i18n: { es, en }</code> on every element including fields and regions (Forge only attaches it to action elements).</li>
+      <li>Action ids carry an <code>op_</code> prefix for operator buttons (<code>calc.action.op_add</code> vs Forge's <code>calc.action.add</code>). The verb names are identical; only the id structure differs.</li>
+      <li>Whitespace-formatted across multiple lines (file size is ~+15% in bytes, zero functional difference).</li>
+    </ul>
+    <p>The manual decoration is closer to what a NAC3 spec author would write by reflex. The added structure has accessibility value (i18n labels for screen readers + agent-facing UIs) but no functional value for an LLM picking a verb.</p>
+
+    <h2>The contract bridge -- making any host script NAC3-aware</h2>
+    <p>NAC3 dispatch (<code>NAC.click_by_verb</code>) waits for the host to emit a <code>nac:action:succeeded</code> event after running its click handler. Vanilla calc.js doesn't emit that -- it just updates the display. Without the bridge, every dispatch times out after 5 s.</p>
+    <p>Forge's solution is a 50-line companion file <code>nac-bridge.js</code> that runs once at <code>DOMContentLoaded</code>:</p>
+    <pre><span class="c">// nac-bridge.js (excerpt)</span>
+const slug = document.body.getAttribute('data-nac-plugin');
+const els = document.querySelectorAll('[data-nac-role="action"][data-nac-id]');
+els.forEach(el =&gt; {
+  const id      = el.getAttribute('data-nac-id');
+  const handler = el.onclick;            <span class="c">// preserve inline onclick</span>
+  el.onclick = null;
+  window.NAC.bindAction(el, handler,     <span class="c">// re-attach via bindAction</span>
+                        { plugin: slug, action_id: id });
+});</pre>
+    <p>The bridge turns every <code>onclick="digit('7')"</code> into a NAC3 contract-compliant action: when the button fires, the host's handler runs (display updates), <em>and</em> <code>nac:action:succeeded</code> emits. No host code modified. Drop-in.</p>
+
+    <h2>The Pilot driver</h2>
+    <p><strong>Yujin Pilot</strong> is the embedded chat + voice cockpit. A single-file IIFE bundle (<code>pilot.bundle.js</code>) + a companion stylesheet (<code>pilot.css</code>). On load it mounts a floating sumi-e branch button bottom-right. Clicking it opens a chat panel; clicking again toggles a larger pizarra panel with voice + action trace.</p>
+    <p>Pilot reads the registered manifest via <code>window.NAC.list_registered_plugins()</code> + <code>window.NAC.manifest(slug)</code>. The user types or speaks an intent; Pilot calls the configured LLM with a system prompt that includes the manifest; the LLM returns a JSON action chain; Pilot dispatches each via <code>NAC.click_by_verb(plugin, verb)</code>.</p>
+    <p>Configuration lives in <code>localStorage</code> under <code>yujin_pilot.config</code>: per-provider API keys (Anthropic, OpenAI, Google, DeepSeek, Groq), model selector (every model the 600-run benchmark exercised), voice preferences (STT via Web Speech API, TTS via Web Speech / ElevenLabs / Google Cloud TTS), and the on/off toggle. Keys never leave the browser. For production use the LLM call belongs behind a server proxy; the client-side mode here is for demos + local dev.</p>
+
+    <div class="note">
+      <strong>Pilot is not Forge.</strong> Forge builds the static NAC3 surface (HTML attrs + manifest + bridge). Pilot is the runtime agent that talks to that surface. The two ship separately and can be used independently: an app can be Forge-decorated and driven by a different agent; Pilot can drive any NAC3-compliant app, whether Forge-decorated or hand-decorated.
+    </div>
+
+    <h2>The harness</h2>
+    <p><code>bench/scripts/calc_bench.mjs</code> stands up a tiny static server, launches Playwright Chromium headless, navigates to each fixture, waits for <code>window.NAC.list_registered_plugins().includes('calc')</code>, sends the manifest + task prompt to Claude Sonnet 4.6, parses the action chain, dispatches via <code>NAC.click_by_verb</code>, reads <code>document.getElementById('display').textContent</code>, and asserts against the expected value. 15 runs total (3 fixtures &times; 5 tasks &times; 1 iter). Writes <code>results/calc_e2e_&lt;ts&gt;.{jsonl,md}</code>.</p>
+    <p>The harness applies <strong>zero monkey-patches</strong> to the fixtures. Everything that makes the fixture work -- data-nac-plugin, the runtime, the bridge, the manifest register -- is baked in by Forge (or by hand for the manual fixture). What the harness tests is the fixture in production-equivalent shape.</p>
+
+    <h2>System prompt for the driver</h2>
+    <p>The same driver prompt runs against all 3 fixtures, so the manifest is the only variable:</p>
+    <pre>You drive a Calculator UI via the NAC3 protocol. You will be given a
+manifest listing every interactive element (each action has a stable
+verb). Your only output is a JSON object:
+
+{ "plan": "&lt;one-line reasoning&gt;",
+  "actions": [ { "verb": "&lt;verb&gt;" }, ... ] }
+
+Rules:
+- Use ONLY verbs that appear in the manifest's elements[].actions[].verb.
+- Each action dispatches NAC.click_by_verb('calc', '&lt;verb&gt;').
+- Output actions in execution order.
+- No prose, no markdown fences, only the JSON object.</pre>
+
+    <h2>Why this fixture is representative</h2>
+    <p>The calculator is mechanically simple but covers the failure modes that matter:</p>
+    <ul>
+      <li><strong>Verb naming.</strong> Should the multiply button be <code>multiply</code>, <code>set_op_multiply</code>, or <code>op_multiply</code>? The model is making a choice on every decoration.</li>
+      <li><strong>Role taxonomy.</strong> Is the display a field or a region? The wrong call breaks no functional test but degrades downstream semantics.</li>
+      <li><strong>State machine.</strong> The driver has to handle compound utterances ("clear then 2+2+2") and emit the verbs in the right order. Easy to test, hard to fake.</li>
+      <li><strong>Contract events.</strong> Calc.js doesn't emit any. The bridge has to bake them in. Without that, every dispatch times out and the whole experiment looks broken.</li>
+    </ul>
+    <p>If your real app is bigger and more semantically complex, the manifest grows but the methodology is the same. The 600-run benchmark uses an invoice editor (richer fixture, same approach) and reports <strong>15% silent-damage rate on raw DOM vs 0% on NAC3</strong> -- the same protocol contract that lets the calc be dispatched correctly here.</p>
+
+    <h2>Reproducing this</h2>
+    <pre><span class="c"># 1. Decorate (Forge silent path)</span>
+yf migrate ./calc-raw --ai-silent --with-pilot \
+  --ai-out ./calc-forge-silent
+
+<span class="c"># 2. Open in browser, or run the harness</span>
+cd /path/to/nac3-bench/bench
+node scripts/calc_bench.mjs
+
+<span class="c"># 3. Drive by hand: click the floating sumi-e button,</span>
+<span class="c">#    paste an Anthropic key, ask "calcula 3 mas 4".</span>
+xdg-open ./calc-forge-silent/index.html</pre>
+    <p>Total cost to reproduce: $0.05 for the decoration + $0.03 for 5 driver dispatches. ~$0.08 total. Driver model can be swapped via the Pilot config to anything in the 600-run benchmark's roster.</p>
+
+  </main>
+
+  <footer class="footer">
+    NAC3 v2.3.1 · Methodology paper · 2026-05-20 &nbsp;·&nbsp;
+    <a href="index.html">migration home</a> &nbsp;·&nbsp;
+    <a href="results.html">results</a> &nbsp;·&nbsp;
+    <a href="byte-diff.html">byte-by-byte diff</a>
+  </footer>
+
+</div>
+</body>
+</html>

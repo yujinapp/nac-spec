@@ -1,9 +1,11 @@
 # NAC3 -- Test Coverage Matrix (automatic + manual)
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 **Spec version:** 2.2 + v2.3 preview.
 **Generated:** 2026-05-11.
 **Authoritative for:** the Yujin reference repository
-`yujinapp/nac-spec` on `main`.
+`pkuschnirof/rpaforce-crm` on `main`.
 
 This matrix lists EVERY artifact in the NAC3 ecosystem and
 reports its coverage by automated tests + the manual

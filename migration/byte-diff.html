@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Migration paper · Byte-by-byte diff</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#18181b; --ink-soft:#3f3f46; --ink-mute:#71717a; --paper:#faf8f3; --paper-warm:#f3efe6; --rule:#1a1a1a; --accent:#b8390a; --teal:#2d6357; --gold:#9a7a1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; line-height: 1.65;
+    background-image: radial-gradient(circle at 20% 10%, rgba(184,57,10,0.03), transparent 40%), radial-gradient(circle at 80% 80%, rgba(45,99,87,0.03), transparent 40%); }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  .topbar { border-bottom: 1px solid var(--rule); padding: 18px 0; display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .topbar a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  header.hero { padding: 60px 0 40px; border-bottom: 1px solid var(--rule); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 20px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(36px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 22px; font-variation-settings: 'opsz' 144; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 760px; }
+  .lede strong { color: var(--ink); }
+  main { padding: 50px 0 80px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; margin: 48px 0 16px; font-variation-settings: 'opsz' 100; }
+  h2 em { font-style: italic; color: var(--accent); }
+  p { margin-bottom: 16px; color: var(--ink-soft); }
+  p strong { color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 30px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  table th, table td { padding: 8px 10px; border-bottom: 1px solid var(--ink-mute); text-align: left; vertical-align: top; }
+  table th { background: var(--paper-warm); font-weight: 700; }
+  table td.missing { color: var(--ink-mute); font-style: italic; }
+  table tr:hover td { background: rgba(184,57,10,0.03); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: var(--paper-warm); padding: 1px 5px; border: 1px solid var(--ink-mute); color: var(--accent); }
+  .note { background: rgba(154,122,30,0.08); border-left: 4px solid var(--gold);
+    padding: 14px 22px; margin: 22px 0; font-size: 15px; color: var(--ink-soft); }
+  .note strong { color: var(--gold); }
+  .scroll { overflow-x: auto; }
+  .footer { padding: 40px 0 20px; border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mute); }
+  .footer a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Migration paper / Byte-by-byte diff</div>
+    <div>
+      <a href="methodology.html">← methodology</a>
+      &nbsp;·&nbsp;
+      <a href="index.html">migration home</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Paper 03 of 03 · every attribute · every cell</div>
+    <h1>The migration <em>under the microscope.</em></h1>
+    <p class="lede">
+      Side-by-side comparison of every NAC attribute set on every interactive element across the three decoration paths. Joined on the invariant <code>onclick</code> handler from <code>calc.js</code>. Then every manifest element. Then a divergence list with one row per disagreement, annotated by kind.
+    </p>
+  </header>
+
+  <main>
+
+    <h2>File sizes</h2>
+    <table>
+      <tr><th>fixture</th><th>index.html (bytes)</th><th>manifest.json (bytes)</th></tr>
+      <tr><td>forge-silent</td><td>6592</td><td>2658</td></tr>
+      <tr><td>forge-assisted</td><td>6592</td><td>2658</td></tr>
+      <tr><td>sumi-manual</td><td>7573</td><td>3468</td></tr>
+    </table>
+    <p>Differences are from (a) markup formatting (manual breaks attributes across multiple lines for readability), (b) <code>label_i18n</code> density on manifest non-action elements.</p>
+
+    <h2>Body / root attributes</h2>
+    <table>
+      <tr><th>fixture</th><th>data-nac-plugin</th></tr>
+      <tr><td>forge-silent</td><td><code>calc</code></td></tr>
+      <tr><td>forge-assisted</td><td><code>calc</code></td></tr>
+      <tr><td>sumi-manual</td><td><code>calc</code></td></tr>
+    </table>
+
+    <h2>Button-by-button decoration</h2>
+    <p>Joined on the invariant <code>onclick</code> handler from <code>calc.js</code>. Each row is one logical button. Cells show <code>data-nac-id</code> + <code>role / verb</code>.</p>
+    <div class="scroll">
+    <table>
+      <tr><th>onclick</th><th>visible</th><th>silent id</th><th>silent r/v</th><th>assisted id</th><th>assisted r/v</th><th>manual id</th><th>manual r/v</th></tr>
+      <tr><td><code>clearAll()</code></td><td><code>C</code></td><td><code>calc.action.clear</code></td><td><code>action / clear</code></td><td><code>calc.action.clear</code></td><td><code>action / clear</code></td><td><code>calc.action.clear</code></td><td><code>action / clear</code></td></tr>
+      <tr><td><code>backspace()</code></td><td>&larr;</td><td><code>calc.action.backspace</code></td><td><code>action / backspace</code></td><td><code>calc.action.backspace</code></td><td><code>action / backspace</code></td><td><code>calc.action.backspace</code></td><td><code>action / backspace</code></td></tr>
+      <tr><td><code>percent()</code></td><td>%</td><td><code>calc.action.percent</code></td><td><code>action / percent</code></td><td><code>calc.action.percent</code></td><td><code>action / percent</code></td><td><code>calc.action.percent</code></td><td><code>action / percent</code></td></tr>
+      <tr><td><code>setOp('/')</code></td><td>/</td><td><code>calc.action.divide</code></td><td><code>action / divide</code></td><td><code>calc.action.divide</code></td><td><code>action / divide</code></td><td><code>calc.action.op_divide</code></td><td><code>action / divide</code></td></tr>
+      <tr><td><code>digit('7')</code></td><td>7</td><td><code>calc.action.digit_7</code></td><td><code>action / digit_7</code></td><td><code>calc.action.digit_7</code></td><td><code>action / digit_7</code></td><td><code>calc.action.digit_7</code></td><td><code>action / digit_7</code></td></tr>
+      <tr><td><code>digit('8')</code></td><td>8</td><td><code>calc.action.digit_8</code></td><td><code>action / digit_8</code></td><td><code>calc.action.digit_8</code></td><td><code>action / digit_8</code></td><td><code>calc.action.digit_8</code></td><td><code>action / digit_8</code></td></tr>
+      <tr><td><code>digit('9')</code></td><td>9</td><td><code>calc.action.digit_9</code></td><td><code>action / digit_9</code></td><td><code>calc.action.digit_9</code></td><td><code>action / digit_9</code></td><td><code>calc.action.digit_9</code></td><td><code>action / digit_9</code></td></tr>
+      <tr><td><code>setOp('*')</code></td><td>x</td><td><code>calc.action.multiply</code></td><td><code>action / multiply</code></td><td><code>calc.action.multiply</code></td><td><code>action / multiply</code></td><td><code>calc.action.op_multiply</code></td><td><code>action / multiply</code></td></tr>
+      <tr><td><code>digit('4')</code></td><td>4</td><td><code>calc.action.digit_4</code></td><td><code>action / digit_4</code></td><td><code>calc.action.digit_4</code></td><td><code>action / digit_4</code></td><td><code>calc.action.digit_4</code></td><td><code>action / digit_4</code></td></tr>
+      <tr><td><code>digit('5')</code></td><td>5</td><td><code>calc.action.digit_5</code></td><td><code>action / digit_5</code></td><td><code>calc.action.digit_5</code></td><td><code>action / digit_5</code></td><td><code>calc.action.digit_5</code></td><td><code>action / digit_5</code></td></tr>
+      <tr><td><code>digit('6')</code></td><td>6</td><td><code>calc.action.digit_6</code></td><td><code>action / digit_6</code></td><td><code>calc.action.digit_6</code></td><td><code>action / digit_6</code></td><td><code>calc.action.digit_6</code></td><td><code>action / digit_6</code></td></tr>
+      <tr><td><code>setOp('-')</code></td><td>-</td><td><code>calc.action.subtract</code></td><td><code>action / subtract</code></td><td><code>calc.action.subtract</code></td><td><code>action / subtract</code></td><td><code>calc.action.op_subtract</code></td><td><code>action / subtract</code></td></tr>
+      <tr><td><code>digit('1')</code></td><td>1</td><td><code>calc.action.digit_1</code></td><td><code>action / digit_1</code></td><td><code>calc.action.digit_1</code></td><td><code>action / digit_1</code></td><td><code>calc.action.digit_1</code></td><td><code>action / digit_1</code></td></tr>
+      <tr><td><code>digit('2')</code></td><td>2</td><td><code>calc.action.digit_2</code></td><td><code>action / digit_2</code></td><td><code>calc.action.digit_2</code></td><td><code>action / digit_2</code></td><td><code>calc.action.digit_2</code></td><td><code>action / digit_2</code></td></tr>
+      <tr><td><code>digit('3')</code></td><td>3</td><td><code>calc.action.digit_3</code></td><td><code>action / digit_3</code></td><td><code>calc.action.digit_3</code></td><td><code>action / digit_3</code></td><td><code>calc.action.digit_3</code></td><td><code>action / digit_3</code></td></tr>
+      <tr><td><code>setOp('+')</code></td><td>+</td><td><code>calc.action.add</code></td><td><code>action / add</code></td><td><code>calc.action.add</code></td><td><code>action / add</code></td><td><code>calc.action.op_add</code></td><td><code>action / add</code></td></tr>
+      <tr><td><code>digit('0')</code></td><td>0</td><td><code>calc.action.digit_0</code></td><td><code>action / digit_0</code></td><td><code>calc.action.digit_0</code></td><td><code>action / digit_0</code></td><td><code>calc.action.digit_0</code></td><td><code>action / digit_0</code></td></tr>
+      <tr><td><code>dot()</code></td><td>.</td><td><code>calc.action.dot</code></td><td><code>action / dot</code></td><td><code>calc.action.dot</code></td><td><code>action / dot</code></td><td><code>calc.action.dot</code></td><td><code>action / dot</code></td></tr>
+      <tr><td><code>equals()</code></td><td>=</td><td><code>calc.action.equals</code></td><td><code>action / equals</code></td><td><code>calc.action.equals</code></td><td><code>action / equals</code></td><td><code>calc.action.equals</code></td><td><code>action / equals</code></td></tr>
+    </table>
+    </div>
+
+    <div class="note">
+      <strong>Reading the table.</strong> 15 of 19 buttons are byte-identical across all three decorations. The 4 differences are the operator buttons -- Forge uses <code>calc.action.add</code>, Sumi uses <code>calc.action.op_add</code>. The verb name (<code>add</code>) is the same in both, so the dispatch path is functionally equivalent.
+    </div>
+
+    <h2>Manifest elements</h2>
+    <p>Joined on the logical key (id minus the <code>calc.</code> plugin prefix). <code>(missing)</code> means that fixture's manifest omits the element entirely.</p>
+    <div class="scroll">
+    <table>
+      <tr><th>logical key</th><th>forge-silent</th><th>forge-assisted</th><th>sumi-manual</th></tr>
+      <tr><td><code>action.add</code></td><td><code>calc.action.add</code> action verb=[add]</td><td><code>calc.action.add</code> action verb=[add]</td><td class="missing">(absent: uses action.op_add)</td></tr>
+      <tr><td><code>action.backspace</code></td><td><code>calc.action.backspace</code> action verb=[backspace]</td><td><code>calc.action.backspace</code> action verb=[backspace]</td><td><code>calc.action.backspace</code> action verb=[backspace]</td></tr>
+      <tr><td><code>action.clear</code></td><td><code>calc.action.clear</code> action verb=[clear]</td><td><code>calc.action.clear</code> action verb=[clear]</td><td><code>calc.action.clear</code> action verb=[clear]</td></tr>
+      <tr><td><code>action.digit_0</code></td><td>... verb=[digit_0]</td><td>... verb=[digit_0]</td><td>... verb=[digit_0]</td></tr>
+      <tr><td><code>action.digit_1</code></td><td>... verb=[digit_1]</td><td>... verb=[digit_1]</td><td>... verb=[digit_1]</td></tr>
+      <tr><td><code>action.digit_2</code></td><td>... verb=[digit_2]</td><td>... verb=[digit_2]</td><td>... verb=[digit_2]</td></tr>
+      <tr><td><code>action.digit_3</code></td><td>... verb=[digit_3]</td><td>... verb=[digit_3]</td><td>... verb=[digit_3]</td></tr>
+      <tr><td><code>action.digit_4</code></td><td>... verb=[digit_4]</td><td>... verb=[digit_4]</td><td>... verb=[digit_4]</td></tr>
+      <tr><td><code>action.digit_5</code></td><td>... verb=[digit_5]</td><td>... verb=[digit_5]</td><td>... verb=[digit_5]</td></tr>
+      <tr><td><code>action.digit_6</code></td><td>... verb=[digit_6]</td><td>... verb=[digit_6]</td><td>... verb=[digit_6]</td></tr>
+      <tr><td><code>action.digit_7</code></td><td>... verb=[digit_7]</td><td>... verb=[digit_7]</td><td>... verb=[digit_7]</td></tr>
+      <tr><td><code>action.digit_8</code></td><td>... verb=[digit_8]</td><td>... verb=[digit_8]</td><td>... verb=[digit_8]</td></tr>
+      <tr><td><code>action.digit_9</code></td><td>... verb=[digit_9]</td><td>... verb=[digit_9]</td><td>... verb=[digit_9]</td></tr>
+      <tr><td><code>action.divide</code></td><td><code>calc.action.divide</code> verb=[divide]</td><td><code>calc.action.divide</code> verb=[divide]</td><td class="missing">(absent: uses action.op_divide)</td></tr>
+      <tr><td><code>action.multiply</code></td><td><code>calc.action.multiply</code> verb=[multiply]</td><td><code>calc.action.multiply</code> verb=[multiply]</td><td class="missing">(absent: uses action.op_multiply)</td></tr>
+      <tr><td><code>action.subtract</code></td><td><code>calc.action.subtract</code> verb=[subtract]</td><td><code>calc.action.subtract</code> verb=[subtract]</td><td class="missing">(absent: uses action.op_subtract)</td></tr>
+      <tr><td><code>action.op_add</code></td><td class="missing">(absent)</td><td class="missing">(absent)</td><td><code>calc.action.op_add</code> verb=[add]</td></tr>
+      <tr><td><code>action.op_divide</code></td><td class="missing">(absent)</td><td class="missing">(absent)</td><td><code>calc.action.op_divide</code> verb=[divide]</td></tr>
+      <tr><td><code>action.op_multiply</code></td><td class="missing">(absent)</td><td class="missing">(absent)</td><td><code>calc.action.op_multiply</code> verb=[multiply]</td></tr>
+      <tr><td><code>action.op_subtract</code></td><td class="missing">(absent)</td><td class="missing">(absent)</td><td><code>calc.action.op_subtract</code> verb=[subtract]</td></tr>
+      <tr><td><code>action.percent</code></td><td>... verb=[percent]</td><td>... verb=[percent]</td><td>... verb=[percent]</td></tr>
+      <tr><td><code>action.dot</code></td><td>... verb=[dot]</td><td>... verb=[dot]</td><td>... verb=[dot]</td></tr>
+      <tr><td><code>action.equals</code></td><td>... verb=[equals]</td><td>... verb=[equals]</td><td>... verb=[equals]</td></tr>
+      <tr><td><code>field.display</code></td><td><code>calc.field.display</code> field</td><td><code>calc.field.display</code> field</td><td><code>calc.field.display</code> field (+ label_i18n)</td></tr>
+      <tr><td><code>field.history</code></td><td><code>calc.field.history</code> field</td><td><code>calc.field.history</code> field</td><td><code>calc.field.history</code> field (+ label_i18n)</td></tr>
+      <tr><td><code>region.main</code></td><td><code>calc.region.main</code> region</td><td><code>calc.region.main</code> region</td><td><code>calc.region.main</code> region (+ label_i18n)</td></tr>
+      <tr><td><code>region.pad</code></td><td><code>calc.region.pad</code> region</td><td><code>calc.region.pad</code> region</td><td class="missing">(absent: uses region.keypad)</td></tr>
+      <tr><td><code>region.keypad</code></td><td class="missing">(absent: uses region.pad)</td><td class="missing">(absent: uses region.pad)</td><td><code>calc.region.keypad</code> region (+ label_i18n)</td></tr>
+    </table>
+    </div>
+
+    <h2>Divergences</h2>
+    <p>Every place where one fixture diverges from another (id structure, manifest role, or verb name).</p>
+    <table>
+      <tr><th>kind</th><th>element</th><th>forge-silent</th><th>forge-assisted</th><th>sumi-manual</th></tr>
+      <tr><td>id</td><td><code>setOp('/')</code></td><td><code>calc.action.divide</code></td><td><code>calc.action.divide</code></td><td><code>calc.action.op_divide</code></td></tr>
+      <tr><td>id</td><td><code>setOp('*')</code></td><td><code>calc.action.multiply</code></td><td><code>calc.action.multiply</code></td><td><code>calc.action.op_multiply</code></td></tr>
+      <tr><td>id</td><td><code>setOp('-')</code></td><td><code>calc.action.subtract</code></td><td><code>calc.action.subtract</code></td><td><code>calc.action.op_subtract</code></td></tr>
+      <tr><td>id</td><td><code>setOp('+')</code></td><td><code>calc.action.add</code></td><td><code>calc.action.add</code></td><td><code>calc.action.op_add</code></td></tr>
+      <tr><td>shape</td><td><code>region.pad</code> vs <code>region.keypad</code></td><td>uses <code>pad</code></td><td>uses <code>pad</code></td><td>uses <code>keypad</code></td></tr>
+      <tr><td>i18n</td><td>label_i18n on field+region</td><td class="missing">none</td><td class="missing">none</td><td>full es/en on every element</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>Reading the divergences.</strong> Zero verb-name divergences. The 4 operator id divergences are stylistic (<code>action.add</code> vs <code>action.op_add</code>) and don't change dispatch behaviour because both refer to the same verb. The only structural difference is the keypad region name (<code>pad</code> vs <code>keypad</code>) and Sumi's i18n labels on non-action elements. The verb-set the LLM has to choose from is identical in size for all three.
+    </div>
+
+    <h2>E2E driver cost (latest run)</h2>
+    <p>Source: <code>results/calc_e2e_2026-05-20T19-55-11-899Z.jsonl</code>, 1 iteration per (fixture, task), driver Claude Sonnet 4.6.</p>
+    <table>
+      <tr><th>fixture</th><th>mean tokens in</th><th>mean tokens out</th><th>mean LLM latency (ms)</th><th>5-task cost (Sonnet 4.6)</th></tr>
+      <tr><td>forge-silent</td><td>1307</td><td>108</td><td>3288</td><td>$0.02774</td></tr>
+      <tr><td>forge-assisted</td><td>1307</td><td>108</td><td>2651</td><td>$0.02774</td></tr>
+      <tr><td>sumi-manual</td><td>1755</td><td>107</td><td>2772</td><td>$0.03435</td></tr>
+    </table>
+
+    <h2>E2E success rate (latest run)</h2>
+    <table>
+      <tr><th>fixture</th><th>tasks passed</th></tr>
+      <tr><td>forge-silent</td><td>5 / 5</td></tr>
+      <tr><td>forge-assisted</td><td>5 / 5</td></tr>
+      <tr><td>sumi-manual</td><td>5 / 5</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>The headline.</strong> 19 of 19 button decorations agree on verb. Three of 19 disagree on id naming (operator buttons). One region label disagrees (<code>pad</code> vs <code>keypad</code>). Sumi-manual adds <code>label_i18n</code> across the board which costs +17% input tokens per dispatch with no functional benefit for the LLM driver. All three pass every task in the suite.
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    NAC3 v2.3.1 · Byte-by-byte diff · 2026-05-20 &nbsp;·&nbsp;
+    <a href="index.html">migration home</a> &nbsp;·&nbsp;
+    <a href="results.html">results</a> &nbsp;·&nbsp;
+    <a href="methodology.html">methodology</a>
+  </footer>
+
+</div>
+</body>
+</html>

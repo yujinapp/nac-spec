@@ -1,73 +1,323 @@
 # Changelog
 
-## 2.3.0 -- 2026-05-20
+## 2.4.0 -- 2026-05-21
 
-### Added
+NAC3 v2.4.0 is a **behavior-of-contract change**: id / verb / qualifier
+resolution becomes strict. Backwards-compatible with code paths that
+already supplied unambiguous arguments, **NOT** backwards-compatible
+with code paths that depended on the previous lenient (`indexOf`)
+fallback to resolve to the first near-match.
 
-- **`NAC.syncPlugin(spec)`** -- idempotent plugin registration.
-  Replaces the manifest for a plugin instead of appending, fixing the
-  stale-snapshot class of bugs where repeated `register()` calls on
-  dynamic re-renders accumulated duplicate manifest entries. Counterpart
-  to the existing `syncDataTable`. Recommended path for SPA hosts.
-- **`data-nac-plugin-id`** -- explicit plugin instance identifier for
-  pages with multiple roots sharing a plugin slug. When a slug appears
-  more than once in the DOM, every root MUST carry a unique
-  `data-nac-plugin-id`. `validate_global` flags violations.
+### Why this changed (the principle, not a feature)
 
-### Fixed
+The lenient resolution in 2.3.x violated the spec's 0-silent-damage
+invariant. Specifically, `click_by_verb(plugin, verb, { qualifier })`
+would, on a no-exact-suffix match, fall through to an `indexOf(qualifier)`
+substring search and resolve silently to whatever element happened to
+contain the qualifier string anywhere in its id. The H4 benchmark on the
+Conduit case study (2026-05-21) showed that **12 of 18 "model failures"
+on the canonical flows were actually silent runtime damage** — the
+agent emitted an invalid qualifier, the runtime sent it to the wrong
+element, the agent looped against the wrong page state. Strict
+resolution rescues those 12 (see `nac-spec/conduit/H4_STRICT_NAC_REPORT.md`).
 
-- Manifest accumulation on repeated `register()` calls. `syncPlugin` is
-  the recommended migration path for hosts that re-render.
-- `validate_global` now flags duplicate plugin manifest entries.
+For an assistive-software use case (the principal driver of this
+project), a silent dispatch to the wrong element with no recovery path
+is a safety blocker. Strict resolution closes that gap.
 
-### Benchmark
+### New error model — disambiguation contract
 
-This release ships the runtime that was validated across **600 runs**
-(5 models x 3 protocols x 4 tasks x 10 iterations) published at
-<https://github.com/yujinapp/nac-spec/tree/main/benchmark/>. Highlights:
+When `click_by_verb` / `tab` / `tab_by_label` cannot resolve a request
+unambiguously, the runtime now:
 
-- **95.5% success rate** under NAC3 (191 / 200 runs).
-- **Zero phantom-selector silent damage** in NAC3 (0 / 200) vs
-  **15%** in Raw DOM (30 / 200).
-- **1.0 round-trip per task** in NAC3 vs 3.5 in MCP.
-- Cheap models (Gemini Flash Lite, GPT-4o-mini) reached
-  **100% success** under NAC3 -- matching frontier models in Raw DOM.
+1. Emits `nac:disambiguation_requested` on `document` with a
+   structured detail payload (see below).
+2. Throws `NacError` with `err.code` ∈ `{no_matching_instance,
+   ambiguous_qualifier, ambiguous_tab, ambiguous_label}` AND
+   `err.candidates: [{nac_id, label}, ...]` pre-validated against the
+   live DOM.
 
-Full reproducibility: every JSONL row carries `runtime_version`,
-`bench_version`, `manifest_checksum`. Bundle downloadable from the
-benchmark page. Cost to re-run: ~US$15.
+Detail / candidates payload:
+```js
+{
+  method:    'click_by_verb' | 'tab' | 'tab_by_label',
+  plugin:    string | null,
+  query:     { verb?, qualifier?, label?, id? },
+  reason:    'no_matching_instance' | 'ambiguous_qualifier' | 'ambiguous_tab' |
+             'ambiguous_label' | 'ambiguous_label_exact' | 'ambiguous_label_fuzzy' |
+             'no_matching_label',
+  candidates: [{ nac_id: string, label: string }, ...]
+}
+```
 
-### Experimental (not yet GA)
+A reactive host (chat UI / voice agent / screen-reader) can listen
+on the event and present the options to the user as *"did you
+mean A or B?"*. A synchronous catcher can read `err.candidates`
+directly. An autonomous agent (Pilot, etc.) can inject the candidates
+into the next turn's prompt so the LLM picks from a DOM-validated
+list instead of re-guessing a qualifier.
 
-The runtime contains code merged for the V24-04 RFC (snapshot
-versioning + optimistic concurrency control). This release ships it as
-**implementation present, enforcement opt-in**:
+### What changed in the resolvers
 
-- `plugin_version` and `element_state_hash` are present in
-  `NAC.describe()` output by default. Shape is stable; semantics may
-  tighten in v2.4.
-- `expected_plugin_version` and `expected_tree_version` parameters on
-  dispatch are accepted, but enforcement (throwing `snapshot_stale`)
-  is gated behind `NAC.STRICT_VERSIONING = true`. Default is `false`.
-- `markHydrationComplete()` is exported and active. SSR hosts may call
-  it; SPA hosts get a 100ms auto-fallback.
+- **`click_by_verb` with qualifier:** only exact-equality or anchored
+  suffix (`id === qualifier || id.endsWith('__' + qualifier)`)
+  resolves. Multiple matches → `ambiguous_qualifier`. Zero matches →
+  `no_matching_instance`. **The `indexOf` substring fallback is
+  removed.**
+- **`tab` single-arg form:** bare id resolves to exact match in DOM. If
+  no exact, exactly one anchored-prefix instance
+  (`id.startsWith(bare + '__')`) resolves; multiple → `ambiguous_tab`;
+  zero → `no_matching_instance`.
+- **`tab_by_label`:** two-tier strict — exact label match first
+  (errors if multiple), then substring match (errors if multiple).
+  Fuzzy match preserved for voice/assistive use case; ambiguity
+  caught.
 
-The 2.3 benchmark ran with `STRICT_VERSIONING=false` and did not
-exercise the OCC enforcement. V24-04 will move from "experimental
-opt-in" to "SHIPPED" in v2.4, validated by a dedicated concurrency
-benchmark. See `/rfcs/README.md` for status.
+### Verification
 
-V24-05 (agent authority + interposition: `confirm_action`,
-`request_authority`) is RFC draft only -- not in this runtime.
+- `packages/nac/test/stage2-disambiguation.mjs` — pre-existing
+  tab_by_label cases still PASS (B1–B4).
+- `packages/nac/test/stage7-strict-resolution.mjs` (new) — 9/9
+  invariants pass under JSDOM shim.
+- `nac3-bench/bench/scripts/stage7_strict_nac.mjs` (new) — 9/9
+  invariants pass under Playwright against a live page.
+- `nac3-bench/bench/h4_results/h4_2026-05-21T19-01-19-040Z.json` —
+  cheap-model benchmark with strict NAC: 48/54 = 89% (vs 36/54 = 67%
+  under lenient).
 
-### Spec changes
+### Migration guide
 
-- `SPEC.md` header bumped to v2.3.
-- New `/rfcs/` directory separates spec-shipped features from open
-  proposals. Index in `/rfcs/README.md` documents status per RFC.
-- `docs/BENCHMARK_PROVENANCE.md` ties dataset (which reads
-  `runtime_version=2.2.1` per JSONL field) to the npm release
-  (`2.3.0`) via the shared commit hash.
+If your code was passing fuzzy qualifiers and depending on the runtime
+to pick "something close", the upgrade requires you to:
+- Either supply the full `nac_id` directly (always unambiguous), OR
+- Pass the exact `__suffix` of the instance you want, OR
+- Listen for `nac:disambiguation_requested` / catch `NacError` with
+  `err.candidates` and pick from the returned list.
+
+Most users won't be affected — the only callers that broke during the
+internal regression were the ones that were already broken silently in
+2.3.x but happened to land on the wrong-but-related element instead of
+failing.
+
+---
+
+## 2.3.1 -- 2026-05-13 (stable, blank republish)
+
+Identical source to 2.3.0. The 2.3.0 tag had already been published to
+npm as a preview; 2.3.1 is the first installable stable version. No
+behavioural changes.
+
+---
+
+## 2.3.0 -- 2026-05-13 (stable)
+
+NAC3 v2.3.0 is the first stable release of the payload-bearing
+contract. Everything in 2.3.0-alpha.1 and 2.3.0-alpha.2 is rolled
+in; the alpha tags are deprecated. New in stable (beyond the alpha
+preview):
+
+### New primitives
+
+- **`NAC.invoke(action_id, payload, opts?)`** -- payload-bearing
+  action. Dispatches `nac:action:requested`, awaits the host's
+  `nac:action:succeeded` / `:failed` with the same `request_id`.
+  Default timeout 30 s. (Promoted from 2.3.0-alpha.1.)
+- **`NAC.utter(action_id, {text, lang?, voice?})`** -- ergonomic
+  shortcut for `verb='utter'`. (Promoted from 2.3.0-alpha.1.)
+- **`NAC.bindTab(el, handler, ctx, opts?)`** -- tab companion to
+  `bindAction`. Emits `nac:tab:activated` / `:activation_failed`
+  for you. Sister of v2.2's `bindAction`.
+- **`NAC.edit_field(nac_id)`** -- field editor primitive promoted
+  from preview to GA. Selection, replace, AI syntax correction,
+  save/cancel verbs. Modal mounts the `nac_editor` plugin
+  idempotently with all 10 locales.
+
+### Shadow DOM resolution (F1 + F6)
+
+- **Open shadow DOM**: the runtime walks `el.shadowRoot`
+  recursively up to depth 10. Any element with `data-nac-id`
+  inside an open shadow root is now resolvable by `NAC.click`,
+  `NAC.fill`, `NAC.invoke`, etc. with no glue code.
+- **Closed shadow DOM**: voluntary exposure contract. A
+  component MAY expose a `nac3` getter on the host element
+  implementing `query(selector)` (mandatory),
+  `queryAll(selector)` (recommended), and `describe()` (optional).
+  The runtime delegates to those methods.
+- **Error events** for closed shadow:
+  - `nac:shadow_blocked` -- emitted once per host with
+    `detail.reason` in `'exposure_threw'`, `'not_exposed'`.
+  - `nac:shadow_protocol_violation` -- emitted when an exposed
+    method returns a non-Element value.
+- All events use `composed: true` so they correctly cross shadow
+  boundaries to document-level listeners.
+
+### Auth-aware capabilities (F7)
+
+- Manifest entries MAY declare `requires_capability: 'verb_slug'`
+  at the element level or per `action.verb`. Array values use
+  OR semantics ("at least one cap matches passes").
+- `NAC.setCapabilities([...])`, `NAC.grantCapability(cap)`,
+  `NAC.revokeCapability(cap)`, `NAC.userCapabilities()` manage
+  the user's capability set.
+- `NAC.click` and `NAC.invoke` gate against the set before
+  dispatch. Missing cap -> reject with `code='capability_required'`
+  + emit `nac:command:rejected`.
+
+### Strict validation default (F3)
+
+- `NAC.STRICT_VALIDATION` default flipped from `false` to **`true`**
+  in v2.3 stable, per the v2.2 migration promise.
+  `NAC.register` now throws `code='strict_validation'` on
+  `manifest_role_unknown` / `tab_id_manifest_role_drift` /
+  `manifest_dom_role_mismatch` findings.
+- Opt-out: set `NAC.STRICT_VALIDATION = false` BEFORE any
+  `register()` call in your bootstrap. See
+  `guides/MIGRATION_v2.2_to_v2.3.md` for the playbook.
+
+### Hotfix carryover from alpha.2
+
+- `NAC.invoke` does NOT reject with `code='disabled'` on elements
+  with `disabled` or `aria-disabled='true'`. `invoke` is a logical
+  payload-bearing request, not a synthetic click. `NAC.click` still
+  rejects on disabled (click semantics preserved). Pinned down by
+  test v23-invoke.mjs T7/T8/T9 so the relaxation cannot silently
+  regress.
+
+### Test surface
+
+`npm test` now chains 7 suites (75+ assertions):
+smoke, v22, v23-invoke, v23-shadow, v23-capabilities, v23-editor,
+v23-interop. Plus 5 stage suites + live Playwright E2E
+(`atlas-pro-v23-utter-e2e.mjs` 16/16 GREEN against the deployed
+demo).
+
+### Spec text
+
+SPEC.md updated:
+- Section 5.1.4 -- `NAC.invoke` + `NAC.utter` final wording.
+- Section 5.1.5 -- Shadow DOM resolution (open, cap 10).
+- Section 5.1.6 -- Closed shadow DOM exposure API (voluntary).
+- Section 5.1.7 -- Auth-aware capabilities.
+- Section 13 -- `edit_field` promoted from preview to GA.
+
+### Reference adopters
+
+- Atlas Pro voice ad (`ads-demo/atlas-pro/`) -- production live,
+  uses `NAC.utter` + payload schema.
+- React demo (`packages/nac-react-demo/`) -- adopts payload-bearing
+  pattern for the chat-to-todos flow.
+- Angular demo (`packages/nac-angular-demo/`) -- mirror of React.
+- Web Component demos: `example-v23-shadow-open.html` and
+  `example-v23-shadow-closed.html`.
+
+## 2.3.0-alpha.2 -- 2026-05-13 (superseded by 2.3.0)
+
+Hotfix on top of 2.3.0-alpha.1:
+
+- `NAC.invoke` no longer rejects with `code='disabled'` when the
+  target element has `disabled` or `aria-disabled='true'` set. The
+  `disabled` HTML attribute is a click-event UX guard; `invoke` is
+  a logical payload-bearing request, not a synthetic click. Hosts
+  that need to refuse an invoke based on UI state should do it in
+  their `nac:action:requested` listener and emit
+  `nac:action:failed` with a meaningful code. This was hitting the
+  Atlas Pro mic which gets `disabled = true` during /parse +
+  /tts processing, blocking subsequent NAC.utter calls from
+  external agents mid-conversation. Reproduced in the video-gen
+  pipeline (every turn after the demo's first state-transition).
+- Bumped CLI version + smoke test assertions to match.
+
+## 2.3.0-alpha.1 -- 2026-05-12
+
+### New: payload-bearing actions via `NAC.invoke` + `NAC.utter`
+
+The NAC v2.2 contract was click-and-go: an agent triggers
+`NAC.click(id)` or `NAC.click_by_verb(plugin, verb)` and the host
+does whatever it does. That works for verb-and-state actions
+(`save`, `cancel`, `submit`, `delete`) but breaks down when the
+action needs **data** from the agent: `utter(text)`,
+`search(query)`, `send_message(body)`, `upload(file)`,
+`schedule(date)`. Hosts had no way to receive an agent's payload
+via a synthetic click.
+
+v2.3 adds the missing primitive:
+
+```ts
+NAC.invoke(action_id, payload, opts?): Promise<{ok, request_id, ack}>
+NAC.utter(action_id, {text, lang?, voice?}): Promise<...>
+```
+
+`NAC.invoke` dispatches a `nac:action:requested` CustomEvent on
+the host element (bubbles) with the agent's `payload` + a
+runtime-issued `request_id`. The host listens, processes, emits
+`nac:action:succeeded` (or `:failed`) echoing the same
+`request_id`. The runtime correlates and resolves the Promise.
+
+Default timeout 30 s (vs 5 s for click). On timeout the Promise
+rejects with `code='timeout'`.
+
+`NAC.utter(id, opts)` is the ergonomic shortcut for `verb='utter'`
+-- equivalent to `NAC.invoke(id, {verb:'utter', text, lang, voice})`.
+
+Manifest entries for payload-bearing actions can declare an
+informational `payload_schema`:
+
+```js
+{ id: 'atlas_pro_ad.mic', role: 'action',
+  actions: [
+    { verb: 'listen' },
+    { verb: 'utter',
+      payload_schema: {
+        text: { type: 'string', required: true, max: 4000 },
+        lang: { type: 'string', enum: ['en','es','pt','fr','it','de','ja','zh','hi','ar'] }
+      }
+    }
+  ]
+}
+```
+
+Click-style verbs (`NAC.click`, `NAC.click_by_verb`) continue to
+work unchanged. The new contract is purely additive; no demo
+behaviour regresses.
+
+#### First adopter
+
+Atlas Pro (`https://yujin.app/nac-spec/ads-demo/atlas-pro/`)
+declares both `listen` (click-only, existing) and `utter`
+(payload-bearing) on its `atlas_pro_ad.mic` action. The same
+`/ad-orchestrator/parse` + `/ad-orchestrator/tts` loop drives
+either path -- agents with their own STT call `listen`, agents
+with their own LM call `utter` with the recognised text.
+
+#### Test coverage
+
+- `test/v23-invoke.mjs` (new) -- 22 assertions covering happy
+  path, ack echo, host-failed path, invalid args, not-found,
+  custom timeout. PASS.
+- `test/v22.mjs` -- amended to accept v2.3.x in addition to
+  v2.2.x. PASS.
+- `test/smoke.mjs` -- updated version assertions. PASS.
+
+#### Files touched
+
+- `yujin.app/nac-spec/js/nac.js` -- `invoke()` + `utter()` (~150
+  LOC additive). Public API surface +2 functions. NAC.version
+  bumped to '2.3.0-alpha.1', spec_version to '2.3'.
+- `yujin.app/nac-spec/SPEC.md` -- new section 5.1.4 + header
+  version line.
+- `yujin.app/nac-spec/ads-demo/atlas-pro/index.html` -- manifest
+  declares the `utter` verb + DOM listener routes into the demo's
+  existing `handleUtterance(text)`.
+- `packages/nac/package.json`, `build.mjs`, `test/smoke.mjs` --
+  version bumps + new test in `npm test`.
+
+#### Not yet wired
+
+- `STRICT_VALIDATION` enforcement of `payload_schema` (alpha:
+  schema is informational).
+- A `NAC.search` / `NAC.upload` / `NAC.send_message` ergonomic
+  shortcut sibling to `NAC.utter`. The generic `NAC.invoke` works
+  today; concrete shortcuts can be added without re-spec.
 
 ## 2.2.1 -- 2026-05-12
 

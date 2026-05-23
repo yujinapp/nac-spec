@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAC3 -- framework demos</title>
+<meta name="description" content="NAC3 reference implementations in React and Angular. Apache 2.0.">
+<link rel="canonical" href="https://yujin.app/nac-spec/demos/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Noto+Serif+JP:wght@300;700&display=swap" rel="stylesheet">
+<style>
+:root{--cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;--ct:#2C2927;--ct2:#615E58;--ct3:#888480;--ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;--font-sans:"DM Sans",system-ui,sans-serif;--font-jp:"Noto Serif JP",serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--ct);background:var(--cp);line-height:1.6;padding:48px 24px;min-height:100vh;}
+.container{max-width:760px;margin:0 auto;}
+.eyebrow{font-size:.78rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
+.eyebrow .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ctl);}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:500;line-height:1.2;letter-spacing:-.02em;margin-bottom:1rem;}
+.lede{font-size:1.05rem;color:var(--ct2);max-width:60ch;margin-bottom:2.5rem;}
+.lede strong{color:var(--ct);font-weight:500;}
+.divider{display:flex;align-items:center;justify-content:center;padding:1.4rem 0;margin:0 0 2rem;}
+.divider::before,.divider::after{content:"";flex:1;border-top:.5px solid var(--cb);max-width:80px;}
+.divider .kanji{margin:0 1.2rem;font-family:var(--font-jp);color:var(--ca);font-size:1.3rem;font-weight:300;opacity:.85;}
+.demos{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-bottom:2.4rem;}
+.demo{background:var(--cs);border:.5px solid var(--cb);border-radius:12px;padding:22px;text-decoration:none;color:inherit;transition:all 200ms cubic-bezier(0.16,1,0.3,1);}
+.demo:hover{border-color:var(--ci);box-shadow:0 8px 24px rgba(45,58,140,.08);transform:translateY(-1px);}
+.demo h2{font-size:1.2rem;font-weight:500;color:var(--ct);margin-bottom:.4rem;}
+.demo .meta{font-size:.78rem;color:var(--ct3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.8rem;}
+.demo p{font-size:.92rem;color:var(--ct2);margin-bottom:.8rem;}
+.demo .arrow{font-size:.85rem;color:var(--ci);font-weight:500;}
+.note{background:#fafaf7;border:.5px solid var(--cb);border-radius:8px;padding:14px 16px;font-size:.88rem;color:var(--ct2);line-height:1.65;}
+.note code{background:var(--cm);padding:1px 6px;border-radius:3px;font-size:.85em;}
+.back{display:inline-block;margin-top:2rem;color:var(--ci);font-size:.88rem;font-weight:500;}
+.back:hover{color:#1A2260;}
+a{color:var(--ci);text-decoration:none;}
+a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="eyebrow"><span class="dot"></span>NAC3 framework demos</div>
+<h1>NAC3 in two flavors of the modern web.</h1>
+<p class="lede">
+  Both demos render the <strong>same NAC3 contract</strong>: the buttons,
+  fields, and verbs are addressable by an LLM, a voice runner, a Playwright
+  spec, or a human cursor through the same API. Pick your framework, look
+  at the source, ship NAC3 in your own app this afternoon.
+</p>
+
+<div class="divider"><span class="kanji">技</span></div>
+
+<div class="demos">
+
+  <a class="demo" href="react/">
+    <div class="meta">React 18 + Vite</div>
+    <h2>React adoption demo</h2>
+    <p>Hooks-based registration, JSX with <code style="font-size:.82em">data-nac-*</code> attributes, single-page reference app.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="angular/">
+    <div class="meta">Angular 17</div>
+    <h2>Angular adoption demo</h2>
+    <p>Component decorators + structural directive bindings, standalone components, signals-ready.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+</div>
+
+<div class="note">
+  <strong>Looking for vanilla / server-rendered?</strong>
+  See <a href="../example.php">example.php</a> (full reference) or any of the
+  <a href="../">example-*.php files at /nac-spec/</a>. NAC3 has zero runtime
+  dependency on a framework -- declare the attributes server-side and the
+  same contract holds.
+</div>
+
+<a class="back" href="../">&larr; Back to NAC3 spec</a>
+
+</div>
+</body>
+</html>

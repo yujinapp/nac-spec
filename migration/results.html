@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Migration paper · Results · Forge silent / assisted / Sumi manual</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#18181b; --ink-soft:#3f3f46; --ink-mute:#71717a; --paper:#faf8f3; --paper-warm:#f3efe6; --rule:#1a1a1a; --accent:#b8390a; --teal:#2d6357; --gold:#9a7a1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Source Serif 4', Georgia, serif; font-size: 17px; line-height: 1.65;
+    background-image: radial-gradient(circle at 20% 10%, rgba(184,57,10,0.03), transparent 40%), radial-gradient(circle at 80% 80%, rgba(45,99,87,0.03), transparent 40%); }
+  .container { max-width: 920px; margin: 0 auto; padding: 0 32px; }
+  .topbar { border-bottom: 1px solid var(--rule); padding: 18px 0; display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .topbar a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); border-color: var(--accent); }
+  header.hero { padding: 60px 0 40px; border-bottom: 1px solid var(--rule); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 20px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 22px; font-variation-settings: 'opsz' 144; }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .lede { font-size: 19px; color: var(--ink-soft); max-width: 760px; }
+  .lede strong { color: var(--ink); }
+  main { padding: 50px 0 80px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; margin: 48px 0 18px; font-variation-settings: 'opsz' 100; }
+  h2 em { font-style: italic; color: var(--accent); }
+  h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; margin: 32px 0 12px; }
+  p { margin-bottom: 16px; color: var(--ink-soft); }
+  p strong { color: var(--ink); }
+  ul, ol { margin: 0 0 18px 24px; color: var(--ink-soft); }
+  ul li, ol li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0 26px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  table th, table td { padding: 10px 12px; border-bottom: 1px solid var(--ink-mute); text-align: left; vertical-align: top; }
+  table th { background: var(--paper-warm); font-weight: 700; }
+  table tr:hover td { background: rgba(184,57,10,0.03); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    background: var(--paper-warm); padding: 1px 6px; border: 1px solid var(--ink-mute); color: var(--accent); border-radius: 0; }
+  .note { background: rgba(154,122,30,0.08); border-left: 4px solid var(--gold);
+    padding: 16px 22px; margin: 24px 0; font-size: 15px; color: var(--ink-soft); }
+  .note strong { color: var(--gold); }
+  .footer { padding: 40px 0 20px; border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-mute); }
+  .footer a { color: var(--ink); border-bottom: 1px solid var(--ink); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <div>NAC3 v2.3 / Migration paper / Results</div>
+    <div>
+      <a href="index.html">← migration home</a>
+      &nbsp;·&nbsp;
+      <a href="methodology.html">methodology →</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Paper 01 of 03 · 1 calculator · 3 decorations · 15 driver runs</div>
+    <h1>Cost, latency, success rate <em>after migration to NAC3.</em></h1>
+    <p class="lede">
+      How much does it cost to decorate a vanilla web app with NAC3? How does the manifest shape affect the cost of every subsequent dispatch? Three migration paths against one calculator. Driver: <strong>Claude Sonnet 4.6</strong>. Tasks: <strong>5 calc operations</strong>. Iterations: <strong>1 per (fixture, task)</strong>. All numbers come from the harness at <code>bench/scripts/calc_bench.mjs</code>.
+    </p>
+  </header>
+
+  <main>
+
+    <h2>The three paths</h2>
+    <table>
+      <tr><th>Path</th><th>Effort</th><th>One-shot LLM cost</th><th>Manifest elements</th></tr>
+      <tr><td><strong>Forge silent</strong><br/><code>yf migrate --ai-silent</code></td><td>23 s wall, no human input</td><td>$0.0468 · 2224 in / 2672 out</td><td>23 (4 region/field + 19 actions)</td></tr>
+      <tr><td><strong>Forge assisted</strong><br/><code>yf migrate --ai-assisted</code></td><td>25 s wall, model self-reports no ambiguities</td><td>$0.0473 · 2379 in / 2677 out</td><td>23 (identical to silent for this app)</td></tr>
+      <tr><td><strong>Sumi manual</strong><br/>hand-decorated reference</td><td>~30 min</td><td>--</td><td>23 (2 region + 2 field + 19 actions)</td></tr>
+    </table>
+
+    <div class="note">
+      <strong>Why assisted == silent here.</strong> Assisted mode lets the model raise ambiguity questions ("is this 'save' or 'submit'?") before producing the final decoration. The calculator's button labels and inline onclick handlers leave no ambiguity, so the model returns the same JSON as silent. Assisted's value shows up on apps with overlapping action semantics (CRM forms with two save-like buttons, multi-tab dashboards, etc.).
+    </div>
+
+    <h2>Functional success</h2>
+    <p>All three decorations drive the calc correctly on every task in the suite.</p>
+    <table>
+      <tr><th>Task</th><th>Forge silent</th><th>Forge assisted</th><th>Sumi manual</th><th>Expected</th></tr>
+      <tr><td>3 + 4 =</td><td>7 OK</td><td>7 OK</td><td>7 OK</td><td>7</td></tr>
+      <tr><td>12 + 15 =</td><td>27 OK</td><td>27 OK</td><td>27 OK</td><td>27</td></tr>
+      <tr><td>7 x 8 =</td><td>56 OK</td><td>56 OK</td><td>56 OK</td><td>56</td></tr>
+      <tr><td>100 / 4 =</td><td>25 OK</td><td>25 OK</td><td>25 OK</td><td>25</td></tr>
+      <tr><td>clear + 2+2+2 =</td><td>6 OK</td><td>6 OK</td><td>6 OK</td><td>6</td></tr>
+    </table>
+
+    <h2>Cost per dispatch</h2>
+    <p>The same driver (Sonnet 4.6) runs each of the 5 tasks against each fixture. Tokens and latency are mean per task; cost is the sum over 5 tasks.</p>
+    <table>
+      <tr><th>Fixture</th><th>Mean tokens in</th><th>Mean tokens out</th><th>Mean LLM latency</th><th>Total cost (5 tasks)</th></tr>
+      <tr><td>forge-silent</td><td>1153</td><td>114</td><td>2510 ms</td><td>$0.02575</td></tr>
+      <tr><td>forge-assisted</td><td>1153</td><td>114</td><td>2398 ms</td><td>$0.02564</td></tr>
+      <tr><td>sumi-manual</td><td>1442</td><td>113</td><td>2542 ms</td><td>$0.03004</td></tr>
+    </table>
+    <p><strong>Manual costs +17% to drive per task</strong> compared to Forge. The delta is the <code>label_i18n</code> payload Sumi attached to every action + field + region. Useful for accessibility, neutral for the model picking a verb -- the model already has the verb name.</p>
+
+    <h2>Total cost of ownership</h2>
+    <p>One-time decoration plus N dispatches at the per-task rates above. (Decoration cost for manual modeled at $30 = 30 min @ $60/h for a human.)</p>
+    <table>
+      <tr><th>Approach</th><th>Decoration</th><th>Per task</th><th>At N = 100</th><th>At N = 10000</th></tr>
+      <tr><td>Forge silent</td><td>$0.0468</td><td>$0.00515</td><td>$0.56</td><td>$51.5</td></tr>
+      <tr><td>Forge assisted</td><td>$0.0473</td><td>$0.00513</td><td>$0.56</td><td>$51.3</td></tr>
+      <tr><td>Sumi manual</td><td>$30.00 (30 min)</td><td>$0.00601</td><td>$30.60</td><td>$90.1</td></tr>
+    </table>
+    <p>Forge wins on TCO out to the multi-thousand-dispatch range. For the long tail (>50k dispatches in one app), a hybrid wins: have Forge produce the manifest, then trim <code>label_i18n</code> off non-action elements in a one-line post-pass.</p>
+
+    <h2>Latency</h2>
+    <p>Driver latency (LLM round-trip) is ~2.5 s mean across all three. The decoration call itself (one-shot Claude Sonnet 4.6 with the whole HTML + JS) is ~23 s -- one-off per app, ignorable in TCO. Dispatch latency in-browser is <50 ms per verb (NAC.click_by_verb is essentially DOM .click() + a contract event).</p>
+
+    <h2>Conclusions</h2>
+    <ol>
+      <li><strong>NAC3 migration is cheap.</strong> Forge does a clean job for $0.05 and 25 s. The output is drop-in: same UI, plus a JSON manifest the agent reads.</li>
+      <li><strong>Silent beats manual on operational cost.</strong> +17% input tokens for the manual reference is the cost of being thorough on <code>label_i18n</code>. If you're driving the app from an LLM thousands of times, drop the i18n off non-action elements.</li>
+      <li><strong>Assisted only earns its keep on ambiguous apps.</strong> For a calculator, the model has nothing to ask. For a CRM with two save-like buttons, the assisted round saves a bad guess.</li>
+      <li><strong>Functional parity is the headline.</strong> Five tasks, three decoration paths, zero failures -- the model picks the right verb chain from any of the three manifest shapes.</li>
+    </ol>
+
+  </main>
+
+  <footer class="footer">
+    NAC3 v2.3.1 · Results paper · 2026-05-20 &nbsp;·&nbsp;
+    <a href="index.html">migration home</a> &nbsp;·&nbsp;
+    <a href="methodology.html">methodology</a> &nbsp;·&nbsp;
+    <a href="byte-diff.html">byte-by-byte diff</a>
+  </footer>
+
+</div>
+</body>
+</html>

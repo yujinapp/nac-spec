@@ -1,3 +1,5 @@
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 ---
 translation_source: docs/NAC_V22_ROADMAP.md
 translation_source_hash: dc0f3c2cfa1ebdc7fb567491c123749675bbb7496bb16cee81c1e202e8e7d4f4

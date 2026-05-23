@@ -57,7 +57,7 @@ Apache 2.0 + MIT licensing यह सुनिश्चित करती ह�
 
 ## लेखकत्व
 
-NAC3 को Yujin (yujin.app) द्वारा authored और maintained किया गया है। Apache-2.0। Contributions का स्वागत है -- `CONTRIBUTING.md` देखें।
+NAC3 को Yujin (rpaforce.com) द्वारा authored और maintained किया गया है। Apache-2.0। Contributions का स्वागत है -- `CONTRIBUTING.md` देखें।
 
 ---
 

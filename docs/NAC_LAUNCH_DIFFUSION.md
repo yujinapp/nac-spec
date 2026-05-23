@@ -1,5 +1,7 @@
 # NAC3 launch diffusion plan
 
+> **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
+
 A practical playbook for getting NAC3 in front of the people who
 should be using it. Written 2026-05-10 for the v2.2 / v2.3-preview
 launch.
@@ -97,7 +99,7 @@ A 6-tweet thread:
 3. "How small: 3 HTML attributes per element. (code screenshot)"
 4. "What you get: stable names, deterministic completion events, 10-locale i18n out of the box, provenance via HMAC + isTrusted, auto-validation."
 5. "Live demo at yujin.app/nac-spec -- four demos, one wired to a Claude Sonnet chat backend. Talk to it."
-6. "React + Angular adoption guides + working study cases at github.com/yujinapp/nac-spec. Spec at yujin.app/nac-spec/SPEC.md."
+6. "React + Angular adoption guides + working study cases at github.com/pkuschnirof/rpaforce-crm. Spec at yujin.app/nac-spec/SPEC.md."
 
 ### LinkedIn
 
@@ -149,7 +151,7 @@ Posted to YouTube + Vimeo.
 ## Metrics to track
 
 - npm downloads of `@nac3/runtime` weekly.
-- GitHub stars + forks on `yujinapp/nac-spec` and
+- GitHub stars + forks on `pkuschnirof/rpaforce-crm` and
   `pkuschnirof/yujin`.
 - Demo page views at yujin.app/nac-spec/ (server access logs).
 - Number of GitHub issues opened (proxy for engagement).

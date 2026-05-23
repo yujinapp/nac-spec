@@ -4,25 +4,30 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-stable-success)](https://yujin.app/nac-spec/)
-[![Spec: v2.4 stable](https://img.shields.io/badge/spec-v2.4_stable-blue)](SPEC.md)
+[![Status: alpha](https://img.shields.io/badge/status-2.5--alpha-orange)](https://yujin.app/nac-spec/)
+[![Spec: v2.5-alpha](https://img.shields.io/badge/spec-v2.5_alpha-orange)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
-[![Tests: passing](https://img.shields.io/badge/tests-passing-success)](docs/COVERAGE_REPORT_2026_05_10.md)
-[![Coverage: ~95%](https://img.shields.io/badge/coverage-95%25-success)](docs/TEST_COVERAGE_MATRIX.md)
+[![Tests: passing](https://img.shields.io/badge/tests-349_passing-success)](runtime/test/)
 
-> **v2.4.0 stable shipping today** (2026-05-23) -- zero-silent-damage
-> strict resolution. The lenient `indexOf` qualifier fallback is removed:
-> `click_by_verb` / `tab` / `tab_by_label` now throw `NacError` with
-> `err.candidates` and emit `nac:disambiguation_requested` on `document`
-> when a request resolves to multiple or zero elements, so reactive
-> hosts (chat UI, voice agent, screen reader) can prompt *"did you mean
-> A or B?"* instead of silently dispatching to the wrong button.
-> Validated on the Conduit H4 benchmark: 89% cheap-model success under
-> strict (vs 67% under lenient). For assistive-software use cases, where
-> a silent wrong dispatch is unrecoverable, this is the headline change.
-> See [example-v24-disambiguation.php](example-v24-disambiguation.php),
-> [SPEC.md sec 16](SPEC.md), [CHANGELOG](packages/nac/CHANGELOG.md).
+> **v2.5.0-alpha.1 shipping today** (2026-05-23) -- consolidation alpha.
+> Unifies the two parallel dev lines that diverged during May 2026 and
+> establishes `yujinapp/nac-spec` as the SOLE source of truth for NAC3
+> from this commit forward. Adds **V25-01** plugin extension contract
+> for canvas+API surfaces (Block A: 8 backends -- postmessage,
+> postmessage-listen, sdk-call, script-bridge, dom-mirror,
+> same-origin-window, synthetic-mutation, synthetic-poll); ships
+> **V24-02** `syncPlugin` for the first time in code (was announced in
+> 2.3.x but never landed); ships **V24-05** agent authority + sudo
+> elevation primitives (`confirm_action`, `request_authority` with TTL,
+> scope rank, `set_confirm_handler`); enforces **V24-01** plugin slug
+> uniqueness via `data-nac-plugin-id` at register time + boot pass +
+> CI gate. Read [PROJECT.md](PROJECT.md) for the orientation +
+> programming norms; [CHANGELOG](runtime/CHANGELOG.md) for the full
+> entry; [rfcs/](rfcs/) for the RFC state index.
+>
+> V24-04 snapshot versioning + OCC is in implementation and targets
+> 2.5.0-alpha.2 (or rc.1).
 
 ---
 
@@ -76,20 +81,26 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 
 | App | Type | NAC3 version |
 |-----|------|--------------|
-| [Yujin CRM](https://yujin.app) | Production reference | v2.4 |
-| [Reference demos](https://yujin.app/nac-spec/) | Live, 9 examples (vanilla, React, Angular, data-table, interop, voice ad, disambiguation) | v2.4 |
-| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.4 |
+| [Yujin CRM](https://yujin.app) | Production reference | v2.5-alpha |
+| [Reference demos](https://yujin.app/nac-spec/) | Live, 9 examples (vanilla, React, Angular, data-table, interop, voice ad, disambiguation) | v2.5-alpha |
+| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.5-alpha |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
-## Status: stable
+## Status: alpha + stable in parallel
 
+- **v2.5.0-alpha.1** -- shipped 2026-05-23. **Consolidation alpha.**
+  Adds RFC V25-01 plugin extension contract for canvas+API (Block A
+  with 8 backends), V24-02 syncPlugin (first real implementation),
+  V24-05 agent authority + sudo elevation, V24-01 plugin slug
+  uniqueness enforcement. Also establishes `yujinapp/nac-spec` as
+  the SOLE source of truth for NAC3 (the rpaforce-crm working copy
+  is deleted as of this release). V24-04 snapshot versioning + OCC
+  in flight for alpha.2.
 - **v2.4** -- shipped 2026-05-23. Zero-silent-damage strict resolution
   + disambiguation contract. `click_by_verb` / `tab` / `tab_by_label`
   throw `NacError` with `err.candidates` and emit
   `nac:disambiguation_requested` instead of guessing. Headline change
-  for assistive-software callers. Backwards-compatible with code paths
-  that already supplied unambiguous arguments. **What `npm install
-  @nac3/runtime` delivers today.**
+  for assistive-software callers. Stable in 2.5; behaviour unchanged.
 - **v2.3** -- shipped 2026-05-13. Payload-bearing actions
   (`NAC.invoke(id, payload)`, `NAC.utter(id, {text, lang})`), F1-F7
   primitives (bindTab, edit_field GA, auth-aware caps).

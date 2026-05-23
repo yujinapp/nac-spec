@@ -1,5 +1,139 @@
 # Changelog
 
+## 2.5.0-alpha.1 -- 2026-05-23
+
+NAC3 v2.5.0-alpha.1 is a **consolidation release**. Two parallel
+development lines that diverged during May 2026 are unified here.
+The yujinapp/nac-spec repository becomes the SOLE source of truth
+for NAC3 from this commit forward; the prior development copies
+under rpaforce-crm (`packages/nac/`, `yujin.app/nac-spec/`) are
+deleted in that monorepo's history.
+
+### Lines unified
+
+- **Line A** (was on this repo, RFC track): V24-01 plugin slug
+  uniqueness, V24-02 idempotent syncPlugin (was announced in
+  2.3.x changelog but never landed in code -- now implemented
+  for the first time with full test coverage), V24-04 snapshot
+  versioning + OCC (in flight, see "Pending" below), V24-05
+  agent authority + sudo (was DRAFT, ships SHIPPED here).
+- **Line B** (was on rpaforce-crm, contract track): V25-01 plugin
+  extension contract for canvas+API surfaces (Block A: 8 backends
+  complete + tests).
+
+### Added (V25-01 -- NEW)
+
+- `NAC.registerPlugin(slug, manifest)` declarative plugin
+  registration for surfaces where verbs / state / events route
+  through something other than direct DOM (postMessage to iframe,
+  plugin SDK call, script bridge, DOM mirror, same-origin window,
+  synthesised events).
+- `NAC.call(plugin, verb_path, args)` abstract verb dispatch.
+- `NAC.read(plugin, state_path)` abstract state read with declared
+  fallback chain semantics.
+- `NAC.subscribe(plugin, event_path, cb) / unsubscribe(handle)`
+  event subscription with backend routing.
+- 8 backend kinds in fixed vocabulary: `postmessage`,
+  `postmessage-listen`, `sdk-call`, `script-bridge`, `dom-mirror`,
+  `same-origin-window`, `synthetic-mutation`, `synthetic-poll`.
+- Declarative extractor mini-DSL (`text` / `value` / `present` /
+  `attribute:NAME` / `classList.contains:CLASS` / dotted-path).
+- Provenance event family: `nac:plugin:invoked` / `:read` / `:event`
+  with `{plugin, backend, request_id, source, trusted, duration_ms,
+  ok, error}` payload.
+
+### Added (V24-02 -- NEW IMPLEMENTATION)
+
+- `NAC.syncPlugin(manifest)` / `NAC.syncPlugin(slug, manifest)`
+  -- idempotent registration. Replaces the manifest for a slug
+  instead of appending; SPA hosts call this on remount without
+  accumulating stale entries.
+- Returns `{ replaced: boolean, slug, version }`.
+- Emits `nac:plugin:invalidated` on REPLACE (not on first-add),
+  detail `{plugin_slug, plugin_instance_id, from_version,
+  to_version, trigger: 'syncPlugin'}`.
+
+### Added (V24-05 -- NEW)
+
+- `NAC.set_confirm_handler(fn)` -- register async (req) => boolean.
+- `NAC.confirm_action(action_id, message, opts?)` -- Promise<boolean>.
+  Sudo bypass: short-circuits true if elevation already granted
+  for the requested scope (or higher).
+- `NAC.request_authority(scope, ttl_ms, opts?)` -- sudo-style
+  time-bounded elevation. Scope rank: high > medium > low.
+- `NAC.has_authority(scope) -> bool`.
+- `NAC.revoke_authority(scope) -> void` (idempotent).
+- Provenance event family:
+  `nac:authority:requested / :granted / :denied / :revoked / :expired`,
+  `nac:action:confirmed / :rejected`.
+- SUPERSEDES the v1.9 confirm_action mechanism (removed: it was
+  unused + had a strictly narrower contract).
+
+### Added (V24-01 -- CONSOLIDATED + ENFORCED)
+
+- `NAC.HARD_DEDUP` flag (default true). Gates the synchronous
+  throw in `NAC.register` + the boot-time pass.
+- `NAC.register` throws `NacError('duplicate_plugin_no_instance_id',
+  ...)` synchronously when the DOM already contains multiple roots
+  for the registered slug and any of them omits / duplicates
+  `data-nac-plugin-id`.
+- Boot-time pass on `DOMContentLoaded` runs the same check across
+  every `[data-nac-plugin]` root. On first violation: dispatches
+  `nac:fatal` event + paints a fixed-position red banner
+  (`#__nac_fatal_banner__`) + re-throws asynchronously so test
+  harnesses + browsers catch it.
+- `validate_global()` extended with `plugin_instance_violations`
+  array -- structured findings for CI gates.
+- Migration: `NAC.HARD_DEDUP = false` BEFORE any `register()`
+  call opts out for one release window. Flag removed in v2.6.
+
+### New: PROJECT.md at repo root
+
+PROJECT.md documents the post-migration topology, the RFC process
+states (Proposed / In implementation / Implemented / Alpha /
+Production), the doc-update invariant (every RFC transition
+touches SPEC + CHANGELOG + USER_MANUAL + TECHNICAL_DESIGN + demos
+list + benchmark numbers + Sumi KB), and the programming +
+architecture norms. Read it FIRST before any contribution.
+
+### Tests
+
+`runtime/test/` suite now has 13 stages:
+
+  smoke + v22 + v23-{invoke,shadow,capabilities,editor,interop}
+  + stage2-disambiguation + stage7-strict-resolution + stage8-plugin-extension
+  + stage9-sync-plugin + stage10-authority-sudo + stage11-plugin-id-dedup
+
+`npm test` exit code 0, 349 PASS / 0 FAIL.
+
+### Pending for 2.5.0-alpha.2
+
+- V24-04 snapshot versioning + OCC -- in implementation, code in
+  flight. Targets `NAC.STRICT_VERSIONING=true` by default, with
+  `expected_plugin_version` / `expected_tree_version` enforcement
+  on every mutating API. The `plugin_version` + `element_state_hash`
+  fields will appear in `describe()` output.
+- V25-02 tree navigation (`context`, `tree`, `data-nac-opens`)
+  -- DRAFT, target 2.5.x.
+- V25-03 asistive labels (`narrate`) -- DRAFT, target 2.5.x.
+- V25-04 effect detection (`expect`, `diff`) -- DRAFT, target 2.5.x.
+
+### Migration notes
+
+- Code that ran fine under 2.4.0 (strict resolution + disambiguation)
+  continues to work unchanged in 2.5; that contract is stable.
+- Code that called the pre-existing v1.9 `confirm_action` must
+  migrate to V24-05 (`confirm_action` + `set_confirm_handler` +
+  `request_authority`). The argument shape changed
+  (`(action_id, opts)` -> `(action_id, message, opts)`). Audit
+  callers; no automatic migration tool.
+- Code that registered the same plugin slug on multiple DOM roots
+  WITHOUT `data-nac-plugin-id` now throws at register time. Either
+  add the attribute, OR set `NAC.HARD_DEDUP=false` before
+  registering for a one-release migration window.
+
+---
+
 ## 2.4.0 -- 2026-05-21
 
 NAC3 v2.4.0 is a **behavior-of-contract change**: id / verb / qualifier

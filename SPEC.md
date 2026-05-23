@@ -1,9 +1,9 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.4.0 (stable; zero silent damage via strict resolution + disambiguation contract)
-**Status:** v2.4.0 stable -- supersedes 2.3.x
+**Version:** 2.5.0-alpha.1 (consolidation alpha: Block A canvas+API + V24-01/02/05 RFCs alongside v2.4 strict resolution)
+**Status:** v2.5.0-alpha.1 alpha -- consolidates parallel dev lines, V24-04 OCC still in implementation for alpha.2
 **License:** Apache-2.0
-**Editor:** Yujin (rpaforce.com)
+**Editor:** Yujin (yujin.app)
 
 ---
 

@@ -6871,8 +6871,8 @@
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.4.0',
-    spec_version: '2.4',
+    version:      '2.5.0-alpha.1',
+    spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
        tab_id_manifest_role_drift, manifest_dom_role_mismatch).

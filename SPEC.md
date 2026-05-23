@@ -1,7 +1,7 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.0-alpha.2 (alpha.1 + V24-04 OCC foundation: tree_version + plugin_version + element_state_hash + markHydrationComplete + versionHistory)
-**Status:** v2.5.0-alpha.2 alpha -- V24-04 foundation SHIPPED, dispatch enforcement hooks pending for alpha.3
+**Version:** 2.5.0-alpha.3 (alpha.2 + V24-04 OCC dispatch hooks on click/fill/select/invoke -- snapshot_stale rejects pre-side-effect)
+**Status:** v2.5.0-alpha.3 alpha -- V24-04 contract teeth real: every mutating verb that accepts opts rejects stale snapshots with NacError('snapshot_stale')
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
 

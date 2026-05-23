@@ -272,5 +272,82 @@ const lastHydrate = pluginInvalidated[pluginInvalidated.length - 1];
 assert('hydration event trigger is hydration_complete',
   lastHydrate && lastHydrate.trigger === 'hydration_complete');
 
+/* ============== Sec 6 -- dispatch enforcement (click with expected_*) ============== */
+/* NAC.click(opts.expected_plugin_version=stale) should throw
+   snapshot_stale BEFORE the side effect. NAC.click with current
+   plugin_version should be accepted (will hit a different failure
+   path -- timeout or success -- but NOT snapshot_stale). */
+
+await (async () => {
+  /* Capture current plugin_version. */
+  const snap = NAC.describe();
+  const occ = snap.plugins.find(p => p.plugin === 'occ_test');
+  const currentVersion = occ.plugin_version;
+
+  /* Stale version -> snapshot_stale. */
+  let staleErr = null;
+  try {
+    await NAC.click('occ_test.action.x', {
+      expected_plugin_version: 'v_999999',
+      timeout: 100,
+    });
+  } catch (e) { staleErr = e; }
+  assert('click with stale expected_plugin_version throws',
+    staleErr && staleErr.code === 'snapshot_stale',
+    '(got ' + (staleErr && staleErr.code) + ')');
+  if (staleErr) {
+    assert('snapshot_stale detail has reason=plugin_changed',
+      staleErr.reason === 'plugin_changed' ||
+      (staleErr.detail && staleErr.detail.reason === 'plugin_changed'));
+    assert('snapshot_stale detail names the plugin',
+      staleErr.plugin_slug === 'occ_test' ||
+      (staleErr.detail && staleErr.detail.plugin_slug === 'occ_test'));
+  }
+
+  /* Current version -> passes the OCC gate; the click may then
+     timeout (no handler bound), but the code must be 'timeout',
+     NOT 'snapshot_stale'. */
+  let timeoutErr = null;
+  try {
+    await NAC.click('occ_test.action.x', {
+      expected_plugin_version: currentVersion,
+      timeout: 100,
+    });
+  } catch (e) { timeoutErr = e; }
+  assert('click with current expected_plugin_version passes OCC gate',
+    timeoutErr && timeoutErr.code === 'timeout',
+    '(got ' + (timeoutErr && timeoutErr.code) + ')');
+
+  /* Tree version: same pattern. */
+  const snapNow = NAC.describe();
+  const treeNow = snapNow.tree_version;
+
+  let staleTreeErr = null;
+  try {
+    await NAC.click('occ_test.action.x', {
+      expected_tree_version: 'v_999999',
+      timeout: 100,
+    });
+  } catch (e) { staleTreeErr = e; }
+  assert('click with stale expected_tree_version throws snapshot_stale',
+    staleTreeErr && staleTreeErr.code === 'snapshot_stale');
+  if (staleTreeErr) {
+    assert('stale_tree detail has reason=tree_changed',
+      staleTreeErr.reason === 'tree_changed' ||
+      (staleTreeErr.detail && staleTreeErr.detail.reason === 'tree_changed'));
+  }
+
+  /* STRICT_VERSIONING ON without any expected_* -> version_required. */
+  NAC.STRICT_VERSIONING = true;
+  let strictErr = null;
+  try {
+    await NAC.click('occ_test.action.x', { timeout: 100 });
+  } catch (e) { strictErr = e; }
+  assert('STRICT_VERSIONING on without expected_* throws version_required',
+    strictErr && strictErr.code === 'version_required',
+    '(got ' + (strictErr && strictErr.code) + ')');
+  NAC.STRICT_VERSIONING = false; /* restore */
+})();
+
 console.log('\n' + (failures === 0 ? 'STAGE-12 PASS' : 'STAGE-12 FAIL (' + failures + ')'));
 process.exit(failures === 0 ? 0 : 1);

@@ -825,7 +825,7 @@
   <div class="container">
     <span class="kanji" aria-hidden="true">&#27005;</span>
     <span class="brand">NAC<small>Native Agent Contract</small></span>
-    <span class="pill">v2.5.0-alpha.2 &middot; alpha</span>
+    <span class="pill">v2.5.0-alpha.3 &middot; alpha</span>
     <button class="icon-btn"
             id="autopilot-toggle"
             data-nac-id="nac_landing.autopilot.toggle"
@@ -1510,7 +1510,7 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     <a href="https://rpaforce.com"
        data-nac-id="nac_landing.footer.yujin"
        data-nac-role="action" data-nac-action="open">Yujin</a>
-    <span style="margin-left: auto; color: var(--color-text-3);">v2.5.0-alpha.2 &middot; 2026-05-23</span>
+    <span style="margin-left: auto; color: var(--color-text-3);">v2.5.0-alpha.3 &middot; 2026-05-23</span>
   </div>
 </footer>
 
@@ -1577,9 +1577,9 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
 </aside>
 
 <!-- ============== NAC runtime + chat ============== -->
-<script src="js/nac.js?v=v25-2026-05-23-alpha2"></script>
-<script src="js/nac-v2-extensions.js?v=v25-2026-05-23-alpha2"></script>
-<script src="js/nac-chat-client.js?v=v25-2026-05-23-alpha2"></script>
+<script src="js/nac.js?v=v25-2026-05-23-alpha3"></script>
+<script src="js/nac-v2-extensions.js?v=v25-2026-05-23-alpha3"></script>
+<script src="js/nac-chat-client.js?v=v25-2026-05-23-alpha3"></script>
 
 <!-- ============== Landing wiring ============== -->
 <script>
@@ -1601,7 +1601,7 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
 
     NAC.register({
       plugin_slug: 'nac_landing',
-      version: '2.5.0-alpha.2',
+      version: '2.5.0-alpha.3',
       nac_version: '2.5',
       elements: [
         /* Topbar */
@@ -1713,7 +1713,7 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     /* Chat plugin manifest -- registered separately so chat is its own plugin scope. */
     NAC.register({
       plugin_slug: 'chat',
-      version: '2.5.0-alpha.2',
+      version: '2.5.0-alpha.3',
       nac_version: '2.5',
       elements: [
         { id: 'chat.lang', role: 'field',

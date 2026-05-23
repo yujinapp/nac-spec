@@ -1,5 +1,76 @@
 # Changelog
 
+## 2.5.0-alpha.3 -- 2026-05-23
+
+NAC3 v2.5.0-alpha.3 wires the V24-04 OCC dispatch hooks into the
+mutating verbs. The contract now has teeth: an agent that passes
+mismatched `expected_*` parameters gets `NacError('snapshot_stale',
+...)` synchronously, BEFORE any side effect occurs. No partial
+mutations on stale state. No silent damage.
+
+### Added (V24-04 -- dispatch enforcement)
+
+Every mutating verb that accepts `opts` now calls
+`_resolveVersionExpectations(opts, el)` after the element lookup +
+disabled / hidden / aria preflight checks, and BEFORE the side
+effect:
+
+- **`click(nac_id, opts?)`** -- after the v2.3 capability gate +
+  v1.8 hidden gate + v1.9 aria preflight, before `el.click()`.
+- **`fill(nac_id, value, opts?)`** -- after the fillability preflight,
+  before native-setter `el.value = ...`.
+- **`select(nac_id, option, opts?)`** -- after `_findElement`, before
+  the select-option write.
+- **`invoke(action_id, payload, opts?)`** -- after `_findElement`,
+  before the `nac:action:requested` dispatch.
+
+Verbs that inherit click/tab transitively are covered automatically:
+
+- **`click_by_verb(plugin, verb, opts?)`** -- resolves to a `nac_id`
+  then dispatches `click(id, opts)`. The OCC gate runs inside the
+  nested click. Caller passes `expected_*` in opts and they flow
+  through.
+- **`tab_by_label(plugin, label, opts?)`** -- similarly delegates to
+  `tab(...)`. But because `tab` itself does not yet accept `opts`
+  (signature change pending alpha.4), `expected_*` passed to
+  `tab_by_label` is currently dropped. This will close in alpha.4.
+
+### Pending for 2.5.0-alpha.4
+
+- `tab(plugin, tab_key, opts?)` accepts opts + threads OCC gate.
+- `NAC.STRICT_VERSIONING` default flips from `false` to `true` once
+  tab is covered (so all mutating verbs uniformly require
+  `expected_*` under strict mode).
+- E2E demo `example-v25-snapshot-versioning.php` for the landing.
+
+### Conditional-await pattern
+
+To avoid introducing a microtask boundary that would reorder
+side-effect-then-immediate-check call patterns (which several
+v23-editor tests rely on with synchronous `NAC.click_by_verb()`
+followed by an immediate DOM check), the OCC hook is conditional:
+
+  - When opts has any `expected_*` key OR `NAC.STRICT_VERSIONING` is
+    true: `await _resolveVersionExpectations(...)`. May throw
+    `snapshot_stale` / `version_required` / `feature_not_supported`.
+  - Otherwise: no await, no microtask. Existing behaviour preserved.
+
+This keeps backward compatibility intact for code that never opted
+into OCC, while making `expected_*`-aware callers see the contract.
+
+### Tests
+
+stage12-snapshot-versioning.mjs gains 7 new assertions for the
+dispatch enforcement: stale plugin_version + stale tree_version
+both raise `snapshot_stale` with structured `reason` + `slug` +
+expected/current pairs; current plugin_version passes the gate and
+proceeds (then hits the timeout, NOT snapshot_stale); STRICT mode
+without expected_* throws `version_required`.
+
+Total suite: **384 PASS / 0 FAIL** across 14 stage suites.
+
+---
+
 ## 2.5.0-alpha.2 -- 2026-05-23
 
 NAC3 v2.5.0-alpha.2 lands the V24-04 OCC foundation that was

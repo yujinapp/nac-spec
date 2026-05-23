@@ -3230,6 +3230,19 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
       });
       throw NacError(ariaPF.reason, ariaPF.message);
     }
+    /* v2.5 / RFC V24-04 OCC gate. Only await when opts actually
+       carries expected_* OR STRICT_VERSIONING demands it; otherwise
+       skip to avoid introducing a microtask boundary that would
+       reorder side-effect-then-immediate-check call patterns. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
     const role = el.getAttribute('data-nac-role') || 'action';
     const family = _CLICK_EVENT_FAMILY[role] || _CLICK_EVENT_FAMILY['action'];
     /* The first event in each family is the "success" signal; if a
@@ -3463,6 +3476,16 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
       });
       throw NacError(fillPF.reason, fillPF.message);
     }
+    /* v2.5 / RFC V24-04 OCC gate. Same conditional pattern as click. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
     _focusElement(el);
     const ft = el.getAttribute('data-nac-field-type');
 
@@ -3523,6 +3546,16 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
   async function select(nac_id, option, opts) {
     const el = _findElement(nac_id, opts);
     if (!el) throw NacError('not_found', 'No select with nac_id=' + nac_id);
+    /* v2.5 / RFC V24-04 OCC gate. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
     _focusElement(el);
     if (el.tagName === 'SELECT') {
       if (el.multiple && Array.isArray(option)) {
@@ -3837,6 +3870,16 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
        an invoke based on UI state should do it in their
        nac:action:requested listener and emit nac:action:failed
        with a meaningful error code. */
+    /* v2.5 / RFC V24-04 OCC gate. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
     const verb = (payload && payload.verb)
               || el.getAttribute('data-nac-action')
               || '';
@@ -7516,7 +7559,7 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.0-alpha.2',
+    version:      '2.5.0-alpha.3',
     spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,

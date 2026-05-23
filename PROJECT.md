@@ -8,29 +8,37 @@
 
 ## 1. Repo topology
 
-There are TWO physical locations that hold NAC3 code. Knowing which is
-which is non-optional -- mixing them up has caused real production
-incidents.
+As of the 2026-05-23 consolidation, NAC3 lives in **one** repo --
+this one. Knowing which repo is which remained non-optional during
+the migration; mixing yujinapp/nac-spec up with the historical
+rpaforce-crm working copy caused real production incidents before
+that date and the rule that prevented recurrence (read PROJECT.md
+first) stays in force.
 
 | Location | Role | Push policy |
 |---|---|---|
-| `github.com/yujinapp/nac-spec` | **Canonical public repo.** This is the URL NPM, the landing page, every "made with NAC3" reference, and external adopters point at. It is the source of truth for the NAC3 spec + reference runtime. | Force-push allowed only from a fully-tested local snapshot. Never write directly here without verification. |
-| `github.com/pkuschnirof/rpaforce-crm` (this monorepo) | **Development monorepo.** Holds the CRM + many other Yujin projects + a working copy of NAC3 under `yujin.app/nac-spec/` and `packages/nac/`. Used for fast iteration during a feature cycle. | Regular push to main is fine for iteration. After each release wraps, the NAC subset is force-pushed to `yujinapp/nac-spec` and the local copies are deleted. |
-| `npm: @nac3/runtime` | The published npm package. | `npm publish` from `packages/nac/` (the rpaforce-crm copy) OR from a fresh clone of `yujinapp/nac-spec/runtime/`. Must match canonical SPEC.md at publish time. |
+| `github.com/yujinapp/nac-spec` (THIS repo) | **Canonical + development.** Sole source of truth from 2026-05-23 onward. NPM, the landing page, every "made with NAC3" reference, every adopter URL points here. Spec + runtime + RFCs + tests + landing + demos all live here. Local working dir: `c:/yujin-nac-spec/`. | Direct push to main is fine for iteration. Tag releases when promoting alpha -> stable. Force-push needs an explicit recovery tag pushed first (precedent: `pre-v25-consolidation-2026-05-23`). |
+| `npm: @nac3/runtime` | The published npm package. | `npm publish` from `runtime/` of a clean clone (or working tree). Must match canonical SPEC.md at publish time. Alpha tags publish with `--tag alpha`; stable promotion via `npm dist-tag add @nac3/runtime@X.Y.Z latest`. Last published: `2.4.0` (`latest`), `2.5.0-alpha.3` (`alpha`). |
+| `github.com/pkuschnirof/rpaforce-crm` (sibling, NOT a NAC repo) | **CRM monorepo, sibling project.** Held a NAC3 development copy under `packages/nac/` + `yujin.app/nac-spec/` until 2026-05-23 commit `0ff3afa`, which deleted both. **No NAC code lives there now.** Cross-references only (Sumi Discord KB build script + the unified agent under `agent/unified/`). | Do NOT push NAC commits there. The dirs do not exist anymore. |
 
-**Mapping of paths between the two repos:**
+**Historical mapping (pre-2026-05-23, kept for archaeology + for
+translating older issue / PR / chat references):**
 
-| rpaforce-crm | yujinapp/nac-spec |
+| rpaforce-crm path (DELETED 2026-05-23 in commit `0ff3afa`) | yujinapp/nac-spec path (canonical now) |
 |---|---|
 | `packages/nac/` | `runtime/` |
-| `yujin.app/nac-spec/` | root (`SPEC.md`, `js/`, `demos/`, `docs/`, etc) |
+| `yujin.app/nac-spec/` | repo root (`SPEC.md`, `js/`, `demos/`, `docs/`, ...) |
+
+If you see a path matching the rpaforce-crm column in any in-flight
+work item, that work was authored pre-migration. Translate via the
+table above before touching anything.
 
 **Rule (`feedback_project_md_required`):** if you are the model
 opening this project, **read this PROJECT.md before any edit**. If
 you cannot reconcile what you see with what this file says, **ask
-before assuming**. Repo confusion in May 2026 cost a full afternoon
-of work + one unintended npm publish; this rule exists to prevent
-recurrence.
+before assuming**. The May 2026 repo confusion cost a full
+afternoon of work + one unintended npm publish; this rule exists to
+prevent recurrence.
 
 ---
 
@@ -130,9 +138,9 @@ These are the non-negotiable rules for any code that lands in NAC3.
 
 - **100% test coverage objective.** Every public function in
   `js/nac.js` (anything exposed on `global.NAC.*`) has a test in
-  `runtime/test/` (the canonical npm-package test dir) AND in
-  `packages/nac/test/` (the monorepo working copy). The two must
-  stay identical at release time -- the build script enforces.
+  `runtime/test/`. After the 2026-05-23 consolidation there is no
+  longer a parallel test dir under rpaforce-crm; the single source
+  of truth lives here in `runtime/test/`.
 - **100% PASS objective.** `npm test` returns exit code 0 with zero
   FAIL lines. Pre-existing failures are NOT acceptable -- fix or
   delete the test. There is no "known-failing-but-not-our-fault"
@@ -185,16 +193,21 @@ These are the non-negotiable rules for any code that lands in NAC3.
 
 ### 3.4 Build + deploy
 
-- `packages/nac/build.mjs` reads from `yujin.app/nac-spec/js/*.js`
-  (single source of truth) + emits `packages/nac/dist/*` bundles +
-  syncs SPEC.md/LICENSE into `packages/nac/`. **No JS source lives
-  outside `yujin.app/nac-spec/js/`.**
-- `npm test` in `packages/nac/` runs the full suite. CI gate (when
+- `runtime/build.mjs` reads from `js/*.js` (one level up from
+  `runtime/` -- the canonical JS source for the runtime) and emits
+  `runtime/dist/*` bundles + syncs `SPEC.md` / `LICENSE` into
+  `runtime/`. **No JS runtime source lives outside `js/`.** The
+  build script was rewritten on 2026-05-23 for the new topology
+  (was `../../yujin.app/nac-spec/js/` in the historical
+  rpaforce-crm world; now `../js/`).
+- `npm test` in `runtime/` runs the full suite. CI gate (when
   GitHub Actions is wired): same script on every push to main of
-  `yujinapp/nac-spec`.
-- Release flow: bump `package.json` -> `npm run build` -> `npm test`
-  -> commit + tag -> `npm publish` -> mirror force-push to
-  `yujinapp/nac-spec` -> verify by fresh clone + re-run tests.
+  this repo.
+- Release flow: bump `runtime/package.json` -> `npm run build`
+  -> `npm test` -> commit + tag -> `npm publish` (with `--tag alpha`
+  for pre-releases) -> verify by fresh clone + re-run tests.
+  Mirror-to-other-repos is no longer part of the flow; this repo
+  IS the canonical mirror.
 
 ### 3.5 Multi-language (DOM contract side)
 
@@ -248,28 +261,58 @@ Standard cadence for any feature (from initial idea to shipped):
 |---|---|
 | Spec (normative) | `SPEC.md` |
 | RFC index | `rfcs/README.md` |
-| Changelog | `runtime/CHANGELOG.md` (canonical), mirror at `../packages/nac/CHANGELOG.md` |
+| Changelog | `runtime/CHANGELOG.md` (canonical, single copy as of 2026-05-23) |
 | Implementation guide for adopters | `IMPLEMENTATION_GUIDE.md` |
 | NPM publish runbook | `NPM_PUBLISH_RUNBOOK.md` |
 | V2.5 status checkpoint | `docs/V2.5_STATUS.md` |
+| V2.5 release handover (alpha.1, dated) | `docs/V2.5_ALPHA_1_RELEASE_HANDOVER_2026_05_23.md` |
 | Benchmark methodology + provenance | `benchmark/methodology.html` + `docs/BENCHMARK_PROVENANCE.md` |
 | Runtime audit (2.3.0 snapshot) | `docs/RUNTIME_AUDIT_2.3.0.md` |
 | Promo / launch playbook | `PROMO_WEEK_2026_05_18.md` |
 | Performance test plan | `PERFORMANCE_TEST_PLAN.md` |
+| Collabora Asistivo (sibling project consuming NAC3) | `c:/collabora-asistivo/PROJECT.md` (local), GitHub repo TBD |
 
 ---
 
 ## 6. Open issues / decisions in flight
 
-(This section is updated per release. Outdated entries get moved to
+(Updated per release. Outdated entries get moved to
 `docs/V<X>_STATUS.md` archives.)
 
-- V2.5.0 release in flight as of 2026-05-23. Tracking in
-  `docs/V2.5_STATUS.md` + the RFC index.
-- Migration of `yujinapp/nac-spec` to be the single source of truth
-  pending the V2.5 ship + the verification step #34 in CYCLE.
+- **Migration to single source of truth: DONE 2026-05-23.**
+  Consolidation commit `39b7d15` + release commit `cc9610b` +
+  alpha.2 `77d9edb` + alpha.3 `6ac3f31` shipped on this repo.
+  rpaforce-crm cleanup (`0ff3afa`) deleted the legacy dev copy.
+  Fresh-clone verification passed (Sumi handover doc:
+  `docs/V2.5_ALPHA_1_RELEASE_HANDOVER_2026_05_23.md`).
+- **V2.5.0 release cycle live.** Current state per RFC index:
+  V25-01 + V24-01 + V24-02 + V24-05 all SHIPPED; V24-04
+  foundation SHIPPED (alpha.2) + dispatch hooks SHIPPED for
+  click/fill/select/invoke (alpha.3). Pending in alpha.4:
+  `tab(plugin, key, opts?)` taking opts + threading the OCC
+  gate; `NAC.STRICT_VERSIONING` default flip from `false` to
+  `true`.
+- **V25-02 / V25-03 / V25-04 RFCs: DRAFT.** Tree navigation,
+  asistive labels, effect detection. Target subsequent 2.5.x
+  patches. RFC files to be drafted under `rfcs/` before the
+  spec sections in SPEC.md transition from placeholder to
+  normative.
+- **Sumi Discord KB path update**: the build script in
+  `rpaforce-crm/tools/discord-setup/worker/build-knowledge.mjs`
+  still reads from the deleted `yujin.app/nac-spec/SPEC.md`
+  path. Needs an update to fetch from this repo (either via
+  HTTPS from `yujin.app/nac-spec/SPEC.md` public landing, or
+  via a local clone of this repo). Tracked for the next CRM
+  maintenance pass.
+- **E2E demos for V24-01/02/05/V25-01**: requested by Pablo
+  for "evidencia". Unit tests carry the contract evidence
+  (377 PASS / 0 FAIL in alpha.2, 384 PASS / 0 FAIL in alpha.3);
+  PHP example pages + Playwright headless smoke are still
+  pending. Target 2.5.0-alpha.4.
 
 ---
 
-*Last reviewed: 2026-05-23 (V2.5 release cycle, Sumi autopilot).
-Update this file in the same commit as any topology / norm change.*
+*Last reviewed: 2026-05-23 (post-V2.5 consolidation, Sumi
+autopilot, alpha.3 published). Update this file in the same commit
+as any topology / norm change. Bumped from the pre-migration
+version that lived in rpaforce-crm.*

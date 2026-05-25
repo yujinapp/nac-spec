@@ -1,0 +1,162 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "detect-and-recover",
+      "text": "A multi-instance plugin slug has been mounted in the DOM with two roots that LACK data-nac-plugin-id (a violation per V24-01). Your task: 1) run validate_global to detect the violation, 2) confirm the plugin_instance_violations bucket has >=1 finding, 3) then clean up the violation surface and re-validate -- the bucket must now be empty.",
+      "expect": {
+        "detected": true,
+        "cleaned": true
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"inject_violation\"},{\"op\":\"validate\"},{\"op\":\"read_violations\"},{\"op\":\"cleanup_violation\"},{\"op\":\"validate\"},{\"op\":\"read_violations\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "inject_violation"
+          },
+          {
+            "op": "validate"
+          },
+          {
+            "op": "read_violations"
+          },
+          {
+            "op": "cleanup_violation"
+          },
+          {
+            "op": "validate"
+          },
+          {
+            "op": "read_violations"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "inject_violation",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "validate",
+          "violations_count": 1,
+          "ok": true,
+          "violations": [
+            {
+              "code": "duplicate_plugin_no_instance_id",
+              "severity": "error",
+              "slug": "cart",
+              "instance_count": 4,
+              "missing_instance_id_count": 2,
+              "duplicate_instance_ids": [],
+              "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+            }
+          ]
+        },
+        {
+          "idx": 2,
+          "op": "read_violations",
+          "violations_count": 1,
+          "ok": true,
+          "violations": [
+            {
+              "code": "duplicate_plugin_no_instance_id",
+              "severity": "error",
+              "slug": "cart",
+              "instance_count": 4,
+              "missing_instance_id_count": 2,
+              "duplicate_instance_ids": [],
+              "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+            }
+          ]
+        },
+        {
+          "idx": 3,
+          "op": "cleanup_violation",
+          "ok": true
+        },
+        {
+          "idx": 4,
+          "op": "validate",
+          "violations_count": 0,
+          "ok": true,
+          "violations": []
+        },
+        {
+          "idx": 5,
+          "op": "read_violations",
+          "violations_count": 0,
+          "ok": true,
+          "violations": []
+        }
+      ],
+      "screenshot": "evidence\\v24-01-plugin-id-dedup-pilot\\2026-05-25\\detect-and-recover.png"
+    },
+    {
+      "id": "register-throws-on-violation",
+      "text": "The DOM has TWO cart roots without data-nac-plugin-id. Call register(slug=cart). It MUST throw with code duplicate_plugin_no_instance_id -- you should not be allowed to register a plugin whose mounted instances violate the uniqueness rule.",
+      "expect": {
+        "register_throws": true
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"inject_violation\"},{\"op\":\"register\",\"slug\":\"cart\"},{\"op\":\"read_violations\"},{\"op\":\"cleanup_violation\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "inject_violation"
+          },
+          {
+            "op": "register",
+            "slug": "cart"
+          },
+          {
+            "op": "read_violations"
+          },
+          {
+            "op": "cleanup_violation"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "inject_violation",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "register",
+          "slug": "cart",
+          "ok": false,
+          "code": "duplicate_plugin_no_instance_id",
+          "error": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+        },
+        {
+          "idx": 2,
+          "op": "read_violations",
+          "violations_count": 1,
+          "ok": true,
+          "violations": [
+            {
+              "code": "duplicate_plugin_no_instance_id",
+              "severity": "error",
+              "slug": "cart",
+              "instance_count": 4,
+              "missing_instance_id_count": 2,
+              "duplicate_instance_ids": [],
+              "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+            }
+          ]
+        },
+        {
+          "idx": 3,
+          "op": "cleanup_violation",
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-01-plugin-id-dedup-pilot\\2026-05-25\\register-throws-on-violation.png"
+    }
+  ]
+}

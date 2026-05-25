@@ -1,0 +1,24 @@
+19:12:21.130 V24-02 Layer 3 Pilot driver
+19:12:21.130   mode: live
+19:12:21.130   base url: http://localhost:8855
+19:12:21.130   evidence: C:\yujin-nac-spec\evidence\v24-02-sync-plugin-pilot\2026-05-25
+19:12:21.640 
+19:12:21.641 ========== statement: sync-replaces-not-appends ==========
+19:12:21.641   text: Call register(slug=cart) with manifest v1 that has only ONE verb. Then call syncPlugin(cart) with manifest v2 that has TWO verbs. Read back the registered manifest via NAC.manifest(slug=cart) and confirm the verb count is exactly 2 (replaced, not appended).
+19:12:23.471   plan steps: 3
+19:12:23.481   step outcomes: register:OK, sync:OK, read_count:OK
+19:12:23.481 PASS sync-replaces-not-appends read_count = 2 (replaced)
+19:12:23.549 
+19:12:23.549 ========== statement: idempotent-no-pollution ==========
+19:12:23.549   text: syncPlugin(cart) twice with the SAME manifest. The verb count after both calls must be the same as after the first call -- the second call should not accumulate or duplicate state.
+19:12:25.771   plan steps: 5
+19:12:25.778   step outcomes: register:OK, sync:OK, read_count:OK, sync:OK, read_count:OK
+19:12:25.778 PASS idempotent-no-pollution counts identical across idempotent sync
+19:12:25.808 
+19:12:25.808 ========== statement: invalidated-event-fires ==========
+19:12:25.808   text: Subscribe to nac:plugin:invalidated. Call syncPlugin with a new manifest version. Verify the invalidated event fired exactly once.
+19:12:28.115   plan steps: 4
+19:12:28.121   step outcomes: subscribe_invalidated:OK, register:OK, sync:OK, read_count:OK
+19:12:28.123 PASS invalidated-event-fires nac:plugin:invalidated fired >=1 time
+
+FAILURES: 0

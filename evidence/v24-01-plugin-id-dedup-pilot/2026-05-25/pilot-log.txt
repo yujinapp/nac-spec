@@ -1,0 +1,21 @@
+19:13:50.556 V24-01 Layer 3 Pilot driver
+19:13:50.556   mode: live
+19:13:50.556   base url: http://localhost:8855
+19:13:50.556   evidence: C:\yujin-nac-spec\evidence\v24-01-plugin-id-dedup-pilot\2026-05-25
+19:13:50.965 
+19:13:50.966 ========== statement: detect-and-recover ==========
+19:13:50.966   text: A multi-instance plugin slug has been mounted in the DOM with two roots that LACK data-nac-plugin-id (a violation per V24-01). Your task: 1) run validate_global to detect the violation, 2) confirm the plugin_instance_violations bucket has >=1 finding, 3) then clean up the violation surface and re-validate -- the bucket must now be empty.
+19:13:52.525   plan steps: 6
+19:13:52.540   step outcomes: inject_violation:OK, validate:OK, read_violations:OK, cleanup_violation:OK, validate:OK, read_violations:OK
+19:13:52.540 PASS detect-and-recover at least 2 validate calls
+19:13:52.540 PASS detect-and-recover first validate detected violation (>=1)
+19:13:52.540 PASS detect-and-recover last validate clean (0 violations)
+19:13:52.596 
+19:13:52.596 ========== statement: register-throws-on-violation ==========
+19:13:52.596   text: The DOM has TWO cart roots without data-nac-plugin-id. Call register(slug=cart). It MUST throw with code duplicate_plugin_no_instance_id -- you should not be allowed to register a plugin whose mounted instances violate the uniqueness rule.
+19:13:56.590   plan steps: 4
+19:13:56.606   step outcomes: inject_violation:OK, register:ERR, read_violations:OK, cleanup_violation:OK
+19:13:56.606 PASS register-throws-on-violation register rejected
+19:13:56.606 PASS register-throws-on-violation code = duplicate_plugin_no_instance_id
+
+FAILURES: 0

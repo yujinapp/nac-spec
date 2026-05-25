@@ -1,0 +1,27 @@
+19:11:14.200 V24-05 Layer 3 Pilot driver
+19:11:14.200   mode: live
+19:11:14.200   base url: http://localhost:8855
+19:11:14.200   evidence: C:\yujin-nac-spec\evidence\v24-05-authority-sudo-pilot\2026-05-25
+19:11:14.626 
+19:11:14.626 ========== statement: single-confirm-approved ==========
+19:11:14.626   text: Install an auto-approve confirm handler. Then call confirm_action for action_id 'edit-text' with scope low. Verify the call returns true (the handler approved).
+19:11:16.216   plan steps: 2
+19:11:16.230   step outcomes: set_handler:OK, confirm_action:OK
+19:11:16.230 PASS single-confirm-approved last confirm approved=true
+19:11:16.297 
+19:11:16.297 ========== statement: sudo-bypass-pattern ==========
+19:11:16.297   text: Install an auto-approve handler. Request high-scope authority for 5000ms. Then perform three confirm_action calls -- one at low scope with id "a", one at medium scope with id "b", one at high scope with id "c". All three should return true. Critically, all three should BYPASS the handler (sudo) because the high grant satisfies all lower scopes.
+19:11:18.712   plan steps: 5
+19:11:18.749   step outcomes: set_handler:OK, request_authority:OK, confirm_action:OK, confirm_action:OK, confirm_action:OK
+19:11:18.749 PASS sudo-bypass-pattern 3 confirms performed
+19:11:18.749 PASS sudo-bypass-pattern all 3 approved=true
+19:11:18.749 PASS sudo-bypass-pattern all 3 sudo=true (bypass)
+19:11:18.801 
+19:11:18.801 ========== statement: rank-rule-blocks-escalation ==========
+19:11:18.801   text: Install a handler that approves request_authority but REJECTS regular confirm_action. Then request low-scope authority for 5000ms. Then call confirm_action id "low-act" scope low (should pass via sudo bypass), and confirm_action id "high-act" scope high (should be REJECTED by the handler -- low grant does NOT satisfy a high check).
+19:11:20.895   plan steps: 4
+19:11:20.916   step outcomes: set_handler:OK, request_authority:OK, confirm_action:OK, confirm_action:OK
+19:11:20.916 PASS rank-rule-blocks-escalation low-act approved (sudo bypass via low grant)
+19:11:20.916 PASS rank-rule-blocks-escalation high-act REJECTED (low grant does not satisfy high)
+
+FAILURES: 0

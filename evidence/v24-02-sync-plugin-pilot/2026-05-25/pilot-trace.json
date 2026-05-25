@@ -1,0 +1,189 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "sync-replaces-not-appends",
+      "text": "Call register(slug=cart) with manifest v1 that has only ONE verb. Then call syncPlugin(cart) with manifest v2 that has TWO verbs. Read back the registered manifest via NAC.manifest(slug=cart) and confirm the verb count is exactly 2 (replaced, not appended).",
+      "expect": {
+        "final_verb_count": 2
+      },
+      "plan_raw": "{ \"steps\": [ { \"op\": \"register\", \"slug\": \"cart\", \"manifest_version\": 1 }, { \"op\": \"sync\", \"slug\": \"cart\", \"manifest_version\": 2 }, { \"op\": \"read_count\", \"slug\": \"cart\" } ] }",
+      "plan": {
+        "steps": [
+          {
+            "op": "register",
+            "slug": "cart",
+            "manifest_version": 1
+          },
+          {
+            "op": "sync",
+            "slug": "cart",
+            "manifest_version": 2
+          },
+          {
+            "op": "read_count",
+            "slug": "cart"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "register",
+          "version": 1,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "sync",
+          "version": 2,
+          "replaced": true,
+          "plugin_version": "v_1",
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "read_count",
+          "slug": "cart",
+          "count": 2,
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-02-sync-plugin-pilot\\2026-05-25\\sync-replaces-not-appends.png"
+    },
+    {
+      "id": "idempotent-no-pollution",
+      "text": "syncPlugin(cart) twice with the SAME manifest. The verb count after both calls must be the same as after the first call -- the second call should not accumulate or duplicate state.",
+      "expect": {
+        "verb_count_stable": true
+      },
+      "plan_raw": "{\n  \"steps\": [\n    { \"op\": \"register\",   \"slug\": \"cart\", \"manifest_version\": 2 },\n    { \"op\": \"sync\",       \"slug\": \"cart\", \"manifest_version\": 2 },\n    { \"op\": \"read_count\", \"slug\": \"cart\" },\n    { \"op\": \"sync\",       \"slug\": \"cart\", \"manifest_version\": 2 },\n    { \"op\": \"read_count\", \"slug\": \"cart\" }\n  ]\n}",
+      "plan": {
+        "steps": [
+          {
+            "op": "register",
+            "slug": "cart",
+            "manifest_version": 2
+          },
+          {
+            "op": "sync",
+            "slug": "cart",
+            "manifest_version": 2
+          },
+          {
+            "op": "read_count",
+            "slug": "cart"
+          },
+          {
+            "op": "sync",
+            "slug": "cart",
+            "manifest_version": 2
+          },
+          {
+            "op": "read_count",
+            "slug": "cart"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "register",
+          "version": 2,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "sync",
+          "version": 2,
+          "replaced": true,
+          "plugin_version": "v_2",
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "read_count",
+          "slug": "cart",
+          "count": 2,
+          "ok": true
+        },
+        {
+          "idx": 3,
+          "op": "sync",
+          "version": 2,
+          "replaced": true,
+          "plugin_version": "v_3",
+          "ok": true
+        },
+        {
+          "idx": 4,
+          "op": "read_count",
+          "slug": "cart",
+          "count": 2,
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-02-sync-plugin-pilot\\2026-05-25\\idempotent-no-pollution.png"
+    },
+    {
+      "id": "invalidated-event-fires",
+      "text": "Subscribe to nac:plugin:invalidated. Call syncPlugin with a new manifest version. Verify the invalidated event fired exactly once.",
+      "expect": {
+        "event_count": 1
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"subscribe_invalidated\"},{\"op\":\"register\",\"slug\":\"cart\",\"manifest_version\":1},{\"op\":\"sync\",\"slug\":\"cart\",\"manifest_version\":2},{\"op\":\"read_count\",\"slug\":\"cart\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "subscribe_invalidated"
+          },
+          {
+            "op": "register",
+            "slug": "cart",
+            "manifest_version": 1
+          },
+          {
+            "op": "sync",
+            "slug": "cart",
+            "manifest_version": 2
+          },
+          {
+            "op": "read_count",
+            "slug": "cart"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "subscribe_invalidated",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "register",
+          "version": 1,
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "sync",
+          "version": 2,
+          "replaced": true,
+          "plugin_version": "v_4",
+          "ok": true
+        },
+        {
+          "idx": 3,
+          "op": "read_count",
+          "slug": "cart",
+          "count": 2,
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-02-sync-plugin-pilot\\2026-05-25\\invalidated-event-fires.png"
+    }
+  ]
+}

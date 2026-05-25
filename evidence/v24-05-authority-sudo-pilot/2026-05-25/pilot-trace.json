@@ -1,0 +1,195 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "single-confirm-approved",
+      "text": "Install an auto-approve confirm handler. Then call confirm_action for action_id 'edit-text' with scope low. Verify the call returns true (the handler approved).",
+      "expect": {
+        "last_confirm_approved": true
+      },
+      "plan_raw": "{ \"steps\": [ { \"op\": \"set_handler\", \"mode\": \"approve-all\" }, { \"op\": \"confirm_action\", \"action_id\": \"edit-text\", \"scope\": \"low\" } ] }",
+      "plan": {
+        "steps": [
+          {
+            "op": "set_handler",
+            "mode": "approve-all"
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "edit-text",
+            "scope": "low"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set_handler",
+          "mode": "approve-all",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "confirm_action",
+          "action_id": "edit-text",
+          "scope": "low",
+          "approved": true,
+          "sudo": false,
+          "event_kind": "confirmed"
+        }
+      ],
+      "screenshot": "evidence\\v24-05-authority-sudo-pilot\\2026-05-25\\single-confirm-approved.png"
+    },
+    {
+      "id": "sudo-bypass-pattern",
+      "text": "Install an auto-approve handler. Request high-scope authority for 5000ms. Then perform three confirm_action calls -- one at low scope with id \"a\", one at medium scope with id \"b\", one at high scope with id \"c\". All three should return true. Critically, all three should BYPASS the handler (sudo) because the high grant satisfies all lower scopes.",
+      "expect": {
+        "all_three_bypass": true
+      },
+      "plan_raw": "{ \"steps\": [ { \"op\": \"set_handler\", \"mode\": \"approve-grants-only\" }, { \"op\": \"request_authority\", \"scope\": \"high\", \"ttl_ms\": 5000 }, { \"op\": \"confirm_action\", \"action_id\": \"a\", \"scope\": \"low\" }, { \"op\": \"confirm_action\", \"action_id\": \"b\", \"scope\": \"medium\" }, { \"op\": \"confirm_action\", \"action_id\": \"c\", \"scope\": \"high\" } ] }",
+      "plan": {
+        "steps": [
+          {
+            "op": "set_handler",
+            "mode": "approve-grants-only"
+          },
+          {
+            "op": "request_authority",
+            "scope": "high",
+            "ttl_ms": 5000
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "a",
+            "scope": "low"
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "b",
+            "scope": "medium"
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "c",
+            "scope": "high"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set_handler",
+          "mode": "approve-grants-only",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "request_authority",
+          "scope": "high",
+          "ttl": 5000,
+          "ok": true,
+          "granted": true,
+          "expires_at": 1779736283732
+        },
+        {
+          "idx": 2,
+          "op": "confirm_action",
+          "action_id": "a",
+          "scope": "low",
+          "approved": true,
+          "sudo": true,
+          "event_kind": "confirmed"
+        },
+        {
+          "idx": 3,
+          "op": "confirm_action",
+          "action_id": "b",
+          "scope": "medium",
+          "approved": true,
+          "sudo": true,
+          "event_kind": "confirmed"
+        },
+        {
+          "idx": 4,
+          "op": "confirm_action",
+          "action_id": "c",
+          "scope": "high",
+          "approved": true,
+          "sudo": true,
+          "event_kind": "confirmed"
+        }
+      ],
+      "screenshot": "evidence\\v24-05-authority-sudo-pilot\\2026-05-25\\sudo-bypass-pattern.png"
+    },
+    {
+      "id": "rank-rule-blocks-escalation",
+      "text": "Install a handler that approves request_authority but REJECTS regular confirm_action. Then request low-scope authority for 5000ms. Then call confirm_action id \"low-act\" scope low (should pass via sudo bypass), and confirm_action id \"high-act\" scope high (should be REJECTED by the handler -- low grant does NOT satisfy a high check).",
+      "expect": {
+        "low_passes": true,
+        "high_rejected": true
+      },
+      "plan_raw": "{ \"steps\": [ { \"op\": \"set_handler\", \"mode\": \"approve-grants-only\" }, { \"op\": \"request_authority\", \"scope\": \"low\", \"ttl_ms\": 5000 }, { \"op\": \"confirm_action\", \"action_id\": \"low-act\", \"scope\": \"low\" }, { \"op\": \"confirm_action\", \"action_id\": \"high-act\", \"scope\": \"high\" } ] }",
+      "plan": {
+        "steps": [
+          {
+            "op": "set_handler",
+            "mode": "approve-grants-only"
+          },
+          {
+            "op": "request_authority",
+            "scope": "low",
+            "ttl_ms": 5000
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "low-act",
+            "scope": "low"
+          },
+          {
+            "op": "confirm_action",
+            "action_id": "high-act",
+            "scope": "high"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set_handler",
+          "mode": "approve-grants-only",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "request_authority",
+          "scope": "low",
+          "ttl": 5000,
+          "ok": true,
+          "granted": true,
+          "expires_at": 1779736285914
+        },
+        {
+          "idx": 2,
+          "op": "confirm_action",
+          "action_id": "low-act",
+          "scope": "low",
+          "approved": true,
+          "sudo": true,
+          "event_kind": "confirmed"
+        },
+        {
+          "idx": 3,
+          "op": "confirm_action",
+          "action_id": "high-act",
+          "scope": "high",
+          "approved": false,
+          "sudo": false,
+          "event_kind": "rejected"
+        }
+      ],
+      "screenshot": "evidence\\v24-05-authority-sudo-pilot\\2026-05-25\\rank-rule-blocks-escalation.png"
+    }
+  ]
+}

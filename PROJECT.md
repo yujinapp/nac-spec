@@ -136,22 +136,73 @@ These are the non-negotiable rules for any code that lands in NAC3.
 
 ### 3.1 Tests
 
-- **100% test coverage objective.** Every public function in
-  `js/nac.js` (anything exposed on `global.NAC.*`) has a test in
-  `runtime/test/`. After the 2026-05-23 consolidation there is no
-  longer a parallel test dir under rpaforce-crm; the single source
-  of truth lives here in `runtime/test/`.
-- **100% PASS objective.** `npm test` returns exit code 0 with zero
-  FAIL lines. Pre-existing failures are NOT acceptable -- fix or
-  delete the test. There is no "known-failing-but-not-our-fault"
-  status.
-- **TDD per feature.** Before implementing, write a test file that
-  fails RED for the new behavior. Then implement. Then commit.
-  Acceptable to skip TDD only for trivial extractor / formatter
-  changes where the test would be a 1:1 mirror of the impl.
-- **Evidence required for spec claims.** Any RFC that ships
-  `Implemented` or later carries a passing test or set of tests
-  cited in the CHANGELOG entry by file name.
+"100% tests" in NAC3 means THREE layers, all green at every
+`Alpha`-or-later release. None of them is optional. None of them is
+substitutable by another.
+
+#### Layer 1 -- Unit tests
+
+- Every public function in `js/nac.js` (anything exposed on
+  `global.NAC.*`) has a test in `runtime/test/`. After the
+  2026-05-23 consolidation there is no longer a parallel test dir
+  under rpaforce-crm; the single source of truth lives in
+  `runtime/test/`.
+- `npm test` returns exit code 0 with zero FAIL lines. Pre-existing
+  failures are NOT acceptable -- fix or delete the test. There is
+  no "known-failing-but-not-our-fault" status.
+- TDD per feature: write a test file that fails RED for the new
+  behavior, then implement, then commit. Acceptable to skip TDD
+  only for trivial extractor / formatter changes where the test
+  would be a 1:1 mirror of the impl.
+
+#### Layer 2 -- Visual demos with Playwright + screenshots
+
+- Every RFC that ships `Implemented` or later carries at least one
+  demo page that exercises it end-to-end visually (browser-rendered,
+  not headless-only). Demos live in `demos/<feature>/` with their
+  own README, are listed in `README_DEMOS.md`, and are linked from
+  the landing.
+- A Playwright runner (`scripts/run-all-demos.mjs` or equivalent)
+  enumerates every demo, drives the documented flow, and asserts
+  the final state matches the expected screenshot. Run output
+  lives in `evidence/<feature>/<run-date>/*.png` + `run-log.txt`.
+  The runner FAILS if any demo does not reach its expected end
+  state, or if any screenshot drifts beyond tolerance.
+
+#### Layer 3 -- Pilot-driven visual tests with high-complexity statements
+
+- A real Yujin Pilot agent (not a Playwright stub) drives each
+  demo via high-complexity multi-step natural-language
+  instructions, e.g. *"open the syncPlugin demo, register the
+  manifest, mutate the DOM three times, replay the registration,
+  and confirm the manifest entries did not duplicate"*. The agent
+  resolves the instruction into NAC3 verb calls through its own
+  reasoning loop; the demo's expected end-state must hold.
+- Coverage objective: every NAC3 RFC `Implemented` or later is
+  exercised by at least one Pilot statement that is NOT a
+  pre-canned one-liner -- the statement reads as a sentence a
+  human adopter might genuinely say, and the agent must navigate
+  the chain.
+- Pilot run output lives alongside Layer 2's evidence:
+  `evidence/<feature>/<run-date>/pilot-run-log.md` (the model's
+  reasoning trace), plus screenshots of the intermediate steps.
+- A Pilot-driven test that ends in the same final-state assertion
+  as the Layer 2 Playwright run constitutes the EVIDENCE that the
+  contract works for a real agent, not just for a scripted driver.
+
+#### Layer-coverage invariant
+
+Any RFC promoted to `Production` carries a CHANGELOG citation of
+all three layers' tests by file path:
+
+  - unit (Layer 1): `runtime/test/stage<NN>-<feature>.mjs`
+  - visual + Playwright (Layer 2): `demos/<feature>/` +
+    `evidence/<feature>/<latest-run>/`
+  - Pilot-driven (Layer 3): `evidence/<feature>/<latest-run>/pilot-run-log.md`
+
+Promotion `Alpha` -> `Production` (i.e. `latest` npm dist-tag)
+requires Pablo's explicit OK after he reviews the Layer 2 + Layer 3
+evidence. This gate was instituted 2026-05-25.
 
 ### 3.2 Architecture
 

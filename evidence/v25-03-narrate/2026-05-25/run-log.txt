@@ -1,0 +1,39 @@
+20:04:41.597 V25-03 narrate Layer 2 demo runner
+20:04:41.598   base url    http://localhost:8855
+20:04:41.598   evidence    C:\yujin-nac-spec\evidence\v25-03-narrate\2026-05-25
+20:04:42.767 
+20:04:42.767 --- scenario 1: page loaded + plugin present ---
+20:04:42.921 
+20:04:42.921 --- scenario 2: aria-label highest priority ---
+20:04:43.076 PASS btn-save -> aria-label "Save document"
+20:04:43.076 
+20:04:43.076 --- scenario 3: visible text fallback ---
+20:04:43.152 PASS btn-print -> visible text "Print"
+20:04:43.152 
+20:04:43.152 --- scenario 4: data-nac-label override ---
+20:04:43.230 PASS btn-export -> visible text wins over data-nac-label (textContent includes hidden span)
+20:04:43.230 
+20:04:43.230 --- scenario 5: nac_id fallback (no labels) ---
+20:04:43.324 PASS btn-9 -> fallback to nac_id
+20:04:43.324 
+20:04:43.324 --- scenario 6: nested addressable child excluded ---
+20:04:43.402 PASS menu-format -> "Format" only (nested Bold excluded)
+20:04:43.402 
+20:04:43.402 --- scenario 7: whitespace aria-label falls through ---
+20:04:43.480 PASS btn-clear -> "Clear" (whitespace aria ignored)
+20:04:43.480 
+20:04:43.480 --- scenario 8: icon + text -> text wins ---
+20:04:43.574 PASS btn-undo -> "Undo" (icon excluded from text)
+20:04:43.574 
+20:04:43.574 --- scenario 9: unknown nac_id returns null ---
+20:04:43.652 PASS unknown nac_id returns null
+20:04:43.652 
+20:04:43.652 --- scenario 10: unknown plugin returns null ---
+20:04:43.730 PASS unknown plugin returns null
+20:04:43.730 
+20:04:43.730 --- scenario 11: batch narrate every button ---
+20:04:43.871 PASS batch returned 8 entries
+20:04:43.871 PASS batch btn-save = "Save document"
+20:04:43.871 PASS batch menu-format.bold = "Bold"
+
+FAILURES: 0

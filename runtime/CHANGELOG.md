@@ -1,5 +1,51 @@
 # Changelog
 
+## 2.5.0-alpha.5 -- 2026-05-25
+
+NAC3 v2.5.0-alpha.5 ships the remaining three assistive blocks of
+the v2.5 line: **Block B tree navigation**, **Block C asistive
+labels**, **Block D effect detection**. The full v2.5 surface is
+now GA: every SHIPPED RFC (V24-01/02/04/05 + V25-01/02/03/04) has
+runtime code + Layer 2 demo + Layer 3 Pilot LIVE evidence.
+
+### Added
+
+- **`NAC.narrate(plugin, nac_id) -> string | null`** (RFC V25-03 /
+  SPEC sec 17). Canonical human-readable label resolution. Priority:
+  `aria-label > visible text > data-nac-label > nac_id`. Nested
+  addressable children excluded from parent's visible-text. Whitespace
+  values at any tier fall through.
+- **`NAC.context(plugin) -> { breadcrumb: [{nac_id, label}, ...] }`**
+  (RFC V25-02 / SPEC sec 16). Walks up from `document.activeElement`
+  through addressable ancestors. Labels via narrate.
+- **`NAC.tree(plugin, rootId?) -> [{nac_id, label, opens?, leaf?}, ...]`**
+  (RFC V25-02). Enumerates IMMEDIATE addressable children of rootId
+  (or the plugin root). Honours `data-nac-opens` and `data-nac-leaf`
+  authoring attributes.
+- **`NAC.expect(plugin, statePath, value, opts?) -> Promise<value>`**
+  (RFC V25-04 / SPEC sec 18). Polls `NAC.read()` until the comparator
+  returns truthy or the deadline fires (default 5000ms timeout,
+  100ms poll). Rejects `NacError('timeout')` on deadline.
+- **`NAC.diff(plugin, statePath, actionFn) -> Promise<{before, after, changed}>`**
+  (RFC V25-04). Snapshots state, awaits actionFn, snapshots again.
+  JSON-stringify compare for the `changed` flag.
+
+### Evidence (Layer 2 + Layer 3 LIVE)
+
+- V25-02 tree-nav: L2 18 PASS / L3 LIVE 4 PASS.
+- V25-03 narrate:  L2 12 PASS / L3 LIVE 6 PASS.
+- V25-04 expect+diff: L2 17 PASS / L3 LIVE 7 PASS.
+
+Each demo + Pilot driver under `demos/` and `scripts/`, evidence in
+`evidence/v25-0{2,3,4}*/<date>/`. Total LIVE Claude cost: ~$0.04.
+
+### Status of v2.5 line
+
+All 8 RFCs of the v2.5 line are now SHIPPED with full L2 + L3 LIVE
+evidence. Collabora pilot can now consume the full surface end-to-end.
+
+---
+
 ## 2.5.0-alpha.4 -- 2026-05-25
 
 NAC3 v2.5.0-alpha.4 closes the V24-04 contract: every mutating

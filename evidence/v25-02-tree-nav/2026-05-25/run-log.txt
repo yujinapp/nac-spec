@@ -1,0 +1,45 @@
+20:11:14.327 V25-02 tree-nav Layer 2 demo runner
+20:11:14.327   base url    http://localhost:8855
+20:11:14.327   evidence    C:\yujin-nac-spec\evidence\v25-02-tree-nav\2026-05-25
+20:11:14.710 
+20:11:14.710 --- scenario 1: tree(editor) returns top-level descendants ---
+20:11:14.851 PASS tree(editor) returns 6 top-level entries
+20:11:14.851 PASS tree(editor) includes menubar
+20:11:14.851 PASS tree(editor) includes all 5 submenus
+20:11:14.888 
+20:11:14.888 --- scenario 2: tree(editor, menubar) ---
+20:11:15.015 PASS tree(menubar) returns 4 menu items
+20:11:15.015 PASS menu-file has opens=submenu-file
+20:11:15.015 PASS menu-help has leaf=true
+20:11:15.015 PASS menu-file label resolved via narrate
+20:11:15.046 
+20:11:15.046 --- scenario 3: tree(editor, submenu-file) ---
+20:11:15.167 PASS tree(submenu-file) returns 4 actions
+20:11:15.167 PASS action-file.export has opens=submenu-file.export
+20:11:15.167 PASS action-file.save label uses aria-label "Save document"
+20:11:15.206 
+20:11:15.206 --- scenario 4: tree(editor, submenu-file.export) ---
+20:11:15.335 PASS tree(submenu-file.export) returns 3 leaves
+20:11:15.335 PASS all 3 are leaf=true
+20:11:15.372 
+20:11:15.372 --- scenario 5: tree of a leaf returns [] ---
+20:11:15.501 PASS tree(action-file.new) returns []
+20:11:15.501 
+20:11:15.501 --- scenario 6: tree of unknown rootId returns [] ---
+20:11:15.615 PASS tree(no-such-id) returns []
+20:11:15.615 
+20:11:15.615 --- scenario 7: context() with no focus inside plugin ---
+20:11:15.734 PASS context with no focus -> empty breadcrumb
+20:11:15.734 
+20:11:15.734 --- scenario 8: context() with deep focus (action-export.pdf) ---
+20:11:15.744 PASS context breadcrumb has at least 1 level
+20:11:15.744 PASS last crumb is action-export.pdf
+20:11:15.744 PASS action-export.pdf label resolved to "PDF"
+20:11:15.814 
+20:11:15.814 --- scenario 9: opens-chain walks via tree() composition ---
+20:11:15.818 PASS opens-chain lvl1 = 4
+20:11:15.818 PASS opens-chain lvl2 = 4
+20:11:15.818 PASS opens-chain lvl3 = 3
+20:11:15.818 PASS opens-chain leaf labels = [PDF, Word document, HTML page]
+
+FAILURES: 0

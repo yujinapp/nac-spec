@@ -1337,35 +1337,106 @@ is one of:
 
 ---
 
-## 16. Tree navigation (v2.5 -- PLANNED, see sec 17 & 18 below)
+## 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / RFC V25-02)
 
-*Drafting pending. Captures `NAC.context(plugin)` (current
-breadcrumb) + `NAC.tree(plugin, rootId?)` (enumerate hijos
-navegables) + the `data-nac-opens` / `data-nac-leaf` attributes
-that let the chrome declare hierarchical relationships explicitly.*
+Hierarchical command navigation primitives for assistive flows and
+voice runners that need to describe what they can do from the
+current focus.
+
+**API surface:**
+
+- `NAC.context(plugin) -> { breadcrumb: [{nac_id, label}, ...] }`
+  Walks up from `document.activeElement` through ancestor elements
+  carrying `data-nac-id`, stopping at the plugin root. Returns an
+  empty breadcrumb if nothing is focused inside the plugin. Each
+  crumb's `label` comes from `narrate` (sec 17).
+
+- `NAC.tree(plugin, rootId?) -> [{nac_id, label, opens?, leaf?}, ...]`
+  Enumerates the IMMEDIATE addressable children of `rootId` (or the
+  plugin root if omitted). "Immediate" means no other `data-nac-id`
+  element lies between the start and the child. For each entry:
+  - `label` resolved via `narrate`
+  - `opens` mirrors the `data-nac-opens` attribute when present
+  - `leaf` is `true` when `data-nac-leaf` is present
+
+**Authoring attributes:**
+
+- `data-nac-opens="<target-nac-id>"`: declares this node opens /
+  drills into the element identified by the target id. Lets agents
+  follow the navigation chain without guessing names.
+- `data-nac-leaf`: explicit terminal marker; downstream agents know
+  no further drill is possible.
+
+**Errors:** `tree` returns `[]` for an unknown rootId (silent
+empty, not an error). `context` always returns
+`{ breadcrumb: [] }` for unknown plugins.
 
 ---
 
-## 17. Asistive labels (v2.5 -- PLANNED)
+## 17. Asistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5 / RFC V25-03)
 
-*Drafting pending. Captures `NAC.narrate(plugin, nodeId)` (return
-the canonical human-readable label for screen reader / TTS),
-validation warnings for ordinal-shaped ids and for nodes that
-have no readable label.*
+Canonical human-readable label resolution. One function for screen
+readers, TTS, voice flows, audit logs, mobile assistive surfaces.
+
+**API surface:**
+
+- `NAC.narrate(plugin, nac_id) -> string | null`
+  Returns `null` if the plugin or nac_id cannot be found. Otherwise
+  the label following this strict priority order:
+
+  1. **`aria-label`** -- a11y-first; respected unless whitespace-only.
+  2. **visible text** -- `textContent` of the element excluding any
+     nested `data-nac-id` subtrees (those have their own narrate
+     resolution; they get excluded so spoken output stays scoped).
+  3. **`data-nac-label`** -- explicit author override; useful when
+     visible text contains icon glyphs or i18n keys.
+  4. **`nac_id` fallback** -- worst case; signals "no label authored".
+
+  Whitespace-only values at any tier collapse to the next tier.
+
+**Validation:** `validate_global()` may emit warnings in the
+`plugin_instance_violations` bucket for ordinal-shaped nac_ids
+(`btn-1`, `btn-2`, ...) lacking any of the upper-tier labels.
 
 ---
 
-## 18. Effect detection (v2.5 -- PLANNED)
+## 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5 / RFC V25-04)
 
-*Drafting pending. Captures `NAC.expect(plugin, statePath, value,
-opts?)` (Promise that resolves when a state matches an expected
-value within a timeout) and `NAC.diff(plugin, statePath, beforeFn,
-afterFn)` (snapshot a state pre- and post- an action).*
+Closes the "silent damage" gap: an agent confirms the EFFECT of
+an action, not just that the command was emitted. Both primitives
+compose with `NAC.read()` so any V25-01 backend works (postmessage,
+sdk-call, dom-mirror, ...).
+
+**API surface:**
+
+- `NAC.expect(plugin, statePath, value, opts?) -> Promise<value>`
+  Polls `NAC.read(plugin, statePath)` until the comparator returns
+  truthy or the deadline fires. Resolves with the resolved value;
+  rejects with `NacError('timeout', ...)` on deadline.
+
+  Read failures during polling are retried until the deadline
+  (treated as "not yet observable", not as a hard error).
+
+  Options:
+  - `timeout_ms` (default `5000`)
+  - `poll_ms` (default `100`)
+  - `comparator` (default `(cur, want) => cur === want`)
+    Receives `(current, expected)`, returns boolean.
+
+- `NAC.diff(plugin, statePath, actionFn) -> Promise<{before, after, changed}>`
+  Reads state, awaits `actionFn()`, reads state again. Returns
+  both snapshots and a `changed` boolean computed via JSON-stringify
+  compare (so `undefined`-vs-value still flags as changed).
+  Read failures collapse to `undefined`.
+
+**Composition notes:** `diff` only captures the START and END
+snapshot; it does NOT observe intermediate states inside the
+action. Use `expect` if your concern is "the state passes through
+some specific value at some point".
 
 ---
 
-*This document is the canonical NAC3 v2.5-draft specification.
-Sections 0-14 are unchanged from v2.4 stable. Section 15 is GA
-in v2.5; sections 16-18 are in active drafting. Edits to this
-file constitute spec changes and require an RFC; see
-`CONTRIBUTING.md`.*
+*This document is the canonical NAC3 v2.5 specification.
+Sections 0-14 are unchanged from v2.4 stable. Sections 15-18 ship
+in v2.5. Edits to this file constitute spec changes and require an
+RFC; see `CONTRIBUTING.md`.*

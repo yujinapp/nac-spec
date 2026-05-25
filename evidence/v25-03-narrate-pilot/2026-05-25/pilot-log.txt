@@ -1,0 +1,27 @@
+20:06:10.784 V25-03 Layer 3 Pilot driver
+20:06:10.784   mode: live
+20:06:10.784   base url: http://localhost:8855
+20:06:10.784   evidence: C:\yujin-nac-spec\evidence\v25-03-narrate-pilot\2026-05-25
+20:06:11.127 
+20:06:11.127 ========== statement: priority-order ==========
+20:06:11.128   text: For the editor plugin, narrate three buttons and confirm the priority order: btn-save has aria-label "Save document" (highest priority), btn-print has only visible text "Print", and btn-9 has no labels of any kind. Report the narration for each.
+20:06:13.039   plan steps: 3
+20:06:13.048   step outcomes: narrate:"Save document", narrate:"Print", narrate:"btn-9"
+20:06:13.048 PASS priority-order btn-save aria-label wins
+20:06:13.048 PASS priority-order btn-print visible text
+20:06:13.048 PASS priority-order btn-9 nac_id fallback
+20:06:13.104 
+20:06:13.104 ========== statement: null-on-missing ==========
+20:06:13.104   text: Call narrate for a nac_id that does not exist in the editor plugin (use "ghost-element"). The runtime should return null. Also call narrate against a plugin slug that is not registered ("no-such-plugin") with any nac_id -- also null.
+20:06:15.203   plan steps: 2
+20:06:15.210   step outcomes: narrate:null, narrate:null
+20:06:15.210 PASS null-on-missing missing nac_id -> null
+20:06:15.211 PASS null-on-missing missing plugin -> null
+20:06:15.269 
+20:06:15.269 ========== statement: nested-children-excluded ==========
+20:06:15.269   text: In the "editor" plugin, narrate the nac_id "menu-format". That element contains the text "Format" AND a nested addressable child whose nac_id is "menu-format.bold". The narration of "menu-format" MUST be just "Format" -- nested addressable children get excluded so the spoken output stays scoped to the requested node.
+20:06:17.270   plan steps: 1
+20:06:17.274   step outcomes: narrate:"Format"
+20:06:17.274 PASS nested-children-excluded "Format" only (nested Bold excluded)
+
+FAILURES: 0

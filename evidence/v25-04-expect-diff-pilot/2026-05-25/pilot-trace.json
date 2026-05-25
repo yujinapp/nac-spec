@@ -1,0 +1,213 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "wait-for-effect",
+      "text": "In the \"canvas\" plugin the state \"canvas.value\" can be set via the host-side window.canvasApp.set(n) function. Schedule a deferred set (canvasApp.set(9) after 400ms) and then use NAC.expect to wait until canvas.value reaches 9, with a timeout of 2000ms. Report the resolved value.",
+      "expect": {
+        "final_value": 9
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"set_after\",\"value\":9,\"delay_ms\":400},{\"op\":\"expect\",\"state_path\":\"canvas.value\",\"value\":9,\"timeout_ms\":2000},{\"op\":\"read\",\"state_path\":\"canvas.value\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "set_after",
+            "value": 9,
+            "delay_ms": 400
+          },
+          {
+            "op": "expect",
+            "state_path": "canvas.value",
+            "value": 9,
+            "timeout_ms": 2000
+          },
+          {
+            "op": "read",
+            "state_path": "canvas.value"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set_after",
+          "value": 9,
+          "delay_ms": 400,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "expect",
+          "state_path": "canvas.value",
+          "want": 9,
+          "resolved": 9,
+          "ok": true,
+          "duration_ms": 442
+        },
+        {
+          "idx": 2,
+          "op": "read",
+          "state_path": "canvas.value",
+          "value": 9,
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-04-expect-diff-pilot\\2026-05-25\\wait-for-effect.png"
+    },
+    {
+      "id": "detect-silent-damage",
+      "text": "In the \"canvas\" plugin, use NAC.diff to verify that calling canvasApp.set(5) really changed canvas.value. The expected outcome is {before: 0, after: 5, changed: true}. Reset first via canvasApp.set(0) so the before snapshot is 0.",
+      "expect": {
+        "before": 0,
+        "after": 5,
+        "changed": true
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"set\",\"value\":0},{\"op\":\"expect\",\"state_path\":\"canvas.value\",\"value\":0,\"timeout_ms\":2000},{\"op\":\"diff\",\"state_path\":\"canvas.value\",\"action_value\":5},{\"op\":\"expect\",\"state_path\":\"canvas.value\",\"value\":5,\"timeout_ms\":2000}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "set",
+            "value": 0
+          },
+          {
+            "op": "expect",
+            "state_path": "canvas.value",
+            "value": 0,
+            "timeout_ms": 2000
+          },
+          {
+            "op": "diff",
+            "state_path": "canvas.value",
+            "action_value": 5
+          },
+          {
+            "op": "expect",
+            "state_path": "canvas.value",
+            "value": 5,
+            "timeout_ms": 2000
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set",
+          "value": 0,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "expect",
+          "state_path": "canvas.value",
+          "want": 0,
+          "resolved": 0,
+          "ok": true,
+          "duration_ms": 3
+        },
+        {
+          "idx": 2,
+          "op": "diff",
+          "state_path": "canvas.value",
+          "action_value": 5,
+          "before": 0,
+          "after": 5,
+          "changed": true,
+          "ok": true
+        },
+        {
+          "idx": 3,
+          "op": "expect",
+          "state_path": "canvas.value",
+          "want": 5,
+          "resolved": 5,
+          "ok": true,
+          "duration_ms": 3
+        }
+      ],
+      "screenshot": "evidence\\v25-04-expect-diff-pilot\\2026-05-25\\detect-silent-damage.png"
+    },
+    {
+      "id": "noop-detection",
+      "text": "In the \"canvas\" plugin, prove that a no-op action does NOT change state. Set canvas.value to 11. Then use diff with an action that does nothing. Verify changed is false.",
+      "expect": {
+        "changed": false
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"set\",\"value\":11},{\"op\":\"expect\",\"state_path\":\"canvas.value\",\"value\":11,\"timeout_ms\":3000},{\"op\":\"diff\",\"state_path\":\"canvas.value\",\"action_value\":null},{\"op\":\"read\",\"state_path\":\"canvas.value\"},{\"op\":\"expect\",\"state_path\":\"canvas.value\",\"value\":11,\"timeout_ms\":3000}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "set",
+            "value": 11
+          },
+          {
+            "op": "expect",
+            "state_path": "canvas.value",
+            "value": 11,
+            "timeout_ms": 3000
+          },
+          {
+            "op": "diff",
+            "state_path": "canvas.value",
+            "action_value": null
+          },
+          {
+            "op": "read",
+            "state_path": "canvas.value"
+          },
+          {
+            "op": "expect",
+            "state_path": "canvas.value",
+            "value": 11,
+            "timeout_ms": 3000
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "set",
+          "value": 11,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "expect",
+          "state_path": "canvas.value",
+          "want": 11,
+          "resolved": 11,
+          "ok": true,
+          "duration_ms": 4
+        },
+        {
+          "idx": 2,
+          "op": "diff",
+          "state_path": "canvas.value",
+          "action_value": null,
+          "before": 11,
+          "after": 11,
+          "changed": false,
+          "ok": true
+        },
+        {
+          "idx": 3,
+          "op": "read",
+          "state_path": "canvas.value",
+          "value": 11,
+          "ok": true
+        },
+        {
+          "idx": 4,
+          "op": "expect",
+          "state_path": "canvas.value",
+          "want": 11,
+          "resolved": 11,
+          "ok": true,
+          "duration_ms": 1
+        }
+      ],
+      "screenshot": "evidence\\v25-04-expect-diff-pilot\\2026-05-25\\noop-detection.png"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v25-02-tree-nav/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "trees": {
+      "root": [
+        {
+          "nac_id": "menubar",
+          "label": "menubar"
+        },
+        {
+          "nac_id": "submenu-file",
+          "label": "submenu-file"
+        },
+        {
+          "nac_id": "submenu-file.export",
+          "label": "submenu-file.export"
+        },
+        {
+          "nac_id": "submenu-edit",
+          "label": "submenu-edit"
+        },
+        {
+          "nac_id": "submenu-insert",
+          "label": "submenu-insert"
+        },
+        {
+          "nac_id": "submenu-insert.table",
+          "label": "submenu-insert.table"
+        }
+      ],
+      "menubar": [
+        {
+          "nac_id": "menu-file",
+          "label": "File",
+          "opens": "submenu-file"
+        },
+        {
+          "nac_id": "menu-edit",
+          "label": "Edit",
+          "opens": "submenu-edit"
+        },
+        {
+          "nac_id": "menu-insert",
+          "label": "Insert",
+          "opens": "submenu-insert"
+        },
+        {
+          "nac_id": "menu-help",
+          "label": "Help",
+          "leaf": true
+        }
+      ],
+      "submenu-file": [
+        {
+          "nac_id": "action-file.new",
+          "label": "New",
+          "leaf": true
+        },
+        {
+          "nac_id": "action-file.open",
+          "label": "Open...",
+          "leaf": true
+        },
+        {
+          "nac_id": "action-file.save",
+          "label": "Save document",
+          "leaf": true
+        },
+        {
+          "nac_id": "action-file.export",
+          "label": "Export to...",
+          "opens": "submenu-file.export"
+        }
+      ],
+      "submenu-export": [
+        {
+          "nac_id": "action-export.pdf",
+          "label": "PDF",
+          "leaf": true
+        },
+        {
+          "nac_id": "action-export.docx",
+          "label": "Word document",
+          "leaf": true
+        },
+        {
+          "nac_id": "action-export.html",
+          "label": "HTML page",
+          "leaf": true
+        }
+      ],
+      "leaf-empty": [],
+      "bad-empty": []
+    },
+    "context": {
+      "breadcrumb": [
+        {
+          "nac_id": "submenu-file.export",
+          "label": "submenu-file.export"
+        },
+        {
+          "nac_id": "action-export.pdf",
+          "label": "PDF"
+        }
+      ]
+    }
+  }
+}

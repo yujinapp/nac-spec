@@ -1,0 +1,178 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "walk-to-leaf",
+      "text": "In the \"editor\" plugin, walk the tree from the menubar down to find the leaf \"PDF\". Steps: tree(editor, \"menubar\") to find menu-file. Follow its opens to submenu-file, call tree(editor, \"submenu-file\") to find action-file.export. Follow its opens to submenu-file.export, call tree(editor, \"submenu-file.export\") and report the labels of the children.",
+      "expect": {
+        "leaves": [
+          "PDF",
+          "Word document",
+          "HTML page"
+        ]
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"tree\",\"plugin\":\"editor\",\"root_id\":\"menubar\"},{\"op\":\"tree\",\"plugin\":\"editor\",\"root_id\":\"submenu-file\"},{\"op\":\"tree\",\"plugin\":\"editor\",\"root_id\":\"submenu-file.export\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "tree",
+            "plugin": "editor",
+            "root_id": "menubar"
+          },
+          {
+            "op": "tree",
+            "plugin": "editor",
+            "root_id": "submenu-file"
+          },
+          {
+            "op": "tree",
+            "plugin": "editor",
+            "root_id": "submenu-file.export"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "tree",
+          "plugin": "editor",
+          "root_id": "menubar",
+          "children": [
+            {
+              "nac_id": "menu-file",
+              "label": "File",
+              "opens": "submenu-file"
+            },
+            {
+              "nac_id": "menu-edit",
+              "label": "Edit",
+              "opens": "submenu-edit"
+            },
+            {
+              "nac_id": "menu-insert",
+              "label": "Insert",
+              "opens": "submenu-insert"
+            },
+            {
+              "nac_id": "menu-help",
+              "label": "Help",
+              "leaf": true
+            }
+          ],
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "tree",
+          "plugin": "editor",
+          "root_id": "submenu-file",
+          "children": [
+            {
+              "nac_id": "action-file.new",
+              "label": "New",
+              "leaf": true
+            },
+            {
+              "nac_id": "action-file.open",
+              "label": "Open...",
+              "leaf": true
+            },
+            {
+              "nac_id": "action-file.save",
+              "label": "Save document",
+              "leaf": true
+            },
+            {
+              "nac_id": "action-file.export",
+              "label": "Export to...",
+              "opens": "submenu-file.export"
+            }
+          ],
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "tree",
+          "plugin": "editor",
+          "root_id": "submenu-file.export",
+          "children": [
+            {
+              "nac_id": "action-export.pdf",
+              "label": "PDF",
+              "leaf": true
+            },
+            {
+              "nac_id": "action-export.docx",
+              "label": "Word document",
+              "leaf": true
+            },
+            {
+              "nac_id": "action-export.html",
+              "label": "HTML page",
+              "leaf": true
+            }
+          ],
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-02-tree-nav-pilot\\2026-05-25\\walk-to-leaf.png"
+    },
+    {
+      "id": "enumerate-menubar",
+      "text": "In the \"editor\" plugin, list the top-level menu items by calling tree(editor, \"menubar\"). I need to see for each child the nac_id, the label, and whether it is a leaf (data-nac-leaf) or it opens a submenu (data-nac-opens target).",
+      "expect": {
+        "count": 4,
+        "has_leaf": "menu-help",
+        "has_opens": [
+          "menu-file",
+          "menu-edit",
+          "menu-insert"
+        ]
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"tree\",\"plugin\":\"editor\",\"root_id\":\"menubar\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "tree",
+            "plugin": "editor",
+            "root_id": "menubar"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "tree",
+          "plugin": "editor",
+          "root_id": "menubar",
+          "children": [
+            {
+              "nac_id": "menu-file",
+              "label": "File",
+              "opens": "submenu-file"
+            },
+            {
+              "nac_id": "menu-edit",
+              "label": "Edit",
+              "opens": "submenu-edit"
+            },
+            {
+              "nac_id": "menu-insert",
+              "label": "Insert",
+              "opens": "submenu-insert"
+            },
+            {
+              "nac_id": "menu-help",
+              "label": "Help",
+              "leaf": true
+            }
+          ],
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-02-tree-nav-pilot\\2026-05-25\\enumerate-menubar.png"
+    }
+  ]
+}

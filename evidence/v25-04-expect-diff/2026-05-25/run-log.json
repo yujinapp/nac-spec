@@ -1,0 +1,54 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v25-04-expect-diff/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "expects": [
+      {
+        "label": "value-7-now",
+        "ok": true,
+        "value": 7,
+        "duration_ms": 2
+      },
+      {
+        "label": "value-7-delayed",
+        "ok": true,
+        "value": 7,
+        "duration_ms": 501
+      },
+      {
+        "label": "value-7-timeout",
+        "ok": false,
+        "error_code": "timeout",
+        "duration_ms": 335
+      },
+      {
+        "label": "bold-true-delayed",
+        "ok": true,
+        "value": true,
+        "duration_ms": 341
+      }
+    ],
+    "diffs": [
+      {
+        "label": "diff-set-7",
+        "before": 0,
+        "after": 7,
+        "changed": true
+      },
+      {
+        "label": "diff-noop",
+        "before": 4,
+        "after": 4,
+        "changed": false
+      },
+      {
+        "label": "diff-multistep",
+        "before": 0,
+        "after": 3,
+        "changed": true
+      }
+    ]
+  }
+}

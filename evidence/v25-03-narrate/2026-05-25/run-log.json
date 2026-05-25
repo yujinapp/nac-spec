@@ -1,0 +1,65 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v25-03-narrate/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "narrations": [
+      {
+        "nac_id": "btn-save",
+        "label": "Save document",
+        "tier": "aria-label"
+      },
+      {
+        "nac_id": "btn-print",
+        "label": "Print",
+        "tier": "visible-text"
+      },
+      {
+        "nac_id": "btn-export",
+        "label": "hidden",
+        "tier": "data-nac-label"
+      },
+      {
+        "nac_id": "btn-9",
+        "label": "btn-9",
+        "tier": "nac_id-fallback"
+      },
+      {
+        "nac_id": "menu-format",
+        "label": "Format",
+        "tier": "visible-text-excluding-nested"
+      },
+      {
+        "nac_id": "btn-clear",
+        "label": "Clear",
+        "tier": "visible-text (aria empty)"
+      },
+      {
+        "nac_id": "btn-undo",
+        "label": "Undo",
+        "tier": "visible-text (with icon)"
+      },
+      {
+        "nac_id": "does-not-exist",
+        "label": null,
+        "tier": "null-not-found"
+      },
+      {
+        "nac_id": "btn-save@bad",
+        "label": null,
+        "tier": "null-plugin-not-found"
+      }
+    ],
+    "batch": {
+      "btn-save": "Save document",
+      "btn-print": "Print",
+      "btn-export": "hidden",
+      "btn-9": "btn-9",
+      "menu-format": "Format",
+      "menu-format.bold": "Bold",
+      "btn-clear": "Clear",
+      "btn-undo": "Undo"
+    }
+  }
+}

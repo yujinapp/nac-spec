@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V25-02 tree navigation -- NAC3 v2.5 demo</title>
+<style>
+:root{--cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;--ct:#2C2927;--ct2:#615E58;--ct3:#888480;--ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;}
+header{max-width:1100px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:78ch;}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.plugin-root{background:#fafaf7;border:.5px solid var(--cm);padding:12px;border-radius:6px;margin-bottom:10px;}
+.meta{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ct3);margin-bottom:8px;}
+.menubar{display:flex;gap:0;background:var(--ct);color:#fff;padding:6px 8px;border-radius:4px;}
+.menubar > [data-nac-id]{padding:4px 10px;cursor:pointer;border-radius:3px;}
+.menubar > [data-nac-id]:hover{background:rgba(255,255,255,0.1);}
+.submenu{background:#fafaf7;border:.5px solid var(--cb);border-radius:4px;padding:6px;margin-top:6px;display:none;}
+.submenu.open{display:block;}
+.submenu [data-nac-id]{display:block;padding:5px 10px;cursor:pointer;}
+.submenu [data-nac-id]:hover{background:var(--cm);}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.72rem;padding:10px;border-radius:6px;height:500px;overflow-y:auto;line-height:1.5;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry.warn{color:#e6b85c;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.kv{font-family:ui-monospace,monospace;font-size:.74rem;color:var(--ct);background:var(--cm);padding:3px 6px;border-radius:3px;margin-right:4px;display:inline-block;}
+code{font-family:ui-monospace,monospace;background:var(--cm);padding:1px 5px;border-radius:3px;font-size:.84em;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">NAC3 v2.5 -- RFC V25-02 demo</div>
+  <h1>Tree navigation via <code>context</code> + <code>tree</code></h1>
+  <p class="lede">
+    <code>NAC.context(plugin)</code> returns the breadcrumb of the
+    currently focused node walking up to the plugin root.
+    <code>NAC.tree(plugin, rootId?)</code> enumerates immediate
+    addressable children. <code>data-nac-opens</code> declares
+    parent-to-child relationships; <code>data-nac-leaf</code> marks
+    terminals. Labels are resolved via <code>narrate</code>.
+  </p>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <h2>app: editor with menubar</h2>
+
+    <div class="plugin-root" data-nac-plugin="editor" data-nac-plugin-id="editor-main">
+      <div class="meta">data-nac-plugin="editor"</div>
+      <div class="menubar" data-nac-id="menubar">
+        <span data-nac-id="menu-file"    data-nac-opens="submenu-file">File</span>
+        <span data-nac-id="menu-edit"    data-nac-opens="submenu-edit">Edit</span>
+        <span data-nac-id="menu-insert"  data-nac-opens="submenu-insert">Insert</span>
+        <span data-nac-id="menu-help" data-nac-leaf>Help</span>
+      </div>
+
+      <div class="submenu" id="submenu-file" data-nac-id="submenu-file">
+        <span data-nac-id="action-file.new"   data-nac-leaf>New</span>
+        <span data-nac-id="action-file.open"  data-nac-leaf>Open...</span>
+        <span data-nac-id="action-file.save"  data-nac-leaf aria-label="Save document">Save</span>
+        <span data-nac-id="action-file.export" data-nac-opens="submenu-file.export">Export to...</span>
+      </div>
+
+      <div class="submenu" id="submenu-file.export" data-nac-id="submenu-file.export">
+        <button data-nac-id="action-export.pdf" data-nac-leaf>PDF</button>
+        <span data-nac-id="action-export.docx" data-nac-leaf>Word document</span>
+        <span data-nac-id="action-export.html" data-nac-leaf>HTML page</span>
+      </div>
+
+      <div class="submenu" id="submenu-edit" data-nac-id="submenu-edit">
+        <span data-nac-id="action-edit.undo" data-nac-leaf>Undo</span>
+        <span data-nac-id="action-edit.redo" data-nac-leaf>Redo</span>
+      </div>
+
+      <div class="submenu" id="submenu-insert" data-nac-id="submenu-insert">
+        <span data-nac-id="action-insert.image" data-nac-leaf>Image</span>
+        <span data-nac-id="action-insert.table" data-nac-opens="submenu-insert.table">Table</span>
+      </div>
+
+      <div class="submenu" id="submenu-insert.table" data-nac-id="submenu-insert.table">
+        <span data-nac-id="action-table.simple" data-nac-leaf>Simple table</span>
+        <span data-nac-id="action-table.spreadsheet" data-nac-leaf>Spreadsheet</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="tree-root">tree(editor)</button>
+      <button data-action="tree-menubar">tree(editor, menubar)</button>
+      <button data-action="tree-file">tree(editor, submenu-file)</button>
+      <button data-action="tree-export">tree(editor, submenu-file.export)</button>
+      <button data-action="tree-leaf">tree(editor, action-file.new) -- leaf, empty</button>
+      <button data-action="tree-bad">tree(editor, no-such) -- empty</button>
+    </div>
+    <div class="btn-row">
+      <button data-action="focus-export-pdf">focus action-export.pdf</button>
+      <button data-action="context-after-focus">context(editor)</button>
+      <button data-action="open-export">open submenu file + export visually</button>
+    </div>
+    <div style="margin-top:14px;">
+      <span class="kv">last context length: <span id="kv-ctx">--</span></span>
+      <span class="kv">last tree children: <span id="kv-tree">--</span></span>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.74rem;color:var(--ct3);">
+      <span>context() + tree() results</span>
+      <button id="btn-clear-log" style="font-size:.7rem;padding:3px 8px;">clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script src="../../runtime/dist/nac.browser.js"></script>
+<script>
+(function(){
+  const NAC = window.NAC;
+  if (!NAC || typeof NAC.tree !== 'function' || typeof NAC.context !== 'function') {
+    document.getElementById('log').innerHTML = '<div class="entry err">FATAL: NAC v2.5 tree/context not loaded.</div>';
+    return;
+  }
+  window.__v25_02Demo = {
+    trees: {},     /* label -> tree result */
+    context: null,
+  };
+  function logEntry(klass, html) {
+    const e = document.createElement('div');
+    e.className = 'entry ' + klass;
+    e.innerHTML = '<span class="ts">' + new Date().toISOString().slice(11,19) + '</span>' + html;
+    const log = document.getElementById('log');
+    log.insertBefore(e, log.firstChild);
+  }
+  function recordTree(label, root) {
+    const r = root ? NAC.tree('editor', root) : NAC.tree('editor');
+    window.__v25_02Demo.trees[label] = r;
+    document.getElementById('kv-tree').textContent = r.length + ' children';
+    logEntry(r.length ? 'ok' : 'warn',
+      '<code>tree(editor' + (root ? ', '+root : '') + ')</code> = ' + JSON.stringify(r));
+  }
+  const actions = {
+    'tree-root':    () => recordTree('root', null),
+    'tree-menubar': () => recordTree('menubar', 'menubar'),
+    'tree-file':    () => recordTree('submenu-file', 'submenu-file'),
+    'tree-export':  () => recordTree('submenu-export', 'submenu-file.export'),
+    'tree-leaf':    () => recordTree('leaf-empty', 'action-file.new'),
+    'tree-bad':     () => recordTree('bad-empty', 'no-such-id'),
+    'focus-export-pdf': () => {
+      /* Need a real focusable element. Add tabindex to the span. */
+      const el = document.querySelector('[data-nac-id="action-export.pdf"]');
+      el.setAttribute('tabindex', '0');
+      el.focus();
+      logEntry('ok', 'focused action-export.pdf (added tabindex=0)');
+    },
+    'context-after-focus': () => {
+      const c = NAC.context('editor');
+      window.__v25_02Demo.context = c;
+      document.getElementById('kv-ctx').textContent = c.breadcrumb.length + ' levels';
+      logEntry('ok', '<code>context(editor)</code> = ' + JSON.stringify(c));
+    },
+    'open-export': () => {
+      document.getElementById('submenu-file').classList.add('open');
+      document.getElementById('submenu-file.export').classList.add('open');
+      logEntry('ok', 'opened submenu-file + submenu-file.export visually');
+    },
+  };
+  document.body.addEventListener('click', function(ev){
+    const t = ev.target;
+    if (t.tagName !== 'BUTTON' || !t.dataset.action) return;
+    const fn = actions[t.dataset.action];
+    if (fn) { try { fn(); } catch(e){ logEntry('err','action threw: '+e.message); } }
+  });
+  document.getElementById('btn-clear-log').addEventListener('click', function(){
+    document.getElementById('log').innerHTML = '';
+  });
+})();
+</script>
+</body>
+</html>

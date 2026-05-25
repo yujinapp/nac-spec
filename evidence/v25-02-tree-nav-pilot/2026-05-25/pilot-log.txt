@@ -1,0 +1,20 @@
+20:12:14.349 V25-02 Layer 3 Pilot driver
+20:12:14.349   mode: live
+20:12:14.349   base url: http://localhost:8855
+20:12:14.349   evidence: C:\yujin-nac-spec\evidence\v25-02-tree-nav-pilot\2026-05-25
+20:12:14.923 
+20:12:14.923 ========== statement: walk-to-leaf ==========
+20:12:14.924   text: In the "editor" plugin, walk the tree from the menubar down to find the leaf "PDF". Steps: tree(editor, "menubar") to find menu-file. Follow its opens to submenu-file, call tree(editor, "submenu-file") to find action-file.export. Follow its opens to submenu-file.export, call tree(editor, "submenu-file.export") and report the labels of the children.
+20:12:16.747   plan steps: 3
+20:12:16.795   step outcomes: tree:4kids, tree:4kids, tree:3kids
+20:12:16.796 PASS walk-to-leaf final leaves == [PDF, Word document, HTML page]
+20:12:16.912 
+20:12:16.912 ========== statement: enumerate-menubar ==========
+20:12:16.912   text: In the "editor" plugin, list the top-level menu items by calling tree(editor, "menubar"). I need to see for each child the nac_id, the label, and whether it is a leaf (data-nac-leaf) or it opens a submenu (data-nac-opens target).
+20:12:18.638   plan steps: 1
+20:12:18.643   step outcomes: tree:4kids
+20:12:18.644 PASS enumerate-menubar menubar has 4 children
+20:12:18.644 PASS enumerate-menubar menu-help has leaf=true
+20:12:18.644 PASS enumerate-menubar 3 children have opens=
+
+FAILURES: 0

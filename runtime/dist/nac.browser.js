@@ -7590,11 +7590,251 @@
     }
   }
 
+  /* ================================================================
+     v2.5 Block C -- RFC V25-03: asistive labels (narrate)
+     ================================================================
+
+     NAC.narrate(plugin, nac_id) -> string
+       Canonical human-readable label for any nac_id in the plugin's
+       DOM. Priority order:
+         1. aria-label              (a11y-first)
+         2. visible text            (the human reading the chrome)
+         3. data-nac-label          (author override)
+         4. nac_id                  (worst case)
+
+     For elements where the visible text leaks child-interactive
+     content (eg a button containing an icon and a label), narrate
+     prefers the FIRST text node directly under the element so the
+     spoken output stays focused.
+
+     Returns null only if the element cannot be found (unknown
+     nac_id or unknown plugin). Empty/whitespace labels collapse to
+     the next priority tier. */
+
+  function _v25c_visibleText(el) {
+    if (!el) return '';
+    /* Collect text directly under el, excluding nested elements that
+       are themselves nac-addressable (those have their own narrate
+       resolution). */
+    let out = '';
+    for (let n = el.firstChild; n; n = n.nextSibling) {
+      if (n.nodeType === 3 /* TEXT_NODE */) {
+        out += n.nodeValue || '';
+      } else if (n.nodeType === 1 /* ELEMENT_NODE */) {
+        /* Skip nested nac-addressable subtrees -- they have their
+           own label. */
+        if (n.getAttribute && n.getAttribute('data-nac-id')) continue;
+        /* Recurse into non-addressable children (typical: icon
+           <span> + text). */
+        out += _v25c_visibleText(n);
+      }
+    }
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function narrate(plugin, nac_id) {
+    if (typeof nac_id !== 'string' || !nac_id) return null;
+    /* Scope by plugin if provided -- look only inside [data-nac-plugin=plugin]
+       subtree. If plugin is omitted, fall back to global search. */
+    let root = document;
+    if (plugin) {
+      const pluginRoot = document.querySelector('[data-nac-plugin="' + plugin + '"]');
+      if (!pluginRoot) return null;
+      root = pluginRoot;
+    }
+    /* Use attribute selector with CSS-safe escape via JSON.stringify
+       to avoid injection when nac_id contains weird chars. */
+    const safeId = '"' + String(nac_id).replace(/["\\]/g, '\\$&') + '"';
+    const el = root.querySelector('[data-nac-id=' + safeId + ']');
+    if (!el) return null;
+    /* 1. aria-label */
+    const aria = el.getAttribute('aria-label');
+    if (aria && aria.trim()) return aria.trim();
+    /* 2. visible text (direct + nested non-addressable) */
+    const vis = _v25c_visibleText(el);
+    if (vis) return vis;
+    /* 3. data-nac-label */
+    const explicit = el.getAttribute('data-nac-label');
+    if (explicit && explicit.trim()) return explicit.trim();
+    /* 4. nac_id fallback */
+    return nac_id;
+  }
+
+  /* ================================================================
+     v2.5 Block B -- RFC V25-02: tree navigation
+     ================================================================
+
+     NAC.context(plugin) -> { breadcrumb: [{nac_id, label}, ...] }
+       Walks up from document.activeElement through ancestor nac-id
+       elements within the plugin subtree. Empty array when nothing
+       focused inside the plugin.
+
+     NAC.tree(plugin, rootId?) -> [{nac_id, label, opens?, leaf?}, ...]
+       Enumerates the IMMEDIATE addressable children of rootId (or the
+       plugin root when rootId is omitted). "Immediate" means: there
+       are no other nac-id elements between them and the start. Each
+       entry reports the data-nac-opens target slug (if any) and a
+       boolean leaf flag (data-nac-leaf attribute present).
+
+     Both functions delegate label resolution to narrate(). */
+
+  function _v25b_pluginRoot(plugin) {
+    if (!plugin) return null;
+    return document.querySelector('[data-nac-plugin="' + plugin + '"]');
+  }
+
+  function context(plugin) {
+    const out = { breadcrumb: [] };
+    const root = _v25b_pluginRoot(plugin);
+    if (!root) return out;
+    const active = document.activeElement;
+    if (!active || !root.contains(active)) return out;
+    /* Walk up; collect each ancestor that owns a data-nac-id. Stop
+       at the plugin root inclusive (root itself may not carry a
+       nac-id -- in that case we just stop there). */
+    let cur = active;
+    while (cur && cur !== root.parentElement) {
+      const id = cur.getAttribute && cur.getAttribute('data-nac-id');
+      if (id) {
+        out.breadcrumb.unshift({ nac_id: id, label: narrate(plugin, id) });
+      }
+      if (cur === root) break;
+      cur = cur.parentElement;
+    }
+    return out;
+  }
+
+  function _v25b_isImmediate(start, node) {
+    /* True if `node` has no OTHER nac-id ancestor between itself and
+       `start`. Excludes node === start and ancestors above start. */
+    let p = node.parentElement;
+    while (p && p !== start) {
+      if (p.getAttribute && p.getAttribute('data-nac-id')) return false;
+      p = p.parentElement;
+    }
+    return true;
+  }
+
+  /* ================================================================
+     v2.5 Block D -- RFC V25-04: effect detection (expect + diff)
+     ================================================================
+
+     NAC.expect(plugin, statePath, value, opts?) -> Promise
+       Polls NAC.read(plugin, statePath) until the returned value
+       satisfies the comparator (default ===) or the timeout fires.
+       Resolves with the resolved value on match.
+       Rejects with NacError('timeout', ...) on deadline.
+       Read failures are retried until the deadline (treated as
+       "the state is not yet observable").
+
+       opts:
+         timeout_ms   default 5000
+         poll_ms      default 100
+         comparator   default (cur, want) => cur === want
+                      receives (current, expected) and returns boolean
+
+     NAC.diff(plugin, statePath, actionFn) -> Promise<{before, after, changed}>
+       Reads state, awaits actionFn(), reads state again, returns
+       both snapshots + a `changed` boolean (JSON-stringify compare).
+       Read failures collapse to undefined and changed is computed
+       on the stringified pair (so undefined vs value still flags).
+
+     Both delegate to NAC.read() so they inherit V25-01's full
+     fallback-chain semantics for free. */
+
+  function expect(plugin, statePath, value, opts) {
+    opts = opts || {};
+    const timeout = (typeof opts.timeout_ms === 'number') ? opts.timeout_ms : 5000;
+    const pollMs  = (typeof opts.poll_ms === 'number')    ? opts.poll_ms    : 100;
+    const cmp = (typeof opts.comparator === 'function')
+      ? opts.comparator
+      : function (cur, want) { return cur === want; };
+    const deadline = Date.now() + timeout;
+    return new Promise(function (resolve, reject) {
+      function tick() {
+        read(plugin, statePath).then(function (cur) {
+          let matches = false;
+          try { matches = !!cmp(cur, value); }
+          catch (_) { matches = false; }
+          if (matches) { resolve(cur); return; }
+          if (Date.now() >= deadline) {
+            reject(_v25_buildNacError('timeout',
+              'NAC.expect: state "' + statePath + '" did not match within ' +
+              timeout + 'ms (last value: ' + JSON.stringify(cur) + ')'));
+            return;
+          }
+          setTimeout(tick, pollMs);
+        }, function (_err) {
+          if (Date.now() >= deadline) {
+            reject(_v25_buildNacError('timeout',
+              'NAC.expect: state "' + statePath + '" unreadable + timeout'));
+            return;
+          }
+          setTimeout(tick, pollMs);
+        });
+      }
+      tick();
+    });
+  }
+
+  function diff(plugin, statePath, actionFn) {
+    function safeRead() {
+      return read(plugin, statePath).then(
+        function (v) { return v; },
+        function ()  { return undefined; }
+      );
+    }
+    return safeRead().then(function (before) {
+      const act = (typeof actionFn === 'function')
+        ? Promise.resolve(actionFn())
+        : Promise.resolve();
+      return act.then(function () {
+        return safeRead().then(function (after) {
+          let changed;
+          try {
+            changed = JSON.stringify(before) !== JSON.stringify(after);
+          } catch (_) {
+            changed = before !== after;
+          }
+          return { before: before, after: after, changed: changed };
+        });
+      });
+    });
+  }
+
+  function tree(plugin, rootId) {
+    const pluginRoot = _v25b_pluginRoot(plugin);
+    if (!pluginRoot) return [];
+    let start = pluginRoot;
+    if (rootId) {
+      const safeId = '"' + String(rootId).replace(/["\\]/g, '\\$&') + '"';
+      const found = pluginRoot.querySelector('[data-nac-id=' + safeId + ']');
+      if (!found) return [];
+      start = found;
+    }
+    const candidates = start.querySelectorAll('[data-nac-id]');
+    const out = [];
+    for (let i = 0; i < candidates.length; i++) {
+      const k = candidates[i];
+      if (!_v25b_isImmediate(start, k)) continue;
+      const id = k.getAttribute('data-nac-id');
+      const entry = {
+        nac_id: id,
+        label:  narrate(plugin, id),
+      };
+      const opens = k.getAttribute('data-nac-opens');
+      if (opens) entry.opens = opens;
+      if (k.hasAttribute('data-nac-leaf')) entry.leaf = true;
+      out.push(entry);
+    }
+    return out;
+  }
+
   /* ---------- Install -------------------------------------------- */
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.0-alpha.4',
+    version:      '2.5.0-alpha.5',
     spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
@@ -7845,6 +8085,25 @@
     read:            read,
     subscribe:       subscribe,
     unsubscribe:     unsubscribe,
+    /* v2.5 Block C -- asistive labels (SPEC.md sec 17 / RFC V25-03).
+       Canonical human-readable label resolution for screen readers,
+       TTS, voice flows, audit logs. Priority order: aria-label >
+       visible text > data-nac-label > nac_id fallback. */
+    narrate:         narrate,
+    /* v2.5 Block B -- tree navigation (SPEC.md sec 16 / RFC V25-02).
+       context(plugin) returns the focused node's breadcrumb;
+       tree(plugin, rootId?) enumerates navigable children.
+       data-nac-opens declares parent->child relationships; data-nac-leaf
+       marks terminals. Companion to narrate for chrome-driven walks. */
+    context:         context,
+    tree:            tree,
+    /* v2.5 Block D -- effect detection (SPEC.md sec 18 / RFC V25-04).
+       Closes the "silent damage" gap for assistive callers: the agent
+       confirms the EFFECT of an action, not just that the command was
+       emitted. expect() polls until a state matches; diff() snapshots
+       around an action. Both compose with NAC.read() / V25-01 surface. */
+    expect:          expect,
+    diff:            diff,
   };
 
   /* v2.2.1: guard browser-only init so this module is importable in

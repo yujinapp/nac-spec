@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V25-04 expect + diff -- NAC3 v2.5 demo</title>
+<style>
+:root{--cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;--ct:#2C2927;--ct2:#615E58;--ct3:#888480;--ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;}
+header{max-width:1100px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:78ch;}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.canvas-stage{background:#0e0e0e;color:#fff;padding:24px;border-radius:6px;text-align:center;margin-bottom:10px;}
+.canvas-value{font-size:64px;font-weight:200;color:var(--ca);line-height:1;}
+.canvas-bold .canvas-value{color:#f7c948;text-shadow:0 0 16px #f7c948;}
+.canvas-meta{font-family:ui-monospace,monospace;font-size:.72rem;color:#666;margin-top:6px;}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.72rem;padding:10px;border-radius:6px;height:480px;overflow-y:auto;line-height:1.5;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry.warn{color:#e6b85c;}
+.log .entry.action{color:#7ea3d6;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.kv{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ct);background:var(--cm);padding:3px 6px;border-radius:3px;margin-right:4px;display:inline-block;}
+code{font-family:ui-monospace,monospace;background:var(--cm);padding:1px 5px;border-radius:3px;font-size:.84em;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">NAC3 v2.5 -- RFC V25-04 demo</div>
+  <h1>Effect detection via <code>expect</code> + <code>diff</code></h1>
+  <p class="lede">
+    Closes the "silent damage" gap: the agent confirms the action HAD
+    an effect, not just that the command was emitted.
+    <code>NAC.expect(plugin, statePath, value, opts?)</code> polls
+    until a state matches. <code>NAC.diff(plugin, statePath, actionFn)</code>
+    snapshots before / after an action and reports
+    <code>{before, after, changed}</code>. Both compose with
+    <code>NAC.read()</code> so any V25-01 backend works.
+  </p>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <h2>fake canvas state</h2>
+    <div class="canvas-stage" id="canvas-stage">
+      <div class="canvas-value" id="canvas-value">0</div>
+      <div class="canvas-meta">value (host SDK + dom-mirror)</div>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="set-1">set value = 1</button>
+      <button data-action="set-7">set value = 7</button>
+      <button data-action="set-reset">reset to 0</button>
+      <button data-action="toggle-bold">toggle bold</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="expect-7-now">expect(value, 7) -- already 7? OK : timeout</button>
+      <button data-action="expect-7-delayed">expect(value, 7) + setTimeout(set 7, 500ms) -- racy, should resolve</button>
+      <button data-action="expect-7-timeout">expect(value, 7, timeout=300ms) -- value stays, expect timeout</button>
+      <button data-action="expect-bold-true">expect(bold, true) + toggle bold in 300ms</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="diff-set-7">diff(value, () =&gt; set 7) -- changed:true 0-&gt;7</button>
+      <button data-action="diff-noop">diff(value, () =&gt; {}) -- changed:false</button>
+      <button data-action="diff-multistep">diff(value, () =&gt; set 1; set 2; set 3) -- changed:true 0-&gt;3</button>
+    </div>
+
+    <div style="margin-top:14px;">
+      <span class="kv">value: <span id="kv-value">0</span></span>
+      <span class="kv">bold: <span id="kv-bold">false</span></span>
+      <span class="kv">last expect: <span id="kv-expect">--</span></span>
+      <span class="kv">last diff: <span id="kv-diff">--</span></span>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.74rem;color:var(--ct3);">
+      <span>expect + diff results</span>
+      <button id="btn-clear-log" style="font-size:.7rem;padding:3px 8px;">clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script src="../../runtime/dist/nac.browser.js"></script>
+<script>
+(function(){
+  const NAC = window.NAC;
+  if (!NAC || typeof NAC.expect !== 'function' || typeof NAC.diff !== 'function') {
+    document.getElementById('log').innerHTML = '<div class="entry err">FATAL: NAC v2.5 expect/diff not loaded.</div>';
+    return;
+  }
+
+  /* Host-side SDK for the fake canvas. */
+  window.canvasApp = {
+    state: { value: 0, bold: false },
+    set: function (v) {
+      window.canvasApp.state.value = v;
+      document.getElementById('canvas-value').textContent = String(v);
+      document.getElementById('kv-value').textContent = String(v);
+    },
+    setBold: function (on) {
+      window.canvasApp.state.bold = !!on;
+      document.getElementById('canvas-stage').classList.toggle('canvas-bold', !!on);
+      document.getElementById('kv-bold').textContent = String(!!on);
+    },
+  };
+
+  /* Register a v2.5 plugin so NAC.read can resolve canvas.value + canvas.bold. */
+  NAC.registerPlugin('canvas', {
+    state: {
+      'canvas.value': [
+        { backend: 'sdk-call', mode: 'read', path: 'canvasApp.state.value' },
+      ],
+      'canvas.bold': [
+        { backend: 'sdk-call', mode: 'read', path: 'canvasApp.state.bold' },
+      ],
+    },
+  });
+
+  window.__v25_04Demo = {
+    expects: [],   /* { label, ok, value, error_code, duration_ms } */
+    diffs:   [],   /* { label, before, after, changed } */
+  };
+
+  function logEntry(klass, html) {
+    const e = document.createElement('div');
+    e.className = 'entry ' + klass;
+    e.innerHTML = '<span class="ts">' + new Date().toISOString().slice(11,19) + '</span>' + html;
+    const log = document.getElementById('log');
+    log.insertBefore(e, log.firstChild);
+  }
+
+  async function runExpect(label, statePath, value, opts) {
+    const t0 = Date.now();
+    try {
+      const v = await NAC.expect('canvas', statePath, value, opts);
+      const dur = Date.now() - t0;
+      window.__v25_04Demo.expects.push({ label, ok: true, value: v, duration_ms: dur });
+      document.getElementById('kv-expect').textContent = label + ' OK (' + dur + 'ms)';
+      logEntry('ok', '<b>expect[' + label + ']</b> resolved ' + JSON.stringify(v) + ' in ' + dur + 'ms');
+    } catch (e) {
+      const dur = Date.now() - t0;
+      window.__v25_04Demo.expects.push({ label, ok: false, error_code: e.code, duration_ms: dur });
+      document.getElementById('kv-expect').textContent = label + ' ' + (e.code || 'ERR');
+      logEntry('err', '<b>expect[' + label + ']</b> code=' + e.code + ' after ' + dur + 'ms');
+    }
+  }
+  async function runDiff(label, statePath, actionFn) {
+    try {
+      const r = await NAC.diff('canvas', statePath, actionFn);
+      window.__v25_04Demo.diffs.push({ label, ...r });
+      document.getElementById('kv-diff').textContent = label + ' changed=' + r.changed;
+      logEntry('action', '<b>diff[' + label + ']</b> ' + JSON.stringify(r));
+    } catch (e) {
+      logEntry('err', '<b>diff[' + label + ']</b> threw: ' + e.message);
+    }
+  }
+
+  const actions = {
+    'set-1':         () => window.canvasApp.set(1),
+    'set-7':         () => window.canvasApp.set(7),
+    'set-reset':     () => window.canvasApp.set(0),
+    'toggle-bold':   () => window.canvasApp.setBold(!window.canvasApp.state.bold),
+
+    'expect-7-now': () => {
+      window.canvasApp.set(7);
+      return runExpect('value-7-now', 'canvas.value', 7);
+    },
+    'expect-7-delayed': () => {
+      window.canvasApp.set(0);
+      setTimeout(() => window.canvasApp.set(7), 500);
+      return runExpect('value-7-delayed', 'canvas.value', 7, { timeout_ms: 2000, poll_ms: 80 });
+    },
+    'expect-7-timeout': () => {
+      window.canvasApp.set(3); /* never becomes 7 */
+      return runExpect('value-7-timeout', 'canvas.value', 7, { timeout_ms: 300, poll_ms: 50 });
+    },
+    'expect-bold-true': () => {
+      window.canvasApp.setBold(false);
+      setTimeout(() => window.canvasApp.setBold(true), 300);
+      return runExpect('bold-true-delayed', 'canvas.bold', true, { timeout_ms: 2000, poll_ms: 80 });
+    },
+
+    'diff-set-7': () => {
+      window.canvasApp.set(0);
+      return runDiff('diff-set-7', 'canvas.value', () => window.canvasApp.set(7));
+    },
+    'diff-noop': () => {
+      window.canvasApp.set(4);
+      return runDiff('diff-noop', 'canvas.value', () => { /* nothing */ });
+    },
+    'diff-multistep': () => {
+      window.canvasApp.set(0);
+      return runDiff('diff-multistep', 'canvas.value', async () => {
+        window.canvasApp.set(1);
+        await new Promise(r => setTimeout(r, 30));
+        window.canvasApp.set(2);
+        await new Promise(r => setTimeout(r, 30));
+        window.canvasApp.set(3);
+      });
+    },
+  };
+
+  document.body.addEventListener('click', function(ev){
+    const t = ev.target;
+    if (t.tagName !== 'BUTTON' || !t.dataset.action) return;
+    const fn = actions[t.dataset.action];
+    if (fn) { Promise.resolve().then(fn).catch(e => logEntry('err','action threw: '+e.message)); }
+  });
+  document.getElementById('btn-clear-log').addEventListener('click', function(){
+    document.getElementById('log').innerHTML = '';
+  });
+})();
+</script>
+</body>
+</html>

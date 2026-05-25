@@ -1,0 +1,38 @@
+20:16:10.732 V25-04 expect+diff Layer 2 demo runner
+20:16:10.732   base url    http://localhost:8855
+20:16:10.732   evidence    C:\yujin-nac-spec\evidence\v25-04-expect-diff\2026-05-25
+20:16:11.115 
+20:16:11.115 --- scenario 1: expect resolves immediately if state matches ---
+20:16:11.279 PASS expect-7-now resolved ok
+20:16:11.279 PASS expect-7-now value === 7
+20:16:11.279 PASS expect-7-now duration < 200ms
+20:16:11.314 
+20:16:11.314 --- scenario 2: expect resolves after delayed mutation (500ms) ---
+20:16:11.859 PASS expect-7-delayed resolved ok
+20:16:11.859 PASS expect-7-delayed value === 7
+20:16:11.859 PASS expect-7-delayed duration ~ 500-1000ms
+20:16:11.900 
+20:16:11.900 --- scenario 3: expect times out (state stays at 3) ---
+20:16:12.250 PASS expect-7-timeout failed
+20:16:12.250 PASS expect-7-timeout code = timeout
+20:16:12.250 PASS expect-7-timeout duration ~ 300ms
+20:16:12.282 
+20:16:12.282 --- scenario 4: expect(bold, true) after delay ---
+20:16:12.675 PASS expect-bold-true resolved
+20:16:12.675 PASS expect-bold-true value === true
+20:16:12.715 
+20:16:12.715 --- scenario 5: diff captures before/after change ---
+20:16:12.732 PASS diff-set-7 before === 0
+20:16:12.732 PASS diff-set-7 after === 7
+20:16:12.732 PASS diff-set-7 changed === true
+20:16:12.764 
+20:16:12.764 --- scenario 6: diff with no-op action -> changed:false ---
+20:16:12.779 PASS diff-noop before === after
+20:16:12.779 PASS diff-noop changed === false
+20:16:12.814 
+20:16:12.814 --- scenario 7: diff captures only START and END of multi-step ---
+20:16:12.909 PASS diff-multistep before === 0
+20:16:12.909 PASS diff-multistep after === 3 (final state)
+20:16:12.909 PASS diff-multistep changed === true
+
+FAILURES: 0

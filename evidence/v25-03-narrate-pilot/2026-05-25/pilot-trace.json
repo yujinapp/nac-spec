@@ -1,0 +1,133 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "priority-order",
+      "text": "For the editor plugin, narrate three buttons and confirm the priority order: btn-save has aria-label \"Save document\" (highest priority), btn-print has only visible text \"Print\", and btn-9 has no labels of any kind. Report the narration for each.",
+      "expect": {
+        "btn-save": "Save document",
+        "btn-print": "Print",
+        "btn-9": "btn-9"
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"narrate\",\"plugin\":\"editor\",\"nac_id\":\"btn-save\"},{\"op\":\"narrate\",\"plugin\":\"editor\",\"nac_id\":\"btn-print\"},{\"op\":\"narrate\",\"plugin\":\"editor\",\"nac_id\":\"btn-9\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "narrate",
+            "plugin": "editor",
+            "nac_id": "btn-save"
+          },
+          {
+            "op": "narrate",
+            "plugin": "editor",
+            "nac_id": "btn-print"
+          },
+          {
+            "op": "narrate",
+            "plugin": "editor",
+            "nac_id": "btn-9"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "narrate",
+          "plugin": "editor",
+          "nac_id": "btn-save",
+          "label": "Save document",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "narrate",
+          "plugin": "editor",
+          "nac_id": "btn-print",
+          "label": "Print",
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "narrate",
+          "plugin": "editor",
+          "nac_id": "btn-9",
+          "label": "btn-9",
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-03-narrate-pilot\\2026-05-25\\priority-order.png"
+    },
+    {
+      "id": "null-on-missing",
+      "text": "Call narrate for a nac_id that does not exist in the editor plugin (use \"ghost-element\"). The runtime should return null. Also call narrate against a plugin slug that is not registered (\"no-such-plugin\") with any nac_id -- also null.",
+      "expect": {
+        "missing": null,
+        "no_plugin": null
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"narrate\",\"plugin\":\"editor\",\"nac_id\":\"ghost-element\"},{\"op\":\"narrate\",\"plugin\":\"no-such-plugin\",\"nac_id\":\"ghost-element\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "narrate",
+            "plugin": "editor",
+            "nac_id": "ghost-element"
+          },
+          {
+            "op": "narrate",
+            "plugin": "no-such-plugin",
+            "nac_id": "ghost-element"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "narrate",
+          "plugin": "editor",
+          "nac_id": "ghost-element",
+          "label": null,
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "narrate",
+          "plugin": "no-such-plugin",
+          "nac_id": "ghost-element",
+          "label": null,
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-03-narrate-pilot\\2026-05-25\\null-on-missing.png"
+    },
+    {
+      "id": "nested-children-excluded",
+      "text": "In the \"editor\" plugin, narrate the nac_id \"menu-format\". That element contains the text \"Format\" AND a nested addressable child whose nac_id is \"menu-format.bold\". The narration of \"menu-format\" MUST be just \"Format\" -- nested addressable children get excluded so the spoken output stays scoped to the requested node.",
+      "expect": {
+        "menu-format": "Format"
+      },
+      "plan_raw": "{\"steps\":[{\"op\":\"narrate\",\"plugin\":\"editor\",\"nac_id\":\"menu-format\"}]}",
+      "plan": {
+        "steps": [
+          {
+            "op": "narrate",
+            "plugin": "editor",
+            "nac_id": "menu-format"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "narrate",
+          "plugin": "editor",
+          "nac_id": "menu-format",
+          "label": "Format",
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v25-03-narrate-pilot\\2026-05-25\\nested-children-excluded.png"
+    }
+  ]
+}

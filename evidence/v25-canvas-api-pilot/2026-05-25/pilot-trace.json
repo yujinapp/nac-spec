@@ -1,0 +1,490 @@
+{
+  "mode": "dry-run",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "add-and-highlight",
+      "text": "Reset the counter, then add seven to it, then turn the highlight on. After that, tell me the current value and whether it is highlighted.",
+      "expect": {
+        "value": 7,
+        "highlighted": true
+      },
+      "plan_raw": "<dry-run stub>",
+      "plan": {
+        "steps": [
+          {
+            "op": "call",
+            "verb": "counter.reset",
+            "args": null
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 7
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.highlight",
+            "args": {
+              "on": true
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.fetch-state",
+            "args": null
+          },
+          {
+            "op": "read",
+            "state": "counter.value"
+          },
+          {
+            "op": "read",
+            "state": "counter.highlighted"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "call",
+          "verb": "counter.reset",
+          "args": null,
+          "ok": true,
+          "result": {
+            "ok": true,
+            "value": 0
+          }
+        },
+        {
+          "idx": 1,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 7
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 2,
+          "op": "call",
+          "verb": "counter.highlight",
+          "args": {
+            "on": true
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 3,
+          "op": "call",
+          "verb": "counter.fetch-state",
+          "args": null,
+          "ok": true,
+          "result": {
+            "MessageId": "CounterStateReply",
+            "SendTime": 1779734478829,
+            "Values": {
+              "value": 7,
+              "highlighted": true
+            }
+          }
+        },
+        {
+          "idx": 4,
+          "op": "read",
+          "state": "counter.value",
+          "ok": true,
+          "result": 7
+        },
+        {
+          "idx": 5,
+          "op": "read",
+          "state": "counter.highlighted",
+          "ok": true,
+          "result": true
+        }
+      ],
+      "final_state": {
+        "value": 7,
+        "highlighted": true
+      },
+      "value_ok": true,
+      "highlighted_ok": true,
+      "screenshot": "evidence\\v25-canvas-api-pilot\\2026-05-25\\add-and-highlight.png"
+    },
+    {
+      "id": "compound-math",
+      "text": "Make sure the counter is at zero. Add three. Add two more. Then add one. Verify the highlight is off, and report the final value.",
+      "expect": {
+        "value": 6,
+        "highlighted": false
+      },
+      "plan_raw": "<dry-run stub>",
+      "plan": {
+        "steps": [
+          {
+            "op": "call",
+            "verb": "counter.reset",
+            "args": null
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 3
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 2
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 1
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.highlight",
+            "args": {
+              "on": false
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.fetch-state",
+            "args": null
+          },
+          {
+            "op": "read",
+            "state": "counter.value"
+          },
+          {
+            "op": "read",
+            "state": "counter.highlighted"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "call",
+          "verb": "counter.reset",
+          "args": null,
+          "ok": true,
+          "result": {
+            "ok": true,
+            "value": 0
+          }
+        },
+        {
+          "idx": 1,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 3
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 2,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 2
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 3,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 1
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 4,
+          "op": "call",
+          "verb": "counter.highlight",
+          "args": {
+            "on": false
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 5,
+          "op": "call",
+          "verb": "counter.fetch-state",
+          "args": null,
+          "ok": true,
+          "result": {
+            "MessageId": "CounterStateReply",
+            "SendTime": 1779734479100,
+            "Values": {
+              "value": 6,
+              "highlighted": false
+            }
+          }
+        },
+        {
+          "idx": 6,
+          "op": "read",
+          "state": "counter.value",
+          "ok": true,
+          "result": 6
+        },
+        {
+          "idx": 7,
+          "op": "read",
+          "state": "counter.highlighted",
+          "ok": true,
+          "result": false
+        }
+      ],
+      "final_state": {
+        "value": 6,
+        "highlighted": false
+      },
+      "value_ok": true,
+      "highlighted_ok": true,
+      "screenshot": "evidence\\v25-canvas-api-pilot\\2026-05-25\\compound-math.png"
+    },
+    {
+      "id": "silent-damage-check",
+      "text": "Reset the counter, add four, then immediately ask the canvas itself (round-trip) what it thinks the value is, to confirm the host-side view matches the canvas-side view. Highlight stays as it is.",
+      "expect": {
+        "value": 4
+      },
+      "plan_raw": "<dry-run stub>",
+      "plan": {
+        "steps": [
+          {
+            "op": "call",
+            "verb": "counter.reset",
+            "args": null
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 4
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.fetch-state",
+            "args": null
+          },
+          {
+            "op": "read",
+            "state": "counter.value"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "call",
+          "verb": "counter.reset",
+          "args": null,
+          "ok": true,
+          "result": {
+            "ok": true,
+            "value": 0
+          }
+        },
+        {
+          "idx": 1,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 4
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 2,
+          "op": "call",
+          "verb": "counter.fetch-state",
+          "args": null,
+          "ok": true,
+          "result": {
+            "MessageId": "CounterStateReply",
+            "SendTime": 1779734479340,
+            "Values": {
+              "value": 4,
+              "highlighted": false
+            }
+          }
+        },
+        {
+          "idx": 3,
+          "op": "read",
+          "state": "counter.value",
+          "ok": true,
+          "result": 4
+        }
+      ],
+      "final_state": {
+        "value": 4,
+        "highlighted": false
+      },
+      "value_ok": true,
+      "highlighted_ok": true,
+      "screenshot": "evidence\\v25-canvas-api-pilot\\2026-05-25\\silent-damage-check.png"
+    },
+    {
+      "id": "mistake-recovery",
+      "text": "Reset the counter. Add one. Realize that was wrong, reset again. Now add ten and confirm the value.",
+      "expect": {
+        "value": 10
+      },
+      "plan_raw": "<dry-run stub>",
+      "plan": {
+        "steps": [
+          {
+            "op": "call",
+            "verb": "counter.reset",
+            "args": null
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 1
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.reset",
+            "args": null
+          },
+          {
+            "op": "call",
+            "verb": "counter.increment",
+            "args": {
+              "by": 10
+            }
+          },
+          {
+            "op": "call",
+            "verb": "counter.fetch-state",
+            "args": null
+          },
+          {
+            "op": "read",
+            "state": "counter.value"
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "call",
+          "verb": "counter.reset",
+          "args": null,
+          "ok": true,
+          "result": {
+            "ok": true,
+            "value": 0
+          }
+        },
+        {
+          "idx": 1,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 1
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 2,
+          "op": "call",
+          "verb": "counter.reset",
+          "args": null,
+          "ok": true,
+          "result": {
+            "ok": true,
+            "value": 0
+          }
+        },
+        {
+          "idx": 3,
+          "op": "call",
+          "verb": "counter.increment",
+          "args": {
+            "by": 10
+          },
+          "ok": true,
+          "result": {
+            "ok": true
+          }
+        },
+        {
+          "idx": 4,
+          "op": "call",
+          "verb": "counter.fetch-state",
+          "args": null,
+          "ok": true,
+          "result": {
+            "MessageId": "CounterStateReply",
+            "SendTime": 1779734479576,
+            "Values": {
+              "value": 10,
+              "highlighted": false
+            }
+          }
+        },
+        {
+          "idx": 5,
+          "op": "read",
+          "state": "counter.value",
+          "ok": true,
+          "result": 10
+        }
+      ],
+      "final_state": {
+        "value": 10,
+        "highlighted": false
+      },
+      "value_ok": true,
+      "highlighted_ok": true,
+      "screenshot": "evidence\\v25-canvas-api-pilot\\2026-05-25\\mistake-recovery.png"
+    }
+  ]
+}

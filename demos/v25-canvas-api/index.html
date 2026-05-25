@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V25-01 canvas+API -- NAC3 v2.5 plugin extension demo</title>
+<meta name="description" content="Live demo of NAC3 v2.5 RFC V25-01. A host page decorates an iframe canvas+API mock via NAC.registerPlugin and exercises all 8 backends.">
+<style>
+:root{
+  --cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;
+  --ct:#2C2927;--ct2:#615E58;--ct3:#888480;
+  --ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;--cred:#a14545;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;min-height:100vh;}
+header{max-width:1240px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:78ch;}
+.layout{display:grid;grid-template-columns:340px 1fr 360px;gap:18px;max-width:1240px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+.row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.row label{font-size:.74rem;color:var(--ct3);flex:0 0 96px;}
+.row input{flex:1;padding:4px 6px;font-size:.82rem;border:.5px solid var(--cb);border-radius:3px;font-family:ui-monospace,monospace;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;transition:all 120ms;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+button:active{background:var(--cm);}
+button.primary{background:var(--ci);color:white;border-color:var(--ci);}
+button.primary:hover{background:#1A2260;}
+.backend-group{margin-bottom:14px;padding-bottom:12px;border-bottom:.5px dashed var(--cm);}
+.backend-group:last-child{border-bottom:none;}
+.backend-name{font-family:ui-monospace,monospace;font-size:.74rem;color:var(--ca);margin-bottom:6px;font-weight:500;}
+.btn-row{display:flex;gap:4px;flex-wrap:wrap;}
+.iframe-wrap{position:relative;background:#000;border-radius:8px;overflow:hidden;height:480px;}
+.iframe-wrap iframe{width:100%;height:100%;border:0;display:block;}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.72rem;padding:10px;border-radius:6px;height:480px;overflow-y:auto;line-height:1.45;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.log .entry .kind{color:#7ea3d6;margin-right:6px;}
+.log .entry .backend{color:#c9a85a;}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ct3);margin-right:6px;vertical-align:middle;}
+.status.ok{background:var(--ctl);}
+.status.err{background:var(--cred);}
+.read-out{font-family:ui-monospace,monospace;font-size:.78rem;background:var(--cm);padding:4px 6px;border-radius:3px;color:var(--ct);min-width:30px;display:inline-block;text-align:right;}
+.note{font-size:.74rem;color:var(--ct3);margin-top:6px;line-height:1.45;}
+.run-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.74rem;color:var(--ct3);}
+.run-meta button{font-size:.7rem;padding:3px 8px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">NAC3 v2.5 -- RFC V25-01 demo</div>
+  <h1>Plugin extension contract on a canvas+API surface</h1>
+  <p class="lede">
+    The iframe in the centre is the "canvas+API" mock (a stand-in for
+    Collabora / Figma / Excalidraw). The host page on this side knows
+    NOTHING about its internals -- it talks to it only through the
+    <code>NAC.registerPlugin / call / read / subscribe</code> contract.
+    Buttons on the left exercise the 8 backend types. The right side
+    shows every <code>nac:plugin:*</code> provenance event the runtime
+    fires.
+  </p>
+</header>
+
+<div class="layout">
+
+  <!-- ============= LEFT: backend exercises ============= -->
+  <div class="panel" id="controls">
+    <h2>backend exercises</h2>
+
+    <div class="backend-group">
+      <div class="backend-name">postmessage (verb)</div>
+      <div class="btn-row">
+        <button data-action="pm-inc-1">call counter.increment {by:1}</button>
+        <button data-action="pm-inc-5">call counter.increment {by:5}</button>
+        <button data-action="pm-hl-on">call counter.highlight {on:true}</button>
+        <button data-action="pm-hl-off">call counter.highlight {on:false}</button>
+      </div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">sdk-call (verb)</div>
+      <div class="btn-row">
+        <button data-action="sdk-reset">call counter.reset</button>
+        <button data-action="sdk-inc-3">call counter.sdk-add {by:3}</button>
+      </div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">script-bridge (verb, request/response)</div>
+      <div class="btn-row">
+        <button data-action="bridge-getstate">call counter.fetch-state</button>
+      </div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">same-origin-window (state)</div>
+      <div class="btn-row">
+        <button data-action="sow-value">read counter.value</button>
+        <button data-action="sow-highlighted">read counter.highlighted</button>
+      </div>
+      <div class="note">value: <span class="read-out" id="out-value">--</span> &nbsp; highlighted: <span class="read-out" id="out-highlighted">--</span></div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">fallback chain (state)</div>
+      <div class="btn-row">
+        <button data-action="fallback-read">read counter.value-fallback (1st binding misses, 2nd wins)</button>
+      </div>
+      <div class="note">resolved: <span class="read-out" id="out-fallback">--</span></div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">subscriptions (events)</div>
+      <div class="btn-row">
+        <button data-action="sub-changed">subscribe counter.changed (postmessage-listen)</button>
+        <button data-action="sub-derived">subscribe counter.derived (synthetic-poll)</button>
+        <button data-action="unsub-all">unsubscribe all</button>
+      </div>
+      <div class="note" id="sub-status">no active subscriptions</div>
+    </div>
+
+    <div class="backend-group">
+      <div class="backend-name">high-complexity scenarios</div>
+      <div class="btn-row">
+        <button data-action="scenario-cross">cross-backend transaction (5 verbs / 3 backends / 3 reads)</button>
+        <button data-action="scenario-error">trigger error contract (plugin_not_registered + verb_not_declared + state_unreadable)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============= CENTER: canvas+API iframe ============= -->
+  <div>
+    <div class="run-meta">
+      <span id="iframe-status"><span class="status"></span>iframe loading...</span>
+      <span>target: <code>./target.html</code></span>
+    </div>
+    <div class="iframe-wrap">
+      <iframe id="target-iframe" src="./target.html" title="V25-01 canvas+API target"></iframe>
+    </div>
+    <div class="note" style="margin-top:8px;">
+      The iframe is a same-origin mock. The host's plugin manifest
+      declares verbs/state/events that route through the 8 backends.
+      Watch the provenance log on the right when you click a button.
+    </div>
+  </div>
+
+  <!-- ============= RIGHT: provenance log ============= -->
+  <div class="panel" style="padding:10px;">
+    <div class="run-meta">
+      <span>nac:plugin:* provenance</span>
+      <button id="btn-clear-log">clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+
+</div>
+
+<!-- Load the built runtime. -->
+<script src="../../runtime/dist/nac.browser.js"></script>
+
+<script>
+/* ========== Demo controller ========== */
+(function(){
+  /* Convenience handle. nac.browser.js exposes window.NAC. */
+  const NAC = window.NAC;
+  if (!NAC || typeof NAC.registerPlugin !== 'function') {
+    document.getElementById('log').innerHTML =
+      '<div class="entry err">FATAL: NAC v2.5 not loaded (registerPlugin missing).</div>';
+    return;
+  }
+
+  /* ----- host-side SDK adapter -----
+     The sdk-call backend resolves `path` against the HOST window. For
+     canvas+API surfaces we typically expose a thin adapter on the host
+     that proxies into the iframe's app. This shape is exactly what
+     Collabora ships in window.officeManager and what every same-origin
+     embed pattern recommends. */
+  window.counterSdk = {
+    reset: function() {
+      const iframe = document.getElementById('target-iframe');
+      return iframe && iframe.contentWindow && iframe.contentWindow.app
+        ? iframe.contentWindow.app.reset()
+        : (function(){ throw new Error('counterSdk.reset: iframe not ready'); })();
+    },
+    add: function(n) {
+      const iframe = document.getElementById('target-iframe');
+      return iframe && iframe.contentWindow && iframe.contentWindow.app
+        ? iframe.contentWindow.app.increment(n)
+        : (function(){ throw new Error('counterSdk.add: iframe not ready'); })();
+    },
+  };
+
+  /* ----- demo state captured for the Playwright runner ----- */
+  window.__v25Demo = {
+    plugin_slug: 'counter-canvas',
+    iframe_ready: false,
+    last_read:    {},     /* state_path -> value */
+    last_event:   {},     /* event_path -> payload */
+    last_call:    null,   /* { verb, args, ok, error } */
+    provenance:   [],     /* {kind, plugin, path, backend, ok, error, ms, ts} */
+    sub_handles:  [],
+    errors_seen:  [],     /* {code, where} */
+  };
+
+  /* ----- provenance log capture (in-page + window state) ----- */
+  function logEntry(kind, detail) {
+    const entry = document.createElement('div');
+    entry.className = 'entry ' + (detail.ok ? 'ok' : 'err');
+    const path = detail.verb_path || detail.state_path || detail.event_path || '-';
+    entry.innerHTML =
+      '<span class="ts">' + new Date().toISOString().slice(11,19) + '</span>' +
+      '<span class="kind">' + kind + '</span>' +
+      '<code>' + path + '</code> via <span class="backend">' + (detail.backend || '-') + '</span>' +
+      (detail.ok ? ' (' + (detail.duration_ms || 0) + 'ms)' : ' &nbsp; ERR: ' + detail.error);
+    const log = document.getElementById('log');
+    log.insertBefore(entry, log.firstChild);
+
+    window.__v25Demo.provenance.push({
+      kind:     kind,
+      plugin:   detail.plugin,
+      path:     path,
+      backend:  detail.backend,
+      ok:       !!detail.ok,
+      error:    detail.error || null,
+      ms:       detail.duration_ms || 0,
+      ts:       Date.now(),
+    });
+  }
+  document.addEventListener('nac:plugin:invoked', function(ev){ logEntry('invoked', ev.detail); });
+  document.addEventListener('nac:plugin:read',    function(ev){ logEntry('read',    ev.detail); });
+  document.addEventListener('nac:plugin:event',   function(ev){ logEntry('event',   ev.detail); });
+
+  /* ----- iframe readiness gate ----- */
+  window.addEventListener('message', function(ev){
+    if (ev && ev.data && ev.data.MessageId === 'CounterReady') {
+      window.__v25Demo.iframe_ready = true;
+      const s = document.getElementById('iframe-status');
+      s.innerHTML = '<span class="status ok"></span>iframe ready';
+      _registerOnce();
+    }
+  });
+
+  /* ----- register the plugin manifest -----
+     Exercises ALL 8 backends across verbs/state/events. */
+  let _registered = false;
+  function _registerOnce() {
+    if (_registered) return;
+    _registered = true;
+    NAC.registerPlugin('counter-canvas', {
+      verbs: {
+        /* Backend: postmessage (one-way fire-and-forget RPC) */
+        'counter.increment': {
+          backend: 'postmessage',
+          target:  '#target-iframe',
+          message: 'IncrementCounter',
+          values:  { by: 1 },
+          values_from_args: ['by'],
+        },
+        'counter.highlight': {
+          backend: 'postmessage',
+          target:  '#target-iframe',
+          message: 'HighlightCounter',
+          values:  { on: true },
+          values_from_args: ['on'],
+        },
+        /* Backend: sdk-call invoke (host-side SDK shim that proxies
+           into the iframe). path resolves against the host window. */
+        'counter.reset': {
+          backend: 'sdk-call',
+          path:    'counterSdk.reset',
+        },
+        'counter.sdk-add': {
+          backend: 'sdk-call',
+          path:    'counterSdk.add',
+          /* args passed positionally; the SDK takes a number */
+        },
+        /* Backend: script-bridge (RPC with awaited reply) */
+        'counter.fetch-state': {
+          backend:        'script-bridge',
+          target:         '#target-iframe',
+          message:        'GetCounterState',
+          response_match: 'CounterStateReply',
+          timeout_ms:     2000,
+          extract:        'Values',
+        },
+      },
+      state: {
+        /* Primary read path: same-origin-window into iframe's app.state.
+           Declared second binding (script-bridge) demonstrates the
+           fallback chain semantics -- it would resolve too, providing
+           a redundant read path. */
+        'counter.value': [
+          { backend: 'same-origin-window',
+            target:  '#target-iframe',
+            path:    'app.state.value' },
+          { backend:        'script-bridge',
+            target:         '#target-iframe',
+            message:        'GetCounterState',
+            response_match: 'CounterStateReply',
+            timeout_ms:     2000,
+            extract:        'Values.value' },
+        ],
+        /* Same shape but FIRST binding is unreachable (selector misses).
+           Demonstrates that the chain transparently falls to the second
+           binding without surfacing the first failure to the caller --
+           only the final read result + provenance backend reflect the
+           binding that actually answered. */
+        'counter.value-fallback': [
+          { backend: 'same-origin-window',
+            target:  '#never-matches-anything',
+            path:    'app.state.value' },
+          { backend: 'same-origin-window',
+            target:  '#target-iframe',
+            path:    'app.state.value' },
+        ],
+        'counter.highlighted': [
+          { backend: 'same-origin-window',
+            target:  '#target-iframe',
+            path:    'app.state.highlighted' },
+        ],
+        /* Intentionally bad on both bindings -- the error-contract
+           scenario exercises this to surface state_unreadable +
+           attempts[]. */
+        'counter.does-not-exist': [
+          { backend: 'same-origin-window',
+            target:  '#target-iframe',
+            path:    'app.state.no_such_field' },
+          { backend: 'dom-mirror',
+            selector: '#never-matches-anything',
+            extract:  'text' },
+        ],
+      },
+      events: {
+        /* Backend: postmessage-listen */
+        'counter.changed': {
+          backend: 'postmessage-listen',
+          source:  '#target-iframe',
+          message: 'CounterChanged',
+        },
+        /* Backend: synthetic-poll -- observes counter.value which is
+           routed via same-origin-window. Fires when the polled snapshot
+           differs from the cached one. */
+        'counter.derived': {
+          backend:     'synthetic-poll',
+          observe:     ['counter.value'],
+          interval_ms: 250,
+        },
+      },
+    });
+    document.getElementById('iframe-status').innerHTML =
+      '<span class="status ok"></span>iframe ready + plugin registered';
+  }
+
+  /* ----- helpers ----- */
+  function withCall(verb, args) {
+    return NAC.call('counter-canvas', verb, args).then(
+      function(r){ window.__v25Demo.last_call = { verb:verb, args:args, ok:true, result:r }; return r; },
+      function(e){ window.__v25Demo.last_call = { verb:verb, args:args, ok:false, error:e.message, code:e.code };
+                   window.__v25Demo.errors_seen.push({ code: e.code, where: 'call:' + verb });
+                   throw e; }
+    );
+  }
+  function withRead(path, outId) {
+    return NAC.read('counter-canvas', path).then(
+      function(v){
+        window.__v25Demo.last_read[path] = v;
+        if (outId) document.getElementById(outId).textContent = JSON.stringify(v);
+        return v;
+      },
+      function(e){
+        window.__v25Demo.errors_seen.push({ code: e.code, where: 'read:' + path });
+        if (outId) document.getElementById(outId).textContent = 'ERR ' + e.code;
+        throw e;
+      }
+    );
+  }
+
+  /* ----- button actions ----- */
+  const actions = {
+    'pm-inc-1':         () => withCall('counter.increment', { by: 1 }),
+    'pm-inc-5':         () => withCall('counter.increment', { by: 5 }),
+    'pm-hl-on':         () => withCall('counter.highlight', { on: true }),
+    'pm-hl-off':        () => withCall('counter.highlight', { on: false }),
+    'sdk-reset':        () => withCall('counter.reset'),
+    'sdk-inc-3':        () => withCall('counter.sdk-add', 3),
+    'bridge-getstate':  () => withCall('counter.fetch-state').then(function(reply){
+      /* script-bridge returns the raw response envelope (extract applies
+         to READS not calls per SPEC sec 15.6). The canvas state lives
+         in reply.Values. */
+      const v = reply && reply.Values && reply.Values.value;
+      document.getElementById('out-value').textContent = JSON.stringify(v);
+    }),
+    'sow-value':        () => withRead('counter.value',       'out-value'),
+    'sow-highlighted':  () => withRead('counter.highlighted', 'out-highlighted'),
+    'fallback-read':    () => withRead('counter.value-fallback', 'out-fallback'),
+
+    'sub-changed': () => {
+      const h = NAC.subscribe('counter-canvas', 'counter.changed', function(payload){
+        window.__v25Demo.last_event['counter.changed'] = payload;
+      });
+      window.__v25Demo.sub_handles.push(h);
+      _updateSubStatus();
+    },
+    'sub-derived': () => {
+      const h = NAC.subscribe('counter-canvas', 'counter.derived', function(snap){
+        window.__v25Demo.last_event['counter.derived'] = snap;
+      });
+      window.__v25Demo.sub_handles.push(h);
+      _updateSubStatus();
+    },
+    'unsub-all': () => {
+      const arr = window.__v25Demo.sub_handles.splice(0);
+      arr.forEach(function(h){ try { NAC.unsubscribe(h); } catch(_){} });
+      _updateSubStatus();
+    },
+
+    'scenario-cross': async () => {
+      await withCall('counter.reset');
+      await withCall('counter.increment', { by: 2 });
+      await withCall('counter.sdk-add', 1);
+      await withCall('counter.highlight', { on: true });
+      /* Postmessage is fire-and-forget: the host has no acked the
+         iframe-side mutation when withCall resolves. Use the script-
+         bridge round trip as the witness -- its reply is processed
+         AFTER any pending postmessage in the iframe's event loop,
+         which is exactly the read-after-write barrier the agent needs.
+         Once it returns we read via same-origin-window for consistency. */
+      const reply = await withCall('counter.fetch-state');
+      const v  = await withRead('counter.value', 'out-value');
+      const hi = await withRead('counter.highlighted', 'out-highlighted');
+      window.__v25Demo.last_call = {
+        verb: 'cross-backend-transaction',
+        ok: true,
+        result: { read_value: v, read_highlighted: hi, bridge_reply: reply },
+      };
+    },
+    'scenario-error': async () => {
+      /* 1. plugin_not_registered */
+      try { await NAC.call('does-not-exist', 'whatever'); }
+      catch(e){ window.__v25Demo.errors_seen.push({ code: e.code, where: 'scenario:plugin_not_registered' }); }
+      /* 2. verb_not_declared */
+      try { await NAC.call('counter-canvas', 'no.such.verb'); }
+      catch(e){ window.__v25Demo.errors_seen.push({ code: e.code, where: 'scenario:verb_not_declared' }); }
+      /* 3. state_unreadable */
+      try { await NAC.read('counter-canvas', 'counter.does-not-exist'); }
+      catch(e){ window.__v25Demo.errors_seen.push({ code: e.code, where: 'scenario:state_unreadable' }); }
+    },
+  };
+
+  function _updateSubStatus() {
+    const n = window.__v25Demo.sub_handles.length;
+    document.getElementById('sub-status').textContent =
+      n === 0 ? 'no active subscriptions' : (n + ' active subscription' + (n===1?'':'s'));
+  }
+
+  /* ----- wire buttons ----- */
+  document.getElementById('controls').addEventListener('click', function(ev){
+    const t = ev.target;
+    if (t.tagName !== 'BUTTON' || !t.dataset.action) return;
+    const fn = actions[t.dataset.action];
+    if (!fn) return;
+    Promise.resolve().then(fn).catch(function(){ /* already logged */ });
+  });
+  document.getElementById('btn-clear-log').addEventListener('click', function(){
+    document.getElementById('log').innerHTML = '';
+    window.__v25Demo.provenance = [];
+  });
+
+  /* Expose for Playwright runner. */
+  window.__v25DemoActions = actions;
+})();
+</script>
+</body>
+</html>

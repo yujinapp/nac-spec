@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V25-01 canvas+API target -- Counter widget mock</title>
+<style>
+  body{font-family:system-ui,sans-serif;background:#1a1a1a;color:#fff;margin:0;padding:24px;height:100vh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+  .stage{background:#0e0e0e;border:1px solid #333;border-radius:8px;padding:32px 48px;text-align:center;min-width:280px;}
+  .value{font-size:96px;font-weight:200;line-height:1;color:#9b6a05;transition:color 220ms ease;}
+  .value.highlighted{color:#f7c948;text-shadow:0 0 18px #f7c948;}
+  .label{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#666;margin-top:8px;}
+  .meta{font-size:12px;color:#555;font-family:ui-monospace,monospace;text-align:center;line-height:1.5;}
+  .toolbar{display:flex;gap:8px;}
+  .toolbar button{background:#222;color:#eee;border:1px solid #444;padding:6px 14px;font-size:13px;border-radius:4px;cursor:pointer;font-family:inherit;}
+  .toolbar button:hover{background:#333;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div id="counter-value" class="value" data-counter-value="0">0</div>
+    <div class="label">canvas value</div>
+  </div>
+  <div class="toolbar">
+    <button id="local-plus">+1 (canvas-side)</button>
+    <button id="local-toggle-hl">toggle highlight (canvas-side)</button>
+  </div>
+  <div class="meta">
+    target.html<br>
+    canvas+API mock driven by host via NAC3 v2.5 plugin extension contract
+  </div>
+
+<script>
+/* This page mocks a "canvas+API" target app (think Collabora / Figma /
+   Excalidraw): the host has NO DOM access to the rendered content
+   except via the V25-01 backends. We expose all 6 surfaces the host's
+   plugin manifest can route through:
+
+   1. postMessage(MessageId, Values) RPC -- the dominant Collabora pattern
+   2. window.parent.postMessage upward emission (postmessage-listen)
+   3. window.app.* same-origin SDK surface (same-origin-window + sdk-call)
+   4. DOM attributes / classes (dom-mirror + synthetic-mutation)
+   5. Custom DOM events the host can dispatch (script-bridge variant)
+
+   Local "+1" and "toggle highlight" buttons let a human drive the
+   canvas independently to verify the host's read paths see the change. */
+
+(function(){
+  let _value = 0;
+  let _highlighted = false;
+
+  function _render() {
+    const el = document.getElementById('counter-value');
+    el.textContent = String(_value);
+    el.setAttribute('data-counter-value', String(_value));
+    el.classList.toggle('highlighted', _highlighted);
+  }
+
+  function _emitUp(MessageId, payload) {
+    /* Upward emission -- the host's postmessage-listen backend filters
+       on MessageId; everything else is contextual payload. */
+    try {
+      window.parent.postMessage(
+        Object.assign({ MessageId: MessageId, SendTime: Date.now() }, payload || {}),
+        '*'
+      );
+    } catch (_) {}
+  }
+
+  /* SDK surface (same-origin only). */
+  window.app = {
+    increment: function(by) {
+      const delta = (typeof by === 'number' && isFinite(by)) ? by : 1;
+      _value += delta;
+      _render();
+      _emitUp('CounterChanged', { value: _value, delta: delta });
+      return { ok: true, value: _value };
+    },
+    reset: function() {
+      _value = 0;
+      _highlighted = false;
+      _render();
+      _emitUp('CounterChanged', { value: _value, delta: 0, reset: true });
+      return { ok: true, value: _value };
+    },
+    highlight: function(on) {
+      _highlighted = !!on;
+      _render();
+      _emitUp('CounterHighlightChanged', { highlighted: _highlighted });
+      return { ok: true, highlighted: _highlighted };
+    },
+    state: { value: 0, highlighted: false },
+  };
+  /* Keep app.state in sync (rendered as a read target for same-origin). */
+  function _syncState() {
+    window.app.state.value = _value;
+    window.app.state.highlighted = _highlighted;
+  }
+  const _origRender = _render;
+  _render = function(){ _origRender(); _syncState(); };
+
+  /* postMessage RPC handler. Honors the runtime's verb shape
+     `{ MessageId, SendTime, Values }`. */
+  window.addEventListener('message', function(ev){
+    const msg = ev.data || {};
+    if (!msg || !msg.MessageId) return;
+    const vals = msg.Values || {};
+    /* Drop our own upward emissions so we don't process them. */
+    if (msg.MessageId === 'CounterChanged'
+     || msg.MessageId === 'CounterHighlightChanged'
+     || msg.MessageId === 'CounterStateReply'
+     || msg.MessageId === 'CounterReady') return;
+
+    switch (msg.MessageId) {
+      case 'IncrementCounter':
+        window.app.increment(vals.by);
+        break;
+      case 'HighlightCounter':
+        window.app.highlight(!!vals.on);
+        break;
+      case 'GetCounterState':
+        /* Script-bridge round trip -- reply with the same MessageId
+           contract the host's `response_match` listens for. */
+        _emitUp('CounterStateReply', {
+          Values: { value: _value, highlighted: _highlighted }
+        });
+        break;
+      default:
+        /* Unknown MessageId -- silently ignore (real apps log). */
+        break;
+    }
+  });
+
+  /* Custom DOM event the script-bridge-style backend can dispatch via
+     same-origin contentDocument access. (Not used by the host demo;
+     kept as evidence that the surface is observable.) */
+  document.addEventListener('nac:v25:counter-add', function(ev){
+    const detail = (ev && ev.detail) || {};
+    window.app.increment(detail.by || 1);
+  });
+
+  /* Local controls (human-driven). */
+  document.getElementById('local-plus').addEventListener('click', function(){
+    window.app.increment(1);
+  });
+  document.getElementById('local-toggle-hl').addEventListener('click', function(){
+    window.app.highlight(!_highlighted);
+  });
+
+  _render();
+  _emitUp('CounterReady', {});
+})();
+</script>
+</body>
+</html>

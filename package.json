@@ -1,0 +1,14 @@
+{
+  "name": "nac-spec-tooling",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Project-root tooling (Playwright demos + scripts). The publishable runtime lives under runtime/ with its own package.json.",
+  "type": "module",
+  "scripts": {
+    "demo:v25-canvas-api": "node scripts/run-demo-v25-canvas-api.mjs",
+    "serve": "python -m http.server 8855"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

@@ -1,0 +1,64 @@
+18:38:45.447 V25-01 Layer 2 demo runner
+18:38:45.447   base url    http://localhost:8855
+18:38:45.447   evidence    C:\yujin-nac-spec\evidence\v25-canvas-api\2026-05-25
+18:38:45.861 
+18:38:45.861 --- scenario 1: initial state ---
+18:38:45.955 PASS plugin registered
+18:38:45.955 PASS iframe ready
+18:38:45.955 PASS no errors yet
+18:38:45.955 
+18:38:45.955 --- scenario 2: postmessage verb counter.increment {by:1} ---
+18:38:46.041 PASS counter.increment +1 reflected via same-origin-window
+18:38:46.121 
+18:38:46.121 --- scenario 3: postmessage verb counter.increment {by:5} ---
+18:38:46.222 PASS counter.increment +5 cumulative -> 6
+18:38:46.222 
+18:38:46.222 --- scenario 4: sdk-call verb counter.reset ---
+18:38:46.264 PASS counter.reset -> 0
+18:38:46.339 
+18:38:46.339 --- scenario 5: sdk-call verb counter.sdk-add 3 (positional) ---
+18:38:46.377 PASS counter.sdk-add +3 -> 3
+18:38:46.377 
+18:38:46.377 --- scenario 6: script-bridge verb counter.fetch-state ---
+18:38:46.813 PASS fetch-state call completed
+18:38:46.894 
+18:38:46.894 --- scenario 7: highlight on + read via same-origin-window ---
+18:38:47.370 PASS counter.highlighted === true after highlight on
+18:38:47.440 
+18:38:47.440 --- scenario 7b: fallback chain for counter.value-fallback ---
+18:38:47.669 PASS fallback chain resolved (1st miss, 2nd succeeds)
+18:38:47.673 PASS fallback provenance reports same-origin-window as the resolver
+18:38:47.745 
+18:38:47.745 --- scenario 8: subscribe to counter.changed (postmessage-listen) ---
+18:38:47.970 PASS postmessage-listen delivered counter.changed
+18:38:48.043 
+18:38:48.043 --- scenario 9: subscribe to counter.derived (synthetic-poll) ---
+18:38:48.839 PASS synthetic-poll delivered counter.derived snapshot
+18:38:48.983 
+18:38:48.983 --- scenario 10: cross-backend transaction (5 verbs / 3 backends / 3 reads) ---
+18:38:49.048 PASS cross-backend tx ok
+18:38:49.048 PASS cross-backend read_value == 3 (reset+2+1)
+18:38:49.048 PASS cross-backend read_highlighted == true
+18:38:49.048 PASS cross-backend bridge_reply.Values.value == 3
+18:38:49.048 PASS cross-backend bridge_reply.Values.highlighted == true
+18:38:49.217 
+18:38:49.217 --- scenario 11: error contract (plugin_not_registered + verb_not_declared + state_unreadable) ---
+18:38:49.660 PASS plugin_not_registered observed
+18:38:49.661 PASS verb_not_declared observed
+18:38:49.661 PASS state_unreadable observed
+18:38:49.790 
+18:38:49.790 --- scenario 12: provenance kind coverage ---
+18:38:49.795 PASS nac:plugin:invoked emitted
+18:38:49.795 PASS nac:plugin:read emitted
+18:38:49.795 PASS nac:plugin:event emitted
+18:38:49.795   backends exercised:  postmessage, postmessage-listen, same-origin-window, script-bridge, sdk-call, synthetic-poll
+18:38:49.795 PASS postmessage exercised
+18:38:49.795 PASS postmessage-listen exercised
+18:38:49.795 PASS sdk-call exercised
+18:38:49.795 PASS script-bridge exercised
+18:38:49.795 PASS same-origin-window exercised
+18:38:49.795 PASS synthetic-poll exercised
+18:38:49.795 
+18:38:49.795 --- final state snapshot ---
+
+FAILURES: 0

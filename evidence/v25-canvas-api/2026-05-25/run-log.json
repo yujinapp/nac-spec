@@ -1,0 +1,414 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v25-canvas-api/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "plugin_slug": "counter-canvas",
+    "iframe_ready": true,
+    "last_read": {
+      "counter.highlighted": true,
+      "counter.value-fallback": 3,
+      "counter.value": 3
+    },
+    "last_event_keys": [
+      "counter.changed",
+      "counter.derived"
+    ],
+    "provenance_count": 37,
+    "errors_seen": [
+      {
+        "code": "plugin_not_registered",
+        "where": "scenario:plugin_not_registered"
+      },
+      {
+        "code": "verb_not_declared",
+        "where": "scenario:verb_not_declared"
+      },
+      {
+        "code": "state_unreadable",
+        "where": "scenario:state_unreadable"
+      }
+    ],
+    "backends": [
+      "postmessage",
+      "same-origin-window",
+      "sdk-call",
+      "script-bridge",
+      "postmessage-listen",
+      "synthetic-poll"
+    ]
+  },
+  "provenance": [
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.increment",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734325985
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734325990
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326046
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326048
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.increment",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326163
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326166
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 1,
+      "ts": 1779734326227
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326229
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.reset",
+      "backend": "sdk-call",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326266
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326270
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326271
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.sdk-add",
+      "backend": "sdk-call",
+      "ok": true,
+      "error": null,
+      "ms": 1,
+      "ts": 1779734326380
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326383
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326385
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.fetch-state",
+      "backend": "script-bridge",
+      "ok": true,
+      "error": null,
+      "ms": 12,
+      "ts": 1779734326426
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.highlight",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734326912
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.highlighted",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734327165
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value-fallback",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734327463
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.increment",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734327949
+    },
+    {
+      "kind": "event",
+      "plugin": "counter-canvas",
+      "path": "counter.changed",
+      "backend": "postmessage-listen",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734327960
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328081
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328338
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328582
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.increment",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328617
+    },
+    {
+      "kind": "event",
+      "plugin": "counter-canvas",
+      "path": "counter.changed",
+      "backend": "postmessage-listen",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328628
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328840
+    },
+    {
+      "kind": "event",
+      "plugin": "counter-canvas",
+      "path": "counter.derived",
+      "backend": "synthetic-poll",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734328840
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.reset",
+      "backend": "sdk-call",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329036
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.increment",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329036
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.sdk-add",
+      "backend": "sdk-call",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329036
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.highlight",
+      "backend": "postmessage",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329036
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "counter.fetch-state",
+      "backend": "script-bridge",
+      "ok": true,
+      "error": null,
+      "ms": 8,
+      "ts": 1779734329044
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.value",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329044
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.highlighted",
+      "backend": "same-origin-window",
+      "ok": true,
+      "error": null,
+      "ms": 0,
+      "ts": 1779734329045
+    },
+    {
+      "kind": "invoked",
+      "plugin": "does-not-exist",
+      "path": "whatever",
+      "backend": null,
+      "ok": false,
+      "error": "NAC.call: plugin \"does-not-exist\" not registered",
+      "ms": 0,
+      "ts": 1779734329250
+    },
+    {
+      "kind": "invoked",
+      "plugin": "counter-canvas",
+      "path": "no.such.verb",
+      "backend": null,
+      "ok": false,
+      "error": "NAC.call: plugin \"counter-canvas\" has no verb \"no.such.verb\"",
+      "ms": 0,
+      "ts": 1779734329250
+    },
+    {
+      "kind": "read",
+      "plugin": "counter-canvas",
+      "path": "counter.does-not-exist",
+      "backend": null,
+      "ok": false,
+      "error": "NAC.read: every binding in chain for \"counter.does-not-exist\" failed",
+      "ms": 0,
+      "ts": 1779734329250
+    }
+  ]
+}

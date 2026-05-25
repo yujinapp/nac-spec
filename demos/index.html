@@ -69,6 +69,55 @@ a:hover{text-decoration:underline;}
 
 </div>
 
+<div class="divider"><span class="kanji">道</span></div>
+
+<p class="lede" style="margin-bottom:1.5rem;">
+  <strong>v2.5 per-RFC demos.</strong> Each RFC shipped in 2.5 has a live,
+  Playwright-driven demo with full evidence captured under
+  <code style="font-size:.82em">evidence/&lt;rfc&gt;/&lt;date&gt;/</code>.
+  Total Layer 2: 77 PASS / 0 FAIL across 5 RFCs. Layer 3 (Pilot-driven
+  with Claude) shipped for V25-01: 11 PASS / 0 FAIL.
+</p>
+
+<div class="demos">
+
+  <a class="demo" href="v25-canvas-api/">
+    <div class="meta">RFC V25-01 -- Layer 2 + Layer 3</div>
+    <h2>Plugin extension: canvas + API</h2>
+    <p>Iframe canvas+API mock decorated via 6 backends (postmessage, postmessage-listen, sdk-call, script-bridge, same-origin-window, synthetic-poll) + fallback chain + cross-backend transaction.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v24-05-authority-sudo/">
+    <div class="meta">RFC V24-05 -- Layer 2</div>
+    <h2>Agent authority + sudo</h2>
+    <p>Modal-backed confirm handler, request_authority TTL grants, rank rule (high &gt; medium &gt; low), TTL expiry, revoke idempotency.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v24-04-snapshot-versioning/">
+    <div class="meta">RFC V24-04 -- Layer 2</div>
+    <h2>Snapshot versioning + OCC</h2>
+    <p>plugin_version / tree_version / element_state_hash gates on click(), STRICT vs relaxed, mutation-then-stale-hash, versionHistory + conformance_tier.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v24-02-sync-plugin/">
+    <div class="meta">RFC V24-02 -- Layer 2</div>
+    <h2>Idempotent syncPlugin</h2>
+    <p>register vs syncPlugin contrast, manifest replace not append, tree_version monotonic across idempotent calls, nac:plugin:invalidated firing.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v24-01-plugin-id-dedup/">
+    <div class="meta">RFC V24-01 -- Layer 2</div>
+    <h2>Plugin slug uniqueness</h2>
+    <p>Happy 2-instance plugin, register-time throw on violation, validate_global plugin_instance_violations bucket, HARD_DEDUP migration flag.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+</div>
+
 <div class="note">
   <strong>Looking for vanilla / server-rendered?</strong>
   See <a href="../example.php">example.php</a> (full reference) or any of the

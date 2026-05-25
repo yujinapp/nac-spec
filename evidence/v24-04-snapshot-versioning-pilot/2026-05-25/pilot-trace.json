@@ -1,0 +1,223 @@
+{
+  "mode": "live",
+  "base_url": "http://localhost:8855",
+  "run_date": "2026-05-25",
+  "statements": [
+    {
+      "id": "snapshot-then-click",
+      "text": "Snapshot the counter plugin via describe(). Then click the counter.add button with the plugin_version from your snapshot. The click should succeed (OCC gate passes).",
+      "expect": {
+        "last_step_op": "click",
+        "last_step_ok": true
+      },
+      "plan_raw": "{\n  \"steps\": [\n    { \"op\": \"describe\" },\n    {\n      \"op\": \"click\",\n      \"nac_id\": \"counter.add\",\n      \"args\": { \"expected_plugin_version\": \"<latest.plugin_version>\" }\n    }\n  ]\n}",
+      "plan": {
+        "steps": [
+          {
+            "op": "describe"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_plugin_version": "<latest.plugin_version>"
+            }
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "describe",
+          "ok": true,
+          "snapshot": {
+            "tv": "v_0",
+            "pv": "v_0"
+          }
+        },
+        {
+          "idx": 1,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {
+            "expected_plugin_version": "v_0"
+          },
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-04-snapshot-versioning-pilot\\2026-05-25\\snapshot-then-click.png"
+    },
+    {
+      "id": "detect-stale-and-retry",
+      "text": "Take a snapshot. Click counter.add pinning your snapshot tree_version via expected_tree_version (should succeed). Then call sync to invalidate. Try to click again pinning the OLD tree_version (the one from before sync) -- it must reject with snapshot_stale. Re-snapshot, get a fresh tree_version, and retry; the retry must succeed.",
+      "expect": {
+        "needs_retry": true,
+        "retry_ok": true
+      },
+      "plan_raw": "```json\n{\n  \"steps\": [\n    { \"op\": \"describe\" },\n    { \"op\": \"click\", \"nac_id\": \"counter.add\", \"args\": { \"expected_tree_version\": \"<latest.tree_version>\" } },\n    { \"op\": \"sync\" },\n    { \"op\": \"click\", \"nac_id\": \"counter.add\", \"args\": { \"expected_tree_version\": \"<latest.tree_version>\" } },\n    { \"op\": \"describe\" },\n    { \"op\": \"click\", \"nac_id\": \"counter.add\", \"args\": { \"expected_tree_version\": \"<latest.tree_version>\" } }\n  ]\n}\n```",
+      "plan": {
+        "steps": [
+          {
+            "op": "describe"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_tree_version": "<latest.tree_version>"
+            }
+          },
+          {
+            "op": "sync"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_tree_version": "<latest.tree_version>"
+            }
+          },
+          {
+            "op": "describe"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_tree_version": "<latest.tree_version>"
+            }
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "describe",
+          "ok": true,
+          "snapshot": {
+            "tv": "v_0",
+            "pv": "v_0"
+          }
+        },
+        {
+          "idx": 1,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {
+            "expected_tree_version": "v_0"
+          },
+          "ok": true
+        },
+        {
+          "idx": 2,
+          "op": "sync",
+          "ok": true
+        },
+        {
+          "idx": 3,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {
+            "expected_tree_version": "v_0"
+          },
+          "ok": false,
+          "code": null,
+          "error": "page.evaluate: NacError: expected_tree_version=v_0 current_tree_version=v_1\n    at NacError (http://localhost:8855/runtime/dist/nac.browser.js:319:15)\n    at _resolveVersionExpectations (http://localhost:8855/runtime/dist/nac.browser.js:1060:15)\n    at Object.click (http://localhost:8855/runtime/dist/nac.browser.js:3242:15)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:32)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+        },
+        {
+          "idx": 4,
+          "op": "describe",
+          "ok": true,
+          "snapshot": {
+            "tv": "v_1",
+            "pv": "v_0"
+          }
+        },
+        {
+          "idx": 5,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {
+            "expected_tree_version": "v_1"
+          },
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-04-snapshot-versioning-pilot\\2026-05-25\\detect-stale-and-retry.png"
+    },
+    {
+      "id": "strict-without-expected",
+      "text": "Enable STRICT_VERSIONING. Try to click counter.add WITHOUT any expected_* values. It must reject with code version_required. Then disable STRICT and retry the same click without expected_* -- this time it must succeed.",
+      "expect": {
+        "strict_rejects": true,
+        "relaxed_ok": true
+      },
+      "plan_raw": "{\n  \"steps\": [\n    { \"op\": \"strict_on\" },\n    { \"op\": \"describe\" },\n    {\n      \"op\": \"click\",\n      \"nac_id\": \"counter.add\",\n      \"args\": { \"expected_plugin_version\": null }\n    },\n    { \"op\": \"strict_off\" },\n    {\n      \"op\": \"click\",\n      \"nac_id\": \"counter.add\",\n      \"args\": { \"expected_plugin_version\": null }\n    }\n  ]\n}",
+      "plan": {
+        "steps": [
+          {
+            "op": "strict_on"
+          },
+          {
+            "op": "describe"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_plugin_version": null
+            }
+          },
+          {
+            "op": "strict_off"
+          },
+          {
+            "op": "click",
+            "nac_id": "counter.add",
+            "args": {
+              "expected_plugin_version": null
+            }
+          }
+        ]
+      },
+      "results": [
+        {
+          "idx": 0,
+          "op": "strict_on",
+          "ok": true
+        },
+        {
+          "idx": 1,
+          "op": "describe",
+          "ok": true,
+          "snapshot": {
+            "tv": "v_1",
+            "pv": "v_0"
+          }
+        },
+        {
+          "idx": 2,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {},
+          "ok": false,
+          "code": null,
+          "error": "page.evaluate: NacError: STRICT_VERSIONING is on; at least one expected_* required.\n    at NacError (http://localhost:8855/runtime/dist/nac.browser.js:319:15)\n    at _resolveVersionExpectations (http://localhost:8855/runtime/dist/nac.browser.js:1013:13)\n    at Object.click (http://localhost:8855/runtime/dist/nac.browser.js:3242:15)\n    at eval (eval at evaluate (:302:30), <anonymous>:1:32)\n    at UtilityScript.evaluate (<anonymous>:304:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+        },
+        {
+          "idx": 3,
+          "op": "strict_off",
+          "ok": true
+        },
+        {
+          "idx": 4,
+          "op": "click",
+          "nac_id": "counter.add",
+          "args": {},
+          "ok": true
+        }
+      ],
+      "screenshot": "evidence\\v24-04-snapshot-versioning-pilot\\2026-05-25\\strict-without-expected.png"
+    }
+  ]
+}

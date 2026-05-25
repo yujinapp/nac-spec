@@ -1,0 +1,29 @@
+19:09:19.751 V24-04 Layer 3 Pilot driver
+19:09:19.751   mode: live
+19:09:19.751   base url: http://localhost:8855
+19:09:19.752   evidence: C:\yujin-nac-spec\evidence\v24-04-snapshot-versioning-pilot\2026-05-25
+19:09:20.852 
+19:09:20.852 ========== statement: snapshot-then-click ==========
+19:09:20.852   text: Snapshot the counter plugin via describe(). Then click the counter.add button with the plugin_version from your snapshot. The click should succeed (OCC gate passes).
+19:09:23.148   plan steps: 2
+19:09:23.167   step outcomes: describe:OK, click:OK
+19:09:23.167 PASS snapshot-then-click last click op present
+19:09:23.167 PASS snapshot-then-click last click ok=true (OCC passed)
+19:09:23.294 
+19:09:23.294 ========== statement: detect-stale-and-retry ==========
+19:09:23.294   text: Take a snapshot. Click counter.add pinning your snapshot tree_version via expected_tree_version (should succeed). Then call sync to invalidate. Try to click again pinning the OLD tree_version (the one from before sync) -- it must reject with snapshot_stale. Re-snapshot, get a fresh tree_version, and retry; the retry must succeed.
+19:09:26.048   plan steps: 6
+19:09:26.079   step outcomes: describe:OK, click:OK, sync:OK, click:ERR, describe:OK, click:OK
+19:09:26.079 PASS detect-stale-and-retry at least 2 clicks attempted (initial + retry)
+19:09:26.080 PASS detect-stale-and-retry middle click rejected (snapshot_stale)
+19:09:26.080 PASS detect-stale-and-retry final retry succeeded
+19:09:26.198 
+19:09:26.198 ========== statement: strict-without-expected ==========
+19:09:26.198   text: Enable STRICT_VERSIONING. Try to click counter.add WITHOUT any expected_* values. It must reject with code version_required. Then disable STRICT and retry the same click without expected_* -- this time it must succeed.
+19:09:28.869   plan steps: 5
+19:09:28.883   step outcomes: strict_on:OK, describe:OK, click:ERR, strict_off:OK, click:OK
+19:09:28.883 PASS strict-without-expected at least 2 clicks
+19:09:28.883 PASS strict-without-expected first click (STRICT on, no expected_*) rejected
+19:09:28.883 PASS strict-without-expected second click (STRICT off, no expected_*) ok
+
+FAILURES: 0

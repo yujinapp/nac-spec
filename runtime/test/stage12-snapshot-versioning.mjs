@@ -168,7 +168,14 @@ globalThis.location = hostWindow.location;
 /* ============== Sec 1 -- API surface ============== */
 
 assert('NAC.STRICT_VERSIONING exposed',       'STRICT_VERSIONING' in NAC);
-assert('NAC.STRICT_VERSIONING default false',  NAC.STRICT_VERSIONING === false);
+/* v2.5 alpha.4: default flipped to true now that every mutating verb
+   honours the OCC gate. Callers that do not pass expected_* must
+   either opt out (set false here) or accept version_required. */
+assert('NAC.STRICT_VERSIONING default true',   NAC.STRICT_VERSIONING === true);
+/* Disable for the rest of this test so the basic describe() reads
+   work without being forced into expected_* every call. The dispatch
+   tests at the bottom flip back to true to verify the gate. */
+NAC.STRICT_VERSIONING = false;
 assert('NAC.eager_hashing exposed',           'eager_hashing' in NAC);
 assert('NAC.conformance_tier exposed',        'conformance_tier' in NAC);
 assert('NAC.conformance_tier default NAC-3-versioned',
@@ -346,6 +353,37 @@ await (async () => {
   assert('STRICT_VERSIONING on without expected_* throws version_required',
     strictErr && strictErr.code === 'version_required',
     '(got ' + (strictErr && strictErr.code) + ')');
+
+  /* v2.5 alpha.4: tab + tab_by_label now also honour the OCC gate.
+     Add a quick verification that tab() with stale expected_tree_version
+     throws snapshot_stale and that tab() with STRICT on + no expected_*
+     throws version_required. */
+  /* Mount a minimal tab for the test. */
+  const tabEl = new FakeNode('button');
+  tabEl.setAttribute('data-nac-id', 'occ_test.tab.demo');
+  tabEl.setAttribute('data-nac-role', 'tab');
+  root.appendChild(tabEl);
+
+  let staleTabErr = null;
+  NAC.STRICT_VERSIONING = false;
+  try {
+    await NAC.tab('occ_test', 'occ_test.tab.demo', {
+      expected_tree_version: 'v_999999',
+    });
+  } catch (e) { staleTabErr = e; }
+  assert('tab() with stale expected_tree_version throws snapshot_stale',
+    staleTabErr && staleTabErr.code === 'snapshot_stale',
+    '(got ' + (staleTabErr && staleTabErr.code) + ')');
+
+  let strictTabErr = null;
+  NAC.STRICT_VERSIONING = true;
+  try {
+    await NAC.tab('occ_test', 'occ_test.tab.demo');
+  } catch (e) { strictTabErr = e; }
+  assert('tab() under STRICT without expected_* throws version_required',
+    strictTabErr && strictTabErr.code === 'version_required',
+    '(got ' + (strictTabErr && strictTabErr.code) + ')');
+
   NAC.STRICT_VERSIONING = false; /* restore */
 })();
 

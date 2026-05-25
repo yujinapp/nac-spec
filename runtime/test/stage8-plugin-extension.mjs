@@ -239,6 +239,12 @@ new Function('window', 'document', 'CustomEvent', 'MutationObserver', 'console',
   (sandbox.window, sandbox.document, sandbox.CustomEvent, sandbox.MutationObserver, console, setTimeout, clearTimeout, setInterval, clearInterval, Promise);
 
 const NAC = sandbox.window.NAC;
+
+/* v2.5 alpha.4: STRICT_VERSIONING default flipped to true. This
+   test does not use V24-04 expected_* params, so opt out at the
+   top to keep the test focused on its actual subject. */
+NAC.STRICT_VERSIONING = false;
+
 if (!NAC) { console.error('NAC failed to load'); process.exit(1); }
 
 /* Helper: assert async function rejects with a given NacError code. */

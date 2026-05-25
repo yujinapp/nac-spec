@@ -172,6 +172,12 @@ installShim();
 loadRuntime();
 const NAC = globalThis.NAC;
 
+
+/* v2.5 alpha.4: STRICT_VERSIONING default flipped to true. This
+   test does not use V24-04 expected_* params, so opt out at the
+   top to keep the test focused on its actual subject. */
+NAC.STRICT_VERSIONING = false;
+
 assert('NAC installed',                typeof NAC === 'object');
 assert('NAC.version v2.2.x or v2.3+', /^2\.(2|3|4|[5-9]|\d{2,})\.\d+(-[a-z0-9.]+)?$/.test(NAC.version));
 assert('NAC.bindAction exists',        typeof NAC.bindAction === 'function');

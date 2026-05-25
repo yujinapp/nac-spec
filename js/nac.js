@@ -3574,7 +3574,22 @@
     throw NacError('not_found', 'option ' + option + ' not present in ' + nac_id);
   }
 
-  async function tab(plugin, tab_key) {
+  async function tab(plugin, tab_key, opts) {
+    /* v2.5.0-alpha.4: opts third arg accepts V24-04 expected_*
+       parameters (expected_plugin_version / expected_tree_version /
+       expected_element_state_hash). When opts has any expected_* OR
+       STRICT_VERSIONING is on, the OCC gate runs before the tab
+       click. Pre-alpha.4 the signature was (plugin, tab_key); the
+       single-arg ergonomic form keeps working because opts on the
+       single-arg path is the SECOND argument (tab_key); we detect
+       that case and re-bind. */
+    /* Re-binding: single-arg ergonomic form may have been called as
+       tab(bareId) OR tab(bareId, opts). Differentiate by typeof. */
+    if (tab_key !== undefined && typeof tab_key === 'object' && tab_key !== null
+        && typeof plugin === 'string' && plugin.indexOf('.') >= 0) {
+      opts = tab_key;
+      tab_key = undefined;
+    }
     /* H1.v5 (2026-05-20): single-arg ergonomic form. When the caller
        passes only a full nac_id (e.g. "conduit.tab.feed__your_feed"),
        resolve it directly against the DOM without requiring the
@@ -3645,6 +3660,16 @@
           '" not in DOM (no exact match, no "' + bareId + '__" qualified instance)',
           { candidates: available });
       }
+      /* v2.5 V24-04 OCC gate, same conditional pattern as click. */
+      {
+        const _o = opts || {};
+        const _hasExp = ('expected_plugin_version' in _o)
+                     || ('expected_tree_version' in _o)
+                     || ('expected_element_state_hash' in _o);
+        if (_hasExp || _strictVersioningOn()) {
+          await _resolveVersionExpectations(opts, tabEl);
+        }
+      }
       _focusElement(tabEl);
       tabEl.click();
       try { await wait_for('nac:tab:changed', 1500); } catch (e) { /* tolerated */ }
@@ -3656,6 +3681,16 @@
       '[data-nac-role="tab"][data-nac-id="' + tab_key + '"]'
     );
     if (!tabEl) throw NacError('not_found', 'tab ' + tab_key + ' missing');
+    /* v2.5 V24-04 OCC gate (two-arg path). */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, tabEl);
+      }
+    }
     _focusElement(tabEl);
     tabEl.click();
     try {
@@ -4183,7 +4218,8 @@
         + targetPlugin + '"',
         { candidates: available });
     }
-    return await tab(targetPlugin, matched.nac_id);
+    /* v2.5 alpha.4: propagate opts (V24-04 expected_*) down to tab(). */
+    return await tab(targetPlugin, matched.nac_id, opts);
   }
 
   /* ---------- Visualization mode ---------------------------------- */
@@ -7557,7 +7593,7 @@
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.0-alpha.3',
+    version:      '2.5.0-alpha.4',
     spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
@@ -7597,10 +7633,12 @@
        describe() output (RFC sec 5.2/5.3). expected_plugin_version
        / expected_tree_version / expected_element_state_hash on every
        mutating API reject with NacError('snapshot_stale', ...) when
-       the snapshot is stale. Default STRICT_VERSIONING=false in
-       2.5.0-alpha.2 so adopters opt in; flips to true in alpha.3
-       once the dispatch hooks finish their soak window. */
-    STRICT_VERSIONING:   false,
+       the snapshot is stale. As of v2.5.0-alpha.4 every mutating
+       verb (click/fill/select/invoke/tab/tab_by_label) honours the
+       gate, so STRICT_VERSIONING default flips to true: callers
+       MUST pass at least one expected_* or set STRICT_VERSIONING
+       =false explicitly. Removed in v2.6 (becomes unconditional). */
+    STRICT_VERSIONING:   true,
     eager_hashing:       false,
     conformance_tier:    'NAC-3-versioned',
     markHydrationComplete: markHydrationComplete,

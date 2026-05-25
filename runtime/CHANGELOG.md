@@ -1,5 +1,78 @@
 # Changelog
 
+## 2.5.0-alpha.4 -- 2026-05-25
+
+NAC3 v2.5.0-alpha.4 closes the V24-04 contract: every mutating
+verb now honours `expected_*` parameters, and `STRICT_VERSIONING`
+default flips from `false` to `true`. Adopters that do not opt in
+to OCC explicitly will get `version_required` and must either pass
+expected parameters or set `NAC.STRICT_VERSIONING = false` once
+at bootstrap.
+
+### Added (V24-04 -- final dispatch hook)
+
+- **`tab(plugin, tab_key, opts?)`** -- third argument added. opts
+  accepts `expected_plugin_version` / `expected_tree_version` /
+  `expected_element_state_hash`. The single-arg ergonomic form
+  (e.g., `tab('conduit.tab.feed__home')`) keeps working; when
+  called as `tab(bareId, opts)` the runtime detects the object
+  and re-binds. Both two-arg and single-arg paths run the OCC
+  gate after element resolution + before the tab click.
+- **`tab_by_label(plugin, label, opts?)`** -- propagates opts
+  through to `tab()`.
+
+### Changed (V24-04 -- default flip)
+
+- **`NAC.STRICT_VERSIONING` defaults to `true`** in alpha.4.
+  Rationale: every mutating verb (click / fill / select / invoke
+  / tab / tab_by_label / click_by_verb via click) now honours the
+  OCC gate, so the strict default is finally safe to flip.
+- Callers that do NOT pass `expected_*` parameters must set
+  `NAC.STRICT_VERSIONING = false` at bootstrap if they want the
+  pre-alpha.4 behaviour (silent dispatch ignoring OCC state).
+- Code reviewers should reject any new callsite that catches
+  `version_required` without escalating to the user -- swallowing
+  the error defeats the point of the contract.
+
+### Breaking changes since alpha.3
+
+- ALL test files that exercised mutating verbs (`click`,
+  `click_by_verb`, `fill`, `select`, `invoke`, `tab`,
+  `tab_by_label`) without passing `expected_*` started failing
+  on the STRICT default flip. Fix: opt out at the top of the test
+  file with `NAC.STRICT_VERSIONING = false;` after the runtime
+  loads. Applied across all internal tests as part of this
+  commit; downstream adopters that have similar tests need the
+  same one-line addition.
+
+### Tests
+
+stage12-snapshot-versioning.mjs grows two assertions:
+
+- `tab() with stale expected_tree_version throws snapshot_stale`
+- `tab() under STRICT without expected_* throws version_required`
+
+Total suite: **384 PASS / 0 FAIL** across 14 stage suites.
+
+### Pending for 2.5.0 stable promotion (alpha -> latest)
+
+Per `PROJECT.md` sec 3.1 (three-layer test bar, instituted
+2026-05-25), `npm dist-tag add @nac3/runtime@2.5.0 latest`
+requires:
+
+  - Layer 1 unit tests green (already 384/0). ✓
+  - Layer 2 visual demos + Playwright + screenshots in
+    `evidence/<feature>/<run-date>/` per RFC.
+  - Layer 3 Pilot-driven high-complexity statements run against
+    each demo, with reasoning trace + screenshots saved.
+  - Pablo's explicit OK after reviewing Layer 2 + Layer 3
+    evidence.
+
+Layer 2 + Layer 3 building scheduled next. V25-02 / V25-03 /
+V25-04 RFCs remain DRAFT; target subsequent 2.5.x patches.
+
+---
+
 ## 2.5.0-alpha.3 -- 2026-05-23
 
 NAC3 v2.5.0-alpha.3 wires the V24-04 OCC dispatch hooks into the

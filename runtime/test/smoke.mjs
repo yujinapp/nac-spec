@@ -107,7 +107,7 @@ try {
 try {
   const pkg = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
   check('pkg name',     pkg.name === '@nac3/runtime');
-  check('pkg version',  pkg.version === '2.5.0-alpha.3');
+  check('pkg version',  pkg.version === '2.5.0-alpha.4');
   check('pkg license',  pkg.license === 'Apache-2.0');
   check('pkg has bin',  pkg.bin && pkg.bin.nac);
   check('pkg has main', pkg.main && pkg.main.endsWith('.cjs'));

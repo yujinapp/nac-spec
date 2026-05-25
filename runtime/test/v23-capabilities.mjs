@@ -163,6 +163,12 @@ global.MutationObserver = class { observe(){} disconnect(){} takeRecords(){retur
 const src = fs.readFileSync(RUNTIME_PATH, 'utf8');
 new Function(src)();
 const NAC = global.window.NAC;
+
+/* v2.5 alpha.4: STRICT_VERSIONING default flipped to true. This
+   test does not use V24-04 expected_* params, so opt out at the
+   top to keep the test focused on its actual subject. */
+NAC.STRICT_VERSIONING = false;
+
 assert('NAC installed', !!NAC && typeof NAC === 'object');
 assert('setCapabilities exists',  typeof NAC.setCapabilities  === 'function');
 assert('grantCapability exists',  typeof NAC.grantCapability  === 'function');

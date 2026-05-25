@@ -18,7 +18,7 @@ first) stays in force.
 | Location | Role | Push policy |
 |---|---|---|
 | `github.com/yujinapp/nac-spec` (THIS repo) | **Canonical + development.** Sole source of truth from 2026-05-23 onward. NPM, the landing page, every "made with NAC3" reference, every adopter URL points here. Spec + runtime + RFCs + tests + landing + demos all live here. Local working dir: `c:/yujin-nac-spec/`. | Direct push to main is fine for iteration. Tag releases when promoting alpha -> stable. Force-push needs an explicit recovery tag pushed first (precedent: `pre-v25-consolidation-2026-05-23`). |
-| `npm: @nac3/runtime` | The published npm package. | `npm publish` from `runtime/` of a clean clone (or working tree). Must match canonical SPEC.md at publish time. Alpha tags publish with `--tag alpha`; stable promotion via `npm dist-tag add @nac3/runtime@X.Y.Z latest`. Last published: `2.4.0` (`latest`), `2.5.0-alpha.3` (`alpha`). |
+| `npm: @nac3/runtime` | The published npm package. | `npm publish` from `runtime/` of a clean clone (or working tree). Must match canonical SPEC.md at publish time. Alpha tags publish with `--tag alpha`; stable promotion via `npm dist-tag add @nac3/runtime@X.Y.Z latest`. Last published: `2.5.0-alpha.5` (`latest` and `alpha`). |
 | `github.com/pkuschnirof/rpaforce-crm` (sibling, NOT a NAC repo) | **CRM monorepo, sibling project.** Held a NAC3 development copy under `packages/nac/` + `yujin.app/nac-spec/` until 2026-05-23 commit `0ff3afa`, which deleted both. **No NAC code lives there now.** Cross-references only (Sumi Discord KB build script + the unified agent under `agent/unified/`). | Do NOT push NAC commits there. The dirs do not exist anymore. |
 
 **Historical mapping (pre-2026-05-23, kept for archaeology + for
@@ -331,39 +331,31 @@ Standard cadence for any feature (from initial idea to shipped):
 `docs/V<X>_STATUS.md` archives.)
 
 - **Migration to single source of truth: DONE 2026-05-23.**
-  Consolidation commit `39b7d15` + release commit `cc9610b` +
-  alpha.2 `77d9edb` + alpha.3 `6ac3f31` shipped on this repo.
-  rpaforce-crm cleanup (`0ff3afa`) deleted the legacy dev copy.
-  Fresh-clone verification passed (Sumi handover doc:
-  `docs/V2.5_ALPHA_1_RELEASE_HANDOVER_2026_05_23.md`).
-- **V2.5.0 release cycle live.** Current state per RFC index:
-  V25-01 + V24-01 + V24-02 + V24-05 all SHIPPED; V24-04
-  foundation SHIPPED (alpha.2) + dispatch hooks SHIPPED for
-  click/fill/select/invoke (alpha.3). Pending in alpha.4:
-  `tab(plugin, key, opts?)` taking opts + threading the OCC
-  gate; `NAC.STRICT_VERSIONING` default flip from `false` to
-  `true`.
-- **V25-02 / V25-03 / V25-04 RFCs: DRAFT.** Tree navigation,
-  asistive labels, effect detection. Target subsequent 2.5.x
-  patches. RFC files to be drafted under `rfcs/` before the
-  spec sections in SPEC.md transition from placeholder to
-  normative.
+  Consolidation + cleanup of legacy rpaforce-crm copy complete.
+- **V2.5 line complete and PUBLISHED 2026-05-25.**
+  alpha.5 (`1616cc7`) ships Blocks B (tree nav) + C (narrate) +
+  D (expect/diff). All 8 SHIPPED RFCs of the v2.5 series:
+  V24-01, V24-02, V24-04, V24-05, V25-01, V25-02, V25-03, V25-04
+  -- each with runtime code + Layer 2 visual (Playwright + screenshots)
+  + Layer 3 Pilot LIVE (Claude sonnet-4-6) evidence. Total across
+  all three layers: ~470+ PASS / 0 FAIL.
+- **Published.** `@nac3/runtime@2.5.0-alpha.5` on npm
+  `latest = alpha` tag. Git tag `v2.5.0-alpha.5` pushed.
 - **Sumi Discord KB path update**: the build script in
   `rpaforce-crm/tools/discord-setup/worker/build-knowledge.mjs`
   still reads from the deleted `yujin.app/nac-spec/SPEC.md`
-  path. Needs an update to fetch from this repo (either via
-  HTTPS from `yujin.app/nac-spec/SPEC.md` public landing, or
-  via a local clone of this repo). Tracked for the next CRM
-  maintenance pass.
-- **E2E demos for V24-01/02/05/V25-01**: requested by Pablo
-  for "evidencia". Unit tests carry the contract evidence
-  (377 PASS / 0 FAIL in alpha.2, 384 PASS / 0 FAIL in alpha.3);
-  PHP example pages + Playwright headless smoke are still
-  pending. Target 2.5.0-alpha.4.
+  path. Needs an update to fetch from this repo. Tracked for the
+  next CRM maintenance pass.
+- **Collabora pilot unblocked spec-side.** All assistive primitives
+  (narrate + context/tree + expect/diff) shipped + V25-01
+  canvas+API contract live. Fase 0 (DOM inspection) still gated
+  on Pablo's Docker Desktop bringup. Fase 1-2 (NAC manifest +
+  implementation) can begin against the source-only inspection
+  done in Fase 0b.
 
 ---
 
-*Last reviewed: 2026-05-23 (post-V2.5 consolidation, Sumi
-autopilot, alpha.3 published). Update this file in the same commit
-as any topology / norm change. Bumped from the pre-migration
-version that lived in rpaforce-crm.*
+*Last reviewed: 2026-05-25 (v2.5 line complete, alpha.5 published
+to npm latest, Blocks B/C/D shipped with Layer 2 + Layer 3 LIVE
+evidence). Update this file in the same commit as any topology /
+norm change.*

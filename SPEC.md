@@ -1,7 +1,7 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.0-alpha.4 (alpha.3 + tab(opts) + STRICT_VERSIONING default flipped to true -- V24-04 contract fully covered across every mutating verb)
-**Status:** v2.5.0-alpha.4 alpha -- V24-04 SHIPPED end-to-end. Promotion alpha->latest gated on the three-layer test bar (sec 3.1 PROJECT.md)
+**Version:** 2.5.0-alpha.5 (alpha.4 + Blocks B/C/D -- narrate, context+tree, expect+diff -- complete v2.5 surface SHIPPED)
+**Status:** v2.5.0-alpha.5 -- all 8 SHIPPED RFCs (V24-01/02/04/05 + V25-01/02/03/04) have runtime + Layer 2 visual + Layer 3 Pilot LIVE evidence. Promoted to npm dist-tag `latest`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
 

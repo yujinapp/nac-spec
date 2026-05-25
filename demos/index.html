@@ -75,8 +75,9 @@ a:hover{text-decoration:underline;}
   <strong>v2.5 per-RFC demos.</strong> Each RFC shipped in 2.5 has a live,
   Playwright-driven demo with full evidence captured under
   <code style="font-size:.82em">evidence/&lt;rfc&gt;/&lt;date&gt;/</code>.
-  Total Layer 2: 77 PASS / 0 FAIL across 5 RFCs. Layer 3 (Pilot-driven
-  with Claude) shipped for V25-01: 11 PASS / 0 FAIL.
+  Across the 8 SHIPPED RFCs in v2.5 (V24-01/02/04/05 + V25-01/02/03/04):
+  <strong>Layer 2: 124 PASS / 0 FAIL</strong> and
+  <strong>Layer 3 LIVE w/ Claude: 51 PASS / 0 FAIL</strong>.
 </p>
 
 <div class="demos">
@@ -88,29 +89,50 @@ a:hover{text-decoration:underline;}
     <span class="arrow">Open demo &rarr;</span>
   </a>
 
+  <a class="demo" href="v25-02-tree-nav/">
+    <div class="meta">RFC V25-02 -- Layer 2 + Layer 3</div>
+    <h2>Tree navigation</h2>
+    <p>context(plugin) breadcrumb + tree(plugin, rootId?) enumeration with data-nac-opens / data-nac-leaf authoring attributes. Multi-level menubar with opens-chain composition.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v25-03-narrate/">
+    <div class="meta">RFC V25-03 -- Layer 2 + Layer 3</div>
+    <h2>Asistive labels (narrate)</h2>
+    <p>Priority: aria-label &gt; visible text &gt; data-nac-label &gt; nac_id. Nested addressable children excluded from parent's visible-text. The label primitive for TTS, screen readers, voice agents, audit logs.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
+  <a class="demo" href="v25-04-expect-diff/">
+    <div class="meta">RFC V25-04 -- Layer 2 + Layer 3</div>
+    <h2>Effect detection (expect + diff)</h2>
+    <p>NAC.expect polls until state matches or times out. NAC.diff snapshots before / after an action. Closes the "silent damage" gap for assistive callers.</p>
+    <span class="arrow">Open demo &rarr;</span>
+  </a>
+
   <a class="demo" href="v24-05-authority-sudo/">
-    <div class="meta">RFC V24-05 -- Layer 2</div>
+    <div class="meta">RFC V24-05 -- Layer 2 + Layer 3</div>
     <h2>Agent authority + sudo</h2>
     <p>Modal-backed confirm handler, request_authority TTL grants, rank rule (high &gt; medium &gt; low), TTL expiry, revoke idempotency.</p>
     <span class="arrow">Open demo &rarr;</span>
   </a>
 
   <a class="demo" href="v24-04-snapshot-versioning/">
-    <div class="meta">RFC V24-04 -- Layer 2</div>
+    <div class="meta">RFC V24-04 -- Layer 2 + Layer 3</div>
     <h2>Snapshot versioning + OCC</h2>
     <p>plugin_version / tree_version / element_state_hash gates on click(), STRICT vs relaxed, mutation-then-stale-hash, versionHistory + conformance_tier.</p>
     <span class="arrow">Open demo &rarr;</span>
   </a>
 
   <a class="demo" href="v24-02-sync-plugin/">
-    <div class="meta">RFC V24-02 -- Layer 2</div>
+    <div class="meta">RFC V24-02 -- Layer 2 + Layer 3</div>
     <h2>Idempotent syncPlugin</h2>
     <p>register vs syncPlugin contrast, manifest replace not append, tree_version monotonic across idempotent calls, nac:plugin:invalidated firing.</p>
     <span class="arrow">Open demo &rarr;</span>
   </a>
 
   <a class="demo" href="v24-01-plugin-id-dedup/">
-    <div class="meta">RFC V24-01 -- Layer 2</div>
+    <div class="meta">RFC V24-01 -- Layer 2 + Layer 3</div>
     <h2>Plugin slug uniqueness</h2>
     <p>Happy 2-instance plugin, register-time throw on violation, validate_global plugin_instance_violations bucket, HARD_DEDUP migration flag.</p>
     <span class="arrow">Open demo &rarr;</span>

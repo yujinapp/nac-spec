@@ -5,12 +5,12 @@
 > without per-app glue code.
 
 [![Status: alpha](https://img.shields.io/badge/status-2.5--alpha-orange)](https://yujin.app/nac-spec/)
-[![Spec: v2.5-alpha](https://img.shields.io/badge/spec-v2.5_alpha-orange)](SPEC.md)
+[![Spec: v2.5-alpha.5](https://img.shields.io/badge/spec-v2.5_alpha.5-orange)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 [![Tests: passing](https://img.shields.io/badge/tests-349_passing-success)](runtime/test/)
 
-> **v2.5.0-alpha.1 shipping today** (2026-05-23) -- consolidation alpha.
+> **v2.5.0-alpha.5 shipped** (2026-05-25) -- v2.5 line complete; 8 SHIPPED RFCs each with Layer 2 + Layer 3 LIVE evidence; promoted to npm latest.
 > Unifies the two parallel dev lines that diverged during May 2026 and
 > establishes `yujinapp/nac-spec` as the SOLE source of truth for NAC3
 > from this commit forward. Adds **V25-01** plugin extension contract
@@ -88,14 +88,21 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 
 ## Status: alpha + stable in parallel
 
-- **v2.5.0-alpha.1** -- shipped 2026-05-23. **Consolidation alpha.**
-  Adds RFC V25-01 plugin extension contract for canvas+API (Block A
-  with 8 backends), V24-02 syncPlugin (first real implementation),
-  V24-05 agent authority + sudo elevation, V24-01 plugin slug
-  uniqueness enforcement. Also establishes `yujinapp/nac-spec` as
-  the SOLE source of truth for NAC3 (the rpaforce-crm working copy
-  is deleted as of this release). V24-04 snapshot versioning + OCC
-  in flight for alpha.2.
+- **v2.5.0-alpha.5** -- shipped 2026-05-25. **v2.5 line complete.**
+  All 8 SHIPPED RFCs of the v2.5 series have runtime + Layer 2
+  visual + Layer 3 Pilot LIVE evidence:
+  - V24-01 plugin slug uniqueness
+  - V24-02 idempotent syncPlugin
+  - V24-04 snapshot versioning + OCC (STRICT_VERSIONING defaults true)
+  - V24-05 agent authority + sudo elevation
+  - V25-01 plugin extension contract for canvas+API (8 backends)
+  - V25-02 tree navigation (context + tree + data-nac-opens/leaf)
+  - V25-03 asistive labels (narrate)
+  - V25-04 effect detection (expect + diff)
+
+  Promoted to npm dist-tag `latest`. `yujinapp/nac-spec` is the
+  SOLE source of truth (rpaforce-crm working copy removed since
+  alpha.1).
 - **v2.4** -- shipped 2026-05-23. Zero-silent-damage strict resolution
   + disambiguation contract. `click_by_verb` / `tab` / `tab_by_label`
   throw `NacError` with `err.candidates` and emit

@@ -1,0 +1,24 @@
+18:51:33.055 V24-02 Layer 2 demo runner
+18:51:33.055   base url    http://localhost:8855
+18:51:33.055   evidence    C:\yujin-nac-spec\evidence\v24-02-sync-plugin\2026-05-25
+18:51:33.476 
+18:51:33.476 --- scenario 1: register(v1) -- 1 verb ---
+18:51:33.683 PASS after register v1, verb_count === 1
+18:51:33.715 
+18:51:33.715 --- scenario 2: register(v2) on existing slug -- contrast behaviour ---
+18:51:34.133 
+18:51:34.133 --- scenario 3: syncPlugin(v3) replaces manifest ---
+18:51:34.332 PASS syncPlugin(v3) replaced=true (manifest was present)
+18:51:34.332 PASS syncPlugin(v3) returned a plugin_version
+18:51:34.335 PASS after sync v3, verb_count === 2 (renamed verbs)
+18:51:34.368 
+18:51:34.368 --- scenario 4: syncPlugin(v3) idempotent -- replace bumps version ---
+18:51:34.564 PASS syncPlugin(v3 again) replaced=true
+18:51:34.566 PASS tree_version monotonic across idempotent sync (v2.5 / V24-02 contract)
+18:51:34.598 
+18:51:34.598 --- scenario 5: subscribe invalidated + syncPlugin(v4) ---
+18:51:34.934 PASS nac:plugin:invalidated fired at least once
+18:51:34.936 PASS syncPlugin(v4) replaced=true
+18:51:34.937 PASS after sync v4, verb_count === 3
+
+FAILURES: 0

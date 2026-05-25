@@ -1,0 +1,27 @@
+18:48:23.885 V24-01 Layer 2 demo runner
+18:48:23.885   base url    http://localhost:8855
+18:48:23.885   evidence    C:\yujin-nac-spec\evidence\v24-01-plugin-id-dedup\2026-05-25
+18:48:24.330 
+18:48:24.330 --- scenario 1: happy path register + validate ---
+18:48:24.738 PASS happy-path register OK
+18:48:24.738 PASS happy-path validate finds 0 dupes
+18:48:24.818 
+18:48:24.818 --- scenario 2: inject 2 violating cart roots, register() throws ---
+18:48:25.192 PASS register after violation THREW
+18:48:25.192 PASS error code is duplicate_plugin_no_instance_id
+18:48:25.271 
+18:48:25.271 --- scenario 3: validate_global surfaces non-fatal finding ---
+18:48:25.450 PASS validate after violation reports dupes
+18:48:25.521 
+18:48:25.521 --- scenario 4: HARD_DEDUP=true (strict mode) ---
+18:48:25.692 PASS HARD_DEDUP flipped to true
+18:48:25.693 PASS register under HARD_DEDUP=true still throws
+18:48:25.779 
+18:48:25.779 --- scenario 5: HARD_DEDUP=false (migration mode) ---
+18:48:26.129 PASS HARD_DEDUP flipped to false
+18:48:26.130 PASS validate under HARD_DEDUP=false still reports dupes
+18:48:26.201 
+18:48:26.201 --- scenario 6: cleanup restores happy path ---
+18:48:26.567 PASS after cleanup, dupes_count back to 0
+
+FAILURES: 0

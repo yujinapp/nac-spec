@@ -1,0 +1,243 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v24-05-authority-sudo/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "confirm_decisions": [
+      {
+        "id": "edit-text",
+        "scope": "low",
+        "approved": true
+      },
+      {
+        "id": "change-amount",
+        "scope": "medium",
+        "approved": false
+      },
+      {
+        "id": "a",
+        "scope": "low",
+        "ok": true
+      },
+      {
+        "id": "b",
+        "scope": "medium",
+        "ok": true
+      },
+      {
+        "id": "c",
+        "scope": "high",
+        "ok": true
+      },
+      {
+        "id": "low-act",
+        "scope": "low",
+        "approved": true
+      },
+      {
+        "id": "high-act",
+        "scope": "high",
+        "approved": false
+      },
+      {
+        "id": "within-ttl",
+        "scope": "medium",
+        "approved": true,
+        "phase": "within-ttl"
+      },
+      {
+        "id": "after-ttl",
+        "scope": "medium",
+        "approved": false,
+        "phase": "after-ttl"
+      }
+    ],
+    "authority_events": [
+      {
+        "kind": "requested",
+        "detail": {
+          "kind": "request_authority",
+          "request_id": "auth_mplkf3dj_1",
+          "scope": "high",
+          "ttl_ms": 5000,
+          "metadata": {}
+        }
+      },
+      {
+        "kind": "granted",
+        "detail": {
+          "scope": "high",
+          "expires_at": 1779735259743,
+          "request_id": "auth_mplkf3dj_1"
+        }
+      },
+      {
+        "kind": "revoked",
+        "detail": {
+          "scope": "high",
+          "reason": "manual"
+        }
+      },
+      {
+        "kind": "requested",
+        "detail": {
+          "kind": "request_authority",
+          "request_id": "auth_mplkf3on_2",
+          "scope": "low",
+          "ttl_ms": 5000,
+          "metadata": {}
+        }
+      },
+      {
+        "kind": "granted",
+        "detail": {
+          "scope": "low",
+          "expires_at": 1779735260143,
+          "request_id": "auth_mplkf3on_2"
+        }
+      },
+      {
+        "kind": "revoked",
+        "detail": {
+          "scope": "low",
+          "reason": "manual"
+        }
+      },
+      {
+        "kind": "requested",
+        "detail": {
+          "kind": "request_authority",
+          "request_id": "auth_mplkf3zr_3",
+          "scope": "medium",
+          "ttl_ms": 1000,
+          "metadata": {}
+        }
+      },
+      {
+        "kind": "granted",
+        "detail": {
+          "scope": "medium",
+          "expires_at": 1779735256543,
+          "request_id": "auth_mplkf3zr_3"
+        }
+      },
+      {
+        "kind": "expired",
+        "detail": {
+          "scope": "medium",
+          "reason": "ttl"
+        }
+      },
+      {
+        "kind": "requested",
+        "detail": {
+          "kind": "request_authority",
+          "request_id": "auth_mplkf5pr_4",
+          "scope": "medium",
+          "ttl_ms": 5000,
+          "metadata": {}
+        }
+      },
+      {
+        "kind": "granted",
+        "detail": {
+          "scope": "medium",
+          "expires_at": 1779735262775,
+          "request_id": "auth_mplkf5pr_4"
+        }
+      },
+      {
+        "kind": "revoked",
+        "detail": {
+          "scope": "medium",
+          "reason": "manual"
+        }
+      }
+    ],
+    "action_events": [
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "edit-text",
+          "scope": "low",
+          "sudo": false
+        }
+      },
+      {
+        "kind": "rejected",
+        "detail": {
+          "action_id": "change-amount",
+          "scope": "medium",
+          "sudo": false
+        }
+      },
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "a",
+          "scope": "low",
+          "sudo": true
+        }
+      },
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "b",
+          "scope": "medium",
+          "sudo": true
+        }
+      },
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "c",
+          "scope": "high",
+          "sudo": true
+        }
+      },
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "low-act",
+          "scope": "low",
+          "sudo": true
+        }
+      },
+      {
+        "kind": "rejected",
+        "detail": {
+          "action_id": "high-act",
+          "scope": "high",
+          "sudo": false
+        }
+      },
+      {
+        "kind": "confirmed",
+        "detail": {
+          "action_id": "within-ttl",
+          "scope": "medium",
+          "sudo": true
+        }
+      },
+      {
+        "kind": "rejected",
+        "detail": {
+          "action_id": "after-ttl",
+          "scope": "medium",
+          "sudo": false
+        }
+      }
+    ],
+    "handler_mode": "auto-approve",
+    "request_results": [
+      {
+        "scope": "medium",
+        "ttl": 5000,
+        "granted": true,
+        "expires_at": 1779735262775
+      }
+    ],
+    "has_snapshots": []
+  }
+}

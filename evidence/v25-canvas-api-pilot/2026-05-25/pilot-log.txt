@@ -1,36 +1,36 @@
-18:41:18.216 V25-01 Layer 3 Pilot driver
-18:41:18.216   base url    http://localhost:8855
-18:41:18.216   mode        dry-run
-18:41:18.216   evidence    C:\yujin-nac-spec\evidence\v25-canvas-api-pilot\2026-05-25
-18:41:18.643 
-18:41:18.644 ========== statement: add-and-highlight ==========
-18:41:18.644   text: Reset the counter, then add seven to it, then turn the highlight on. After that, tell me the current value and whether it is highlighted.
-18:41:18.815   plan steps: 6
-18:41:18.834   final state: {"value":7,"highlighted":true}
-18:41:18.834 PASS add-and-highlight value matches intent (7)
-18:41:18.834 PASS add-and-highlight highlighted matches intent (true)
-18:41:18.834 PASS add-and-highlight all plan steps executed (6 steps)
-18:41:18.928 
-18:41:18.928 ========== statement: compound-math ==========
-18:41:18.928   text: Make sure the counter is at zero. Add three. Add two more. Then add one. Verify the highlight is off, and report the final value.
-18:41:19.086   plan steps: 8
-18:41:19.105   final state: {"value":6,"highlighted":false}
-18:41:19.105 PASS compound-math value matches intent (6)
-18:41:19.105 PASS compound-math highlighted matches intent (false)
-18:41:19.105 PASS compound-math all plan steps executed (8 steps)
-18:41:19.177 
-18:41:19.177 ========== statement: silent-damage-check ==========
-18:41:19.178   text: Reset the counter, add four, then immediately ask the canvas itself (round-trip) what it thinks the value is, to confirm the host-side view matches the canvas-side view. Highlight stays as it is.
-18:41:19.331   plan steps: 4
-18:41:19.343   final state: {"value":4,"highlighted":false}
-18:41:19.343 PASS silent-damage-check value matches intent (4)
-18:41:19.343 PASS silent-damage-check all plan steps executed (4 steps)
-18:41:19.410 
-18:41:19.410 ========== statement: mistake-recovery ==========
-18:41:19.410   text: Reset the counter. Add one. Realize that was wrong, reset again. Now add ten and confirm the value.
-18:41:19.564   plan steps: 6
-18:41:19.578   final state: {"value":10,"highlighted":false}
-18:41:19.578 PASS mistake-recovery value matches intent (10)
-18:41:19.578 PASS mistake-recovery all plan steps executed (6 steps)
+18:44:42.218 V25-01 Layer 3 Pilot driver
+18:44:42.218   base url    http://localhost:8855
+18:44:42.218   mode        live
+18:44:42.218   evidence    C:\yujin-nac-spec\evidence\v25-canvas-api-pilot\2026-05-25
+18:44:42.656 
+18:44:42.656 ========== statement: add-and-highlight ==========
+18:44:42.656   text: Reset the counter, then add seven to it, then turn the highlight on. After that, tell me the current value and whether it is highlighted.
+18:44:45.434   plan steps: 6
+18:44:45.458   final state: {"value":7,"highlighted":true}
+18:44:45.458 PASS add-and-highlight value matches intent (7)
+18:44:45.458 PASS add-and-highlight highlighted matches intent (true)
+18:44:45.458 PASS add-and-highlight all plan steps executed (6 steps)
+18:44:45.558 
+18:44:45.558 ========== statement: compound-math ==========
+18:44:45.558   text: Make sure the counter is at zero. Add three. Add two more. Then add one. Verify the highlight is off, and report the final value.
+18:44:48.616   plan steps: 7
+18:44:48.632   final state: {"value":6,"highlighted":false}
+18:44:48.632 PASS compound-math value matches intent (6)
+18:44:48.632 PASS compound-math highlighted matches intent (false)
+18:44:48.632 PASS compound-math all plan steps executed (7 steps)
+18:44:48.706 
+18:44:48.706 ========== statement: silent-damage-check ==========
+18:44:48.706   text: Reset the counter, add four, then immediately ask the canvas itself (round-trip) what it thinks the value is, to confirm the host-side view matches the canvas-side view. Highlight stays as it is.
+18:44:50.741   plan steps: 4
+18:44:50.750   final state: {"value":4,"highlighted":false}
+18:44:50.750 PASS silent-damage-check value matches intent (4)
+18:44:50.750 PASS silent-damage-check all plan steps executed (4 steps)
+18:44:50.819 
+18:44:50.819 ========== statement: mistake-recovery ==========
+18:44:50.819   text: Reset the counter. Add one. Realize that was wrong, reset again. Now add ten and confirm the value.
+18:44:53.951   plan steps: 6
+18:44:53.965   final state: {"value":10,"highlighted":false}
+18:44:53.965 PASS mistake-recovery value matches intent (10)
+18:44:53.965 PASS mistake-recovery all plan steps executed (6 steps)
 
 FAILURES: 0

@@ -1,0 +1,38 @@
+19:00:42.588 V24-04 Layer 2 demo runner
+19:00:42.588   base url    http://localhost:8855
+19:00:42.588   evidence    C:\yujin-nac-spec\evidence\v24-04-snapshot-versioning\2026-05-25
+19:00:43.014 
+19:00:43.015 --- scenario 1: register + markHydrationComplete + snapshot ---
+19:00:43.424 PASS describe() exposes counter plugin
+19:00:43.424 PASS plugin_version present and v_-prefixed
+19:00:43.424 PASS tree_version present and v_-prefixed
+19:00:43.424 PASS element_state_hash present on counter.add
+19:00:43.493 
+19:00:43.493 --- scenario 2: click() with fresh expected_plugin_version ---
+19:00:43.854 PASS click with fresh expected_plugin_version OK
+19:00:43.922 
+19:00:43.922 --- scenario 3: click() with stale expected_plugin_version ---
+19:00:44.270 PASS click with stale expected_plugin_version REJECTED
+19:00:44.270 PASS error code === snapshot_stale
+19:00:44.334 
+19:00:44.334 --- scenario 4: STRICT=true + missing expected_* -> version_required ---
+19:00:44.697 PASS click without expected_* under STRICT rejects
+19:00:44.697 PASS error code === version_required
+19:00:44.754 
+19:00:44.754 --- scenario 5: STRICT=false + missing expected_* -> OK ---
+19:00:45.104 PASS click without expected_* under STRICT=false OK
+19:00:45.171 
+19:00:45.171 --- scenario 6: tree_version OCC ---
+19:00:45.521 PASS click with fresh expected_tree_version OK
+19:00:45.863 PASS click with stale expected_tree_version REJECTED
+19:00:45.923 
+19:00:45.923 --- scenario 7: element_state_hash OCC ---
+19:00:46.269 PASS click with fresh expected_element_state_hash OK
+19:00:46.798 PASS mutated then click with old hash REJECTED snapshot_stale
+19:00:46.855 
+19:00:46.855 --- scenario 8: versionHistory + conformance_tier ---
+19:00:47.243 PASS versionHistory() returned entries
+19:00:47.243 PASS every history entry has tree_version + trigger
+19:00:47.243 PASS conformance_tier exposed
+
+FAILURES: 0

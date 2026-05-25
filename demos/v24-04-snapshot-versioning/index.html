@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V24-04 snapshot versioning + OCC -- NAC3 v2.5 demo</title>
+<style>
+:root{--cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;--ct:#2C2927;--ct2:#615E58;--ct3:#888480;--ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;--cred:#a14545;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;}
+header{max-width:1100px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:78ch;}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.plugin-root{background:#fafaf7;border:.5px solid var(--cm);padding:10px;border-radius:6px;margin-bottom:8px;}
+.plugin-root .meta{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ct3);}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.72rem;padding:10px;border-radius:6px;height:560px;overflow-y:auto;line-height:1.5;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry.warn{color:#e6b85c;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.kv{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ct);background:var(--cm);padding:3px 6px;border-radius:3px;margin-right:4px;margin-bottom:4px;display:inline-block;}
+code{font-family:ui-monospace,monospace;background:var(--cm);padding:1px 5px;border-radius:3px;font-size:.84em;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">NAC3 v2.5 -- RFC V24-04 demo</div>
+  <h1>Snapshot versioning + optimistic concurrency control</h1>
+  <p class="lede">
+    Three primitives in cheap-to-expensive order:
+    <code>plugin_version</code> (per-plugin monotonic),
+    <code>tree_version</code> (global monotonic, escape hatch), and
+    <code>element_state_hash</code> (128-bit SHA-256 truncated content
+    hash). Every mutating verb honours
+    <code>expected_plugin_version</code> /
+    <code>expected_tree_version</code> /
+    <code>expected_element_state_hash</code> and rejects with
+    <code>NacError('snapshot_stale', ...)</code> when the snapshot the
+    agent planned against has been invalidated.
+    <code>STRICT_VERSIONING</code> defaults <code>true</code> in 2.5
+    alpha.4.
+  </p>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <h2>actions</h2>
+
+    <div class="plugin-root" data-nac-plugin="counter" data-nac-plugin-id="counter-main">
+      <div class="meta">data-nac-plugin="counter" data-nac-plugin-id="counter-main"</div>
+      <input data-nac-id="counter.input" data-nac-role="input" value="">
+      <button data-nac-id="counter.add" data-nac-role="button" data-nac-action="add">add</button>
+      <button data-nac-id="counter.reset" data-nac-role="button" data-nac-action="reset">reset</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="register-counter">register('counter')</button>
+      <button data-action="snapshot-describe">describe() snapshot</button>
+      <button data-action="markhydration">markHydrationComplete()</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="invoke-fresh">invoke with fresh expected_plugin_version (should OK)</button>
+      <button data-action="invoke-stale">invoke with STALE expected_plugin_version (should snapshot_stale)</button>
+      <button data-action="invoke-no-expected-strict">invoke without expected_* under STRICT (should version_required)</button>
+      <button data-action="invoke-no-expected-relaxed">disable STRICT + invoke without expected_* (allowed)</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="invoke-fresh-tree">invoke with fresh expected_tree_version (OK)</button>
+      <button data-action="invoke-stale-tree">invoke with STALE expected_tree_version (snapshot_stale)</button>
+      <button data-action="invoke-fresh-hash">invoke with fresh expected_element_state_hash (OK)</button>
+      <button data-action="mutate-then-invoke-fresh-hash">mutate input then invoke with OLD hash (snapshot_stale)</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="version-history">versionHistory() -- last 10 bumps</button>
+      <button data-action="conformance-tier">conformance_tier</button>
+      <button data-action="reset-strict">re-enable STRICT_VERSIONING</button>
+    </div>
+
+    <div style="margin-top:14px;" id="kv-row">
+      <span class="kv">tree_version: <span id="kv-tv">--</span></span>
+      <span class="kv">counter plugin_version: <span id="kv-pv">--</span></span>
+      <span class="kv">counter.input hash: <span id="kv-hash">--</span></span>
+      <span class="kv">STRICT: <span id="kv-strict">--</span></span>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.74rem;color:var(--ct3);">
+      <span>events + invoke results + provenance</span>
+      <button id="btn-clear-log" style="font-size:.7rem;padding:3px 8px;">clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script src="../../runtime/dist/nac.browser.js"></script>
+<script>
+(function(){
+  const NAC = window.NAC;
+  if (!NAC || typeof NAC.invoke !== 'function') {
+    document.getElementById('log').innerHTML =
+      '<div class="entry err">FATAL: NAC v2.5 not loaded (invoke missing).</div>';
+    return;
+  }
+
+  window.__v24_04Demo = {
+    invokes:       [],   /* {label, expected, ok, code, message} */
+    snapshots:     [],   /* describe() snapshots */
+    history:       null, /* versionHistory result */
+    strict_state:  NAC.STRICT_VERSIONING,
+    conformance:   NAC.conformance_tier,
+  };
+
+  /* Drive verbs via NAC.click(nac_id, opts) -- the OCC gate runs
+     synchronously before the actual side effect, so stale versions
+     reject with snapshot_stale before any click handler fires. */
+
+  /* The 'add' button needs a real click handler that emits the
+     nac:action:succeeded lifecycle event NAC.click waits for. */
+  document.querySelectorAll('[data-nac-id="counter.add"], [data-nac-id="counter.reset"]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail: { nac_id: btn.getAttribute('data-nac-id'), source: 'demo' },
+        bubbles: true,
+      }));
+    });
+  });
+
+  function logEntry(klass, html) {
+    const e = document.createElement('div');
+    e.className = 'entry ' + klass;
+    e.innerHTML = '<span class="ts">' + new Date().toISOString().slice(11,19) + '</span>' + html;
+    const log = document.getElementById('log');
+    log.insertBefore(e, log.firstChild);
+  }
+
+  function snap() {
+    const d = NAC.describe();
+    const counterPlugin = d.plugins.find(function(p){ return p.plugin === 'counter'; });
+    const inputEl = counterPlugin && counterPlugin.elements.find(function(e){ return e.nac_id === 'counter.input'; });
+    window.__v24_04Demo.snapshots.push(d);
+    document.getElementById('kv-tv').textContent      = d.tree_version;
+    document.getElementById('kv-pv').textContent      = counterPlugin && counterPlugin.plugin_version;
+    document.getElementById('kv-hash').textContent    = inputEl ? String(inputEl.element_state_hash || '').slice(0, 20) + '...' : '--';
+    document.getElementById('kv-strict').textContent  = String(NAC.STRICT_VERSIONING);
+    return d;
+  }
+
+  async function clickWith(label, nac_id, opts) {
+    const t0 = Date.now();
+    try {
+      const r = await NAC.click(nac_id, opts);
+      window.__v24_04Demo.invokes.push({ label: label, nac_id: nac_id, opts: opts, ok: true, result: r, ms: Date.now() - t0 });
+      logEntry('ok', '<b>click[' + label + ']</b> ' + nac_id + ' -> OK ' + (Date.now() - t0) + 'ms');
+    } catch (e) {
+      window.__v24_04Demo.invokes.push({ label: label, nac_id: nac_id, opts: opts, ok: false, code: e.code, message: e.message });
+      logEntry('err', '<b>click[' + label + ']</b> ' + nac_id + ' -> ERR code=' + e.code + ' msg=' + JSON.stringify(e.message).slice(0, 120));
+    }
+  }
+
+  const actions = {
+    'register-counter': () => {
+      try {
+        NAC.register({
+          plugin_slug: 'counter',
+          verbs: {
+            'counter.add':   { role: 'button', action: 'add' },
+            'counter.reset': { role: 'button', action: 'reset' },
+            'counter.input': { role: 'input' },
+          },
+        });
+        logEntry('ok', "register('counter') OK");
+      } catch (e) { logEntry('err', 'register threw: ' + e.message); }
+      snap();
+    },
+    'snapshot-describe': () => {
+      const d = snap();
+      logEntry('ok', 'describe() snapshot: tree_version=' + d.tree_version + ' plugins=' + d.plugins.length);
+    },
+    'markhydration': () => {
+      NAC.markHydrationComplete();
+      logEntry('ok', 'markHydrationComplete() called');
+      snap();
+    },
+    'invoke-fresh': async () => {
+      const d = snap();
+      const cp = d.plugins.find(p => p.plugin === 'counter');
+      await clickWith('fresh-pv', 'counter.add', { expected_plugin_version: cp && cp.plugin_version });
+      snap();
+    },
+    'invoke-stale': async () => {
+      snap();
+      /* Any expected_plugin_version != current is stale.
+         v_999999 is reliably ahead of any real bumped value. */
+      await clickWith('stale-pv', 'counter.add', { expected_plugin_version: 'v_999999' });
+      snap();
+    },
+    'invoke-no-expected-strict': async () => {
+      NAC.STRICT_VERSIONING = true;
+      window.__v24_04Demo.strict_state = NAC.STRICT_VERSIONING;
+      snap();
+      await clickWith('no-exp-strict', 'counter.add', {});
+      snap();
+    },
+    'invoke-no-expected-relaxed': async () => {
+      NAC.STRICT_VERSIONING = false;
+      window.__v24_04Demo.strict_state = NAC.STRICT_VERSIONING;
+      snap();
+      await clickWith('no-exp-relaxed', 'counter.add', {});
+      snap();
+    },
+    'invoke-fresh-tree': async () => {
+      const d = snap();
+      await clickWith('fresh-tv', 'counter.add', { expected_tree_version: d.tree_version });
+      snap();
+    },
+    'invoke-stale-tree': async () => {
+      await clickWith('stale-tv', 'counter.add', { expected_tree_version: 'v_0' });
+      snap();
+    },
+    'invoke-fresh-hash': async () => {
+      const d = snap();
+      const cp = d.plugins.find(p => p.plugin === 'counter');
+      const el = cp && cp.elements.find(e => e.nac_id === 'counter.add');
+      const hash = el && el.element_state_hash;
+      await clickWith('fresh-hash', 'counter.add', { expected_element_state_hash: hash });
+      snap();
+    },
+    'mutate-then-invoke-fresh-hash': async () => {
+      const before = snap();
+      const cpB = before.plugins.find(p => p.plugin === 'counter');
+      const elB = cpB && cpB.elements.find(e => e.nac_id === 'counter.add');
+      const oldHash = elB && elB.element_state_hash;
+      /* Mutate an attribute that influences the hash. Changing
+         data-nac-action triggers the structural MutationObserver
+         which calls _bumpPluginVersion and bumps tree_version too. */
+      const buttonEl = document.querySelector('[data-nac-id="counter.add"]');
+      buttonEl.setAttribute('data-nac-state', 'mutated-' + Date.now());
+      buttonEl.textContent = 'add!';
+      /* Poll describe() until the hash actually flips. */
+      const deadline = Date.now() + 1500;
+      let newHash = oldHash;
+      while (Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 80));
+        const d2 = NAC.describe();
+        const cp2 = d2.plugins.find(p => p.plugin === 'counter');
+        const el2 = cp2 && cp2.elements.find(e => e.nac_id === 'counter.add');
+        newHash = el2 && el2.element_state_hash;
+        if (newHash !== oldHash) break;
+      }
+      logEntry('warn', 'mutate: oldHash=' + String(oldHash).slice(0, 12) + '... newHash=' + String(newHash).slice(0, 12) + '... changed=' + (newHash !== oldHash));
+      snap();
+      /* Use the OLD hash -- now stale -- to trigger snapshot_stale. */
+      await clickWith('stale-hash', 'counter.add', { expected_element_state_hash: oldHash });
+      snap();
+    },
+    'version-history': () => {
+      const h = NAC.versionHistory(10);
+      window.__v24_04Demo.history = h;
+      logEntry('ok', 'versionHistory(10) -> ' + (h && h.length) + ' entries');
+      (h || []).forEach(function(e, i){
+        if (i < 5) logEntry('ok', '  ' + e.tree_version + ' trigger=' + e.trigger + ' plugins=' + JSON.stringify(e.affected_plugins));
+      });
+    },
+    'conformance-tier': () => {
+      logEntry('ok', 'conformance_tier = "' + NAC.conformance_tier + '"');
+    },
+    'reset-strict': () => {
+      NAC.STRICT_VERSIONING = true;
+      window.__v24_04Demo.strict_state = NAC.STRICT_VERSIONING;
+      snap();
+      logEntry('ok', 'STRICT_VERSIONING = true');
+    },
+  };
+
+  document.body.addEventListener('click', function(ev){
+    const t = ev.target;
+    if (t.tagName !== 'BUTTON' || !t.dataset.action) return;
+    const fn = actions[t.dataset.action];
+    if (fn) Promise.resolve().then(fn).catch(function(e){ logEntry('err', 'action threw: ' + e.message); });
+  });
+  document.getElementById('btn-clear-log').addEventListener('click', function(){
+    document.getElementById('log').innerHTML = '';
+  });
+
+  /* boot snapshot */
+  snap();
+})();
+</script>
+</body>
+</html>

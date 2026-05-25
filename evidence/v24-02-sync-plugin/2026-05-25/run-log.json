@@ -1,0 +1,77 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v24-02-sync-plugin/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "registry_snapshots": [
+      {
+        "label": "after-register-v1",
+        "slug": "cart",
+        "verb_count": 1,
+        "plugin_version": "v_0"
+      },
+      {
+        "label": "after-register-v2",
+        "slug": "cart",
+        "verb_count": 2,
+        "plugin_version": "v_0"
+      },
+      {
+        "label": "snapshot-after-registers",
+        "slug": "cart",
+        "verb_count": 2,
+        "plugin_version": "v_0"
+      },
+      {
+        "label": "after-sync-v3",
+        "slug": "cart",
+        "verb_count": 2,
+        "plugin_version": "v_1"
+      },
+      {
+        "label": "after-sync-v3-again",
+        "slug": "cart",
+        "verb_count": 2,
+        "plugin_version": "v_2"
+      },
+      {
+        "label": "after-sync-v4",
+        "slug": "cart",
+        "verb_count": 3,
+        "plugin_version": "v_3"
+      }
+    ],
+    "sync_results": [
+      {
+        "label": "v3",
+        "replaced": true,
+        "version": "v_1"
+      },
+      {
+        "label": "v3-again",
+        "replaced": true,
+        "version": "v_2",
+        "pv_before": "v_1"
+      },
+      {
+        "label": "v4",
+        "replaced": true,
+        "version": "v_3"
+      }
+    ],
+    "invalidated_count": 1,
+    "invalidated_events": [
+      {
+        "detail": {
+          "plugin_slug": "cart",
+          "plugin_instance_id": null,
+          "from_version": "v_2",
+          "to_version": "v_3",
+          "trigger": "syncPlugin"
+        }
+      }
+    ],
+    "last_pv": "v_3"
+  }
+}

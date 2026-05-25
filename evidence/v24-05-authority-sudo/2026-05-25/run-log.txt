@@ -1,0 +1,34 @@
+18:54:13.488 V24-05 Layer 2 demo runner
+18:54:13.488   base url    http://localhost:8855
+18:54:13.488   evidence    C:\yujin-nac-spec\evidence\v24-05-authority-sudo\2026-05-25
+18:54:13.902 
+18:54:13.902 --- scenario 1: confirm_action without handler installed ---
+18:54:13.911 PASS confirm_action with no handler rejects with no_confirm_handler
+18:54:13.967 
+18:54:13.967 --- scenario 2: auto-approve handler ---
+18:54:14.295 PASS confirm_action(low) approved via auto-approve handler
+18:54:14.296 PASS nac:action:confirmed fired (sudo=false)
+18:54:14.334 
+18:54:14.334 --- scenario 3: auto-reject handler ---
+18:54:14.659 PASS confirm_action(medium) rejected via auto-reject handler
+18:54:14.659 PASS nac:action:rejected fired
+18:54:14.690 
+18:54:14.690 --- scenario 4: sudo bypass (high grant satisfies low+medium+high) ---
+18:54:15.055 PASS sudo-bypass: all 3 confirms approved
+18:54:15.055 PASS sudo-bypass: every emitted confirmed event has sudo=true
+18:54:15.092 
+18:54:15.092 --- scenario 5: rank rule (low grant does NOT satisfy high check) ---
+18:54:15.456 PASS rank-rule: low-act approved (sudo bypass via low grant)
+18:54:15.456 PASS rank-rule: high-act REJECTED (low grant does not satisfy high)
+18:54:15.493 
+18:54:15.493 --- scenario 6: TTL expiry ---
+18:54:17.551 PASS ttl-expiry: within-ttl confirm approved (sudo bypass)
+18:54:17.551 PASS ttl-expiry: after-ttl confirm rejected (handler said no)
+18:54:17.551 PASS ttl-expiry: nac:authority:expired fired
+18:54:17.591 
+18:54:17.591 --- scenario 7: revoke_authority idempotency ---
+18:54:17.972 PASS after grant medium 5s, has(medium) === true
+18:54:17.972 PASS after grant medium, has(low) === true (rank rule)
+18:54:18.245 PASS after revoke, has(medium) === false
+
+FAILURES: 0

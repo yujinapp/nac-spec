@@ -1,0 +1,89 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v24-01-plugin-id-dedup/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "register_results": [
+      {
+        "phase": "happy-path",
+        "ok": true
+      },
+      {
+        "phase": "after-violation",
+        "ok": false,
+        "code": "duplicate_plugin_no_instance_id",
+        "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+      },
+      {
+        "phase": "boot-revalidate-strict (register surface of same gate)",
+        "ok": false,
+        "code": "duplicate_plugin_no_instance_id",
+        "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+      },
+      {
+        "phase": "boot-revalidate-migration (register surface of same gate)",
+        "ok": true
+      }
+    ],
+    "validate_results": [
+      {
+        "phase": "happy-path",
+        "violations": [],
+        "dupes_count": 0
+      },
+      {
+        "phase": "after-violation",
+        "violations": [
+          {
+            "code": "duplicate_plugin_no_instance_id",
+            "severity": "error",
+            "slug": "cart",
+            "instance_count": 4,
+            "missing_instance_id_count": 2,
+            "duplicate_instance_ids": [],
+            "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+          }
+        ],
+        "dupes_count": 1
+      },
+      {
+        "phase": "boot-revalidate-strict",
+        "violations": [
+          {
+            "code": "duplicate_plugin_no_instance_id",
+            "severity": "error",
+            "slug": "cart",
+            "instance_count": 4,
+            "missing_instance_id_count": 2,
+            "duplicate_instance_ids": [],
+            "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+          }
+        ],
+        "dupes_count": 1
+      },
+      {
+        "phase": "boot-revalidate-migration",
+        "violations": [
+          {
+            "code": "duplicate_plugin_no_instance_id",
+            "severity": "error",
+            "slug": "cart",
+            "instance_count": 4,
+            "missing_instance_id_count": 2,
+            "duplicate_instance_ids": [],
+            "message": "4 DOM roots carry data-nac-plugin=\"cart\" but 2 lack data-nac-plugin-id. Per SPEC sec 7.4, every root sharing a slug MUST carry a unique data-nac-plugin-id."
+          }
+        ],
+        "dupes_count": 1
+      },
+      {
+        "phase": "happy-path",
+        "violations": [],
+        "dupes_count": 0
+      }
+    ],
+    "fatal_events": [],
+    "HARD_DEDUP_state": true
+  }
+}

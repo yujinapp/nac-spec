@@ -1,0 +1,1494 @@
+{
+  "base_url": "http://localhost:8855",
+  "demo_url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+  "run_date": "2026-05-25",
+  "failures": 0,
+  "final_state": {
+    "invokes": [
+      {
+        "label": "fresh-pv",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_plugin_version": "v_0"
+        },
+        "ok": true,
+        "result": {
+          "ok": true,
+          "event": {
+            "event": "nac:action:succeeded",
+            "detail": {
+              "nac_id": "counter.add",
+              "source": "demo"
+            }
+          }
+        },
+        "ms": 2
+      },
+      {
+        "label": "stale-pv",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_plugin_version": "v_999999"
+        },
+        "ok": false,
+        "code": "snapshot_stale",
+        "message": "expected_plugin_version=v_999999 current_plugin_version=v_0"
+      },
+      {
+        "label": "no-exp-strict",
+        "nac_id": "counter.add",
+        "opts": {},
+        "ok": false,
+        "code": "version_required",
+        "message": "STRICT_VERSIONING is on; at least one expected_* required."
+      },
+      {
+        "label": "no-exp-relaxed",
+        "nac_id": "counter.add",
+        "opts": {},
+        "ok": true,
+        "result": {
+          "ok": true,
+          "event": {
+            "event": "nac:action:succeeded",
+            "detail": {
+              "nac_id": "counter.add",
+              "source": "demo"
+            }
+          }
+        },
+        "ms": 1
+      },
+      {
+        "label": "fresh-tv",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_tree_version": "v_1"
+        },
+        "ok": true,
+        "result": {
+          "ok": true,
+          "event": {
+            "event": "nac:action:succeeded",
+            "detail": {
+              "nac_id": "counter.add",
+              "source": "demo"
+            }
+          }
+        },
+        "ms": 0
+      },
+      {
+        "label": "stale-tv",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_tree_version": "v_0"
+        },
+        "ok": false,
+        "code": "snapshot_stale",
+        "message": "expected_tree_version=v_0 current_tree_version=v_1"
+      },
+      {
+        "label": "fresh-hash",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+        },
+        "ok": true,
+        "result": {
+          "ok": true,
+          "event": {
+            "event": "nac:action:succeeded",
+            "detail": {
+              "nac_id": "counter.add",
+              "source": "demo"
+            }
+          }
+        },
+        "ms": 1
+      },
+      {
+        "label": "stale-hash",
+        "nac_id": "counter.add",
+        "opts": {
+          "expected_element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+        },
+        "ok": false,
+        "code": "snapshot_stale",
+        "message": "expected_element_state_hash=0674ec223cdcdd7a27d8f380f07ffb8a current_element_state_hash=2d50be384504bbf59406ba66fb720f7f"
+      }
+    ],
+    "snapshots": [
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735642774,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_0"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643068,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_0"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643261,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643527,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643535,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643960,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735643963,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735644377,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735644378,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735644793,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735644794,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735645211,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735645212,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735645543,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735645961,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735645962,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735646291,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735646387,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "mutated-1779735646291",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add!",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "2d50be384504bbf59406ba66fb720f7f"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735646388,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "mutated-1779735646291",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add!",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "2d50be384504bbf59406ba66fb720f7f"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      },
+      {
+        "nac_version": "1.0",
+        "timestamp": 1779735647259,
+        "url": "http://localhost:8855/demos/v24-04-snapshot-versioning/index.html",
+        "active": "counter",
+        "plugins": [
+          {
+            "plugin": "counter",
+            "plugin_instance_id": "counter-main",
+            "plugin_state": "idle",
+            "plugin_version": "v_0",
+            "elements": [
+              {
+                "nac_id": "counter.input",
+                "plugin": "counter",
+                "role": "input",
+                "state": "idle",
+                "field_type": null,
+                "action": null,
+                "error": null,
+                "label": null,
+                "value": "",
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              },
+              {
+                "nac_id": "counter.add",
+                "plugin": "counter",
+                "role": "button",
+                "state": "mutated-1779735646291",
+                "field_type": null,
+                "action": "add",
+                "error": null,
+                "label": "add!",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "2d50be384504bbf59406ba66fb720f7f"
+              },
+              {
+                "nac_id": "counter.reset",
+                "plugin": "counter",
+                "role": "button",
+                "state": "idle",
+                "field_type": null,
+                "action": "reset",
+                "error": null,
+                "label": "reset",
+                "value": null,
+                "visible": true,
+                "disabled": false,
+                "a11y_hint": null,
+                "braille_label": null,
+                "undoable": false,
+                "element_state_hash": "0674ec223cdcdd7a27d8f380f07ffb8a"
+              }
+            ]
+          }
+        ],
+        "tree_version": "v_1"
+      }
+    ],
+    "history": [
+      {
+        "at": 1779735643260,
+        "tree_version": "v_1",
+        "trigger": "hydration_complete",
+        "affected_plugins": []
+      }
+    ],
+    "strict_state": true,
+    "conformance": "NAC-3-versioned"
+  }
+}

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>V24-05 authority + sudo elevation -- NAC3 v2.5 demo</title>
+<style>
+:root{--cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;--ct:#2C2927;--ct2:#615E58;--ct3:#888480;--ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;--cred:#a14545;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;}
+header{max-width:1100px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:78ch;}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1100px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.72rem;padding:10px;border-radius:6px;height:520px;overflow-y:auto;line-height:1.5;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry.warn{color:#e6b85c;}
+.log .entry.action{color:#7ea3d6;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.kv{font-family:ui-monospace,monospace;font-size:.74rem;color:var(--ct);background:var(--cm);padding:3px 6px;border-radius:3px;margin-right:4px;display:inline-block;}
+code{font-family:ui-monospace,monospace;background:var(--cm);padding:1px 5px;border-radius:3px;font-size:.84em;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100;}
+.modal.open{display:flex;}
+.modal-box{background:white;border-radius:8px;padding:22px;max-width:380px;border-top:4px solid var(--ca);}
+.modal-box h3{font-size:1rem;font-weight:500;margin-bottom:8px;}
+.modal-box .msg{font-size:.88rem;color:var(--ct2);margin-bottom:12px;line-height:1.5;}
+.modal-box .meta{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ct3);margin-bottom:14px;}
+.modal-buttons{display:flex;gap:8px;justify-content:flex-end;}
+.modal-buttons button{padding:8px 14px;}
+.modal-buttons button.approve{background:var(--ctl);color:white;border-color:var(--ctl);}
+.modal-buttons button.reject{background:var(--cred);color:white;border-color:var(--cred);}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">NAC3 v2.5 -- RFC V24-05 demo</div>
+  <h1>Agent authority + sudo elevation</h1>
+  <p class="lede">
+    Hosts can interpose a confirm UI between an agent dispatch and the
+    side effect via <code>set_confirm_handler</code>. Agents request
+    bounded SUDO via <code>request_authority(scope, ttl_ms)</code>;
+    every subsequent <code>confirm_action</code> in that scope (or
+    lower) resolves without re-prompting until the TTL expires. Higher
+    scope grants satisfy lower-scope checks (high &gt; medium &gt; low).
+  </p>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <h2>actions</h2>
+
+    <div class="btn-row">
+      <button data-action="install-handler">install confirm_handler (auto-approve via modal)</button>
+      <button data-action="install-auto-reject">install handler that auto-rejects all</button>
+      <button data-action="install-auto-approve">install handler that auto-approves all (no UI)</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="confirm-low">confirm_action('edit-text', scope=low)</button>
+      <button data-action="confirm-medium">confirm_action('change-amount', scope=medium)</button>
+      <button data-action="confirm-high">confirm_action('delete-user', scope=high)</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="request-medium-5s">request_authority('medium', 5000ms)</button>
+      <button data-action="request-high-2s">request_authority('high', 2000ms)</button>
+      <button data-action="check-has-authority">check has_authority for each scope</button>
+      <button data-action="revoke-medium">revoke_authority('medium')</button>
+    </div>
+
+    <div class="btn-row">
+      <button data-action="scenario-sudo-bypass">scenario: grant high, then 3 confirms (sudo bypass)</button>
+      <button data-action="scenario-rank-rule">scenario: low grant does NOT satisfy high check</button>
+      <button data-action="scenario-ttl-expiry">scenario: grant 1s, wait 1.2s, retry (should re-prompt)</button>
+    </div>
+
+    <div style="margin-top:14px;">
+      <span class="kv">has(low):    <span id="kv-low">--</span></span>
+      <span class="kv">has(medium): <span id="kv-med">--</span></span>
+      <span class="kv">has(high):   <span id="kv-high">--</span></span>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.74rem;color:var(--ct3);">
+      <span>events: nac:authority:* + nac:action:*</span>
+      <button id="btn-clear-log" style="font-size:.7rem;padding:3px 8px;">clear</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm action</h3>
+    <div class="msg" id="modal-message">--</div>
+    <div class="meta" id="modal-meta">--</div>
+    <div class="modal-buttons">
+      <button class="reject" data-modal="reject">Reject</button>
+      <button class="approve" data-modal="approve">Approve</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../runtime/dist/nac.browser.js"></script>
+<script>
+(function(){
+  const NAC = window.NAC;
+  if (!NAC || typeof NAC.set_confirm_handler !== 'function') {
+    document.getElementById('log').innerHTML =
+      '<div class="entry err">FATAL: NAC v2.5 (V24-05 authority) not loaded.</div>';
+    return;
+  }
+
+  window.__v24_05Demo = {
+    confirm_decisions: [], /* { action_id, scope, sudo, approved } */
+    authority_events:  [], /* nac:authority:* details */
+    action_events:     [], /* nac:action:* details */
+    handler_mode:      'manual', /* manual | auto-reject | auto-approve */
+    request_results:   [], /* { scope, ttl, granted, expires_at } */
+    has_snapshots:     [], /* { low, medium, high } */
+  };
+
+  function logEntry(klass, html) {
+    const e = document.createElement('div');
+    e.className = 'entry ' + klass;
+    e.innerHTML = '<span class="ts">' + new Date().toISOString().slice(11,19) + '</span>' + html;
+    const log = document.getElementById('log');
+    log.insertBefore(e, log.firstChild);
+  }
+
+  /* Mirror NAC events into the log + state. */
+  ['requested','granted','denied','revoked','expired'].forEach(function(k){
+    document.addEventListener('nac:authority:' + k, function(ev){
+      window.__v24_05Demo.authority_events.push({ kind: k, detail: ev.detail });
+      logEntry(k === 'granted' ? 'action' : (k === 'denied' || k === 'revoked' || k === 'expired') ? 'warn' : 'ok',
+        '<b>nac:authority:' + k + '</b> ' + JSON.stringify(ev.detail).slice(0, 160));
+    });
+  });
+  ['confirmed','rejected'].forEach(function(k){
+    document.addEventListener('nac:action:' + k, function(ev){
+      window.__v24_05Demo.action_events.push({ kind: k, detail: ev.detail });
+      logEntry(k === 'confirmed' ? 'ok' : 'err',
+        '<b>nac:action:' + k + '</b> ' + JSON.stringify(ev.detail).slice(0, 160));
+    });
+  });
+
+  /* Modal-driven handler: render the request, wait for click. */
+  function manualHandler(req) {
+    return new Promise(function(resolve){
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').textContent =
+        req.kind === 'request_authority' ? ('Grant ' + req.scope + ' authority for ' + req.ttl_ms + 'ms?') : ('Confirm action: ' + req.action_id);
+      document.getElementById('modal-message').textContent =
+        req.message || (req.kind === 'request_authority' ? 'Agent requests bounded sudo.' : '(no message)');
+      document.getElementById('modal-meta').textContent = JSON.stringify({
+        kind: req.kind, scope: req.scope, ttl_ms: req.ttl_ms, action_id: req.action_id,
+      }).slice(0, 160);
+      modal.classList.add('open');
+      function pick(choice){
+        modal.classList.remove('open');
+        modal.removeEventListener('click', onClick);
+        resolve(choice === 'approve');
+      }
+      function onClick(ev){
+        const t = ev.target.closest('[data-modal]');
+        if (t) pick(t.dataset.modal);
+      }
+      modal.addEventListener('click', onClick);
+    });
+  }
+
+  function updateHasUI() {
+    document.getElementById('kv-low').textContent    = NAC.has_authority('low');
+    document.getElementById('kv-med').textContent    = NAC.has_authority('medium');
+    document.getElementById('kv-high').textContent   = NAC.has_authority('high');
+  }
+
+  const actions = {
+    'install-handler': () => {
+      NAC.set_confirm_handler(manualHandler);
+      window.__v24_05Demo.handler_mode = 'manual';
+      logEntry('ok', 'set_confirm_handler installed (modal-backed manual mode)');
+    },
+    'install-auto-reject': () => {
+      NAC.set_confirm_handler(function(){ return Promise.resolve(false); });
+      window.__v24_05Demo.handler_mode = 'auto-reject';
+      logEntry('ok', 'set_confirm_handler installed (auto-reject)');
+    },
+    'install-auto-approve': () => {
+      NAC.set_confirm_handler(function(){ return Promise.resolve(true); });
+      window.__v24_05Demo.handler_mode = 'auto-approve';
+      logEntry('ok', 'set_confirm_handler installed (auto-approve, no UI)');
+    },
+
+    'confirm-low':    async () => {
+      const ok = await NAC.confirm_action('edit-text', 'Edit text in the document?', { scope: 'low' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'edit-text', scope: 'low', approved: ok });
+      logEntry('action', 'confirm_action(edit-text, low) -> ' + ok);
+      updateHasUI();
+    },
+    'confirm-medium': async () => {
+      const ok = await NAC.confirm_action('change-amount', 'Change amount on invoice?', { scope: 'medium' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'change-amount', scope: 'medium', approved: ok });
+      logEntry('action', 'confirm_action(change-amount, medium) -> ' + ok);
+      updateHasUI();
+    },
+    'confirm-high':   async () => {
+      const ok = await NAC.confirm_action('delete-user', 'Delete user permanently?', { scope: 'high' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'delete-user', scope: 'high', approved: ok });
+      logEntry('action', 'confirm_action(delete-user, high) -> ' + ok);
+      updateHasUI();
+    },
+
+    'request-medium-5s': async () => {
+      const r = await NAC.request_authority('medium', 5000);
+      window.__v24_05Demo.request_results.push({ scope: 'medium', ttl: 5000, granted: r.granted, expires_at: r.expires_at });
+      logEntry('action', 'request_authority(medium, 5000ms) -> ' + JSON.stringify(r));
+      updateHasUI();
+    },
+    'request-high-2s': async () => {
+      const r = await NAC.request_authority('high', 2000);
+      window.__v24_05Demo.request_results.push({ scope: 'high', ttl: 2000, granted: r.granted, expires_at: r.expires_at });
+      logEntry('action', 'request_authority(high, 2000ms) -> ' + JSON.stringify(r));
+      updateHasUI();
+    },
+    'check-has-authority': () => {
+      const snap = {
+        low:    NAC.has_authority('low'),
+        medium: NAC.has_authority('medium'),
+        high:   NAC.has_authority('high'),
+      };
+      window.__v24_05Demo.has_snapshots.push(snap);
+      logEntry('action', 'has_authority snapshot: ' + JSON.stringify(snap));
+      updateHasUI();
+    },
+    'revoke-medium': () => {
+      NAC.revoke_authority('medium');
+      logEntry('action', 'revoke_authority(medium) called');
+      updateHasUI();
+    },
+
+    'scenario-sudo-bypass': async () => {
+      /* requires auto-approve handler */
+      NAC.set_confirm_handler(function(){ return Promise.resolve(true); });
+      const r = await NAC.request_authority('high', 5000);
+      logEntry('action', 'scenario-sudo: granted high=' + r.granted);
+      /* Now 3 confirms across scopes -- all should bypass (sudo=true). */
+      const decisions = [];
+      decisions.push({ id: 'a', scope: 'low',    ok: await NAC.confirm_action('a', 'A', { scope: 'low' }) });
+      decisions.push({ id: 'b', scope: 'medium', ok: await NAC.confirm_action('b', 'B', { scope: 'medium' }) });
+      decisions.push({ id: 'c', scope: 'high',   ok: await NAC.confirm_action('c', 'C', { scope: 'high' }) });
+      window.__v24_05Demo.confirm_decisions.push.apply(window.__v24_05Demo.confirm_decisions, decisions);
+      logEntry('action', 'scenario-sudo: ' + JSON.stringify(decisions));
+      updateHasUI();
+    },
+    'scenario-rank-rule': async () => {
+      NAC.revoke_authority('low');
+      NAC.revoke_authority('medium');
+      NAC.revoke_authority('high');
+      /* Handler approves request_authority (so the grant is real) but
+         REJECTS plain confirm_action -- this lets us see the sudo
+         bypass at low scope and the handler rejection at high scope. */
+      NAC.set_confirm_handler(function(req){
+        return Promise.resolve(req.kind === 'request_authority');
+      });
+      const r = await NAC.request_authority('low', 5000);
+      logEntry('action', 'scenario-rank: granted low=' + r.granted);
+      const lowOk  = await NAC.confirm_action('low-act',  'L', { scope: 'low' });
+      const highOk = await NAC.confirm_action('high-act', 'H', { scope: 'high' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'low-act',  scope: 'low',  approved: lowOk });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'high-act', scope: 'high', approved: highOk });
+      logEntry('action', 'scenario-rank: low_act=' + lowOk + ' high_act=' + highOk + ' (high should be false)');
+      updateHasUI();
+    },
+    'scenario-ttl-expiry': async () => {
+      NAC.revoke_authority('low');
+      NAC.revoke_authority('medium');
+      NAC.revoke_authority('high');
+      /* Use auto-approve handler so the GRANT goes through. */
+      NAC.set_confirm_handler(function(req){ return Promise.resolve(req.kind === 'request_authority'); });
+      const r = await NAC.request_authority('medium', 1000);
+      logEntry('action', 'scenario-ttl: granted medium for 1000ms, expires_at=' + r.expires_at);
+      const inWindow = await NAC.confirm_action('within-ttl', 'inside', { scope: 'medium' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'within-ttl', scope: 'medium', approved: inWindow, phase: 'within-ttl' });
+      logEntry('action', 'scenario-ttl: within-ttl confirm -> ' + inWindow);
+      await new Promise(r => setTimeout(r, 1200));
+      /* After expiry, handler rejects (it only auto-approves request_authority,
+         not confirm_action), so the confirm should resolve false. */
+      const afterTtl = await NAC.confirm_action('after-ttl', 'expired', { scope: 'medium' });
+      window.__v24_05Demo.confirm_decisions.push({ id: 'after-ttl', scope: 'medium', approved: afterTtl, phase: 'after-ttl' });
+      logEntry('action', 'scenario-ttl: after-ttl confirm -> ' + afterTtl + ' (should be false)');
+      updateHasUI();
+    },
+  };
+
+  document.body.addEventListener('click', function(ev){
+    const t = ev.target;
+    if (t.tagName !== 'BUTTON' || !t.dataset.action) return;
+    const fn = actions[t.dataset.action];
+    if (fn) Promise.resolve().then(fn).catch(function(e){ logEntry('err', 'action threw: ' + e.message); });
+  });
+  document.getElementById('btn-clear-log').addEventListener('click', function(){
+    document.getElementById('log').innerHTML = '';
+  });
+
+  updateHasUI();
+})();
+</script>
+</body>
+</html>

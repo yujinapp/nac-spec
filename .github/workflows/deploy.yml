@@ -17,6 +17,13 @@ name: Deploy nac-spec to yujin.app/nac-spec/
 # Trigger:
 #   - every push to main
 #   - manual via "Run workflow" on the Actions tab
+#
+# Implementation note: the GoDaddy cPanel shell init scripts call
+# `tput` which fails on non-interactive SSH sessions when $TERM is
+# empty. The default appleboy/scp-action runs an extract step that
+# inherits this broken state and rolls back. We use direct rsync
+# over SSH (with the runner's openssh client) and explicitly
+# override TERM so the remote shell init does not blow up.
 
 on:
   push:
@@ -32,16 +39,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Shallow clone is enough; we are only copying current files.
           fetch-depth: 1
 
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
-        # The exclusions mirror what rpaforce's deploy.yml does for
-        # yujin.app/, plus a few nac-spec-specific dev-only paths.
-        # The stage dir MUST live inside the workspace because the
-        # scp-action runs in a Docker container that only mounts
-        # /github/workspace -- /tmp/ on the runner is not visible.
         run: |
           rm -rf _deploy_stage
           mkdir -p _deploy_stage
@@ -62,32 +63,40 @@ jobs:
             ./ _deploy_stage/
           echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 
-      - name: Deploy via SCP over SSH
-        # appleboy/scp-action: source paths are relative to the
-        # runner's $GITHUB_WORKSPACE which the action's Docker
-        # container mounts at /github/workspace.
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.GODADDY_HOST }}
-          username: ${{ secrets.GODADDY_USER }}
-          key: ${{ secrets.GODADDY_SSH_KEY }}
-          port: 22
-          # Source is relative to the workspace. strip_components=1
-          # peels off the leading "_deploy_stage/" so the contents
-          # land directly under target/.
-          source: "_deploy_stage/*"
-          target: "/home/${{ secrets.GODADDY_USER }}/public_html/yujin.app/nac-spec/"
-          strip_components: 1
-          rm: false
-          overwrite: true
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GODADDY_SSH_KEY }}" > ~/.ssh/godaddy_key
+          chmod 600 ~/.ssh/godaddy_key
+          ssh-keyscan -t ed25519,rsa,ecdsa -H "${{ secrets.GODADDY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Rsync to GoDaddy
+        # Direct rsync over SSH with an explicit TERM=dumb so the
+        # remote cPanel shell init's tput call does not abort the
+        # connection. -e configures the SSH command rsync invokes
+        # under the hood.
+        env:
+          TERM: dumb
+        run: |
+          rsync -avz --delete-after \
+            --no-times --no-perms --no-owner --no-group \
+            -e "ssh -i ~/.ssh/godaddy_key -p 22 -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR -o SendEnv=TERM" \
+            _deploy_stage/ \
+            "${{ secrets.GODADDY_USER }}@${{ secrets.GODADDY_HOST }}:/home/${{ secrets.GODADDY_USER }}/public_html/yujin.app/nac-spec/" \
+            2>&1 | tail -40
 
       - name: Smoke check the live site
-        # Hit the canonical landing + ensure the v2.x pill is present.
         run: |
           for i in 1 2 3; do
             BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/ || true)"
             if echo "$BODY" | grep -q "Native Agent Contract"; then
               echo "Live site responding with expected content."
+              # Bonus: confirm the Now-in-alpha section landed too.
+              if echo "$BODY" | grep -q "Now in alpha"; then
+                echo "Updated Forge commercial section is live."
+              else
+                echo "::warning::Live site responding but 'Now in alpha' section not yet visible (may be CDN cache)."
+              fi
               exit 0
             fi
             echo "Attempt $i did not see expected content, retrying..."

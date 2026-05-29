@@ -39,13 +39,18 @@ jobs:
         # Strip junk that should never land on the live server.
         # The exclusions mirror what rpaforce's deploy.yml does for
         # yujin.app/, plus a few nac-spec-specific dev-only paths.
+        # The stage dir MUST live inside the workspace because the
+        # scp-action runs in a Docker container that only mounts
+        # /github/workspace -- /tmp/ on the runner is not visible.
         run: |
-          mkdir -p /tmp/nac-spec-stage
+          rm -rf _deploy_stage
+          mkdir -p _deploy_stage
           rsync -a \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='.gitignore' \
             --exclude='node_modules/' \
+            --exclude='_deploy_stage/' \
             --exclude='*.tsbuildinfo' \
             --exclude='*.log' \
             --exclude='IMPLEMENTATION_GUIDE.md' \
@@ -54,26 +59,25 @@ jobs:
             --exclude='PROJECT.md' \
             --exclude='PROMO_WEEK_*.md' \
             --exclude='PENDING_*.md' \
-            ./ /tmp/nac-spec-stage/
-          echo "Staged $(find /tmp/nac-spec-stage -type f | wc -l) files"
+            ./ _deploy_stage/
+          echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 
-      - name: Deploy via rsync over SSH
-        # We use the appleboy/scp-action because the rpaforce repo
-        # uses the appleboy family and the same private key shape.
-        # If we ever switch rpaforce's deploy, switch this in parallel.
+      - name: Deploy via SCP over SSH
+        # appleboy/scp-action: source paths are relative to the
+        # runner's $GITHUB_WORKSPACE which the action's Docker
+        # container mounts at /github/workspace.
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.GODADDY_HOST }}
           username: ${{ secrets.GODADDY_USER }}
           key: ${{ secrets.GODADDY_SSH_KEY }}
           port: 22
-          # Recursively copy everything under the staged tree into
-          # public_html/yujin.app/nac-spec/.
-          source: "/tmp/nac-spec-stage/*"
+          # Source is relative to the workspace. strip_components=1
+          # peels off the leading "_deploy_stage/" so the contents
+          # land directly under target/.
+          source: "_deploy_stage/*"
           target: "/home/${{ secrets.GODADDY_USER }}/public_html/yujin.app/nac-spec/"
-          strip_components: 3
-          # rm = false keeps server-only files (none expected, but
-          # safer if anyone ever drops a custom .htaccess override).
+          strip_components: 1
           rm: false
           overwrite: true
 

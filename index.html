@@ -1217,24 +1217,36 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
   </div>
 </section>
 
-<!-- Waitlist Forge + Pilot -->
-<section class="section section-waitlist" id="waitlist" data-nac-id="nac_landing.section.waitlist" data-nac-role="section">
+<!-- Commercial layer on top of NAC3 -- Forge available, Pilot waitlist -->
+<section class="section section-waitlist" id="waitlist" data-nac-id="nac_landing.section.commercial" data-nac-role="section">
   <div class="container">
-    <h2>Coming Q3 2026: Yujin Forge + Pilot</h2>
-    <p class="section-lede">Two commercial tools built on NAC3, BYOK (you supply your Claude / OpenAI / Gemini key). Sign up to be notified when they launch.</p>
+    <h2>Commercial layer on top of NAC3</h2>
+    <p class="section-lede">Two products built on the NAC3 contract. Forge is available now; Pilot ships next. Both are BYOK -- you bring your Claude / OpenAI / Gemini key, we ship the tooling.</p>
     <div class="waitlist-grid">
-      <div class="waitlist-card" data-nac-id="nac_landing.waitlist.forge" data-nac-role="region">
-        <h3>Yujin Forge -- $19/mo</h3>
-        <p>The IDE for NAC3 apps. Claude Code curado + scaffolding + auto-deploy + <code>forge publish</code>. Every app you build is NAC3-compliant by default and ships with Pilot bundled free.</p>
+      <div class="waitlist-card" data-nac-id="nac_landing.commercial.forge" data-nac-role="region">
+        <h3>Yujin Forge -- USD 10 / mo  &middot;  Now in alpha</h3>
+        <p>The voice-first React dev framework. CLI + chat panel + voice loop + 10-format spec ingest. Every app Forge scaffolds is NAC3-compliant on day one.</p>
         <ul>
-          <li>Guided BYOK setup wizard</li>
-          <li>Multi-provider router (Claude / OpenAI / Gemini / local)</li>
-          <li>Token-aware UI (cost before action)</li>
-          <li>"Convert existing app" mode</li>
+          <li>Multi-provider BYOK router (Anthropic / OpenAI / Google AI / DeepSeek)</li>
+          <li>E2E-encrypted key sync to mobile companion</li>
+          <li>"Convert existing React app" auditor</li>
+          <li>Auto-generated e2e tests (Playwright / Cypress / Vitest / WebdriverIO)</li>
+          <li>7-day free trial &middot; cancel anytime</li>
         </ul>
+        <p style="margin-top:1rem">
+          <a href="https://yujin.app/yujin-forge/"
+             data-nac-id="nac_landing.commercial.forge_landing"
+             data-nac-role="action" data-nac-action="open"
+             style="display:inline-block;margin-right:1rem;font-weight:500">Forge landing  &rarr;</a>
+          <a href="https://buy.polar.sh/polar_cl_hy6ndD0QpqBnJ8qM2HQPrxZekiIsijW1VQLIf2Y8AHa"
+             target="_blank" rel="noopener"
+             data-nac-id="nac_landing.commercial.forge_buy"
+             data-nac-role="action" data-nac-action="open"
+             style="display:inline-block;font-weight:500">Start 7-day trial  &rarr;</a>
+        </p>
       </div>
-      <div class="waitlist-card" data-nac-id="nac_landing.waitlist.pilot" data-nac-role="region">
-        <h3>Yujin Pilot -- $5/mo (or free w/ Forge)</h3>
+      <div class="waitlist-card" data-nac-id="nac_landing.commercial.pilot" data-nac-role="region">
+        <h3>Yujin Pilot -- USD 5 / mo (free w/ Forge)  &middot;  Coming next</h3>
         <p>The controller for NAC3 apps. Voice + chat + keyboard dispatch across every NAC3-compliant app in the registry. The first general-purpose accessibility tool that works on every app.</p>
         <ul>
           <li>Registry browser of NAC3 apps</li>
@@ -1247,18 +1259,15 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     <form class="waitlist-form" id="waitlist-form"
           data-nac-id="nac_landing.waitlist.form" data-nac-role="region"
           onsubmit="return submitWaitlist(event)">
+      <p style="font-size:.94rem;color:var(--ct2,#615E58);margin-bottom:.6rem">Get notified when Pilot launches:</p>
       <input type="email" id="waitlist-email" required
              placeholder="you@example.com"
              data-nac-id="nac_landing.waitlist.email" data-nac-role="field" />
-      <label data-nac-id="nac_landing.waitlist.opt_forge" data-nac-role="field">
-        <input type="checkbox" id="waitlist-forge" checked /> Forge ($19)
-      </label>
-      <label data-nac-id="nac_landing.waitlist.opt_pilot" data-nac-role="field">
-        <input type="checkbox" id="waitlist-pilot" checked /> Pilot ($5)
-      </label>
+      <input type="hidden" id="waitlist-forge" />
+      <input type="hidden" id="waitlist-pilot" checked />
       <button type="submit"
               data-nac-id="nac_landing.waitlist.submit" data-nac-role="action"
-              data-nac-action="submit">Notify me</button>
+              data-nac-action="submit">Notify me about Pilot</button>
       <span class="waitlist-status" id="waitlist-status" aria-live="polite"></span>
     </form>
     <p class="waitlist-disclaimer">BYOK: subscriptions cover the tooling -- guided setup, multi-provider routing, prompt caching, token-aware UI, app registry. They do not cover AI consumption. You pay Anthropic, OpenAI, or Google directly.</p>
@@ -1884,7 +1893,7 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
         body: JSON.stringify({ email: email, products: products, source: 'nac-spec-landing' })
       });
       if (resp.ok) {
-        status.textContent = 'Got it. You will hear from us when Forge + Pilot launch.';
+        status.textContent = 'Got it. You will hear from us when Pilot launches.';
         document.getElementById('waitlist-email').value = '';
       } else {
         throw new Error('non-ok response');

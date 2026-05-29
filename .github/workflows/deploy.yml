@@ -1,0 +1,93 @@
+name: Deploy nac-spec to yujin.app/nac-spec/
+
+# Mirror this repo's contents into the GoDaddy public_html path that
+# serves https://yujin.app/nac-spec/. The mirror previously lived
+# inside the rpaforce repo (rpaforce/yujin.app/nac-spec/) and was
+# removed in rpaforce commit 0ff3afa0 ("canonical lives at
+# yujinapp/nac-spec"). This workflow re-establishes the deploy path
+# without a duplicate copy in rpaforce.
+#
+# Secrets needed in this repo (Settings -> Secrets and variables ->
+# Actions). Copy them from the rpaforce-crm repo secrets where the
+# same values already live:
+#   GODADDY_HOST     -- e.g. p3plzcpnl504099.prod.phx3.secureserver.net
+#   GODADDY_USER     -- e.g. c5kfcjz0z5se
+#   GODADDY_SSH_KEY  -- the full private key (PEM), no passphrase
+#
+# Trigger:
+#   - every push to main
+#   - manual via "Run workflow" on the Actions tab
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Rsync to GoDaddy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Shallow clone is enough; we are only copying current files.
+          fetch-depth: 1
+
+      - name: Stage files for upload
+        # Strip junk that should never land on the live server.
+        # The exclusions mirror what rpaforce's deploy.yml does for
+        # yujin.app/, plus a few nac-spec-specific dev-only paths.
+        run: |
+          mkdir -p /tmp/nac-spec-stage
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.gitignore' \
+            --exclude='node_modules/' \
+            --exclude='*.tsbuildinfo' \
+            --exclude='*.log' \
+            --exclude='IMPLEMENTATION_GUIDE.md' \
+            --exclude='NPM_PUBLISH_RUNBOOK.md' \
+            --exclude='PERFORMANCE_TEST_PLAN.md' \
+            --exclude='PROJECT.md' \
+            --exclude='PROMO_WEEK_*.md' \
+            --exclude='PENDING_*.md' \
+            ./ /tmp/nac-spec-stage/
+          echo "Staged $(find /tmp/nac-spec-stage -type f | wc -l) files"
+
+      - name: Deploy via rsync over SSH
+        # We use the appleboy/scp-action because the rpaforce repo
+        # uses the appleboy family and the same private key shape.
+        # If we ever switch rpaforce's deploy, switch this in parallel.
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GODADDY_HOST }}
+          username: ${{ secrets.GODADDY_USER }}
+          key: ${{ secrets.GODADDY_SSH_KEY }}
+          port: 22
+          # Recursively copy everything under the staged tree into
+          # public_html/yujin.app/nac-spec/.
+          source: "/tmp/nac-spec-stage/*"
+          target: "/home/${{ secrets.GODADDY_USER }}/public_html/yujin.app/nac-spec/"
+          strip_components: 3
+          # rm = false keeps server-only files (none expected, but
+          # safer if anyone ever drops a custom .htaccess override).
+          rm: false
+          overwrite: true
+
+      - name: Smoke check the live site
+        # Hit the canonical landing + ensure the v2.x pill is present.
+        run: |
+          for i in 1 2 3; do
+            BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/ || true)"
+            if echo "$BODY" | grep -q "Native Agent Contract"; then
+              echo "Live site responding with expected content."
+              exit 0
+            fi
+            echo "Attempt $i did not see expected content, retrying..."
+            sleep 5
+          done
+          echo "::error::Smoke check failed -- yujin.app/nac-spec/ did not return expected content within 3 tries"
+          exit 1

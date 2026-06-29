@@ -1,12 +1,12 @@
 /* =====================================================================
    NAC3 (Native Agent Contract v3) -- reference JavaScript runtime.
-   Spec: packages/nac/SPEC.md. Public docs: yujin.app/nac-spec/.
-   MIT License -- Pablo Adrian Kuschniroff + Sumi, 2026.
+   Spec: SPEC.md (repo root). Public docs: yujin.app/nac-spec/.
+   Apache-2.0 License -- Pablo Adrian Kuschniroff + Sumi, 2026.
    =====================================================================
 
    AUTHORITATIVE VERSION CONSTANT: see the global.NAC export at the
-   bottom of this file. `version: '2.4.0', spec_version: '2.4'` is
-   the normative declaration. The dated changelog sections below are
+   bottom of this file. `version: '2.5.0-alpha.5', spec_version: '2.5'`
+   is the normative declaration. The dated changelog sections below are
    historical notes; if they ever drift from the export, the export
    wins.
 

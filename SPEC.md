@@ -333,7 +333,7 @@ with a meaningful error code.
 
 `NAC.click`, by contrast, STILL rejects on disabled elements
 (click semantics preserved). Test coverage:
-`packages/nac/test/v23-invoke.mjs` T7/T8/T9.
+`runtime/test/v23-invoke.mjs` T7/T8/T9.
 
 #### Conformance: hosts that support invoke MUST
 
@@ -457,7 +457,7 @@ helpers `NAC.click`, `NAC.fill`, `NAC.invoke`,
 
 - `example-v23-shadow-open.php` -- 1-, 2-, and 3-level nested
   open shadow demos.
-- `packages/nac/test/v23-shadow.mjs` T1-T3, T10 -- unit
+- `runtime/test/v23-shadow.mjs` T1-T3, T10 -- unit
   coverage including depth cap.
 
 ### 5.1.6 Shadow DOM resolution -- closed roots, voluntary exposure (v2.3)
@@ -558,7 +558,7 @@ adapter code.
   (`<todo-card-closed-exposed>`) and negative
   (`<todo-card-closed-blind>`) side-by-side with verdict
   panels + live event log.
-- `packages/nac/test/v23-shadow.mjs` T4-T9 -- unit coverage
+- `runtime/test/v23-shadow.mjs` T4-T9 -- unit coverage
   for every error event family plus dedup semantics.
 - `guides/SHADOW_DOM_CLOSED.md` -- authoring guide.
 
@@ -659,7 +659,7 @@ intent-level signal, not a security boundary.
 
 #### Demos and tests
 
-- `packages/nac/test/v23-capabilities.mjs` -- 17 assertions
+- `runtime/test/v23-capabilities.mjs` -- 17 assertions
   covering set/get, grant/revoke, click gate, invoke gate,
   verb-level vs element-level resolution, OR semantics,
   null-clear, invalid-input rejection, regression for
@@ -721,8 +721,31 @@ NAC.validate_global(opts?: {probe?: boolean}): Findings[]
 
 ### 5.3 Data tables (v2.1)
 
+The data-table primitives are NOT part of the core runtime
+(`js/nac.js` / `@nac3/runtime`'s `nac.mjs`). They ship in the
+brownfield extensions module `js/nac-v2-extensions.js`
+(published as `@nac3/runtime/extensions`), which attaches them
+onto the same `window.NAC` object after it loads. Load the
+extensions module after the core runtime to get the `dt_*`
+surface:
+
+```html
+<script src="https://yujin.app/nac-spec/js/nac.js"></script>
+<script src="https://yujin.app/nac-spec/js/nac-v2-extensions.js"></script>
+```
+
+```js
+// or with the npm package:
+import '@nac3/runtime';
+import '@nac3/runtime/extensions';
+```
+
+The methods below are present only when the extensions module
+is loaded; calling them on a core-only runtime is a no-op /
+`undefined`.
+
 ```ts
-NAC.registerDataTable(spec: DataTableSpec): void
+NAC.registerDataTable(spec: DataTableSpec): string   // returns table_id
 NAC.dt_add_row(table_id, values): {ok, row_id}
 NAC.dt_remove_row(table_id, row_id): {ok}
 NAC.dt_edit_cell(table_id, row_id, column, value): {ok} | {ok:false, error}
@@ -743,6 +766,140 @@ A data table has a `subkind`:
   Used for permission matrices, schedule grids.
 - `matrix-singletree` -- matrix where each row collapses into a
   tree (rare).
+
+---
+
+### 5.4 Strict resolution + disambiguation (v2.4)
+
+NAC3 v2.4 makes id / verb / qualifier / label resolution
+**strict**. The verbs that resolve a request to a single DOM
+element -- `click_by_verb`, `tab` (single-arg form), and
+`tab_by_label` -- no longer guess. When a request resolves to
+zero candidates or to more than one, the runtime throws a
+`NacError` carrying the candidate list AND emits a
+`nac:disambiguation_requested` event, instead of silently
+dispatching to the first near-match.
+
+This is the **zero-silent-damage** invariant. It exists for
+assistive-software and agent callers, where a silent dispatch to
+the wrong element with no recovery path is a safety blocker. The
+pre-2.4 lenient behaviour -- a substring `indexOf` fallback that
+resolved to the first near-match -- is removed.
+
+> Backward compatibility: v2.4 is a *behaviour-of-contract*
+> change. Code paths that already supplied unambiguous arguments
+> keep working unchanged. Code paths that depended on the lenient
+> `indexOf` fallback to resolve to the first near-match will now
+> throw -- by design.
+
+#### 5.4.1 Strict qualifier matching (`click_by_verb`)
+
+`click_by_verb(plugin, verb, opts?)` selects among DOM nodes that
+share `data-nac-action="<verb>"`. When `opts.qualifier` (a string)
+is supplied, an element matches **only** if its `data-nac-id`
+satisfies:
+
+```js
+id === qualifier || id.endsWith('__' + qualifier)
+```
+
+That is: exact id equality, or an anchored suffix after a `__`
+separator. There is **no substring fallback**. A qualifier that
+is a mere substring of an id (not equal, not an anchored
+`__suffix`) does NOT match.
+
+- 0 matches -> throw `NacError('no_matching_instance', ...)`.
+- exactly 1 match -> resolves and clicks.
+- >1 matches -> throw `NacError('ambiguous_qualifier', ...)`.
+
+`opts.qualifier_ordinal` (a number) selects positionally across
+all DOM elements sharing the verb, bypassing qualifier matching.
+
+#### 5.4.2 Strict id resolution (`tab`)
+
+`tab(plugin, id)` single-arg form: an exact `data-nac-id` match
+in the DOM wins. Otherwise the runtime looks for instances whose
+id starts with `id + "__"`:
+
+- 0 qualified instances and no exact id -> `no_matching_instance`.
+- exactly 1 -> resolves.
+- >1 -> `ambiguous_tab` (pass the full qualified id).
+
+#### 5.4.3 Strict label resolution (`tab_by_label`)
+
+`tab_by_label(plugin, label)` resolves a human label to a tab,
+trying, in order: exact manifest-label match, fuzzy/substring
+manifest match, exact DOM-text match, fuzzy DOM-text match. If
+any tier yields more than one match it throws
+`NacError('ambiguous_label', ...)`; if no tier matches it throws
+`NacError('not_found', ...)`. The emitted event's `reason` field
+records which tier was ambiguous (`ambiguous_label_exact`,
+`ambiguous_label_fuzzy`, `ambiguous_label_exact_dom`,
+`ambiguous_label_fuzzy_dom`, or `no_matching_label`).
+
+#### 5.4.4 Error codes
+
+| `err.code` | Thrown by | Meaning |
+|------------|-----------|---------|
+| `no_matching_instance` | `click_by_verb` (qualifier), `tab` | zero elements match the qualifier / id |
+| `ambiguous_qualifier`  | `click_by_verb` | >1 element matches the qualifier |
+| `ambiguous_tab`        | `tab`           | >1 qualified `id__` instance matches |
+| `ambiguous_label`      | `tab_by_label`  | >1 tab matches the label (any tier) |
+| `not_found`            | `tab_by_label`  | no tab matches the label at all |
+
+#### 5.4.5 The `err.candidates` shape
+
+Every disambiguation error carries a `candidates` array. Each
+candidate is exactly:
+
+```ts
+{ nac_id: string, label: string }
+```
+
+`nac_id` is the element's `data-nac-id`. `label` is resolved by
+preferring `aria-label`, then trimmed `textContent` (sliced to
+120 chars), then falling back to the `data-nac-id`. The list is
+DOM-validated -- it names the real elements the caller can pick
+from. `NacError` merges `candidates` onto the thrown `Error`, so
+`err.code`, `err.message`, and `err.candidates` are all
+populated.
+
+#### 5.4.6 The `nac:disambiguation_requested` event
+
+Whenever a strict-resolution call fails (no match OR too many
+matches), the runtime dispatches a `nac:disambiguation_requested`
+`CustomEvent` on `document` *in addition to* throwing. Emission
+is best-effort: if dispatch fails the runtime still throws.
+
+```ts
+document.addEventListener('nac:disambiguation_requested', (e) => {
+  e.detail; /* {
+    method:     'click_by_verb' | 'tab' | 'tab_by_label',
+    plugin:     string | null,
+    query:      { verb?, qualifier?, label?, id? },
+    reason:     string,   // finer-grained than err.code (see 5.4.3)
+    candidates: Array<{ nac_id: string, label: string }>,
+  } */
+});
+```
+
+#### 5.4.7 How a caller disambiguates
+
+Given the candidate list (from `err.candidates` or
+`event.detail.candidates`), the caller picks one and re-dispatches
+by any of:
+
+1. **Full `nac_id`** -- `NAC.click(candidate.nac_id)`. This is the
+   canonical recovery path: the candidate already carries the
+   exact id.
+2. **Anchored `__suffix`** -- pass the instance's exact suffix as
+   the qualifier to `click_by_verb`.
+3. **`opts.qualifier_ordinal`** -- positional selection across the
+   elements sharing the verb (DOM order).
+
+The worked reference is `example-v24-disambiguation.php`; the
+contract is covered by `runtime/test/stage2-disambiguation.mjs`
+and `runtime/test/stage7-strict-resolution.mjs`.
 
 ---
 
@@ -894,8 +1051,9 @@ A page is **NAC-3 conformant** if it also:
 - Passes `NAC.validate_global({probe: true})` with zero
   findings.
 
-The NPM package's CLI (`npx @nac3/runtime validate <url>`) reports
-the highest level a page reaches.
+The NPM package's CLI (`npx nac3 validate <url>`) reports
+the highest level a page reaches. (The package ships `nac3` and
+`nac` bins; both resolve to the same CLI.)
 
 ---
 
@@ -938,7 +1096,7 @@ and returns an array of findings:
 Findings codes are stable across patch releases; new codes only
 in minor bumps.
 
-### 10.2 CLI: `npx @nac3/runtime validate <target>`
+### 10.2 CLI: `npx nac3 validate <target>`
 
 Wraps `validate_global` plus a static lint of HTML/manifest
 coherence. Exit codes:
@@ -947,8 +1105,10 @@ coherence. Exit codes:
 - `1` -- findings.
 - `2` -- the target itself failed to load.
 
-Useful in CI: `npx @nac3/runtime validate ./dist/index.html
---severity=error`.
+Useful in CI: `npx nac3 validate ./dist/index.html
+--severity=error`. The package exposes the CLI under two bin
+names, `nac3` and `nac`; use whichever does not collide with
+another tool on your PATH.
 
 ---
 
@@ -1013,36 +1173,54 @@ What this spec does NOT promise:
 
 ## 13.5 Governance
 
-NAC3 is currently stewarded by Yujin. The spec is published
-under Apache 2.0; the reference runtime under MIT. Yujin
-commits to moving NAC3 to a neutral foundation (W3C community
-group, Linux Foundation, or equivalent industry body) if and
-when adoption justifies neutral governance. Until then, spec
-changes follow the RFC process documented in
+NAC3 is currently stewarded by Yujin. The spec, the docs, and
+the reference runtime are all published under Apache-2.0. (The
+runtime was tagged MIT in the pre-2.5 dual-repo era; it was
+harmonised to Apache-2.0 across every NAC3 artefact in the
+2026-05-23 consolidation. See `LICENSE` and `runtime/LICENSE`.)
+Yujin commits to moving NAC3 to a neutral foundation (W3C
+community group, Linux Foundation, or equivalent industry body)
+if and when adoption justifies neutral governance. Until then,
+spec changes follow the RFC process documented in
 `CONTRIBUTING.md`, with public comment period of at least 14
 days for any change that affects the public API or wire
 formats.
 
-Adopters: the Apache 2.0 + MIT license combination guarantees
-that the spec and runtime survive any change in Yujin's
-corporate status. You can fork either, run either, and ship
-either, today and after we are gone. This document records
-the commitment so the path to that survival is explicit, not
-implicit.
+Adopters: the uniform Apache-2.0 licensing guarantees that the
+spec and runtime survive any change in Yujin's corporate status.
+You can fork either, run either, and ship either, today and
+after we are gone. This document records the commitment so the
+path to that survival is explicit, not implicit.
 
 ---
 
 ## 14. Reference implementation
 
 The canonical implementation is the reference runtime distributed
-as the NPM package `@nac3/runtime`. The runtime is feature-complete
-for v2.1 and ships:
+as the NPM package `@nac3/runtime` (current version
+2.5.0-alpha.5; the runtime's `NAC.version` constant is the
+normative version source). It ships:
 
-- `js/nac.js` -- v1.9 base + the public API in section 5.
-- `js/nac-v2-extensions.js` -- the v2.0 brownfield primitives
-  (scope tree, capture ephemeral, autoRegister, HMAC, isTrusted).
+- `js/nac.js` -- the core runtime: the public imperative +
+  introspection API of section 5 (click/fill/select/tab,
+  click_by_verb/tab_by_label, invoke/utter, edit_field,
+  setCapabilities, syncPlugin, request_authority/confirm_action,
+  registerPlugin/call/read/subscribe, narrate/context/tree,
+  expect/diff, describe, validate_global, ...). Published as the
+  package's `main`/`module`/`browser` entry (`dist/nac.mjs`).
+- `js/nac-v2-extensions.js` -- the brownfield + data-table
+  primitives that attach onto the same `window.NAC` after the
+  core loads: scope tree, autoRegister, capture ephemeral, HMAC,
+  isTrusted attestation, i18n catalog (`t`/`locale`), and the
+  entire `registerDataTable` / `dt_*` data-table family
+  (section 5.3). Published as `@nac3/runtime/extensions`
+  (`dist/nac-v2-extensions.mjs`). The core runtime does NOT carry
+  the `dt_*` surface; load this module to get it.
 - `js/nac-chat-client.js` -- a reference chat client that wires
-  voice + LLM + dispatcher.
+  voice + LLM + dispatcher. Published as `@nac3/runtime/chat-client`.
+
+The package also exposes a CLI under the bin names `nac3` and
+`nac` (`dist/cli.js`, section 10.2).
 
 Other implementations are welcome (Python for native automation
 runners, Rust for embedded agents, etc). The spec, not the JS

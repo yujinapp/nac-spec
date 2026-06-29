@@ -1,21 +1,55 @@
 # NAC3 live demos at yujin.app/nac-spec/
 
-**Spec version:** 2.2 stable (+ v2.3 interop preview).
+**Spec version:** 2.5.0-alpha.5 (v2.5 line complete; promoted to npm
+dist-tag `latest`).
 
 **NAC3** = **Native Agent Contract**. The spec that lets web UIs be
-driven by AI assistants, voice runners, and accessibility tools
-without per-app glue code.
+driven by AI assistants, voice runners, RPA bots, and accessibility
+tools without per-app glue code.
 
-Three demos live side-by-side. Each has a distinct purpose; do not
-confuse them.
+The repo ships two families of runnable demos:
+
+1. **Vanilla PHP examples** at the repo root (`example*.php`) -- one
+   self-contained page per spec milestone, loading the reference
+   runtime directly.
+2. **Framework + RFC demos** under `demos/` -- React/Angular study
+   cases plus a focused walkthrough per shipped v2.4 / v2.5 RFC.
+
+## Vanilla PHP examples (repo root) -- 13 files
 
 | File | Version | Purpose |
 |---|---|---|
-| `example.php` | v1.9 stable | The canonical demo for NAC3 v1.9. 27 widgets (chat, calendar, autopilot, modals, tabs, charts, etc.). Shows the full v1.9 feature surface in production-shaped UI. **Unchanged.** |
-| `example-v20-primitives-showcase.php` | v2.0-rc4 | **Didactic showcase** of the 8 v2.0 primitives + HMAC + isTrusted + i18n contract. 8 sections, one per primitive. Useful for reviewers and adopters who want to understand each new primitive in isolation. **NOT a migration of example.php.** |
-| `example-v20-full.php` | v2.0-rc4 | **Brownfield migration** of `example.php` to NAC3 v2.0 strict. Same 27 widgets, same HTML, same handlers -- with v2.0 layer applied on top via ~80 lines of setup code. Demonstrates that real-world adoption does NOT require rewriting every widget. |
+| `example.php` | v1.9 stable | The canonical demo. 27 widgets (chat, calendar, autopilot, modals, tabs, charts, etc.). The full v1.9 surface in a production-shaped UI. |
+| `example-navmap.php` | v1.x | Navigation map / sitemap primitive demo. |
+| `example-v13.php` | v1.3 | The v1.3 widget primitives (stepper, tree, calendar, chart, map, richtext, ...). |
+| `example-v20-primitives-showcase.php` | v2.0 | Didactic showcase of the 8 v2.0 brownfield primitives + HMAC + isTrusted + i18n, one section each. |
+| `example-v20-full.php` | v2.0 | Brownfield migration of `example.php` to NAC3 v2.0 strict -- same widgets, v2.0 layer added in ~80 lines. See the side-by-side guide below. |
+| `example-v20-page-a.php` / `example-v20-page-b.php` | v2.0 | Two-page pair for cross-page scope + navigation. |
+| `example-v21-data-table.php` | v2.1 | The data-table primitives (`registerDataTable` + `dt_*`, from the extensions module). |
+| `example-v22-interop.php` | v2.2 | The cross-app interop layer (routing verbs between NAC3 apps). |
+| `example-v23-editor.php` | v2.3 | The `edit_field` Word-style field editor primitive. |
+| `example-v23-shadow-open.php` / `example-v23-shadow-closed.php` | v2.3 | Shadow-DOM resolution for open and (voluntarily exposed) closed roots. |
+| `example-v24-disambiguation.php` | v2.4 | Strict resolution + disambiguation: `err.candidates`, `nac:disambiguation_requested`, and the "silent damage" anti-pattern (SPEC sec 5.4). |
 
-## Side-by-side comparison
+## Framework + RFC demos (`demos/`) -- 10 dirs
+
+| Dir | What it shows |
+|---|---|
+| `demos/react/` | NAC3 + React -- todos study case. |
+| `demos/angular/` | NAC3 + Angular -- todos study case. |
+| `demos/v24-01-plugin-id-dedup/` | V24-01 plugin slug uniqueness (`data-nac-plugin-id`). |
+| `demos/v24-02-sync-plugin/` | V24-02 idempotent `syncPlugin`. |
+| `demos/v24-04-snapshot-versioning/` | V24-04 snapshot versioning + optimistic concurrency. |
+| `demos/v24-05-authority-sudo/` | V24-05 agent authority + sudo elevation. |
+| `demos/v25-canvas-api/` | V25-01 plugin extension contract for canvas + API surfaces. |
+| `demos/v25-02-tree-nav/` | V25-02 tree navigation (`context` + `tree`). |
+| `demos/v25-03-narrate/` | V25-03 asistive labels (`narrate`). |
+| `demos/v25-04-expect-diff/` | V25-04 effect detection (`expect` + `diff`). |
+
+Plus the **Atlas Pro voice ad** under `ads-demo/atlas-pro/` -- a
+voice-driven advertisement that closes its own sale via NAC3.
+
+## Side-by-side comparison: brownfield migration
 
 Open `example.php` and `example-v20-full.php` in two tabs.
 
@@ -24,55 +58,29 @@ Open `example.php` and `example-v20-full.php` in two tabs.
 - HTML markup (every `<article data-nac-plugin="X">`, every
   `data-nac-id`, every i18n catalog reference, every handler)
 - Visual appearance (same layout, same widgets, same interactions)
-- v1.9 reference runtime (`js/nac.js`) loaded the same way
+- Reference runtime (`js/nac.js`) loaded the same way
 - Existing `data-i18n-key` catalog references
 
 ### What is different in the v2.0-full version
 
-1. **Header docstring** explicitly explains it is a brownfield
-   migration showcase.
+1. **Header docstring** explaining it is a brownfield migration.
 2. **One additional script tag**: `js/nac-v2-extensions.js` loaded
    after `nac.js` and before `example.js`.
-3. **One additional setup block** (~80 lines at the bottom of the
-   page) that:
-   - Builds a hierarchical scope tree from existing
-     `data-nac-plugin` attributes (every plugin becomes a scope
-     under `demo.shell`).
-   - Calls `NAC.set_provenance_secret()` to enable HMAC sign.
-   - Calls `NAC.setTenantPrefix('demo')` to demo multi-tenant.
-   - Starts `NAC.captureEphemeral()` ring buffer for toasts.
-   - Calls `NAC.autoRegister.watch()` on the cards container.
-4. **One additional UI panel** (`#v20-panel`, fixed bottom-right)
-   exposing live `describe_v2()`, `validate_global_v2()`, HMAC
-   sign demo, and isTrusted distinction button.
+3. **One additional setup block** (~80 lines) that builds a scope
+   tree from existing `data-nac-plugin` attributes, enables HMAC
+   sign via `NAC.set_provenance_secret()`, sets a tenant prefix,
+   starts `NAC.captureEphemeral()`, and calls
+   `NAC.autoRegister.watch()` on the cards container.
+4. **One additional UI panel** (`#v20-panel`) exposing live
+   `describe_v2()`, `validate_global_v2()`, HMAC sign, and the
+   isTrusted distinction.
 
 That is the entire delta. Real adopters reuse this pattern verbatim.
 
-## How to evaluate
-
-If you are a peer reviewer of NAC3 v2.0:
-
-1. Open `example.php` first. Confirm v1.9 demo works as before.
-2. Open `example-v20-full.php`. Confirm it works IDENTICALLY for
-   the v1.9 functionality (chat, calendar, autopilot, etc.).
-3. Open the v2.0 panel (bottom-right corner). Click each button:
-   - `describe_v2()` -- see the scope tree built from the
-     brownfield plugin attributes.
-   - `validate_global_v2()` -- see findings (likely warnings only
-     if i18n catalog has gaps).
-   - `sign as agent` -- see HMAC signature produced.
-   - `click=trusted` / `.click()=fake` -- see isTrusted distinction
-     in action.
-
-If you are an adopter:
-
-Use `example-v20-full.php`'s setup block as your template. Adapt
-the scope tree to your app's plugin structure. Most of the work
-is identifying your scope hierarchy; the rest is mechanical.
-
 ## Cross-links
 
-- NAC3 spec: https://github.com/pkuschnirof/nac-spec
-- v1.9 release: tag `v1.9.0`
-- v2.0 release candidate: `2.0.0-rc4` on `main`
-- Round 3 peer review trail: `docs/PEER_REVIEW.md`
+- NAC3 spec: https://github.com/yujinapp/nac-spec
+- Live spec: https://yujin.app/nac-spec/
+- npm: https://www.npmjs.com/package/@nac3/runtime
+- CHANGELOG: `runtime/CHANGELOG.md`
+- RFC state index: `rfcs/`

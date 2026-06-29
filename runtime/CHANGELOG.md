@@ -98,7 +98,7 @@ stage12-snapshot-versioning.mjs grows two assertions:
 - `tab() with stale expected_tree_version throws snapshot_stale`
 - `tab() under STRICT without expected_* throws version_required`
 
-Total suite: **384 PASS / 0 FAIL** across 14 stage suites.
+Total suite: **386 PASS / 0 FAIL** across 14 stage suites.
 
 ### Pending for 2.5.0 stable promotion (alpha -> latest)
 
@@ -106,7 +106,7 @@ Per `PROJECT.md` sec 3.1 (three-layer test bar, instituted
 2026-05-25), `npm dist-tag add @nac3/runtime@2.5.0 latest`
 requires:
 
-  - Layer 1 unit tests green (already 384/0). ✓
+  - Layer 1 unit tests green (already 386/0). ✓
   - Layer 2 visual demos + Playwright + screenshots in
     `evidence/<feature>/<run-date>/` per RFC.
   - Layer 3 Pilot-driven high-complexity statements run against
@@ -186,7 +186,7 @@ expected/current pairs; current plugin_version passes the gate and
 proceeds (then hits the timeout, NOT snapshot_stale); STRICT mode
 without expected_* throws `version_required`.
 
-Total suite: **384 PASS / 0 FAIL** across 14 stage suites.
+Total suite: **386 PASS / 0 FAIL** across 14 stage suites.
 
 ---
 

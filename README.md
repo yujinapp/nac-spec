@@ -8,7 +8,7 @@
 [![Spec: v2.5-alpha.5](https://img.shields.io/badge/spec-v2.5_alpha.5-orange)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
-[![Tests: passing](https://img.shields.io/badge/tests-349_passing-success)](runtime/test/)
+[![Tests: passing](https://img.shields.io/badge/tests-386_passing-success)](runtime/test/)
 
 > **v2.5.0-alpha.5 shipped** (2026-05-25) -- v2.5 line complete; 8 SHIPPED RFCs each with Layer 2 + Layer 3 LIVE evidence; promoted to npm latest.
 > Unifies the two parallel dev lines that diverged during May 2026 and
@@ -82,7 +82,7 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | App | Type | NAC3 version |
 |-----|------|--------------|
 | [Yujin CRM](https://yujin.app) | Production reference | v2.5-alpha |
-| [Reference demos](https://yujin.app/nac-spec/) | Live, 9 examples (vanilla, React, Angular, data-table, interop, voice ad, disambiguation) | v2.5-alpha |
+| [Reference demos](https://yujin.app/nac-spec/) | Live: 13 vanilla PHP examples (v1.3 -> v2.4: primitives showcase, data-table, interop, shadow DOM, field editor, disambiguation, ...) + 10 framework/RFC demos under `demos/` (React, Angular, v24-* + v25-* RFC walkthroughs) + the Atlas Pro voice ad | v2.5-alpha |
 | [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.5-alpha |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
@@ -133,21 +133,28 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | Security review | [SECURITY.md](SECURITY.md) |
 | Accessibility | [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) |
 
-Full docs in 10 languages (es, en, pt, fr, it, de, ja, zh, hi,
-ar) under `i18n/` -- machine-translated baseline +
-native-speaker reviewed for ja/zh/ar/hi.
+English is the source language (the docs at the repo root).
+Translated docs ship for 9 further locales (es, pt, fr, it, de,
+ja, zh, hi, ar) under `i18n/<locale>/` -- machine-translated
+baseline + native-speaker reviewed for ja/zh/ar/hi. (Note: the
+manifest `label_i18n` contract still requires all 10 NAC3 label
+locales including `en`; that is a separate, in-spec requirement
+from the doc translations -- see SPEC.md sec 4.3.)
 
 ## Open standard, open governance
 
-NAC3 is currently stewarded by Yujin. The spec is Apache 2.0;
-the reference runtime is MIT. Yujin commits to moving NAC3 to a
-neutral foundation (W3C community group, Linux Foundation, or
-equivalent) if and when adoption justifies neutral governance.
-Spec changes follow the RFC process in
-[CONTRIBUTING.md](CONTRIBUTING.md) with at least 14 days of
-public comment for any public API or wire-format change.
+NAC3 is currently stewarded by Yujin. The spec, the docs, and
+the reference runtime are all Apache-2.0 (the runtime was tagged
+MIT in the pre-2.5 dual-repo era; harmonised to Apache-2.0
+across every NAC3 artefact in the 2026-05-23 consolidation).
+Yujin commits to moving NAC3 to a neutral foundation (W3C
+community group, Linux Foundation, or equivalent) if and when
+adoption justifies neutral governance. Spec changes follow the
+RFC process in [CONTRIBUTING.md](CONTRIBUTING.md) with at least
+14 days of public comment for any public API or wire-format
+change.
 
-The Apache 2.0 + MIT licensing guarantees the spec + runtime
+The uniform Apache-2.0 licensing guarantees the spec + runtime
 survive any change in Yujin's corporate status. Adopters can
 fork either, run either, and ship either, today and after
 Yujin no longer exists.

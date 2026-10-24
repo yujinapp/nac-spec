@@ -1,0 +1,40 @@
+# =====================================================================
+# Published bytes are the contract.
+#
+# NAC3 ships a Subresource Integrity hash of the runtime, and that hash
+# is computed over the exact bytes a visitor receives. Those bytes must
+# be the same everywhere: in the repository, in a Windows working tree
+# and in the Linux deploy checkout.
+#
+# Without this file, core.autocrlf=true on a Windows clone turns every
+# LF into CRLF in the working tree while the deploy checkout keeps LF.
+# A hash computed locally is then wrong for what the site actually
+# serves, and the browser refuses to execute the runtime. That is
+# audit finding N-22 (2026-10-24): the integrity gate blocked a deploy
+# because of exactly this, before it could reach production.
+#
+# Rule: LF in the repository, LF in the working tree, LF on the wire.
+# =====================================================================
+
+* text=auto eol=lf
+
+# Binary assets -- never touched by the text machinery.
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.webp    binary
+*.ico     binary
+*.mp4     binary
+*.webm    binary
+*.mov     binary
+*.mp3     binary
+*.wav     binary
+*.zip     binary
+*.gz      binary
+*.tar     binary
+*.pdf     binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+*.eot     binary

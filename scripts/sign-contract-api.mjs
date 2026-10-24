@@ -28,7 +28,7 @@
    Key location, in order of precedence:
      --key <path>
      $NAC3_CONTRACT_SIGNING_KEY
-     <home>/.nac3-keys/contract-signing-<key_id>.pem
+     <home>/.nac3-keys/<key_id>.pem
 
    Optional passphrase: set $NAC3_CONTRACT_KEY_PASSPHRASE before
    --keygen and the key is written encrypted (aes-256-cbc). The same
@@ -98,7 +98,7 @@ const passphrase = () => process.env.NAC3_CONTRACT_KEY_PASSPHRASE || null;
 
 function defaultKeyPath(keyId) {
   if (process.env.NAC3_CONTRACT_SIGNING_KEY) return process.env.NAC3_CONTRACT_SIGNING_KEY;
-  return join(homedir(), '.nac3-keys', 'contract-signing-' + keyId + '.pem');
+  return join(homedir(), '.nac3-keys', keyId + '.pem');
 }
 
 /* The one mistake that cannot be undone by a later commit: a private

@@ -47,7 +47,8 @@ commit. El indice solo se mueve cuando se publica una version.
 node scripts/sign-contract-api.mjs --keygen
 ```
 
-Escribe la mitad privada en `%USERPROFILE%\.nac3-keys\contract-signing-nac3-contract-<anio>.pem`
+Escribe la mitad privada en `%USERPROFILE%\.nac3-keys
+ac3-contract-<anio>.pem`
 (permisos 600) y la mitad publica en `api/trust.json`, que se publica con el
 resto de la API. Imprime la huella.
 

@@ -1,0 +1,23 @@
+{
+  "algorithm": "ed25519",
+  "api_schema": 1,
+  "generated_by": "scripts/sign-contract-api.mjs",
+  "payload": {
+    "api_schema": 1,
+    "chain_head": "sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V",
+    "entry_count": 1,
+    "index_sha384": "sha384-m9n6F1FVnt/55xmhQ9SuW94I9KuWWG1hvBp9ntT3T0SE7Ock3E/QzPQ+FW6pxlYA",
+    "key_id": "nac3-contract-2026",
+    "protocol": "NAC3",
+    "signed_at": "2026-10-24T20:40:17Z",
+    "surface": "attestation-payload",
+    "versions": [
+      "2.5.0-alpha.5"
+    ]
+  },
+  "protocol": "NAC3",
+  "signature_b64": "Pdn1u0yoiD8SCEOefMgVFaxLalnQCyHZiEcqubvL/B3YQ0vvkk5icJjq2Zt7zje97U+j4vroQln7maL6KWVnCQ==",
+  "statement": "The holder of the offline key published as nac3-contract-2026 in api/trust.json attests that api/index.json, with the sha384 and chain head recorded in payload below, is the contract index this project published. The signature is over the canonical JSON of payload: keys sorted at every depth, two-space indent, LF, one trailing newline.",
+  "surface": "attestation",
+  "verify_with": "node scripts/verify-contract-api.mjs --base <url> --expect-head-from-repo"
+}

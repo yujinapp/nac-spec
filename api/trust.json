@@ -1,0 +1,24 @@
+{
+  "algorithm": "ed25519",
+  "api_schema": 1,
+  "generated_by": "scripts/sign-contract-api.mjs",
+  "keys": [
+    {
+      "algorithm": "ed25519",
+      "created_at": "2026-10-24",
+      "custody": "offline, on the owner machine. Never in this repository and never a CI secret (owner decision, PND-034 option A).",
+      "fingerprint_sha384": "sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft",
+      "key_id": "nac3-contract-2026",
+      "public_key_spki_b64": "MCowBQYDK2VwAyEAlTcXZIXQIM/WaFCArFHkJE1ict0WJ8/g6C+5fTFoLxs=",
+      "status": "active"
+    }
+  ],
+  "policy": {
+    "ci_can_verify_but_cannot_sign": true,
+    "note": "The public keys that may sign api/attestation.json. This file is published by the web host, which means a compromised host can serve a key of its own choosing: compare the fingerprint of the active key against this repository (git) and against the fingerprint recorded in the release documentation before trusting a signature. A signature is only evidence of provenance when the key is witnessed somewhere the signer does not control.",
+    "private_key_is_offline": true,
+    "retired_keys_are_never_removed": true
+  },
+  "protocol": "NAC3",
+  "surface": "trust"
+}

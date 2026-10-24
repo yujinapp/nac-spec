@@ -24,6 +24,14 @@
      node scripts/sign-contract-api.mjs --keygen --rotate
      node scripts/sign-contract-api.mjs --sign
      node scripts/sign-contract-api.mjs --sign --key D:/keys/mykey.pem
+     node scripts/sign-contract-api.mjs --witness
+
+   --witness rewrites the witness record in docs/CONTRACT_API_SIGNING.md
+   from api/index.json, api/trust.json and api/attestation.json. It needs
+   NO private key: it copies public values into the one place a third
+   party reads before trusting a signature. --sign runs it, so a release
+   stays one command; it is separate only so the record can be repaired
+   without touching the key.
 
    Key location, in order of precedence:
      --key <path>
@@ -50,7 +58,21 @@ const API_DIR  = join(ROOT, 'api');
 const INDEX    = join(API_DIR, 'index.json');
 const TRUST    = join(API_DIR, 'trust.json');
 const ATTEST   = join(API_DIR, 'attestation.json');
+const DOC      = join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md');
 const API_SCHEMA = 1;
+
+/* The witness record is spliced between these two markers. Anchored on
+   purpose: if the document is reorganised and the markers go with it, the
+   writer refuses loudly instead of recording the fingerprint nowhere. A
+   witness that quietly stops being written is the exact failure this
+   layer exists to prevent. */
+const W_BEGIN = '<!-- NAC3-WITNESS-BEGIN -->';
+const W_END   = '<!-- NAC3-WITNESS-END -->';
+const PUBLIC_BASE = 'https://yujin.app/nac-spec/';
+const WITNESS_FIELDS = [
+  'key_id', 'key_fingerprint_sha384', 'chain_head',
+  'index_sha384', 'entry_count', 'versions', 'signed_at',
+];
 
 function arg(name, fallback = null) {
   const i = process.argv.indexOf(name);
@@ -311,19 +333,133 @@ function signIndex() {
   console.log('  signed at    ' + payload.signed_at);
   console.log('');
   console.log('WROTE api/attestation.json (' + bytes + ' bytes)');
+  /* A signature is worth nothing as provenance unless its fingerprint is
+     recorded where the host cannot rewrite it. Doing it here means a
+     release cannot produce a signature and forget its witness. */
+  writeWitness();
+  console.log('WROTE the witness record in docs/CONTRACT_API_SIGNING.md');
   console.log('');
   console.log('Next: node scripts/build-contract-api.mjs   (the gate verifies this signature)');
+}
+
+/* ---- witness record ------------------------------------------------
+   api/trust.json tells a reader to compare the active fingerprint
+   "against the fingerprint recorded in the release documentation".
+   Until this existed, that record did not: the instruction pointed at
+   nothing, which is the same defect as the phantom third witness
+   (audit N-24). Every value below is public by construction -- it is
+   what the server already serves. The point is that it also exists
+   somewhere the server does not write.
+
+   Honest about what it buys: this record lives in git, so whoever can
+   push can move it together with api/. It defeats a compromised HOST,
+   not a compromised repository. The record that defeats the repository
+   is the one the owner wrote down offline the day the key was made. */
+
+function witnessRows() {
+  if (!existsSync(INDEX)) die('api/index.json does not exist: there is no chain to witness');
+  const trust = readTrust();
+  if (!trust) {
+    die('api/trust.json does not exist: there is no key to witness',
+        'run: node scripts/sign-contract-api.mjs --keygen');
+  }
+  const active = (trust.keys || []).filter((k) => k.status === 'active');
+  if (active.length !== 1) {
+    die('api/trust.json must publish exactly one active key, it publishes ' + active.length);
+  }
+  if (!existsSync(ATTEST)) {
+    die('api/attestation.json does not exist: sign the index before recording its witness',
+        'run: node scripts/sign-contract-api.mjs --sign');
+  }
+  let att = null;
+  try { att = JSON.parse(readFileSync(ATTEST, 'utf8')); }
+  catch (e) { return die('api/attestation.json is not valid JSON: ' + e.message); }
+  const signedAt = att && att.payload ? att.payload.signed_at : null;
+  if (!signedAt) die('api/attestation.json carries no payload.signed_at');
+
+  const indexBytes = readFileSync(INDEX);
+  const index = JSON.parse(indexBytes.toString('utf8'));
+  return {
+    key_id: active[0].key_id,
+    key_fingerprint_sha384: active[0].fingerprint_sha384,
+    chain_head: index.chain_head,
+    index_sha384: sha384(indexBytes),
+    entry_count: String(index.entry_count),
+    versions: (index.entries || []).map((e) => e.version).join(' '),
+    signed_at: signedAt,
+  };
+}
+
+function renderWitness(rows, eol) {
+  const out = [
+    W_BEGIN,
+    '<!-- Generado por: node scripts/sign-contract-api.mjs --witness',
+    '     NO editar a mano: la compuerta compara cada valor contra api/. -->',
+    '',
+    '| campo | valor |',
+    '|---|---|',
+  ];
+  for (const f of WITNESS_FIELDS) out.push('| ' + f + ' | ' + rows[f] + ' |');
+  out.push(
+    '',
+    'Comando listo para pegar, para un tercero que no confia en el servidor',
+    'ni en este repositorio:',
+    '',
+    '```',
+    'node scripts/verify-contract-api.mjs --base ' + PUBLIC_BASE + ' \\',
+    '  --expect-head ' + rows.chain_head + ' \\',
+    '  --expect-key  ' + rows.key_fingerprint_sha384,
+    '```',
+    W_END
+  );
+  return out.join(eol);
+}
+
+function writeWitness() {
+  if (!existsSync(DOC)) {
+    die('docs/CONTRACT_API_SIGNING.md does not exist',
+        'the witness record lives in it: it is what a third party reads to learn which',
+        'chain head and which key fingerprint this project published.');
+  }
+  const src = readFileSync(DOC, 'utf8');
+  const eol = src.indexOf('\r\n') >= 0 ? '\r\n' : '\n';
+  const a = src.indexOf(W_BEGIN);
+  const b = src.indexOf(W_END);
+  if (a < 0 || b < 0 || b < a) {
+    die('cannot find the witness markers in docs/CONTRACT_API_SIGNING.md',
+        'expected a block delimited by ' + W_BEGIN + ' and ' + W_END + '.',
+        'refusing to guess where the record goes: a record written in the wrong',
+        'place is a witness nobody reads.');
+  }
+  const rows = witnessRows();
+  const next = src.slice(0, a) + renderWitness(rows, eol) + src.slice(b + W_END.length);
+  writeFileSync(DOC, Buffer.from(next, 'utf8'));
+  return rows;
+}
+
+function witnessOnly() {
+  const rows = writeWitness();
+  console.log('');
+  console.log('WROTE the witness record in docs/CONTRACT_API_SIGNING.md');
+  for (const f of WITNESS_FIELDS) {
+    console.log('  ' + f.padEnd(23) + rows[f]);
+  }
+  console.log('');
+  console.log('No private key was read: every value above is already public in api/.');
+  console.log('Next: node scripts/build-contract-api.mjs   (the gate compares this record)');
 }
 
 /* ---- main ---------------------------------------------------------- */
 
 if (has('--keygen')) keygen();
 else if (has('--sign')) signIndex();
+else if (has('--witness')) witnessOnly();
 else {
   console.log('sign-contract-api.mjs -- produce the offline Ed25519 attestation over api/index.json');
   console.log('');
   console.log('  --keygen [--key-id <id>] [--key <path>] [--rotate]   create the offline key, publish its public half');
   console.log('  --sign   [--key <path>]                              sign the current api/index.json');
+  console.log('  --witness                                            rewrite the witness record in docs/ (no key needed)');
   console.log('');
   console.log('This program only SIGNS. Verification is in build-contract-api.mjs (gate)');
   console.log('and verify-contract-api.mjs (consumer, over a URL).');

@@ -43,6 +43,7 @@ Veredicto de verificacion, en una tabla:
 | N-22 | La huella publicada se calculaba sobre bytes CRLF y el servidor entrega LF | **CERRADO** (2026-10-24) -- la compuerta de integridad lo detuvo antes de produccion; arreglado en `0778d9f` + `dcb71ea` | bloquea |
 | N-23 | El runtime acepta 3 roles que la tabla normativa del SPEC no lista | **CONFIRMADO** (nuevo, mio -- lo delato el contrato generado) | avisa |
 | N-24 | El indice publicado declara tres testigos de su cabeza y el tercero (tarball de npm) todavia no existe | **CONFIRMADO** (nuevo, mio -- lo delato construir la capa 4) | avisa |
+| N-25 | `api/trust.json` mandaba comparar la huella contra un registro de la documentacion de release que no existia | **CERRADO** (2026-10-24) -- el registro testigo existe, lo escribe `--witness` y la compuerta lo compara campo por campo (4 casos en rojo) | avisa |
 
 Resumen al cierre del 2026-10-24: **24 entradas, 6 cerradas, 3 parciales, 1 refutada**. Las tres entradas que no estaban en la auditoria original (N-22, N-23 y N-24) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, N-23 la delato el primer contrato generado y N-24 la delato construir la firma. Vale anotarlo como patron: **cada capa de verificacion que se construye encuentra un hallazgo que la lectura no habia encontrado.**
 
@@ -829,6 +830,28 @@ Es una frase, y es verificable con el barrido de arriba: mas de lo que habia ant
 - Auditor: `npm pack` del runtime contiene la cabeza, y coincide con la del host y la del repositorio.
 
 **Severidad:** avisa. **Quien decide:** Forge; es mecanico. **Estado:** abierto, anotado en PND-032.
+
+---
+
+### N-25 (nuevo, CERRADO el mismo dia) La huella publicada mandaba compararse contra un registro que no existia
+
+**Que esta mal:** `api/trust.json` publicaba, en su propio texto de politica, que un lector debe comparar la huella de la clave activa *"contra este repositorio (git) y contra la huella registrada en la documentacion de release"* antes de confiar en una firma. Y `docs/CONTRACT_API_SIGNING.md` le decia a un tercero que corriera el verificador con `--expect-head <cabeza publicada en las notas del release>` y `--expect-key <huella publicada en las notas del release>`. Esas notas no tenian ningun valor escrito: la huella existia unicamente en `api/trust.json`, es decir en el archivo que sirve el host que uno esta auditando.
+
+**Como aparecio:** lo delato escribir el paso a paso para el dueno. Al redactar "anota la huella en un lugar fuera de la maquina" hubo que contestar donde la anota el proyecto, y la respuesta era: en ningun lado.
+
+**Evidencia que medi (2026-10-24):** `grep` de la huella `sha384-joOCEsjN728D...` sobre todo el arbol, excluyendo `.git`: una sola aparicion, `api/trust.json:10`. Cero en `docs/`, cero en `SPEC.md`, cero en `runtime/`.
+
+**Por que importa:** es la misma familia que N-24 y que N-01 -- una promesa publicada que apunta a nada. Pero aca el costo es peor que una promesa incumplida: un auditor que sigue la instruccion al pie de la letra lee la huella del servidor que esta auditando y la compara **contra si misma**, lo que da verde siempre, incluido el caso en que el host publico una clave propia y firmo su falsificacion con ella. Una comparacion que no puede fallar no es una verificacion; es una ceremonia que produce confianza falsa. El ataque exacto que vuelve inutil esta ceremonia ya estaba cubierto por un caso en rojo del verificador (`un host que reconstruye la cadena y firma con su propia clave`) -- el caso pasaba, pero el instrumento que el documento le ofrecia a una persona para detectarlo no existia.
+
+**Donde vive el arreglo (ya hecho):** `docs/CONTRACT_API_SIGNING.md` lleva un **registro testigo** entre anclas, con `key_id`, huella, cabeza de la cadena, sha384 del indice, cantidad de entradas, versiones y fecha de firma, mas el comando de verificacion listo para pegar con los dos valores reales adentro. Lo escribe `sign-contract-api.mjs --witness`, que **no lee ninguna clave privada** (todos los valores ya son publicos) y que `--sign` corre solo, de modo que una release no puede producir una firma y olvidarse del testigo. `build-contract-api.mjs` lo **compara campo por campo contra `api/`** en cada publicacion y se pone rojo ante cualquier deriva: el valor no se escribe a mano en dos lugares sin una compuerta que los confronte, que es la leccion de las trece copias de la version (N-17).
+
+**Probado en rojo:** 4 casos nuevos en `scripts/test-contract-api.mjs` (26 -> 30): huella que `api/` no publica, cabeza que `api/` no publica, anclas borradas, documento ausente.
+
+**Lo que el arreglo NO compra, escrito en el mismo documento:** el deploy publica `docs/`, asi que el host tambien sirve una copia de este registro. **Esa copia no es un testigo** -- un host comprometido la reescribe junto con `api/trust.json`. El testigo es la copia de GitHub, que tiene otro operador. Y ni esa cubre el caso peor: vive en el mismo repositorio que `api/`, asi que quien pueda pushear mueve las dos. El unico testigo que cubre un repositorio comprometido sigue siendo la huella que el dueno anoto fuera de la maquina el dia que creo la clave.
+
+**Grupo de convergencia:** G5-HONESTIDAD (una instruccion publicada que no se podia seguir).
+
+**Severidad:** avisa. **Quien decide:** Forge; es mecanico. **Estado:** CERRADO el 2026-10-24, en la misma sesion en que aparecio.
 
 ---
 

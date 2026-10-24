@@ -92,6 +92,9 @@ const LATEST_DIR = join(API_DIR, 'latest');
 const META_PATH  = join(ROOT, 'scripts', 'contract-api.meta.json');
 const TRUST_PATH = join(API_DIR, 'trust.json');
 const ATTEST_PATH = join(API_DIR, 'attestation.json');
+const WITNESS_DOC_PATH = join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md');
+const W_BEGIN = '<!-- NAC3-WITNESS-BEGIN -->';
+const W_END   = '<!-- NAC3-WITNESS-END -->';
 
 const SURFACES = ['contract.json', 'findings.json', 'levels.json'];
 
@@ -813,7 +816,87 @@ function verifyAttestation(index, indexBytes, hard) {
   }
 
   ok('signature verifies: key ' + key.key_id + ' (' + key.fingerprint_sha384.slice(7, 19) + '...) over ' + p.entry_count + ' entries, signed ' + p.signed_at);
-  note('the signature proves provenance only if that fingerprint matches an independent record.');
+  note('that fingerprint is only evidence against a record the host does not write: docs/CONTRACT_API_SIGNING.md in git, and the note the owner kept offline.');
+}
+
+/* A signature is evidence of provenance only against a record the
+   signer's host cannot rewrite. api/trust.json says so itself, and
+   points at "the fingerprint recorded in the release documentation".
+   This checks that the record is there and still says what api/ says.
+
+   Why a gate and not a convention: the same repository spent five
+   months with its version written by hand in thirteen places. A value
+   copied into prose and never compared drifts, and a drifted witness
+   is worse than no witness -- it is a comparison that passes against
+   the wrong value, which is precisely the outcome the layer exists to
+   make impossible.
+
+   The record is parsed, not byte-compared against a rendered template:
+   comparing two templates would only prove the two templates agree. */
+function verifyWitnessRecord(index, indexBytes, hard) {
+  const bad = hard ? fail : note;
+
+  /* No published key means layer 4 is not in place; there is nothing to
+     witness and the earlier checks already said so. */
+  if (!existsSync(TRUST_PATH) || !existsSync(ATTEST_PATH)) return;
+
+  if (!existsSync(WITNESS_DOC_PATH)) {
+    bad('docs/CONTRACT_API_SIGNING.md is missing: the published fingerprint has no record outside api/, so a host that serves its own key cannot be contradicted');
+    return;
+  }
+  const src = readFileSync(WITNESS_DOC_PATH, 'utf8');
+  const a = src.indexOf(W_BEGIN);
+  const b = src.indexOf(W_END);
+  if (a < 0 || b < 0 || b < a) {
+    bad('docs/CONTRACT_API_SIGNING.md has no witness record: expected a block between ' + W_BEGIN + ' and ' + W_END);
+    note('write it with: node scripts/sign-contract-api.mjs --witness   (no private key needed)');
+    return;
+  }
+
+  const got = {};
+  for (const raw of src.slice(a, b).split('\n')) {
+    const m = /^\|\s*([a-z0-9_]+)\s*\|\s*(\S.*?)\s*\|\s*$/.exec(raw.replace(/\r$/, ''));
+    if (m) got[m[1]] = m[2];
+  }
+
+  let trust = null;
+  try { trust = JSON.parse(readFileSync(TRUST_PATH, 'utf8')); } catch { return; }
+  const active = (trust.keys || []).filter((k) => k.status === 'active');
+  if (active.length !== 1) return; /* already reported by verifyAttestation */
+  let att = null;
+  try { att = JSON.parse(readFileSync(ATTEST_PATH, 'utf8')); } catch { return; }
+  const signedAt = att && att.payload ? att.payload.signed_at : null;
+
+  const want = {
+    key_id: active[0].key_id,
+    key_fingerprint_sha384: active[0].fingerprint_sha384,
+    chain_head: index.chain_head,
+    index_sha384: sha384(indexBytes),
+    entry_count: String(index.entry_count),
+    versions: (index.entries || []).map((e) => e.version).join(' '),
+    signed_at: signedAt,
+  };
+
+  let drift = 0;
+  for (const f of Object.keys(want)) {
+    if (want[f] === null || want[f] === undefined) continue;
+    if (!(f in got)) {
+      bad('the witness record in docs/CONTRACT_API_SIGNING.md has no ' + f + ' row');
+      drift += 1;
+      continue;
+    }
+    if (got[f] !== want[f]) {
+      bad('the witness record in docs/CONTRACT_API_SIGNING.md records ' + f + ' that api/ does not publish');
+      note('recorded  ' + got[f]);
+      note('api says  ' + want[f]);
+      drift += 1;
+    }
+  }
+  if (drift) {
+    note('rewrite it from api/: node scripts/sign-contract-api.mjs --witness   (no private key needed)');
+    return;
+  }
+  ok('the witness record in docs/ matches the published key and chain head');
 }
 
 /* ---- main ---------------------------------------------------------- */
@@ -1012,6 +1095,7 @@ function main() {
     checkLatest(existingIndex, bytesOf, version);
     /* Hard here: this is the mode CI runs before the upload. */
     verifyAttestation(existingIndex, readFileSync(existingIndexPath), true);
+    verifyWitnessRecord(existingIndex, readFileSync(existingIndexPath), true);
     if (failed) process.exit(1);
     console.log('');
     console.log('Contract API is coherent.');
@@ -1071,6 +1155,7 @@ function main() {
      mode -- the one CI runs -- turns the same condition red. */
   console.log('');
   verifyAttestation(index, indexBytes, false);
+  verifyWitnessRecord(index, indexBytes, false);
 
   console.log('');
   console.log('Contract API written. Commit api/ together with the runtime that produced it.');

@@ -12,6 +12,10 @@
    in its own temporary git repository, so the no-purge rule -- which
    compares against HEAD -- is exercised for real rather than mocked.
 
+   Covers the generator, the no-purge rule, the hash chain, the
+   signature layer and the witness record the signature is compared
+   against.
+
    Run: node scripts/test-contract-api.mjs
    ASCII only. No dependency beyond node core.
    ===================================================================== */
@@ -40,11 +44,15 @@ function sandbox() {
   const dir = mkdtempSync(join(tmpdir(), 'nac3-contract-api-'));
   mkdirSync(join(dir, 'scripts'), { recursive: true });
   mkdirSync(join(dir, 'js'), { recursive: true });
+  mkdirSync(join(dir, 'docs'), { recursive: true });
   copyFileSync(join(ROOT, 'scripts', 'build-contract-api.mjs'), join(dir, 'scripts', 'build-contract-api.mjs'));
   copyFileSync(join(ROOT, 'scripts', 'sign-contract-api.mjs'), join(dir, 'scripts', 'sign-contract-api.mjs'));
   copyFileSync(join(ROOT, 'scripts', 'contract-api.meta.json'), join(dir, 'scripts', 'contract-api.meta.json'));
   copyFileSync(join(ROOT, 'js', 'nac.js'), join(dir, 'js', 'nac.js'));
   copyFileSync(join(ROOT, 'SPEC.md'), join(dir, 'SPEC.md'));
+  /* The witness record lives in this document and the gate compares it,
+     so a sandbox without it would test a tree that cannot exist. */
+  copyFileSync(join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md'), join(dir, 'docs', 'CONTRACT_API_SIGNING.md'));
   cpSync(join(ROOT, 'api'), join(dir, 'api'), { recursive: true });
 
   git(dir, ['init', '-q']);
@@ -370,6 +378,14 @@ function signSandbox(dir, opts = {}) {
     payload,
     signature_b64: signature,
   }));
+
+  /* The gate compares the witness record against trust.json and the
+     index. Refresh it through the real writer -- rendering it here
+     would only prove the suite and the writer agree on a template.
+     Without this, every signature case below would go red for a
+     drifted record instead of the defect it was written for. */
+  const w = runSigner(dir, ['--witness']);
+  if (w.code !== 0) throw new Error('--witness failed in the sandbox: ' + w.out);
 }
 
 function runSigner(dir, args) {
@@ -525,6 +541,40 @@ expectRedSigner(
     return ['--keygen', '--key-id', 'existing-key', '--key', join(keyDir, 'offline.pem')];
   },
   'a key already exists at'
+);
+
+/* 27 to 30. The witness record. api/trust.json tells a reader to
+       compare the active fingerprint against the record in the release
+       documentation, so that record is load-bearing: if it can drift
+       from api/ without anything going red, the comparison it exists
+       for passes against the wrong value. These four are the ways it
+       can rot -- a wrong key, a wrong head, a record deleted, and the
+       whole document gone. */
+expectRed(
+  'a witness record with a key fingerprint api/ does not publish is refused',
+  (dir) => patch(dir, 'docs/CONTRACT_API_SIGNING.md', (s) =>
+    s.replace(/\| key_fingerprint_sha384 \| sha384-[^|]+\|/, '| key_fingerprint_sha384 | sha384-' + 'E'.repeat(64) + ' |')),
+  'records key_fingerprint_sha384 that api/ does not publish'
+);
+
+expectRed(
+  'a witness record with a chain head api/ does not publish is refused',
+  (dir) => patch(dir, 'docs/CONTRACT_API_SIGNING.md', (s) =>
+    s.replace(/\| chain_head \| sha384-[^|]+\|/, '| chain_head | sha384-' + 'F'.repeat(64) + ' |')),
+  'records chain_head that api/ does not publish'
+);
+
+expectRed(
+  'a witness record whose markers were removed is refused',
+  (dir) => patch(dir, 'docs/CONTRACT_API_SIGNING.md', (s) =>
+    s.replace('<!-- NAC3-WITNESS-BEGIN -->', '')),
+  'has no witness record'
+);
+
+expectRed(
+  'a missing witness document is refused',
+  (dir) => rmSync(join(dir, 'docs', 'CONTRACT_API_SIGNING.md'), { force: true }),
+  'has no record outside api/'
 );
 
 console.log('');

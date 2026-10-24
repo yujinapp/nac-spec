@@ -47,10 +47,9 @@ commit. El indice solo se mueve cuando se publica una version.
 node scripts/sign-contract-api.mjs --keygen
 ```
 
-Escribe la mitad privada en `%USERPROFILE%\.nac3-keys
-ac3-contract-<anio>.pem`
-(permisos 600) y la mitad publica en `api/trust.json`, que se publica con el
-resto de la API. Imprime la huella.
+Escribe la mitad privada en `~/.nac3-keys/<key_id>.pem` (permisos 600) y la
+mitad publica en `api/trust.json`, que se publica con el resto de la API.
+Imprime la huella.
 
 El programa **se niega** a escribir la clave en cualquier ruta dentro del
 repositorio y **se niega** a sobreescribir una clave existente. Las dos cosas
@@ -86,7 +85,7 @@ El orden importa. Una release es:
 
 ```
 node scripts/build-contract-api.mjs --write     # mueve la cadena
-node scripts/sign-contract-api.mjs --sign       # firma la cadena nueva
+node scripts/sign-contract-api.mjs --sign       # firma la cadena nueva + escribe el testigo
 npm run check:release                           # las tres compuertas
 git add api/ && git commit && git push          # el deploy verifica desde afuera
 ```
@@ -118,6 +117,56 @@ firmar el indice actual (caso de regresion propio).
   publicacion que pierde su firma en silencio es un *downgrade*, no una
   ausencia.
 
+## El registro testigo
+
+Este es el registro que `api/trust.json` manda comparar antes de confiar en
+una firma. Lo escribe `--witness` (lo corre `--sign` solo) y **la compuerta
+compara cada valor contra `api/` en cada publicacion**: un registro que
+nadie verifica deriva, y un testigo derivado es peor que ninguno, porque es
+una comparacion que da verde contra el valor equivocado.
+
+<!-- NAC3-WITNESS-BEGIN -->
+<!-- Generado por: node scripts/sign-contract-api.mjs --witness
+     NO editar a mano: la compuerta compara cada valor contra api/. -->
+
+| campo | valor |
+|---|---|
+| key_id | nac3-contract-2026 |
+| key_fingerprint_sha384 | sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft |
+| chain_head | sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V |
+| index_sha384 | sha384-m9n6F1FVnt/55xmhQ9SuW94I9KuWWG1hvBp9ntT3T0SE7Ock3E/QzPQ+FW6pxlYA |
+| entry_count | 1 |
+| versions | 2.5.0-alpha.5 |
+| signed_at | 2026-10-24T20:40:17Z |
+
+Comando listo para pegar, para un tercero que no confia en el servidor
+ni en este repositorio:
+
+```
+node scripts/verify-contract-api.mjs --base https://yujin.app/nac-spec/ \
+  --expect-head sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V \
+  --expect-key  sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft
+```
+<!-- NAC3-WITNESS-END -->
+
+Que cubre y que no, sin maquillaje. Tres precisiones, en orden de
+importancia:
+
+1. **La copia que vale es la de git, no la que sirve el host.** El deploy
+   publica `docs/`, asi que este mismo documento queda servido en
+   `yujin.app/nac-spec/docs/CONTRACT_API_SIGNING.md`. Esa copia **no es un
+   testigo**: un host comprometido la reescribe junto con `api/trust.json`
+   y las dos coinciden. El testigo es
+   `github.com/yujinapp/nac-spec/blob/main/docs/CONTRACT_API_SIGNING.md`,
+   que tiene otro operador. Leer la huella del servidor que estas
+   auditando y compararla contra si misma no prueba nada.
+2. **Ni la copia de git cubre el caso peor.** Vive en el mismo repositorio
+   que `api/`, asi que quien pueda pushear mueve los dos a la vez. Sirve
+   contra un host comprometido, no contra el repositorio.
+3. **El unico testigo que cubre el repositorio** es la huella que el dueno
+   anoto fuera de la maquina el dia que creo la clave. Este registro es lo
+   que le permite comparar sin tener que clonar nada; no lo reemplaza.
+
 ## Como lo verifica un tercero
 
 Sin confiar en el servidor, sin clonar el repositorio, sin instalar nada mas
@@ -125,8 +174,8 @@ que Node:
 
 ```
 node scripts/verify-contract-api.mjs --base https://yujin.app/nac-spec/ \
-  --expect-head <cabeza publicada en las notas del release> \
-  --expect-key  <huella publicada en las notas del release>
+  --expect-head <chain_head del registro testigo de arriba> \
+  --expect-key  <key_fingerprint_sha384 del registro testigo de arriba>
 ```
 
 Recalcula la cadena, vuelve a hashear **los bytes que el servidor entrego**
@@ -137,7 +186,7 @@ interna y **no** procedencia.
 
 ## Los candados, probados en rojo
 
-- `scripts/test-contract-api.mjs` -- 26 casos sobre la compuerta (productor).
+- `scripts/test-contract-api.mjs` -- 30 casos sobre la compuerta (productor).
 - `scripts/test-contract-api-http.mjs` -- 8 casos sobre el verificador
   (consumidor), cada uno con un servidor HTTP real.
 

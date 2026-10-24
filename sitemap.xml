@@ -15,7 +15,7 @@
   <!-- core -->
   <url>
     <loc>https://yujin.app/nac-spec/</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-10-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -30,6 +30,16 @@
     <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://yujin.app/nac-spec/api/index.json</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://yujin.app/nac-spec/api/latest.json</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <!-- site -->
   <url>

@@ -9,8 +9,12 @@
     "serve": "python -m http.server 8855",
     "check:integrity": "node scripts/build-integrity.mjs",
     "check:version": "node scripts/check-version-coherence.mjs",
-    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs",
-    "test:integrity": "node scripts/test-integrity-load.mjs"
+    "check:contract": "node scripts/build-contract-api.mjs",
+    "build:contract": "node scripts/build-contract-api.mjs --write",
+    "verify:contract": "node scripts/verify-contract-api.mjs --expect-head-from-repo",
+    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs && node scripts/build-contract-api.mjs",
+    "test:integrity": "node scripts/test-integrity-load.mjs",
+    "test:contract": "node scripts/test-contract-api.mjs"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

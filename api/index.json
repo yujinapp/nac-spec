@@ -1,0 +1,42 @@
+{
+  "api_schema": 1,
+  "chain_head": "sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V",
+  "entries": [
+    {
+      "channel": "prerelease",
+      "entry_sha384": "sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V",
+      "files": [
+        {
+          "bytes": 17918,
+          "path": "api/v/2.5.0-alpha.5/contract.json",
+          "sha384": "sha384-VefqQzotn/2XOR7BsTzFQ3Q/YkV0C1NeJ6Gp10FVVi2qLT09zMeJunQ2MNkeCiOH"
+        },
+        {
+          "bytes": 12504,
+          "path": "api/v/2.5.0-alpha.5/findings.json",
+          "sha384": "sha384-5an+mTjVeYyaHNHhCH3ZDrvHAgTQz6qtg29vuLw/yP8qw8C4fwQm0aa6qJtVzASJ"
+        },
+        {
+          "bytes": 7178,
+          "path": "api/v/2.5.0-alpha.5/levels.json",
+          "sha384": "sha384-sGIJ2I5X4EcMOnMBGjGIbMc5jkPLldcksX9DmIgzDIN2+CUUjKg8hD5nwKlwMvVO"
+        }
+      ],
+      "generated_at_commit": "aaaf4ef533fcda4e780b5d7274d641f7418f1381",
+      "prev_entry_sha384": null,
+      "published_at": "2026-10-24",
+      "runtime_sha384": "sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp",
+      "version": "2.5.0-alpha.5"
+    }
+  ],
+  "entry_count": 1,
+  "generated_by": "scripts/build-contract-api.mjs",
+  "policy": {
+    "append_only": true,
+    "note": "Each entry carries the hash of the previous entry. The head below is also recorded in the git history of this repository and in the published npm tarball: three independent witnesses. Verify the head against all three before trusting the contract.",
+    "versions_are_never_purged": true,
+    "versions_are_never_rewritten": true
+  },
+  "protocol": "NAC3",
+  "surface": "index"
+}

@@ -45,6 +45,14 @@ const PAGES = [
   ['core', '', 'weekly', '1.0'],
   ['core', 'SPEC.html', 'weekly', '0.9'],
   ['core', 'SPEC.md', 'weekly', '0.5'],
+  // The machine-readable contract (audit N-04, owner decision D-02).
+  // Only the two stable entry points are listed: api/index.json names
+  // every published version and api/latest.json says which one `latest`
+  // is handing over. The frozen per-version directories are reachable
+  // from the index and do not belong in a crawler's queue -- they never
+  // change, and there will be one more of them per release forever.
+  ['core', 'api/index.json', 'weekly', '0.8'],
+  ['core', 'api/latest.json', 'weekly', '0.8'],
   // -- public site -------------------------------------------------------
   ['site', 'ABOUT.html', 'monthly', '0.6'],
   ['site', 'SECURITY.html', 'monthly', '0.5'],

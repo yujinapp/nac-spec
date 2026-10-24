@@ -1,0 +1,22 @@
+# Frozen contract versions.
+#
+# Everything under api/v/<version>/ is immutable by policy and by gate:
+# scripts/build-contract-api.mjs refuses to rewrite a version that is
+# already in the published chain, and refuses to let one disappear from
+# the tree (the deploy mirrors this repository with --delete-after, so
+# a deletion here is a deletion from the web for everyone who pinned
+# the path).
+#
+# Because the bytes can never change, they can be cached forever. That
+# is the practical reward of pinning a version instead of following
+# `latest`, and it is why the parent .htaccess five-minute rule is
+# overridden here.
+
+<FilesMatch "\.json$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+    Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+AddType "application/json; charset=UTF-8" .json

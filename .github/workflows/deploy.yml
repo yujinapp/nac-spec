@@ -56,6 +56,23 @@ jobs:
         # with the authoritative constant in js/nac.js.
         run: node scripts/check-version-coherence.mjs
 
+      - name: Contract API gate
+        # Audit N-04 / N-14, owner decision D-02. The contract is
+        # published as static JSON under api/, one frozen directory per
+        # version. This regenerates it from the runtime and refuses the
+        # deploy when: the artefacts drifted from the runtime that
+        # produced them, a published version was rewritten, a version
+        # disappeared from the tree (the rsync below mirrors with
+        # --delete-after, so that would delete it from the web), or the
+        # hash chain does not recompute.
+        run: node scripts/build-contract-api.mjs
+
+      - name: Contract API gate goes red when it should
+        # A gate nobody proved red is a decoration. This suite breaks
+        # one thing at a time in a throwaway copy and asserts the gate
+        # refuses each one for the right reason.
+        run: node scripts/test-contract-api.mjs
+
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |
@@ -136,3 +153,17 @@ jobs:
           grep -qF "$IMMUTABLE" <<< "$BODY" || { echo "::error::Landing page does not offer the immutable versioned path ($IMMUTABLE)"; exit 1; }
           curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' "https://yujin.app/nac-spec/$IMMUTABLE" | grep -qx 200 || { echo "::error::Immutable runtime path is not being served ($IMMUTABLE)"; exit 1; }
           echo "Integrity is live."
+
+      - name: Verify the published contract API from outside
+        # The producer checked itself before the upload; this checks the
+        # HOST. It fetches the published chain, recomputes it, compares
+        # the sha384 of the bytes the server actually sent against the
+        # recorded hashes, and requires the CORS header without which a
+        # browser agent cannot read any of it.
+        #
+        # --expect-head-from-repo is the part that matters: the head is
+        # compared against this repository's copy, which GitHub holds
+        # and the web host does not. A compromised host can serve a
+        # perfectly self-consistent forgery; only an independent
+        # witness of the head catches that.
+        run: node scripts/verify-contract-api.mjs --expect-head-from-repo

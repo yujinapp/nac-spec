@@ -1,0 +1,231 @@
+{
+  "_README": [
+    "Human meaning for the published contract API. Build input, not an artefact.",
+    "",
+    "scripts/build-contract-api.mjs extracts WHICH finding codes exist, with what",
+    "severity and from which function, by loading the published runtime bytes. It",
+    "cannot extract what a code MEANS, what an author should do about it, or whether",
+    "a conformance requirement is decidable by a tool. That is what this file holds.",
+    "",
+    "The gate refuses a mismatch in BOTH directions: a code the runtime emits with no",
+    "entry here, and an entry here for a code the runtime no longer emits. Level",
+    "requirements are keyed by the sha384 of their text in SPEC.md section 8, so",
+    "editing the sentence turns the gate red until someone re-reads the mapping.",
+    "A published conformance level that nobody re-read is how a guarantee rots."
+  ],
+
+  "finding_codes": {
+    "manifest_role_unknown": {
+      "what": "A manifest element declares a data-nac-role that is not in the runtime's accepted role set.",
+      "fix": "Use one of the roles published in contract.json, or drop the role and let the element default to action behaviour.",
+      "since": "2.2.0"
+    },
+    "tab_id_manifest_role_drift": {
+      "what": "An id matching the reserved tab. prefix carries a role other than tab, so NAC.tab() and NAC.tab_by_label() will never resolve it.",
+      "fix": "Set role to tab, or rename the id out of the reserved tab. prefix.",
+      "since": "2.2.0"
+    },
+    "manifest_dom_role_mismatch": {
+      "what": "The manifest and the mounted DOM element disagree about the role of the same id.",
+      "fix": "Make the data-nac-role attribute on the element match the role declared in the manifest.",
+      "since": "2.2.0"
+    },
+    "duplicate_plugin_no_instance_id": {
+      "what": "The same plugin slug is mounted more than once and the instances carry no distinct data-nac-plugin-id, so no id under that slug resolves to one element.",
+      "fix": "Give every mounted instance a unique data-nac-plugin-id, or mount the plugin once.",
+      "since": null
+    },
+    "no_manifest": {
+      "what": "Validation was asked for a plugin slug that was never registered.",
+      "fix": "Call NAC.register() for that slug before validating it, or correct the slug.",
+      "since": null
+    },
+    "plugin_not_mounted": {
+      "what": "The plugin is registered but no element with its data-nac-plugin root is in the DOM.",
+      "fix": "Mount the plugin root before validating, or unregister it when the view unmounts.",
+      "since": null
+    },
+    "missing_in_dom": {
+      "what": "An id the manifest advertises has no element in the DOM, so an agent that trusts the manifest will fail to operate it.",
+      "fix": "Render the element, or remove the id from the manifest while it is not mounted.",
+      "since": null
+    },
+    "field_type_mismatch": {
+      "what": "The manifest declares a field type the mounted element contradicts.",
+      "fix": "Align the manifest type with data-nac-field-type on the element.",
+      "since": "1.4.1"
+    },
+    "field_type_undeclared": {
+      "what": "A field is advertised without a type, so an agent has to guess how to fill it.",
+      "fix": "Declare the field type in the manifest.",
+      "since": "1.4.1"
+    },
+    "options_unresolved": {
+      "what": "A field advertises options and no resolver or option element produces them.",
+      "fix": "Provide the options resolver, or mark the field as free text.",
+      "since": "1.4.1"
+    },
+    "depends_on_orphan": {
+      "what": "A manifest entry depends on an id that nothing in the manifest declares.",
+      "fix": "Declare the referenced id, or remove the dependency.",
+      "since": "1.4.1"
+    },
+    "row_cell_missing": {
+      "what": "A data table declares a column with no matching cell in a row, so cell addressing by column breaks.",
+      "fix": "Render every declared column in every row, or drop the column declaration.",
+      "since": "2.1.0"
+    },
+    "breadcrumb_item_missing": {
+      "what": "A declared breadcrumb hop has no matching breadcrumb-item element in the DOM.",
+      "fix": "Render the breadcrumb item, or remove the hop from the manifest.",
+      "since": "1.4.1"
+    },
+    "duplicate_tab_label": {
+      "what": "Two tabs under one plugin share a label, so NAC.tab_by_label() is ambiguous.",
+      "fix": "Make the labels distinct, or address those tabs by id only.",
+      "since": null
+    },
+    "duplicate_verb": {
+      "what": "Two actions under one plugin declare the same data-nac-action verb, so NAC.click_by_verb() cannot resolve it. SPEC.md section 3 names this a manifest error.",
+      "fix": "Make the verb unique within the plugin, or address those actions by id.",
+      "since": null
+    },
+    "aria_nac_state_mismatch": {
+      "what": "The ARIA state of an element and its data-nac-state disagree, so a screen reader and an agent see different truths about the same widget.",
+      "fix": "Mirror the two: update data-nac-state wherever the ARIA attribute changes.",
+      "since": "1.4.1"
+    },
+    "drag_type_unknown": {
+      "what": "A drag type or accept value falls outside the registry. Custom types still work; this is a heads-up that no agent can guess the semantics.",
+      "fix": "Use a registered drag type, or document the custom one for the agents that must handle it.",
+      "since": "1.9.0"
+    },
+    "skip_without_reason": {
+      "what": "A subtree is excluded from validation with no reason recorded, so the exclusion cannot be reviewed.",
+      "fix": "State the reason on the skip annotation.",
+      "since": null
+    },
+    "skip_no_remediate_date": {
+      "what": "A validation exclusion carries no remediation date, so it has no expiry and becomes permanent debt.",
+      "fix": "Add the date by which the exclusion is expected to be gone.",
+      "since": null
+    },
+    "skip_remediation_overdue": {
+      "what": "A validation exclusion is past the remediation date it declared.",
+      "fix": "Remediate the subtree, or renegotiate the date deliberately.",
+      "since": null
+    },
+    "skip_subtree_contains_interactives": {
+      "what": "An excluded subtree contains operable widgets, so the page is hiding agent-operable surface behind the exclusion.",
+      "fix": "Narrow the exclusion to the part that genuinely cannot be annotated.",
+      "since": null
+    },
+    "strict_validation": {
+      "what": "Thrown, not reported: strict validation is on and register-time findings were raised, so the registration was refused.",
+      "fix": "Fix the findings carried on the error, or register with strict validation off while migrating.",
+      "since": "2.2.0"
+    },
+    "backend_unknown": {
+      "what": "Thrown, not reported: an action named a backend vocabulary term the runtime does not know.",
+      "fix": "Use a term from the backend vocabulary published in the spec, or register the extension that defines it.",
+      "since": "2.5.0"
+    },
+    "invalid": {
+      "what": "Thrown, not reported: an argument failed validation at the API boundary.",
+      "fix": "Read the message on the error; it names the argument and what it expected.",
+      "since": null
+    }
+  },
+
+  "global_buckets": {
+    "duplicates": {
+      "severity": "error",
+      "what": "The same nac_id is declared by two or more registered plugins, so an agent addressing it by id cannot know which element it gets."
+    },
+    "orphans": {
+      "severity": "warn",
+      "what": "An element in the DOM carries a data-nac-id that no registered manifest declares. Common and sometimes legitimate during brownfield migration, which is why it is a warning."
+    },
+    "unmounted": {
+      "severity": "warn",
+      "what": "A manifest declares an id that is not currently in the DOM. Expected while a view is closed; a defect when the manifest claims a permanent surface."
+    },
+    "convention_violations": {
+      "severity": "warn",
+      "what": "A declared nac_id does not start with its plugin slug, so it loses the namespacing that keeps two plugins from colliding."
+    },
+    "plugin_instance_violations": {
+      "severity": "error",
+      "what": "Plugin slug uniqueness is broken: the same slug is mounted more than once without distinct instance ids. Reported in its own bucket so CI can gate on it separately."
+    }
+  },
+
+  "level_requirements": {
+    "sha384-j3EccnTJffrFyTGTBhktgDu5jcTnAu1msfFNT2wFDLyUsNksotJjbCzerlDLPTf8": {
+      "machine_checkable": false,
+      "check": "human",
+      "falsified_by": [],
+      "note": "A tool cannot decide which widgets an agent SHOULD be able to operate. It can report unannotated interactive elements as candidates; whether each one belongs in the contract is the author's call. Any validator that reports this requirement as passed is overreaching."
+    },
+    "sha384-6IyP2dxizNAvAGFY8nPrMQ6+0eKeerkXDFGJEF/aaFAVUtVSMFzxjuefOJpoviVy": {
+      "machine_checkable": true,
+      "check": "behavioural",
+      "falsified_by": [],
+      "note": "Decidable only by clicking every advertised action and waiting for its completion event. No finding code covers it: a validator must drive the page and report the ids that never completed."
+    },
+    "sha384-h4xO/CCA+qJNBu7Xp2vJEylobWm0k2De7YIdEQI1EjeLJ78yk85ROMDQZEc4odIx": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": ["no_manifest"],
+      "note": "Decidable by asking the runtime for its registered manifests after the page settles."
+    },
+    "sha384-ndiKxR+qIPGNkI4eZwE158BPjbtXD+s1vZs1oZqSGl0mAaq/V/HpPHfC8Wb6d6SY": {
+      "machine_checkable": true,
+      "check": "behavioural",
+      "falsified_by": ["missing_in_dom", "plugin_not_mounted"],
+      "note": "Resolution can be checked statically; that the click actually lands needs the page driven."
+    },
+    "sha384-qfF53+n/AsHuAeu0Lfbo/3PoKFd+rlJL/xf88CO4qLLQban9Hdk1yEU4NlmbA2NS": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": [],
+      "note": "Decidable by reading the registered manifest: the three arrays are present and non-empty, rather than inferred from the DOM. No finding code reports their absence today."
+    },
+    "sha384-/SmujOyfyfbhHD/JB/DmJfkBS0w5F2RsJJZJ7uIH9d2ckfccP1kuFayhb/Ea/8te": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": [],
+      "note": "Decidable by comparing every label_i18n against the 10 required locales published in contract.json. Gap worth naming: no finding code reports incomplete locale coverage, so a page can miss this and no validator currently says so."
+    },
+    "sha384-aUm/oI5UhZdQCNrxIO1olGuEaU46HASMg1Aga2tWVV27PrGIc9/g2PmCd3ht2mOG": {
+      "machine_checkable": false,
+      "check": "human",
+      "falsified_by": [],
+      "note": "A tool cannot distinguish a page that does not need the brownfield primitives from one that needed them and skipped them. Observing that they were called proves use, not conformance."
+    },
+    "sha384-34d0xK6T07qc7Z5B6CTrQCBBTKqSa1mR4kLsJVHhoiGWOSPLlzuqUYahKUnQS6d9": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": [],
+      "note": "Decided today by the counts in the error-severity buckets of validate_global, because those findings carry no codes yet. When the buckets get codes this becomes falsified_by a code list."
+    },
+    "sha384-SCzRE3480NmJW1pwZDYGdd4BND5eO/hWImjUMV3YijdWwMNaYeFVX9/0af9SSHAF": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": [],
+      "note": "Decidable as the presence of a provenance block whose HMAC the runtime verifies. A validator without the tenant secret can confirm the block is present and verified by the page, not recompute it."
+    },
+    "sha384-yb/vat4c8XyXR9Y5SaMjmKW+TniJJnyahGXkGkvkP/6Bobff090sDLbKTxbV4q+D": {
+      "machine_checkable": false,
+      "check": "human",
+      "falsified_by": [],
+      "note": "Which verbs are security-sensitive is a product decision. A tool can report which actions refuse untrusted clicks; it cannot know which ones should."
+    },
+    "sha384-LsrEiYGyTKFsR2QbpYaAkZLnHunuHKScq0LLlRHPIRSw/7mAkVCKAtE1Mp5vAzQz": {
+      "machine_checkable": true,
+      "check": "static",
+      "falsified_by": [],
+      "note": "Same shape as the level 2 requirement above, with probing on and zero findings of any severity."
+    }
+  }
+}

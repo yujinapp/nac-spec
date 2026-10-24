@@ -198,6 +198,39 @@ expectAll('DECLARED', 'SPEC document version', 'SPEC.md',
   }
 })();
 
+/* --- the published contract API (audit N-04, owner decision D-02).
+       The runtime version is now also a published URL, so it is one
+       more slot that can fall behind. The deep checks -- hash chain,
+       immutability, no purge -- belong to the contract API gate; this
+       probe only answers "is THIS version published at all", which is
+       what a version bump breaks. --- */
+(() => {
+  const RUN_API = 'run: node scripts/build-contract-api.mjs --write';
+  const label = 'contract API publishes this version';
+  const file = 'api/index.json';
+  if (!has(file)) { drift(label, file, VERSION, '(file not found)', RUN_API); return; }
+  const idx = JSON.parse(read(file));
+  const entry = (idx.entries || []).find((e) => e.version === VERSION);
+  if (!entry) {
+    drift(label, file, VERSION,
+      'chain holds ' + ((idx.entries || []).map((e) => e.version).join(', ') || 'nothing'), RUN_API);
+    return;
+  }
+  const missing = (entry.files || []).map((f) => f.path).filter((p) => !has(p));
+  if (missing.length) {
+    drift(label, file, 'every artefact on disk', 'missing ' + missing.join(', '), RUN_API);
+    return;
+  }
+  const pointerPath = 'api/latest.json';
+  if (!has(pointerPath)) { drift(label, pointerPath, VERSION, '(file not found)', RUN_API); return; }
+  const pointer = JSON.parse(read(pointerPath));
+  if (pointer.mirrored_in_api_latest !== VERSION) {
+    drift('contract API latest mirror', pointerPath, VERSION, pointer.mirrored_in_api_latest, RUN_API);
+    return;
+  }
+  ok(label + ' [DERIVED]', file, entry.files.length + ' surfaces, channel ' + entry.channel);
+})();
+
 /* --- the landing page: the pinned path, the version pills, and the
        two demo plugin manifests. The demo plugins track the runtime
        version on purpose; if one ever needs its own lifecycle, remove

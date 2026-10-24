@@ -1,0 +1,36 @@
+# NAC3 contract API -- static, public, read-only.
+#
+# This subtree is an API in the only sense that matters to an agent:
+# stable URLs that return data. There is no server-side code here and
+# that is deliberate -- nothing to inject into, nothing to take over,
+# and the published bytes are hash-verifiable from outside (see
+# scripts/verify-contract-api.mjs).
+#
+# CORS is not a nicety here. The consumer this exists for is an agent
+# running inside a page on somebody else's origin; without the header
+# below, the browser refuses to hand it the response body and the
+# contract is readable only by curl. Measured on 2026-10-24: the host
+# sent no Access-Control-Allow-Origin, so this is the line that makes
+# the API actually consumable.
+#
+# Allow-Origin is * on purpose: the contract is public data, carries
+# no credentials, and is served with no cookies. There is nothing here
+# to protect from being read -- only from being altered unnoticed, and
+# that is the job of the hash chain, not of an origin check.
+
+<FilesMatch "\.json$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+    Header set Access-Control-Max-Age "600"
+    # No sniffing: this is JSON and must be read as JSON.
+    Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+AddType "application/json; charset=UTF-8" .json
+
+# The index and the latest pointer MOVE on every release, so they are
+# the two files that must not be cached for long. Five minutes matches
+# the rest of the site.
+<FilesMatch "^(index|latest)\.json$">
+    Header set Cache-Control "public, max-age=300"
+</FilesMatch>

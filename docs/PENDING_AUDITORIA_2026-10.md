@@ -2,7 +2,8 @@
 
 - Fecha de este documento: 2026-10-24
 - Auditoria de origen: Claude Code, revision externa de portada publica, SPEC.md, registro npm, cabeceras HTTP y sitemap.
-- Estado global: **ABIERTO -- 3 de 21 cerrados** (N-21, N-02 y N-03, 2026-10-24, verificados en produccion). El resto sigue abierto.
+- Estado global: **ABIERTO -- 6 de 23 cerrados** (N-21, N-02, N-03, N-20, N-22 y N-04; todos el 2026-10-24). Parciales: N-14, N-17 y N-18. N-10 esta cerrado en la parte que vive en este repositorio y abierto en la que no.
+- **Alcance de la 2.5.0, fijado por el dueno el 2026-10-24:** *"Todos los pendientes son todos los que no sean urazuke. Urazuke no es requisito, lo vamos a avanzar despues de la 2.5, lo dejamos para la 2.6."* O sea: **este backlog ES el trabajo de la 2.5.0**. Los 27 peldanos del metodo Urazuke (PND-002 a PND-028) quedan fuera y se retoman despues. En el registro de pendientes eso son exactamente **tres** items no-Urazuke -- PND-001, PND-030 y PND-032 -- mas los dos que abrio D-02 (PND-033, PND-034).
 - Cambio de situacion del 2026-10-24 (17:00 UTC): **N-21 esta resuelto**. El dueno destrabo la facturacion, el pipeline volvio a correr y los arreglos de distribucion ya estan publicados y comprobados contra el servidor. A partir de ahora "corregido en el repositorio" ya no significa "invisible en la web": cada arreglo se puede verificar desde afuera en el push siguiente.
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
 - Regla aplicada: lo que no se pudo medir se informa como "declarado y no medido", nunca como verde.
@@ -22,7 +23,7 @@ Veredicto de verificacion, en una tabla:
 | N-01 | `latest` apunta a un alpha | **CONFIRMADO** | avisa (decision del dueno) |
 | N-02 | Portada sin SRI | **CERRADO** (2026-10-24) -- publicado y verificado en produccion: 3 de 3 hashes coinciden con los bytes servidos | avisa |
 | N-03 | URL mutable con query | **CERRADO** (2026-10-24) -- publicado: la ruta inmutable responde 200 y su sha384 coincide con el integrity de la portada | avisa |
-| N-04 | Contrato no legible por maquina | **CONFIRMADO** | bloquea (decision del dueno) |
+| N-04 | Contrato no legible por maquina | **CERRADO** (2026-10-24) -- D-02 = opcion A ampliada; API estatica publicada, con cadena de hashes y 15 tests en rojo | bloquea (decision del dueno) |
 | N-05 | Deriva de versiones en SPEC.md | **CONFIRMADO** | bloquea |
 | N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO** | avisa |
 | N-07 | Typo "Asistive" en encabezado normativo | **CONFIRMADO** | registra |
@@ -39,8 +40,10 @@ Veredicto de verificacion, en una tabla:
 | N-18 | `npx nac3 validate <url>` no existe y nunca reporta nivel | **CONFIRMADO** (nuevo, mio) | bloquea |
 | N-19 | Las 9 traducciones publicadas son 30-38% del canonico | **CONFIRMADO** (nuevo, mio) | avisa |
 | N-20 | No hay frontera interno/publico: el deploy publica todo el arbol | **CONFIRMADO** (nuevo, mio) | bloquea |
+| N-22 | La huella publicada se calculaba sobre bytes CRLF y el servidor entrega LF | **CERRADO** (2026-10-24) -- la compuerta de integridad lo detuvo antes de produccion; arreglado en `0778d9f` + `dcb71ea` | bloquea |
+| N-23 | El runtime acepta 3 roles que la tabla normativa del SPEC no lista | **CONFIRMADO** (nuevo, mio -- lo delato el contrato generado) | avisa |
 
-Resumen: 13 confirmados, 2 parciales, 1 refutado, 4 nuevos. Total 20 entradas abiertas.
+Resumen al cierre del 2026-10-24: **23 entradas, 6 cerradas, 3 parciales, 1 refutada**. Las dos entradas que no estaban en la auditoria original (N-22 y N-23) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, y N-23 la delato el primer contrato generado.
 
 ---
 
@@ -105,6 +108,32 @@ Registrado en el pending registry como **PND-032**, con su criterio de aceptacio
 **Opcion C: minimo que desbloquea.** Solo el catalogo de codigos de hallazgo con su severidad, publicado y versionado.
 - Costo: bajo. Cierra N-14 y deja N-04 abierto con el resto.
 - Beneficio: convierte una garantia incomprobable en una comprobable.
+
+**DECIDIDO el 2026-10-24: OPCION A, AMPLIADA.** El dueno, textual: *"D-02. SI. Publica en una forma que una maquina lo pueda leer, de hecho quiero que como urazuke lo sirva desde una o mas APIS estaticas validadas, con multiversion y latest sin purga... Al igual que urazuke hay que establecer un metodo a prueba de hackeos. Al ser protocolo interno que lo hackeen es altamente peligroso."*
+
+No eligio el minimo: eligio el artefacto completo y le agrego cuatro requisitos que este documento no contemplaba.
+
+1. **API estatica**, no un archivo suelto: superficies JSON con URL estable bajo una raiz propia.
+2. **Multiversion**: cada version publicada en su propia ruta congelada.
+3. **`latest` sin purga**: el puntero se mueve, las versiones viejas no se borran nunca.
+4. **Metodo a prueba de manipulacion**, con la misma vara que Urazuke.
+
+Registrado como **PND-033** (la API) y **PND-034** (el metodo de integridad, con la unica decision que queda abierta: donde vive la clave privada de firma).
+
+**Precision que hay que dejar escrita, porque el pedido dice "a prueba de hackeos" y eso no es alcanzable tal cual:** con alojamiento estatico no se puede IMPEDIR que alguien que compromete el host cambie los bytes -- el host no corre codigo nuestro. Lo alcanzable, y lo que se construyo, es **manipulacion siempre detectable + consumidor que falla cerrado**: cualquiera que reciba el contrato puede probar, sin confiar en el servidor, que recibio lo que el proyecto publico; y el validador se niega a usar un contrato que no cierra. Prometer impedimento seria repetir el pecado que esta auditoria vino a corregir.
+
+**ENTREGADO el 2026-10-24 (mismo dia de la decision).** Lo que existe y esta probado:
+
+- `api/v/<version>/` con tres superficies: el contrato (roles, atributos, eventos, locales, superficie de API), el catalogo de hallazgos (24 codigos con su severidad y la funcion que los emite) y los niveles de conformidad (los 11 requisitos de la seccion 8, uno por uno).
+- `api/index.json`: el directorio con **cadena de hashes append-only**. Cada entrada lleva el hash de la anterior, asi que reescribir una version vieja invalida todas las posteriores y la cabeza deja de coincidir con las otras dos copias (repositorio y tarball de npm): **tres testigos de operadores distintos**.
+- `api/latest.json` + `api/latest/`: el puntero movil. **El canal viaja ADENTRO de cada artefacto**, no solo en el puntero, asi que un consumidor que exige estable rechaza un alpha sin leer nada mas. Es N-01 resuelto por construccion: hoy `stable` es `null` y `prerelease` es `2.5.0-alpha.5`, dicho en los datos.
+- `scripts/build-contract-api.mjs`: el generador. **Carga los bytes publicados de `js/nac.js` en un sandbox y le pregunta al runtime**: su version, su set de roles, sus familias de eventos, sus codigos con severidad, sus baldes de `validate_global`. Nada se copia a mano del SPEC. Lo que solo vive en prosa (los 10 locales, los requisitos de nivel) se extrae con patrones anclados que **fallan ruidosamente si el ancla se mueve**.
+- `scripts/contract-api.meta.json`: lo unico que no se puede derivar -- que SIGNIFICA cada codigo y si un requisito es decidible por una maquina. La compuerta exige simetria en **las dos direcciones**: un codigo sin significado documentado es rojo, y un significado documentado para un codigo que el runtime ya no emite tambien.
+- `scripts/verify-contract-api.mjs`: el comando del tercero. Toma una URL, recomputa la cadena, **recalcula el sha384 sobre los bytes que el servidor realmente entrego** (no sobre el repo), comprueba el CORS, y compara la cabeza contra un testigo independiente.
+- `scripts/test-contract-api.mjs`: **15 casos, probados en rojo de verdad**, cada uno en un repositorio temporal propio. Editar un artefacto publicado, borrar una version, purgar una entrada del indice, falsear la cabeza, falsear un hash, cambiar el runtime sin regenerar, subir la version sin publicar, un codigo sin documentar, un documento sin codigo, reescribir un requisito del SPEC, un espejo de `latest` que deriva, un puntero que inventa una estable. Y un caso verde: el arbol intacto pasa. **Uno de esos casos nacio de un bug real de la compuerta**: listaba `api/v/` por nombre y acusaba al propio `.htaccess` de ser una version sin entrada en la cadena, lo que habria bloqueado un deploy correcto.
+- Dos `.htaccess` nuevos: CORS para todo el subarbol (**medido el 2026-10-24: el host no enviaba `Access-Control-Allow-Origin`, asi que un agente en el navegador desde otro origen no podia leer nada**) y cache inmutable de un ano para las versiones congeladas.
+- Enganchado al deploy como dos pasos previos al envio (la compuerta y su suite en rojo) y uno posterior (verificacion contra el host con testigo independiente), mas una casilla nueva en la compuerta de coherencia de version: ahora son 16.
+
 
 ### D-03 (sobre N-08, reencuadrado por N-19) -- que se declara sobre idiomas
 
@@ -266,7 +295,27 @@ Los tres scripts se comprobaron uno por uno, no una muestra: `nac.js` (344.665 b
 - Agente externo: puede validar un manifest contra el contrato sin ejecutar el runtime.
 - Auditor: el artefacto responde 200, declara version, y su huella se recalcula y coincide.
 
-**Severidad:** bloquea. **Quien decide:** el dueno (ver D-02). **Estado:** abierto.
+**Severidad:** bloquea. **Quien decide:** el dueno (ver D-02).
+
+**Estado:** **CERRADO** el 2026-10-24 en el repositorio; pendiente de la verificacion en produccion del mismo dia (ver el pie de esta entrada).
+
+**Cierre -- que se hizo.** Decidido D-02 = opcion A ampliada, el contrato existe como dato. Las cifras del artefacto generado, que son la respuesta medida a "los elementos normativos no existen como dato":
+
+| superficie | contenido |
+|---|---|
+| `api/v/2.5.0-alpha.5/contract.json` | 20 roles con sus eventos de completitud, 48 atributos `data-nac-*`, 89 nombres de evento, 133 funciones exportadas, los 10 locales obligatorios, los verbos convencionales |
+| `api/v/2.5.0-alpha.5/findings.json` | 24 codigos de hallazgo con severidad y funcion emisora, mas los 5 baldes sin codigo de `validate_global` declarados como tales |
+| `api/v/2.5.0-alpha.5/levels.json` | los 3 niveles con sus 11 requisitos: 8 decidibles por una maquina (5 estaticos, 3 por manejo de la pagina) y 3 que NO lo son, cada uno diciendo por que |
+
+Lo que hace que esto no pueda derivar: el generador **no lee el SPEC para saber que hay**, carga los bytes publicados del runtime y le pregunta. La compuerta del deploy regenera y compara; si el runtime cambia y el contrato no, el deploy se detiene.
+
+**Criterio de aceptacion por perfil:**
+- Adoptante nuevo: **CUMPLIDO.** Obtiene roles y verbos de un JSON, sin leer 62 KB de markdown.
+- Adoptante existente: **CUMPLIDO.** El catalogo declara la version del runtime y su sha384, asi que se puede atar a la version que tiene instalada.
+- Agente externo: **CUMPLIDO en el repositorio.** Puede validar contra el contrato sin ejecutar el runtime. El CORS que necesita para leerlo desde otro origen no existia en el host (medido) y se agrego en este mismo cambio: se comprueba recien despues del deploy.
+- Auditor: **CUMPLIDO**, con la verificacion en produccion pegada al pie de esta entrada.
+
+**Los 3 requisitos que una maquina NO puede decidir se publican diciendolo**, en vez de ser omitidos para que el numero quede lindo: "todo widget que un agente DEBERIA poder operar lleva id y rol" (una herramienta no sabe cual deberia), "implementa las primitivas de brownfield" (no se distingue el que no las necesita del que las omitio) y "distingue `isTrusted` para verbos sensibles" (cual verbo es sensible es decision de producto). Un validador que reporte esos tres como aprobados esta excediendose, y el artefacto lo dice en el propio dato.
 
 ---
 
@@ -496,7 +545,15 @@ Los tres scripts se comprobaron uno por uno, no una muestra: `nac.js` (344.665 b
 - Agente externo: compara el catalogo de dos versiones y no encuentra reutilizacion.
 - Auditor: la promesa de la seccion 12 tiene un artefacto contra el que contrastarse.
 
-**Severidad:** bloquea. **Quien decide:** el dueno, via D-02. **Estado:** abierto, bloqueado por N-04.
+**Severidad:** bloquea. **Quien decide:** el dueno, via D-02.
+
+**Estado:** **PARCIAL** el 2026-10-24. El catalogo existe y esta publicado (N-04 cerrado): 24 codigos con severidad, cada uno con su significado y su arreglo. Comparar dos versiones publicadas y detectar un codigo reusado ya es posible, que es lo que la promesa 4 de la seccion 12 necesitaba.
+
+**Y hay una correccion que me hago a mi mismo, porque la medi mal en el primer pase.** Dije que los codigos "no existen". Lo preciso es: **existen 24 codigos con severidad, y ninguno de ellos esta en el validador que la seccion 12 nombra.** `validate(plugin_slug)` -- el validador por plugin -- emite 16 codigos con severidad explicita, el validador estricto de registro emite otros 3, y hay 5 codigos de error lanzado. Pero `validate_global()`, que es el que la promesa cita textualmente, devuelve **5 baldes de objetos sin un solo campo `code`**. Asi que la promesa de la seccion 12 sigue cubriendo un conjunto vacio: no por falta de catalogo, sino porque apunta al unico validador que no participa de el.
+
+**Lo que falta, acotado:** darle codigos del catalogo a los 5 baldes de `validate_global` (duplicados, huerfanos, no montados, violaciones de convencion, violaciones de instancia de plugin). Eso toca `js/nac.js`, y tocar el runtime obliga a subir la version porque la compuerta de integridad se niega a que la copia congelada difiera del fuente. **Entra en el tren de la 2.5.0 (PND-032), no antes.** Mientras tanto el artefacto publicado declara los 5 baldes como "sin codigo" en vez de inventarles uno: el dato dice la verdad sobre su propio agujero.
+
+**Grupo:** G2-CONTRATO-LEGIBLE. Ya no esta bloqueado por N-04.
 
 ---
 
@@ -705,6 +762,31 @@ Es una frase, y es verificable con el barrido de arriba: mas de lo que habia ant
 
 ---
 
+### N-23 (nuevo) El runtime acepta tres roles que la tabla normativa no lista
+
+**Que esta mal:** la seccion 1 publica una tabla de 17 roles canonicos y cierra con "los roles fuera de esta lista estan reservados para uso futuro", y la seccion 1 tambien dice que un runtime estricto DEBERIA rechazar roles desconocidos al registrar. El runtime acepta 20.
+
+**Como aparecio:** no lo busque. **Lo delato el primer contrato generado.** Al pedirle al runtime su set de roles y comparar contra la tabla del documento, la diferencia salio sola. Es el primer dividendo del artefacto de D-02: una incoherencia que cinco meses de lectura del SPEC no habian encontrado aparecio el dia uno de tener el contrato como dato.
+
+**Evidencia que medi (2026-10-24):** el set de roles del runtime tiene 20 entradas; la tabla de la seccion 1 tiene 17. Los tres que sobran: `draggable`, `drop-target` (primitivas de arrastrar y soltar) y `button` (tolerado para botones heredados que solo necesitan ser clicables). Los tres estan en el runtime con comentario propio, asi que no son un accidente: son deliberados y **no se declararon en el documento**.
+
+**Por que importa:** un adoptante que lee la tabla y marca un elemento como `draggable` esta usando un rol que el documento llama reservado. Un agente externo que valide contra la tabla reporta un error donde no hay ninguno. Y al reves: si manana el runtime estricto empieza a rechazar roles no listados, rompe las paginas que usan los tres.
+
+**Donde vive el arreglo:** `SPEC.md` seccion 1 -- agregar las tres filas, o declarar explicitamente que hay un set extendido no normativo. Es una decision de redaccion sobre una tabla normativa, asi que la propongo y la aprueba el dueno.
+
+**Mientras no se arregle:** el contrato publicado **no elige por su cuenta**. Publica los 20 como aceptados y marca cada uno con `declared_in_spec_table: true|false`, asi que el dato dice exactamente donde esta la discrepancia en vez de taparla con cualquiera de las dos listas.
+
+**Grupo de convergencia:** G3-DERIVA (misma familia que N-05, N-06, N-07: el documento y el codigo no dicen lo mismo).
+
+**Perfiles y criterio de aceptacion:**
+- Adoptante nuevo: la tabla que lee incluye todo rol que el runtime acepta, o dice donde esta el resto.
+- Agente externo: no reporta un error contra un rol que el runtime acepta.
+- Auditor: el contrato publicado no tiene ningun rol con `declared_in_spec_table: false`.
+
+**Severidad:** avisa. **Quien decide:** Forge propone la redaccion; el dueno aprueba. **Estado:** abierto.
+
+---
+
 ## 4. Grupos de convergencia
 
 Estos son el mismo problema visto de dos lados y **tienen que cerrarse juntos**:
@@ -734,7 +816,16 @@ Orden de cierre que se desprende de las dependencias, **sujeto a tu aprobacion**
 - **(4) G3 (deriva del documento): es ahora el frente mecanico mas grande que esta desbloqueado**, y el que mas casillas mueve del bloque de verificacion de la seccion 5 (puntos 6 y 7). Pasa a ser el proximo trabajo.
 - **Lo que esta trabado esperandote:** G2 por **D-02**, G4 por **D-03**. Nada mas.
 
-**Orden vigente:** G3 (deriva) -> redaccion de limites de D-04 -> 2.5.0 estable (cierra G1) -> G2 y G4 cuando decidas D-02 y D-03 -> G6 -> G7 (lo que no es externo).
+**Orden vigente al cierre del 2026-10-24, con D-02 ya decidido y entregado:**
+
+1. **G2 (contrato legible): CERRADO en lo que dependia de D-02.** N-04 cerrado, N-14 parcial con alcance acotado (codigos para los 5 baldes de `validate_global`, entra con la 2.5.0), N-18 desbloqueado: ahora existe una definicion comprobable de nivel contra la que el validador puede reportar.
+2. **G3 (deriva del documento):** el frente mecanico mas grande y mas rentable -- mueve los puntos 6 y 7 del bloque de verificacion, y ahora tambien N-23.
+3. **Redaccion de limites (D-04)** -- mueve el punto 3.
+4. **N-18 segunda mitad:** el modo URL del validador y el reporte de nivel, apoyado en `levels.json`.
+5. **2.5.0 estable (PND-032):** cierra N-01 y lo que queda de N-17, y es donde entran los codigos de `validate_global`.
+6. **G4 cuando decidas D-03**, despues G6 y G7 (lo que no es externo).
+
+**Lo unico que sigue trabado esperandote:** **D-03** (idiomas) y la custodia de la clave de firma de PND-034.
 
 ---
 

@@ -2,7 +2,8 @@
 
 - Fecha de este documento: 2026-10-24
 - Auditoria de origen: Claude Code, revision externa de portada publica, SPEC.md, registro npm, cabeceras HTTP y sitemap.
-- Estado global: **ABIERTO -- 2 de 21 corregidos en el repositorio** (N-02, N-03, 2026-10-24). Ninguno es verificable en produccion hasta que se destrabe N-21.
+- Estado global: **ABIERTO -- 3 de 21 cerrados** (N-21, N-02 y N-03, 2026-10-24, verificados en produccion). El resto sigue abierto.
+- Cambio de situacion del 2026-10-24 (17:00 UTC): **N-21 esta resuelto**. El dueno destrabo la facturacion, el pipeline volvio a correr y los arreglos de distribucion ya estan publicados y comprobados contra el servidor. A partir de ahora "corregido en el repositorio" ya no significa "invisible en la web": cada arreglo se puede verificar desde afuera en el push siguiente.
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
 - Regla aplicada: lo que no se pudo medir se informa como "declarado y no medido", nunca como verde.
 - Nombre: este archivo se llamaba `PENDIENTES_AUDITORIA_2026-10.md`. Se renombro el 2026-10-24 por pedido del dueno ("fuera del alcance del deploy"). El rsync de publicacion excluye el patron `PENDING_*.md` (deploy.yml, linea 62, sin barra inicial: aplica a cualquier carpeta), asi que este documento no se publica. Verificado en vivo: https://yujin.app/nac-spec/docs/PENDING_AUDITORIA_2026-10.md devuelve 404.
@@ -19,15 +20,15 @@ Veredicto de verificacion, en una tabla:
 | id | Hallazgo | Verificado | Severidad |
 |----|----------|-----------|-----------|
 | N-01 | `latest` apunta a un alpha | **CONFIRMADO** | avisa (decision del dueno) |
-| N-02 | Portada sin SRI | **CORREGIDO EN REPO** (2026-10-24) -- sin publicar, ver N-21 | avisa |
-| N-03 | URL mutable con query | **CORREGIDO EN REPO** (2026-10-24) -- sin publicar, ver N-21 | avisa |
+| N-02 | Portada sin SRI | **CERRADO** (2026-10-24) -- publicado y verificado en produccion: 3 de 3 hashes coinciden con los bytes servidos | avisa |
+| N-03 | URL mutable con query | **CERRADO** (2026-10-24) -- publicado: la ruta inmutable responde 200 y su sha384 coincide con el integrity de la portada | avisa |
 | N-04 | Contrato no legible por maquina | **CONFIRMADO** | bloquea (decision del dueno) |
 | N-05 | Deriva de versiones en SPEC.md | **CONFIRMADO** | bloquea |
 | N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO** | avisa |
 | N-07 | Typo "Asistive" en encabezado normativo | **CONFIRMADO** | registra |
 | N-08 | "10 idiomas" vs spec en un idioma | **REFUTADO en su premisa** -- ver N-08, se reencuadra en N-19 | registra |
 | N-09 | Portada sin limites declarados | **CONFIRMADO** (hecho); el reencuadre cambia por N-20 | bloquea (decision del dueno) |
-| N-10 | `/nac-spec/` fuera del sitemap | **CONFIRMADO**; arreglado EN ESTE REPO (2026-10-24, 61 urls) -- **no publicado**, ver N-21 | avisa |
+| N-10 | `/nac-spec/` fuera del sitemap | **CONFIRMADO**; arreglado y **publicado** (2026-10-24): `/nac-spec/sitemap.xml` responde 200 con los 61 urls. Lo que queda es externo: el sitemap y el robots de la raiz `yujin.app`, que no viven en este repo | avisa |
 | N-11 | Sin nota de vigencia (5 meses) | **CONFIRMADO** | avisa |
 | N-12 | Cifras sin recibo al lado | **PARCIAL** -- los recibos existen, no estan anclados | avisa |
 | N-13 | "Open questions (tracked separately)" sin direccion | **CONFIRMADO** | registra |
@@ -165,7 +166,7 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 
 **Severidad:** avisa. **Quien decide:** Forge propone; el dueno aprueba el snippet.
 
-**Estado:** CORREGIDO EN EL REPOSITORIO el 2026-10-24. No verificable en produccion hasta que se destrabe N-21.
+**Estado:** **CERRADO** el 2026-10-24, verificado en produccion.
 
 **Cierre -- que se hizo:**
 - `index.html` carga sus tres scripts con `integrity="sha384-..."` y `crossorigin="anonymous"`, y el snippet que se manda copiar lleva el hash en el propio tag.
@@ -173,7 +174,25 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 - Se documento en la portada como recalcularlo, con un comando de una linea sin dependencias (`node -e ...`) y el comando del gate.
 - Prueba de regresion real: `scripts/test-integrity-load.mjs` sirve el repositorio por HTTP y abre la portada en un navegador de verdad. **Se probo en rojo**: alterado un digito del hash, el navegador rechazo el runtime y `window.NAC` quedo indefinido; restaurado el hash, verde. Un hash mal escrito se ve perfecto en el archivo, y solo el navegador decide.
 
-**Criterio de aceptacion pendiente (perfil auditor):** `curl -s https://yujin.app/nac-spec/ | grep -c "integrity="` mayor que cero. Hoy da 0 porque el sitio publicado sigue siendo el del 2026-06-29.
+**Criterio de aceptacion (perfil auditor): CUMPLIDO.** `curl -s https://yujin.app/nac-spec/ | grep -c "integrity="` devuelve 3.
+
+**Evidencia en produccion (2026-10-24 17:00 UTC, medida por mi):**
+
+```
+$ gh run list --limit 1
+completed  success  40113957823  fix(integrity): refresh the published sha384 over LF bytes  24s
+
+$ curl -s https://yujin.app/nac-spec/ | grep -o 'integrity="[^"]*"' | wc -l
+3
+
+$ curl -sI https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js | head -1
+HTTP/1.1 200 OK            (344665 bytes)
+
+  servido   sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp
+  publicado sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp
+```
+
+Los tres scripts se comprobaron uno por uno, no una muestra: `nac.js` (344.665 b), `nac-v2-extensions.js` (82.861 b) y `nac-chat-client.js` (29.435 b). El sha384 calculado sobre los bytes que entrega el servidor es identico al atributo `integrity` de la portada publicada en los tres casos. Lo que no hice: abrir produccion con un navegador real; la comprobacion es la misma aritmetica que hace el navegador, sobre los mismos bytes.
 
 ---
 
@@ -197,16 +216,18 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 
 **Severidad:** avisa. **Quien decide:** Forge propone.
 
-**Estado:** CORREGIDO EN EL REPOSITORIO el 2026-10-24. No verificable en produccion hasta que se destrabe N-21.
+**Estado:** **CERRADO** el 2026-10-24, verificado en produccion.
 
 **Cierre -- que se hizo:**
-- Existe la ruta inmutable `js/2.5.0-alpha.5/nac.js` (352.798 bytes): copia congelada, nunca editada a mano. `js/nac.js` queda como alias movil (el build mas nuevo) y asi esta documentado en la portada.
+- Existe la ruta inmutable `js/2.5.0-alpha.5/nac.js` (344.665 bytes): copia congelada, nunca editada a mano. `js/nac.js` queda como alias movil (el build mas nuevo) y asi esta documentado en la portada.
 - `js/integrity.json` es el recibo: version, ruta inmutable, alias movil, bytes y sha384 de cada artefacto que la portada carga.
 - La portada dice explicitamente cual URL fijar en produccion y cual usar solo para probar.
 - El gate falla si `js/<version>/nac.js` difiere de `js/nac.js`: un runtime editado sin subir la version rompe el build en vez de romper a quien fijo la ruta.
 - El workflow ahora verifica **despues** del envio que la ruta versionada responda 200 y que la portada publicada ofrezca el path inmutable.
 
-**Criterio de aceptacion pendiente (perfil auditor):** la ruta versionada responde 200 y su sha384 coincide con el `integrity` publicado. Se podra correr cuando N-21 este destrabado.
+**Criterio de aceptacion (perfil auditor): CUMPLIDO.** `https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js` responde 200 con 344.665 bytes y su sha384 es exactamente el `integrity` de la portada publicada. La evidencia esta pegada en N-02.
+
+**Correccion de este documento:** la version anterior de esta entrada decia 352.798 bytes. Ese numero era el del working tree de Windows con CRLF, no el del artefacto que se publica. El tamano real del contrato es 344.665 bytes (LF). La causa esta explicada en N-21.
 
 ---
 
@@ -613,7 +634,9 @@ Se verifica ademas por estructura: en el canonico la seccion 8 esta en la linea 
 - Auditor de seguridad: puede enumerar que es publico y verificarlo contra la politica, sin depender de una lista de nombres.
 - Auditor: ningun documento marcado interno responde 200; lo que responde 200 coincide con la politica declarada.
 
-**Severidad:** bloquea. **Quien decide:** Forge propone la politica; el dueno la aprueba. **Estado:** abierto.
+**Agravante medido el 2026-10-24 a las 17:00 UTC, despues de destrabar N-21:** mientras el pipeline estuvo muerto, la exposicion estaba congelada en el arbol de junio. Al revivir, el primer deploy verde publico tambien los documentos de la estacion N0 que se habian escrito con el pipeline caido. Verificado en vivo: `docs/ELIGIBILITY.md` responde **200** y `docs/EVIDENCE_N0.md` responde **200**. Ninguno de los dos estaba pensado para la web. El backlog de auditoria sigue en 404, pero solo porque su nombre matchea `PENDING_*.md`, que es lo que esta entrada denuncia: una lista de nombres no es una politica. Este hallazgo sube de prioridad: cada deploy verde que hagamos desde ahora publica lo que haya en `docs/`.
+
+**Severidad:** bloquea. **Quien decide:** Forge propone la politica; el dueno la aprueba. **Estado:** abierto, **y ahora activo en cada deploy**.
 
 ---
 
@@ -674,6 +697,22 @@ $ curl -s -o nul -w "%{http_code}" https://yujin.app/nac-spec/sitemap.xml
 
 **Quien decide:** DUENO (es gasto / cuenta, no criterio tecnico mio).
 
+**RESUELTO el 2026-10-24 a las 17:00 UTC.** El dueno tomo el camino 1: cambio el medio de pago y la cuenta quedo al dia. Lo que medi despues, en orden:
+
+```
+run 40113318771  workflow_dispatch  16:49 UTC  success  34s   <- el job arranca: la cuenta esta destrabada
+run 40113417255  push 934dd4f       16:50 UTC  failure  10s   <- NO es facturacion: lo paro la compuerta de integridad
+run 40113957823  push dcb71ea       16:58 UTC  success  24s   <- publica, y lo publicado se verifica
+```
+
+El segundo run merece su propio parrafo, porque es la parte que importa. No volvio a fallar por la cuenta: fallo porque la compuerta de integridad que se habia construido para N-02 detuvo el envio con `index.html:1601 integrity is stale for js/2.5.0-alpha.5/nac.js`. Y tenia razon. El hash publicado se habia calculado sobre 352.798 bytes -- los que tiene el archivo en un working tree de Windows, donde cada salto de linea ocupa dos caracteres -- mientras el servidor entrega 344.665 bytes. Mismo codigo fuente, bytes distintos, hash imposible de cumplir. Si la compuerta no hubiera existido, el deploy habria salido verde y el navegador de cada visitante habria rechazado el runtime en silencio. El arreglo quedo en dos commits: `0778d9f` fija los finales de linea del repositorio y ensena al generador a negarse a hashear bytes con CRLF (falla al generar, no en produccion), y `dcb71ea` recalcula el hash sobre los bytes reales.
+
+**Criterio de aceptacion: CUMPLIDO.** Un push produjo un run `success` y el contenido publicado cambio: `/nac-spec/sitemap.xml` responde 200 con los 61 urls, la portada trae sus tres atributos `integrity`, y la ruta inmutable responde 200 con el hash que la portada declara.
+
+**Efecto sobre el resto del backlog:** se levanta el bloqueo de publicacion. N-02 y N-03 quedan cerrados y verificados; N-10 queda cerrado en la parte que vive en este repo. Los demas hallazgos de superficie publica (N-05, N-06, N-07, N-09, N-11, N-12, N-13, N-15, N-16) pasan a ser comprobables desde afuera en cuanto se corrijan. **Contracara, y no es menor:** cada deploy verde publica todo `docs/`. Ver el agravante nuevo en N-20.
+
+**Estado:** **CERRADO.**
+
 **Perfiles afectados:**
 
 - Adoptante nuevo: recibe la version de junio. Todo lo publicado despues de esa fecha, no.
@@ -683,9 +722,7 @@ $ curl -s -o nul -w "%{http_code}" https://yujin.app/nac-spec/sitemap.xml
 
 **Criterio de aceptacion por perfil:** un push nuevo produce un run con conclusion `success` y el contenido publicado cambia (por ejemplo `sitemap.xml` responde 200 con los 61 urls).
 
-**Grupo de convergencia:** G1-PUBLICACION. Bloquea el cierre de todo hallazgo cuyo arreglo se comprueba desde afuera.
-
-**Estado:** abierto.
+**Grupo de convergencia:** G1-PUBLICACION. Era el que bloqueaba el cierre de todo hallazgo cuyo arreglo se comprueba desde afuera.
 
 ---
 
@@ -696,7 +733,7 @@ Esto es lo que los comandos del pedido devuelven **hoy**, medido el 2026-10-24. 
 | # | Comando | Esperado por el pedido | Devuelve hoy |
 |---|---|---|---|
 | 1 | `curl registry.npmjs.org/@nac3/runtime \| grep dist-tags` | lo que D-01 resuelva, y la seccion 9 diciendo lo mismo | `{"latest":"2.5.0-alpha.5","alpha":"2.5.0-alpha.5"}`; la seccion 9 no menciona prereleases |
-| 2 | `curl /nac-spec/ \| grep -c "integrity="` | `> 0` | `0` |
+| 2 | `curl /nac-spec/ \| grep -c "integrity="` | `> 0` | **`3` -- CUMPLE** (2026-10-24 17:00 UTC, desde que N-21 se destrabo) |
 | 3 | `curl /nac-spec/ \| grep -c -i "does not cover"` | `> 0` | `0` |
 | 4 | `curl /nac-spec/ \| grep -c -i "urazuke"` | `> 0` | `0` |
 | 5 | `curl /sitemap.xml \| grep -c "nac-spec"` | `> 0` | `0` (7 URLs, ninguna de nac-spec) |
@@ -704,7 +741,7 @@ Esto es lo que los comandos del pedido devuelven **hoy**, medido el 2026-10-24. 
 | 7 | `curl /nac-spec/SPEC.md \| grep -n "v2.1\|v2.3 stable\|v2.4 will"` | vacio o explicado | 8 lineas: 54, 80, 317, 321, 722, 1075, 1164, 1167 |
 | 8 | `npx nac3 validate <demo>` | corre y reporta nivel | con URL: aborta, salida 2. Con directorio: corre, no reporta nivel |
 
-Cero de ocho. El bloque de verificacion esta escrito en verde y hoy da cero.
+Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde el 2026-10-24 a las 17:00 UTC con el cierre de N-21, N-02 y N-03. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
 
 ---
 

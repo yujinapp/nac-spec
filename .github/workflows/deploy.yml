@@ -70,8 +70,24 @@ jobs:
       - name: Contract API gate goes red when it should
         # A gate nobody proved red is a decoration. This suite breaks
         # one thing at a time in a throwaway copy and asserts the gate
-        # refuses each one for the right reason.
+        # refuses each one for the right reason. Includes the signature
+        # cases: a tampered signature, a stale one, a substituted key,
+        # a retired key, a published key with no signature at all, and
+        # the two ways the owner could lose control of the private key.
         run: node scripts/test-contract-api.mjs
+
+      - name: Consumer verifier goes red when it should
+        # The other half, and the half that matters to anyone who is
+        # not us: the command a third party runs against a URL. Each
+        # case stands up a real HTTP server over a copy of api/, serves
+        # a tampered publication, and asserts the verifier refuses.
+        #
+        # The case worth naming: a host that rewrites an artefact,
+        # rebuilds the whole chain so it recomputes, publishes a key of
+        # its own and signs the forgery with it. Everything closes
+        # against itself; only the independent witnesses catch it. All
+        # localhost, no network.
+        run: node scripts/test-contract-api-http.mjs
 
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
@@ -166,4 +182,12 @@ jobs:
         # and the web host does not. A compromised host can serve a
         # perfectly self-consistent forgery; only an independent
         # witness of the head catches that.
+        #
+        # The same flag also takes the signing key fingerprint from
+        # api/trust.json in this repository, so this step fails when the
+        # host publishes a key the repository does not know -- and when
+        # the host quietly stops serving the signature at all, which is
+        # a downgrade rather than an absence. CI verifies signatures and
+        # cannot make them: the private key is offline on the owner
+        # machine, never a repository secret (owner decision, PND-034).
         run: node scripts/verify-contract-api.mjs --expect-head-from-repo

@@ -2,7 +2,7 @@
 
 - Fecha de este documento: 2026-10-24
 - Auditoria de origen: Claude Code, revision externa de portada publica, SPEC.md, registro npm, cabeceras HTTP y sitemap.
-- Estado global: **ABIERTO -- 6 de 23 cerrados** (N-21, N-02, N-03, N-20, N-22 y N-04; todos el 2026-10-24). Parciales: N-14, N-17 y N-18. N-10 esta cerrado en la parte que vive en este repositorio y abierto en la que no.
+- Estado global: **ABIERTO -- 6 de 24 cerrados** (N-21, N-02, N-03, N-20, N-22 y N-04; todos el 2026-10-24). Parciales: N-14, N-17 y N-18. N-10 esta cerrado en la parte que vive en este repositorio y abierto en la que no.
 - **Alcance de la 2.5.0, fijado por el dueno el 2026-10-24:** *"Todos los pendientes son todos los que no sean urazuke. Urazuke no es requisito, lo vamos a avanzar despues de la 2.5, lo dejamos para la 2.6."* O sea: **este backlog ES el trabajo de la 2.5.0**. Los 27 peldanos del metodo Urazuke (PND-002 a PND-028) quedan fuera y se retoman despues. En el registro de pendientes eso son exactamente **tres** items no-Urazuke -- PND-001, PND-030 y PND-032 -- mas los dos que abrio D-02 (PND-033, PND-034).
 - Cambio de situacion del 2026-10-24 (17:00 UTC): **N-21 esta resuelto**. El dueno destrabo la facturacion, el pipeline volvio a correr y los arreglos de distribucion ya estan publicados y comprobados contra el servidor. A partir de ahora "corregido en el repositorio" ya no significa "invisible en la web": cada arreglo se puede verificar desde afuera en el push siguiente.
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
@@ -42,8 +42,9 @@ Veredicto de verificacion, en una tabla:
 | N-20 | No hay frontera interno/publico: el deploy publica todo el arbol | **CONFIRMADO** (nuevo, mio) | bloquea |
 | N-22 | La huella publicada se calculaba sobre bytes CRLF y el servidor entrega LF | **CERRADO** (2026-10-24) -- la compuerta de integridad lo detuvo antes de produccion; arreglado en `0778d9f` + `dcb71ea` | bloquea |
 | N-23 | El runtime acepta 3 roles que la tabla normativa del SPEC no lista | **CONFIRMADO** (nuevo, mio -- lo delato el contrato generado) | avisa |
+| N-24 | El indice publicado declara tres testigos de su cabeza y el tercero (tarball de npm) todavia no existe | **CONFIRMADO** (nuevo, mio -- lo delato construir la capa 4) | avisa |
 
-Resumen al cierre del 2026-10-24: **23 entradas, 6 cerradas, 3 parciales, 1 refutada**. Las dos entradas que no estaban en la auditoria original (N-22 y N-23) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, y N-23 la delato el primer contrato generado.
+Resumen al cierre del 2026-10-24: **24 entradas, 6 cerradas, 3 parciales, 1 refutada**. Las tres entradas que no estaban en la auditoria original (N-22, N-23 y N-24) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, N-23 la delato el primer contrato generado y N-24 la delato construir la firma. Vale anotarlo como patron: **cada capa de verificacion que se construye encuentra un hallazgo que la lectura no habia encontrado.**
 
 ---
 
@@ -118,7 +119,9 @@ No eligio el minimo: eligio el artefacto completo y le agrego cuatro requisitos 
 3. **`latest` sin purga**: el puntero se mueve, las versiones viejas no se borran nunca.
 4. **Metodo a prueba de manipulacion**, con la misma vara que Urazuke.
 
-Registrado como **PND-033** (la API) y **PND-034** (el metodo de integridad, con la unica decision que queda abierta: donde vive la clave privada de firma).
+Registrado como **PND-033** (la API) y **PND-034** (el metodo de integridad).
+
+**DECIDIDO el 2026-10-24 -- la custodia de la clave: OPCION A, clave offline en la maquina del dueno.** El dueno, textual: *"Si. Vamos con la primera."* Es la unica de las tres opciones en la que comprometer el sistema de publicacion **no** permite firmar: el CI verifica y no puede firmar, porque la clave privada no vive ni en el repositorio ni en los secretos de Actions. Cuesta un comando manual por release; las releases son raras y el indice solo se mueve con una.
 
 **Precision que hay que dejar escrita, porque el pedido dice "a prueba de hackeos" y eso no es alcanzable tal cual:** con alojamiento estatico no se puede IMPEDIR que alguien que compromete el host cambie los bytes -- el host no corre codigo nuestro. Lo alcanzable, y lo que se construyo, es **manipulacion siempre detectable + consumidor que falla cerrado**: cualquiera que reciba el contrato puede probar, sin confiar en el servidor, que recibio lo que el proyecto publico; y el validador se niega a usar un contrato que no cierra. Prometer impedimento seria repetir el pecado que esta auditoria vino a corregir.
 
@@ -133,6 +136,23 @@ Registrado como **PND-033** (la API) y **PND-034** (el metodo de integridad, con
 - `scripts/test-contract-api.mjs`: **15 casos, probados en rojo de verdad**, cada uno en un repositorio temporal propio. Editar un artefacto publicado, borrar una version, purgar una entrada del indice, falsear la cabeza, falsear un hash, cambiar el runtime sin regenerar, subir la version sin publicar, un codigo sin documentar, un documento sin codigo, reescribir un requisito del SPEC, un espejo de `latest` que deriva, un puntero que inventa una estable. Y un caso verde: el arbol intacto pasa. **Uno de esos casos nacio de un bug real de la compuerta**: listaba `api/v/` por nombre y acusaba al propio `.htaccess` de ser una version sin entrada en la cadena, lo que habria bloqueado un deploy correcto.
 - Dos `.htaccess` nuevos: CORS para todo el subarbol (**medido el 2026-10-24: el host no enviaba `Access-Control-Allow-Origin`, asi que un agente en el navegador desde otro origen no podia leer nada**) y cache inmutable de un ano para las versiones congeladas.
 - Enganchado al deploy como dos pasos previos al envio (la compuerta y su suite en rojo) y uno posterior (verificacion contra el host con testigo independiente), mas una casilla nueva en la compuerta de coherencia de version: ahora son 16.
+
+**CAPA 4 ENTREGADA el 2026-10-24, misma sesion que la decision.** Lo que existe:
+
+- `scripts/sign-contract-api.mjs`: el unico programa que **produce** firmas, y lo unico que hace. `--keygen` crea la clave Ed25519, escribe la mitad privada fuera del repositorio con permisos 600 y publica la mitad publica en `api/trust.json`; `--sign` firma el indice. **Se niega** a escribir una clave en cualquier ruta bajo la raiz del repositorio, y **se niega** a sobreescribir una clave existente -- las dos unicas maneras de perder el control de la clave, cada una con su caso en rojo.
+- `api/trust.json`: el ancla de confianza publicada. Lista de claves con `status` (`active` / `retired`), su material publico y su huella. **Las claves retiradas nunca se borran**, asi que las firmas viejas siguen siendo verificables; una clave retirada **no** puede firmar el indice actual.
+- `api/attestation.json`: la firma. Cubre un payload que ata cuatro cosas: la cabeza de la cadena, la cantidad de entradas, las versiones publicadas y el **sha384 del indice entero**. Ese ultimo es el que importa: significa que la firma cubre todo el indice, no solo su cabeza, asi que editar el texto de la politica -- que no esta dentro de ninguna entrada y por lo tanto la cadena no mira -- rompe la firma. Tiene su caso en rojo.
+- La compuerta (`build-contract-api.mjs`) **verifica y no puede firmar**. Mientras no exista `api/trust.json` avisa que la capa no esta puesta y deja pasar; desde que existe, se pone **roja** si falta la firma, si quedo vieja, si la hizo otra clave o si la clave esta retirada. En modo `--write` la misma condicion es un aviso con el comando exacto, porque ahi firmar es el paso siguiente y no un error.
+- El verificador del tercero (`verify-contract-api.mjs`) ahora trae la firma del host, la comprueba **sobre los bytes que el servidor entrego**, y compara la huella de la clave contra un testigo independiente (`--expect-key`, o el repositorio con `--expect-head-from-repo`). Tambien detecta el **downgrade**: un host que deja de servir la firma falla, porque perderla en silencio no es una ausencia.
+- Honestidad de la salida: la linea "la firma verifica" **solo** se imprime en verde cuando la clave coincide con un testigo. Si la firma cierra contra una clave que el testigo no conoce, el programa lo dice con esas palabras. Un verde que puede convivir con una falsificacion es peor que no imprimir nada.
+- `scripts/test-contract-api-http.mjs`: **8 casos sobre el verificador, cada uno con un servidor HTTP real** y el verificador corriendo como proceso aparte. El caso que define la capa: un host que reescribe un artefacto, **reconstruye la cadena entera para que recompute**, mantiene coherentes el puntero y el espejo, publica una clave propia y firma su falsificacion con ella. Todo cierra contra si mismo; lo detectan los testigos. Al lado hay un caso **verde** que corre esa misma falsificacion sin testigos y la acepta: existe para que la frase "verifico coherencia interna y no procedencia" no se pueda borrar en silencio.
+- La suite de la compuerta paso de 15 a **26 casos**. Los 11 nuevos: firma manipulada, firma valida sobre otra cabeza, firma de una clave no publicada, clave publicada sin firma, indice editado donde la cadena no mira, clave retirada firmando, huella que no coincide con su material, clave privada dentro del repositorio, sobreescritura de una clave existente, el firmador real contra la compuerta real de punta a punta, y el arbol firmado intacto en verde.
+- El caso del firmador real contra la compuerta real no es decorativo: los tres programas llevan **su propia copia** de la regla de JSON canonico, a proposito, porque un verificador que importa el codigo del productor solo prueba que coinciden entre si. Si esas copias se separan un byte, todas las firmas dejan de verificar y ese caso es lo unico que lo dice antes que una release.
+- `docs/CONTRACT_API_SIGNING.md`: el procedimiento del dueno, con los comandos, el respaldo, la rotacion y que pasa si no firma.
+- Cache: `trust.json` y `attestation.json` entran en la regla de cinco minutos del indice, no en la de un ano de las versiones congeladas. Una firma cacheada vieja le llega al consumidor como una firma que ya no cubre el indice, es decir, como una publicacion manipulada: cachear una firma es fabricar una falsa alarma.
+- `.gitignore` suma `*.pem`, `*.key` y `.nac3-keys/` como segundo cinturon, para una clave que llegue al arbol por otra via.
+
+**Lo que esta capa dejo pendiente del dueno, y es lo unico:** correr los dos comandos. La clave no la puede crear Forge -- si la creara Forge en esta maquina y la dejara escrita en algun lado, seria la opcion B con otro nombre.
 
 
 ### D-03 (sobre N-08, reencuadrado por N-19) -- que se declara sobre idiomas
@@ -784,6 +804,31 @@ Es una frase, y es verificable con el barrido de arriba: mas de lo que habia ant
 - Auditor: el contrato publicado no tiene ningun rol con `declared_in_spec_table: false`.
 
 **Severidad:** avisa. **Quien decide:** Forge propone la redaccion; el dueno aprueba. **Estado:** abierto.
+
+---
+
+### N-24 (nuevo) El indice publicado declara tres testigos de su cabeza y el tercero no existe
+
+**Que esta mal:** `api/index.json` publica, en su propio texto de politica, que la cabeza de la cadena *"esta registrada tambien en la historia de git de este repositorio y en el tarball de npm publicado: tres testigos independientes"*, y recomienda al consumidor comparar la cabeza contra los tres antes de confiar. El tercero todavia no existe.
+
+**Como aparecio:** tampoco lo busque. **Lo delato construir la capa 4.** Al escribir de donde saca el verificador su testigo independiente hubo que contestar donde vive cada uno, y ahi el tercero se quedo sin direccion.
+
+**Evidencia que medi (2026-10-24):** `chain_head` aparece unicamente en `api/index.json`, `api/latest.json` y los tres programas que lo manejan. No esta en `runtime/`, ni en `runtime/package.json` (`files` lista `dist/`, `README.md`, `LICENSE`, `SPEC.md`, `CHANGELOG.md`), ni puede estar en el tarball publicado: `@nac3/runtime` 2.5.0-alpha.5 se publico antes de que la API existiera.
+
+**Por que importa:** es exactamente la familia de hallazgos que esta auditoria vino a corregir -- una promesa publicada que no se puede cumplir. Un auditor que siga la instruccion al pie de la letra busca un testigo que no esta y no tiene como saber si falta porque nadie lo puso o porque alguien lo saco. Y de los dos testigos reales, uno es el repositorio: comprometerlo mueve la cabeza y su testigo a la vez. Por eso la firma offline es la que sostiene ese caso hoy, no el tercer testigo.
+
+**Donde vive el arreglo:** un artefacto generado dentro de `runtime/`, incluido en `files` del paquete, escrito por `build-contract-api.mjs --write` y verificado por la compuerta, de modo que el tarball de la 2.5.0 lleve la cabeza y la deriva sea imposible. Entra con el tren de la 2.5.0 (PND-032).
+
+**Por que no se arreglo en el acto:** el texto esta dentro de `api/index.json`. Corregirlo obliga a regenerar el indice, y regenerarlo reescribe la entrada de una version **ya publicada** -- precisamente lo que el metodo prohibe. Se corrige cuando el indice se mueva por un motivo legitimo, que es la proxima release. Mientras tanto queda escrito aca y en `docs/CONTRACT_API_SIGNING.md`: **los testigos efectivos son dos.**
+
+**Grupo de convergencia:** G1-DISTRIBUCION (la cabeza viaja con el paquete) y G5-HONESTIDAD (una promesa publicada que todavia no se cumple).
+
+**Perfiles y criterio de aceptacion:**
+- Adoptante nuevo: no se entera; no cambia nada de lo que usa.
+- Agente externo: encuentra los tres testigos en las tres direcciones que el indice declara.
+- Auditor: `npm pack` del runtime contiene la cabeza, y coincide con la del host y la del repositorio.
+
+**Severidad:** avisa. **Quien decide:** Forge; es mecanico. **Estado:** abierto, anotado en PND-032.
 
 ---
 

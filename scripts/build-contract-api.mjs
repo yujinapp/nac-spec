@@ -75,7 +75,7 @@
    ASCII only. No dependency beyond node core.
    ===================================================================== */
 
-import { createHash } from 'node:crypto';
+import { createHash, createPublicKey, verify as edVerify } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -90,6 +90,8 @@ const API_DIR    = join(ROOT, 'api');
 const V_DIR      = join(API_DIR, 'v');
 const LATEST_DIR = join(API_DIR, 'latest');
 const META_PATH  = join(ROOT, 'scripts', 'contract-api.meta.json');
+const TRUST_PATH = join(API_DIR, 'trust.json');
+const ATTEST_PATH = join(API_DIR, 'attestation.json');
 
 const SURFACES = ['contract.json', 'findings.json', 'levels.json'];
 
@@ -670,6 +672,150 @@ function verifyChain(index) {
   return true;
 }
 
+/* ---- layer 4: the offline signature -------------------------------
+   The chain proves the publication is internally coherent and the
+   three witnesses of the head catch a compromised web host. Neither
+   catches a compromised REPOSITORY: whoever can push can rewrite the
+   chain and all three witnesses follow. The signature is what closes
+   that, and only because the key that makes it is not reachable from
+   the repository or from CI -- it lives offline on the owner machine
+   (owner decision 2026-10-24, PND-034 option A).
+
+   So this gate VERIFIES and can never sign. A missing or stale
+   signature is a hard red in check mode, which is the mode CI runs:
+   publishing an unsigned contract after a signed one would be a
+   silent downgrade, and a consumer that accepts it gains nothing from
+   the layer. Right after --write the same condition is a note rather
+   than a red, because at that moment signing is the next step the
+   owner has not taken yet. */
+
+function verifyAttestation(index, indexBytes, hard) {
+  const bad = hard ? fail : note;
+  const trustExists = existsSync(TRUST_PATH);
+  const attExists = existsSync(ATTEST_PATH);
+
+  if (!trustExists) {
+    if (attExists) {
+      fail('api/attestation.json exists and api/trust.json does not: a signature whose public key is not published cannot be verified by anyone');
+      return;
+    }
+    note('unsigned: no api/trust.json yet, so provenance rests on the hash chain and its witnesses alone.');
+    note('layer 4 of the method (offline signature) is not in place. To put it in place:');
+    note('  node scripts/sign-contract-api.mjs --keygen');
+    return;
+  }
+
+  let trust;
+  try { trust = JSON.parse(readFileSync(TRUST_PATH, 'utf8')); }
+  catch (e) { fail('api/trust.json is not valid JSON: ' + e.message); return; }
+
+  const keys = Array.isArray(trust.keys) ? trust.keys : [];
+  const active = keys.filter((k) => k.status === 'active');
+  if (active.length !== 1) {
+    fail('api/trust.json must publish exactly one active key and it publishes ' + active.length);
+    return;
+  }
+  for (const k of keys) {
+    if (!k.public_key_spki_b64 || !k.fingerprint_sha384) {
+      fail('api/trust.json key "' + k.key_id + '" is missing its public key or its fingerprint');
+      return;
+    }
+    /* The fingerprint is what a human compares against an independent
+       record. If it does not match the key material beside it, the
+       comparison is theatre. */
+    if (sha384(Buffer.from(k.public_key_spki_b64, 'base64')) !== k.fingerprint_sha384) {
+      fail('api/trust.json key "' + k.key_id + '": the fingerprint does not match the published key material');
+      return;
+    }
+  }
+
+  if (!attExists) {
+    bad('api/trust.json publishes a signing key and api/attestation.json is missing: the contract would be published unsigned');
+    note('sign it with the offline key: node scripts/sign-contract-api.mjs --sign');
+    return;
+  }
+
+  let att;
+  try { att = JSON.parse(readFileSync(ATTEST_PATH, 'utf8')); }
+  catch (e) { fail('api/attestation.json is not valid JSON: ' + e.message); return; }
+
+  const p = att.payload;
+  if (!p || typeof p !== 'object' || !att.signature_b64) {
+    fail('api/attestation.json has no payload or no signature');
+    return;
+  }
+
+  const key = keys.find((k) => k.key_id === p.key_id);
+  if (!key) {
+    fail('api/attestation.json is signed by key_id "' + p.key_id + '", which api/trust.json does not publish');
+    return;
+  }
+  if (key.status !== 'active') {
+    bad('api/attestation.json is signed by key_id "' + p.key_id + '", which is ' + key.status + ': the current index must be signed by the active key');
+    note('re-sign with the active key: node scripts/sign-contract-api.mjs --sign');
+    return;
+  }
+
+  /* Signature first: everything the payload claims is only worth
+     checking once we know the payload is the owner's words. */
+  let signatureOk = false;
+  try {
+    const pub = createPublicKey({
+      key: Buffer.from(key.public_key_spki_b64, 'base64'),
+      format: 'der',
+      type: 'spki',
+    });
+    signatureOk = edVerify(
+      null,
+      Buffer.from(canonical(p), 'utf8'),
+      pub,
+      Buffer.from(att.signature_b64, 'base64')
+    );
+  } catch (e) {
+    fail('api/attestation.json signature could not be checked: ' + e.message);
+    return;
+  }
+  if (!signatureOk) {
+    fail('api/attestation.json signature does not verify against the published key "' + key.key_id + '"');
+    note('either the attestation was altered, or it was made with a key other than the one trust.json publishes.');
+    return;
+  }
+
+  /* Then what it covers. index_sha384 is the binding one: it is taken
+     over the whole published index, so a rewritten policy note or an
+     edited entry list breaks it even when the chain still recomputes. */
+  const actualIndexSha = sha384(indexBytes);
+  let stale = false;
+  if (p.index_sha384 !== actualIndexSha) {
+    bad('the signature covers a different api/index.json than the one on disk');
+    note('signed    ' + p.index_sha384);
+    note('on disk   ' + actualIndexSha);
+    stale = true;
+  }
+  if (p.chain_head !== index.chain_head) {
+    bad('the signature covers chain head ' + String(p.chain_head).slice(7, 19) + '... and the index head is ' + String(index.chain_head).slice(7, 19) + '...');
+    stale = true;
+  }
+  if (p.entry_count !== index.entry_count) {
+    bad('the signature covers ' + p.entry_count + ' entries and the index has ' + index.entry_count);
+    stale = true;
+  }
+  const signedVersions = (p.versions || []).join(',');
+  const indexVersions = (index.entries || []).map((e) => e.version).join(',');
+  if (signedVersions !== indexVersions) {
+    bad('the signature covers versions [' + signedVersions + '] and the index publishes [' + indexVersions + ']');
+    stale = true;
+  }
+  if (stale) {
+    note('a release moves the chain, so the index has to be signed again -- that manual step IS the layer:');
+    note('  node scripts/sign-contract-api.mjs --sign');
+    return;
+  }
+
+  ok('signature verifies: key ' + key.key_id + ' (' + key.fingerprint_sha384.slice(7, 19) + '...) over ' + p.entry_count + ' entries, signed ' + p.signed_at);
+  note('the signature proves provenance only if that fingerprint matches an independent record.');
+}
+
 /* ---- main ---------------------------------------------------------- */
 
 function main() {
@@ -864,6 +1010,8 @@ function main() {
     }
     /* latest must mirror the newest entry byte for byte. */
     checkLatest(existingIndex, bytesOf, version);
+    /* Hard here: this is the mode CI runs before the upload. */
+    verifyAttestation(existingIndex, readFileSync(existingIndexPath), true);
     if (failed) process.exit(1);
     console.log('');
     console.log('Contract API is coherent.');
@@ -888,7 +1036,8 @@ function main() {
 
   const entries = priorEntries.concat([entry]);
   const index = buildIndex(entries);
-  writeBytes(existingIndexPath, toBytes(canonical(index), 'api/index.json'));
+  const indexBytes = toBytes(canonical(index), 'api/index.json');
+  writeBytes(existingIndexPath, indexBytes);
   console.log('WRITE api/index.json (' + index.entry_count + ' entries, head ' + String(index.chain_head).slice(7, 19) + '...)');
 
   /* latest: a mirror of the newest entry, plus explicit pointers. The
@@ -916,6 +1065,12 @@ function main() {
     writeBytes(join(LATEST_DIR, name), bytesOf[name]);
   }
   console.log('WRITE api/latest/ (mirror of ' + entry.version + ')');
+
+  /* Soft here on purpose: the chain just moved, so an existing
+     signature is stale BY DESIGN and signing is the next step. Check
+     mode -- the one CI runs -- turns the same condition red. */
+  console.log('');
+  verifyAttestation(index, indexBytes, false);
 
   console.log('');
   console.log('Contract API written. Commit api/ together with the runtime that produced it.');

@@ -18,3 +18,11 @@ Thumbs.db
 .env.local
 .yujin-forge/
 .tmp/
+
+# Private keys. The contract signing key lives OUTSIDE this repository by
+# design (owner decision 2026-10-24, PND-034 option A) and
+# scripts/sign-contract-api.mjs refuses any path under the repo root. These
+# lines are the second belt, for a key that arrives here some other way.
+*.pem
+*.key
+.nac3-keys/

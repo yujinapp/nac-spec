@@ -18,23 +18,34 @@
         is backed by a stable entry;
      5. checks that the response carries the CORS header an agent in a
         browser needs in order to read any of this at all;
-     6. if --expect-head is given, compares the chain head against a
-        value obtained somewhere ELSE (this repository, the npm
-        tarball). That comparison is the point: a compromised host can
-        serve a perfectly self-consistent forgery, and only an
-        independent witness of the head catches it.
+     6. fetches api/trust.json and api/attestation.json and checks the
+        Ed25519 signature over the canonical payload -- including that
+        the signed index_sha384 is the sha384 of the index bytes THIS
+        host just served. The key that makes those signatures lives
+        offline on the owner machine, so a signature that closes is
+        evidence no compromise of the web host or of CI can produce;
+     7. if --expect-head / --expect-key are given, compares the chain
+        head and the signing key fingerprint against values obtained
+        somewhere ELSE (this repository, the npm tarball, the release
+        notes). That comparison is the point: a compromised host can
+        serve a perfectly self-consistent forgery -- rebuilt chain,
+        own key, valid signature over it -- and only an independent
+        witness catches that. scripts/test-contract-api-http.mjs
+        carries exactly that case.
 
    Usage:
      node scripts/verify-contract-api.mjs
      node scripts/verify-contract-api.mjs --base https://yujin.app/nac-spec/
      node scripts/verify-contract-api.mjs --expect-head sha384-...
+     node scripts/verify-contract-api.mjs --expect-key sha384-...
      node scripts/verify-contract-api.mjs --expect-head-from-repo
+     node scripts/verify-contract-api.mjs --expect-key-from-repo
 
    Exit code 0 only if every check passed.
    ASCII only. No dependency beyond node core.
    ===================================================================== */
 
-import { createHash } from 'node:crypto';
+import { createHash, createPublicKey, verify as edVerify } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -56,6 +67,26 @@ if (process.argv.includes('--expect-head-from-repo')) {
     process.exit(1);
   }
   expectHead = JSON.parse(readFileSync(p, 'utf8')).chain_head;
+}
+
+/* The signing key needs an independent witness of its own, for the
+   same reason the head does: trust.json is served by the host, so a
+   compromised host can publish a key it holds and sign whatever it
+   likes with it. The repository is the witness CI has at hand; a
+   third party uses --expect-key with the fingerprint from the release
+   notes. Taking the fingerprint from the repo is also what makes a
+   DOWNGRADE visible: a host that stops serving the signature at all. */
+let expectKey = arg('--expect-key', null);
+if (process.argv.includes('--expect-head-from-repo') || process.argv.includes('--expect-key-from-repo')) {
+  const p = join(ROOT, 'api', 'trust.json');
+  if (existsSync(p)) {
+    const t = JSON.parse(readFileSync(p, 'utf8'));
+    const active = (t.keys || []).filter((k) => k.status === 'active');
+    if (active.length === 1) expectKey = expectKey || active[0].fingerprint_sha384;
+  } else if (process.argv.includes('--expect-key-from-repo')) {
+    console.error('FAIL  --expect-key-from-repo: this repository has no api/trust.json');
+    process.exit(1);
+  }
 }
 
 let failed = false;
@@ -222,6 +253,116 @@ async function main() {
         }
       }
       if (mirrorOk) ok('api/latest/ is byte-identical to ' + mirrored.version);
+    }
+  }
+
+  /* ---- the offline signature ----
+     The chain catches an altered artefact and the head witness catches
+     a host serving a coherent forgery. Neither catches someone who can
+     PUSH to the repository: they rewrite the chain and every witness
+     follows. The signature closes that, and only because the key is
+     offline on the owner machine -- not in the repository, not in CI
+     (owner decision 2026-10-24, PND-034 option A). */
+  const trustRes = await get('api/trust.json');
+  const attRes = await get('api/attestation.json');
+
+  if (trustRes.status !== 200) {
+    if (expectKey) {
+      fail('this repository publishes a signing key and the host serves no api/trust.json (HTTP ' + trustRes.status + ')');
+      console.error('        a publication that silently loses its signature is a downgrade, not an absence.');
+    } else {
+      console.log('      no signature layer published: provenance rests on the chain and the head witness.');
+    }
+  } else {
+    let trust = null;
+    try { trust = JSON.parse(trustRes.buf.toString('utf8')); }
+    catch (e) { fail('api/trust.json is not valid JSON: ' + e.message); }
+
+    /* Three states, not two: the key matched a witness, there was no
+       witness to match, or it matched nothing. Only the first one lets
+       a valid signature mean provenance, and the output has to say
+       which one happened -- an "OK signature" line printed next to a
+       substituted key is worse than no line at all. */
+    let keyWitness = expectKey ? 'mismatch' : 'none';
+    const active = trust ? (trust.keys || []).filter((k) => k.status === 'active') : [];
+    if (trust && active.length !== 1) {
+      fail('api/trust.json publishes ' + active.length + ' active keys; exactly one is required');
+    } else if (trust) {
+      const key = active[0];
+      /* The fingerprint a human compares must match the key material
+         it is printed next to, or the comparison proves nothing. */
+      if (sha384(Buffer.from(key.public_key_spki_b64 || '', 'base64')) !== key.fingerprint_sha384) {
+        fail('api/trust.json: the active key fingerprint does not match the key material beside it');
+      } else if (expectKey && key.fingerprint_sha384 !== expectKey) {
+        fail('the host publishes a signing key that the independent witness does not know');
+        console.error('        published ' + key.fingerprint_sha384);
+        console.error('        expected  ' + expectKey);
+        console.error('        a substituted key with a valid signature over forged data is exactly');
+        console.error('        what this comparison exists to catch.');
+      } else {
+        if (expectKey) keyWitness = 'matched';
+        ok(expectKey
+          ? 'signing key matches the independent witness (' + key.key_id + ')'
+          : 'host publishes a signing key (' + key.key_id + '), not compared against any witness');
+      }
+
+      if (attRes.status !== 200) {
+        fail('api/trust.json publishes a signing key and api/attestation.json returned HTTP ' + attRes.status + ': the contract is served unsigned');
+      } else {
+        let att = null;
+        try { att = JSON.parse(attRes.buf.toString('utf8')); }
+        catch (e) { fail('api/attestation.json is not valid JSON: ' + e.message); }
+        const p = att && att.payload;
+        if (!p || !att.signature_b64) {
+          fail('api/attestation.json carries no payload or no signature');
+        } else if (p.key_id !== key.key_id) {
+          fail('api/attestation.json is signed by "' + p.key_id + '" and the active key is "' + key.key_id + '"');
+        } else {
+          let sigOk = false;
+          try {
+            const pub = createPublicKey({
+              key: Buffer.from(key.public_key_spki_b64, 'base64'),
+              format: 'der',
+              type: 'spki',
+            });
+            sigOk = edVerify(null, Buffer.from(canonical(p), 'utf8'), pub, Buffer.from(att.signature_b64, 'base64'));
+          } catch (e) {
+            fail('api/attestation.json signature could not be checked: ' + e.message);
+          }
+          if (!sigOk) {
+            fail('api/attestation.json signature does not verify against the published key');
+          } else {
+            /* Over the bytes the SERVER sent, not the repository copy.
+               This is what makes the signature cover the publication
+               rather than the intention. */
+            const servedIndexSha = sha384(idxRes.buf);
+            let covered = true;
+            if (p.index_sha384 !== servedIndexSha) {
+              fail('the signature covers a different api/index.json than the one the host served');
+              console.error('        signed ' + p.index_sha384);
+              console.error('        served ' + servedIndexSha);
+              covered = false;
+            }
+            if (p.chain_head !== index.chain_head) {
+              fail('the signature covers chain head ' + String(p.chain_head).slice(7, 19) + '... and the served index head is ' + String(index.chain_head).slice(7, 19) + '...');
+              covered = false;
+            }
+            const sv = (p.versions || []).join(',');
+            const iv = (index.entries || []).map((e) => e.version).join(',');
+            if (sv !== iv || p.entry_count !== index.entry_count) {
+              fail('the signature covers versions [' + sv + '] and the host publishes [' + iv + ']');
+              covered = false;
+            }
+            if (covered && keyWitness === 'matched') {
+              ok('offline signature verifies over the served index, by the witnessed key (signed ' + p.signed_at + ')');
+            } else if (covered) {
+              console.log('      the signature closes against the key THIS HOST published'
+                + (keyWitness === 'mismatch' ? ', which is not the witnessed one: it proves nothing.' : '.'));
+              console.log('      pass --expect-key <fingerprint> to turn that into evidence of provenance.');
+            }
+          }
+        }
+      }
     }
   }
 

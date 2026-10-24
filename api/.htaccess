@@ -28,9 +28,15 @@
 
 AddType "application/json; charset=UTF-8" .json
 
-# The index and the latest pointer MOVE on every release, so they are
-# the two files that must not be cached for long. Five minutes matches
-# the rest of the site.
-<FilesMatch "^(index|latest)\.json$">
+# The index, the latest pointer, the trust anchor and the signature MOVE
+# on every release, so they are the files that must not be cached for
+# long. Five minutes matches the rest of the site.
+#
+# trust.json and attestation.json belong in this list and not in the
+# frozen one: a stale cached signature reads to a consumer as a host
+# serving a signature that no longer covers the index -- that is, as a
+# tampered publication. Caching a signature is how you manufacture a
+# false alarm.
+<FilesMatch "^(index|latest|trust|attestation)\.json$">
     Header set Cache-Control "public, max-age=300"
 </FilesMatch>

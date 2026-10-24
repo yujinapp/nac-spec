@@ -16,3 +16,4 @@ Thumbs.db
 # Local config
 .env
 .env.local
+.yujin-forge/

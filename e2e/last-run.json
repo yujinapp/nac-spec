@@ -1,0 +1,143 @@
+{
+  "station": "N0",
+  "prerequisite": 4,
+  "target": "http://localhost:8855/example-v21-data-table.php",
+  "checks": [
+    {
+      "name": "A. page loads and the NAC runtime boots with the demo data",
+      "green": true,
+      "detail": {
+        "runtime": "2.5.0-alpha.5",
+        "spec": "2.5",
+        "tables": [
+          "invoice.lines",
+          "perm.matrix"
+        ],
+        "rows": 8
+      }
+    },
+    {
+      "name": "B. every element describe() reports is addressable and role-consistent",
+      "green": true,
+      "detail": {
+        "total": 15,
+        "plugins": [
+          "topbar:0",
+          "invoice:1",
+          "invoice_edit_modal:7",
+          "chat:7"
+        ],
+        "problems": []
+      }
+    },
+    {
+      "name": "C. describe() tracks visibility (modal internals hidden while closed)",
+      "green": true,
+      "detail": {
+        "open": true,
+        "save": false,
+        "cancel": false
+      }
+    },
+    {
+      "name": "D. opening the invoice modal through the UI works",
+      "green": true,
+      "detail": {
+        "state": "open",
+        "ariaHidden": "false",
+        "renderedRows": 8
+      }
+    },
+    {
+      "name": "E. flow part 1: add a line -> runtime state and DOM both follow",
+      "green": true,
+      "detail": {
+        "before": {
+          "rows": 8,
+          "sum": 1115,
+          "domSum": "1115"
+        },
+        "after": {
+          "rows": 9,
+          "renderedRows": 9,
+          "modified": true,
+          "sum": 1115,
+          "domSum": "1115"
+        }
+      }
+    },
+    {
+      "name": "E2. flow part 2: edit a cell -> computed column + aggregate recompute",
+      "green": true,
+      "detail": {
+        "edit": {
+          "ok": true
+        },
+        "qty": 4,
+        "unitPrice": 0,
+        "lineTotal": 0,
+        "sum": 1115,
+        "domSum": "1115"
+      }
+    },
+    {
+      "name": "E3. flow part 3: non-editable and computed columns are refused (rule enforced)",
+      "green": true,
+      "detail": {
+        "unitPrice": {
+          "ok": false,
+          "error": "column_not_editable"
+        },
+        "lineTotal": {
+          "ok": false,
+          "error": "computed_column"
+        },
+        "unknown": {
+          "ok": false,
+          "error": "column_not_found"
+        }
+      }
+    },
+    {
+      "name": "E4. flow ends: commit closes the modal and lands in the audit log",
+      "green": true,
+      "detail": {
+        "state": "closed",
+        "rowsAfterCommit": 9,
+        "auditLine": "[15:33:44.227] COMMITTED: invoice.lines"
+      }
+    },
+    {
+      "name": "F. persistence boundary: commit is in-memory only (no server write)",
+      "green": true,
+      "detail": {
+        "tables": [
+          {
+            "id": "invoice.lines",
+            "on_commit_hook": false
+          },
+          {
+            "id": "perm.matrix",
+            "on_commit_hook": false
+          }
+        ],
+        "commit_is_client_fn": true
+      }
+    }
+  ],
+  "findings": {
+    "commit_persistence": "IN-MEMORY ONLY -- nothing is written outside the browser",
+    "chat_endpoint": {
+      "path": "/crm/api/v1/yujin/nac-demo",
+      "local_probe": {
+        "status": 200,
+        "content_type": "text/html; charset=UTF-8",
+        "served_html": true
+      },
+      "verdict": "NOT a real intermediary: the dev server answered 200 with site HTML. The chat/voice layer needs the real Yujin backend (external integration)."
+    }
+  },
+  "console_errors": [],
+  "failed_requests": [],
+  "verdict": "GREEN (all asserted checks)"
+}

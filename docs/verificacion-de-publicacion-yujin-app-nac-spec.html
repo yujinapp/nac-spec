@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Verificacion de publicacion -- yujin.app/nac-spec</title>
+<style>
+  body{background:#f5f1e8;color:#2b2620;font-family:Georgia,'Times New Roman',serif;line-height:1.65;margin:0;padding:48px 32px;}
+  .wrap{max-width:820px;margin:0 auto;}
+  h1{font-size:30px;font-weight:600;margin:0 0 4px;letter-spacing:-.4px;}
+  .sub{color:#7a6f60;font-style:italic;margin:0 0 32px;}
+  h2{font-size:19px;margin:36px 0 10px;padding-bottom:6px;border-bottom:1px solid #d8cfc0;}
+  p{margin:10px 0;}
+  .verdict{background:#fff;border-left:4px solid #2e7d5b;padding:16px 20px;margin:24px 0;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .verdict strong{color:#2e7d5b;}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-family:ui-monospace,Consolas,monospace;font-size:13px;}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e0d8ca;}
+  th{background:#ece5d8;font-weight:600;}
+  .ok{color:#2e7d5b;font-weight:600;}
+  .warn{color:#a8621b;font-weight:600;}
+  code{background:#ece5d8;padding:1px 5px;border-radius:3px;font-size:13px;}
+  ul{margin:10px 0 10px 22px;padding:0;}
+  li{margin:6px 0;}
+  .note{font-size:14px;color:#6b6155;border-top:1px solid #ddd4c5;margin-top:36px;padding-top:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Verificación de publicación</h1>
+<p class="sub">yujin.app/nac-spec &middot; repo yujinapp/nac-spec @ main &middot; comprobado el 29/06 contra el sitio en vivo</p>
+
+<div class="verdict">
+  <strong>Sí, está publicado y sincronizado.</strong> El sitio responde, el despliegue automático está en verde y lo que se ve online corresponde exactamente al último cambio del repo. No hay nada pendiente de subir.
+</div>
+
+<h2>1. El sitio responde de verdad</h2>
+<p>Se pidió la URL del proyecto y devolvió <strong>HTTP 200</strong> con <strong>87.166 bytes</strong> de contenido. No es una página de error ni un placeholder: trae la cabecera real del proyecto (<em>NAC &mdash; Native Agent Contract</em>) y la sección comercial con el precio y el estado alpha.</p>
+
+<h2>2. El contenido online coincide con el último commit</h2>
+<p>El último commit local es <code>96a0ea4 fix(landing): drop the last MIT runtime reference (governance section)</code>. Se buscó en el HTML publicado cualquier mención a licencia MIT y <strong>no aparece ninguna</strong>: solo figura <code>Apache-2.0</code> en el pie, en la sección de recursos y en el párrafo de gobernanza. Es decir, la corrección de licencia ya está en el aire.</p>
+<p>El árbol de trabajo está limpio: lo único sin trackear es la carpeta interna de la herramienta, no contenido del sitio.</p>
+
+<h2>3. El despliegue automático está sano</h2>
+<table>
+  <tr><th>Estado</th><th>Run</th><th>Commit</th></tr>
+  <tr><td class="ok">success</td><td>28341600586</td><td>drop the last MIT runtime reference</td></tr>
+  <tr><td class="ok">success</td><td>28341587207</td><td>runtime is Apache-2.0, not MIT</td></tr>
+  <tr><td class="warn">failure</td><td>28341536994</td><td>docs: refresh drifted spec/docs/types</td></tr>
+</table>
+<p>Cada push a <code>main</code> dispara la publicación. Los dos últimos corrieron en verde y en menos de 30 segundos. El fallo que aparece arriba es <strong>anterior y ya está superado</strong>: lo reemplazaron los dos pushes siguientes.</p>
+
+<h2>4. Verificación de humo dentro del propio despliegue</h2>
+<p>El flujo de publicación no termina al copiar archivos: después consulta el sitio en vivo y exige encontrar el título y la sección de estado alpha. Si alguno falta, el run falla. Como los dos últimos runs terminaron en verde, la copia subida quedó confirmada desde adentro del proceso, no solo por fuera.</p>
+
+<h2>Qué significa para vos</h2>
+<ul>
+  <li>Podés compartir la URL hoy: es la versión vigente del proyecto.</li>
+  <li>Cualquier push nuevo a <code>main</code> se publica solo, sin pasos manuales.</li>
+  <li>El único pendiente real es cosmético: el run fallido del commit de docs quedó en el historial de acciones. Si querés un historial impecable, se puede revisar por qué falló y dejarlo documentado.</li>
+</ul>
+
+<p class="note">Método: pedido HTTP directo al sitio publicado, búsqueda de cadenas en el HTML servido, estado del árbol de git e historial de ejecuciones del despliegue. Todo lo afirmado arriba salió de esas comprobaciones en vivo.</p>
+
+</div>
+</body>
+</html>

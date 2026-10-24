@@ -1,0 +1,816 @@
+{
+  "version": 2,
+  "workflows": {
+    "urazuke": {
+      "kind": "urazuke",
+      "title": "Urazuke -- el metodo de la evidencia (24 peldanos, 4 tramos)",
+      "whenToUse": "Proyecto nuevo, sin codigo previo. La escalera completa desde la elegibilidad.",
+      "stages": [
+        {
+          "id": "u-arranque",
+          "title": "I. Arranque",
+          "purpose": "Decidir si se puede, acordar las reglas, definir, dimensionar y montar el esqueleto con sus compuertas.",
+          "steps": [
+            {
+              "id": "u00-elegibilidad",
+              "title": "00 Este proyecto se puede encarar asi? (elegibilidad)",
+              "content": "Decidir, con criterios excluyentes y ponderados, si el proyecto se puede construir con el metodo. Prompt y verificacion: yujin.urazuke.step {num: 0}.",
+              "urazuke": {
+                "step": 0
+              }
+            },
+            {
+              "id": "u01-contrato-de-convivencia",
+              "title": "01 El contrato de convivencia",
+              "content": "Las reglas que el agente cumple en cada sesion, escritas antes del codigo. Prompt y verificacion: yujin.urazuke.step {num: 1}.",
+              "urazuke": {
+                "step": 1
+              }
+            },
+            {
+              "id": "u02-definicion-y-lectura",
+              "title": "02 La definicion del proyecto, el arbol semantico y la lectura obligatoria",
+              "content": "Que es el sistema, para quien, con que casos de uso, y que se lee en cada sesion. Prompt y verificacion: yujin.urazuke.step {num: 2}.",
+              "urazuke": {
+                "step": 2
+              }
+            },
+            {
+              "id": "u03-dimensionar",
+              "title": "03 Dimensionar antes de disenar la arquitectura",
+              "content": "Volumetria, retencion, concurrencia y envoltura de hardware antes de elegir la persistencia. Prompt y verificacion: yujin.urazuke.step {num: 3}.",
+              "urazuke": {
+                "step": 3
+              }
+            },
+            {
+              "id": "u04-esqueleto",
+              "title": "04 El esqueleto con sus compuertas",
+              "content": "Repositorio, integracion continua, entornos y las compuertas que nadie puede saltar. Prompt y verificacion: yujin.urazuke.step {num: 4}.",
+              "urazuke": {
+                "step": 4
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-bucle",
+          "title": "II. Bucle de construccion",
+          "purpose": "Construir por bloques: cada pendiente con su especificacion, su rojo probado, su calidad, su caso manual y su reporte honesto.",
+          "steps": [
+            {
+              "id": "u05-pendientes",
+              "title": "05 El plan son los pendientes",
+              "content": "Cada pendiente lleva su especificacion completa: criterios de aceptacion y como se verifica. Prompt y verificacion: yujin.urazuke.step {num: 5}.",
+              "urazuke": {
+                "step": 5
+              }
+            },
+            {
+              "id": "u06-decisiones",
+              "title": "06 Las decisiones se escriben junto al codigo",
+              "content": "Cada decision con dueno, fecha, la frase textual de origen y donde se aplica. Prompt y verificacion: yujin.urazuke.step {num: 6}.",
+              "urazuke": {
+                "step": 6
+              }
+            },
+            {
+              "id": "u07-medir",
+              "title": "07 Medir antes de construir, con un instrumento que tambien se verifica",
+              "content": "Un numero que alimenta una decision se mide con un programa que tiene su propio test. Prompt y verificacion: yujin.urazuke.step {num: 7}.",
+              "urazuke": {
+                "step": 7
+              }
+            },
+            {
+              "id": "u08-tests-en-rojo",
+              "title": "08 Tests como candados, probados en rojo",
+              "content": "El rojo contra el codigo anterior como recibo, el verde, la regresion y la prueba de punta a punta. Prompt y verificacion: yujin.urazuke.step {num: 8}.",
+              "urazuke": {
+                "step": 8
+              }
+            },
+            {
+              "id": "u09-calidad-de-codigo",
+              "title": "09 Calidad del codigo verificada por maquina, con compuerta",
+              "content": "Linter, formateador, limites de tamano y complejidad, duplicacion, codigo muerto, cobertura con trinquete. Prompt y verificacion: yujin.urazuke.step {num: 9}.",
+              "urazuke": {
+                "step": 9
+              }
+            },
+            {
+              "id": "u10-casos-de-prueba-manual",
+              "title": "10 Los casos de prueba manual se escriben con la funcionalidad y los ejecutan personas",
+              "content": "Cada pendiente deja su caso de prueba manual; cada fallo humano vuelve como pendiente. Prompt y verificacion: yujin.urazuke.step {num: 10}.",
+              "urazuke": {
+                "step": 10
+              }
+            },
+            {
+              "id": "u11-simetria-y-antipatrones",
+              "title": "11 Simetria entre productor y consumidor, y el registro de anti-patrones",
+              "content": "Nadie cambia una estructura compartida sin tocar a todos sus consumidores; cada golpe queda escrito. Prompt y verificacion: yujin.urazuke.step {num: 11}.",
+              "urazuke": {
+                "step": 11
+              }
+            },
+            {
+              "id": "u12-verificacion-honesta",
+              "title": "12 Verificacion honesta y reporte proporcional",
+              "content": "Cada reporte separa lo verificado, lo creido y el punto ciego, y ocupa lo que la evidencia da. Prompt y verificacion: yujin.urazuke.step {num: 12}.",
+              "urazuke": {
+                "step": 12
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-salida",
+          "title": "III. Salida a produccion",
+          "purpose": "Lo que un sistema necesita para salir a produccion y seguir vivo: auditoria, candados, despliegue, observabilidad, seguridad, rendimiento, manuales.",
+          "steps": [
+            {
+              "id": "u13-auditoria",
+              "title": "13 La auditoria periodica como insumo del plan",
+              "content": "Otra sesion, idealmente otro modelo, revisa todo y sus hallazgos entran al plan como pendientes. Prompt y verificacion: yujin.urazuke.step {num: 13}.",
+              "urazuke": {
+                "step": 13
+              }
+            },
+            {
+              "id": "u14-fail-closed",
+              "title": "14 Fail-closed, candados y cero dano silencioso",
+              "content": "Cada accion con consecuencia real tiene su candado; ante la duda, el sistema se detiene. Prompt y verificacion: yujin.urazuke.step {num: 14}.",
+              "urazuke": {
+                "step": 14
+              }
+            },
+            {
+              "id": "u15-ci-entornos-secretos-deploy",
+              "title": "15 Integracion continua, entornos, secretos y despliegue como parte del producto",
+              "content": "Despliegue repetible, configuracion afuera del codigo, secretos en su lugar y vuelta atras probada. Prompt y verificacion: yujin.urazuke.step {num: 15}.",
+              "urazuke": {
+                "step": 15
+              }
+            },
+            {
+              "id": "u16-observabilidad-y-trazabilidad",
+              "title": "16 Observabilidad y trazabilidad totales, con nivel configurable",
+              "content": "Cada accion deja un registro estructurado con su identificador; el nivel se configura sin tocar codigo. Prompt y verificacion: yujin.urazuke.step {num: 16}.",
+              "urazuke": {
+                "step": 16
+              }
+            },
+            {
+              "id": "u17-persistencia",
+              "title": "17 Optimizacion de la capa de persistencia, medida antes y despues",
+              "content": "Indices, fin de los bucles N+1, presupuestos de consultas por camino; todo con numero antes y despues. Prompt y verificacion: yujin.urazuke.step {num: 17}.",
+              "urazuke": {
+                "step": 17
+              }
+            },
+            {
+              "id": "u18-vulnerabilidades",
+              "title": "18 Escaneo y solucion de vulnerabilidades, en la cadena y con calendario",
+              "content": "Dependencias, secretos, codigo e infraestructura escaneados en cada push y con fecha de repaso. Prompt y verificacion: yujin.urazuke.step {num: 18}.",
+              "urazuke": {
+                "step": 18
+              }
+            },
+            {
+              "id": "u19-rendimiento-y-punto-de-ruptura",
+              "title": "19 Pruebas de rendimiento en volumen y punto de ruptura",
+              "content": "Cargar al volumen esperado y al por diez, y encontrar que se rompe primero. Prompt y verificacion: yujin.urazuke.step {num: 19}.",
+              "urazuke": {
+                "step": 19
+              }
+            },
+            {
+              "id": "u20-documentacion-viva",
+              "title": "20 Documentacion viva y manuales que una persona puede seguir sin IA",
+              "content": "Manual de usuario, de mantenimiento y de infraestructura y recuperacion; el registro de cambios al dia. Prompt y verificacion: yujin.urazuke.step {num: 20}.",
+              "urazuke": {
+                "step": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-operacion",
+          "title": "IV. Operacion",
+          "purpose": "Monitoreo de recursos y de errores con reporte ciclico, el agente residente y la retrospectiva con numero.",
+          "steps": [
+            {
+              "id": "u21-monitoreo-de-recursos",
+              "title": "21 Monitoreo de recursos, funciones y consultas fuera de rango, con reporte ciclico",
+              "content": "Umbrales por recurso y por funcion, alertas, y un reporte que llega solo cada ciclo. Prompt y verificacion: yujin.urazuke.step {num: 21}.",
+              "urazuke": {
+                "step": 21
+              }
+            },
+            {
+              "id": "u22-monitoreo-de-errores",
+              "title": "22 Monitoreo de errores y reporte ciclico: ningun error sin pendiente",
+              "content": "Captura centralizada de errores, alerta cuando importa, y cada error nuevo con su pendiente. Prompt y verificacion: yujin.urazuke.step {num: 22}.",
+              "urazuke": {
+                "step": 22
+              }
+            },
+            {
+              "id": "u23-agente-residente-y-retrospectiva",
+              "title": "23 El agente adentro del sistema, y la retrospectiva con numero",
+              "content": "Un agente residente con alcance escrito, y una retrospectiva que termina en una propuesta al metodo. Prompt y verificacion: yujin.urazuke.step {num: 23}.",
+              "urazuke": {
+                "step": 23
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "urazuke-legacy": {
+      "kind": "urazuke-legacy",
+      "title": "Urazuke sobre un sistema existente (normalizacion N0..N7, despues la escalera desde el 5)",
+      "whenToUse": "El proyecto ya tiene codigo y NO fue construido con el metodo (faltan el contrato, el arbol semantico, las compuertas).",
+      "stages": [
+        {
+          "id": "u-normalizacion",
+          "title": "0. Normalizacion del legado (N0..N7)",
+          "purpose": "Recuperar los insumos que nadie escribio, poner el cinturon de seguridad y armar el backlog de normalizacion. Nada se reescribe.",
+          "steps": [
+            {
+              "id": "n0-elegibilidad-legado",
+              "title": "N0 Elegibilidad de un sistema existente: los prerrequisitos que un modelo puede verificar haciendo",
+              "content": "Siete prerrequisitos verificados haciendo; cada rojo es un proyecto previo. Prompt y verificacion: yujin.urazuke.step {station: 0}.",
+              "urazuke": {
+                "station": 0
+              }
+            },
+            {
+              "id": "n1-contrato-legado",
+              "title": "N1 El contrato de convivencia para un legado",
+              "content": "Las reglas del metodo mas la regla de no reescribir. Prompt y verificacion: yujin.urazuke.step {station: 1}.",
+              "urazuke": {
+                "station": 1
+              }
+            },
+            {
+              "id": "n2-lectura-del-sistema",
+              "title": "N2 La lectura del sistema: el mapa recuperado y las discrepancias",
+              "content": "Relevamiento, proyecto y arbol desde el codigo con marcas de fuente; la lista de discrepancias. Prompt y verificacion: yujin.urazuke.step {station: 2}.",
+              "urazuke": {
+                "station": 2
+              }
+            },
+            {
+              "id": "n3-auditoria-inventario",
+              "title": "N3 La auditoria como inventario de la deuda",
+              "content": "Toda la deuda, con su marca: bloquea, se paga al tocar, puede esperar. Prompt y verificacion: yujin.urazuke.step {station: 3}.",
+              "urazuke": {
+                "station": 3
+              }
+            },
+            {
+              "id": "n4-cinturon-de-seguridad",
+              "title": "N4 El cinturon de seguridad",
+              "content": "Tests de caracterizacion con su rojo por mutacion, la cadena y los entornos. Compuerta dura. Prompt y verificacion: yujin.urazuke.step {station: 4}.",
+              "urazuke": {
+                "station": 4
+              }
+            },
+            {
+              "id": "n5-candados-y-mapa",
+              "title": "N5 Candados y mapa productor-consumidor desde el codigo",
+              "content": "Las acciones con consecuencia y las estructuras compartidas, leidas del sistema. Prompt y verificacion: yujin.urazuke.step {station: 5}.",
+              "urazuke": {
+                "station": 5
+              }
+            },
+            {
+              "id": "n6-dimensionar-real",
+              "title": "N6 Dimensionar con numeros reales",
+              "content": "La volumetria medida en la base real, y la persistencia contrastada con su envoltura. Prompt y verificacion: yujin.urazuke.step {station: 6}.",
+              "urazuke": {
+                "station": 6
+              }
+            },
+            {
+              "id": "n7-backlog-de-normalizacion",
+              "title": "N7 El backlog de normalizacion, emparejado con el pedido del cliente",
+              "content": "La deuda que bloquea y el pedido del cliente, en un solo plan ordenado. Prompt y verificacion: yujin.urazuke.step {station: 7}.",
+              "urazuke": {
+                "station": 7
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-bucle",
+          "title": "II. Bucle de construccion",
+          "purpose": "Construir por bloques: cada pendiente con su especificacion, su rojo probado, su calidad, su caso manual y su reporte honesto.",
+          "steps": [
+            {
+              "id": "u05-pendientes",
+              "title": "05 El plan son los pendientes",
+              "content": "Cada pendiente lleva su especificacion completa: criterios de aceptacion y como se verifica. Prompt y verificacion: yujin.urazuke.step {num: 5}.",
+              "urazuke": {
+                "step": 5
+              }
+            },
+            {
+              "id": "u06-decisiones",
+              "title": "06 Las decisiones se escriben junto al codigo",
+              "content": "Cada decision con dueno, fecha, la frase textual de origen y donde se aplica. Prompt y verificacion: yujin.urazuke.step {num: 6}.",
+              "urazuke": {
+                "step": 6
+              }
+            },
+            {
+              "id": "u07-medir",
+              "title": "07 Medir antes de construir, con un instrumento que tambien se verifica",
+              "content": "Un numero que alimenta una decision se mide con un programa que tiene su propio test. Prompt y verificacion: yujin.urazuke.step {num: 7}.",
+              "urazuke": {
+                "step": 7
+              }
+            },
+            {
+              "id": "u08-tests-en-rojo",
+              "title": "08 Tests como candados, probados en rojo",
+              "content": "El rojo contra el codigo anterior como recibo, el verde, la regresion y la prueba de punta a punta. Prompt y verificacion: yujin.urazuke.step {num: 8}.",
+              "urazuke": {
+                "step": 8
+              }
+            },
+            {
+              "id": "u09-calidad-de-codigo",
+              "title": "09 Calidad del codigo verificada por maquina, con compuerta",
+              "content": "Linter, formateador, limites de tamano y complejidad, duplicacion, codigo muerto, cobertura con trinquete. Prompt y verificacion: yujin.urazuke.step {num: 9}.",
+              "urazuke": {
+                "step": 9
+              }
+            },
+            {
+              "id": "u10-casos-de-prueba-manual",
+              "title": "10 Los casos de prueba manual se escriben con la funcionalidad y los ejecutan personas",
+              "content": "Cada pendiente deja su caso de prueba manual; cada fallo humano vuelve como pendiente. Prompt y verificacion: yujin.urazuke.step {num: 10}.",
+              "urazuke": {
+                "step": 10
+              }
+            },
+            {
+              "id": "u11-simetria-y-antipatrones",
+              "title": "11 Simetria entre productor y consumidor, y el registro de anti-patrones",
+              "content": "Nadie cambia una estructura compartida sin tocar a todos sus consumidores; cada golpe queda escrito. Prompt y verificacion: yujin.urazuke.step {num: 11}.",
+              "urazuke": {
+                "step": 11
+              }
+            },
+            {
+              "id": "u12-verificacion-honesta",
+              "title": "12 Verificacion honesta y reporte proporcional",
+              "content": "Cada reporte separa lo verificado, lo creido y el punto ciego, y ocupa lo que la evidencia da. Prompt y verificacion: yujin.urazuke.step {num: 12}.",
+              "urazuke": {
+                "step": 12
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-salida",
+          "title": "III. Salida a produccion",
+          "purpose": "Lo que un sistema necesita para salir a produccion y seguir vivo: auditoria, candados, despliegue, observabilidad, seguridad, rendimiento, manuales.",
+          "steps": [
+            {
+              "id": "u13-auditoria",
+              "title": "13 La auditoria periodica como insumo del plan",
+              "content": "Otra sesion, idealmente otro modelo, revisa todo y sus hallazgos entran al plan como pendientes. Prompt y verificacion: yujin.urazuke.step {num: 13}.",
+              "urazuke": {
+                "step": 13
+              }
+            },
+            {
+              "id": "u14-fail-closed",
+              "title": "14 Fail-closed, candados y cero dano silencioso",
+              "content": "Cada accion con consecuencia real tiene su candado; ante la duda, el sistema se detiene. Prompt y verificacion: yujin.urazuke.step {num: 14}.",
+              "urazuke": {
+                "step": 14
+              }
+            },
+            {
+              "id": "u15-ci-entornos-secretos-deploy",
+              "title": "15 Integracion continua, entornos, secretos y despliegue como parte del producto",
+              "content": "Despliegue repetible, configuracion afuera del codigo, secretos en su lugar y vuelta atras probada. Prompt y verificacion: yujin.urazuke.step {num: 15}.",
+              "urazuke": {
+                "step": 15
+              }
+            },
+            {
+              "id": "u16-observabilidad-y-trazabilidad",
+              "title": "16 Observabilidad y trazabilidad totales, con nivel configurable",
+              "content": "Cada accion deja un registro estructurado con su identificador; el nivel se configura sin tocar codigo. Prompt y verificacion: yujin.urazuke.step {num: 16}.",
+              "urazuke": {
+                "step": 16
+              }
+            },
+            {
+              "id": "u17-persistencia",
+              "title": "17 Optimizacion de la capa de persistencia, medida antes y despues",
+              "content": "Indices, fin de los bucles N+1, presupuestos de consultas por camino; todo con numero antes y despues. Prompt y verificacion: yujin.urazuke.step {num: 17}.",
+              "urazuke": {
+                "step": 17
+              }
+            },
+            {
+              "id": "u18-vulnerabilidades",
+              "title": "18 Escaneo y solucion de vulnerabilidades, en la cadena y con calendario",
+              "content": "Dependencias, secretos, codigo e infraestructura escaneados en cada push y con fecha de repaso. Prompt y verificacion: yujin.urazuke.step {num: 18}.",
+              "urazuke": {
+                "step": 18
+              }
+            },
+            {
+              "id": "u19-rendimiento-y-punto-de-ruptura",
+              "title": "19 Pruebas de rendimiento en volumen y punto de ruptura",
+              "content": "Cargar al volumen esperado y al por diez, y encontrar que se rompe primero. Prompt y verificacion: yujin.urazuke.step {num: 19}.",
+              "urazuke": {
+                "step": 19
+              }
+            },
+            {
+              "id": "u20-documentacion-viva",
+              "title": "20 Documentacion viva y manuales que una persona puede seguir sin IA",
+              "content": "Manual de usuario, de mantenimiento y de infraestructura y recuperacion; el registro de cambios al dia. Prompt y verificacion: yujin.urazuke.step {num: 20}.",
+              "urazuke": {
+                "step": 20
+              }
+            }
+          ]
+        },
+        {
+          "id": "u-operacion",
+          "title": "IV. Operacion",
+          "purpose": "Monitoreo de recursos y de errores con reporte ciclico, el agente residente y la retrospectiva con numero.",
+          "steps": [
+            {
+              "id": "u21-monitoreo-de-recursos",
+              "title": "21 Monitoreo de recursos, funciones y consultas fuera de rango, con reporte ciclico",
+              "content": "Umbrales por recurso y por funcion, alertas, y un reporte que llega solo cada ciclo. Prompt y verificacion: yujin.urazuke.step {num: 21}.",
+              "urazuke": {
+                "step": 21
+              }
+            },
+            {
+              "id": "u22-monitoreo-de-errores",
+              "title": "22 Monitoreo de errores y reporte ciclico: ningun error sin pendiente",
+              "content": "Captura centralizada de errores, alerta cuando importa, y cada error nuevo con su pendiente. Prompt y verificacion: yujin.urazuke.step {num: 22}.",
+              "urazuke": {
+                "step": 22
+              }
+            },
+            {
+              "id": "u23-agente-residente-y-retrospectiva",
+              "title": "23 El agente adentro del sistema, y la retrospectiva con numero",
+              "content": "Un agente residente con alcance escrito, y una retrospectiva que termina en una propuesta al metodo. Prompt y verificacion: yujin.urazuke.step {num: 23}.",
+              "urazuke": {
+                "step": 23
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "greenfield": {
+      "kind": "greenfield",
+      "title": "Desarrollo de app nueva (6 fases / 18 pasos)",
+      "whenToUse": "El proyecto se construye desde cero (no hay implementacion previa en el directorio).",
+      "stages": [
+        {
+          "id": "i-discovery",
+          "title": "I. Triage e intencion",
+          "purpose": "Entender que se pide, el peso del proyecto y el terreno.",
+          "steps": [
+            {
+              "id": "triage",
+              "title": "Triage de tier",
+              "content": "Clasificar simple/medium/full con su justificacion."
+            },
+            {
+              "id": "vault-inventory",
+              "title": "Inventario del vault",
+              "content": "Que secretos/credenciales necesita el proyecto."
+            },
+            {
+              "id": "intent",
+              "title": "Intencion",
+              "content": "Modo, plataforma, interaccion, distribucion. (Si hubiera legacy, auditarlo aca -- paso 3.5, no aplica en greenfield.)"
+            }
+          ]
+        },
+        {
+          "id": "ii-clarification",
+          "title": "II. Clarificacion",
+          "purpose": "Cerrar el funcional + los NFR + descomponer en bloques.",
+          "steps": [
+            {
+              "id": "functional",
+              "title": "Funcional",
+              "content": "Persona, north-star, MVP."
+            },
+            {
+              "id": "nfr-quantitative",
+              "title": "NFR cuantitativo",
+              "content": "Volumetria (entidades x eventos/ano x FILAS POR EVENTO), retencion por clase de dato, concurrencia, envoltura de HW. Cierra con el dimensionamiento registrado: compuerta G9."
+            },
+            {
+              "id": "nfr-structural",
+              "title": "NFR estructural",
+              "content": "Persistencia, middleware, workers."
+            },
+            {
+              "id": "nfr-governance",
+              "title": "NFR governance",
+              "content": "Compliance, secretos, RBAC."
+            },
+            {
+              "id": "nfr-operational",
+              "title": "NFR operacional",
+              "content": "i18n, a11y, monitoreo, navegadores."
+            },
+            {
+              "id": "blocks",
+              "title": "Bloques",
+              "content": "Descomponer el MVP en bloques implementables."
+            }
+          ]
+        },
+        {
+          "id": "iii-specification",
+          "title": "III. Especificacion",
+          "purpose": "Producir los entregables: RFP, arquitectura, diseno.",
+          "steps": [
+            {
+              "id": "rfp",
+              "title": "RFP/SPEC",
+              "content": "El contrato funcional del producto."
+            },
+            {
+              "id": "architecture",
+              "title": "Arquitectura",
+              "content": "Como se construye: piezas + conexiones."
+            },
+            {
+              "id": "design",
+              "title": "Diseno de solucion",
+              "content": "Decisiones de experiencia + interfaz."
+            }
+          ]
+        },
+        {
+          "id": "iv-approval",
+          "title": "IV. Aprobacion",
+          "purpose": "El owner aprueba antes de construir.",
+          "steps": [
+            {
+              "id": "gate-13",
+              "title": "Gate 13",
+              "content": "OK explicito del owner sobre RFP + arquitectura + diseno.",
+              "gate": true
+            }
+          ]
+        },
+        {
+          "id": "v-construction",
+          "title": "V. Construccion",
+          "purpose": "Bootstrap + desarrollo por bloques con tests (testing-policy: tests post-implementacion, scaffold gate verde).",
+          "steps": [
+            {
+              "id": "bootstrap",
+              "title": "Bootstrap",
+              "content": "Stack, scaffolding, CI gates."
+            },
+            {
+              "id": "block-dev",
+              "title": "Desarrollo por bloques",
+              "content": "Implementar cada bloque (codigo + tests verdes antes de scaffold)."
+            }
+          ]
+        },
+        {
+          "id": "vi-delivery",
+          "title": "VI. Entrega",
+          "purpose": "Manuales, despliegue, post-lanzamiento e iteracion.",
+          "steps": [
+            {
+              "id": "manuals",
+              "title": "Manuales",
+              "content": "Generar DOS entregables derivados de TODAS las funcionalidades del codigo (no stubs): (1) MANUAL DE IMPLEMENTACION -- arquitectura, decisiones, stack, build/deploy y como extender, para que otro dev retome el proyecto; (2) MANUAL DE USUARIO completo -- cada feature real, paso a paso. Guardar en docs/ del proyecto."
+            },
+            {
+              "id": "deploy",
+              "title": "Deploy",
+              "content": "QA visual + publicar (npm/hosting) con los gates verdes."
+            },
+            {
+              "id": "postlaunch",
+              "title": "Post-lanzamiento",
+              "content": "Metricas, handoff, monitoreo post-deploy."
+            },
+            {
+              "id": "iterate",
+              "title": "Iteracion",
+              "content": "Cambios post-lanzamiento; aca el proyecto suele pasar al flujo correctivo/evolutivo."
+            }
+          ]
+        }
+      ]
+    },
+    "corrective": {
+      "kind": "corrective",
+      "title": "Correctivo (arreglar un defecto en un proyecto vivo)",
+      "whenToUse": "El proyecto ya existe y hay que ARREGLAR un comportamiento roto.",
+      "stages": [
+        {
+          "id": "m-triage",
+          "title": "I. Triage",
+          "purpose": "Clasificar el pedido y acotar el alcance.",
+          "steps": [
+            {
+              "id": "classify",
+              "title": "Clasificar",
+              "content": "Confirmar correctivo vs evolutivo + el peso del cambio."
+            },
+            {
+              "id": "register",
+              "title": "Registrar",
+              "content": "Alta del pedido en el pending registry (request-lifecycle micro)."
+            }
+          ]
+        },
+        {
+          "id": "m-locate",
+          "title": "II. Reproducir + causa raiz",
+          "purpose": "Reproducir el defecto y localizar la causa raiz en el codigo/grafo.",
+          "steps": [
+            {
+              "id": "reproduce",
+              "title": "Reproducir",
+              "content": "Confirmar el bug con un caso minimo (idealmente un test rojo)."
+            },
+            {
+              "id": "root-cause",
+              "title": "Causa raiz",
+              "content": "Leer codigo + grafo; identificar la causa, no el sintoma."
+            }
+          ]
+        },
+        {
+          "id": "m-change",
+          "title": "III. Implementar",
+          "purpose": "Aplicar el cambio en el codigo.",
+          "steps": [
+            {
+              "id": "implement",
+              "title": "Implementar",
+              "content": "Aplicar la correccion sobre la causa raiz."
+            }
+          ]
+        },
+        {
+          "id": "m-validate",
+          "title": "IV. Validar (ciclo iterativo)",
+          "purpose": "Probar; si falla o se puede mejorar, corregir y re-validar hasta converger.",
+          "steps": [
+            {
+              "id": "validate",
+              "title": "Validar",
+              "content": "Tests/checks verdes; el caso reproducido ahora pasa. Loguear cada iteracion (pending.note)."
+            }
+          ]
+        },
+        {
+          "id": "m-docs",
+          "title": "V. Actualizar documentacion",
+          "purpose": "Mantener la docu al dia -- requisito explicito del flujo de mantenimiento.",
+          "steps": [
+            {
+              "id": "docs",
+              "title": "Refrescar docs",
+              "content": "Actualizar README/ARCHITECTURE/DESIGN, el grafo, y las secciones afectadas del MANUAL DE IMPLEMENTACION + MANUAL DE USUARIO segun lo que cambio. No dejar deriva."
+            }
+          ]
+        },
+        {
+          "id": "m-close",
+          "title": "VI. Cerrar",
+          "purpose": "Entregar y dejar registro.",
+          "steps": [
+            {
+              "id": "commit",
+              "title": "Commit",
+              "content": "Commit con el porque; referenciar el PND."
+            },
+            {
+              "id": "close",
+              "title": "Cerrar + log",
+              "content": "Cerrar el pending con resolution (history) y registrar la evolucion del wfl."
+            }
+          ]
+        }
+      ]
+    },
+    "evolutive": {
+      "kind": "evolutive",
+      "title": "Evolutivo (extender/mejorar un proyecto vivo)",
+      "whenToUse": "El proyecto ya existe y hay que AGREGAR o MEJORAR funcionalidad.",
+      "stages": [
+        {
+          "id": "m-triage",
+          "title": "I. Triage",
+          "purpose": "Clasificar el pedido y acotar el alcance.",
+          "steps": [
+            {
+              "id": "classify",
+              "title": "Clasificar",
+              "content": "Confirmar correctivo vs evolutivo + el peso del cambio."
+            },
+            {
+              "id": "register",
+              "title": "Registrar",
+              "content": "Alta del pedido en el pending registry (request-lifecycle micro)."
+            }
+          ]
+        },
+        {
+          "id": "m-locate",
+          "title": "II. Diseno del cambio",
+          "purpose": "Decidir como encaja el cambio en la arquitectura existente.",
+          "steps": [
+            {
+              "id": "fit",
+              "title": "Encaje",
+              "content": "Como se integra en la arquitectura/diseno actual (mini-spec)."
+            },
+            {
+              "id": "impact",
+              "title": "Impacto",
+              "content": "Que modulos/docs/contratos toca el cambio."
+            }
+          ]
+        },
+        {
+          "id": "m-change",
+          "title": "III. Implementar",
+          "purpose": "Aplicar el cambio en el codigo.",
+          "steps": [
+            {
+              "id": "implement",
+              "title": "Implementar",
+              "content": "Construir la mejora."
+            }
+          ]
+        },
+        {
+          "id": "m-validate",
+          "title": "IV. Validar (ciclo iterativo)",
+          "purpose": "Probar; si falla o se puede mejorar, corregir y re-validar hasta converger.",
+          "steps": [
+            {
+              "id": "validate",
+              "title": "Validar",
+              "content": "Tests/checks verdes; el caso reproducido ahora pasa. Loguear cada iteracion (pending.note)."
+            }
+          ]
+        },
+        {
+          "id": "m-docs",
+          "title": "V. Actualizar documentacion",
+          "purpose": "Mantener la docu al dia -- requisito explicito del flujo de mantenimiento.",
+          "steps": [
+            {
+              "id": "docs",
+              "title": "Refrescar docs",
+              "content": "Actualizar README/ARCHITECTURE/DESIGN, el grafo, y las secciones afectadas del MANUAL DE IMPLEMENTACION + MANUAL DE USUARIO segun lo que cambio. No dejar deriva."
+            }
+          ]
+        },
+        {
+          "id": "m-close",
+          "title": "VI. Cerrar",
+          "purpose": "Entregar y dejar registro.",
+          "steps": [
+            {
+              "id": "commit",
+              "title": "Commit",
+              "content": "Commit con el porque; referenciar el PND."
+            },
+            {
+              "id": "close",
+              "title": "Cerrar + log",
+              "content": "Cerrar el pending con resolution (history) y registrar la evolucion del wfl."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

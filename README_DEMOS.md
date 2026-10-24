@@ -43,7 +43,7 @@ The repo ships two families of runnable demos:
 | `demos/v24-05-authority-sudo/` | V24-05 agent authority + sudo elevation. |
 | `demos/v25-canvas-api/` | V25-01 plugin extension contract for canvas + API surfaces. |
 | `demos/v25-02-tree-nav/` | V25-02 tree navigation (`context` + `tree`). |
-| `demos/v25-03-narrate/` | V25-03 asistive labels (`narrate`). |
+| `demos/v25-03-narrate/` | V25-03 assistive labels (`narrate`). |
 | `demos/v25-04-expect-diff/` | V25-04 effect detection (`expect` + `diff`). |
 
 Plus the **Atlas Pro voice ad** under `ads-demo/atlas-pro/` -- a

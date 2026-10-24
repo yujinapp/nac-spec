@@ -30,6 +30,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -48,6 +49,24 @@ const ASSETS = [
 const abs = (p) => join(ROOT, p);
 const read = (p) => readFileSync(abs(p));
 const fail = (msg) => { console.error('FAIL  ' + msg); process.exitCode = 1; };
+
+/* Did this path already go out to the web? The deploy mirrors the
+   committed tree, so "present at HEAD" is the honest proxy for
+   "an adopter may already have pinned these bytes". Used to tell a
+   never-released version (safe to refreeze) from a published one
+   (never, because the hash the landing page promises is public).
+   Returns false outside a git checkout, which is the conservative
+   answer only because the caller then needs --force anyway. */
+function publishedAtHead(path) {
+  try {
+    execFileSync('git', ['cat-file', '-e', 'HEAD:' + path], {
+      cwd: ROOT, stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /* ---- version: the authoritative constant lives in the runtime export ---- */
 
@@ -109,9 +128,32 @@ function main() {
   if (existsSync(abs(immutablePath))) {
     const frozen = read(immutablePath);
     if (!frozen.equals(nacBytes)) {
-      if ((FORCE || WRITE) && nacIsLf) {
+      /* --write alone used to refresh this copy, which made the only
+         protection on a PUBLISHED frozen path a human remembering to
+         bump first. The contract API gate already drew the line in the
+         right place -- an entry in the published chain is immutable,
+         --force is only for a version that never shipped -- and this
+         freezer has to draw the same one, because it is the producer
+         of the hash the landing page promises in public. */
+      const alreadyOut = publishedAtHead(immutablePath);
+      if (nacIsLf && FORCE) {
+        writeFileSync(abs(immutablePath), nacBytes);
+        console.log(`WRITE ${immutablePath} (refreshed under --force, ${nacBytes.length} bytes)`);
+        if (alreadyOut) {
+          console.log(`WARN  ${immutablePath} was already published at HEAD.`);
+          console.log(`      Anyone who pinned it with the old sha384 now gets different bytes`);
+          console.log(`      and their browser refuses the script. You asserted this is safe.`);
+        }
+      } else if (nacIsLf && WRITE && !alreadyOut) {
         writeFileSync(abs(immutablePath), nacBytes);
         console.log(`WRITE ${immutablePath} (refreshed, ${nacBytes.length} bytes)`);
+      } else if (nacIsLf && WRITE && alreadyOut) {
+        fail(`${immutablePath} is already published at HEAD and js/nac.js no longer matches it.`);
+        console.error('      An immutable path is a promise: the landing page publishes its sha384,');
+        console.error('      so rewriting these bytes breaks every adopter who pinned them.');
+        console.error(`      Fix: bump the version constant in js/nac.js, then rerun --write.`);
+        console.error('      --force overrides this, and only makes sense if you are certain this');
+        console.error('      version never reached the web.');
       } else if (nacIsLf) {
         fail(`${immutablePath} differs from js/nac.js -- bump the version, or rerun with --write if this version was never released`);
       }
@@ -126,6 +168,22 @@ function main() {
     } else if (nacIsLf) {
       fail(`${immutablePath} does not exist -- run with --write to freeze this version`);
     }
+  }
+
+  /* 1b. fail closed before touching anything downstream.
+         Without this, a refused freeze still fell through to step 3,
+         which rewrote index.html with the sha384 of the NEW bytes
+         while the frozen path on disk still held the OLD ones. The
+         exit code was 1, so the deploy was blocked -- but the tree
+         was left declaring a hash that matched nothing at that path,
+         which is a worse state than the one we refused to create.
+         A gate that half-applies is not a gate. */
+  if (process.exitCode) {
+    console.error('');
+    console.error('Integrity gate FAILED at the freeze step. Nothing downstream was written:');
+    console.error('index.html and js/integrity.json are untouched, so the tree still agrees');
+    console.error('with itself. Resolve the message above and rerun.');
+    return;
   }
 
   /* 2. hashes */
@@ -149,20 +207,36 @@ function main() {
   const original = readFileSync(indexPath, 'utf8');
   let text = original;
   if (WRITE) {
+    let repinned = 0;
     text = original.replace(/<script\b[^>]*>/g, (tag) => {
       const src = tag.match(/\bsrc="([^"]+?\.js)(?:\?[^"]*)?"/);
       if (!src) return tag;
       const base = src[1].replace(/\\/g, '/').split('/').pop();
       const rec = files.find((f) => f.path.split('/').pop() === base);
       if (!rec) return tag;
-      if (/\bintegrity="sha384-[^"]*"/.test(tag)) {
-        return tag.replace(/\bintegrity="sha384-[^"]*"/, `integrity="${rec.sha384}"`);
+      let out = tag;
+      /* Re-pin the runtime tag onto the CURRENT immutable path. Before
+         this, a version bump froze js/<new>/nac.js and then left the
+         tag pointing at the previous version's path, so the gate
+         failed and a human had to retype the path in index.html --
+         the same hand-written-version disease the whole lock exists
+         to kill (audit N-17). The hash and the path it belongs to now
+         have one producer each, and it is this script. */
+      if (rec.path === 'js/nac.js' && src[1] !== immutablePath) {
+        out = out.replace(/\bsrc="[^"]+"/, `src="${immutablePath}"`);
+        repinned += 1;
       }
-      return tag.replace(/\s*>$/, ` integrity="${rec.sha384}">`);
+      if (/\bintegrity="sha384-[^"]*"/.test(out)) {
+        out = out.replace(/\bintegrity="sha384-[^"]*"/, `integrity="${rec.sha384}"`);
+      } else {
+        out = out.replace(/\s*>$/, ` integrity="${rec.sha384}">`);
+      }
+      return out;
     });
     if (text !== original) {
       writeFileSync(indexPath, text);
-      console.log('WRITE index.html (integrity hashes refreshed)');
+      console.log('WRITE index.html (integrity hashes refreshed' +
+                  (repinned ? `, runtime re-pinned to ${immutablePath}` : '') + ')');
     }
   }
   const lineAt = (idx) => text.slice(0, idx).split('\n').length;
@@ -187,10 +261,43 @@ function main() {
   }
   if (checked === 0) fail('index.html references none of the tracked assets -- did the script tags move?');
 
-  /* 4. the copy-paste snippet must use the immutable path, not the
-        moving alias. js/nac.js stays published as "newest build". */
-  const snippetImmutable = text.includes('js/' + version + '/nac.js');
-  if (!snippetImmutable) {
+  /* 4. the page must LOAD the runtime from the immutable path, not
+        just mention it. js/nac.js stays published as "newest build".
+
+        This used to be text.includes(immutablePath), which the prose
+        two sections above satisfies on its own ("js/<v>/nac.js is
+        immutable -- pin it in production"). So the tag could revert to
+        the moving alias js/nac.js?v=... and the gate still said OK --
+        which is audit N-03 verbatim, inside the lock built to close
+        it. Documentation is not a load path: assert the tag. */
+  const runtimeTags = [...text.matchAll(/<script\b[^>]*>/g)]
+    .map((t) => ({ tag: t[0], at: lineAt(t.index), src: (t[0].match(/\bsrc="([^"]+?\.js)(?:\?[^"]*)?"/) || [])[1] }))
+    .filter((t) => t.src && t.src.replace(/\\/g, '/').split('/').pop() === 'nac.js');
+  if (runtimeTags.length === 0) {
+    fail('index.html does not load the runtime at all -- did the script tag move?');
+  } else {
+    const mutable = runtimeTags.filter((t) => t.src !== immutablePath);
+    if (mutable.length) {
+      for (const t of mutable) {
+        fail(`index.html:${t.at} loads the runtime from "${t.src}", a mutable path.\n` +
+             `      Production must load the immutable ${immutablePath}, whose bytes\n` +
+             '      can never change. Fix: rerun with --write (it re-pins the tag).');
+      }
+    } else {
+      console.log(`OK    index.html loads the runtime from ${immutablePath} (${runtimeTags.length} tag` +
+                  (runtimeTags.length === 1 ? ')' : 's)'));
+    }
+  }
+  /* The adopter-facing copy-paste snippet is a separate promise: it is
+     prose, and it must show the same path the page itself uses.
+
+     Measured OUTSIDE the script tags on purpose. --write re-pins the
+     tag, so asking "does the immutable path appear in index.html"
+     after that is a question the gate just made true by itself -- it
+     would pass on a version bump that never touched the documentation,
+     which is the stale snippet it exists to catch. */
+  const prose = text.replace(/<script\b[^>]*>/g, '');
+  if (!prose.includes('js/' + version + '/nac.js')) {
     fail(`index.html never shows the immutable path js/${version}/nac.js to adopters`);
   } else {
     console.log(`OK    index.html shows the immutable path to adopters`);

@@ -3,7 +3,7 @@
 ## 2.5.0-alpha.5 -- 2026-05-25
 
 NAC3 v2.5.0-alpha.5 ships the remaining three assistive blocks of
-the v2.5 line: **Block B tree navigation**, **Block C asistive
+the v2.5 line: **Block B tree navigation**, **Block C assistive
 labels**, **Block D effect detection**. The full v2.5 surface is
 now GA: every SHIPPED RFC (V24-01/02/04/05 + V25-01/02/03/04) has
 runtime code + Layer 2 demo + Layer 3 Pilot LIVE evidence.
@@ -265,7 +265,7 @@ versions differ across calls).
   release; the hooks are not yet wired into the dispatch verbs).
 - **`STRICT_VERSIONING` default flip** from false to true. Gated on
   the dispatch hooks landing.
-- **V25-02/03/04 drafts** -- tree navigation, asistive labels,
+- **V25-02/03/04 drafts** -- tree navigation, assistive labels,
   effect detection. Target subsequent 2.5.x patches.
 
 ### Tests
@@ -405,7 +405,7 @@ architecture norms. Read it FIRST before any contribution.
   fields will appear in `describe()` output.
 - V25-02 tree navigation (`context`, `tree`, `data-nac-opens`)
   -- DRAFT, target 2.5.x.
-- V25-03 asistive labels (`narrate`) -- DRAFT, target 2.5.x.
+- V25-03 assistive labels (`narrate`) -- DRAFT, target 2.5.x.
 - V25-04 effect detection (`expect`, `diff`) -- DRAFT, target 2.5.x.
 
 ### Migration notes

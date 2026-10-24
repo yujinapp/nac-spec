@@ -48,6 +48,20 @@ jobs:
         # Byte-level, no browser, no dependencies.
         run: node scripts/build-integrity.mjs
 
+      - name: Integrity gate goes red when it should
+        # The integrity gate shipped with zero behaviour tests, and four
+        # defects were found in it by hand once someone looked: --write
+        # alone refreshed an already-published frozen copy; a refused
+        # freeze still rewrote index.html, leaving a hash that matched
+        # nothing; the "loads from the immutable path" assertion was
+        # satisfied by the prose two sections above, so the tag could
+        # revert to the mutable alias (audit N-03) and still pass; and
+        # the adopter-snippet check read the tag --write had just
+        # re-pinned, so it could not see a stale snippet.
+        # Same shape as the contract suite: one thing broken per case,
+        # in a throwaway git repo, asserting the right refusal.
+        run: node scripts/test-integrity-gate.mjs
+
       - name: Version coherence gate
         # Audit N-17. The published tarball once announced a version two
         # releases behind its own package.json, because the version was

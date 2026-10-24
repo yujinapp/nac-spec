@@ -1136,7 +1136,7 @@
 
   function _candidateLabel(el) {
     /* Best-effort human label for a DOM element. Used in
-       candidates[].label so voice/asistive can re-prompt. */
+       candidates[].label so voice/assistive can re-prompt. */
     if (!el) return '';
     const al = el.getAttribute && el.getAttribute('aria-label');
     if (al) return String(al).trim();
@@ -7591,7 +7591,7 @@
   }
 
   /* ================================================================
-     v2.5 Block C -- RFC V25-03: asistive labels (narrate)
+     v2.5 Block C -- RFC V25-03: assistive labels (narrate)
      ================================================================
 
      NAC.narrate(plugin, nac_id) -> string
@@ -8085,7 +8085,7 @@
     read:            read,
     subscribe:       subscribe,
     unsubscribe:     unsubscribe,
-    /* v2.5 Block C -- asistive labels (SPEC.md sec 17 / RFC V25-03).
+    /* v2.5 Block C -- assistive labels (SPEC.md sec 17 / RFC V25-03).
        Canonical human-readable label resolution for screen readers,
        TTS, voice flows, audit logs. Priority order: aria-label >
        visible text > data-nac-label > nac_id fallback. */

@@ -97,7 +97,7 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
   - V24-05 agent authority + sudo elevation
   - V25-01 plugin extension contract for canvas+API (8 backends)
   - V25-02 tree navigation (context + tree + data-nac-opens/leaf)
-  - V25-03 asistive labels (narrate)
+  - V25-03 assistive labels (narrate)
   - V25-04 effect detection (expect + diff)
 
   Promoted to npm dist-tag `latest`. `yujinapp/nac-spec` is the

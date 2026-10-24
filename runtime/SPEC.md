@@ -51,14 +51,25 @@ canonical roles are:
 | `confirm-button` | A confirm/cancel button inside a confirm dialog. | `<button data-nac-role="confirm-button">` |
 | `sort-control` | A column sort header. | `<th data-nac-role="sort-control">` |
 | `filter-control` | A column filter trigger. | `<button data-nac-role="filter-control">` |
-| `data-table` | A data-table host (v2.1). | `<table data-nac-role="data-table">` |
+| `data-table` | A data-table host (since 2.1). | `<table data-nac-role="data-table">` |
 | `navigation` | A landmark navigation region. **Not a tab.** | `<nav data-nac-role="navigation">` |
 | `confirm-dialog` | The modal of a confirmation request. | `<div data-nac-role="confirm-dialog">` |
+| `draggable` | An element the user can pick up and move (since 1.6.2). | `<li data-nac-role="draggable">` |
+| `drop-target` | A place a `draggable` can be dropped (since 1.6.2). | `<ul data-nac-role="drop-target">` |
+| `button` | **Tolerated, not recommended.** A legacy button that only needs to be clickable, with no action contract. The runtime treats it as `action`. Prefer `action` with an explicit `data-nac-action`. | `<button data-nac-role="button">` |
 
 Roles outside this list are reserved for future use. A NAC-strict
 runtime SHOULD reject unknown roles at register-time (v2.2). A
 NAC-permissive runtime MAY treat unknown roles as `action` for
 back-compat (v1.9 and v2.0 default).
+
+This table is the normative list, and it is published as data: the
+machine-readable catalogue at `api/latest/contract.json` carries
+every role the reference runtime accepts, each flagged with
+`declared_in_spec_table` so the two lists can be compared without
+reading prose. They agree as of v2.5. Any future divergence is
+visible in that flag rather than hidden in a difference of opinion
+between a document and an implementation.
 
 ---
 
@@ -77,7 +88,7 @@ Every agent-resolvable element carries `data-nac-id`. The id is:
 - **Stable across UI redesigns.** A button moves from the toolbar
   to a dropdown; its id MUST stay the same.
 
-Reserved id prefixes (v2.1):
+Reserved id prefixes (since 2.1):
 
 | Prefix | Reserved for |
 |--------|--------------|
@@ -314,12 +325,27 @@ NAC.register({
 });
 ```
 
-`payload_schema` is informational in v2.3 stable. Agents MAY
-validate before sending; runtimes MAY enforce it when
-`STRICT_VALIDATION` is `true`. Schemas are intentionally simple
-(JSON-Schema-shaped subset) so a runtime can validate without
-shipping a full JSON-Schema validator. v2.4 will formalise the
-schema grammar and turn enforcement into a default.
+`payload_schema` is **informational as of v2.5**, and the
+reference runtime does not read it at all: the field is accepted
+in a manifest, carried in `NAC.manifest()`, and never validated
+against. `NAC.STRICT_VALIDATION` -- whose default did flip to
+`true` in 2.3.0 -- covers manifest/DOM role findings only;
+it has never covered payloads. So an agent MUST NOT assume a
+payload was checked because a schema was declared: today the only
+validation that happens is the one the agent does before sending.
+
+Schemas are intentionally simple (a JSON-Schema-shaped subset) so
+that a runtime can validate without shipping a full JSON-Schema
+validator, and that remains the design intent for enforcement.
+
+An earlier revision of this section promised, for the 2.4
+release, to formalise the schema grammar and make enforcement
+the default. **That did not happen in 2.4 and has not happened
+through 2.5.** The sentence is removed rather than re-dated: a
+promise with a version number attached, left standing past that
+version, reads to an agent as a capability it can expect. Formalising the
+grammar and wiring enforcement is tracked as an open question in
+section 13, where it is listed as open and undated.
 
 #### Disabled-state semantics (v2.3 hotfix from alpha.2)
 
@@ -719,7 +745,7 @@ NAC.manifest(plugin_slug: string): Manifest|null
 NAC.validate_global(opts?: {probe?: boolean}): Findings[]
 ```
 
-### 5.3 Data tables (v2.1)
+### 5.3 Data tables (since 2.1)
 
 The data-table primitives are NOT part of the core runtime
 (`js/nac.js` / `@nac3/runtime`'s `nac.mjs`). They ship in the
@@ -1071,8 +1097,42 @@ Deprecation policy: a feature marked `@deprecated` in version
 `X.Y.0` is removed no earlier than `(X+1).0.0`. The release notes
 document every removal explicitly.
 
-The NPM package version mirrors the spec version: `@nac3/runtime@2.1.3`
-implements NAC3 v2.1 with three patch revisions.
+The NPM package version mirrors the spec version:
+`@nac3/runtime@X.Y.Z` implements NAC3 vX.Y, with Z patch
+revisions on top of it. The example is written with placeholders
+on purpose -- a concrete version in this sentence goes stale the
+next release, and this document used to carry `2.1.3` long after
+the package had moved on.
+
+### 9.1 Prereleases and dist-tags
+
+A version with a prerelease tail (`-alpha.N`, `-beta.N`,
+`-rc.N`) is **not** a release of this specification. It exists so
+a change can be exercised before it is promised.
+
+- **`latest` only ever points at a stable version.** `npm install
+  @nac3/runtime` without a tag MUST resolve to a version with no
+  prerelease tail. An adopter who installs the default never gets
+  a prerelease by accident.
+- **Prereleases are published under their own dist-tag** (`alpha`,
+  `beta`, `rc`). Opting in is explicit: `npm install
+  @nac3/runtime@alpha`.
+- **Nothing in a prerelease is a promise.** Any surface introduced
+  in one may change or disappear before the stable release that
+  carries it. The stability guarantees of section 10 and the
+  finding-code guarantees of section 12 begin at the stable
+  version.
+- **Prereleases are never unpublished** and never retagged into
+  `latest` retroactively. The record of what was published stays
+  readable.
+
+The authoritative version of the reference runtime is the
+`NAC.version` constant in `js/nac.js`, and it is published as
+data: `api/latest.json` carries a separate `stable` and
+`prerelease` pointer (either may be `null`), and every published
+artefact carries its own `channel` field. A consumer that
+requires a stable contract reads one field and refuses, with no
+version string to parse and no tag to trust.
 
 ---
 
@@ -1158,16 +1218,30 @@ What this spec does NOT promise:
 
 ---
 
-## 13. Open questions (tracked separately)
+## 13. Open questions
 
-- Should `data-nac-role="navigation"` ever resolve to a tab?
-  Currently no (v2.1). The v22 roadmap argues for stricter
-  rejection.
-- Should `NAC.click()` accept relative ids (e.g. `'./save'` to
-  mean "save under the active plugin")? Not in v2.1; possibly v2.3.
-- Should manifests support inheritance / extension across plugins
-  (one base manifest extended by a tenant)? Tracked as v3.0
-  candidate.
+These are tracked **here**, in this section. An earlier revision
+titled this "Open questions (tracked separately)" and never said
+where "separately" was; there was no other register. A question
+that reaches a decision moves out of the table below and into the
+section it affects. A question that becomes a concrete proposal
+gets an RFC, and those are indexed at
+[`rfcs/README.md`](rfcs/README.md), with the process in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Every row carries the version where it was last assessed, so a
+reader can tell a live question from an abandoned one. **No row
+carries a target version**: a dated promise that passes its date
+is worse than an undated one, which is the mistake section 5 used
+to make about `payload_schema`.
+
+| Question | State | Last assessed | Where it stands |
+|----------|-------|---------------|-----------------|
+| Should `data-nac-role="navigation"` ever resolve to a tab? | **DECIDED: no** | v2.5 | Decided in 2.2.0 and enforced since: a `tab.`-prefixed id with role `navigation` raises `tab_id_manifest_role_drift`, and with `STRICT_VALIDATION` (default `true` since 2.3.0) `NAC.register` throws. `tab_by_label` resolves tabs only from `m.tabs[]` and `elements[role=='tab']`. `navigation` is a landmark region, never a switchable panel. See sections 1 and 10. |
+| Should `NAC.click()` accept relative ids (e.g. `'./save'`)? | **OPEN, not implemented** | v2.5 | The resolver matches `data-nac-id` exactly and scopes by plugin -- the active one, or `opts.plugin`. That scoping already covers the case the question was asking for (`NAC.click('save', {plugin:'invoice'})`), so the pressure for a relative syntax is low and nothing is in progress. Deciding it would mean adding a path grammar to section 2, where ids are declared opaque to the runtime. |
+| Should manifests support inheritance / extension across plugins (one base manifest extended by a tenant)? | **OPEN, candidate for the next major** | v2.5 | Not implemented. **Not to be confused with section 15**, "plugin extension contract": that shipped in v2.5 and is a backend-routing mechanism (`registerPlugin` / `call` / `read` / `subscribe`), not manifest inheritance. The question here is about one manifest deriving from another, which touches the id-uniqueness rules of section 2 and is why it is held for a major. |
+| Should `payload_schema` enforcement be formalised and turned on? | **OPEN, undated** | v2.5 | Moved here from section 5, which promised it for v2.4. It did not land in v2.4 and has not landed through v2.5; the reference runtime does not read the field. See section 5 for exactly what is and is not validated today. |
+| Should `validate_global()` findings carry a code from the published catalogue? | **OPEN, in progress** | v2.5 | `validate_global()` returns named buckets of objects with no `code` field, while section 12 promises code stability for this validator by name. The catalogue exists and is published at `api/latest/findings.json`, which marks these buckets as uncoded. Until the buckets carry codes, that promise covers an empty set. |
 
 ---
 
@@ -1197,9 +1271,13 @@ path to that survival is explicit, not implicit.
 ## 14. Reference implementation
 
 The canonical implementation is the reference runtime distributed
-as the NPM package `@nac3/runtime` (current version
-2.5.0-alpha.5; the runtime's `NAC.version` constant is the
-normative version source). It ships:
+as the NPM package `@nac3/runtime`. The normative version source
+is the runtime's own `NAC.version` constant, published as data at
+`api/latest.json` (see section 9.1). This section deliberately
+does not restate a version number: it carried `2.5.0-alpha.5`
+while the package had already moved, which is the same class of
+defect as the stale examples removed from sections 5 and 9. It
+ships:
 
 - `js/nac.js` -- the core runtime: the public imperative +
   introspection API of section 5 (click/fill/select/tab,
@@ -1551,7 +1629,7 @@ empty, not an error). `context` always returns
 
 ---
 
-## 17. Asistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5 / RFC V25-03)
+## 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5 / RFC V25-03)
 
 Canonical human-readable label resolution. One function for screen
 readers, TTS, voice flows, audit logs, mobile assistive surfaces.

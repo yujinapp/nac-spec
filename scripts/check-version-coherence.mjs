@@ -235,8 +235,13 @@ expectAll('DECLARED', 'SPEC document version', 'SPEC.md',
        two demo plugin manifests. The demo plugins track the runtime
        version on purpose; if one ever needs its own lifecycle, remove
        it from this probe deliberately instead of letting it drift. --- */
-expectAll('DECLARED', 'landing pinned immutable path', 'index.html',
-  'js/(' + SEMVER + ')/nac\\.js', BY_HAND);
+/* Three occurrences, two producers. The <script> tag is written by
+   build-integrity.mjs --write (it re-pins the runtime onto the current
+   immutable path); the two in the adopter-facing prose are by hand,
+   and build-integrity refuses the tree while they are stale. */
+expectAll('MIXED', 'landing pinned immutable path', 'index.html',
+  'js/(' + SEMVER + ')/nac\\.js',
+  RUN_INTEG + ' (rewrites the script tag), then edit the adopter snippet in index.html by hand');
 expectAll('DECLARED', 'landing version pills', 'index.html',
   'v(' + SEMVER + ')\\s*&middot;', BY_HAND);
 expectAll('DECLARED', 'landing demo plugin manifests', 'index.html',

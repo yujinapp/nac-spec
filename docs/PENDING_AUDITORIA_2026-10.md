@@ -24,15 +24,15 @@ Veredicto de verificacion, en una tabla:
 | N-02 | Portada sin SRI | **CERRADO** (2026-10-24) -- publicado y verificado en produccion: 3 de 3 hashes coinciden con los bytes servidos | avisa |
 | N-03 | URL mutable con query | **CERRADO** (2026-10-24) -- publicado: la ruta inmutable responde 200 y su sha384 coincide con el integrity de la portada | avisa |
 | N-04 | Contrato no legible por maquina | **CERRADO** (2026-10-24) -- D-02 = opcion A ampliada; API estatica publicada, con cadena de hashes y 15 tests en rojo | bloquea (decision del dueno) |
-| N-05 | Deriva de versiones en SPEC.md | **CONFIRMADO** | bloquea |
-| N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO** | avisa |
-| N-07 | Typo "Asistive" en encabezado normativo | **CONFIRMADO** | registra |
+| N-05 | Deriva de versiones en SPEC.md | **CERRADO en el repositorio** (2026-10-24) -- las 8 lineas resueltas una por una contra el codigo, mas 2 que la auditoria no vio; el grep del punto 7 da vacio. Llega a la web con la 2.5.0 | bloquea |
+| N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO**; la mitad que le importa a una maquina ya esta cerrada (`api/` publica el id `nac3-conformance-level-N`). Falta la prosa: **esperando el nombre, A o B** | avisa (decision del dueno) |
+| N-07 | Typo "Asistive" en encabezado normativo | **CERRADO en el repositorio** (2026-10-24) -- 9 archivos a mano + derivados regenerados; `grep -c` da 0. Llega a la web con la 2.5.0 | registra |
 | N-08 | "10 idiomas" vs spec en un idioma | **REFUTADO en su premisa** -- ver N-08, se reencuadra en N-19 | registra |
 | N-09 | Portada sin limites declarados | **CONFIRMADO** (hecho); el reencuadre cambia por N-20 | bloquea (decision del dueno) |
 | N-10 | `/nac-spec/` fuera del sitemap | **CONFIRMADO**; arreglado y **publicado** (2026-10-24): `/nac-spec/sitemap.xml` responde 200 con los 61 urls. Lo que queda es externo: el sitemap y el robots de la raiz `yujin.app`, que no viven en este repo | avisa |
 | N-11 | Sin nota de vigencia (5 meses) | **CONFIRMADO** | avisa |
 | N-12 | Cifras sin recibo al lado | **PARCIAL** -- los recibos existen, no estan anclados | avisa |
-| N-13 | "Open questions (tracked separately)" sin direccion | **CONFIRMADO** | registra |
+| N-13 | "Open questions (tracked separately)" sin direccion | **CERRADO en el repositorio** (2026-10-24) -- las preguntas estan en el documento, con estado, version evaluada y dos direcciones que responden 200 | registra |
 | N-14 | Garantia de estabilidad no verificable | **CONFIRMADO** | bloquea |
 | N-15 | Enlace de ida sin vuelta a Urazuke | **CONFIRMADO** | registra |
 | N-16 | Licencias distintas no declaradas | **PARCIAL** -- NAC3 si declara Apache-2.0; falta Urazuke | registra |
@@ -41,11 +41,14 @@ Veredicto de verificacion, en una tabla:
 | N-19 | Las 9 traducciones publicadas son 30-38% del canonico | **CONFIRMADO** (nuevo, mio) | avisa |
 | N-20 | No hay frontera interno/publico: el deploy publica todo el arbol | **CONFIRMADO** (nuevo, mio) | bloquea |
 | N-22 | La huella publicada se calculaba sobre bytes CRLF y el servidor entrega LF | **CERRADO** (2026-10-24) -- la compuerta de integridad lo detuvo antes de produccion; arreglado en `0778d9f` + `dcb71ea` | bloquea |
-| N-23 | El runtime acepta 3 roles que la tabla normativa del SPEC no lista | **CONFIRMADO** (nuevo, mio -- lo delato el contrato generado) | avisa |
+| N-23 | El runtime acepta 3 roles que la tabla normativa del SPEC no lista | **ESCRITO en el repositorio** (2026-10-24), esperando tu lectura de las 3 filas nuevas | avisa |
 | N-24 | El indice publicado declara tres testigos de su cabeza y el tercero (tarball de npm) todavia no existe | **CONFIRMADO** (nuevo, mio -- lo delato construir la capa 4) | avisa |
 | N-25 | `api/trust.json` mandaba comparar la huella contra un registro de la documentacion de release que no existia | **CERRADO** (2026-10-24) -- el registro testigo existe, lo escribe `--witness` y la compuerta lo compara campo por campo (4 casos en rojo) | avisa |
+| N-26 | `payload_schema` es normativo en el SPEC y el runtime no lo lee nunca | **CONFIRMADO** (nuevo, mio -- lo delato resolver N-05). Parte documental cerrada; cablearlo o retirar el campo es decision del dueno | avisa |
+| N-27 | El gate de integridad tenia 4 defectos y cero tests de comportamiento | **CERRADO** (2026-10-24) -- los 4 arreglados y una suite de 16 casos; contra el gate de HEAD caen exactamente 4 | bloquea |
+| N-28 | Los `data-nac-id` de los encabezados derivan del titulo, asi que un typo renombra un id direccionable | **CONFIRMADO** (nuevo, mio -- lo delato verificar el criterio de N-07). **Abierto a proposito**, se hace con G4 | registra |
 
-Resumen al cierre del 2026-10-24: **24 entradas, 6 cerradas, 3 parciales, 1 refutada**. Las tres entradas que no estaban en la auditoria original (N-22, N-23 y N-24) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, N-23 la delato el primer contrato generado y N-24 la delato construir la firma. Vale anotarlo como patron: **cada capa de verificacion que se construye encuentra un hallazgo que la lectura no habia encontrado.**
+Resumen al cierre del 2026-10-24: **27 entradas, 7 cerradas, 4 cerradas en el repositorio y en cola para la 2.5.0, 3 parciales, 1 refutada**. Las seis entradas que no estaban en la auditoria original (N-22 a N-28, menos N-21) las encontro el trabajo de arreglar las otras: N-22 la detuvo una compuerta antes de produccion, N-23 la delato el primer contrato generado, N-24 la delato construir la firma, N-25 la delato escribir el paso a paso para el dueno, N-26 la delato resolver la deriva de versiones y N-27 la delato escribirle al gate de integridad la suite que no tenia. Vale anotarlo como patron, porque ya van seis: **cada capa de verificacion que se construye encuentra un hallazgo que la lectura no habia encontrado** -- y la variante mas barata de todas es escribirle los tests a un candado que no los tenia.
 
 ---
 
@@ -358,7 +361,29 @@ Lo que hace que esto no pueda derivar: el generador **no lee el SPEC para saber 
 - Agente externo: no reporta una capacidad como "proxima" si ya esta entregada.
 - Auditor: el comando del bloque de verificacion sobre `v2.1|v2.3 stable|v2.4 will` devuelve vacio, o cada aparicion queda explicada aca como intencional (marca de linea base historica).
 
-**Severidad:** bloquea. **Quien decide:** Forge propone, el dueno aprueba cada reescritura que cambie una promesa. **Estado:** abierto.
+**RESUELTO EN EL REPOSITORIO el 2026-10-24** (rama `release/2.5.0`; sale a la web con la 2.5.0).
+
+Las ocho lineas, una por una, resueltas contra el estado real leido del codigo y del changelog -- no supuesto:
+
+| Linea | Decia | Queda | Por que |
+|-------|-------|-------|---------|
+| 54 | `A data-table host (v2.1).` | `(since 2.1)` | Marca de linea base historica, se conserva: un adoptante existente necesita saber desde cuando existe el rol. Reescrita para que se lea como pasado y no como presente. |
+| 91 | `Reserved id prefixes (v2.1):` | `(since 2.1)` | Idem. |
+| 317 | ``payload_schema` is informational in v2.3 stable` | parrafo nuevo | El campo es informativo **en 2.5** y el runtime **no lo lee**. Ver N-26: esto destapo un hallazgo propio. |
+| 321 | `v2.4 will formalise the schema grammar and turn enforcement into a default` | eliminada | No ocurrio en 2.4 ni hasta 2.5. Se **elimina** en vez de re-fecharse y pasa a la seccion 13 como pregunta abierta **sin fecha**. Una promesa con version adosada, pasada su version, un agente la lee como capacidad disponible. |
+| 722 | `### 5.3 Data tables (v2.1)` | `(since 2.1)` | Marca historica. |
+| 1075 | ``@nac3/runtime@2.1.3` implements NAC3 v2.1 with three patch revisions` | `@nac3/runtime@X.Y.Z` ... `vX.Y` ... `Z patch revisions` | Era un EJEMPLO de la regla de espejo, no una afirmacion sobre la version vigente, y la regla sigue siendo cierta. Pero el ejemplo con numeros concretos vuelve a envejecer en cada release: queda con marcadores, que no pueden derivar. |
+| 1164 | `Currently no (v2.1). El v22 roadmap argumenta...` | fila de tabla, **DECIDIDO: no** | Decidido en 2.2.0 y con candado desde entonces: `tab.`+rol `navigation` produce `tab_id_manifest_role_drift` y con `STRICT_VALIDATION` (default `true` desde 2.3.0) `register` tira. Verificado en `runtime/test/v22.mjs` T3 y T5. |
+| 1167 | `Not in v2.1; possibly v2.3` | fila de tabla, **ABIERTA, no implementada** | Medido: cero manejo de `'./'` en el runtime; `_findElement` matchea el id exacto y scopea por plugin. Ese scope ya cubre el caso que la pregunta pedia, asi que se deja abierta y se dice por que la presion es baja. No se inventa una decision que nadie tomo. |
+
+Mas dos lineas que la auditoria no vio y que son de la misma familia, encontradas al barrer TODA referencia de version (no solo las ocho del patron):
+
+- **Seccion 14** afirmaba "current version 2.5.0-alpha.5". Era una casilla de version escrita a mano que **ninguna de las casillas del candado vigilaba**. Se elimina el numero: apunta a `NAC.version` y a `api/latest.json`.
+- **Seccion 9** no decia una palabra sobre prereleases, que es la mitad documental de N-01. Ahora existe la **seccion 9.1**: `latest` apunta solo a estables, los prereleases viven bajo su propio dist-tag, nada en un prerelease es una promesa, y las garantias de las secciones 10 y 12 empiezan en la estable. Eso es lo que hace comprobable el punto 1 del bloque de verificacion.
+
+**Medicion del criterio de aceptacion:** `grep -n "v2.1\|v2.3 stable\|v2.4 will"` sobre `SPEC.md` devuelve **vacio**. No por eliminar informacion: las tres marcas historicas siguen diciendo su version, escritas como `since 2.1`, que se lee como pasado. Las dos frases que eran el defecto -- `v2.3 stable` como presente y `v2.4 will` como futuro -- ya no existen.
+
+**Severidad:** bloquea. **Quien decide:** Forge propone, el dueno aprueba cada reescritura que cambie una promesa. **Estado:** **CERRADO en el repositorio**; el punto 7 del bloque de verificacion se mide contra el servidor y pasa a verde con el deploy de la 2.5.0.
 
 ---
 
@@ -380,7 +405,16 @@ Lo que hace que esto no pueda derivar: el generador **no lee el SPEC para saber 
 - Agente externo: reporta un nivel con un identificador que no colisiona con el nombre del protocolo.
 - Auditor: ningun encabezado normativo usa la misma cadena para las dos cosas.
 
-**Severidad:** avisa. **Quien decide:** el dueno elige el nombre nuevo; Forge redacta la nota de compatibilidad. **Estado:** abierto.
+**DATO NUEVO DEL 2026-10-24 que acota la eleccion (no la toma):** la API de contrato ya publica los niveles como dato, y ya los desambigua para una maquina: el id normativo es `nac3-conformance-level-1|2|3` y el nombre que colisiona viaja al lado como `display_name: "NAC-1"`, es decir como etiqueta y no como clave. O sea que **la mitad del hallazgo que le importa a un agente esta cerrada**: un consumidor que reporta un nivel ya tiene un identificador que no colisiona con el nombre del protocolo.
+
+Lo que queda es la prosa de la seccion 8, que es lo que lee una persona. Y ahi la eleccion esta acotada a dos, porque un nombre nuevo tipo Bronze/Silver/Gold obligaria a cambiar un id **ya publicado** en una API inmutable, o a vivir con un tercer vocabulario:
+
+- **Opcion A -- "Level 1 / 2 / 3"** (recomendada). Coherente con el id que ya se publico: el documento pasa a decir "a page is at **NAC3 Conformance Level 2**", el id publicado no se toca, y `NAC-2` queda escrito como alias historico en una nota de compatibilidad. Costo: una pasada por la seccion 8 y el extractor de `build-contract-api.mjs`, que ancla en la cadena literal `A page is **NAC-N conformant**` y se pone rojo a proposito cuando se mueve.
+- **Opcion B -- dejar NAC-1/2/3 en la prosa** y declarar explicitamente en la seccion 8 que el nivel se cita por su id publicado, no por su nombre. Costo cero de codigo. A cambio, el texto sigue siendo ambiguo para una persona, que es la mitad del hallazgo que el auditor senalo primero.
+
+**Lo que esto bloquea:** la seccion 8 es una de las cuatro superficies que `build-contract-api.mjs` extrae del SPEC con ancla, y el texto de cada requisito esta hasheado contra un sidecar revisado. Tocarla pone el gate en rojo hasta que alguien re-lea el mapeo, que es el comportamiento buscado. Por eso este cambio **tiene que viajar en el mismo salto de version** que el resto, y por eso es lo unico de G3 que no se hizo hoy.
+
+**Severidad:** avisa. **Quien decide:** el dueno elige el nombre nuevo; Forge redacta la nota de compatibilidad. **Estado:** **abierto, esperando una palabra del dueno** (A o B). Es lo unico de G3 que falta.
 
 ---
 
@@ -400,7 +434,18 @@ Lo que hace que esto no pueda derivar: el generador **no lee el SPEC para saber 
 - Todos: `grep -c "Asistive"` sobre el SPEC publicado devuelve 0.
 - Adoptante existente: los anclas de seccion siguen funcionando despues del cambio (verificar que nadie enlace al encabezado con el error).
 
-**Severidad:** registra. **Quien decide:** Forge. **Estado:** abierto.
+**RESUELTO EN EL REPOSITORIO el 2026-10-24.** Corregido en los nueve archivos escritos a mano (`SPEC.md`, `README.md`, `README_DEMOS.md`, `rfcs/README.md` x2, `demos/index.html`, `demos/v25-03-narrate/index.html`, `docs/V2.5_ALPHA_1_RELEASE_HANDOVER_2026_05_23.md`, `runtime/CHANGELOG.md` x3, y tres comentarios de `js/nac.js`), y los derivados regenerados por sus generadores en vez de a mano: `runtime/SPEC.md`, `SPEC.html`, `README_DEMOS.html`, `runtime/dist/*`.
+
+**Medicion:** `grep -c "Asistive" SPEC.md` devuelve **0**; `grep -c -i asistive` devuelve 0 en `SPEC.html`, `README_DEMOS.html`, `runtime/SPEC.md` y `runtime/dist/nac.mjs`.
+
+**Dos cosas que NO se tocaron, a proposito:**
+
+- **`js/2.5.0-alpha.5/nac.js`**, la copia congelada ya publicada, conserva el typo en sus comentarios. Es correcto: una ruta inmutable es una promesa de bytes, y corregir una falta de ortografia no justifica romperla. El typo muere en la 2.5.0, donde se congela una copia nueva.
+- **Las nueve traducciones** (`i18n/*/SPEC.html`) conservan el typo. Se regeneran con G4-IDIOMAS, cuando se decida D-03; hacerlo hoy seria regenerarlas dos veces.
+
+**El criterio de aceptacion pedia verificar que nadie enlace al encabezado con el error:** verificado, cero enlaces entrantes. Pero esa verificacion destapo un problema de fondo que no estaba en la auditoria: el `data-nac-id` del encabezado deriva del titulo, asi que corregir el typo renombra un id direccionable, y el propio SPEC exige que los ids sean estables. Queda registrado como **N-28**, abierto y atado a G4.
+
+**Severidad:** registra. **Quien decide:** Forge. **Estado:** **CERRADO en el repositorio**; el punto 6 del bloque de verificacion pasa a verde con el deploy de la 2.5.0.
 
 ---
 
@@ -545,7 +590,13 @@ Lo que hace que esto no pueda derivar: el generador **no lee el SPEC para saber 
 - Agente externo: la remision resuelve a un recurso existente.
 - Auditor: la seccion 13 contiene una direccion que responde 200, o las preguntas estan en el documento.
 
-**Severidad:** registra. **Quien decide:** Forge. **Estado:** abierto.
+**RESUELTO EN EL REPOSITORIO el 2026-10-24**, por la segunda rama del criterio: las preguntas estan **en el documento**. La seccion 13 se llama ahora "Open questions" (sin el "tracked separately" que no llevaba a ningun lado, porque no habia ningun otro registro) y dice en su primera linea que se rastrean **ahi**. Trae una tabla con cinco preguntas, cada una con su estado, la **version en que se evaluo por ultima vez** y donde esta parada. Y dos direcciones que responden 200, medidas: `rfcs/README.md` (donde una pregunta que se vuelve propuesta concreta recibe su RFC) y `CONTRIBUTING.md` (el proceso).
+
+**Una regla escrita en la seccion, que es la leccion de N-05:** ninguna fila lleva version objetivo. Una promesa con fecha que pasa su fecha es peor que una sin fecha, que es exactamente el error que la seccion 5 cometia con `payload_schema`.
+
+Las tres preguntas originales se resolvieron **leyendo el codigo**, no suponiendo: una quedo DECIDIDA con su candado localizado en los tests, dos quedan abiertas con su estado real medido. Y se sumaron dos que estaban vivas sin estar escritas en ninguna parte: la de `payload_schema` (N-26) y la de los codigos de `validate_global` (N-14). Detalle por fila en N-05.
+
+**Severidad:** registra. **Quien decide:** Forge. **Estado:** **CERRADO en el repositorio**; visible en la web con el deploy de la 2.5.0.
 
 ---
 
@@ -804,7 +855,17 @@ Es una frase, y es verificable con el barrido de arriba: mas de lo que habia ant
 - Agente externo: no reporta un error contra un rol que el runtime acepta.
 - Auditor: el contrato publicado no tiene ningun rol con `declared_in_spec_table: false`.
 
-**Severidad:** avisa. **Quien decide:** Forge propone la redaccion; el dueno aprueba. **Estado:** abierto.
+**RESUELTO EN EL REPOSITORIO el 2026-10-24, A FALTA DE TU APROBACION DE LA REDACCION.** La tabla normativa de la seccion 1 pasa de 17 a 20 filas. Las tres que faltaban, descritas por lo que el runtime hace con ellas y no por lo que uno querria que fueran:
+
+- `draggable` -- un elemento que el usuario puede levantar y mover (since 1.6.2).
+- `drop-target` -- un lugar donde se puede soltar un `draggable` (since 1.6.2).
+- `button` -- **tolerado, no recomendado**: un boton heredado que solo necesita ser clickeable, sin contrato de accion. El runtime lo trata como `action`. Se recomienda `action` con su `data-nac-action` explicito.
+
+Esa ultima fila es la que mas importa que este escrita: el runtime la acepta desde siempre y el documento no la nombraba, asi que un adoptante que la usaba estaba fuera de la tabla normativa sin saberlo, y uno que leia la tabla no sabia que existia una salida para su codigo heredado.
+
+**Y se agrega la frase que hace que esto no vuelva a derivar:** la tabla declara que la lista tambien se publica como dato en `api/latest/contract.json`, donde cada rol lleva `declared_in_spec_table`, de modo que una divergencia futura entre documento e implementacion queda **visible en una bandera** en vez de escondida en una diferencia de opinion. Hoy las dos listas coinciden.
+
+**Severidad:** avisa. **Quien decide:** Forge propone la redaccion; el dueno aprueba. **Estado:** **escrito en el repositorio, esperando tu lectura de las tres filas.** Viaja con el salto de version porque cambia `contract.json`.
 
 ---
 
@@ -855,6 +916,82 @@ Es una frase, y es verificable con el barrido de arriba: mas de lo que habia ant
 
 ---
 
+### N-26 (nuevo) `payload_schema` es un campo normativo del manifest que el runtime de referencia no lee nunca
+
+**Que esta mal:** la seccion 5 del SPEC describia `payload_schema` con semantica de validacion -- "los agentes PUEDEN validar antes de enviar; los runtimes PUEDEN imponerlo cuando `STRICT_VALIDATION` es `true`" -- y el runtime de referencia no tiene una sola linea que lea ese campo.
+
+**Como aparecio:** no lo busque. Aparecio al resolver las lineas 317 y 321 de N-05 contra el estado real: para decir en que version se formalizo la gramatica habia que leer el codigo, y el codigo no la tiene.
+
+**Evidencia que medi (2026-10-24):**
+
+```
+$ grep -c "payload_schema" js/nac.js
+0
+$ grep -rl "payload_schema" (js/mjs/ts/json/php/html, sin node_modules ni .tmp)
+ads-demo/atlas-pro/index.html
+packages/nac-angular-demo/src/app/manifest.ts
+packages/nac-react-demo/src/manifest.ts
+runtime/test/v23-invoke.mjs
+SPEC.html
+```
+
+Cero apariciones en el runtime. Las cinco que hay son **productores** (manifests de demo que declaran el campo) y una fixture de test que lo incluye sin afirmar nada sobre su validacion. `STRICT_VALIDATION` si existe y su default **si** paso a `true`, pero en 2.3.0 y solo para hallazgos de rol de manifest/DOM: `manifest_role_unknown`, `tab_id_manifest_role_drift`, `manifest_dom_role_mismatch`. Nunca cubrio payloads. Y el propio `runtime/CHANGELOG.md`, bajo 2.3.0-alpha.1, lo dice en una seccion titulada **"Not yet wired"**: `STRICT_VALIDATION enforcement of payload_schema (alpha: schema is informational)`. Desde ahi hasta 2.5.0-alpha.5 no se cableo.
+
+**Por que importa, y por que es peor que la deriva de N-05:** un agente que lee la seccion 5 puede concluir que un payload declarado con esquema fue verificado por el runtime. No lo fue. Es asimetria productor/consumidor publicada como contrato: hay tres manifests en este mismo repositorio que declaran el campo y ningun consumidor que lo lea.
+
+**Donde vive el arreglo (ya hecho en la parte documental):** `SPEC.md` seccion 5 dice ahora que el campo es informativo, que el runtime no lo lee, que `STRICT_VALIDATION` cubre roles y no payloads, y que un agente NO DEBE suponer que un payload fue verificado. La promesa "la 2.4 formalizara la gramatica" se **elimina** en vez de re-fecharse, y la pregunta pasa a la seccion 13 como abierta y **sin fecha**.
+
+**Lo que queda abierto:** cablear la validacion, o retirar el campo. Es decision del dueno y no entra en la 2.5.0: cualquiera de las dos toca el runtime y cambia lo que un adoptante puede declarar. Queda como pregunta abierta en la seccion 13, que es exactamente donde el documento ahora dice que viven.
+
+**Grupo de convergencia:** G3-DERIVA (ahi aparecio) + G5-HONESTIDAD (es una capacidad afirmada que no existe).
+
+**Severidad:** avisa. **Quien decide:** Forge redacto la parte documental; el cableado o el retiro del campo es DECISION DEL DUENO. **Estado:** parte documental CERRADA el 2026-10-24; la decision sobre el campo, abierta.
+
+---
+
+### N-27 (nuevo) El gate de integridad tenia cuatro defectos y cero tests de comportamiento
+
+**Que esta mal:** `scripts/build-integrity.mjs` es el UNICO productor del `sha384` que la portada publica, y el congelador de `js/<version>/nac.js`. Se construyo para cerrar N-02 y N-03 y nunca tuvo un solo test de su comportamiento. El gate de contrato tiene su suite en rojo; este tenia ninguna.
+
+**Como aparecio:** al escribirle la suite que le faltaba, antes de usarlo para cortar la 2.5.0. Los dos primeros defectos los encontre a mano al correrlo; los otros dos los delato la suite.
+
+**Los cuatro, medidos:**
+
+1. **`--write` solo refrescaba una copia congelada YA PUBLICADA.** La unica proteccion de una ruta inmutable era que una persona se acordara de subir la version primero. El gate de contrato ya habia trazado la linea en el lugar correcto -- una entrada de la cadena publicada es inmutable, `--force` es solo para una version que nunca salio -- y este congelador no la trazaba. Ahora `--write` se niega cuando la ruta ya existe en HEAD, con el mensaje que dice que hacer, y `--force` avisa en voz alta lo que cuesta.
+2. **Un congelamiento rechazado seguia escribiendo aguas abajo.** Devolvia 1 (el deploy quedaba bloqueado) pero igual reescribia `index.html` con el hash de los bytes NUEVOS mientras la ruta congelada tenia los VIEJOS: el arbol quedaba declarando una huella que no correspondia a nada en esa ruta. Peor que el estado que se nego a crear. Ahora corta antes de tocar nada aguas abajo.
+3. **La afirmacion "la pagina carga desde la ruta inmutable" la satisfacia la prosa.** Era `text.includes(rutaInmutable)`, y dos secciones mas arriba la portada explica en prosa que `js/<v>/nac.js` es inmutable y que hay que fijarla en produccion. Asi que el `<script>` podia volver al alias mutable `js/nac.js?v=...` -- **que es N-03 textual** -- y el gate decia OK. Ahora se afirma sobre el tag que carga, no sobre una cadena en el archivo.
+4. **El chequeo del snippet para adoptantes leia el tag que el propio gate acababa de escribir.** Con `--write` repintando el tag, preguntar "aparece la ruta inmutable en index.html" es una pregunta que el gate ya hizo verdadera por su cuenta: pasaba en un salto de version que no actualizo la documentacion. Ahora se mide fuera de los tags. Es la misma familia que N-25: una comparacion que no puede fallar no es una verificacion.
+
+**De paso, lo que el arreglo 1 habilito:** `--write` ahora **repinta** el tag del runtime a la ruta inmutable vigente. Antes un salto de version congelaba `js/<nueva>/nac.js` y dejaba el tag apuntando a la version anterior, el gate fallaba y una persona tenia que retipear la ruta en `index.html` -- la misma enfermedad de version escrita a mano que el candado existe para matar (N-17). Una casilla menos de las cinco ediciones a mano del release.
+
+**Probado en rojo:** `scripts/test-integrity-gate.mjs`, 16 casos, misma forma que la suite de contrato (un repositorio git desechable por caso, una sola cosa rota, se afirma el rechazo POR EL MOTIVO correcto). Dos casos verdes deliberados: el arbol intacto pasa, y el salto de version CON su snippet actualizado congela sin `--force`. Corrida contra el gate de HEAD -- el de antes de estos arreglos -- **caen exactamente 4 casos y los otros 12 siguen verdes**, que es lo que prueba que estos arreglos son los que sostienen esos candados y que no se rompio nada mas. Cableada al deploy como paso propio.
+
+**Hallazgo lateral (tambien arreglado):** `scripts/build-spec-html.mjs` llevaba la version del spec escrita a mano (`'2.5'`) en dos entradas, y ninguna de las casillas del candado de version la vigilaba. Ahora deriva `spec_version` de `js/nac.js` y se niega a renderizar si no puede leerla.
+
+**Grupo de convergencia:** G1-DISTRIBUCION (es el candado de N-02/N-03) + G5-HONESTIDAD (el defecto 4).
+
+**Severidad:** bloquea (el defecto 3 reabria N-03 en silencio). **Quien decide:** Forge; es mecanico. **Estado:** CERRADO el 2026-10-24, con suite.
+
+---
+
+### N-28 (nuevo, ABIERTO -- no se arreglo a proposito) Los `data-nac-id` de los encabezados del SPEC derivan del titulo, asi que corregir un typo renombra un id direccionable
+
+**Que esta mal:** `scripts/build-spec-html.mjs` genera el `data-nac-id` de cada encabezado a partir del texto del titulo. El encabezado 17 era `spec.h2.17-asistive-labels-v25-shipped-in-250alpha5-rfc-v2503`. Al corregir el typo de N-07, ese id pasa a ser otro. La seccion 2 del propio SPEC dice que un `data-nac-id` debe ser **estable entre redisenos**: "un boton se mueve de la barra a un menu; su id DEBE seguir siendo el mismo".
+
+**Como aparecio:** verificando el criterio de aceptacion de N-07, que pide comprobar que nadie enlace al encabezado con el error.
+
+**Evidencia que medi (2026-10-24):** cero enlaces entrantes a ese ancla en todo el repositorio; las unicas apariciones son las definiciones en `SPEC.html` y en la traduccion `i18n/hi/SPEC.html`. Asi que el cambio **no rompe nada hoy**.
+
+**Por que no lo arregle:** el arreglo correcto es derivar el id del NUMERO de seccion (`spec.h2.17`), que es estable ante cualquier edicion del titulo. Pero eso renombra los ids de TODOS los encabezados del SPEC y de las nueve traducciones de golpe, lo que es un radio de impacto mucho mayor que el typo que lo destapo, y toca material que G4-IDIOMAS va a regenerar igual cuando se decida D-03. Arreglarlo ahora seria hacer el cambio grande dos veces.
+
+**Donde vive el arreglo:** `scripts/build-spec-html.mjs` (derivacion del id) + regenerar `SPEC.html` y las nueve traducciones.
+
+**Grupo de convergencia:** G3-DERIVA + G4-IDIOMAS (se hace con la regeneracion de las traducciones).
+
+**Severidad:** registra. **Quien decide:** Forge propone hacerlo junto con D-03. **Estado:** ABIERTO, con fecha de ejecucion atada a G4.
+
+---
+
 ## 4. Grupos de convergencia
 
 Estos son el mismo problema visto de dos lados y **tienen que cerrarse juntos**:
@@ -894,6 +1031,24 @@ Orden de cierre que se desprende de las dependencias, **sujeto a tu aprobacion**
 6. **G4 cuando decidas D-03**, despues G6 y G7 (lo que no es externo).
 
 **Lo unico que sigue trabado esperandote:** **D-03** (idiomas) y la custodia de la clave de firma de PND-034.
+
+---
+
+**Orden vigente al 2026-10-24 23:00 UTC, con G3 entregado salvo un nombre (PND-035):**
+
+G3-DERIVA esta **cerrado en el repositorio** salvo N-06, que es una palabra tuya. Lo entregado: N-05 (las ocho lineas de deriva, mas dos que la auditoria no vio), N-07 (el typo en nueve archivos + derivados regenerados), N-13 (la seccion 13 con las preguntas adentro, su estado y dos direcciones que responden 200) y N-23 (la tabla normativa de roles pasa de 17 a 20 filas). Tres hallazgos nuevos salieron de hacerlo: **N-26** (`payload_schema` declarado y nunca leido), **N-27** (cuatro defectos en el gate de integridad, mas su suite de 16 casos que no existia) y **N-28** (los ids de encabezado derivan del titulo).
+
+**Lo que ESTE trabajo volvio evidente, y cambia el orden de lo que falta:** el gate de contrato hashea `SPEC.md` entero en `generated_from.spec_sha384`. O sea que **cualquier** edicion del SPEC -- hasta un typo -- cambia `contract.json` y pone el gate en rojo con el mensaje "bump the version". Medido, no deducido: los dos gates estan hoy en rojo en la rama `release/2.5.0` y los dos dicen lo mismo. No es un estorbo, es el diseno: una edicion del contrato **es** una version nueva del contrato. La consecuencia practica es que **nada del contenido de G3 llega a la web sin el salto de version**, y por lo tanto el resto del backlog de superficie publica se acumula en la misma release en vez de salir de a goteo.
+
+De ahi el orden que queda:
+
+1. **N-06** -- una palabra tuya (A o B). Es lo unico de G3 que falta y toca la seccion 8, que el gate extrae con ancla.
+2. **D-04, la seccion publica de limites** -- mueve el punto 3 del bloque de verificacion. Vos pediste aprobarla **frase por frase**, asi que se redacta y se te presenta antes de escribirla.
+3. **G5 + G6 en la portada** -- N-11 (vigencia), N-12 (recibo al lado de cada cifra), N-15 (el enlace a Urazuke, que mueve el punto 4) y N-16 (las dos licencias en una linea). Son todas de la portada y van juntas.
+4. **N-14 + la segunda mitad de N-18** -- codigos para los cinco baldes de `validate_global` y el modo URL del validador apoyado en `levels.json`. Tocan el runtime.
+5. **N-24** -- el testigo que falta dentro del paquete de npm. Se arregla cuando el indice se mueva, que es ahora.
+6. **El salto a 2.5.0 y la publicacion** (PND-032): regenerar los cuatro generadores, firmar con la clave offline, correr las cuatro suites sobre un arbol otra vez coherente, publicar y promover el dist-tag.
+7. **G4 cuando decidas D-03**, y con el N-28 y las nueve traducciones.
 
 ---
 
@@ -971,13 +1126,15 @@ Esto es lo que los comandos del pedido devuelven **hoy**, medido el 2026-10-24. 
 | 3 | `curl /nac-spec/ \| grep -c -i "does not cover"` | `> 0` | `0` |
 | 4 | `curl /nac-spec/ \| grep -c -i "urazuke"` | `> 0` | `0` |
 | 5 | `curl /sitemap.xml \| grep -c "nac-spec"` | `> 0` | `0` (7 URLs, ninguna de nac-spec) |
-| 6 | `curl /nac-spec/SPEC.md \| grep -c "Asistive"` | `0` | `1` |
-| 7 | `curl /nac-spec/SPEC.md \| grep -n "v2.1\|v2.3 stable\|v2.4 will"` | vacio o explicado | 8 lineas: 54, 80, 317, 321, 722, 1075, 1164, 1167 |
+| 6 | `curl /nac-spec/SPEC.md \| grep -c "Asistive"` | `0` | en el servidor: `1`. **En el repositorio: `0` desde el 2026-10-24** (N-07). Pasa a verde cuando la 2.5.0 se publique. |
+| 7 | `curl /nac-spec/SPEC.md \| grep -n "v2.1\|v2.3 stable\|v2.4 will"` | vacio o explicado | en el servidor: 8 lineas (54, 80, 317, 321, 722, 1075, 1164, 1167). **En el repositorio: vacio desde el 2026-10-24** (N-05). Pasa a verde cuando la 2.5.0 se publique. |
 | 8 | `npx nac3 validate <demo>` | corre y reporta nivel | con URL: aborta, salida 2. Con directorio: corre, no reporta nivel |
 
 Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde el 2026-10-24 a las 17:00 UTC con el cierre de N-21, N-02 y N-03.
 
-**Sigue en uno de ocho al cierre de la sesion del 2026-10-24, y conviene decirlo sin adornos:** el trabajo de N-17 de esa tarde no mueve ninguna casilla de esta tabla. No las mueve porque esta tabla mide la **superficie publica** (lo que la portada y el SPEC dicen) y N-17 arreglo la **maquinaria de publicacion** (que lo que se publique coincida consigo mismo). Era el prerrequisito de la 2.5.0 estable, no un arreglo de contenido. Las seis casillas rojas que viven en este repositorio -- los puntos 3, 4, 6 y 7 -- se mueven con G3 y con la redaccion de limites, que son el trabajo siguiente. El punto 5 es externo y el 8 espera D-02. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
+**Sigue en uno de ocho al cierre del 2026-10-24, y la razon vale mas que el numero.** Los puntos 6 y 7 ya dan lo que se les pide **medido contra el repositorio**, y siguen rojos en la tabla porque esta tabla mide **el servidor**, que es lo correcto: un adoptante no lee el repositorio. Y no se pueden publicar por separado, porque el gate de contrato hashea el SPEC entero: editarlo exige el salto de version. Asi que los puntos 6 y 7 estan **hechos y en cola**, no pendientes. La distincion importa para no confundir trabajo terminado con trabajo publicado -- y para no cantar verde antes de que el servidor lo entregue.
+
+**Nota del tramo anterior, que se mantiene:** el trabajo de N-17 de esa tarde no mueve ninguna casilla de esta tabla. No las mueve porque esta tabla mide la **superficie publica** (lo que la portada y el SPEC dicen) y N-17 arreglo la **maquinaria de publicacion** (que lo que se publique coincida consigo mismo). Era el prerrequisito de la 2.5.0 estable, no un arreglo de contenido. Las seis casillas rojas que viven en este repositorio -- los puntos 3, 4, 6 y 7 -- se mueven con G3 y con la redaccion de limites, que son el trabajo siguiente. El punto 5 es externo y el 8 espera D-02. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
 
 ---
 

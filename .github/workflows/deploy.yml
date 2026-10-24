@@ -48,6 +48,14 @@ jobs:
         # Byte-level, no browser, no dependencies.
         run: node scripts/build-integrity.mjs
 
+      - name: Version coherence gate
+        # Audit N-17. The published tarball once announced a version two
+        # releases behind its own package.json, because the version was
+        # hand-typed in a dozen files and whoever published remembered
+        # eleven. This refuses a tree where any declared slot disagrees
+        # with the authoritative constant in js/nac.js.
+        run: node scripts/check-version-coherence.mjs
+
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |
@@ -114,9 +122,17 @@ jobs:
 
       - name: Smoke check integrity is live
         # The audit measures these from outside; so does this.
+        #
+        # The versioned path is READ from js/integrity.json, not typed
+        # here. It used to be hard-coded twice, which meant the next
+        # version bump would have failed this step on a deploy that was
+        # otherwise perfectly correct -- the workflow would have been
+        # asserting the presence of the PREVIOUS release. Audit N-17.
         run: |
+          IMMUTABLE="$(node -e "process.stdout.write(require('./js/integrity.json').immutable_path)")"
+          echo "Immutable path under test: $IMMUTABLE"
           BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/)"
           grep -q 'integrity="sha384-' <<< "$BODY" || { echo "::error::Landing page went live without an SRI hash"; exit 1; }
-          grep -q 'js/2.5.0-alpha.5/nac.js' <<< "$BODY" || { echo "::error::Landing page does not offer the immutable versioned path"; exit 1; }
-          curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js | grep -qx 200 || { echo "::error::Immutable runtime path is not being served"; exit 1; }
+          grep -qF "$IMMUTABLE" <<< "$BODY" || { echo "::error::Landing page does not offer the immutable versioned path ($IMMUTABLE)"; exit 1; }
+          curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' "https://yujin.app/nac-spec/$IMMUTABLE" | grep -qx 200 || { echo "::error::Immutable runtime path is not being served ($IMMUTABLE)"; exit 1; }
           echo "Integrity is live."

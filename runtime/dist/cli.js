@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// NAC CLI v2.3.0-alpha.2
+// NAC CLI v2.5.0-alpha.5
 // Usage:
 //   nac validate <url-or-dir> [--severity=error|warn|info]
 //   nac --version
@@ -18,7 +18,7 @@ const args = process.argv.slice(2);
 const cmd = args[0];
 
 function showHelp() {
-  console.log('NAC CLI v2.3.0-alpha.2');
+  console.log('NAC CLI v2.5.0-alpha.5');
   console.log('');
   console.log('Usage:');
   console.log('  nac validate <url-or-dir> [--severity=error|warn|info]');
@@ -27,7 +27,7 @@ function showHelp() {
 }
 
 function showVersion() {
-  console.log('@nac3/runtime CLI 2.3.0-alpha.2 (Native Agent Contract v2.3)');
+  console.log('@nac3/runtime CLI 2.5.0-alpha.5 (Native Agent Contract v2.5)');
 }
 
 if (!cmd || cmd === '--help' || cmd === '-h') { showHelp(); process.exit(0); }

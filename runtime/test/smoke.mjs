@@ -16,6 +16,18 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const PKG_DIR  = path.resolve(__dirname, '..');
 const DIST_DIR = path.resolve(PKG_DIR, 'dist');
 
+/* The version this package claims. Read once, never typed: the CLI
+   assertion below used to carry its own literal, which is how it stayed
+   green while the CLI announced a version two releases old (audit N-17 /
+   N-18). A test that hard-codes the value it is checking stops being a
+   lock and becomes a second place for the bug to hide.
+
+   Agreement ACROSS files is not this test's job -- that is
+   scripts/check-version-coherence.mjs, which runs in prepublishOnly and
+   in CI. Here we only assert that the built artefacts agree with the
+   package that ships them. */
+const PKG = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
+
 const REQUIRED = [
   'nac.mjs', 'nac.cjs', 'nac.browser.js', 'nac.d.ts',
   'nac-v2-extensions.mjs', 'nac-v2-extensions.cjs',
@@ -77,7 +89,8 @@ try {
   const out = execSync('node ' + JSON.stringify(path.join(DIST_DIR, 'cli.js')) + ' --version', {
     encoding: 'utf8', timeout: 5000
   });
-  check('cli --version', out.includes('@nac3/runtime CLI 2.3.0-alpha.2'));
+  check('cli --version', out.includes('@nac3/runtime CLI ' + PKG.version),
+        'CLI reported: ' + out.trim() + ' -- expected version ' + PKG.version);
 } catch (e) {
   check('cli --version', false, e.message);
 }
@@ -105,9 +118,12 @@ try {
 
 // 6. Package.json consistency.
 try {
-  const pkg = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
+  const pkg = PKG;
   check('pkg name',     pkg.name === '@nac3/runtime');
-  check('pkg version',  pkg.version === '2.5.0-alpha.5');
+  /* Shape, not a literal. Which version is correct is decided by
+     js/nac.js and enforced across every slot by the coherence check. */
+  check('pkg version',  /^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+(\.[A-Za-z0-9]+)*)?$/.test(pkg.version),
+        'not a semver: ' + pkg.version);
   check('pkg license',  pkg.license === 'Apache-2.0');
   check('pkg has bin',  pkg.bin && pkg.bin.nac);
   check('pkg has main', pkg.main && pkg.main.endsWith('.cjs'));

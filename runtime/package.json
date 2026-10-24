@@ -79,7 +79,7 @@
     "test:stage9":        "node ./test/stage9-sync-plugin.mjs",
     "test:stage10":       "node ./test/stage10-authority-sudo.mjs",
     "test:stage11":       "node ./test/stage11-plugin-id-dedup.mjs",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && node ../scripts/check-version-coherence.mjs && npm test"
   },
   "engines": {
     "node": ">=18"

@@ -8,6 +8,8 @@
     "demo:v25-canvas-api": "node scripts/run-demo-v25-canvas-api.mjs",
     "serve": "python -m http.server 8855",
     "check:integrity": "node scripts/build-integrity.mjs",
+    "check:version": "node scripts/check-version-coherence.mjs",
+    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs",
     "test:integrity": "node scripts/test-integrity-load.mjs"
   },
   "devDependencies": {

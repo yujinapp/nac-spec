@@ -41,6 +41,13 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Integrity gate
+        # Audit N-02/N-03. A stale Subresource Integrity hash in index.html
+        # must block the deploy instead of shipping a page that silently
+        # refuses to run, or that tells adopters to load an unverified file.
+        # Byte-level, no browser, no dependencies.
+        run: node scripts/build-integrity.mjs
+
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |
@@ -104,3 +111,12 @@ jobs:
           done
           echo "::error::Smoke check failed -- yujin.app/nac-spec/ did not return expected content within 3 tries"
           exit 1
+
+      - name: Smoke check integrity is live
+        # The audit measures these from outside; so does this.
+        run: |
+          BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/)"
+          grep -q 'integrity="sha384-' <<< "$BODY" || { echo "::error::Landing page went live without an SRI hash"; exit 1; }
+          grep -q 'js/2.5.0-alpha.5/nac.js' <<< "$BODY" || { echo "::error::Landing page does not offer the immutable versioned path"; exit 1; }
+          curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js | grep -qx 200 || { echo "::error::Immutable runtime path is not being served"; exit 1; }
+          echo "Integrity is live."

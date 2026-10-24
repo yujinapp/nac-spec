@@ -1,0 +1,23 @@
+{
+  "generated_by": "scripts/build-integrity.mjs",
+  "version": "2.5.0-alpha.5",
+  "immutable_path": "js/2.5.0-alpha.5/nac.js",
+  "mutable_alias": "js/nac.js",
+  "files": [
+    {
+      "path": "js/nac.js",
+      "bytes": 352798,
+      "sha384": "sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ"
+    },
+    {
+      "path": "js/nac-v2-extensions.js",
+      "bytes": 82861,
+      "sha384": "sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK"
+    },
+    {
+      "path": "js/nac-chat-client.js",
+      "bytes": 29435,
+      "sha384": "sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR"
+    }
+  ]
+}

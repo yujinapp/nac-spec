@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "demo:v25-canvas-api": "node scripts/run-demo-v25-canvas-api.mjs",
-    "serve": "python -m http.server 8855"
+    "serve": "python -m http.server 8855",
+    "check:integrity": "node scripts/build-integrity.mjs",
+    "test:integrity": "node scripts/test-integrity-load.mjs"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

@@ -2,7 +2,7 @@
 
 - Fecha de este documento: 2026-10-24
 - Auditoria de origen: Claude Code, revision externa de portada publica, SPEC.md, registro npm, cabeceras HTTP y sitemap.
-- Estado global: **ABIERTO -- nada corregido**. Este archivo es la compuerta del PASO 0.
+- Estado global: **ABIERTO -- 2 de 21 corregidos en el repositorio** (N-02, N-03, 2026-10-24). Ninguno es verificable en produccion hasta que se destrabe N-21.
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
 - Regla aplicada: lo que no se pudo medir se informa como "declarado y no medido", nunca como verde.
 - Nombre: este archivo se llamaba `PENDIENTES_AUDITORIA_2026-10.md`. Se renombro el 2026-10-24 por pedido del dueno ("fuera del alcance del deploy"). El rsync de publicacion excluye el patron `PENDING_*.md` (deploy.yml, linea 62, sin barra inicial: aplica a cualquier carpeta), asi que este documento no se publica. Verificado en vivo: https://yujin.app/nac-spec/docs/PENDING_AUDITORIA_2026-10.md devuelve 404.
@@ -19,8 +19,8 @@ Veredicto de verificacion, en una tabla:
 | id | Hallazgo | Verificado | Severidad |
 |----|----------|-----------|-----------|
 | N-01 | `latest` apunta a un alpha | **CONFIRMADO** | avisa (decision del dueno) |
-| N-02 | Portada sin SRI | **CONFIRMADO** | avisa |
-| N-03 | URL mutable con query | **CONFIRMADO** | avisa |
+| N-02 | Portada sin SRI | **CORREGIDO EN REPO** (2026-10-24) -- sin publicar, ver N-21 | avisa |
+| N-03 | URL mutable con query | **CORREGIDO EN REPO** (2026-10-24) -- sin publicar, ver N-21 | avisa |
 | N-04 | Contrato no legible por maquina | **CONFIRMADO** | bloquea (decision del dueno) |
 | N-05 | Deriva de versiones en SPEC.md | **CONFIRMADO** | bloquea |
 | N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO** | avisa |
@@ -163,7 +163,17 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 - Agente externo: el hash publicado corresponde al archivo servido hoy.
 - Auditor: `grep -c "integrity="` sobre la portada devuelve mas de cero, y el hash pegado en el snippet coincide con el del archivo servido.
 
-**Severidad:** avisa. **Quien decide:** Forge propone; el dueno aprueba el snippet. **Estado:** abierto.
+**Severidad:** avisa. **Quien decide:** Forge propone; el dueno aprueba el snippet.
+
+**Estado:** CORREGIDO EN EL REPOSITORIO el 2026-10-24. No verificable en produccion hasta que se destrabe N-21.
+
+**Cierre -- que se hizo:**
+- `index.html` carga sus tres scripts con `integrity="sha384-..."` y `crossorigin="anonymous"`, y el snippet que se manda copiar lleva el hash en el propio tag.
+- El hash no esta escrito a mano: lo produce `scripts/build-integrity.mjs`, que recorre los `<script src>` de la portada y **falla** si el hash de la pagina no coincide con el byte en disco. Corre como compuerta del workflow **antes** de preparar el envio.
+- Se documento en la portada como recalcularlo, con un comando de una linea sin dependencias (`node -e ...`) y el comando del gate.
+- Prueba de regresion real: `scripts/test-integrity-load.mjs` sirve el repositorio por HTTP y abre la portada en un navegador de verdad. **Se probo en rojo**: alterado un digito del hash, el navegador rechazo el runtime y `window.NAC` quedo indefinido; restaurado el hash, verde. Un hash mal escrito se ve perfecto en el archivo, y solo el navegador decide.
+
+**Criterio de aceptacion pendiente (perfil auditor):** `curl -s https://yujin.app/nac-spec/ | grep -c "integrity="` mayor que cero. Hoy da 0 porque el sitio publicado sigue siendo el del 2026-06-29.
 
 ---
 
@@ -185,7 +195,18 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 - Agente externo: la ruta versionada y la mutable sirven el mismo byte.
 - Auditor: la ruta versionada responde 200 y su hash coincide con el `integrity` de N-02.
 
-**Severidad:** avisa. **Quien decide:** Forge propone. **Estado:** abierto.
+**Severidad:** avisa. **Quien decide:** Forge propone.
+
+**Estado:** CORREGIDO EN EL REPOSITORIO el 2026-10-24. No verificable en produccion hasta que se destrabe N-21.
+
+**Cierre -- que se hizo:**
+- Existe la ruta inmutable `js/2.5.0-alpha.5/nac.js` (352.798 bytes): copia congelada, nunca editada a mano. `js/nac.js` queda como alias movil (el build mas nuevo) y asi esta documentado en la portada.
+- `js/integrity.json` es el recibo: version, ruta inmutable, alias movil, bytes y sha384 de cada artefacto que la portada carga.
+- La portada dice explicitamente cual URL fijar en produccion y cual usar solo para probar.
+- El gate falla si `js/<version>/nac.js` difiere de `js/nac.js`: un runtime editado sin subir la version rompe el build en vez de romper a quien fijo la ruta.
+- El workflow ahora verifica **despues** del envio que la ruta versionada responda 200 y que la portada publicada ofrezca el path inmutable.
+
+**Criterio de aceptacion pendiente (perfil auditor):** la ruta versionada responde 200 y su sha384 coincide con el `integrity` publicado. Se podra correr cuando N-21 este destrabado.
 
 ---
 

@@ -1062,10 +1062,20 @@
 await NAC.click(<span class="string">'invoice.save'</span>);              <span class="comment">// by id</span>
 await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="string">'save'</span>);   <span class="comment">// by verb</span></pre>
 
-    <p class="section-lede" style="margin-top: 24px;">Add the runtime once:</p>
+    <p class="section-lede" style="margin-top: 24px;">Add the runtime once. Production pins the immutable path and verifies it with a hash:</p>
 <pre>npm install @nac3/runtime
 <span class="comment">// or via CDN:</span>
-&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/nac.js"</span>&gt;&lt;/script&gt;</pre>
+&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js"</span>
+        integrity=<span class="string">"sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ"</span>
+        crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;</pre>
+
+    <p class="section-lede"><strong>Which URL.</strong> <code>js/2.5.0-alpha.5/nac.js</code> is immutable -- those bytes never change, so pin it in production. <code>js/nac.js</code> is a moving alias that always serves the newest build; use it only to try things, never to pin. The <code>integrity</code> attribute makes the browser refuse a file that does not match the published hash, so a corrupted or substituted download fails loudly instead of running.</p>
+
+    <p class="section-lede"><strong>Recompute the hash yourself.</strong> Do not take the value above on faith:</p>
+<pre><span class="comment"># one line, no dependencies -- prints the same string that is in the tag</span>
+node -e <span class="string">"const c=require('crypto'),f=require('fs');console.log('sha384-'+c.createHash('sha384').update(f.readFileSync('nac.js')).digest('base64'))"</span>
+<span class="comment"># in this repository the same check runs as a gate</span>
+node scripts/build-integrity.mjs</pre>
   </div>
 </section>
 
@@ -1586,9 +1596,11 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
 </aside>
 
 <!-- ============== NAC runtime + chat ============== -->
-<script src="js/nac.js?v=v25-2026-05-25-alpha5"></script>
-<script src="js/nac-v2-extensions.js?v=v25-2026-05-25-alpha5"></script>
-<script src="js/nac-chat-client.js?v=v25-2026-05-25-alpha5"></script>
+<!-- Hashes are produced by scripts/build-integrity.mjs and checked in CI.
+     Never hand-edit them: a stale hash is a blocked deploy, on purpose. -->
+<script src="js/2.5.0-alpha.5/nac.js" integrity="sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ" crossorigin="anonymous"></script>
+<script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
+<script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
 
 <!-- ============== Landing wiring ============== -->
 <script>

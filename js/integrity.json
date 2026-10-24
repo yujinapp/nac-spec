@@ -6,8 +6,8 @@
   "files": [
     {
       "path": "js/nac.js",
-      "bytes": 352798,
-      "sha384": "sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ"
+      "bytes": 344665,
+      "sha384": "sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp"
     },
     {
       "path": "js/nac-v2-extensions.js",

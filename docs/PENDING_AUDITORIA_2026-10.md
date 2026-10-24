@@ -76,7 +76,20 @@ Ninguno esta resuelto. Van opciones y costo de adopcion.
 - Beneficio: cero trabajo de publicacion; el estado real queda declarado.
 - Riesgo: el registro npm entrega algo que semver puro no promete, y N-17 muestra que ese tarball hoy sirve el SPEC de la version anterior. Mientras N-17 este abierto, esta opcion publica una version que no coincide con su propio documento.
 
-**Dato que pesa en la eleccion y que no elijo yo:** con N-17 abierto, cualquiera de las dos opciones deja al adoptante nuevo recibiendo un artefacto cuyo SPEC interno dice `2.5.0-alpha.4`.
+**Opcion C: se termina el backlog y se publica una 2.5.0 estable de verdad, promovida a `latest`.**
+- Costo: es el backlog completo. No hay 2.5.0 estable honesta mientras N-17 siga abierto (el tarball serviria un SPEC que no es el suyo) ni mientras la seccion 9 no diga lo que dice el registro.
+- Beneficio: `latest` vuelve a cumplir semver **y** apunta a la version que la portada y el SPEC describen. Es la unica opcion donde las cuatro fuentes coinciden.
+- Riesgo: hasta que salga, `latest` sigue entregando un prerelease.
+
+**Dato que pesa en la eleccion y que no elijo yo:** con N-17 abierto, cualquiera de las dos primeras opciones deja al adoptante nuevo recibiendo un artefacto cuyo SPEC interno dice `2.5.0-alpha.4`.
+
+**DECIDIDO el 2026-10-24: OPCION C.** El dueno, textual: *"C era exactamente, terminar todos los pendientes y publicar una 2.5.0 estable. Yo prefiero C."*
+
+Descarta el desvio de la opcion A, y el motivo es un dato que no estaba en este documento: **hoy el dueno es el unico consumidor de `@nac3/runtime`**. El radio de dano de que `latest` apunte a un alpha es practicamente cero, asi que la opcion A no compra seguridad y solo cuesta trabajo de publicacion. El riesgo que la opcion C deja abierto -- que `latest` entregue un prerelease hasta que salga la estable -- es un riesgo que el dueno asume a sabiendas y que no alcanza a nadie mas.
+
+Registrado en el pending registry como **PND-032**, con su criterio de aceptacion. Esto se escribe aca porque la vez anterior la opcion C se presento solo en el chat, la sesion se corto, y la decision se perdio: no estaba en disco en ningun lado.
+
+**N-01 queda DECIDIDO y pendiente de ejecucion.** Sigue bloqueado por N-17, que es lo que se ataca primero.
 
 ### D-02 (sobre N-04) -- si NAC3 tiene nivel de datos propio
 
@@ -119,6 +132,10 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 **Opcion B: se publica el documento interno tal cual.** El pedido la veta expresamente. La listo solo para dejar constancia de que esta descartada.
 
 **Opcion C: se arregla N-20 y no se escribe nada sobre limites por ahora.** Costo minimo; la portada sigue diciendo 95,5% sin decir donde no llega.
+
+**DESBLOQUEADO el 2026-10-24.** N-20 ya no condiciona esta decision: el dueno resolvio N-20 aceptando la exposicion (ver el cierre al pie de N-20), asi que "arreglar primero la frontera" dejo de ser un prerrequisito. Lo que queda de D-04 es una sola pregunta: se escribe la seccion publica de limites, si o no.
+
+**Se escribe.** No es una eleccion nueva: el **punto 3 del bloque de verificacion del dueno** (seccion 5) ya exige `curl /nac-spec/ | grep -c -i "does not cover"` mayor que cero. El dueno pidio ese criterio cuando aprobo el backlog, y hoy devuelve `0`. Cumplirlo ES escribir la seccion. Queda como trabajo pendiente de redaccion, con aprobacion frase por frase del dueno antes de publicar.
 
 ---
 
@@ -547,7 +564,29 @@ Los tres scripts se comprobaron uno por uno, no una muestra: `nac.js` (344.665 b
 - Auditor de seguridad: cabecera del artefacto, metadata y `LICENSE` coinciden.
 - Auditor: descomprimir el tarball publicado y comparar `SPEC.md` contra el del repo da cero diferencias.
 
-**Severidad:** bloquea. **Quien decide:** Forge arregla; el dueno aprueba la republicacion (prod es destino unico). **Estado:** abierto.
+**Severidad:** bloquea. **Quien decide:** Forge arregla; el dueno aprueba la republicacion (prod es destino unico).
+
+**PARCIALMENTE CERRADO el 2026-10-24 (commit `b490968`, run de deploy 40115680057 success).** La causa raiz esta arreglada y con candado; lo que queda es republicar.
+
+Lo que se encontro al buscar la causa, y que es mas grande que el hallazgo: **la version estaba escrita a mano en 13 lugares**. El repositorio ya estaba sano en SPEC y en licencia (los commits del 2026-06-29 lo habian corregido *despues* de publicar); lo que seguia roto era el **generador**, que llevaba sus propios literales -- dos en las cabeceras `.d.ts` y tres en el banner del CLI. Por eso cada publicacion podia volver a derivar.
+
+Y una falla latente que nadie habia visto: **el chequeo de humo del deploy tenia `js/2.5.0-alpha.5/nac.js` escrito a mano, dos veces.** Tal como estaba el repositorio, subir el numero a 2.5.0 habria **fallado el deploy** sobre un arbol correcto, porque el workflow afirmaba la presencia de la version ANTERIOR. Se arreglo: ahora lee `immutable_path` de `js/integrity.json`.
+
+Lo entregado:
+- `runtime/build.mjs` lee `version:` / `spec_version:` de `js/nac.js` -- la misma constante que `scripts/build-integrity.mjs` ya trataba como normativa -- y se niega a emitir artefactos si no puede leerla. El CLI reporta `2.5.0-alpha.5` / spec `v2.5` en lugar de `2.3.0-alpha.2` / `v2.3`, que es el tercer bullet de N-18.
+- `scripts/check-version-coherence.mjs`: candado nuevo. Contrasta 15 casillas contra `js/nac.js` y sale distinto de cero ante cualquier desacuerdo, clasificando cada una como DERIVED (regenerala), DECLARED (editala) o GENERATOR (el generador no debe llevar literal alguno). Cableado al workflow de deploy y al `prepublishOnly` de `runtime/`, asi que el registro npm ya no puede recibir un paquete que se declare mal.
+- `runtime/test/smoke.mjs` afirmaba que el CLI imprimia `2.3.0-alpha.2`. **Estaba verde porque coincidia con el bug.** Un test que lleva escrito el valor que verifica no es un candado, es un segundo escondite. Ahora deriva de `package.json`.
+
+Verificacion (no alcanza con que este verde):
+- Las dos compuertas verdes en el arbol actual, y **verificadas en el CI real**: el log del run 40115680057 dice `All 15 version slots agree on 2.5.0-alpha.5` y `Immutable path under test: js/2.5.0-alpha.5/nac.js`.
+- **Ensayo en seco del salto real a 2.5.0**: el candado se pone ROJO en 12 casillas, cada una con su instruccion. Revertido; el salto no esta en ese commit.
+- El ensayo delato un agujero del propio candado: la sonda del changelog pasaba por `includes("2.5.0")`, que matchea el encabezado `2.5.0-alpha.5`. Ahora exige un encabezado `## <version>` como token completo.
+- `npm test` de `runtime/`: 15 suites verdes.
+- Se probo que la afirmacion corregida del smoke se pone roja inyectando la version vieja en el CLI generado.
+
+**Lo que FALTA para cerrarlo del todo:** republicar. El criterio de aceptacion del auditor -- descomprimir el tarball publicado y comparar su `SPEC.md` contra el del repo da cero diferencias -- solo se puede comprobar contra un paquete nuevo. Se cumple con la 2.5.0 estable de D-01 opcion C.
+
+**Estado:** causa raiz CERRADA y con candado; cierre definitivo pendiente de la republicacion.
 
 ---
 
@@ -572,7 +611,17 @@ Los tres scripts se comprobaron uno por uno, no una muestra: `nac.js` (344.665 b
 - Agente externo: obtiene un nivel de conformidad con un identificador no ambiguo (N-06).
 - Auditor: el comando del punto 8 del bloque de verificacion corre y su salida esta pegada.
 
-**Severidad:** bloquea. **Quien decide:** Forge propone el alcance (implementar el modo URL o corregir el pedido); el dueno aprueba. **Estado:** abierto.
+**Severidad:** bloquea. **Quien decide:** Forge propone el alcance (implementar el modo URL o corregir el pedido); el dueno aprueba.
+
+**AVANCE PARCIAL el 2026-10-24 (commit `b490968`).** De los tres sintomas, **uno esta cerrado**: la deriva de version del propio CLI. Reportaba `2.3.0-alpha.2` / `Native Agent Contract v2.3`; ahora reporta `2.5.0-alpha.5` / `v2.5`, derivado de la constante autoritativa en lugar de escrito a mano (ver N-17). El criterio de aceptacion "el CLI reporta la misma version que el paquete que lo contiene" esta **cumplido y con test**, y el test se probo en rojo.
+
+**Siguen abiertos los dos sintomas de fondo**, que son los que bloquean N-04, N-14 y el punto 8 del bloque de verificacion:
+1. `validate <url>` aborta con salida 2 (requiere Playwright y no lo declara como opcional).
+2. Ningun modo reporta un **nivel de conformidad**.
+
+Ninguno de los dos es un arreglo de una linea: el punto 2 necesita que exista una definicion comprobable de "nivel", y eso es justamente lo que **D-02** decide. Hacerlo antes de D-02 seria inventar el criterio.
+
+**Estado:** parcial -- version del CLI cerrada; modo URL y reporte de nivel abiertos, el segundo en espera de D-02.
 
 ---
 
@@ -636,7 +685,23 @@ Se verifica ademas por estructura: en el canonico la seccion 8 esta en la linea 
 
 **Agravante medido el 2026-10-24 a las 17:00 UTC, despues de destrabar N-21:** mientras el pipeline estuvo muerto, la exposicion estaba congelada en el arbol de junio. Al revivir, el primer deploy verde publico tambien los documentos de la estacion N0 que se habian escrito con el pipeline caido. Verificado en vivo: `docs/ELIGIBILITY.md` responde **200** y `docs/EVIDENCE_N0.md` responde **200**. Ninguno de los dos estaba pensado para la web. El backlog de auditoria sigue en 404, pero solo porque su nombre matchea `PENDING_*.md`, que es lo que esta entrada denuncia: una lista de nombres no es una politica. Este hallazgo sube de prioridad: cada deploy verde que hagamos desde ahora publica lo que haya en `docs/`.
 
-**Severidad:** bloquea. **Quien decide:** Forge propone la politica; el dueno la aprueba. **Estado:** abierto, **y ahora activo en cada deploy**.
+**Severidad:** bloquea. **Quien decide:** Forge propone la politica; el dueno la aprueba.
+
+**CERRADO el 2026-10-24 -- el dueno ACEPTA la exposicion.** Textual: *"con respecto a la publicacion de docs internos, no tengo problemas, no vendo perfeccion, sino trabajo y evolucion"*.
+
+Esta entrada declaraba, ademas de una incoherencia, **un problema de seguridad**. Para eso la palabra del dueno no alcanza: se verifico antes de aceptar la decision. Barrido de credenciales sobre todo el arbol publicable buscando claves privadas PEM, tokens npm / GitHub / Anthropic y claves AWS. **Resultado: cero valores de credencial.** Los unicos matches son *nombres* de secretos, en `.github/workflows/deploy.yml` (que el rsync excluye) y en la prosa de este mismo documento. Lo que esta expuesto es trabajo en curso, que es exactamente lo que el dueno acepta exponer.
+
+Lo que esta entrada reclamaba con razon -- *una lista de nombres no es una politica* -- queda resuelto por la via contraria a la propuesta. En lugar de una lista de inclusion, la **politica declarada** es:
+
+> Todo lo que esta en el repositorio es publico. En el repositorio no hay secretos.
+
+Es una frase, y es verificable con el barrido de arriba: mas de lo que habia antes, que era una lista de nueve nombres sin criterio.
+
+**Queda registrada una inconsistencia menor, a sabiendas:** la exclusion `PENDING_*.md` sigue en `deploy.yml`, asi que este backlog responde 404 por accidente de nombre y no por politica. Bajo la politica nueva esa exclusion no tiene sentido, pero sacarla no se pidio y no se toco.
+
+**Efecto:** **D-04 queda desbloqueado** -- era lo unico que esta entrada condicionaba.
+
+**Estado:** **CERRADO** (rechazado por decision del dueno, con la verificacion de seguridad hecha). Registro: PND-029.
 
 ---
 
@@ -660,6 +725,16 @@ Orden de cierre que se desprende de las dependencias, **sujeto a tu aprobacion**
 4. G3 (deriva del documento) -- mecanico salvo dos aprobaciones de redaccion.
 5. G2 (contrato legible) -- depende de D-02.
 6. G5, G4, G6, G7.
+
+**Como quedo ese orden al 2026-10-24 (actualizado en vivo):**
+
+- **(1) N-20: CERRADO**, aceptado por el dueno con verificacion de seguridad hecha. Ya no bloquea nada.
+- **(2) N-18: PARCIAL.** La version del CLI esta cerrada. El reporte de nivel **no puede hacerse antes de D-02**: D-02 es lo que define que es un "nivel" comprobable. Asi que N-18 deja de ser el paso 2 y pasa a depender de D-02.
+- **(3) G1: la causa raiz de N-17 esta CERRADA y con candado** (commit `b490968`, verificado en el CI real). N-02, N-03 y N-21 ya estaban cerrados. Lo que le queda a G1 es **ejecutar D-01 opcion C**: publicar la 2.5.0 estable. Eso cierra N-01 y el resto de N-17 de una sola vez.
+- **(4) G3 (deriva del documento): es ahora el frente mecanico mas grande que esta desbloqueado**, y el que mas casillas mueve del bloque de verificacion de la seccion 5 (puntos 6 y 7). Pasa a ser el proximo trabajo.
+- **Lo que esta trabado esperandote:** G2 por **D-02**, G4 por **D-03**. Nada mas.
+
+**Orden vigente:** G3 (deriva) -> redaccion de limites de D-04 -> 2.5.0 estable (cierra G1) -> G2 y G4 cuando decidas D-02 y D-03 -> G6 -> G7 (lo que no es externo).
 
 ---
 
@@ -741,7 +816,9 @@ Esto es lo que los comandos del pedido devuelven **hoy**, medido el 2026-10-24. 
 | 7 | `curl /nac-spec/SPEC.md \| grep -n "v2.1\|v2.3 stable\|v2.4 will"` | vacio o explicado | 8 lineas: 54, 80, 317, 321, 722, 1075, 1164, 1167 |
 | 8 | `npx nac3 validate <demo>` | corre y reporta nivel | con URL: aborta, salida 2. Con directorio: corre, no reporta nivel |
 
-Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde el 2026-10-24 a las 17:00 UTC con el cierre de N-21, N-02 y N-03. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
+Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde el 2026-10-24 a las 17:00 UTC con el cierre de N-21, N-02 y N-03.
+
+**Sigue en uno de ocho al cierre de la sesion del 2026-10-24, y conviene decirlo sin adornos:** el trabajo de N-17 de esa tarde no mueve ninguna casilla de esta tabla. No las mueve porque esta tabla mide la **superficie publica** (lo que la portada y el SPEC dicen) y N-17 arreglo la **maquinaria de publicacion** (que lo que se publique coincida consigo mismo). Era el prerrequisito de la 2.5.0 estable, no un arreglo de contenido. Las seis casillas rojas que viven en este repositorio -- los puntos 3, 4, 6 y 7 -- se mueven con G3 y con la redaccion de limites, que son el trabajo siguiente. El punto 5 es externo y el 8 espera D-02. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
 
 ---
 
@@ -756,8 +833,20 @@ Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde
 
 ## 7. Lo que necesito de vos para seguir
 
+Lista original del 2026-10-24, con lo que se resolvio tachado al pie.
+
 1. **Aprobar o corregir este backlog.** Nada se toca antes.
 2. **D-01, D-02, D-03, D-04:** las cuatro decisiones, con las opciones de arriba.
 3. **N-10:** donde vive el sitio raiz de yujin.app, o lo dejo como pendiente externo.
 4. **El destino de este archivo:** `docs/` se publica. Decime si lo muevo fuera del alcance del deploy o si primero arreglamos N-20.
 5. **El punto 8 del bloque de verificacion:** lo corrijo (N-18) o lo cambias. Hoy no se puede cumplir.
+
+**Estado de esa lista al 2026-10-24, fin de sesion:**
+
+- **(1) RESUELTO.** Backlog aprobado tal como estaba.
+- **(2) DOS DE CUATRO.** **D-01 = opcion C** (2.5.0 estable, promovida a `latest`). **D-04 = se escribe la seccion de limites**, desbloqueado al cerrarse N-20. **D-02 y D-03 siguen abiertas** y son lo unico que traba G2 y G4.
+- **(3) ABIERTO, externo.** Sigue sin ubicarse el repositorio del sitio raiz de yujin.app. El sitemap propio de `/nac-spec/` ya responde 200 con 61 urls; falta solo que la raiz lo enlace.
+- **(4) RESUELTO.** El archivo se queda en `docs/` y se publica. Decision del dueno al cerrar N-20: no hay material secreto, solo trabajo en curso.
+- **(5) RESUELTO EN PARTE, y la parte que falta depende de (2).** La deriva de version del CLI esta cerrada. El reporte de nivel necesita **D-02** primero, porque D-02 es lo que define que es un nivel comprobable. El punto 8 del bloque de verificacion sigue sin poder cumplirse hasta entonces.
+
+**Lo unico que te pido ahora: D-02 y D-03.** Todo lo demas que esta desbloqueado puede avanzar sin vos.

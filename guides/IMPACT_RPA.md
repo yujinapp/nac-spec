@@ -114,8 +114,8 @@ The CoE engineer reviews + approves. Hours, not weeks.
 ### 4. Self-discovery for new apps
 
 `NAC.describe()` returns the full manifest. The bot can introspect
-ANY NAC-3-compliant app at runtime. **An automation that targets
-"every NAC-3 conformant app the user has open" becomes possible**
+ANY NAC3 app at runtime. **An automation that targets
+"every NAC3 app the user has open" becomes possible**
 (see Yujin Pilot at yujin.app/pilot for the productised version).
 
 ### 5. Audit trail with provenance
@@ -152,8 +152,8 @@ spreadsheet of bot permissions.
 ### 7. Voice + chat as RPA front-end
 
 The RPA layer can use the chat panel as its UI: a CoE engineer
-says "run the unpaid-invoice job for tenant Acme" and a NAC-3-
-aware backend resolves + dispatches. The voice path uses the
+says "run the unpaid-invoice job for tenant Acme" and a NAC3-aware
+backend resolves + dispatches. The voice path uses the
 same NAC.* primitives the chat does.
 
 ## Adoption matrix by RPA platform

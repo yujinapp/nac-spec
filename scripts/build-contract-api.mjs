@@ -352,6 +352,32 @@ function extractCommonVerbs(specSrc) {
   return verbs;
 }
 
+/* The names the levels carried before 2.5.0, read out of the
+   compatibility subsection that promises them.
+
+   api/ publishes these as `legacy_display_name` so a document written
+   before the rename can still be mapped onto a level. That makes
+   section 8.1 load-bearing: if it stops recording an alias and this
+   function just composed 'NAC-' + n anyway, api/ would keep promising
+   a mapping no document explains -- the same shape of lie as a
+   fingerprint compared against itself. So the gate refuses instead. */
+function extractLegacyLevelNames(sectionBody) {
+  const subStart = sectionBody.indexOf('### 8.1');
+  if (subStart < 0) {
+    throw new Error('cannot find SPEC.md section 8.1 -- api/ publishes legacy_display_name and that subsection is what documents it');
+  }
+  const sub = sectionBody.slice(subStart);
+  const out = {};
+  for (const n of [1, 2, 3]) {
+    const name = 'NAC-' + n;
+    if (sub.indexOf('`' + name + '`') < 0) {
+      throw new Error('SPEC.md section 8.1 no longer records `' + name + '` as the historical name of level ' + n + ', but api/ still publishes it as legacy_display_name');
+    }
+    out[n] = name;
+  }
+  return out;
+}
+
 /* The three conformance levels, requirement by requirement, lifted
    verbatim from section 8. The TEXT is extracted; whether a
    requirement is machine-decidable, and which finding code falsifies
@@ -365,20 +391,27 @@ function extractLevels(specSrc) {
   if (secEnd < 0) throw new Error('cannot find the end of SPEC.md section 8');
   const body = specSrc.slice(secStart, secEnd);
 
+  const legacy = extractLegacyLevelNames(body);
+
   const levels = [];
-  const blockRx = /A page is \*\*NAC-([123]) conformant\*\*([\s\S]*?)(?=A page is \*\*NAC-|\n\nThe NPM package)/g;
+  /* The display name is CAPTURED from the heading, not composed here:
+     two places writing the same string is how the version ended up
+     typed in 13 places (audit N-17). What section 8 calls a level is
+     what api/ publishes as its display_name, by construction. */
+  const blockRx = /A page is at \*\*(NAC3 Conformance Level ([123]))\*\*([\s\S]*?)(?=A page is at \*\*NAC3 Conformance Level |\n\nThe NPM package)/g;
   let m;
   while ((m = blockRx.exec(body))) {
-    const n = Number(m[1]);
+    const displayName = m[1];
+    const n = Number(m[2]);
     const bullets = [];
-    const lines = m[2].split('\n');
+    const lines = m[3].split('\n');
     let current = null;
     for (const raw of lines) {
       const line = raw.trim();
       if (/^-\s+/.test(line)) {
         if (current) bullets.push(current);
         current = line.replace(/^-\s+/, '');
-      } else if (current && line && !/^(A page is|The NPM)/.test(line)) {
+      } else if (current && line && !/^(A page is|The NPM|###)/.test(line)) {
         current += ' ' + line;
       } else if (current && !line) {
         bullets.push(current);
@@ -389,13 +422,17 @@ function extractLevels(specSrc) {
 
     levels.push({
       level: n,
-      /* Audit N-06: the level names collide with the protocol name
-         (NAC-3 the level vs NAC3 the protocol). A machine must never
-         have to disambiguate by string shape, so the published id is
-         unambiguous and the colliding display name travels beside it
-         as a label, not as the key. */
+      /* Audit N-06, resolved in 2.5.0 by owner decision (option A):
+         the pre-2.5.0 names NAC-1/2/3 were one dash away from the
+         protocol name NAC3, so a report could not be told apart from
+         a statement about the protocol. A machine must never have to
+         disambiguate by string shape, so the published id stays the
+         key, the display name now says what it is, and the old name
+         travels beside it as an alias for documents that predate the
+         rename. */
       id: 'nac3-conformance-level-' + n,
-      display_name: 'NAC-' + n,
+      display_name: displayName,
+      legacy_display_name: legacy[n],
       cumulative: n > 1,
       requirements: bullets.map((text) => ({
         /* Hex, not a slice of the base64 hash: an id that can contain
@@ -567,13 +604,17 @@ function buildLevels(rt, specSrc, meta) {
     channel: channelOf(NAC.version),
     generated_by: 'scripts/build-contract-api.mjs',
     naming: {
-      note: 'Audit N-06: the display names NAC-1 / NAC-2 / NAC-3 collide with the protocol name NAC3. Machines MUST key on `id`, never on `display_name`.',
+      note: 'Audit N-06, resolved in 2.5.0 (owner decision: option A). The pre-2.5.0 display names NAC-1 / NAC-2 / NAC-3 collided with the protocol name NAC3; they are published as `legacy_display_name` so a document that predates the rename can still be mapped. Machines MUST key on `id`, never on any display name.',
       id_pattern: 'nac3-conformance-level-<1|2|3>',
+      display_name_pattern: 'NAC3 Conformance Level <1|2|3>',
+      legacy_display_name_pattern: 'NAC-<1|2|3>',
+      spec_section: '8 (names), 8.1 (historical names)',
     },
     levels: levels.map((lv) => ({
       id: lv.id,
       level: lv.level,
       display_name: lv.display_name,
+      legacy_display_name: lv.legacy_display_name,
       cumulative: lv.cumulative,
       requirements: lv.requirements.map((r) => {
         const m = meta.level_requirements[r.text_sha384] || null;

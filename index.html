@@ -1387,12 +1387,12 @@ node scripts/build-integrity.mjs</pre>
 
       <div class="resource-group" data-nac-id="nac_landing.usecase.rpa" data-nac-role="region">
         <h3>RPA</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Robotic process automation traditionally scrapes the DOM with brittle CSS selectors that break on every UI change. With NAC, an RPA bot reads <code>NAC.describe()</code>, picks an action by verb, calls it, and waits on the canonical event family. No screenshot OCR, no XPath rituals. The same bot drives ten different vendors' apps if all ten are NAC-3 conformant.</p>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Robotic process automation traditionally scrapes the DOM with brittle CSS selectors that break on every UI change. With NAC, an RPA bot reads <code>NAC.describe()</code>, picks an action by verb, calls it, and waits on the canonical event family. No screenshot OCR, no XPath rituals. The same bot drives ten different vendors' apps if all ten implement NAC3.</p>
       </div>
 
       <div class="resource-group" data-nac-id="nac_landing.usecase.agentic" data-nac-role="region">
         <h3>Agentic control</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">LLM agents (Claude, GPT, Gemini, local models) drive web UIs by name without per-app fine-tuning. Cross-app interop (v2.3 preview): a host agent imports a peer app's tree via MCP and proxies dispatches. "Yujin, jump to Excel" becomes one extra MCP call. The contract scales to a marketplace of NAC-3-compliant apps each addressable from any agent.</p>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">LLM agents (Claude, GPT, Gemini, local models) drive web UIs by name without per-app fine-tuning. Cross-app interop (v2.3 preview): a host agent imports a peer app's tree via MCP and proxies dispatches. "Yujin, jump to Excel" becomes one extra MCP call. The contract scales to a marketplace of NAC3 apps each addressable from any agent.</p>
       </div>
     </div>
   </div>
@@ -1410,7 +1410,7 @@ node scripts/build-integrity.mjs</pre>
           <span class="file">Yujin CRM</span>
           <span class="version">brownfield in progress</span>
         </div>
-        <p>Yujin CRM is the framework's first adopter -- a production multi-tenant SaaS being progressively migrated to NAC-3. The 7-step migration recipe (decorate top-20 buttons -&gt; manifest -&gt; ack events -&gt; coverage -&gt; chat + autopilot -&gt; HMAC + isTrusted -&gt; field editor) is documented and re-runnable for any existing app.</p>
+        <p>Yujin CRM is the framework's first adopter -- a production multi-tenant SaaS being progressively migrated to NAC3. The 7-step migration recipe (decorate top-20 buttons -&gt; manifest -&gt; ack events -&gt; coverage -&gt; chat + autopilot -&gt; HMAC + isTrusted -&gt; field editor) is documented and re-runnable for any existing app.</p>
         <a class="open"
            href="https://github.com/pkuschnirof/yujin/blob/main/docs/MIGRATION_FROM_RPAFORCE.md"
            data-nac-id="nac_landing.case.yujin_crm.open"

@@ -217,7 +217,7 @@ NAC.edit_field(nac_id: string): Promise<{ok:true}>
 ```
 
 The modal registers under `plugin_slug='nac_editor'` with these
-NAC-3 callable verbs:
+NAC3-callable verbs:
 
 | Verb | Effect |
 |------|--------|
@@ -1049,7 +1049,14 @@ See `SECURITY.md` for the full threat model. Short version:
 
 ## 8. Conformance levels
 
-A page is **NAC-1 conformant** if:
+A level is written **NAC3 Conformance Level 1**, **2** or **3**. The
+name of a level is not the name of the protocol: a validator, a report
+or a conformance claim MUST cite a level by the identifier
+`nac3-conformance-level-<1|2|3>` published in `api/latest/levels.json`,
+never by a display name. Section 8.1 records the names these levels
+carried before 2.5.0.
+
+A page is at **NAC3 Conformance Level 1** if:
 
 - Every clickable widget that an agent should be able to operate
   carries `data-nac-id` and `data-nac-role`.
@@ -1059,7 +1066,7 @@ A page is **NAC-1 conformant** if:
   `NAC.register()`.
 - `NAC.click(id)` works for every advertised id.
 
-A page is **NAC-2 conformant** if it also:
+A page is at **NAC3 Conformance Level 2** if it also:
 
 - Registers `tabs[]`, `fields[]`, `actions[]` arrays explicitly
   in its manifest (not inferred from DOM).
@@ -1070,7 +1077,7 @@ A page is **NAC-2 conformant** if it also:
 - Passes `NAC.validate_global({probe: false})` with zero
   `error`-severity findings.
 
-A page is **NAC-3 conformant** if it also:
+A page is at **NAC3 Conformance Level 3** if it also:
 
 - Carries HMAC-signed manifests.
 - Distinguishes `isTrusted` for security-sensitive verbs.
@@ -1080,6 +1087,21 @@ A page is **NAC-3 conformant** if it also:
 The NPM package's CLI (`npx nac3 validate <url>`) reports
 the highest level a page reaches. (The package ships `nac3` and
 `nac` bins; both resolve to the same CLI.)
+
+### 8.1 Historical level names (v2.5)
+
+Before 2.5.0 the three levels were written `NAC-1`, `NAC-2` and
+`NAC-3`. Those names are one dash away from the protocol name `NAC3`,
+so "this page is NAC-3 conformant" could not be told apart from "this
+page implements NAC3", and an agent asked to report a level had no
+unambiguous string to report.
+
+The old names stay readable as historical aliases:
+`api/latest/levels.json` publishes each one as `legacy_display_name`
+beside the level it belonged to, so a document written before 2.5.0
+can still be mapped onto a level. They are NOT normative. New text,
+validator output and conformance claims use the level number or the
+published identifier.
 
 ---
 
@@ -1174,7 +1196,7 @@ another tool on your PATH.
 
 ## 11. The system around NAC3
 
-NAC3 is a contract layer. To turn a NAC-conformant page into a
+NAC3 is a contract layer. To turn a page that conforms to NAC3 into a
 voice-driven app, you also need:
 
 1. **A speech-to-text source** (browser SpeechRecognition,

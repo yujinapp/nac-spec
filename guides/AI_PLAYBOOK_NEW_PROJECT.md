@@ -1,14 +1,14 @@
-# AI Playbook -- Start a new NAC-3 project
+# AI Playbook -- Start a new NAC3 project
 
 > **v2.3.0-alpha.1 preview now available (2026-05-12)** -- adds `NAC.invoke` and `NAC.utter` for payload-bearing actions. The v2.2 contracts described in this document still hold; v2.3 is additive. See SPEC.md sec 5.1.4 and CHANGELOG for details.
 
 **NAC3 version:** 2.2 stable + v2.3 interop preview.
 **Audience:** Any AI agent (Claude, GPT, Gemini, local LLM) tasked
-with bootstrapping a NAC-3 conformant project from scratch.
+with bootstrapping a project that conforms to NAC3 from scratch.
 **Format:** Step-by-step runbook. Each step has WHAT, HOW, ASSERT.
 No ambiguity.
 
-When a human says **"let's start a new NAC-3 project"** or
+When a human says **"let's start a new NAC3 project"** or
 similar, an AI agent reading this file MUST execute the steps
 below in order, asserting each gate before advancing.
 
@@ -358,13 +358,13 @@ Before deploy:
 
 ---
 
-## Step 10 -- Promote to NAC-3 conformance
+## Step 10 -- Promote to NAC3 Conformance Level 3
 
 Run `NAC.validate_global({probe: true})`. The runtime synthesises
 clicks against every `role="action"` element to verify each
 emits its ack within 5s.
 
-**Assert:** zero findings. You are NAC-3 conformant.
+**Assert:** zero findings. You are at NAC3 Conformance Level 3.
 
 ---
 
@@ -396,7 +396,7 @@ emits its ack within 5s.
 - [AI_PLAYBOOK_MIGRATION.md](AI_PLAYBOOK_MIGRATION.md) -- for
   brownfield projects.
 - [NAC_TEST_MANUAL.md](../docs/NAC_TEST_MANUAL.md) -- test
-  playbook for any NAC-3 app.
+  playbook for any NAC3 app.
 - [REACT.md](REACT.md) / [ANGULAR.md](ANGULAR.md) -- framework
   deep dives.
 

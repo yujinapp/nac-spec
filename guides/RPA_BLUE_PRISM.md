@@ -9,7 +9,7 @@ out of the box. NAC3 + Blue Prism is a 5-stage pattern.
 ## Stage flow
 
 1. **Login Agent** -- standard.
-2. **Navigate** -- open the NAC-conformant app.
+2. **Navigate** -- open the NAC3 app.
 3. **JS: wait for window.NAC3** -- poll until ready.
 4. **JS: NAC.click / fill / tab** -- canonical dispatch.
 5. **JS: read describe()** -- introspect manifest for the next

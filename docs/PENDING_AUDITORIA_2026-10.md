@@ -25,7 +25,7 @@ Veredicto de verificacion, en una tabla:
 | N-03 | URL mutable con query | **CERRADO** (2026-10-24) -- publicado: la ruta inmutable responde 200 y su sha384 coincide con el integrity de la portada | avisa |
 | N-04 | Contrato no legible por maquina | **CERRADO** (2026-10-24) -- D-02 = opcion A ampliada; API estatica publicada, con cadena de hashes y 15 tests en rojo | bloquea (decision del dueno) |
 | N-05 | Deriva de versiones en SPEC.md | **CERRADO en el repositorio** (2026-10-24) -- las 8 lineas resueltas una por una contra el codigo, mas 2 que la auditoria no vio; el grep del punto 7 da vacio. Llega a la web con la 2.5.0 | bloquea |
-| N-06 | Colision NAC-1/2/3 vs NAC3 | **CONFIRMADO**; la mitad que le importa a una maquina ya esta cerrada (`api/` publica el id `nac3-conformance-level-N`). Falta la prosa: **esperando el nombre, A o B** | avisa (decision del dueno) |
+| N-06 | Colision NAC-1/2/3 vs NAC3 | **CERRADO en el repositorio** (2026-10-24) -- **decision del dueno: opcion A**. Los niveles se llaman `NAC3 Conformance Level 1/2/3`, `NAC-1/2/3` queda como alias historico en la seccion 8.1, el id publicado no se toco y 3 candados nuevos lo sostienen. Llega a la web con la 2.5.0 | avisa (decision del dueno) |
 | N-07 | Typo "Asistive" en encabezado normativo | **CERRADO en el repositorio** (2026-10-24) -- 9 archivos a mano + derivados regenerados; `grep -c` da 0. Llega a la web con la 2.5.0 | registra |
 | N-08 | "10 idiomas" vs spec en un idioma | **REFUTADO en su premisa** -- ver N-08, se reencuadra en N-19 | registra |
 | N-09 | Portada sin limites declarados | **CONFIRMADO** (hecho); el reencuadre cambia por N-20 | bloquea (decision del dueno) |
@@ -414,7 +414,31 @@ Lo que queda es la prosa de la seccion 8, que es lo que lee una persona. Y ahi l
 
 **Lo que esto bloquea:** la seccion 8 es una de las cuatro superficies que `build-contract-api.mjs` extrae del SPEC con ancla, y el texto de cada requisito esta hasheado contra un sidecar revisado. Tocarla pone el gate en rojo hasta que alguien re-lea el mapeo, que es el comportamiento buscado. Por eso este cambio **tiene que viajar en el mismo salto de version** que el resto, y por eso es lo unico de G3 que no se hizo hoy.
 
-**Severidad:** avisa. **Quien decide:** el dueno elige el nombre nuevo; Forge redacta la nota de compatibilidad. **Estado:** **abierto, esperando una palabra del dueno** (A o B). Es lo unico de G3 que falta.
+**DECISION DEL DUENO (2026-10-24, chat): OPCION A.** Pedido textual: "A.". Los niveles pasan a llamarse **NAC3 Conformance Level 1 / 2 / 3** y `NAC-1/2/3` queda escrito como nombre historico.
+
+**RESUELTO EN EL REPOSITORIO el 2026-10-24 (PND-036).** Lo entregado:
+
+- `SPEC.md` seccion 8: los tres encabezados pasan a `A page is at **NAC3 Conformance Level N**`, y la seccion abre diciendo que un nivel se cita por el id publicado y no por su nombre.
+- `SPEC.md` **seccion 8.1 (nueva)**, *Historical level names*: queda escrito que antes de la 2.5.0 los niveles se llamaban `NAC-1`, `NAC-2` y `NAC-3`, por que colisionaban, y que siguen siendo legibles como alias historico pero **no son normativos**. Es exactamente lo que pedia el criterio del perfil "adoptante existente".
+- `levels.json`: `display_name` pasa a `NAC3 Conformance Level N` y aparece `legacy_display_name: NAC-N` al lado. **El id publicado no cambia** (`nac3-conformance-level-N`): la API es inmutable y no se toco. El bloque `naming` publica los tres patrones y de que seccion del SPEC sale cada uno.
+- `scripts/build-contract-api.mjs`: el extractor **ya no compone** el nombre. Lo **captura** del encabezado de la seccion 8, y el alias lo **lee** de la seccion 8.1. Dos lugares escribiendo la misma cadena es el bug de N-17 (la version tipeada en 13 lugares); aca no puede repetirse porque el generador no tiene ningun nombre de nivel escrito adentro.
+- Superficie publica en ingles: **36 ediciones en 11 archivos** (`guides/*` md + html, `index.html`, `SPEC.md`), **cada una con su lectura anotada** -- protocolo o nivel.
+
+**Evidencia nueva que la auditoria no tenia, y que aparecio al hacer el reemplazo:** la misma cadena significaba dos cosas distintas **dentro del mismo archivo**. En `guides/AI_PLAYBOOK_NEW_PROJECT.md` el titulo "Start a new NAC-3 project" es el **protocolo** y "Step 10 -- Promote to NAC-3 conformance" es el **nivel**; el archivo lo usa en los dos sentidos sin distinguirlos. Un reemplazo a ciegas habria quedado mal en la mitad del archivo. Ese playbook, cuya audiencia declarada es un agente de IA, es por si mismo la mejor evidencia del hallazgo.
+
+**Medicion (2026-10-24):** `grep -n "NAC-1\|NAC-2\|NAC-3\|NAC-conformant"` sobre `SPEC.md`, `guides/*.md`, `guides/*.html`, `index.html`, `README.md`, `ABOUT.md`, `SECURITY.md`, `CONTRIBUTING.md`, `README_DEMOS.md` e `IMPLEMENTATION_GUIDE.md` devuelve **tres lineas, las tres dentro de la seccion 8.1**, que es donde deben estar. El contrato generado en un sandbox a version de ensayo publica los tres niveles con 4/4/3 requisitos, los mismos ids y los mismos hashes de requisito que antes -- o sea que el texto normativo de los requisitos no se movio, solo el nombre del nivel.
+
+**Candados nuevos, 3 casos que no existian:**
+
+- renombrar un nivel en la prosa -> el gate corta con `yielded 2 levels, expected 3`.
+- sacar un alias de la seccion 8.1 -> corta con ``section 8.1 no longer records `NAC-2` ``.
+- sacar la seccion 8.1 entera -> corta con `cannot find SPEC.md section 8.1`.
+
+**Probados en rojo uno por uno, no por el mensaje:** desactive **solo** el chequeo de la 8.1 y cayeron exactamente esos dos casos (31 pasaron, 2 fallaron); desactive **solo** el ancla del encabezado y cayo exactamente el tercero (32 pasaron, 1 fallo). Y con el chequeo desactivado verifique el **escenario real**, que es editar la 8.1 **y regenerar** -- lo que hace un release, y donde el chequeo de congelamiento no puede ver nada porque el arbol vuelve a ser coherente consigo mismo: el gate publicaba `legacy_display_name: "NAC-2"` con la seccion 8.1 ya sin documentarlo. Con el chequeo puesto, corta y no escribe nada. Es la misma forma de mentira que la huella que se comparaba contra si misma (N-25): una promesa publicada que ningun documento sostiene.
+
+**Lo que NO se toco, y por que:** `NAC.conformance_tier` sigue devolviendo `'NAC-3-versioned'`. Es un valor de cable, no prosa, y es otra taxonomia (la de RFC V24-04). Entra como **N-29**.
+
+**Severidad:** avisa. **Quien decide:** decidido. **Estado:** **CERRADO en el repositorio.** Como todo G3, llega a la web con el salto de version.
 
 ---
 
@@ -437,6 +461,10 @@ Lo que queda es la prosa de la seccion 8, que es lo que lee una persona. Y ahi l
 **RESUELTO EN EL REPOSITORIO el 2026-10-24.** Corregido en los nueve archivos escritos a mano (`SPEC.md`, `README.md`, `README_DEMOS.md`, `rfcs/README.md` x2, `demos/index.html`, `demos/v25-03-narrate/index.html`, `docs/V2.5_ALPHA_1_RELEASE_HANDOVER_2026_05_23.md`, `runtime/CHANGELOG.md` x3, y tres comentarios de `js/nac.js`), y los derivados regenerados por sus generadores en vez de a mano: `runtime/SPEC.md`, `SPEC.html`, `README_DEMOS.html`, `runtime/dist/*`.
 
 **Medicion:** `grep -c "Asistive" SPEC.md` devuelve **0**; `grep -c -i asistive` devuelve 0 en `SPEC.html`, `README_DEMOS.html`, `runtime/SPEC.md` y `runtime/dist/nac.mjs`.
+
+**CONSECUENCIA MEDIDA EL 2026-10-24 (tramo siguiente), y es parte de la lista de tareas del release:** tres de esas correcciones estaban en **comentarios de `js/nac.js`**, que es el runtime publicado. Resultado: la copia congelada e inmutable que la portada carga con su hash, `js/2.5.0-alpha.5/nac.js`, quedo en 344.665 bytes y `js/nac.js` en 344.668. Medido con `git show`: en `HEAD~1` las dos copias eran **identicas**; desde `5ee1f1e` **difieren**.
+
+Por eso el gate de integridad esta en rojo en esta rama, y **no por la misma razon que el gate de contrato** -- el de contrato se queja del hash del SPEC, el de integridad se queja de que los bytes del runtime publicado se movieron. Los dos se arreglan con el salto de version, pero el release tiene que acordarse de **regenerar tambien la copia congelada del runtime**, no solo el contrato. Dicho en una linea: un typo en un comentario del runtime cuesta una version, y eso es el precio correcto de que la direccion congelada sea de verdad inmutable.
 
 **Dos cosas que NO se tocaron, a proposito:**
 
@@ -988,7 +1016,48 @@ Cero apariciones en el runtime. Las cinco que hay son **productores** (manifests
 
 **Grupo de convergencia:** G3-DERIVA + G4-IDIOMAS (se hace con la regeneracion de las traducciones).
 
+**LA OTRA MITAD DEL MISMO DEFECTO, medida el 2026-10-24 al escribir la seccion 8.1:** los ids del CUERPO no derivan del titulo, derivan de la **posicion**: `spec.p.N`, `spec.list.N`, `spec.code.N`. Agregar dos parrafos y un encabezado a la seccion 8 renumero todo lo que viene despues: **85 lineas de `SPEC.html` cambiaron** y ninguna por su contenido. O sea que insertar un parrafo en el medio del SPEC le cambia la direccion a cada elemento posterior. Es el mismo problema que el de los encabezados, por un mecanismo distinto, y se arregla en la misma pasada: el id tiene que derivar de algo estable (numero de seccion + indice dentro de la seccion), no de la posicion global. Nada enlaza hoy a esos ids, igual que en el caso de los encabezados.
+
 **Severidad:** registra. **Quien decide:** Forge propone hacerlo junto con D-03. **Estado:** ABIERTO, con fecha de ejecucion atada a G4.
+
+---
+
+### N-29 (nuevo) `NAC.conformance_tier` sigue hablando el vocabulario que la 2.5.0 retira
+
+**Que esta mal:** la seccion 8 ya no llama `NAC-3` a un nivel, pero el runtime sigue exponiendo `NAC.conformance_tier = 'NAC-3-versioned'` y sigue rechazando con `NacError('feature_not_supported', {tier: 'NAC-3', ...})`. Un agente que lee el contrato obtiene un **nivel** sin ambiguedad y un **tier** con la ambiguedad intacta.
+
+**Evidencia que reproduje (2026-10-24):** `js/nac.js:7883` `conformance_tier: 'NAC-3-versioned'`; `js/nac.js:1020` el fallback `|| 'NAC-3-versioned'`; `docs/RFC_V24-04.md:738` y siguientes definen los tres tiers `NAC-3`, `NAC-3-versioned` y `NAC-3-strict`. `api/latest/contract.json` publica `conformance_tier` como miembro de tipo `string` y **no publica su vocabulario**: una maquina ve el campo y no los valores posibles, asi que tampoco puede saber que esos valores son de otra taxonomia.
+
+**Alcance adicional medido:** `js/nac-v2-extensions.js` usa "at NAC-3" en unos quince comentarios para referirse al nivel. Eso ahora se lee como alias historico, que es para lo que existe la seccion 8.1 -- y tocarlos tiene un costo real, medido en N-07: cambiar un comentario del runtime mueve sus bytes y obliga a un salto de version. No se tocan sin motivo.
+
+**Donde vive el arreglo:** `js/nac.js` + RFC V24-04 + publicar el vocabulario del tier en `contract.json`.
+
+**Por que NO se arreglo hoy:** es un valor de cable, no prosa. Un host puede estar comparando esa cadena, asi que renombrarla es un cambio de compatibilidad -- no esta cubierto por las garantias de la seccion 12, pero tampoco se hace sin decidirlo. Lo barato y honesto, mientras tanto, es **publicar el vocabulario** (los tres valores posibles, con su significado) para que una maquina pueda al menos distinguir tier de nivel sin leer prosa.
+
+**Perfiles y criterio de aceptacion:**
+- Agente externo: puede distinguir un *tier* de un *nivel* leyendo solo el contrato.
+- Adoptante existente: si el valor se renombra, encuentra escrito el nombre viejo y la fecha del cambio.
+- Auditor: el contrato publica el vocabulario de todo campo enumerado que publica.
+
+**Grupo de convergencia:** G2-CONTRATO-LEGIBLE (toca el runtime, asi que viaja con N-14 y la segunda mitad de N-18).
+
+**Severidad:** avisa. **Quien decide:** el dueno decide si el valor se renombra; Forge puede publicar el vocabulario sin decision.
+
+---
+
+### N-30 (nuevo, CERRADO el mismo dia) La suite del gate de contrato quedaba ciega justo cuando hay un release en vuelo
+
+**Que estaba mal:** `scripts/test-contract-api.mjs` copia el arbol real a un sandbox y rompe **una** cosa por caso. Pero el arbol real no es publicable mientras hay un release en vuelo: en cuanto `SPEC.md` o el runtime se mueven, `api/v/<version>/` queda stale contra ellos y el gate corta **ahi**, antes de llegar al defecto que cada caso queria probar.
+
+**Evidencia medida (2026-10-24):** sobre `release/2.5.0` la suite daba **13 pasaron, 17 fallaron**, y los 17 con el mismo texto: `api/v/2.5.0-alpha.5/ differs from what the runtime generates`. Ningun candado estaba roto. Un rojo que dice lo mismo en los 17 casos no prueba nada de ninguno.
+
+**Por que importa mas de lo que parece:** esa suite es el unico instrumento que dice si la cadena de hashes, la capa de firma y los testigos siguen guardando lo que prometen. Mientras estuviera ciega, cualquier defecto que se introdujera en esa capa se habria reportado como el mismo rojo generico del release en vuelo. Y el momento en que se apagaba era exactamente el momento en que mas se la necesita: cuando se esta editando el contrato.
+
+**El arreglo:** el sandbox se **normaliza** antes de que ningun caso lo toque -- se regenera a la version que tiene en disco y se firma con una clave desechable, y recien despues se commitea, para que HEAD sea ese estado. Es **incondicional** a proposito: normalizar "solo si el arbol real esta rojo" haria que la suite probara cosas distintas segun el dia, que es la podredumbre que los casos de firma ya evitan reseteando el ancla de confianza en cada corrida. La pregunta separada -- si el arbol commiteado es publicable **hoy** -- la responde `npm run check:contract` sobre el arbol real, y el CI lo corre.
+
+**Medicion despues:** **33 pasaron, 0 fallaron** (los 30 de antes mas los 3 nuevos de N-06). Las otras dos suites no tenian el defecto: `test-integrity-gate.mjs` da **16/16** y `test-contract-api-http.mjs` da **8/8**.
+
+**Severidad:** avisa (es el instrumento, no el producto). **Estado:** CERRADO el mismo dia.
 
 ---
 
@@ -1049,6 +1118,23 @@ De ahi el orden que queda:
 5. **N-24** -- el testigo que falta dentro del paquete de npm. Se arregla cuando el indice se mueva, que es ahora.
 6. **El salto a 2.5.0 y la publicacion** (PND-032): regenerar los cuatro generadores, firmar con la clave offline, correr las cuatro suites sobre un arbol otra vez coherente, publicar y promover el dist-tag.
 7. **G4 cuando decidas D-03**, y con el N-28 y las nueve traducciones.
+
+---
+
+**Orden vigente al 2026-10-25 00:30 UTC, con N-06 decidido y entregado:**
+
+**G3-DERIVA esta CERRADO en el repositorio, completo.** N-05, N-06, N-07, N-13 y N-23, los cinco. De hacerlo salieron cinco hallazgos nuevos: N-26, N-27, N-28, y hoy **N-29** (`conformance_tier` habla el vocabulario retirado) y **N-30** (la suite del gate de contrato quedaba ciega durante un release).
+
+**Lo que falta para la 2.5.0, en orden:**
+
+1. **D-04, la seccion publica de limites** -- mueve el punto 3 del bloque de verificacion. Pediste aprobarla **frase por frase**, asi que se redacta y se presenta antes de escribirla.
+2. **G5 + G6 en la portada** -- N-11 (vigencia), N-12 (recibo al lado de cada cifra), N-15 (el enlace a Urazuke, que mueve el punto 4) y N-16 (las dos licencias en una linea). Son todas de la portada y van juntas.
+3. **N-14 + la segunda mitad de N-18** -- codigos para los cinco baldes de `validate_global` y el modo URL del validador apoyado en `levels.json`. Tocan el runtime, y con ellos conviene publicar el vocabulario del tier (**N-29**), que es la parte de N-29 que no necesita decision.
+4. **N-24** -- el testigo que falta dentro del paquete de npm. Se arregla cuando el indice se mueva, que es en este release.
+5. **El salto a 2.5.0 y la publicacion** (PND-032). Lo que este tramo agrego a esa lista, medido y no deducido: hay que **regenerar la copia congelada del runtime** (`js/<version>/nac.js`), no solo el contrato -- ver la consecuencia medida en N-07. Despues: firmar con la clave offline, correr las cuatro suites sobre un arbol otra vez coherente, publicar y promover el dist-tag.
+6. **G4 cuando decidas D-03**, y con el N-28 (las dos mitades) y las nueve traducciones.
+
+**Lo unico que sigue trabado esperandote: D-03 (idiomas).** Nada mas.
 
 ---
 
@@ -1134,6 +1220,8 @@ Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde
 
 **Sigue en uno de ocho al cierre del 2026-10-24, y la razon vale mas que el numero.** Los puntos 6 y 7 ya dan lo que se les pide **medido contra el repositorio**, y siguen rojos en la tabla porque esta tabla mide **el servidor**, que es lo correcto: un adoptante no lee el repositorio. Y no se pueden publicar por separado, porque el gate de contrato hashea el SPEC entero: editarlo exige el salto de version. Asi que los puntos 6 y 7 estan **hechos y en cola**, no pendientes. La distincion importa para no confundir trabajo terminado con trabajo publicado -- y para no cantar verde antes de que el servidor lo entregue.
 
+**Al cierre de N-06 (2026-10-25 00:30 UTC) sigue en uno de ocho, y ninguna casilla se movio.** Es correcto que no se moviera: N-06 renombro los niveles en el documento y en el contrato, y esta tabla mide el **servidor**. El punto 8 -- el unico que habla de niveles -- necesita la segunda mitad de N-18 (el modo URL del validador), no el nombre. Lo que si cambio es que **ahora existe contra que reportar un nivel**: `levels.json` publica los tres niveles con id no ambiguo, los 11 requisitos y cuales son decidibles por una maquina.
+
 **Nota del tramo anterior, que se mantiene:** el trabajo de N-17 de esa tarde no mueve ninguna casilla de esta tabla. No las mueve porque esta tabla mide la **superficie publica** (lo que la portada y el SPEC dicen) y N-17 arreglo la **maquinaria de publicacion** (que lo que se publique coincida consigo mismo). Era el prerrequisito de la 2.5.0 estable, no un arreglo de contenido. Las seis casillas rojas que viven en este repositorio -- los puntos 3, 4, 6 y 7 -- se mueven con G3 y con la redaccion de limites, que son el trabajo siguiente. El punto 5 es externo y el 8 espera D-02. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
 
 ---
@@ -1165,4 +1253,9 @@ Lista original del 2026-10-24, con lo que se resolvio tachado al pie.
 - **(4) RESUELTO.** El archivo se queda en `docs/` y se publica. Decision del dueno al cerrar N-20: no hay material secreto, solo trabajo en curso.
 - **(5) RESUELTO EN PARTE, y la parte que falta depende de (2).** La deriva de version del CLI esta cerrada. El reporte de nivel necesita **D-02** primero, porque D-02 es lo que define que es un nivel comprobable. El punto 8 del bloque de verificacion sigue sin poder cumplirse hasta entonces.
 
-**Lo unico que te pido ahora: D-02 y D-03.** Todo lo demas que esta desbloqueado puede avanzar sin vos.
+**Estado al 2026-10-25 00:30 UTC:**
+
+- **(2) TRES DE CUATRO.** **D-01 = opcion C**, **D-02 = SI** (API estatica, multiversion, `latest` sin purga, a prueba de manipulacion, con clave offline en custodia del dueno) y **D-04 = se escribe la seccion de limites**. Ademas, fuera de las cuatro: **N-06 = opcion A**. **D-03 (idiomas) es la unica que sigue abierta.**
+- **(5) Sigue en pie la mitad que falta**, y ya no depende de una decision: existe `levels.json` con los niveles como dato, asi que el reporte de nivel del validador es trabajo, no espera.
+
+**Lo unico que te pido ahora: D-03.** Todo lo demas que esta desbloqueado puede avanzar sin vos.

@@ -4,10 +4,10 @@
 
 **NAC3 version:** 2.2 stable + v2.3 interop preview.
 **Audience:** Any AI agent (Claude, GPT, Gemini, local LLM) tasked
-with brownfield-migrating an existing web app to NAC-3 conformance.
+with brownfield-migrating an existing web app to NAC3.
 **Format:** Step-by-step runbook with WHAT, HOW, ASSERT per step.
 
-When a human says **"let's migrate this project to NAC-3"** an AI
+When a human says **"let's migrate this project to NAC3"** an AI
 agent reading this file MUST execute the steps below in order.
 Brownfield migration is harder than greenfield because you cannot
 break the running app. Every step ships INDEPENDENTLY.
@@ -345,7 +345,7 @@ bash ./test/nac3/test-launch.sh
 
 ---
 
-## Step 10 -- Promote to NAC-3 conformance
+## Step 10 -- Promote to NAC3 Conformance Level 3
 
 ```bash
 # In your CI:
@@ -356,7 +356,7 @@ NAC.validate_global({probe: true})              # zero findings required
 Set `NAC.STRICT_VALIDATION = true` in your prod boot to enforce
 register-time role coherence.
 
-**Commit:** `feat(nac3-migration): step 10 -- NAC-3 conformance gate`
+**Commit:** `feat(nac3-migration): step 10 -- NAC3 conformance level 3 gate`
 
 ---
 

@@ -77,7 +77,7 @@ keeps the UiPath idiom.
 `Examples_NAC_Invoice.xaml` (download from the Yujin marketplace
 once published):
 
-1. **Open Browser** -- target tab to your NAC-3 conformant app.
+1. **Open Browser** -- target tab to your NAC3 app.
 2. **Wait for window.NAC3** -- inject:
    ```js
    return new Promise(r => {
@@ -113,7 +113,7 @@ Returns the full plugin tree. Use it to build dynamic
 flowcharts that adapt to manifest changes without redeploying
 the .xaml.
 
-## Provenance (NAC-3)
+## Provenance (NAC3 Conformance Level 3)
 
 UiPath dispatches synthetic clicks, so `event.isTrusted === false`
 on the NAC3 ack event. Apps that gate sensitive verbs on

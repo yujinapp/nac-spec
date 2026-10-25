@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AI Playbook -- Start a new NAC-3 project -- NAC3</title>
+<title>AI Playbook -- Start a new NAC3 project -- NAC3</title>
 <meta name="nac3-doc-slug" content="ai_playbook_new_project" />
 <meta name="nac3-spec-version" content="2.2" />
 <link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
@@ -58,9 +58,9 @@
 </nav>
 
 <main data-nac-id="ai_playbook_new_project.main" data-nac-role="region">
-<h1 data-nac-id="ai_playbook_new_project.h1.ai-playbook-start-a-new-nac-3-project" data-nac-role="heading" data-nac-level="1" id="ai-playbook-start-a-new-nac-3-project">AI Playbook -- Start a new NAC-3 project</h1>
-<p data-nac-id="ai_playbook_new_project.p.1" data-nac-role="paragraph"><strong>NAC3 version:</strong> 2.2 stable + v2.3 interop preview. <strong>Audience:</strong> Any AI agent (Claude, GPT, Gemini, local LLM) tasked with bootstrapping a NAC-3 conformant project from scratch. <strong>Format:</strong> Step-by-step runbook. Each step has WHAT, HOW, ASSERT. No ambiguity.</p>
-<p data-nac-id="ai_playbook_new_project.p.2" data-nac-role="paragraph">When a human says <strong>"let's start a new NAC-3 project"</strong> or similar, an AI agent reading this file MUST execute the steps below in order, asserting each gate before advancing.</p>
+<h1 data-nac-id="ai_playbook_new_project.h1.ai-playbook-start-a-new-nac3-project" data-nac-role="heading" data-nac-level="1" id="ai-playbook-start-a-new-nac3-project">AI Playbook -- Start a new NAC3 project</h1>
+<p data-nac-id="ai_playbook_new_project.p.1" data-nac-role="paragraph"><strong>NAC3 version:</strong> 2.2 stable + v2.3 interop preview. <strong>Audience:</strong> Any AI agent (Claude, GPT, Gemini, local LLM) tasked with bootstrapping a project that conforms to NAC3 from scratch. <strong>Format:</strong> Step-by-step runbook. Each step has WHAT, HOW, ASSERT. No ambiguity.</p>
+<p data-nac-id="ai_playbook_new_project.p.2" data-nac-role="paragraph">When a human says <strong>"let's start a new NAC3 project"</strong> or similar, an AI agent reading this file MUST execute the steps below in order, asserting each gate before advancing.</p>
 <hr />
 <h2 data-nac-id="ai_playbook_new_project.h2.step-0-confirm-scope-with-the-human" data-nac-role="heading" data-nac-level="2" id="step-0-confirm-scope-with-the-human">Step 0 -- Confirm scope with the human</h2>
 <p data-nac-id="ai_playbook_new_project.p.5" data-nac-role="paragraph">Ask exactly these questions before writing any code:</p>
@@ -254,9 +254,9 @@ npx playwright install chromium</code></pre>
 <p data-nac-id="ai_playbook_new_project.p.96" data-nac-role="paragraph"><code data-nac-role="code-inline">i18n_strict: 'permissive'</code> during migration).</p>
 <ul data-nac-id="ai_playbook_new_project.list.97" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.97.item.1" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">NAC.STRICT_VALIDATION = true</code> -- enforces register-time</li><li data-nac-id="ai_playbook_new_project.list.97.item.2" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npx @nac3/runtime validate ./src</code> -- zero error-severity</li><li data-nac-id="ai_playbook_new_project.list.97.item.3" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npm test</code> (your harness) -- 100% pass.</li><li data-nac-id="ai_playbook_new_project.list.97.item.4" data-nac-role="list-item">[ ] <code data-nac-role="code-inline">npx playwright test</code> -- all e2e green.</li><li data-nac-id="ai_playbook_new_project.list.97.item.5" data-nac-role="list-item">[ ] Multi-tenant: HMAC-sign manifests server-side; call</li><li data-nac-id="ai_playbook_new_project.list.97.item.6" data-nac-role="list-item">[ ] is_trusted-gated verbs: explicitly whitelist any verb that</li><li data-nac-id="ai_playbook_new_project.list.97.item.7" data-nac-role="list-item">[ ] i18n: every <code data-nac-role="code-inline">label_i18n</code> covers all 10 locales (or use</li></ul>
 <hr />
-<h2 data-nac-id="ai_playbook_new_project.h2.step-10-promote-to-nac-3-conformance" data-nac-role="heading" data-nac-level="2" id="step-10-promote-to-nac-3-conformance">Step 10 -- Promote to NAC-3 conformance</h2>
+<h2 data-nac-id="ai_playbook_new_project.h2.step-10-promote-to-nac3-conformance-level-3" data-nac-role="heading" data-nac-level="2" id="step-10-promote-to-nac3-conformance-level-3">Step 10 -- Promote to NAC3 Conformance Level 3</h2>
 <p data-nac-id="ai_playbook_new_project.p.100" data-nac-role="paragraph">Run <code data-nac-role="code-inline">NAC.validate_global({probe: true})</code>. The runtime synthesises clicks against every <code data-nac-role="code-inline">role="action"</code> element to verify each emits its ack within 5s.</p>
-<p data-nac-id="ai_playbook_new_project.p.101" data-nac-role="paragraph"><strong>Assert:</strong> zero findings. You are NAC-3 conformant.</p>
+<p data-nac-id="ai_playbook_new_project.p.101" data-nac-role="paragraph"><strong>Assert:</strong> zero findings. You are at NAC3 Conformance Level 3.</p>
 <hr />
 <h2 data-nac-id="ai_playbook_new_project.h2.common-ai-mistakes-and-how-to-avoid-them" data-nac-role="heading" data-nac-level="2" id="common-ai-mistakes-and-how-to-avoid-them">Common AI mistakes (and how to avoid them)</h2>
 <p data-nac-id="ai_playbook_new_project.p.104" data-nac-role="paragraph">The runtime's <code data-nac-role="code-inline">NAC.describe()</code> walks the DOM, not the    registry. Without the attribute, the LLM intermediary's    snapshot is empty for that plugin. ALWAYS pair the two.</p>
@@ -268,7 +268,7 @@ npx playwright install chromium</code></pre>
 <hr />
 <h2 data-nac-id="ai_playbook_new_project.h2.see-also" data-nac-role="heading" data-nac-level="2" id="see-also">See also</h2>
 <p data-nac-id="ai_playbook_new_project.p.112" data-nac-role="paragraph">brownfield projects.</p>
-<p data-nac-id="ai_playbook_new_project.p.113" data-nac-role="paragraph">playbook for any NAC-3 app.</p>
+<p data-nac-id="ai_playbook_new_project.p.113" data-nac-role="paragraph">playbook for any NAC3 app.</p>
 <p data-nac-id="ai_playbook_new_project.p.114" data-nac-role="paragraph">deep dives.</p>
 <ul data-nac-id="ai_playbook_new_project.list.115" data-nac-role="list"><li data-nac-id="ai_playbook_new_project.list.115.item.1" data-nac-role="list-item"><a href="../SPEC.md" data-nac-id="ai_playbook_new_project.link.1" data-nac-role="action" data-nac-action="open">SPEC.md</a> -- canonical contract.</li><li data-nac-id="ai_playbook_new_project.list.115.item.2" data-nac-role="list-item"><a href="AI_PLAYBOOK_MIGRATION.md" data-nac-id="ai_playbook_new_project.link.2" data-nac-role="action" data-nac-action="open">AI_PLAYBOOK_MIGRATION.md</a> -- for</li><li data-nac-id="ai_playbook_new_project.list.115.item.3" data-nac-role="list-item"><a href="../docs/NAC_TEST_MANUAL.md" data-nac-id="ai_playbook_new_project.link.3" data-nac-role="action" data-nac-action="open">NAC_TEST_MANUAL.md</a> -- test</li><li data-nac-id="ai_playbook_new_project.list.115.item.4" data-nac-role="list-item"><a href="REACT.md" data-nac-id="ai_playbook_new_project.link.4" data-nac-role="action" data-nac-action="open">REACT.md</a> / <a href="ANGULAR.md" data-nac-id="ai_playbook_new_project.link.5" data-nac-role="action" data-nac-action="open">ANGULAR.md</a> -- framework</li></ul>
 <h2 data-nac-id="ai_playbook_new_project.h2.license" data-nac-role="heading" data-nac-level="2" id="license">License</h2>

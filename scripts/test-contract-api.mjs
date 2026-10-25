@@ -38,8 +38,42 @@ function git(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
 }
 
-/* A copy with only what the generator reads, committed, so HEAD has a
-   published chain to compare against. */
+/* Bring the copy to a state the gate ACCEPTS before any case touches
+   it.
+
+   Why this exists: the sandbox copies the real tree, and the real tree
+   is NOT publishable while a release is in flight -- the moment SPEC.md
+   or the runtime moves, api/v/<version>/ is stale against them and the
+   gate stops there. Every case below then "failed", all for that one
+   unrelated reason, and the suite reported 17 broken guards when not a
+   single guard was broken. A red that says the same thing for every
+   case proves nothing about any of them.
+
+   So each case starts from a tree regenerated at the version on disk
+   and signed with a throwaway key. That is what the cases are about:
+   whether the gate refuses a tree that has been BROKEN IN ONE WAY. The
+   separate question -- whether the committed tree is publishable right
+   now -- is what `npm run check:contract` answers on the real tree, and
+   CI runs it.
+
+   This is unconditional on purpose. Normalising only when the real tree
+   happens to be red would make the suite test different things on
+   different days, which is the rot the signature cases already avoid by
+   resetting trust every time. */
+function normalize(dir) {
+  const r = runGate(dir, ['--write', '--force']);
+  if (r.code !== 0) {
+    throw new Error('the sandbox could not be brought to a publishable state, so no case below would mean anything:\n' + r.out);
+  }
+  /* --write moved the chain, so whatever signature came from the real
+     repository now covers a different index. Re-sign with a throwaway
+     key and refresh the witness record through the real writer. */
+  resetTrust(dir);
+  signSandbox(dir);
+}
+
+/* A copy with only what the generator reads, normalized, then
+   committed, so HEAD has a published chain to compare against. */
 function sandbox() {
   const dir = mkdtempSync(join(tmpdir(), 'nac3-contract-api-'));
   mkdirSync(join(dir, 'scripts'), { recursive: true });
@@ -54,6 +88,10 @@ function sandbox() {
      so a sandbox without it would test a tree that cannot exist. */
   copyFileSync(join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md'), join(dir, 'docs', 'CONTRACT_API_SIGNING.md'));
   cpSync(join(ROOT, 'api'), join(dir, 'api'), { recursive: true });
+
+  /* Before git sees it: the no-purge rule compares against HEAD, so
+     HEAD must be the normalized state, not the half-released one. */
+  normalize(dir);
 
   git(dir, ['init', '-q']);
   git(dir, ['config', 'user.email', 'test@local']);
@@ -144,8 +182,11 @@ console.log('contract API gate -- regression suite');
 console.log('version under test: ' + VERSION);
 console.log('');
 
-/* 1. The baseline must pass, or every red below is meaningless. */
-expectGreen('an untouched tree passes');
+/* 1. The baseline must pass, or every red below is meaningless. The
+      tree is the real one, regenerated at its own version and signed
+      with a throwaway key (see normalize), so "self-consistent" is the
+      honest name for it -- not "untouched". */
+expectGreen('a self-consistent tree passes');
 
 /* 2. A published artefact edited after the fact. This is the whole
       point of the chain: the bytes an adopter pinned cannot change. */
@@ -238,6 +279,42 @@ expectRed(
   'rewording a conformance requirement forces the mapping to be re-reviewed',
   (dir) => patch(dir, 'SPEC.md', (s) => s.replace('- Carries HMAC-signed manifests.', '- Carries signed manifests.')),
   'has no reviewed mapping'
+);
+
+/* 11a to 11c. The level NAMES (audit N-06, owner decision: option A).
+       api/ publishes the display name it read out of section 8 and the
+       pre-2.5.0 alias it read out of section 8.1. Neither string is
+       composed in the generator, so neither can drift from the spec in
+       silence -- and these three are what proves that. */
+expectRed(
+  'renaming a conformance level in the prose is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => {
+    const out = s.replace('A page is at **NAC3 Conformance Level 2** if it also:',
+      'A page is **NAC-2 conformant** if it also:');
+    if (out === s) throw new Error('the section 8 level heading anchor moved; fix this test');
+    return out;
+  }),
+  'expected 3'
+);
+
+expectRed(
+  'dropping a historical level name from section 8.1 is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => {
+    const out = s.replace('`NAC-1`, `NAC-2` and', '`NAC-1` and');
+    if (out === s) throw new Error('the section 8.1 alias list anchor moved; fix this test');
+    return out;
+  }),
+  'no longer records `NAC-2`'
+);
+
+expectRed(
+  'removing the historical-names subsection is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => {
+    const out = s.replace('### 8.1 Historical level names', '#### Historical level names');
+    if (out === s) throw new Error('the section 8.1 heading anchor moved; fix this test');
+    return out;
+  }),
+  'cannot find SPEC.md section 8.1'
 );
 
 /* 12. latest must be a copy, not an editable second truth. */

@@ -1045,7 +1045,9 @@ Cero apariciones en el runtime. Las cinco que hay son **productores** (manifests
 
 ---
 
-### N-30 (nuevo, CERRADO el mismo dia) La suite del gate de contrato quedaba ciega justo cuando hay un release en vuelo
+### N-30 (CERRADO) La suite del gate de contrato quedaba ciega justo cuando hay un release en vuelo
+
+**Esto NO es un hallazgo nuevo: estaba anotado y diferido.** El tramo del 2026-10-24 ~23:00 UTC lo dejo escrito en el historial de PND-035 como "limitacion que vale anotar", con la tecnica del arreglo ya identificada (normalizar el baseline, lo mismo que se habia hecho en la suite de integridad) y con un motivo para no hacerlo: "toca las cases de firma y testigo". Hoy se hizo, y ese motivo resulto no sostenerse -- la normalizacion firma con una clave desechable y refresca el registro de testigo con el escritor real, asi que los casos de firma no hubo que tocarlos.
 
 **Que estaba mal:** `scripts/test-contract-api.mjs` copia el arbol real a un sandbox y rompe **una** cosa por caso. Pero el arbol real no es publicable mientras hay un release en vuelo: en cuanto `SPEC.md` o el runtime se mueven, `api/v/<version>/` queda stale contra ellos y el gate corta **ahi**, antes de llegar al defecto que cada caso queria probar.
 

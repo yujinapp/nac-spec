@@ -76,9 +76,13 @@ ok('the duplicate names both plugins that declared it',
 ok('a duplicate across plugins is an error, and the result says so',
   result.has_errors === true && result.ok === false);
 
+/* Indexing is guarded on purpose: against a runtime with the defect planted
+   back in, some buckets are EMPTY, and a lock that crashes instead of failing
+   is a worse witness than one that says which assertion broke. */
+const firstCodes = FIXTURE_BUCKETS.map((b) => ((result[b] || [])[0] || {}).code || null);
 ok('each bucket uses its own code, never another condition\'s',
-  new Set(FIXTURE_BUCKETS.map((b) => result[b][0].code)).size === FIXTURE_BUCKETS.length,
-  FIXTURE_BUCKETS.map((b) => b + '=' + result[b][0].code).join(' '));
+  new Set(firstCodes).size === FIXTURE_BUCKETS.length && firstCodes.every(Boolean),
+  FIXTURE_BUCKETS.map((b, i) => b + '=' + firstCodes[i]).join(' '));
 
 /* -------------------------------------------------------------- RED CASES */
 

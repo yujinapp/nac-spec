@@ -7,7 +7,7 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
    =====================================================================
 
    AUTHORITATIVE VERSION CONSTANT: see the global.NAC export at the
-   bottom of this file. `version: '2.5.0-alpha.5', spec_version: '2.5'`
+   bottom of this file. `version: '2.5.0', spec_version: '2.5'`
    is the normative declaration. The dated changelog sections below are
    historical notes; if they ever drift from the export, the export
    wins.
@@ -3519,23 +3519,45 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
     _focusElement(el);
     const ft = el.getAttribute('data-nac-field-type');
 
+    /* The native property setter, or null when this host has no such
+       constructor (audit N-44).
+
+       Every call site below already had a fallback -- `el.value = v`
+       when the descriptor has no setter -- and the fallback was
+       UNREACHABLE in the only environment it was written for. The guard
+       tested the descriptor and the expression reached through
+       `window.HTMLInputElement.prototype` to produce it, so on a host
+       with a partial DOM (a test shim, an SSR or headless context --
+       the paths this runtime claims to support) fill() threw
+       `Cannot read properties of undefined (reading 'prototype')`
+       before any fallback could run. Worse than the crash: the thrown
+       value is a raw TypeError with no `code`, so a caller relying on
+       the error contract gets nothing it can branch on.
+
+       A real browser is unaffected: the constructors always exist,
+       the descriptor is found, and the native setter is used exactly
+       as before -- which is what keeps React's controlled inputs
+       working. */
+    const _nativeSetter = function (ctorName, prop) {
+      var ctor = (typeof window !== 'undefined') ? window[ctorName] : undefined;
+      if (!ctor || !ctor.prototype) return null;
+      var d = Object.getOwnPropertyDescriptor(ctor.prototype, prop);
+      return (d && d.set) ? d.set : null;
+    };
+
     if (ft === 'checkbox' || ft === 'radio') {
       /* React tracks `checked` similarly to `value`; use the native
          setter so controlled checkboxes/radios update state. */
-      var nativeCheckedSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype, 'checked'
-      );
-      if (nativeCheckedSetter && nativeCheckedSetter.set) {
-        nativeCheckedSetter.set.call(el, !!value);
+      var nativeCheckedSetter = _nativeSetter('HTMLInputElement', 'checked');
+      if (nativeCheckedSetter) {
+        nativeCheckedSetter.call(el, !!value);
       } else {
         el.checked = !!value;
       }
     } else if (el.tagName === 'SELECT') {
-      var nativeSelectSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLSelectElement.prototype, 'value'
-      );
-      if (nativeSelectSetter && nativeSelectSetter.set) {
-        nativeSelectSetter.set.call(el, String(value));
+      var nativeSelectSetter = _nativeSetter('HTMLSelectElement', 'value');
+      if (nativeSelectSetter) {
+        nativeSelectSetter.call(el, String(value));
       } else {
         el.value = String(value);
       }
@@ -3547,13 +3569,13 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
          tracks the original property setter on HTMLInputElement.prototype.
          Use the native setter so React's onChange receives the new value
          and updates its state. Works on plain DOM inputs unchanged. */
-      var proto = (el.tagName === 'TEXTAREA')
-        ? window.HTMLTextAreaElement.prototype
-        : window.HTMLInputElement.prototype;
-      var nativeValueSetter = Object.getOwnPropertyDescriptor(proto, 'value');
+      var nativeValueSetter = _nativeSetter(
+        (el.tagName === 'TEXTAREA') ? 'HTMLTextAreaElement' : 'HTMLInputElement',
+        'value'
+      );
       var newVal = String(value == null ? '' : value);
-      if (nativeValueSetter && nativeValueSetter.set) {
-        nativeValueSetter.set.call(el, newVal);
+      if (nativeValueSetter) {
+        nativeValueSetter.call(el, newVal);
       } else {
         el.value = newVal;
       }
@@ -7900,7 +7922,7 @@ const _g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== '
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.0-alpha.5',
+    version:      '2.5.0',
     spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,

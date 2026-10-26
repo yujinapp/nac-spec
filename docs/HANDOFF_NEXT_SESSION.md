@@ -1,15 +1,161 @@
 # Handoff -- continuar sesion
 
-**Actualizado:** 2026-10-26, tercera sesion del dia.
-**Donde quedo:** las dos piezas que faltaban antes del salto de version estan hechas
-(N-18 segunda mitad y el vocabulario de N-29). Lo siguiente es el paso 4.3, el salto de
-version, y su paso 4 es del dueno: la firma offline.
-**Palabra de reanudacion:** cuando el dueno diga **"Continua"**, se ejecuta la seccion 4
-de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
+**Actualizado:** 2026-10-26, CUARTA sesion del dia.
+**Donde quedo:** el salto de version esta HECHO en la rama. El arbol declara **2.5.0**
+en sus 18 slots, la cadena del contrato publica la entrada 2.5.0 como **stable**, y
+todas las compuertas estan verdes salvo una. **Lo unico que falta es la firma offline
+del dueno** -- el paso 4 de 4.3 -- y despues publicar.
+**Lo que el dueno tiene que hacer, y es un solo comando:**
+
+```
+node scripts/sign-contract-api.mjs --sign     # en SU maquina; la clave no vive aca
+npm run check:release                         # tiene que decir OK signature verifies
+```
+
+Ese `--sign` **tambien reescribe el registro testigo** de
+`docs/CONTRACT_API_SIGNING.md` por su cuenta (verificado en el codigo, no supuesto), asi
+que no hay un paso extra que recordar.
+
+**Palabra de reanudacion:** cuando el dueno diga **"Continua"**, se sigue por la seccion
+0 de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
 
 ---
 
-## 0. ULTIMO ESTADO -- 2026-10-26, TERCERA sesion del dia (MANDA SOBRE TODO LO DE ABAJO)
+## 0. ULTIMO ESTADO -- 2026-10-26, CUARTA sesion del dia (MANDA SOBRE TODO LO DE ABAJO)
+
+### Lo que el dueno decidio en esta sesion
+
+Textual: **"Dejarlo como esta."** Sobre N-29: el valor de cable
+`NAC.conformance_tier` **NO se renombra**, sigue devolviendo `NAC-3-versioned`, y los
+tres valores del vocabulario conservan su nombre. Es una **no-accion declarada**, no una
+deuda: reabrirla necesita una decision nueva y un salto de version, porque el valor ya
+viaja publicado en el contrato de la 2.5.0. Expediente en la seccion N-29 de
+`docs/PENDING_AUDITORIA_2026-10.md`. **Con esto N-29 queda CERRADO completo.**
+
+### El salto de version: HECHO en la rama (no publicado)
+
+Pasos 1 a 3 del 4.3, en orden y sin saltear ninguno:
+
+1. **Version a 2.5.0.** 11 slots declarados movidos a mano desde la fuente autoritativa;
+   el resto lo escribieron sus generadores. `check:version` da **18/18 sobre 2.5.0**.
+   La portada deja de decir `alpha` y dice `stable`; el changelog tomo su fecha; el SPEC
+   declara 2.5.0 estable. La seccion 9.1 del SPEC ya decia normativamente que `latest`
+   solo apunta a una estable, asi que no hubo que tocarla.
+2. **`build-integrity.mjs --write`.** Congelo `js/2.5.0/nac.js` (349103 bytes) y re-pinneo
+   la portada. Integridad **verde**.
+3. **`build-contract-api.mjs --write`.** La cadena tiene ahora **2 entradas** y
+   `api/latest.json` declara `stable=2.5.0`, `prerelease=2.5.0-alpha.5`. Cabeza de cadena
+   `sha384-tBEQVA0WiCwv...`.
+
+**N-24 entro en esta regeneracion, como estaba planificado, y de verdad.** El tercer
+testigo de la cabeza de cadena ya **existe**: `runtime/contract-head.json`, escrito por
+`--write`, exigido por el modo check, y listado en `files` de `runtime/package.json` --
+lo cual la compuerta **tambien** verifica, porque un testigo que no viaja en el tarball
+es el mismo defecto con nombre de archivo. Verificado por `npm pack --dry-run`: el
+tarball `nac3-runtime-2.5.0.tgz` lo lleva (972 B, 22 archivos). El texto de politica de
+`api/index.json` deja de prometer tres testigos y **nombra las tres direcciones**, con la
+salvedad honesta de que el del paquete existe **desde la 2.5.0** (las releases anteriores
+se publicaron antes de que la API existiera).
+
+### Cinco hallazgos nuevos, los cinco CERRADOS, y ninguno salio de leer
+
+Salieron de **preparar y verificar el salto**. Expediente completo de cada uno en
+`docs/PENDING_AUDITORIA_2026-10.md`.
+
+- **N-40 (bloqueaba):** el fragmento copy-paste de instalacion de la portada publicaba
+  una huella SRI **que no corresponde a ningun archivo publicado** -- era la huella de
+  los bytes CRLF, el defecto de N-22 sobreviviendo donde `dcb71ea` solo arreglo el
+  `<script>` real. Un adoptante que copiaba el fragmento obtenia un navegador que se
+  niega a ejecutar el runtime, **en silencio**. Causa de fondo: asimetria
+  productor/consumidor. Arreglado en dos mitades (la huella del fragmento tiene
+  productor; la compuerta refuta toda cadena `sha384` de la pagina que no sea una huella
+  publicada). **5 casos nuevos**, integridad pasa de 16 a **21**.
+- **N-41 (bloqueaba):** la compuerta de versiones **refutaba documentacion verdadera** el
+  dia que se publica una estable que el codigo ya nombra -- 7 frases ciertas en rojo.
+  Arreglado haciendo la pregunta estructural en vez de por digitos.
+- **N-42 (bloqueaba, dos mitades):** (a) la compuerta de versiones leia su fuente de
+  verdad de un **comentario** (linea 8 de `js/nac.js`, no el export de la linea 7901), asi
+  que daba **18/18 verde sobre un runtime que no exporta ninguna version**; ahora la
+  carga en un sandbox `vm` y le pregunta que exporta. (b) la prueba del workflow de
+  deploy **pasaba** con un camino versionado recien escrito a mano mientras nombrara la
+  version en curso, y rompia el deploy en el salto siguiente -- que es la falla para la
+  que se creo.
+- **N-43 (avisa):** un caso de la suite del contrato **dejo de medir** el dia que su
+  version inventada (`2.5.0`) se volvio real. Ahora usa una version inalcanzable **con
+  guarda** que se niega a correr si la cadena la alcanza.
+- **N-44 (bloqueaba):** `fill()` **se estrellaba** en todo host con DOM parcial (shim de
+  test, SSR, headless) y con un `TypeError` **fuera del contrato de errores**, porque la
+  guarda miraba el descriptor y la expresion atravesaba
+  `window.HTMLInputElement.prototype`: el fallback era inalcanzable en el unico entorno
+  para el que se escribio. Preexistente, verificado contra HEAD.
+
+### La compuerta de versiones ya tiene suite (era la ultima sin tests)
+
+`scripts/test-version-gate.mjs`, **18 casos**, cableada en `npm run check:release` y en
+el CI justo detras de la compuerta que prueba. Escribirla encontro N-41, N-42a y N-42b
+en la misma hora. **Van ocho hallazgos que no salieron de leer**, y la variante mas
+barata sigue siendo la misma: escribirle los tests a un candado que no los tenia.
+
+### Estado de los gates al cierre de esta sesion (medido, no recordado)
+
+| gate | estado |
+| --- | --- |
+| `check:integrity` | **PASSED** |
+| `check:version` | **18/18 sobre 2.5.0** |
+| `test:version-gate` (nuevo) | **18/18** |
+| `test:integrity-gate` | **21/21** (eran 16) |
+| `test:integrity` (navegador) | **PASSED** |
+| `test:validate-global` | **33/33** |
+| `test:contract` | **36/36** |
+| `test:contract-http` | **8/8** |
+| `test:limits` (navegador) | **GREEN** |
+| `test:cli-levels` (navegador) | **29/29** |
+| `test:fill-setter` (navegador, nuevo) | **8/8 GREEN** |
+| suite del runtime | **18 de 19 archivos verdes** (ver nota) |
+| `check:contract` | **ROJO por un solo motivo: falta la firma del dueno** |
+
+**Integridad y contrato ya NO estan rojos por el salto de version** -- ese motivo se
+resolvio. El unico rojo que queda es la firma, y es por diseno: *una release mueve la
+cadena, asi que el indice tiene que firmarse de nuevo, y ese paso manual ES la capa*.
+
+**Nota sobre la suite del runtime, corrigiendo lo que decia el handoff anterior:** el
+handoff declaraba *"suite del runtime (14 stages) verde"* y **no era cierto**. `stage4`
+tenia 2 casos rojos -- es N-44, ya cerrado, ahora **31/31**. Y `stage3-backend` **no
+puede correr en esta maquina y no es un defecto**: su propia cabecera lo declara
+*local-only*, pide una `api_key` de un repositorio hermano (`crm_desa/config/config.json`,
+que no existe aca) y pega contra un endpoint de LLM en produccion. Lo verde medible es
+**18 de 19**, y el que falta es externo por diseno.
+
+### Lo que falta para publicar
+
+1. **La firma offline del dueno.** El unico paso, y no lo puede hacer Forge: la clave no
+   vive en este repositorio ni es un secreto de CI (decision PND-034 opcion A). Comando
+   en la cabecera de este documento.
+2. **Publicar el paquete y promover `latest` a la 2.5.0 estable** (D-01 opcion C).
+
+### Lo que sigue esperando al dueno, y ya no es N-29
+
+- **D-03 (idiomas).** Lo unico que le espera ademas de su firma. Traba la pasada de
+  traducciones + N-28 + N-31 + N-32.
+- **N-35 a N-38:** cuatro decisiones sobre texto normativo de niveles. **Ninguna traba el
+  release.** Las dos que mas pesan: ninguna herramienta puede afirmar el nivel 3 hoy
+  (N-36), y el nivel 2 leido literalmente exige la forma de manifest que la seccion 4
+  llama heredada (N-37).
+
+### Trabajo abierto que NO traba el release
+
+- **N-39** (`PND-048`): seis acciones declaradas de la portada no confirman nunca.
+- **N-31** (`PND-038`): la portada declara 50 ids y pinta 116.
+- **PND-040**: re-medir el benchmark contra la 2.5.0 (las cifras salen declaradas
+  historicas, por decision del dueno).
+- **PND-049**: los gates que necesitan navegador no corren en CI. Ahora son **cuatro**,
+  no dos: `test:integrity`, `test:limits`, `test:cli-levels` y el nuevo
+  `test:fill-setter`. Deliberadamente no cablee el nuevo al CI: cablearlos es el trabajo
+  de ese pendiente y hay que instalar el navegador en el runner.
+
+---
+
+## 0-bis. ESTADO DE LA TERCERA SESION DEL 2026-10-26 (historico)
 
 Lo de la seccion 0-bis y de las secciones 1 a 8 sigue siendo cierto salvo donde esta
 seccion diga otra cosa.
@@ -104,7 +250,7 @@ el, la misma rotura pasa con salida 0.
 
 ---
 
-## 0-bis. ESTADO DE LA SEGUNDA SESION DEL 2026-10-26 (historico)
+## 0-ter. ESTADO DE LA SEGUNDA SESION DEL 2026-10-26 (historico)
 
 Lo de las secciones 1 a 8 sigue siendo cierto salvo donde esta seccion diga otra cosa.
 

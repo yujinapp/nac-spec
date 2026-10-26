@@ -1,6 +1,6 @@
 {
   "api_schema": 1,
-  "channel": "prerelease",
+  "channel": "stable",
   "coded_findings": [
     {
       "code": "aria_nac_state_mismatch",
@@ -188,6 +188,58 @@
       "what": "An id the manifest advertises has no element in the DOM, so an agent that trusts the manifest will fail to operate it."
     },
     {
+      "code": "nac_id_declared_not_mounted",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Nothing, if the view is simply closed. If the manifest claims a permanent surface, mount it or stop declaring it.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "A manifest declares an id that is not currently in the DOM."
+    },
+    {
+      "code": "nac_id_duplicate_across_plugins",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Namespace the ids with the plugin slug (plugin.element), or remove the declaration from the manifest that should not own it.",
+      "severity": "error",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "Two or more registered manifests declare the same nac_id, so an agent addressing it by id cannot know which element it gets."
+    },
+    {
+      "code": "nac_id_missing_plugin_prefix",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Rename the id to slug.element. Renaming an id breaks every caller that used the old one, so do it with the same care as changing a URL.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "A declared nac_id does not start with its plugin slug followed by a dot, so it loses the namespacing that keeps two plugins from colliding."
+    },
+    {
+      "code": "nac_id_orphan_in_dom",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Declare it in the manifest, or drop the attribute if the element is not meant to be agent-addressable. Common and sometimes legitimate mid-migration, which is why it is a warning.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "An element in the DOM carries a data-nac-id that no registered manifest declares, so it is reachable by name but not discoverable by an agent that reads the manifest."
+    },
+    {
       "code": "no_manifest",
       "emitted_by": [
         "validate"
@@ -321,6 +373,41 @@
     }
   ],
   "generated_by": "scripts/build-contract-api.mjs",
+  "global_buckets": {
+    "buckets": [
+      {
+        "bucket": "convention_violations",
+        "code": "nac_id_missing_plugin_prefix",
+        "severity": "warn",
+        "what": "A declared nac_id does not start with its plugin slug, so it loses the namespacing that keeps two plugins from colliding."
+      },
+      {
+        "bucket": "duplicates",
+        "code": "nac_id_duplicate_across_plugins",
+        "severity": "error",
+        "what": "The same nac_id is declared by two or more registered plugins, so an agent addressing it by id cannot know which element it gets."
+      },
+      {
+        "bucket": "orphans",
+        "code": "nac_id_orphan_in_dom",
+        "severity": "warn",
+        "what": "An element in the DOM carries a data-nac-id that no registered manifest declares. Common and sometimes legitimate during brownfield migration, which is why it is a warning."
+      },
+      {
+        "bucket": "plugin_instance_violations",
+        "code": "duplicate_plugin_no_instance_id",
+        "severity": "error",
+        "what": "Plugin slug uniqueness is broken: the same slug is mounted more than once without distinct instance ids. Reported in its own bucket so CI can gate on it separately."
+      },
+      {
+        "bucket": "unmounted",
+        "code": "nac_id_declared_not_mounted",
+        "severity": "warn",
+        "what": "A manifest declares an id that is not currently in the DOM. Expected while a view is closed; a defect when the manifest claims a permanent surface."
+      }
+    ],
+    "note": "validate_global() reports findings as named buckets of objects, not as a flat array. Since 2.5.0 every item of every bucket carries code + severity, so section 12 promise 4 covers a real set. The code and the severity below are READ off items a fixture provokes on purpose (scripts/fixture-dom.mjs), not written here: the previous version of this generator wrote them by hand and published a null for a bucket that had carried a code since 2.5.0 (audit N-14)."
+  },
   "protocol": "NAC3",
   "spec_version": "2.5",
   "stability": {
@@ -330,39 +417,8 @@
   },
   "surface": "findings",
   "uncoded_findings": {
-    "buckets": [
-      {
-        "bucket": "convention_violations",
-        "code": null,
-        "severity": "warn",
-        "what": "A declared nac_id does not start with its plugin slug, so it loses the namespacing that keeps two plugins from colliding."
-      },
-      {
-        "bucket": "duplicates",
-        "code": null,
-        "severity": "error",
-        "what": "The same nac_id is declared by two or more registered plugins, so an agent addressing it by id cannot know which element it gets."
-      },
-      {
-        "bucket": "orphans",
-        "code": null,
-        "severity": "warn",
-        "what": "An element in the DOM carries a data-nac-id that no registered manifest declares. Common and sometimes legitimate during brownfield migration, which is why it is a warning."
-      },
-      {
-        "bucket": "plugin_instance_violations",
-        "code": null,
-        "severity": "error",
-        "what": "Plugin slug uniqueness is broken: the same slug is mounted more than once without distinct instance ids. Reported in its own bucket so CI can gate on it separately."
-      },
-      {
-        "bucket": "unmounted",
-        "code": null,
-        "severity": "warn",
-        "what": "A manifest declares an id that is not currently in the DOM. Expected while a view is closed; a defect when the manifest claims a permanent surface."
-      }
-    ],
-    "note": "validate_global() reports these as named buckets of objects and attaches no code field. SPEC.md section 12 promise 4 names this validator, so until each bucket carries a code from the catalogue above, that promise covers an empty set. Tracked as audit N-14 / PND-033; the codes land with 2.5.0 because changing the runtime requires a version bump."
+    "buckets": [],
+    "note": "Kept for schema compatibility with 2.5.0-alpha.5 and earlier, where validate_global attached no code to any bucket. Empty since 2.5.0: every bucket is coded, and the codes are in global_buckets above (audit N-14, closed)."
   },
-  "version": "2.5.0-alpha.5"
+  "version": "2.5.0"
 }

@@ -1,11 +1,46 @@
 # Changelog
 
-## 2.5.0 -- unreleased
+## 2.5.0 -- 2026-10-26
 
-Stabilises the 2.5 line. The entries below land with the version bump;
-the heading takes its date then.
+Stabilises the 2.5 line. First stable release of the 2.5 series: `latest`
+points here, and the stability guarantees of SPEC section 10 and the
+finding-code guarantees of section 12 begin at this version.
 
 ### Fixed
+
+- **`fill()` no longer throws on a host with a partial DOM, and the
+  fallback it always had is finally reachable** (audit N-44). `fill()`
+  writes an input value through the native property setter on
+  `HTMLInputElement.prototype` rather than with `el.value = v`, because
+  React tracks the original setter and a plain assignment is silently
+  reverted on the next render -- a controlled input never sees the
+  value. A fallback existed for a host without those constructors, and
+  it could never run: the guard tested the property DESCRIPTOR while
+  the expression producing it reached through
+  `window.HTMLInputElement.prototype`. On a partial DOM -- a test shim,
+  an SSR or headless context -- `fill()` threw
+  `TypeError: Cannot read properties of undefined (reading 'prototype')`
+  before any fallback could run, and that TypeError carries no `code`,
+  so a caller branching on the error contract got nothing usable.
+  The three call sites (`checked`, `SELECT.value`,
+  `INPUT`/`TEXTAREA.value`) now share one helper that checks the
+  constructor before the descriptor.
+  **No change in a browser:** the constructors always exist there, the
+  native setter is used exactly as before, and a Chromium lock
+  (`npm run test:fill-setter`) now proves it by spying on the
+  instance property the native setter bypasses.
+
+- **The copy-paste install snippet on the project landing page
+  published an `integrity` hash that matched no released file** (audit
+  N-40). It carried the hash computed over CRLF bytes from a Windows
+  working tree; the fix that moved every real `<script>` tag onto the
+  LF hash never reached the snippet, because the snippet is
+  HTML-escaped and so was not a script tag. Anyone who copied it got a
+  browser that refused to execute the runtime, reported only as a
+  console line. Does not affect `npm install`; it affected the
+  documented CDN path. The snippet hash now has a single producer and
+  the gate refuses any `sha384` on the page that is not a published
+  hash.
 
 - **`validate_global()` can see a manifest written the documented way**
   (audit N-33). The id collector behind it read only the legacy manifest

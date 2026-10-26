@@ -233,6 +233,35 @@ function main() {
       }
       return out;
     });
+    /* The adopter-facing copy-paste snippet carries an integrity hash
+       too, and it is HTML-ESCAPED -- `&lt;script src=...` -- so it is
+       not a <script> tag and the pass above never saw it. That is how
+       audit N-40 happened: dcb71ea refreshed every real tag when the
+       hash moved from CRLF bytes to LF bytes and left the snippet
+       advertising the CRLF hash, which matches no file that has ever
+       been published. An adopter who copied it got a browser that
+       refused to execute the runtime.
+
+       A hash is a derived value, so it gets a producer here rather
+       than a reminder to retype it -- the N-17 rule. The PATH in the
+       surrounding prose stays hand-written on purpose: that one is
+       the signal that somebody read the documentation after a bump,
+       and the gate below refuses it when it is stale. */
+    const runtimeRec = files.find((f) => f.path === 'js/nac.js');
+    const SNIPPET_RX = /(&lt;script src=<span class="string">"[^"]*\/nac\.js"<\/span>\s*\n\s*integrity=<span class="string">")sha384-[A-Za-z0-9+/=]+(")/;
+    if (runtimeRec) {
+      if (!SNIPPET_RX.test(text)) {
+        fail('cannot find the adopter copy-paste snippet in index.html to re-pin its hash.\n' +
+             '      The markup this script anchors on changed. Fix the anchor instead of\n' +
+             '      letting the snippet keep a hash nobody rewrites (audit N-40).');
+      } else {
+        const repinnedSnippet = text.replace(SNIPPET_RX, (_m, head, tail) => head + runtimeRec.sha384 + tail);
+        if (repinnedSnippet !== text) {
+          text = repinnedSnippet;
+          console.log('      adopter snippet re-pinned to ' + runtimeRec.sha384);
+        }
+      }
+    }
     if (text !== original) {
       writeFileSync(indexPath, text);
       console.log('WRITE index.html (integrity hashes refreshed' +
@@ -301,6 +330,40 @@ function main() {
     fail(`index.html never shows the immutable path js/${version}/nac.js to adopters`);
   } else {
     console.log(`OK    index.html shows the immutable path to adopters`);
+  }
+
+  /* EVERY sha384 the page prints must be one this project publishes --
+     inside a script tag or in prose, it makes no difference to the
+     reader who copies it (audit N-40).
+
+     The checks above compare the hash on each <script> tag. Nothing
+     compared the one in the escaped copy-paste snippet, so for two
+     days the landing page of the protocol advertised an integrity
+     value computed over Windows CRLF bytes: 344665 bytes on the
+     server, 352798 in the hash. The browser's only report of that is
+     a console line, so it failed quietly -- in the one direction this
+     project claims never to fail. The paragraph right under the
+     snippet tells the reader to recompute the hash and not take it on
+     faith, which is the check that would have caught it.
+
+     Phrased over the whole page on purpose: an unpublished hash is
+     the same defect wherever it is printed, and this way the lock
+     does not have to know which decorations the markup uses. */
+  const published = new Set(files.map((f) => f.sha384));
+  let hashesSeen = 0;
+  for (const m of text.matchAll(/sha384-[A-Za-z0-9+/=]{20,}/g)) {
+    hashesSeen += 1;
+    if (published.has(m[0])) continue;
+    fail(`index.html:${lineAt(m.index)} advertises a sha384 that matches no published file\n` +
+         `      in page  ${m[0]}\n` +
+         '      on disk  ' + [...published].join('\n               ') + '\n' +
+         '      A reader who copies this gets a browser that refuses the file.\n' +
+         '      Fix: rerun with --write (it re-pins every hash, snippet included).');
+  }
+  if (hashesSeen === 0) {
+    fail('index.html prints no sha384 at all -- the integrity attributes vanished');
+  } else if (!process.exitCode) {
+    console.log(`OK    all ${hashesSeen} sha384 values on the page are published hashes`);
   }
 
   /* 5. receipt */

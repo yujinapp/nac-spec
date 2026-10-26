@@ -1209,8 +1209,31 @@ compatibilidad. Si se renombra, conviene que sea en la 2.5.0: mover un valor de 
 despues cuesta otra version. Si se deja, el vocabulario publicado ya resuelve la
 ambiguedad para una maquina sin tocar a nadie.
 
-**Severidad:** avisa. **Quien decide:** el dueno decide si el valor se renombra; el
-vocabulario ya esta publicado sin necesidad de decision.
+**DECISION DEL DUENO -- 2026-10-26: NO SE RENOMBRA. N-29 QUEDA CERRADO.**
+
+Textual: *"Dejarlo como esta."* Preguntado con el motivo explicito de que renombrar un
+valor de cable despues de la 2.5.0 cuesta otra version, de modo que la decision se tomo
+con su costo de oportunidad a la vista y no por omision.
+
+Lo que la decision fija, para que un lector futuro no la relea como un olvido:
+
+- `NAC.conformance_tier` sigue devolviendo `'NAC-3-versioned'` en la 2.5.0 y en adelante.
+  Los tres valores del vocabulario -- `NAC-3`, `NAC-3-versioned`, `NAC-3-strict` --
+  conservan su nombre.
+- El motivo aceptado: es un valor que un host puede estar **comparando** en codigo, no
+  prosa que alguien lee. La ambiguedad que hacia dano -- un agente que no podia saber si
+  `NAC-3` nombraba un tier o un nivel -- ya la resuelve el vocabulario publicado en
+  `contract.json`, que una maquina lee sin tocar a nadie. Renombrar romperia a todo
+  tercero que compare la cadena a cambio de algo cosmetico.
+- Es una **no-accion declarada**, no una deuda. Si alguien quiere reabrirla hace falta una
+  decision nueva del dueno y un salto de version mayor, porque a esta altura el valor ya
+  viaja publicado en el contrato de la 2.5.0.
+
+Con esto las dos mitades de N-29 estan cerradas: el vocabulario publicado el 2026-10-26, y
+la decision de renombre resuelta como no-renombre el mismo dia.
+
+**Severidad:** avisa. **Estado: CERRADO** (2026-10-26) -- mitad mecanica hecha, mitad de
+decision resuelta por el dueno como no-accion declarada.
 
 ---
 
@@ -1550,6 +1573,305 @@ seccion de limites, que son ids que se agregaron en `c64fcf2`.
 **Severidad:** avisa (no rompe la pagina para una persona; la rompe para un agente, que es
 el publico del protocolo). **Quien decide:** nadie, es trabajo. **Estado:** abierto, no
 empezado -- queda fuera del alcance de las dos piezas de este tramo.
+
+---
+
+### N-40 (nuevo, CERRADO el mismo dia -- 2026-10-26) El fragmento que un adoptante copia de la portada publica una huella SRI que no corresponde a ningun archivo
+
+**Que esta mal:** la portada publica la huella del runtime **dos veces**. Una en el
+`<script>` real que la pagina carga, y otra dentro del fragmento HTML-escapado que la
+seccion de instalacion le ofrece a un adoptante para copiar y pegar. La segunda
+declaraba `sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ`,
+que **no es la huella de ningun archivo del repositorio** ni de ninguno que se haya
+publicado.
+
+**Evidencia medida (2026-10-26):**
+
+- La huella real de `js/2.5.0-alpha.5/nac.js` (344665 bytes, LF) es
+  `sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp`, igual que
+  en `js/integrity.json` y que en el `<script>` de `index.html:1724`.
+- La huella del fragmento (`index.html:1127`) aparece **una sola vez en todo el arbol**
+  y no coincide con ningun archivo de `js/` ni de `runtime/dist/`: se verifico
+  recalculando sha384 sobre cada uno.
+- `git log -S` la ubica: la introdujo `934dd4f` y `dcb71ea` la cambio **solo en el
+  `<script>`**. El mensaje de `dcb71ea` dice exactamente que esta corrigiendo una huella
+  calculada sobre bytes CRLF (352798 bytes en Windows) cuando el servidor entrega LF
+  (344665). Es decir: **la huella del fragmento es la de los bytes CRLF**, el defecto de
+N-22 sobreviviendo en el unico lugar que lee quien copia y pega.
+
+**Por que importa:** es el camino de instalacion documentado del protocolo. Un adoptante
+que copia el fragmento obtiene un `integrity` que el navegador no puede hacer coincidir,
+asi que **el navegador se niega a ejecutar el runtime** y la pagina queda sin NAC3. Y la
+unica senal es una linea en la consola: falla en silencio, que es justo la direccion en
+la que este proyecto declara no fallar nunca (SQ 0.3). El agravante esta en el parrafo
+inmediatamente debajo del fragmento, que le dice al lector *"Recompute the hash
+yourself. Do not take the value above on faith"* -- la verificacion que el documento
+ofrece es exactamente la que delata la mentira.
+
+**Por que la compuerta no lo atrapo (el defecto de fondo):** `build-integrity.mjs` es el
+unico productor de la huella y compara una por una las huellas de **los `<script>`**. El
+fragmento esta HTML-escapado, asi que no es un `<script>` y nunca entro ni al re-pinneo
+ni a la comparacion. La compuerta **si** verificaba el **camino** en la prosa -- lo hace a
+proposito, para detectar una documentacion sin actualizar -- pero nunca la **huella**.
+Asimetria productor/consumidor exacta (SQ 14): custodiado donde se genera, descubierto
+donde se publica.
+
+**Como se encontro:** no salio de leer ni de una auditoria. Salio de **preparar el salto
+de version**: al ir a actualizar los slots de version de `index.html` aparecieron dos
+huellas distintas para la misma URL en el mismo archivo. Van siete: cada capa de
+verificacion que se construye encuentra un hallazgo que la lectura no habia encontrado.
+
+**El arreglo (2026-10-26), las dos mitades:**
+
+1. **La huella del fragmento tiene productor.** `--write` la re-pinnea junto con las de
+   los `<script>`, anclado en el markup del fragmento. Una huella es un valor derivado,
+   asi que no se escribe a mano: es la regla de N-17 aplicada al ultimo lugar donde
+   quedaba una copia manual. Si el markup del fragmento se mueve, la compuerta **lo
+   dice en voz alta** en vez de dejar de cubrirlo en silencio.
+2. **La compuerta refuta cualquier huella no publicada, donde sea.** Toda cadena
+   `sha384-...` que la pagina imprima -- en un tag o en prosa -- tiene que ser una de
+   las huellas que el proyecto publica, y se reporta con su numero de linea. Formulado
+   sobre la pagina entera a proposito: una huella inventada es el mismo defecto donde
+   sea que se imprima, y asi el candado no depende de que decoraciones use el markup.
+
+El **camino** en la prosa sigue escrito a mano y custodiado por su caso: es la senal de
+que alguien leyo la documentacion despues de un bump, y automatizarlo seria hacer que la
+compuerta se conteste sola.
+
+**Verificacion (probada en rojo, no solo en verde):** 5 casos nuevos en
+`scripts/test-integrity-gate.mjs`, que pasa de 16 a 21. Corridos contra la compuerta de
+HEAD (la anterior al arreglo) **caen los 5 y los 16 viejos siguen verdes**, asi que los
+casos miden el cambio y nada mas. Uno de los cinco reproduce el defecto **como paso**:
+no planta una cadena inventada, hashea el mismo fuente sobre bytes CRLF y publica eso.
+Y hay un caso verde de base -- *el fragmento de base publica la huella publicada* --
+porque sin el los dos casos rojos podrian estar verdes sobre un fragmento sin ninguna
+huella, que es verde sobre nada.
+
+**Severidad:** bloquea (rompe el camino de instalacion documentado). **Quien decide:**
+nadie, es mecanico. **Estado: CERRADO** (2026-10-26) -- huella corregida, productor
+unico, compuerta extendida y 5 casos en rojo.
+
+---
+
+### N-41 (nuevo, CERRADO el mismo dia -- 2026-10-26) La compuerta de versiones refutaba documentacion verdadera el dia que se publica una estable
+
+**Que esta mal:** el candado que impide que el paquete publicado misdeclare su propia
+version (N-17) tiene una regla para su ultima prueba, la que exige que un generador no
+lleve version propia: *"cuenta como hardcodeada cualquier x.y.z que sea igual a la
+version que se esta publicando"*. Esa regla es correcta para **codigo** y falsa para
+**prosa**, y las dos chocan exactamente un dia: el dia que el proyecto publica una
+version estable que sus propios comentarios ya nombran.
+
+**Evidencia medida (2026-10-26):** al subir la version a `2.5.0`, la compuerta paso a
+**16 de 18** y los 2 rojos eran 7 frases ciertas:
+
+| archivo | texto |
+|---|---|
+| `runtime/src/cli.mjs:20` | `Audit N-18: before 2.5.0 the URL mode aborted with exit 2` |
+| `runtime/src/cli.mjs:215` | `(pre-2.5.0 alias: ...)` |
+| `runtime/src/cli-url.mjs:5` | `Before 2.5.0 nac validate <url> aborted` |
+| `runtime/src/cli-url.mjs:182` | `2.5.0 attaches neither code nor severity` |
+| `runtime/src/cli-url.mjs:358` | `so nobody reads a pre-2.5.0 runtime as a defective page` |
+| `runtime/src/cli-url.mjs:706` | `Audit N-33: before 2.5.0, validate_global() read only the legacy` |
+| `runtime/src/cli-url.mjs:720` | `Serve a runtime at 2.5.0 or later.` |
+
+Ninguna declara una version: cinco estan en comentarios y dos son texto que el CLI le
+imprime a una persona. Ninguna llega a un artefacto como declaracion.
+
+**Por que importa mas de lo que parece:** un rojo asi deja al que publica con dos
+salidas, y las dos son malas. Aflojar el candado, o reescribir documentacion correcta
+para esquivar un lint. La segunda ademas no escala: la 2.6.0 choca igual con frases
+distintas. Y las dos ensenan lo mismo al proximo lector: que esta compuerta se
+desactiva cuando molesta. Un candado en el que nadie cree ya no es un candado.
+
+**El arreglo:** la pregunta se hace de forma estructural en vez de por digitos. Un
+literal es una **autodeclaracion** cuando (a) lleva cola de prerelease -- `2.3.0-alpha.2`
+no es prosa nunca; (b) la cadena entera **es** la version, que es la forma literal de
+N-17 (`const V = '2.5.0'`, `version: '2.5.0'`); o (c) viene **presentada** como una:
+precedida por `v`, por `version` y puntuacion, o por `@` (`@nac3/runtime@2.5.0`).
+Cualquier otra cosa -- un comentario, o una version dentro de una frase mas larga -- es
+prosa y queda legal. Deliberadamente **no** es un removedor de comentarios: `//` aparece
+en cada URL de esos archivos, asi que cortar hasta el fin de linea podria **esconder**
+una declaracion real. La prueba nunca tiene que decidir que es un comentario, y cuando
+duda, marca: falla cerrada.
+
+**Severidad:** bloquea (traba la publicacion de toda version estable que el codigo ya
+nombre). **Quien decide:** nadie, es mecanico. **Estado: CERRADO** (2026-10-26).
+
+---
+
+### N-42 (nuevo, CERRADO el mismo dia -- 2026-10-26) La compuerta de versiones leia su fuente de verdad de un comentario, y una prueba suya pasaba con la version correcta pero rompia el deploy siguiente
+
+Dos defectos del mismo archivo, los dos encontrados por el mismo trabajo: escribirle a
+la compuerta de versiones la suite de comportamiento que **nunca tuvo**. Era el ultimo
+candado del proyecto sin tests, y es el octavo hallazgo que no salio de leer.
+
+#### 42a. La fuente de verdad era un comentario
+
+**Que esta mal:** la compuerta declara que la version autoritativa es la constante del
+export `NAC` al final de `js/nac.js`, y la leia con `src.match(/version:\s*'<semver>'/)`
+-- sin `/g`, es decir **la primera** aparicion. En `js/nac.js` la primera aparicion esta
+en la **linea 8**, dentro del comentario de cabecera que *cita* la constante. El export
+real es la quinta aparicion, en la linea 7901.
+
+**Evidencia medida (2026-10-26):** las cinco apariciones de `version: '<semver>'` en
+`js/nac.js` son, en orden: linea 8 (comentario de cabecera, `2.5.0`), linea 302
+(manifest de ejemplo, `1.0.0`), linea 1914 (`2.3.0`), linea 6713 (`1.0.0`) y linea 7901
+(**el export real**, `2.5.0`). La compuerta tomaba la primera.
+
+**Las dos consecuencias, las dos medidas:**
+
+1. Se vacia el export y se deja el comentario: la compuerta reporta **los 18 slots en
+   verde** sobre un runtime que no exporta ninguna version. Es el caso de prueba
+   `un runtime sin constante de version se refuta, no se asume`.
+2. Se mueve solo el comentario: la compuerta **adopta el comentario como autoritativo** y
+   reporta el **export** como el slot derivado -- es decir, le dice al que mantiene el
+   codigo que edite el artefacto para que coincida con la documentacion. Es N-17 apuntando
+   al reves.
+
+**El arreglo:** la version se lee como la lee `scripts/build-contract-api.mjs`:
+**cargando** los bytes publicados de `js/nac.js` en un sandbox `vm` y preguntandole al
+runtime que exporta. Un comentario no puede satisfacer eso. El comentario de cabecera
+conserva su propia prueba, ahora como **consumidor** que tiene que coincidir. Misma
+tecnica, mismo archivo, una sola fuente de verdad.
+
+#### 42b. La prueba del deploy pasaba con la version correcta y rompia el deploy siguiente
+
+**Que esta mal:** la prueba del workflow de deploy existe porque el smoke check tenia el
+camino versionado escrito a mano, *"lo que hacia que un salto de version rompiera el
+deploy"*, y su propio comentario dice: **"encontrar NINGUNA version aca es el caso que
+pasa"**. Pero estaba implementada con el helper generico, que pregunta *"toda version
+encontrada es la correcta?"*. Asi que un camino recien escrito a mano **pasaba** mientras
+nombrara la version en curso, y se ponia rojo en el **salto siguiente** -- que es
+exactamente la falla para la que se creo la prueba.
+
+**Evidencia medida (2026-10-26):** con un camino `js/2.5.0/nac.js` plantado en
+`.github/workflows/deploy.yml`, la compuerta anterior sale con **codigo 0**. El
+comentario ya decia la regla; el codigo recien ahora la aplica.
+
+**El arreglo:** esa prueba deja de usar el helper generico. Aca, a diferencia de los
+otros 17 slots, **no encontrar version es el unico verde**, y el mensaje de arreglo lo
+dice: un camino correcto hoy rompe el deploy en el proximo salto.
+
+#### Verificacion de los dos (probados en rojo, en dos corridas distintas)
+
+Suite nueva `scripts/test-version-gate.mjs`, **18 casos**, cableada en
+`npm run check:release` y en el CI justo despues de la compuerta que prueba.
+
+- Con el arreglo de N-41 puesto y los de N-42 todavia no, los dos casos de N-42 dan
+  **RED-FAIL con el texto "la compuerta lo ACEPTO"**: prueba limpia de que el defecto
+  era real y de que el caso lo mide.
+- Contra la compuerta de HEAD completa (sin ninguno de los tres arreglos) caen **6 de
+  18**, y son los 6 correctos: el caso de control, los **3 casos verdes de prosa** de
+  N-41 -- es decir, la compuerta vieja refuta documentacion verdadera -- y los 2 de
+  N-42. Los otros 12 siguen verdes, asi que la suite mide el cambio y nada mas.
+- La suite incluye casos verdes con el mismo peso que los rojos, porque en N-41 el
+  defecto **era** un rojo de mas.
+
+**Severidad:** bloquea las dos mitades (42a invalida la garantia entera de la compuerta;
+42b rompe un deploy). **Quien decide:** nadie, es mecanico. **Estado: CERRADO**
+(2026-10-26).
+
+---
+
+### N-43 (nuevo, CERRADO el mismo dia -- 2026-10-26) Un caso de la suite del contrato dejo de medir el dia que su version inventada se volvio real
+
+**Que esta mal:** el caso *"un puntero latest que inventa una version estable se
+refuta"* mutaba `api/latest.json` poniendo `stable = '2.5.0'`. Se escribio cuando no
+existia ninguna version estable, asi que `2.5.0` era entonces una invencion. El dia que
+se publica la 2.5.0, esa mutacion escribe **la verdad**: la compuerta la acepta -- y
+hace bien -- y el caso deja de medir nada mientras sigue reportando.
+
+**Evidencia medida (2026-10-26):** con el arbol en 2.5.0 el caso da **RED-FAIL "la
+compuerta ACEPTO un arbol roto"**. Es la unica falla de los 36 casos de la suite, y no
+la causo ningun cambio de codigo: la causo el calendario.
+
+**Por que importa:** un fixture que codifica una version a la que el proyecto va a
+llegar algun dia tiene fecha de vencimiento y nadie la anoto. Entre que vence y que
+alguien lo nota, el caso es una luz verde que no mira nada -- la misma forma de mentira
+que N-30 y que la huella que se comparaba contra si misma.
+
+**El arreglo:** una constante `NEVER_PUBLISHED = '99.99.99'` **con guarda**: si la
+cadena alguna vez la publica, la suite se niega a correr y lo dice, en vez de volver a
+mutar hacia la verdad en silencio. Los otros dos literales de version de las suites
+(`9.9.9`, `99.0.0`) ya eran inalcanzables; se verifico que no hay mas.
+
+**Severidad:** avisa (un caso que no mide, no un defecto del producto). **Quien decide:**
+nadie, es mecanico. **Estado: CERRADO** (2026-10-26).
+
+---
+
+### N-44 (nuevo, CERRADO el mismo dia -- 2026-10-26) `fill()` se estrella en un DOM parcial, y el fallback que existe para ese caso es inalcanzable
+
+**Que esta mal:** `fill()` escribe el valor de un input a traves del **setter nativo**
+de `HTMLInputElement.prototype` y no con `el.value = v`. Eso no es un detalle: React
+rastrea el setter original, asi que una asignacion directa se revierte en el siguiente
+render y un input controlado nunca recibe el valor. El codigo tiene un fallback para un
+host sin ese constructor -- y **el fallback era inalcanzable en el unico entorno para el
+que se escribio**. La guarda miraba el **descriptor**, y la expresion que lo produce
+atraviesa `window.HTMLInputElement.prototype`. Si ese constructor no existe, tira antes
+de llegar a cualquier fallback.
+
+**Evidencia medida (2026-10-26):** `runtime/test/stage4-calls.mjs` -- la suite unitaria
+de **todas** las APIs de escritura -- fallaba 2 de 31 casos, `T6 fill happy path
+resolves` y `T6 fill set value on input`. Instrumentando el `catch` que se los comia, el
+motivo real es `TypeError: Cannot read properties of undefined (reading 'prototype')`.
+Verificado preexistente: con el arbol en HEAD (antes de todo el trabajo de esta sesion)
+caen los mismos 2 casos.
+
+**Dos consecuencias, no una:**
+
+1. `fill()` y la rama de `checkbox`/`radio` **se estrellan** en vez de degradar en todo
+   host con DOM parcial -- un shim de test, un contexto SSR o headless; justo los
+   caminos que el runtime declara soportar.
+2. Lo que tira **no es un `NacError`**: es un `TypeError` crudo sin `code`. Un agente
+   que programo contra el contrato de errores no recibe nada en que ramificar, que es
+   la falla que la doctrina de errores de este proyecto existe para no tener.
+
+**Como se encontro:** corriendo la suite completa del runtime para verificar el salto de
+version. El handoff declaraba *"suite del runtime (14 stages) verde"* y no lo estaba.
+
+**El arreglo:** un helper `_nativeSetter(ctorName, prop)` que devuelve el setter nativo o
+`null`, y chequea **el constructor y su prototype** antes del descriptor. Los tres
+puntos de llamada (`checked`, `SELECT.value`, `INPUT`/`TEXTAREA.value`) pasan a usarlo,
+asi que no pueden discrepar sobre que significa "el setter nativo no esta". En un
+navegador real no cambia nada: los constructores existen siempre, el descriptor se
+encuentra y el setter nativo se usa igual que antes.
+
+**Verificacion, de los dos lados, porque el arreglo tiene un riesgo real:**
+
+- **DOM parcial:** `stage4-calls.mjs` pasa de 29/31 a **31/31**. Ese caso ya existia y
+  ya estaba rojo: es la prueba en rojo del defecto, no una escrita para la ocasion.
+- **Navegador real:** el riesgo del arreglo es haber movido **al navegador** al fallback,
+  que es precisamente lo que rompe React. La suite unitaria no puede contestarlo: su
+  shim no tiene ningun constructor de elemento, que es por lo que el defecto vivio ahi.
+  Candado nuevo `e2e/fill-native-setter-check.mjs` (`npm run test:fill-setter`), en
+  Chromium real, que lo mide con una **espia**: define un accessor propio de `value` en
+  la instancia, que el setter nativo saltea y el fallback tocaria. 8 verificaciones,
+  todas verdes: el descriptor nativo existe, `fill()` resuelve, escribe el valor, emite
+  `input`, **no usa el fallback**, y lo mismo en la rama `TEXTAREA`.
+- **El candado nuevo, probado en rojo:** se planto la regresion que vigila -- se quito el
+  setter nativo de la rama de input y se asigna directo -- y el candado sale **codigo 1**
+  con *"fill() used the NATIVE setter, not the fallback"* en rojo. Sobre el arbol
+  arreglado sale codigo 0. El runtime se restauro byte a byte identico despues de la
+  prueba, verificado.
+
+**Alcance de lo que NO se toco:** `window.HTMLInputElement` no aparece mas sin guarda en
+ningun archivo de `js/` (verificado con grep sobre los tres). El unico resto es la
+mencion dentro del comentario que explica el arreglo.
+
+**Severidad:** bloquea (un verbo central del protocolo se estrella, y con un error fuera
+de contrato, en un entorno declarado soportado). **Quien decide:** nadie, es mecanico.
+**Estado: CERRADO** (2026-10-26).
+
+**Nota sobre una afirmacion del handoff, corregida:** *"suite del runtime (14 stages)
+verde"* no era cierto. `stage4` tenia 2 casos rojos (este hallazgo, ya cerrado) y
+`stage3-backend` **no puede correr en esta maquina y no es un defecto**: su propia
+cabecera lo declara *local-only*, pide una `api_key` de un repositorio hermano
+(`crm_desa/config/config.json`, que no existe aca) y pega contra un endpoint de LLM en
+produccion. Lo verde medible es **18 de 19** archivos de la suite, y el que falta es
+externo por diseno. Queda escrito asi para que la proxima sesion no lo lea como una
+regresion.
 
 ---
 

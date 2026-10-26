@@ -37,6 +37,7 @@
    ===================================================================== */
 
 import { readFileSync, existsSync } from 'node:fs';
+import vm from 'node:vm';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -69,23 +70,63 @@ function drift(label, where, want, got, fix) {
 /* ---- the authoritative constant ---------------------------------- */
 
 const nacSrc = read('js/nac.js');
-const authoritative = nacSrc.match(
-  new RegExp('\\bversion\\s*:\\s*\'(' + SEMVER + ')\'')
-);
-if (!authoritative) {
-  console.error('FAIL  cannot find the version constant in js/nac.js.');
-  console.error('      Expected a line like:  version: \'2.5.0\',');
-  console.error('      Without it there is no authoritative version to check against.');
-  process.exit(1);
-}
-const VERSION = authoritative[1];
 
-const specVersionMatch = nacSrc.match(/\bspec_version\s*:\s*'([0-9]+\.[0-9]+)'/);
-const SPEC_VERSION = specVersionMatch ? specVersionMatch[1] : null;
-if (!SPEC_VERSION) {
-  console.error('FAIL  cannot find the spec_version constant in js/nac.js.');
+/* THE SOURCE OF TRUTH IS WHAT THE RUNTIME EXPORTS, NOT WHAT THE FILE
+   SAYS ABOUT ITSELF (audit N-42).
+
+   This used to be a regex over the source, taking the FIRST
+   `version: '<semver>'` it found. In js/nac.js that is line 8 -- the
+   header COMMENT that quotes the constant -- and the real export is
+   the fifth such match, at the bottom of the file. So the lock that
+   exists to stop a published artefact from misdeclaring its own
+   version was reading that version out of a comment. Two consequences,
+   both measured:
+
+     - blank the export and leave the comment alone, and the gate
+       reported all 18 slots green over a runtime that exports no
+       version at all;
+     - move only the comment, and the gate adopts the comment as
+       authoritative and reports the EXPORT as the drifted slot -- it
+       would tell a maintainer to edit the artefact to match the
+       documentation. That is N-17 pointing backwards.
+
+   So the version is now read the way scripts/build-contract-api.mjs
+   reads it: by loading the exact published bytes in a vm sandbox and
+   asking the runtime what it exports. A comment cannot satisfy that,
+   and the header comment keeps its own probe below as a consumer that
+   has to agree. Same technique, same file, one source of truth. */
+const NAC = (() => {
+  const quiet = { log() {}, warn() {}, error() {}, info() {} };
+  const ctx = vm.createContext({ console: quiet });
+  try {
+    vm.runInContext(nacSrc, ctx, { filename: 'js/nac.js' });
+  } catch (e) {
+    console.error('FAIL  js/nac.js does not evaluate: ' + e.message);
+    console.error('      The version is read from what the runtime EXPORTS, so a runtime');
+    console.error('      that cannot load has no version to check against.');
+    process.exit(1);
+  }
+  if (!ctx.NAC || typeof ctx.NAC !== 'object') {
+    console.error('FAIL  js/nac.js installed no NAC export in the sandbox.');
+    process.exit(1);
+  }
+  return ctx.NAC;
+})();
+
+if (typeof NAC.version !== 'string' || !new RegExp('^' + SEMVER + '$').test(NAC.version)) {
+  console.error('FAIL  the NAC export carries no usable version (got ' + JSON.stringify(NAC.version) + ').');
+  console.error('      Expected the export at the bottom of js/nac.js to read:  version: \'2.5.0\',');
+  console.error('      Without it there is no authoritative version to check against -- and a');
+  console.error('      version quoted in a comment is documentation, not a declaration.');
   process.exit(1);
 }
+const VERSION = NAC.version;
+
+if (typeof NAC.spec_version !== 'string' || !/^[0-9]+\.[0-9]+$/.test(NAC.spec_version)) {
+  console.error('FAIL  the NAC export carries no usable spec_version (got ' + JSON.stringify(NAC.spec_version) + ').');
+  process.exit(1);
+}
+const SPEC_VERSION = NAC.spec_version;
 
 /* ---- probes -------------------------------------------------------
    Each probe collects EVERY version-shaped string in its slot and
@@ -250,10 +291,30 @@ expectAll('DECLARED', 'landing demo plugin manifests', 'index.html',
 /* --- CI: the deploy smoke check used to hard-code the versioned path,
        which meant a version bump failed the deploy. It must now derive
        it, so finding NO version here is the passing case. --- */
-expectAll('DECLARED', 'deploy smoke check derives the path', '.github/workflows/deploy.yml',
-  'js/(' + SEMVER + ')/nac\\.js',
-  'the deploy workflow hard-codes a version path -- read it from js/integrity.json instead',
-  { allowEmpty: true });
+/* Here, unlike every other slot, finding NO version is the ONLY pass.
+
+   expectAll asks "is every version found the right one", which let a
+   freshly hard-coded path through as long as it named the version being
+   shipped -- and then broke the deploy at the NEXT bump, which is the
+   exact failure this slot was added for. The comment already said
+   "finding NO version here is the passing case"; the code only started
+   enforcing it here (audit N-42). */
+(() => {
+  const label = 'deploy smoke check derives the path';
+  const file = '.github/workflows/deploy.yml';
+  if (!has(file)) {
+    drift(label, file, 'no version path', '(file not found)', 'restore the deploy workflow');
+    return;
+  }
+  const found = [...new Set(allMatches(read(file), 'js/(' + SEMVER + ')/nac\\.js'))];
+  if (found.length) {
+    drift(label, file, 'no version path at all', found.join(', '),
+      'the deploy workflow hard-codes a version path -- read it from js/integrity.json instead. '
+      + 'A path that is correct today fails the deploy at the next bump, which is why this slot exists.');
+  } else {
+    ok(label + ' [DECLARED]', file, 'no hard-coded version (correct)');
+  }
+})();
 
 /* --- the generated CLI: N-18 third bullet --- */
 expectAll('DERIVED', 'CLI reported version', 'runtime/dist/cli.js',
@@ -274,25 +335,59 @@ expectAll('DERIVED', 'type declaration headers', 'runtime/dist/nac-v2-extensions
        has to cover that source too -- otherwise the hard-coding simply
        moves one directory over and the gate keeps reporting green
        about a file nobody writes a version into any more. --- */
+/* Is this version literal a DECLARATION of the package's own version,
+   or prose that happens to name a version? (audit N-41)
+
+   The first cut of this lock answered "any bare x.y.z equal to the
+   version being shipped". That is right for code and wrong for prose,
+   and the two collide on exactly one day: the day the project ships a
+   stable version that its own comments already mention. Cutting 2.5.0
+   turned seven correct sentences red -- "before 2.5.0 the URL mode
+   aborted", "(pre-2.5.0 alias: ...)", "serve a runtime at 2.5.0 or
+   later" -- and left a maintainer two ways out: weaken the lock, or
+   reword true documentation to dodge a lint. Both teach the next
+   reader to stop believing this gate.
+
+   So the question is asked structurally instead of by digits. A literal
+   is a self-declaration when:
+     - it carries a prerelease tail -- 2.3.0-alpha.2 is never prose; or
+     - the WHOLE string literal is the version -- const V = '2.5.0',
+       version: '2.5.0'; that is the N-17 shape verbatim; or
+     - it is introduced as one -- preceded by `v`, by `version` and
+       punctuation, or by `@` as in @nac3/runtime@2.5.0.
+   Anything else -- a comment, or a version embedded in a longer
+   sentence -- is prose and stays legal.
+
+   Deliberately NOT a comment stripper: `//` lives inside every URL in
+   these files, so stripping to end-of-line could hide a real
+   declaration. This test never has to decide what is a comment, and
+   when it is unsure it flags -- fail closed. */
+function declaredVersions(src) {
+  const out = new Set();
+  const rx = new RegExp('(?<![0-9.])(' + SEMVER + ')', 'g');
+  let m;
+  while ((m = rx.exec(src)) !== null) {
+    const v = m[1];
+    if (v.includes('-')) { out.add(v); continue; }
+    if (v !== VERSION) continue;
+    const i = m.index;
+    const before = src[i - 1];
+    const after = src[i + v.length];
+    const isWholeString = (before === "'" || before === '"' || before === '`') && before === after;
+    const lead = src.slice(Math.max(0, i - 24), i);
+    const isIntroduced =
+      /(?:^|[^A-Za-z0-9])v$/.test(lead) ||
+      /version[^A-Za-z0-9]*$/i.test(lead) ||
+      lead.endsWith('@');
+    if (isWholeString || isIntroduced) out.add(v);
+  }
+  return [...out];
+}
+
 for (const file of ['runtime/build.mjs', 'runtime/src/cli.mjs', 'runtime/src/cli-url.mjs']) (() => {
   const label = 'generator carries no hard-coded version';
   const src = read(file);
-  /* What counts as a package version hard-coded into the generator:
-     anything carrying a prerelease tail (2.3.0-alpha.2 -- unambiguously
-     a package version, never prose), plus any bare x.y.z that equals
-     the version being shipped (so hard-coding the stable 2.5.0 is
-     caught too). What does NOT count: a bare x.y.z naming a past spec
-     feature, as in the comment "v1.4.1 -- ergonomic resolution". That
-     is documentation, it never reaches an artefact, and flagging it
-     would train the next reader to ignore this lock. */
-  const found = [...new Set(
-    /* Leading guard only. A trailing (?![0-9.]) looks right but makes
-       the engine backtrack into the prerelease tail when the version
-       ends a sentence, yielding a truncated "2.5.0-alph" -- the tail
-       pattern above already refuses to end on a dot. */
-    allMatches(src, '(?<![0-9.])(' + SEMVER + ')')
-      .filter((v) => v.includes('-') || v === VERSION)
-  )];
+  const found = declaredVersions(src);
   if (found.length > 0) {
     drift(label, file, 'no literal version', found.join(', '),
       'read the version from js/nac.js instead of writing it here -- that is the N-17 root cause');

@@ -80,6 +80,15 @@ jobs:
         # with the authoritative constant in js/nac.js.
         run: node scripts/check-version-coherence.mjs
 
+      - name: Version coherence gate goes red when it should
+        # A gate nobody proved red is a decoration, and this one was the
+        # last gate in the project with no behaviour tests. Writing the
+        # suite found two defects in it the same hour (N-41, N-42): it
+        # refused true documentation that names the shipping version, and
+        # it read the authoritative version out of a COMMENT, so it went
+        # green over a runtime that exported no version at all.
+        run: node scripts/test-version-gate.mjs
+
       - name: Contract API gate
         # Audit N-04 / N-14, owner decision D-02. The contract is
         # published as static JSON under api/, one frozen directory per

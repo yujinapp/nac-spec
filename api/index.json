@@ -1,6 +1,6 @@
 {
   "api_schema": 1,
-  "chain_head": "sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V",
+  "chain_head": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
   "entries": [
     {
       "channel": "prerelease",
@@ -27,13 +27,39 @@
       "published_at": "2026-10-24",
       "runtime_sha384": "sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp",
       "version": "2.5.0-alpha.5"
+    },
+    {
+      "channel": "stable",
+      "entry_sha384": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
+      "files": [
+        {
+          "bytes": 20595,
+          "path": "api/v/2.5.0/contract.json",
+          "sha384": "sha384-mYCMGTJWLRmkv/NddHFKlIRNQJeeT9DE+toQX5P7FdTPnCR5JVL6zCBOMLiZadHL"
+        },
+        {
+          "bytes": 15055,
+          "path": "api/v/2.5.0/findings.json",
+          "sha384": "sha384-QhxYtszb7INSJxvdhdDozr/ClxpAad95LLOxBrDUL4pVnqggjqFHvqYSgIrOuk12"
+        },
+        {
+          "bytes": 10397,
+          "path": "api/v/2.5.0/levels.json",
+          "sha384": "sha384-ix6C+7cnVI1dqjhoduW6U3eSFJBL1n8LbOpJl9uLN52M5knHZtAJcwqhcyvclPxm"
+        }
+      ],
+      "generated_at_commit": "4da473e822067553ec618c6406ff2125cd4b5c17",
+      "prev_entry_sha384": "sha384-5PqxVX3z3QQlXjwqyGZcmoXaB+3+Ice3v9uPyAE8WOklYtIi7pDI2JGxqkEowi1V",
+      "published_at": "2026-10-26",
+      "runtime_sha384": "sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE",
+      "version": "2.5.0"
     }
   ],
-  "entry_count": 1,
+  "entry_count": 2,
   "generated_by": "scripts/build-contract-api.mjs",
   "policy": {
     "append_only": true,
-    "note": "Each entry carries the hash of the previous entry. The head below is also recorded in the git history of this repository and in the published npm tarball: three independent witnesses. Verify the head against all three before trusting the contract.",
+    "note": "Each entry carries the hash of the previous entry. The head below has three independent witnesses, each held by a different operator: (1) this file, served by the web host; (2) the git history of api/index.json in the source repository; (3) contract-head.json inside the published @nac3/runtime tarball, from 2.5.0 onward -- releases before 2.5.0 were published before this API existed and carry no copy. Compare the head against all three before trusting the contract: a compromise of the web host alone moves only one of them.",
     "versions_are_never_purged": true,
     "versions_are_never_rewritten": true
   },

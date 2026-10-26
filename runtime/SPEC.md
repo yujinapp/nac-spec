@@ -1,6 +1,6 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.0-alpha.5 (alpha.4 + Blocks B/C/D -- narrate, context+tree, expect+diff -- complete v2.5 surface SHIPPED)
+**Version:** 2.5.0 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
 **Status:** v2.5.0-alpha.5 -- all 8 SHIPPED RFCs (V24-01/02/04/05 + V25-01/02/03/04) have runtime + Layer 2 visual + Layer 3 Pilot LIVE evidence. Promoted to npm dist-tag `latest`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)

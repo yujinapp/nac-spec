@@ -1,13 +1,13 @@
 {
   "generated_by": "scripts/build-integrity.mjs",
-  "version": "2.5.0-alpha.5",
-  "immutable_path": "js/2.5.0-alpha.5/nac.js",
+  "version": "2.5.0",
+  "immutable_path": "js/2.5.0/nac.js",
   "mutable_alias": "js/nac.js",
   "files": [
     {
       "path": "js/nac.js",
-      "bytes": 344665,
-      "sha384": "sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp"
+      "bytes": 349103,
+      "sha384": "sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"
     },
     {
       "path": "js/nac-v2-extensions.js",

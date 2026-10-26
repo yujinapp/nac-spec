@@ -1,0 +1,928 @@
+{
+  "api": {
+    "functions": [
+      {
+        "arity": 3,
+        "name": "NacError"
+      },
+      {
+        "arity": 1,
+        "name": "action_undo_window_ms"
+      },
+      {
+        "arity": 1,
+        "name": "action_undoable"
+      },
+      {
+        "arity": 2,
+        "name": "add_tag"
+      },
+      {
+        "arity": 3,
+        "name": "assert_event_count"
+      },
+      {
+        "arity": 2,
+        "name": "assert_event_fired"
+      },
+      {
+        "arity": 3,
+        "name": "bindAction"
+      },
+      {
+        "arity": 4,
+        "name": "bindTab"
+      },
+      {
+        "arity": 2,
+        "name": "calendar_go_to"
+      },
+      {
+        "arity": 1,
+        "name": "calendar_list_events"
+      },
+      {
+        "arity": 1,
+        "name": "calendar_select_event"
+      },
+      {
+        "arity": 2,
+        "name": "calendar_view"
+      },
+      {
+        "arity": 3,
+        "name": "call"
+      },
+      {
+        "arity": 0,
+        "name": "capabilities"
+      },
+      {
+        "arity": 2,
+        "name": "carousel_advance"
+      },
+      {
+        "arity": 2,
+        "name": "carousel_autoplay"
+      },
+      {
+        "arity": 1,
+        "name": "carousel_state"
+      },
+      {
+        "arity": 2,
+        "name": "carousel_to"
+      },
+      {
+        "arity": 1,
+        "name": "chart_data"
+      },
+      {
+        "arity": 2,
+        "name": "chart_filter"
+      },
+      {
+        "arity": 3,
+        "name": "chart_toggle_series"
+      },
+      {
+        "arity": 2,
+        "name": "check_canonical_shape"
+      },
+      {
+        "arity": 2,
+        "name": "click"
+      },
+      {
+        "arity": 3,
+        "name": "click_by_verb"
+      },
+      {
+        "arity": 1,
+        "name": "close_drawer"
+      },
+      {
+        "arity": 1,
+        "name": "command_failed"
+      },
+      {
+        "arity": 1,
+        "name": "command_rejected"
+      },
+      {
+        "arity": 2,
+        "name": "confirm"
+      },
+      {
+        "arity": 3,
+        "name": "confirm_action"
+      },
+      {
+        "arity": 1,
+        "name": "context"
+      },
+      {
+        "arity": 0,
+        "name": "describe"
+      },
+      {
+        "arity": 3,
+        "name": "diff"
+      },
+      {
+        "arity": 1,
+        "name": "dismiss_banner"
+      },
+      {
+        "arity": 1,
+        "name": "dismiss_toast"
+      },
+      {
+        "arity": 3,
+        "name": "drag_drop"
+      },
+      {
+        "arity": 1,
+        "name": "edit_field"
+      },
+      {
+        "arity": 3,
+        "name": "emit_dual"
+      },
+      {
+        "arity": 4,
+        "name": "expect"
+      },
+      {
+        "arity": 3,
+        "name": "fill"
+      },
+      {
+        "arity": 2,
+        "name": "find"
+      },
+      {
+        "arity": 2,
+        "name": "fullscreen"
+      },
+      {
+        "arity": 0,
+        "name": "get_validation_tolerance"
+      },
+      {
+        "arity": 1,
+        "name": "go_to_section"
+      },
+      {
+        "arity": 1,
+        "name": "grantCapability"
+      },
+      {
+        "arity": 1,
+        "name": "has_authority"
+      },
+      {
+        "arity": 3,
+        "name": "invalidate_options"
+      },
+      {
+        "arity": 3,
+        "name": "invoke"
+      },
+      {
+        "arity": 0,
+        "name": "is_blocked"
+      },
+      {
+        "arity": 1,
+        "name": "list"
+      },
+      {
+        "arity": 0,
+        "name": "list_banners"
+      },
+      {
+        "arity": 0,
+        "name": "list_breadcrumbs"
+      },
+      {
+        "arity": 0,
+        "name": "list_carousels"
+      },
+      {
+        "arity": 1,
+        "name": "list_markers"
+      },
+      {
+        "arity": 0,
+        "name": "list_pending_confirms"
+      },
+      {
+        "arity": 0,
+        "name": "list_registered_plugins"
+      },
+      {
+        "arity": 0,
+        "name": "list_sections"
+      },
+      {
+        "arity": 1,
+        "name": "list_tags"
+      },
+      {
+        "arity": 0,
+        "name": "list_timelines"
+      },
+      {
+        "arity": 0,
+        "name": "list_toasts"
+      },
+      {
+        "arity": 1,
+        "name": "manifest"
+      },
+      {
+        "arity": 4,
+        "name": "map_focus"
+      },
+      {
+        "arity": 1,
+        "name": "map_select_marker"
+      },
+      {
+        "arity": 3,
+        "name": "map_toggle_layer"
+      },
+      {
+        "arity": 0,
+        "name": "markHydrationComplete"
+      },
+      {
+        "arity": 1,
+        "name": "maximize"
+      },
+      {
+        "arity": 1,
+        "name": "minimize"
+      },
+      {
+        "arity": 2,
+        "name": "narrate"
+      },
+      {
+        "arity": 1,
+        "name": "navigate_breadcrumb"
+      },
+      {
+        "arity": 2,
+        "name": "open_drawer"
+      },
+      {
+        "arity": 1,
+        "name": "options"
+      },
+      {
+        "arity": 2,
+        "name": "peek_drawer"
+      },
+      {
+        "arity": 1,
+        "name": "perf_probe"
+      },
+      {
+        "arity": 2,
+        "name": "read"
+      },
+      {
+        "arity": 0,
+        "name": "read_feedback"
+      },
+      {
+        "arity": 1,
+        "name": "recommended_remediation"
+      },
+      {
+        "arity": 2,
+        "name": "register"
+      },
+      {
+        "arity": 2,
+        "name": "registerPlugin"
+      },
+      {
+        "arity": 2,
+        "name": "remove_tag"
+      },
+      {
+        "arity": 3,
+        "name": "reorder"
+      },
+      {
+        "arity": 1,
+        "name": "replay_pending"
+      },
+      {
+        "arity": 3,
+        "name": "request_authority"
+      },
+      {
+        "arity": 1,
+        "name": "reset"
+      },
+      {
+        "arity": 1,
+        "name": "restore"
+      },
+      {
+        "arity": 1,
+        "name": "revokeCapability"
+      },
+      {
+        "arity": 1,
+        "name": "revoke_authority"
+      },
+      {
+        "arity": 3,
+        "name": "richtext_format"
+      },
+      {
+        "arity": 3,
+        "name": "richtext_insert_link"
+      },
+      {
+        "arity": 3,
+        "name": "richtext_insert_mention"
+      },
+      {
+        "arity": 0,
+        "name": "screenshot"
+      },
+      {
+        "arity": 3,
+        "name": "search_options"
+      },
+      {
+        "arity": 3,
+        "name": "select"
+      },
+      {
+        "arity": 1,
+        "name": "setCapabilities"
+      },
+      {
+        "arity": 1,
+        "name": "set_a11y_hint_localizer"
+      },
+      {
+        "arity": 1,
+        "name": "set_capabilities_provider"
+      },
+      {
+        "arity": 1,
+        "name": "set_confirm_handler"
+      },
+      {
+        "arity": 1,
+        "name": "set_hint_priority"
+      },
+      {
+        "arity": 1,
+        "name": "set_mode"
+      },
+      {
+        "arity": 3,
+        "name": "set_options_resolver"
+      },
+      {
+        "arity": 2,
+        "name": "set_reset_provider"
+      },
+      {
+        "arity": 1,
+        "name": "set_system_map_provider"
+      },
+      {
+        "arity": 1,
+        "name": "set_validation_tolerance"
+      },
+      {
+        "arity": 2,
+        "name": "sign_provenance"
+      },
+      {
+        "arity": 0,
+        "name": "snapshot_state"
+      },
+      {
+        "arity": 1,
+        "name": "sort_hints_by_priority"
+      },
+      {
+        "arity": 1,
+        "name": "step_back"
+      },
+      {
+        "arity": 1,
+        "name": "step_next"
+      },
+      {
+        "arity": 1,
+        "name": "step_state"
+      },
+      {
+        "arity": 2,
+        "name": "step_to"
+      },
+      {
+        "arity": 3,
+        "name": "subscribe"
+      },
+      {
+        "arity": 2,
+        "name": "syncPlugin"
+      },
+      {
+        "arity": 0,
+        "name": "system_map"
+      },
+      {
+        "arity": 0,
+        "name": "system_map_layers"
+      },
+      {
+        "arity": 3,
+        "name": "tab"
+      },
+      {
+        "arity": 3,
+        "name": "tab_by_label"
+      },
+      {
+        "arity": 2,
+        "name": "timeline_load_newer"
+      },
+      {
+        "arity": 2,
+        "name": "timeline_load_older"
+      },
+      {
+        "arity": 1,
+        "name": "timeline_state"
+      },
+      {
+        "arity": 2,
+        "name": "toast"
+      },
+      {
+        "arity": 2,
+        "name": "tree"
+      },
+      {
+        "arity": 1,
+        "name": "tree_collapse"
+      },
+      {
+        "arity": 1,
+        "name": "tree_expand"
+      },
+      {
+        "arity": 1,
+        "name": "tree_path"
+      },
+      {
+        "arity": 1,
+        "name": "tree_select"
+      },
+      {
+        "arity": 1,
+        "name": "unregister"
+      },
+      {
+        "arity": 1,
+        "name": "unsubscribe"
+      },
+      {
+        "arity": 0,
+        "name": "userCapabilities"
+      },
+      {
+        "arity": 2,
+        "name": "utter"
+      },
+      {
+        "arity": 1,
+        "name": "validate"
+      },
+      {
+        "arity": 2,
+        "name": "validate_event_conformance"
+      },
+      {
+        "arity": 0,
+        "name": "validate_global"
+      },
+      {
+        "arity": 2,
+        "name": "verify_provenance"
+      },
+      {
+        "arity": 1,
+        "name": "versionHistory"
+      },
+      {
+        "arity": 2,
+        "name": "wait_for"
+      }
+    ],
+    "note": "The exported surface of the runtime, read by loading the published bytes and enumerating the export. Arity is the declared parameter count, not a schema.",
+    "values": [
+      {
+        "name": "HARD_DEDUP",
+        "type": "boolean"
+      },
+      {
+        "name": "STRICT_VALIDATION",
+        "type": "boolean"
+      },
+      {
+        "name": "STRICT_VERSIONING",
+        "type": "boolean"
+      },
+      {
+        "name": "__nac_v1_installed",
+        "type": "boolean"
+      },
+      {
+        "name": "config",
+        "type": "object"
+      },
+      {
+        "name": "conformance_tier",
+        "type": "string"
+      },
+      {
+        "name": "eager_hashing",
+        "type": "boolean"
+      },
+      {
+        "name": "errors",
+        "type": "object"
+      },
+      {
+        "name": "spec_version",
+        "type": "string"
+      },
+      {
+        "name": "version",
+        "type": "string"
+      }
+    ]
+  },
+  "api_schema": 1,
+  "attributes": [
+    "data-nac-a11y-hint",
+    "data-nac-a11y-hint-span-id",
+    "data-nac-action",
+    "data-nac-braille-label",
+    "data-nac-cell",
+    "data-nac-confirmation-message",
+    "data-nac-date",
+    "data-nac-default-hidden",
+    "data-nac-default-state",
+    "data-nac-default-value",
+    "data-nac-drag-accept",
+    "data-nac-drag-type",
+    "data-nac-end",
+    "data-nac-error",
+    "data-nac-field-type",
+    "data-nac-focus-pulse",
+    "data-nac-id",
+    "data-nac-label",
+    "data-nac-lat",
+    "data-nac-leaf",
+    "data-nac-level",
+    "data-nac-lng",
+    "data-nac-opens",
+    "data-nac-ordering",
+    "data-nac-peek-pct",
+    "data-nac-plugin",
+    "data-nac-plugin-bus",
+    "data-nac-plugin-id",
+    "data-nac-plugin-state",
+    "data-nac-position",
+    "data-nac-role",
+    "data-nac-section-visited",
+    "data-nac-severity",
+    "data-nac-shadow",
+    "data-nac-skip-reason",
+    "data-nac-soft",
+    "data-nac-start",
+    "data-nac-state",
+    "data-nac-tab",
+    "data-nac-ts",
+    "data-nac-validate",
+    "data-nac-value",
+    "data-nac-verb",
+    "data-nac-view",
+    "data-nac-was-expanded",
+    "data-nac-x",
+    "data-nac-y",
+    "data-nac-zoom"
+  ],
+  "channel": "stable",
+  "common_verbs": {
+    "duplicate_verb_is_a_finding": true,
+    "note": "Verbs are free-form snake_case identifiers agreed between host and agent. This list is conventional, not exhaustive, and not normative.",
+    "verbs": [
+      "save",
+      "cancel",
+      "submit",
+      "delete",
+      "edit",
+      "view",
+      "create",
+      "approve",
+      "reject",
+      "send",
+      "download",
+      "upload",
+      "refresh",
+      "expand",
+      "collapse",
+      "open",
+      "close",
+      "add_row",
+      "remove_row"
+    ]
+  },
+  "conformance_tier": {
+    "declared_by_this_runtime": "NAC-3-versioned",
+    "defined_in": "docs/RFC_V24-04.md section 6",
+    "field": "conformance_tier",
+    "level_vocabulary": "levels.json -- id pattern nac3-conformance-level-<1|2|3>",
+    "not_a_level": true,
+    "note": "A TIER is not a LEVEL. A tier describes what the RUNTIME on the page implements (RFC V24-04 section 6, read off NAC.conformance_tier); a conformance level describes what the PAGE declares and does (SPEC.md section 8, reported by the CLI validator against the identifiers in levels.json). They are separate taxonomies with separate identifiers and neither implies the other. Published as a vocabulary since 2.5.0: before that the contract published this field as type \"string\" and not its values, so a machine saw the field and had no way to learn that \"NAC-3-versioned\" is not a level name (audit N-29).",
+    "values": [
+      {
+        "requires": "Reject every expected_* parameter with feature_not_supported.",
+        "value": "NAC-3",
+        "what": "The v2.3 baseline: the runtime implements the roles, verbs and completion events of the main spec and nothing of the V24-04 snapshot machinery. A mutating call that arrives carrying an expected_* parameter MUST be rejected with feature_not_supported; silently ignoring it is non-conformant, because an agent that believes its optimistic-concurrency guard was honoured is worse off than one that knows it was refused."
+      },
+      {
+        "requires": "Honour every expected_* parameter on every mutating call, and expose the three version tokens in describe().",
+        "value": "NAC-3-versioned",
+        "what": "The baseline plus snapshot versioning: describe() returns plugin_version per plugin, tree_version at the top level and element_state_hash on every agent-relevant element; the runtime emits nac:plugin:invalidated, nac:tree:invalidated and the hydration completion event; and every mutating call honours expected_plugin_version, expected_tree_version and expected_element_state_hash. This is the tier the reference runtime declares."
+      },
+      {
+        "requires": "Set STRICT_VERSIONING = true and reject every mutating call that carries no expected_* parameter.",
+        "value": "NAC-3-strict",
+        "what": "The versioned tier plus enforcement: STRICT_VERSIONING is on before any agent interaction and every mutating call that arrives WITHOUT at least one expected_* parameter is rejected. It differs from the versioned tier only in enforcement, not in features exposed -- which is what closed the silent-ignore hole where a versioned runtime received expected_element_state_hash and discarded it."
+      }
+    ]
+  },
+  "events": [
+    "nac:accordion:collapsed",
+    "nac:accordion:expanded",
+    "nac:action:confirm:denied",
+    "nac:action:confirm:granted",
+    "nac:action:confirm:requested",
+    "nac:action:dispatching",
+    "nac:action:failed",
+    "nac:action:requested",
+    "nac:action:succeeded",
+    "nac:banner:dismissed",
+    "nac:breadcrumb:navigated",
+    "nac:calendar:date_selected",
+    "nac:calendar:event_clicked",
+    "nac:calendar:event_selected",
+    "nac:calendar:view_changed",
+    "nac:carousel:advanced",
+    "nac:carousel:autoplay_paused",
+    "nac:carousel:autoplay_resumed",
+    "nac:carousel:slide_changed",
+    "nac:chart:data_loaded",
+    "nac:chart:filtered",
+    "nac:chart:series_toggled",
+    "nac:command:failed",
+    "nac:command:rejected",
+    "nac:confirm:cancelled",
+    "nac:confirm:confirmed",
+    "nac:confirm:requested",
+    "nac:confirm:resolved",
+    "nac:disambiguation_requested",
+    "nac:drag:cancelled",
+    "nac:drag:dropped",
+    "nac:drag:over",
+    "nac:drag:started",
+    "nac:drawer:closed",
+    "nac:drawer:opened",
+    "nac:drawer:peek",
+    "nac:editor:closed",
+    "nac:editor:opened",
+    "nac:fatal",
+    "nac:field:changed",
+    "nac:focus:moved",
+    "nac:installed",
+    "nac:list:reordered",
+    "nac:map:focused",
+    "nac:map:layer_toggled",
+    "nac:map:marker_clicked",
+    "nac:map:marker_selected",
+    "nac:map:moved",
+    "nac:map:zoom_changed",
+    "nac:mode:requested",
+    "nac:plugin:closed",
+    "nac:plugin:invalidated",
+    "nac:plugin:maximized",
+    "nac:plugin:minimized",
+    "nac:plugin:opened",
+    "nac:plugin:reset",
+    "nac:plugin:restored",
+    "nac:registered",
+    "nac:richtext:format_applied",
+    "nac:richtext:formatted",
+    "nac:richtext:link_inserted",
+    "nac:richtext:mention_picked",
+    "nac:section:collapsed",
+    "nac:section:expanded",
+    "nac:section:reached",
+    "nac:shadow_blocked",
+    "nac:shadow_protocol_violation",
+    "nac:slider:value_changed",
+    "nac:state:changed",
+    "nac:step:advanced",
+    "nac:step:back",
+    "nac:step:completed",
+    "nac:tab:activated",
+    "nac:tab:activation_failed",
+    "nac:tab:changed",
+    "nac:table:filter_changed",
+    "nac:table:page_changed",
+    "nac:table:sort_changed",
+    "nac:tags:added",
+    "nac:tags:removed",
+    "nac:timeline:loaded",
+    "nac:timeline:loaded_more",
+    "nac:toast:dismissed",
+    "nac:toast:fired",
+    "nac:toast:shown",
+    "nac:tree:collapsed",
+    "nac:tree:expanded",
+    "nac:tree:invalidated",
+    "nac:tree:selected"
+  ],
+  "generated_by": "scripts/build-contract-api.mjs",
+  "generated_from": {
+    "runtime_bytes": 349103,
+    "runtime_path": "js/nac.js",
+    "runtime_sha384": "sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE",
+    "spec_path": "SPEC.md",
+    "spec_sha384": "sha384-YqR+nBB9RdrA4l7JvB5SYFchPIgoR48PAO9n741/qGrE+f6bnLg6HTj0ogw0tu40"
+  },
+  "locales": {
+    "note": "Every label_i18n MUST cover all 10 locales (SPEC.md section 4.3). This is a requirement on the adopter manifest, not on the language of the specification.",
+    "required": [
+      "es",
+      "en",
+      "pt",
+      "fr",
+      "ja",
+      "zh",
+      "hi",
+      "ar",
+      "de",
+      "it"
+    ]
+  },
+  "protocol": "NAC3",
+  "roles": [
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "plugin"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "section"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "region"
+    },
+    {
+      "completion_events": [
+        "nac:action:succeeded",
+        "nac:action:failed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "action"
+    },
+    {
+      "completion_events": [
+        "nac:field:changed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "field"
+    },
+    {
+      "completion_events": [
+        "nac:field:changed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "option"
+    },
+    {
+      "completion_events": [
+        "nac:tab:activated"
+      ],
+      "declared_in_spec_table": true,
+      "role": "tab"
+    },
+    {
+      "completion_events": [
+        "nac:breadcrumb:navigated"
+      ],
+      "declared_in_spec_table": true,
+      "role": "breadcrumb-item"
+    },
+    {
+      "completion_events": [
+        "nac:accordion:expanded",
+        "nac:accordion:collapsed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "accordion-toggle"
+    },
+    {
+      "completion_events": [
+        "nac:step:advanced"
+      ],
+      "declared_in_spec_table": true,
+      "role": "step"
+    },
+    {
+      "completion_events": [
+        "nac:table:page_changed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "pagination-item"
+    },
+    {
+      "completion_events": [
+        "nac:confirm:resolved",
+        "nac:confirm:cancelled"
+      ],
+      "declared_in_spec_table": true,
+      "role": "confirm-button"
+    },
+    {
+      "completion_events": [
+        "nac:table:sort_changed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "sort-control"
+    },
+    {
+      "completion_events": [
+        "nac:table:filter_changed"
+      ],
+      "declared_in_spec_table": true,
+      "role": "filter-control"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "data-table"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "navigation"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "confirm-dialog"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "draggable"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "drop-target"
+    },
+    {
+      "completion_events": [],
+      "declared_in_spec_table": true,
+      "role": "button"
+    }
+  ],
+  "spec_version": "2.5",
+  "surface": "contract",
+  "version": "2.5.0"
+}

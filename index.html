@@ -841,7 +841,7 @@
   <div class="container">
     <span class="kanji" aria-hidden="true">&#27005;</span>
     <span class="brand">NAC<small>Native Agent Contract</small></span>
-    <span class="pill">v2.5.0-alpha.5 &middot; alpha</span>
+    <span class="pill">v2.5.0 &middot; stable</span>
     <button class="icon-btn"
             id="autopilot-toggle"
             data-nac-id="nac_landing.autopilot.toggle"
@@ -1123,11 +1123,11 @@ await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="stri
     <p class="section-lede" style="margin-top: 24px;">Add the runtime once. Production pins the immutable path and verifies it with a hash:</p>
 <pre>npm install @nac3/runtime
 <span class="comment">// or via CDN:</span>
-&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0-alpha.5/nac.js"</span>
-        integrity=<span class="string">"sha384-JWmlAZyztLTUdWDFM5mBeXAX13iRTXEw//7eK5YpblEEZ/81A50WTmWWS9QwzqrJ"</span>
+&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
+        integrity=<span class="string">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
         crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;</pre>
 
-    <p class="section-lede"><strong>Which URL.</strong> <code>js/2.5.0-alpha.5/nac.js</code> is immutable -- those bytes never change, so pin it in production. <code>js/nac.js</code> is a moving alias that always serves the newest build; use it only to try things, never to pin. The <code>integrity</code> attribute makes the browser refuse a file that does not match the published hash, so a corrupted or substituted download fails loudly instead of running.</p>
+    <p class="section-lede"><strong>Which URL.</strong> <code>js/2.5.0/nac.js</code> is immutable -- those bytes never change, so pin it in production. <code>js/nac.js</code> is a moving alias that always serves the newest build; use it only to try things, never to pin. The <code>integrity</code> attribute makes the browser refuse a file that does not match the published hash, so a corrupted or substituted download fails loudly instead of running.</p>
 
     <p class="section-lede"><strong>Recompute the hash yourself.</strong> Do not take the value above on faith:</p>
 <pre><span class="comment"># one line, no dependencies -- prints the same string that is in the tag</span>
@@ -1652,7 +1652,7 @@ node scripts/build-integrity.mjs</pre>
     <a href="https://rpaforce.com"
        data-nac-id="nac_landing.footer.yujin"
        data-nac-role="action" data-nac-action="open">Yujin</a>
-    <span style="margin-left: auto; color: var(--color-text-3);">v2.5.0-alpha.5 &middot; 2026-05-25</span>
+    <span style="margin-left: auto; color: var(--color-text-3);">v2.5.0 &middot; 2026-10-26</span>
   </div>
 </footer>
 
@@ -1721,7 +1721,7 @@ node scripts/build-integrity.mjs</pre>
 <!-- ============== NAC runtime + chat ============== -->
 <!-- Hashes are produced by scripts/build-integrity.mjs and checked in CI.
      Never hand-edit them: a stale hash is a blocked deploy, on purpose. -->
-<script src="js/2.5.0-alpha.5/nac.js" integrity="sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp" crossorigin="anonymous"></script>
+<script src="js/2.5.0/nac.js" integrity="sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE" crossorigin="anonymous"></script>
 <script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
 <script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
 
@@ -1745,7 +1745,7 @@ node scripts/build-integrity.mjs</pre>
 
     NAC.register({
       plugin_slug: 'nac_landing',
-      version: '2.5.0-alpha.5',
+      version: '2.5.0',
       nac_version: '2.5',
       elements: [
         /* Topbar */
@@ -1886,7 +1886,7 @@ node scripts/build-integrity.mjs</pre>
     /* Chat plugin manifest -- registered separately so chat is its own plugin scope. */
     NAC.register({
       plugin_slug: 'chat',
-      version: '2.5.0-alpha.5',
+      version: '2.5.0',
       nac_version: '2.5',
       elements: [
         { id: 'chat.lang', role: 'field',

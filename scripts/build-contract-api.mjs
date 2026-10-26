@@ -98,6 +98,15 @@ const META_PATH  = join(ROOT, 'scripts', 'contract-api.meta.json');
 const TRUST_PATH = join(API_DIR, 'trust.json');
 const ATTEST_PATH = join(API_DIR, 'attestation.json');
 const WITNESS_DOC_PATH = join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md');
+/* The third witness of the chain head, and the only one that does not
+   live in this repository: it rides inside the npm tarball (audit
+   N-24). Written by --write, required by check mode, and listed in
+   runtime/package.json "files" -- the gate checks that too, because a
+   witness that exists on disk and never ships is the same published
+   promise pointing at nothing that N-24 was about. */
+const PKG_WITNESS_PATH = join(ROOT, 'runtime', 'contract-head.json');
+const PKG_WITNESS_REL  = 'contract-head.json';
+const PKG_MANIFEST_PATH = join(ROOT, 'runtime', 'package.json');
 const W_BEGIN = '<!-- NAC3-WITNESS-BEGIN -->';
 const W_END   = '<!-- NAC3-WITNESS-END -->';
 
@@ -713,12 +722,88 @@ function buildIndex(entries) {
       append_only: true,
       versions_are_never_purged: true,
       versions_are_never_rewritten: true,
-      note: 'Each entry carries the hash of the previous entry. The head below is also recorded in the git history of this repository and in the published npm tarball: three independent witnesses. Verify the head against all three before trusting the contract.',
+      note: 'Each entry carries the hash of the previous entry. The head below has three independent witnesses, each held by a different operator: (1) this file, served by the web host; (2) the git history of api/index.json in the source repository; (3) contract-head.json inside the published @nac3/runtime tarball, from 2.5.0 onward -- releases before 2.5.0 were published before this API existed and carry no copy. Compare the head against all three before trusting the contract: a compromise of the web host alone moves only one of them.',
     },
     chain_head: entries.length ? entries[entries.length - 1].entry_sha384 : null,
     entry_count: entries.length,
     entries,
   };
+}
+
+/* ---- the packaged witness (audit N-24) ----------------------------
+   api/index.json told a consumer to compare the head against three
+   witnesses and the third one did not exist. This is it. It carries
+   nothing derived from itself: just the head, the version it belongs
+   to, and the addresses of the other two, so a reader holding only an
+   unpacked tarball knows where to look. */
+
+function buildHeadWitness(index, version, publishedAt) {
+  return {
+    api_schema: API_SCHEMA,
+    protocol: 'NAC3',
+    surface: 'contract-head-witness',
+    generated_by: 'scripts/build-contract-api.mjs',
+    runtime_version: version,
+    published_at: publishedAt,
+    chain_head: index.chain_head,
+    entry_count: index.entry_count,
+    witnesses: {
+      host: 'api/index.json served by the web host (chain_head)',
+      repository: 'the git history of api/index.json in the source repository',
+      package: 'this file, inside the published @nac3/runtime tarball',
+    },
+    note: 'The third of three independent witnesses of the contract chain head (audit N-24). This copy is immutable once published: npm does not allow a version to be republished, so a host that rewrites the chain cannot reach back and change it. If this head disagrees with the one the host serves for this version, do not trust the host. Present from 2.5.0 onward; earlier releases were published before this API existed.',
+  };
+}
+
+/* Check mode is what CI runs before the upload, so a missing or stale
+   packaged witness is red THERE -- in --write it is simply written. */
+function verifyPackagedWitness(index, version) {
+  if (!existsSync(PKG_WITNESS_PATH)) {
+    fail('runtime/' + PKG_WITNESS_REL + ' is missing: api/index.json declares a witness inside the npm tarball and there is none (audit N-24)');
+    note('write it with: node scripts/build-contract-api.mjs --write');
+    return;
+  }
+  let w;
+  try {
+    w = JSON.parse(readFileSync(PKG_WITNESS_PATH, 'utf8'));
+  } catch (e) {
+    fail('runtime/' + PKG_WITNESS_REL + ' is not valid JSON: ' + e.message);
+    return;
+  }
+  const bad = [];
+  if (w.chain_head !== index.chain_head) {
+    bad.push('chain_head=' + w.chain_head + ' and the published chain head is ' + index.chain_head);
+  }
+  if (w.runtime_version !== version) {
+    bad.push('runtime_version=' + w.runtime_version + ' and the runtime is ' + version);
+  }
+  if (w.entry_count !== index.entry_count) {
+    bad.push('entry_count=' + w.entry_count + ' and the chain has ' + index.entry_count);
+  }
+  if (bad.length) {
+    fail('the packaged witness disagrees with the published chain: ' + bad.join('; '));
+    note('a drifted witness is worse than no witness -- rewrite it: node scripts/build-contract-api.mjs --write');
+    return;
+  }
+  /* A witness that never ships is the N-24 defect wearing a file name.
+     The sandbox of the gate suite has no runtime/package.json, so this
+     half is checked only where a manifest exists. */
+  if (existsSync(PKG_MANIFEST_PATH)) {
+    let files = null;
+    try {
+      files = JSON.parse(readFileSync(PKG_MANIFEST_PATH, 'utf8')).files;
+    } catch (e) {
+      fail('runtime/package.json is not valid JSON: ' + e.message);
+      return;
+    }
+    if (!Array.isArray(files) || files.indexOf(PKG_WITNESS_REL) < 0) {
+      fail('runtime/package.json does not list "' + PKG_WITNESS_REL + '" in "files", so the witness never reaches the tarball (audit N-24)');
+      note('add "' + PKG_WITNESS_REL + '" to the "files" array of runtime/package.json');
+      return;
+    }
+  }
+  ok('the packaged witness records the published chain head (3rd witness, audit N-24)');
 }
 
 function verifyChain(index) {
@@ -1217,6 +1302,8 @@ function main() {
     /* Hard here: this is the mode CI runs before the upload. */
     verifyAttestation(existingIndex, readFileSync(existingIndexPath), true);
     verifyWitnessRecord(existingIndex, readFileSync(existingIndexPath), true);
+    /* The third witness of the head, the one that ships (audit N-24). */
+    verifyPackagedWitness(existingIndex, version);
     if (failed) process.exit(1);
     console.log('');
     console.log('Contract API is coherent.');
@@ -1270,6 +1357,14 @@ function main() {
     writeBytes(join(LATEST_DIR, name), bytesOf[name]);
   }
   console.log('WRITE api/latest/ (mirror of ' + entry.version + ')');
+
+  /* The witness that rides inside the tarball (audit N-24). Written
+     last because it records the head, and the head is only final once
+     the index is. It is NOT part of any entry, so writing it cannot
+     move the chain it witnesses. */
+  const headWitness = buildHeadWitness(index, entry.version, entry.published_at);
+  writeBytes(PKG_WITNESS_PATH, toBytes(canonical(headWitness), 'runtime/' + PKG_WITNESS_REL));
+  console.log('WRITE runtime/' + PKG_WITNESS_REL + ' (head ' + String(index.chain_head).slice(7, 19) + '... , 3rd witness)');
 
   /* Soft here on purpose: the chain just moved, so an existing
      signature is stale BY DESIGN and signing is the next step. Check

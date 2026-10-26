@@ -35,6 +35,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -364,6 +365,99 @@ expectRed(
   'ENOENT'
 );
 
+/* ---- 7. the adopter copy-paste snippet (audit N-40) ---------------
+   The page carries the runtime hash TWICE: on the real <script> tag,
+   and inside an HTML-escaped snippet an adopter is invited to copy.
+   Only the first had a producer and only the first was ever checked,
+   so when dcb71ea moved the hash from CRLF bytes to LF bytes the
+   snippet kept advertising a value that matches no file that has
+   ever been published. Two days in public on the protocol's own
+   landing page, and the failure mode is a console line: a browser
+   that refuses to execute the runtime, quietly.
+
+   Both halves get a case: the gate must REFUSE an unpublished hash
+   wherever it is printed, and --write must be the one that writes
+   the snippet's hash so nobody retypes it. */
+
+/* A syntactically valid sha384 of the right shape that belongs to no
+   file -- which is exactly what a stale hash is. */
+const BOGUS_SRI = 'sha384-' + 'B0gus'.repeat(12) + 'xy==';
+
+const snippetHashRx =
+  /(&lt;script src=<span class="string">"[^"]*\/nac\.js"<\/span>\s*\n\s*integrity=<span class="string">")(sha384-[A-Za-z0-9+/=]+)(")/;
+
+function snippetHashOf(dir) {
+  const m = readFileSync(join(dir, 'index.html'), 'utf8').match(snippetHashRx);
+  return m ? m[2] : null;
+}
+
+function publishedRuntimeHash(dir) {
+  return JSON.parse(readFileSync(join(dir, 'js', 'integrity.json'), 'utf8'))
+    .files.find((f) => f.path === 'js/nac.js').sha384;
+}
+
+/* The baseline must already have a snippet whose hash is the real one.
+   Without this the two cases below could both be green on a tree
+   where the snippet carries no hash at all -- green over nothing,
+   which is the shape of mistake this suite exists to refuse. */
+expectGreen('the baseline snippet advertises the published hash', [], null, (dir) => {
+  const got = snippetHashOf(dir);
+  if (!got) return 'the adopter snippet carries no sha384, so nothing below measures anything';
+  const want = publishedRuntimeHash(dir);
+  return got === want ? null : 'the snippet advertises ' + got + ' and the published hash is ' + want;
+});
+
+expectRed(
+  'a hash in the adopter snippet that matches no published file is refused',
+  [],
+  (dir) => patch(dir, 'index.html', (s) => {
+    if (!snippetHashRx.test(s)) throw new Error('the adopter snippet anchor is gone');
+    return s.replace(snippetHashRx, (_m, a, _h, c) => a + BOGUS_SRI + c);
+  }),
+  'matches no published file'
+);
+
+expectRed(
+  'the real defect of N-40: the snippet keeps the hash of the CRLF bytes',
+  [],
+  (dir) => {
+    /* Reproduce it the way it happened rather than with a made-up
+       string: hash the SAME source over CRLF bytes, which is what a
+       Windows working tree produced, and advertise that. */
+    const lf = readFileSync(join(dir, 'js', 'nac.js'));
+    const crlf = Buffer.from(lf.toString('utf8').replace(/\n/g, '\r\n'), 'utf8');
+    const crlfSri = 'sha384-' + createHash('sha384').update(crlf).digest('base64');
+    patch(dir, 'index.html', (s) => {
+      if (!snippetHashRx.test(s)) throw new Error('the adopter snippet anchor is gone');
+      return s.replace(snippetHashRx, (_m, a, _h, c) => a + crlfSri + c);
+    });
+  },
+  'matches no published file'
+);
+
+expectGreen(
+  '--write re-pins the snippet hash instead of asking a human to retype it',
+  ['--write', '--force'],
+  (dir) => patch(dir, 'index.html', (s) => s.replace(snippetHashRx, (_m, a, _h, c) => a + BOGUS_SRI + c)),
+  (dir) => {
+    const got = snippetHashOf(dir);
+    const want = publishedRuntimeHash(dir);
+    if (got === BOGUS_SRI) return '--write left the stale hash in the snippet';
+    return got === want ? null : 'the snippet now says ' + got + ' and the published hash is ' + want;
+  }
+);
+
+/* The anchor itself is load-bearing: if the markup of the snippet
+   changes, --write silently stops re-pinning it and the hash goes
+   back to having no producer. The gate has to say so out loud
+   instead of writing a tree it no longer covers. */
+expectRed(
+  'a snippet whose markup moved is reported, not silently skipped',
+  ['--write', '--force'],
+  (dir) => patch(dir, 'index.html', (s) =>
+    s.replace(snippetHashRx, (_m, _a, h, _c) => '&lt;script integrity="' + h + '"&gt;')),
+  'cannot find the adopter copy-paste snippet'
+);
 console.log('');
 console.log(passed + ' passed, ' + failed + ' failed');
 if (failed) {

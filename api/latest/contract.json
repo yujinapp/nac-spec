@@ -629,7 +629,7 @@
     "data-nac-y",
     "data-nac-zoom"
   ],
-  "channel": "prerelease",
+  "channel": "stable",
   "common_verbs": {
     "duplicate_verb_is_a_finding": true,
     "note": "Verbs are free-form snake_case identifiers agreed between host and agent. This list is conventional, not exhaustive, and not normative.",
@@ -653,6 +653,31 @@
       "close",
       "add_row",
       "remove_row"
+    ]
+  },
+  "conformance_tier": {
+    "declared_by_this_runtime": "NAC-3-versioned",
+    "defined_in": "docs/RFC_V24-04.md section 6",
+    "field": "conformance_tier",
+    "level_vocabulary": "levels.json -- id pattern nac3-conformance-level-<1|2|3>",
+    "not_a_level": true,
+    "note": "A TIER is not a LEVEL. A tier describes what the RUNTIME on the page implements (RFC V24-04 section 6, read off NAC.conformance_tier); a conformance level describes what the PAGE declares and does (SPEC.md section 8, reported by the CLI validator against the identifiers in levels.json). They are separate taxonomies with separate identifiers and neither implies the other. Published as a vocabulary since 2.5.0: before that the contract published this field as type \"string\" and not its values, so a machine saw the field and had no way to learn that \"NAC-3-versioned\" is not a level name (audit N-29).",
+    "values": [
+      {
+        "requires": "Reject every expected_* parameter with feature_not_supported.",
+        "value": "NAC-3",
+        "what": "The v2.3 baseline: the runtime implements the roles, verbs and completion events of the main spec and nothing of the V24-04 snapshot machinery. A mutating call that arrives carrying an expected_* parameter MUST be rejected with feature_not_supported; silently ignoring it is non-conformant, because an agent that believes its optimistic-concurrency guard was honoured is worse off than one that knows it was refused."
+      },
+      {
+        "requires": "Honour every expected_* parameter on every mutating call, and expose the three version tokens in describe().",
+        "value": "NAC-3-versioned",
+        "what": "The baseline plus snapshot versioning: describe() returns plugin_version per plugin, tree_version at the top level and element_state_hash on every agent-relevant element; the runtime emits nac:plugin:invalidated, nac:tree:invalidated and the hydration completion event; and every mutating call honours expected_plugin_version, expected_tree_version and expected_element_state_hash. This is the tier the reference runtime declares."
+      },
+      {
+        "requires": "Set STRICT_VERSIONING = true and reject every mutating call that carries no expected_* parameter.",
+        "value": "NAC-3-strict",
+        "what": "The versioned tier plus enforcement: STRICT_VERSIONING is on before any agent interaction and every mutating call that arrives WITHOUT at least one expected_* parameter is rejected. It differs from the versioned tier only in enforcement, not in features exposed -- which is what closed the silent-ignore hole where a versioned runtime received expected_element_state_hash and discarded it."
+      }
     ]
   },
   "events": [
@@ -748,11 +773,11 @@
   ],
   "generated_by": "scripts/build-contract-api.mjs",
   "generated_from": {
-    "runtime_bytes": 344665,
+    "runtime_bytes": 349103,
     "runtime_path": "js/nac.js",
-    "runtime_sha384": "sha384-esz+6WxnJZiOKEl1oEgTt5LaoGTBX8pyI8QdsnISxHIVzGCgGYk5qKnWmBEsYnmp",
+    "runtime_sha384": "sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE",
     "spec_path": "SPEC.md",
-    "spec_sha384": "sha384-TbEUyYMhosC0m0+C3MCEVcdBiTZRvZjsv4He83sDJR7LfOByeIeM4/66Jda5xTHj"
+    "spec_sha384": "sha384-YqR+nBB9RdrA4l7JvB5SYFchPIgoR48PAO9n741/qGrE+f6bnLg6HTj0ogw0tu40"
   },
   "locales": {
     "note": "Every label_i18n MUST cover all 10 locales (SPEC.md section 4.3). This is a requirement on the adopter manifest, not on the language of the specification.",
@@ -883,21 +908,21 @@
     },
     {
       "completion_events": [],
-      "declared_in_spec_table": false,
+      "declared_in_spec_table": true,
       "role": "draggable"
     },
     {
       "completion_events": [],
-      "declared_in_spec_table": false,
+      "declared_in_spec_table": true,
       "role": "drop-target"
     },
     {
       "completion_events": [],
-      "declared_in_spec_table": false,
+      "declared_in_spec_table": true,
       "role": "button"
     }
   ],
   "spec_version": "2.5",
   "surface": "contract",
-  "version": "2.5.0-alpha.5"
+  "version": "2.5.0"
 }

@@ -127,6 +127,19 @@ function currentVersion() {
 
 const VERSION = currentVersion();
 
+/* A version this project can never publish, for the cases that need a
+   value the chain cannot legitimately hold. Guarded rather than
+   assumed: if the chain ever reaches it, these cases go back to
+   mutating toward the truth and the suite has to say so instead of
+   quietly passing (audit N-43). */
+const NEVER_PUBLISHED = '99.99.99';
+(() => {
+  const idx = JSON.parse(readFileSync(join(ROOT, 'api', 'index.json'), 'utf8'));
+  if ((idx.entries || []).some((e) => e.version === NEVER_PUBLISHED)) {
+    throw new Error('the chain now publishes ' + NEVER_PUBLISHED + ', so the cases that use it as an impossible version measure nothing -- pick another');
+  }
+})();
+
 /* ---- the harness --------------------------------------------------- */
 
 function expectRed(name, mutate, expectText) {
@@ -410,8 +423,18 @@ expectRed(
        able to lie about what channel it is handing over. */
 expectRed(
   'a latest pointer that invents a stable version is refused',
-  (dir) => patchJson(dir, 'api/latest.json', (o) => { o.stable = '2.5.0'; }),
-  'declares stable=2.5.0'
+  (dir) => patchJson(dir, 'api/latest.json', (o) => {
+    /* NEVER_PUBLISHED, not a plausible-looking number. This case read
+       `o.stable = '2.5.0'` from the day it was written, when no stable
+       version existed and 2.5.0 was therefore an invention. The day
+       2.5.0 shipped, the mutation started setting the pointer to the
+       TRUTH: the gate accepted it, correctly, and the case stopped
+       measuring anything while still reporting (audit N-43). A fixture
+       that encodes a version the project will one day reach has an
+       expiry date nobody wrote down. */
+    o.stable = NEVER_PUBLISHED;
+  }),
+  'declares stable=' + NEVER_PUBLISHED
 );
 
 /* ---- layer 4: the offline signature -------------------------------

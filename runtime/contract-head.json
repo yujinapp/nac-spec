@@ -1,0 +1,16 @@
+{
+  "api_schema": 1,
+  "chain_head": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
+  "entry_count": 2,
+  "generated_by": "scripts/build-contract-api.mjs",
+  "note": "The third of three independent witnesses of the contract chain head (audit N-24). This copy is immutable once published: npm does not allow a version to be republished, so a host that rewrites the chain cannot reach back and change it. If this head disagrees with the one the host serves for this version, do not trust the host. Present from 2.5.0 onward; earlier releases were published before this API existed.",
+  "protocol": "NAC3",
+  "published_at": "2026-10-26",
+  "runtime_version": "2.5.0",
+  "surface": "contract-head-witness",
+  "witnesses": {
+    "host": "api/index.json served by the web host (chain_head)",
+    "package": "this file, inside the published @nac3/runtime tarball",
+    "repository": "the git history of api/index.json in the source repository"
+  }
+}

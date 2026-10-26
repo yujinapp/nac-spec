@@ -1,2073 +1,555 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NAC -- Native Agent Contract</title>
-<meta name="description" content="A small public spec that lets web UIs be driven by AI agents, voice runners, and accessibility tools without per-app glue code.">
-<meta property="og:title" content="NAC -- Native Agent Contract">
-<meta property="og:description" content="Drive web UIs by voice, chat, AI. The contract that lets agents click and type for the user, with provenance.">
-<meta property="og:url" content="https://yujin.app/nac-spec/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="meta.title">NAC3 — the Native Agent Contract for agent-driven front-ends</title>
+<meta name="description" data-i18n-attr="content:meta.description" content="NAC3 is a small, free Apache-2.0 contract that lets an existing web UI be driven by AI assistants, voice runners, RPA bots, accessibility tools and test runners, by stable name instead of by brittle selectors. Add a few HTML attributes. Published as data, with a recomputable hash.">
+<meta property="og:title" data-i18n-attr="content:meta.ogTitle" content="NAC3 — the Native Agent Contract">
+<meta property="og:description" data-i18n-attr="content:meta.ogDescription" content="Stable names for the things an agent wants to act on. Free, Apache-2.0, framework-neutral, published as data.">
 <meta property="og:type" content="website">
-<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="icon" href="../assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-  :root {
-    --bg-page:        #fafafa;
-    --bg-surface:     #ffffff;
-    --bg-subtle:      #f4f3f0;
-    --bg-ink:         #1a1a1a;
-    --color-text:     #1a1a1a;
-    --color-text-2:   #555;
-    --color-text-3:   #888;
-    --color-border:   #e5e5e5;
-    --color-accent:   #c8a04d;
-    --color-indigo:   #4F46E5;
-    --color-teal:     #0E8A8A;
-    --color-rose:     #DC2626;
-    --font-sans:      'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --font-serif:     'Noto Serif JP', Georgia, serif;
-    --font-mono:      'Fira Code', 'SF Mono', Consolas, monospace;
-    --shadow-sm:      0 1px 2px rgba(0,0,0,.04);
-    --shadow-md:      0 4px 16px rgba(0,0,0,.06);
-    --chat-w:         360px;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg-page);
-    color:      var(--color-text);
-    font-family: var(--font-sans);
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-  body[data-chat-open="1"] {
-    padding-right: var(--chat-w);
-  }
-  .container {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-  /* Topbar */
-  .topbar {
-    background: var(--bg-ink);
-    color: #f5f5f5;
-    padding: 14px 0;
-    border-bottom: 2px solid var(--color-accent);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar .container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .topbar .kanji {
-    font-family: var(--font-serif);
-    font-size: 28px;
-    color: var(--color-accent);
-    line-height: 1;
-  }
-  .topbar .brand {
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    font-size: 15px;
-  }
-  .topbar .brand small {
-    color: var(--color-text-3);
-    font-weight: 400;
-    margin-left: 8px;
-    font-size: 13px;
-  }
-  .topbar .pill {
-    background: var(--color-accent);
-    color: var(--bg-ink);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-left: auto;
-  }
-  .topbar button.icon-btn {
-    background: transparent;
-    color: #f5f5f5;
-    border: 1px solid #444;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
-    margin-left: 8px;
-    font-family: inherit;
-  }
-  .topbar button.icon-btn:hover { background: #2a2a2a; }
-  .topbar button.icon-btn[aria-pressed="true"] {
-    background: var(--color-accent);
-    color: var(--bg-ink);
-    border-color: var(--color-accent);
-  }
+:root{
+  --cp:#F7F4EC; --cs:#FFFFFF; --csu:#EFE9DC; --cm:#EAE6DA;
+  --cbs:#E4DCCB; --cb:#DDD4C2; --cbst:#C8C0AC;
+  --ct:#1C1A17; --ct2:#5A554B; --ct3:#847D6F; --ctd:#A8A092;
+  --ci:#B7410E; --ci50:#F7ECE4; --ci100:#E7C6B4; --cim:#C8643B; --cid:#7D2C09;
+  --ctl:#0F6E66; --ctl50:#E2F5F3;
+  --ca:#9A7B3F; --ca50:#F6EEDD; --ca400:#B8923D;
+  --ccr:#943020; --ccr50:#FCEEE9;
+  --ink:#1A1815;
+  --font-sans:"DM Sans",system-ui,-apple-system,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-jp:"Noto Serif JP",serif;
+  --font-mono:"JetBrains Mono",Consolas,monospace;
+  --maxw:1100px; --gutter:clamp(1.5rem,5vw,4rem);
+  --rmd:8px; --rlg:12px; --rxl:16px;
+  --shsm:0 1px 2px rgba(26,24,21,.05);
+  --shmd:0 4px 16px rgba(26,24,21,.08);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;font-family:var(--font-sans);font-weight:400;color:var(--ct);background:var(--cp);
+  overflow-x:hidden;line-height:1.6;
+  background-image:radial-gradient(1200px 600px at 80% -10%,rgba(183,65,14,.06),transparent 60%),
+                   radial-gradient(900px 500px at -10% 8%,rgba(154,123,63,.07),transparent 55%);
+  background-attachment:fixed;
+}
+h1,h2,h3,h4{font-family:var(--font-serif);font-weight:600;line-height:1.15;letter-spacing:-.01em;color:var(--ct);margin:0}
+code{font-family:var(--font-mono);font-size:.88em;background:var(--csu);padding:.12em .35em;border-radius:4px;color:var(--ct)}
+a{color:var(--ci);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter)}
+.skip-link{position:absolute;left:-9999px}
+.skip-link:focus{left:1rem;top:1rem;background:var(--cs);padding:.6rem 1rem;border-radius:var(--rmd);z-index:99}
 
-  /* Hero */
-  .hero {
-    padding: 64px 0 48px 0;
-    border-bottom: 1px solid var(--color-border);
-    position: relative;
-    overflow: hidden;
-  }
-  .hero .kanji-bg {
-    position: absolute;
-    right: 24px;
-    top: 80px;
-    font-family: var(--font-serif);
-    font-size: 200px;
-    color: var(--color-accent);
-    opacity: 0.08;
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-  .hero h1 {
-    font-size: 44px;
-    line-height: 1.1;
-    margin: 0 0 20px 0;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    max-width: 720px;
-  }
-  .hero h1 .accent { color: var(--color-accent); }
-  .hero .lede {
-    font-size: 19px;
-    color: var(--color-text-2);
-    line-height: 1.55;
-    margin: 0 0 28px 0;
-    max-width: 640px;
-  }
-  .hero .ctas {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 32px;
-  }
-  .cta {
-    display: inline-block;
-    padding: 12px 22px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform .12s ease, box-shadow .12s ease;
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
-  }
-  .cta.primary {
-    background: var(--bg-ink);
-    color: #f5f5f5;
-  }
-  .cta.primary:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-  .cta.secondary {
-    background: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-  }
-  .cta.secondary:hover {
-    background: var(--bg-subtle);
-  }
-  .cta.tertiary {
-    background: var(--color-accent);
-    color: var(--bg-ink);
-  }
-  .cta.tertiary:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
+header.site{position:sticky;top:0;z-index:50;background:rgba(247,244,236,.92);backdrop-filter:blur(10px);border-bottom:.5px solid var(--cbs)}
+.header-inner{max-width:var(--maxw);margin:0 auto;padding:.7rem var(--gutter);display:flex;align-items:center;gap:1rem}
+.logo-link{display:flex;align-items:baseline;gap:.45rem}
+.logo-link .yujin{font-family:var(--font-jp);font-size:1.25rem;font-weight:300;color:var(--ct);letter-spacing:.02em}
+.logo-link .nac{font-family:var(--font-sans);font-size:.95rem;font-weight:500;color:var(--ci);letter-spacing:.01em}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:1.1rem;font-size:.85rem}
+.header-actions a{color:var(--ct2)}
+.header-actions a:hover{color:var(--ci)}
+.yujin-lang-select{font-family:inherit;font-size:.8rem;color:var(--ct2);background:var(--cp);border:.5px solid var(--cbs);border-radius:6px;padding:.25rem .4rem;cursor:pointer}
+@media(max-width:860px){.nav-hide{display:none}}
 
-  /* Sections */
-  section {
-    padding: 56px 0;
-    border-bottom: 1px solid var(--color-border);
-    scroll-margin-top: 80px;
-  }
-  section h2 {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0 0 12px 0;
-    letter-spacing: -0.01em;
-  }
-  section .section-lede {
-    color: var(--color-text-2);
-    margin: 0 0 28px 0;
-    max-width: 640px;
-  }
+.hero{padding-block:clamp(3rem,8vw,5.5rem) clamp(2rem,5vw,3.5rem)}
+.hero .kanji-big{font-family:var(--font-jp);font-weight:300;color:var(--ca);font-size:clamp(2.6rem,6vw,4.2rem);line-height:1;margin-bottom:.6rem;letter-spacing:.08em}
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ci);display:flex;align-items:center;gap:.5rem;margin:0 0 1rem}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--ci);display:inline-block;flex:none}
+.hero h1{font-size:clamp(1.9rem,5vw,3.1rem);margin-bottom:1.1rem;max-width:21ch}
+.hero h1 em{font-style:normal;color:var(--ci)}
+.lede{font-size:clamp(1rem,1.5vw,1.14rem);color:var(--ct2);max-width:64ch;margin:0 0 1.5rem}
+.vbadge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.76rem;background:var(--ctl50);color:var(--ctl);border:.5px solid rgba(15,110,102,.25);border-radius:999px;padding:.22rem .7rem;margin:0 0 1.1rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:.65rem;margin-bottom:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;font-weight:500;padding:.62rem 1.15rem;border-radius:var(--rmd);border:.5px solid transparent;cursor:pointer;transition:.15s}
+.btn-p{background:var(--ci);color:#fff}
+.btn-p:hover{background:var(--cid);text-decoration:none}
+.btn-s{background:var(--cs);color:var(--ct);border-color:var(--cb);box-shadow:var(--shsm)}
+.btn-s:hover{border-color:var(--ca);text-decoration:none}
+.trust{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.82rem;color:var(--ct3);align-items:center}
 
-  /* Peer reviews featured callout (between hero + "How small") */
-  .peer-callout {
-    padding: 0 0 56px 0;
-  }
-  .peer-card {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    text-decoration: none;
-    color: inherit;
-    background: linear-gradient(135deg, #fff8e6 0%, #ffffff 70%);
-    border: 2px solid var(--color-accent);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .peer-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(200, 160, 77, 0.25);
-  }
-  .peer-card-left {
-    display: flex; align-items: center; justify-content: center;
-    background: var(--color-accent);
-    color: #fff;
-    width: 120px;
-    flex-shrink: 0;
-  }
-  .peer-kanji {
-    font-family: var(--font-serif);
-    font-size: 80px;
-    line-height: 1;
-    opacity: 0.95;
-  }
-  .peer-card-body {
-    flex: 1;
-    padding: 24px 28px;
-  }
-  .peer-card-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    color: var(--color-accent);
-    margin-bottom: 8px;
-  }
-  .peer-card-title {
-    font-size: 22px;
-    line-height: 1.3;
-    margin: 0 0 12px 0;
-    color: var(--color-text);
-  }
-  .peer-card-quote {
-    font-size: 14px;
-    color: var(--color-text-2);
-    margin: 0 0 12px 0;
-    line-height: 1.6;
-  }
-  .peer-card-quote strong {
-    color: var(--color-text);
-    font-weight: 600;
-  }
-  .peer-card-stats {
-    font-size: 13px;
-    color: var(--color-text-2);
-    margin: 0 0 14px 0;
-    display: flex; flex-wrap: wrap; gap: 8px;
-  }
-  .peer-card-stats strong {
-    color: var(--color-indigo);
-    font-weight: 600;
-  }
-  .peer-stat-sep { opacity: 0.4; }
-  .peer-card-cta {
-    display: inline-block;
-    color: var(--color-accent);
-    font-weight: 600;
-    font-size: 14px;
-    border-bottom: 1px dashed transparent;
-    transition: border-color 0.15s ease;
-  }
-  .peer-card:hover .peer-card-cta {
-    border-bottom-color: var(--color-accent);
-  }
-  @media (max-width: 700px) {
-    .peer-card { flex-direction: column; }
-    .peer-card-left { width: 100%; padding: 18px 0; }
-    .peer-kanji { font-size: 56px; }
-    .peer-card-title { font-size: 18px; }
-    .peer-card-stats { font-size: 12px; flex-direction: column; gap: 4px; }
-    .peer-stat-sep { display: none; }
-  }
+section{padding-block:clamp(2.4rem,6vw,4rem)}
+.sec-h{margin-bottom:1.6rem}
+.sec-h h2{font-size:clamp(1.4rem,3vw,2rem);margin-bottom:.5rem}
+.sec-h .lede{margin-bottom:0}
+.divider{display:flex;align-items:center;justify-content:center}
+.divider::before,.divider::after{content:"";flex:1;height:.5px;background:var(--cbs)}
+.divider .kanji{margin:0 1.4rem;font-family:var(--font-jp);color:var(--ca);font-size:1.4rem;font-weight:300;opacity:.85}
 
-  /* Benchmark callout -- empirical-evidence variant of peer-callout */
-  .bench-callout { padding: 0 0 56px 0; }
-  .bench-card {
-    display: flex; align-items: stretch; gap: 0;
-    text-decoration: none; color: inherit;
-    background: linear-gradient(135deg, #e7f1ef 0%, #ffffff 70%);
-    border: 2px solid var(--color-indigo);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .bench-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(45, 99, 87, 0.25);
-  }
-  .bench-card-left {
-    display: flex; align-items: center; justify-content: center;
-    background: var(--color-indigo); color: #fff;
-    width: 120px; flex-shrink: 0;
-  }
-  .bench-kanji {
-    font-family: var(--font-serif); font-size: 80px;
-    line-height: 1; opacity: 0.95;
-  }
-  .bench-card-body { flex: 1; padding: 24px 28px; }
-  .bench-card-eyebrow {
-    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-    color: var(--color-indigo); margin-bottom: 8px;
-  }
-  .bench-card-title {
-    font-size: 22px; line-height: 1.3; margin: 0 0 12px 0;
-    color: var(--color-text);
-  }
-  .bench-card-quote {
-    font-size: 14px; color: var(--color-text-2);
-    margin: 0 0 12px 0; line-height: 1.6;
-  }
-  .bench-card-quote strong { color: var(--color-indigo); font-weight: 700; }
-  .bench-card-stats {
-    font-size: 13px; color: var(--color-text-2);
-    margin: 0 0 14px 0; display: flex; flex-wrap: wrap; gap: 8px;
-  }
-  .bench-card-stats strong { color: var(--color-text); font-weight: 600; }
-  .bench-stat-sep { opacity: 0.4; }
-  /* A figure and its receipt live in the same place (audit N-12): the date,
-     the runtime version it was measured against, and the command that
-     reproduces it, next to the claim instead of a click away. */
-  .card-receipt {
-    font-size: 12px; color: var(--color-text-2);
-    line-height: 1.75; margin: 10px 2px 0 2px;
-  }
-  .card-receipt code {
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--color-text); word-break: break-word;
-  }
-  .card-receipt strong { color: var(--color-text); font-weight: 600; }
-  .card-receipt .receipt-label {
-    text-transform: uppercase; letter-spacing: 0.09em;
-    font-weight: 700; color: var(--color-text);
-  }
-  .bench-card-cta {
-    display: inline-block; color: var(--color-indigo);
-    font-weight: 600; font-size: 14px;
-    border-bottom: 1px dashed transparent;
-    transition: border-color 0.15s ease;
-  }
-  .bench-card:hover .bench-card-cta { border-bottom-color: var(--color-indigo); }
-  @media (max-width: 700px) {
-    .bench-card { flex-direction: column; }
-    .bench-card-left { width: 100%; padding: 18px 0; }
-    .bench-kanji { font-size: 56px; }
-    .bench-card-title { font-size: 18px; }
-    .bench-card-stats { font-size: 12px; flex-direction: column; gap: 4px; }
-    .bench-stat-sep { display: none; }
-  }
+.grid{display:grid;gap:1rem}
+.g2{grid-template-columns:repeat(auto-fit,minmax(285px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(195px,1fr))}
+.card{background:var(--cs);border:.5px solid var(--cbs);border-radius:var(--rlg);padding:1.15rem 1.3rem;box-shadow:var(--shsm)}
+.card h3{font-size:1.02rem;margin-bottom:.45rem}
+.card h4{font-family:var(--font-sans);font-size:.88rem;font-weight:600;margin-bottom:.3rem}
+.card p{font-size:.88rem;color:var(--ct2);margin:0 0 .5rem}
+.card p:last-child{margin-bottom:0}
+.card .kanji{font-family:var(--font-jp);color:var(--ca);font-size:1.15rem;font-weight:300;margin-right:.35rem}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ca);background:var(--ca50);border-radius:4px;padding:.12rem .42rem;margin-bottom:.5rem}
+.tag.teal{color:var(--ctl);background:var(--ctl50)}
+.tag.rust{color:var(--ci);background:var(--ci50)}
 
-  /* Demos */
-  .demos {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .demo-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    padding: 22px 24px;
-    box-shadow: var(--shadow-sm);
-    transition: border-color .12s ease, box-shadow .12s ease;
-  }
-  .demo-card:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-md);
-  }
-  .demo-card .head {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 10px;
-  }
-  .demo-card .file {
-    font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-indigo);
-  }
-  .demo-card .version {
-    font-size: 12px;
-    background: var(--bg-subtle);
-    padding: 2px 8px;
-    border-radius: 4px;
-    color: var(--color-text-2);
-    font-weight: 500;
-  }
-  .demo-card p {
-    margin: 0 0 14px 0;
-    color: var(--color-text-2);
-    font-size: 14.5px;
-  }
-  .demo-card a.open {
-    color: var(--color-indigo);
-    font-weight: 600;
-    font-size: 14px;
-    text-decoration: none;
-  }
-  .demo-card a.open:hover { text-decoration: underline; }
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem;margin:1.1rem 0}
+.fig{background:var(--csu);border:.5px solid var(--cbs);border-radius:var(--rmd);padding:.85rem 1rem}
+.fig .k{font-family:var(--font-mono);font-size:1.4rem;font-weight:500;line-height:1;color:var(--ci);letter-spacing:-.02em}
+.fig .l{font-size:.76rem;color:var(--ct2);margin-top:.4rem;line-height:1.35}
 
-  /* Code */
-  pre {
-    background: var(--bg-ink);
-    color: #e5e5e5;
-    padding: 18px 20px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-family: var(--font-mono);
-    font-size: 13.5px;
-    line-height: 1.55;
-    margin: 0 0 12px 0;
-  }
-  pre .comment { color: #888; }
-  pre .keyword { color: var(--color-accent); }
-  pre .string  { color: #6CC55F; }
-  code {
-    font-family: var(--font-mono);
-    background: var(--bg-subtle);
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 0.94em;
-  }
+.receipt{background:var(--csu);border:.5px solid var(--cbs);border-left:3px solid var(--ca);border-radius:0 var(--rmd) var(--rmd) 0;padding:.85rem 1.1rem;margin-top:1rem;font-size:.8rem;color:var(--ct2)}
+.receipt strong.lbl{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ca);display:block;margin-bottom:.35rem}
+.receipt p{margin:0 0 .4rem}
+.receipt p:last-child{margin-bottom:0}
 
-  /* Resources -- 4-column grouped */
-  .resource-groups {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 24px;
-  }
-  .resource-group h3 {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-3);
-    font-weight: 700;
-    margin: 0 0 12px 0;
-  }
-  .resource-group ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .resource-group li {
-    margin-bottom: 8px;
-  }
-  .resource-link {
-    display: block;
-    padding: 10px 14px;
-    background: var(--bg-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--color-text);
-    font-size: 14px;
-    transition: border-color .12s ease, transform .12s ease;
-  }
-  .resource-link:hover {
-    border-color: var(--color-accent);
-    transform: translateY(-1px);
-  }
-  .resource-link .resource-desc {
-    font-size: 12px;
-    color: var(--color-text-3);
-    display: block;
-    margin-top: 2px;
-  }
+.review{background:var(--cs);border:.5px solid var(--cbs);border-top:3px solid var(--ctl);border-radius:var(--rlg);padding:1.5rem 1.6rem;box-shadow:var(--shmd)}
+.review blockquote{margin:0 0 1rem;font-family:var(--font-serif);font-size:clamp(1.02rem,2vw,1.22rem);line-height:1.5;color:var(--ct)}
+.review .who{font-size:.8rem;color:var(--ct3);font-family:var(--font-mono);letter-spacing:.02em;margin:0}
+.review h4{font-family:var(--font-sans);font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--ct3);margin:1.4rem 0 .5rem}
+.review ul{margin:0;padding-left:1.15rem;font-size:.89rem;color:var(--ct2)}
+.review li{margin-bottom:.45rem}
 
-  /* Adopters grid */
-  .adopter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
-    margin-top: 22px;
-  }
-  .adopter-card {
-    padding: 22px;
-    background: var(--color-bg-surface, #fafaf7);
-    border: 1px solid var(--color-border-subtle, #e6e3da);
-    border-radius: 8px;
-  }
-  .adopter-card.adopter-placeholder {
-    opacity: 0.72;
-    border-style: dashed;
-  }
-  .adopter-card h3 {
-    margin: 8px 0 8px 0;
-    font-size: 18px;
-  }
-  .adopter-card p {
-    font-size: 14px;
-    color: var(--color-text-2, #555);
-    line-height: 1.5;
-  }
-  .adopter-card a {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--color-accent, #4f5b87);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .adopter-card a:hover { text-decoration: underline; }
-  .adopter-kanji {
-    font-family: var(--font-serif);
-    color: var(--color-accent);
-    font-size: 28px;
-  }
+.hl{background:linear-gradient(180deg,var(--ctl50),var(--cs));border:.5px solid rgba(15,110,102,.22);border-radius:var(--rxl);padding:1.6rem 1.7rem}
+.hl h2{font-size:clamp(1.3rem,2.6vw,1.75rem);margin-bottom:.7rem}
+.hl .ura{font-family:var(--font-jp);color:var(--ctl);font-size:1.5rem;font-weight:300;letter-spacing:.06em}
+.hl ol{margin:1rem 0 .8rem;padding-left:1.25rem;font-size:.9rem;color:var(--ct2)}
+.hl ol li{margin-bottom:.5rem}
+.hl .caveat{background:var(--cs);border:.5px dashed var(--cbst);border-radius:var(--rmd);padding:.8rem 1rem;font-size:.84rem;color:var(--ct2);margin-top:1rem}
 
-  /* Waitlist */
-  .section-waitlist {
-    background: var(--color-bg-subtle, #f5f2ea);
-  }
-  .waitlist-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-    margin: 24px 0 32px 0;
-  }
-  @media (max-width: 720px) {
-    .waitlist-grid { grid-template-columns: 1fr; }
-  }
-  .waitlist-card {
-    padding: 22px;
-    background: var(--color-bg-surface, #fff);
-    border: 1px solid var(--color-border-subtle, #e6e3da);
-    border-radius: 8px;
-  }
-  .waitlist-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 19px;
-  }
-  .waitlist-card p {
-    color: var(--color-text-2, #555);
-    font-size: 14px;
-    line-height: 1.55;
-    margin-bottom: 10px;
-  }
-  .waitlist-card ul {
-    margin: 0;
-    padding-left: 22px;
-    font-size: 13px;
-    color: var(--color-text-2, #555);
-  }
-  .waitlist-card li { margin: 4px 0; }
-  .waitlist-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    padding: 18px;
-    background: var(--color-bg-surface, #fff);
-    border: 1px solid var(--color-border-subtle, #e6e3da);
-    border-radius: 8px;
-  }
-  .waitlist-form input[type="email"] {
-    flex: 1 1 240px;
-    padding: 10px 12px;
-    font-size: 15px;
-    border: 1px solid var(--color-border-default, #ccc);
-    border-radius: 6px;
-  }
-  .waitlist-form label {
-    font-size: 14px;
-    color: var(--color-text-2, #555);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .waitlist-form button {
-    padding: 10px 18px;
-    background: var(--color-accent, #4f5b87);
-    color: #fff;
-    border: 0;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .waitlist-form button:hover { filter: brightness(1.1); }
-  .waitlist-status {
-    flex-basis: 100%;
-    font-size: 13px;
-    color: var(--color-text-2, #666);
-  }
-  .waitlist-disclaimer {
-    margin-top: 14px;
-    font-size: 12px;
-    color: var(--color-text-3, #888);
-    line-height: 1.5;
-  }
+pre{background:var(--ink);color:#E4DFD3;border-radius:var(--rlg);padding:1.1rem 1.25rem;overflow-x:auto;font-family:var(--font-mono);font-size:.8rem;line-height:1.65;margin:1rem 0}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.cm{color:#8F8878}
+.st{color:#C8A04D}
+.kw{color:#D98B6A}
 
-  /* Footer */
-  footer {
-    padding: 40px 0 60px 0;
-    color: var(--color-text-3);
-    font-size: 14px;
-  }
-  footer a {
-    color: var(--color-text-2);
-    text-decoration: none;
-  }
-  footer a:hover {
-    color: var(--color-text);
-    text-decoration: underline;
-  }
-  footer .footer-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px;
-    align-items: center;
-  }
-  footer .kanji-mark {
-    font-family: var(--font-serif);
-    color: var(--color-accent);
-    font-size: 18px;
-  }
+.tw{overflow-x:auto;border:.5px solid var(--cbs);border-radius:var(--rlg);background:var(--cs);margin:1.1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:640px}
+th,td{text-align:left;padding:.65rem .85rem;border-bottom:.5px solid var(--cbs);vertical-align:top}
+thead th{background:var(--csu);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ct2);font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+td strong{color:var(--ct)}
 
-  /* Chat panel */
-  .chat {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: var(--chat-w);
-    height: 100vh;
-    background: var(--bg-surface);
-    border-left: 1px solid var(--color-border);
-    display: none;
-    flex-direction: column;
-    z-index: 200;
-    box-shadow: -8px 0 24px rgba(0,0,0,.04);
-  }
-  body[data-chat-open="1"] .chat {
-    display: flex;
-  }
-  .chat-head {
-    background: var(--bg-ink);
-    color: #f5f5f5;
-    padding: 12px 16px;
-    border-bottom: 2px solid var(--color-accent);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .chat-head .brand {
-    font-weight: 600;
-    font-size: 14px;
-  }
-  .chat-head .lang {
-    background: #2a2a2a;
-    color: #f5f5f5;
-    border: 1px solid #444;
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-family: inherit;
-    margin-left: auto;
-  }
-  .chat-head button {
-    background: transparent;
-    color: #f5f5f5;
-    border: 1px solid #444;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    font-family: inherit;
-  }
-  .chat-head button[aria-pressed="true"] {
-    background: var(--color-accent);
-    color: var(--bg-ink);
-    border-color: var(--color-accent);
-  }
-  .chat-log {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    background: var(--bg-page);
-  }
-  .nac-chat-bubble {
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1.45;
-    max-width: 85%;
-    word-wrap: break-word;
-  }
-  .nac-chat-bubble.user {
-    background: var(--color-indigo);
-    color: white;
-    margin-left: auto;
-    border-bottom-right-radius: 2px;
-  }
-  .nac-chat-bubble.bot {
-    background: var(--bg-subtle);
-    color: var(--color-text);
-    border-bottom-left-radius: 2px;
-  }
-  .chat-tools {
-    padding: 8px 12px;
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    gap: 6px;
-  }
-  .chat-tools button {
-    background: var(--bg-subtle);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    font-family: inherit;
-    flex: 1;
-  }
-  .chat-tools button[aria-pressed="true"],
-  .chat-tools button[data-state="recording"] {
-    background: var(--color-rose);
-    color: white;
-    border-color: var(--color-rose);
-  }
-  .chat-input-row {
-    padding: 12px;
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    gap: 8px;
-  }
-  .chat-input-row input {
-    flex: 1;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-family: inherit;
-  }
-  .chat-input-row button {
-    background: var(--bg-ink);
-    color: #f5f5f5;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: inherit;
-    font-weight: 600;
-  }
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.9rem 1.6rem;font-size:.87rem}
+.links h4{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ct3);margin:0 0 .5rem}
+.links ul{list-style:none;margin:0;padding:0}
+.links li{margin-bottom:.42rem;color:var(--ct2)}
+.links li span{color:var(--ct3);font-size:.84rem}
 
-  /* Autopilot pulse */
-  [data-autopilot="active"] {
-    outline: 3px solid var(--color-rose);
-    outline-offset: 4px;
-    transition: outline-color .25s ease, outline-offset .25s ease;
-  }
+.price{display:inline-block;font-family:var(--font-mono);font-size:.74rem;color:var(--ci);background:var(--ci50);border-radius:4px;padding:.14rem .48rem}
+.free{display:inline-block;font-family:var(--font-mono);font-size:.74rem;color:var(--ctl);background:var(--ctl50);border-radius:4px;padding:.14rem .48rem}
 
-  @media (max-width: 900px) {
-    body[data-chat-open="1"] { padding-right: 0; }
-    .chat {
-      bottom: 0;
-      top: auto;
-      height: 70vh;
-      width: 100%;
-      border-left: none;
-      border-top: 2px solid var(--color-accent);
-    }
-  }
-  @media (max-width: 600px) {
-    .hero { padding: 40px 0 32px 0; }
-    .hero h1 { font-size: 32px; }
-    .hero .lede { font-size: 16px; }
-    .hero .kanji-bg { font-size: 140px; top: 60px; }
-    section { padding: 40px 0; }
-  }
-  .compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 24px 0;
-    font-size: 14px;
-  }
-  .compare-table th,
-  .compare-table td {
-    text-align: left;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--color-border);
-    vertical-align: top;
-  }
-  .compare-table th {
-    font-weight: 600;
-    color: var(--color-text);
-    background: rgba(0, 0, 0, 0.02);
-    border-bottom: 2px solid var(--color-border);
-  }
-  .compare-table td {
-    color: var(--color-text-2);
-  }
-  .compare-table td:first-child,
-  .compare-table td strong { color: var(--color-text); }
-  .compare-table code {
-    background: rgba(0, 0, 0, 0.04);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-size: 12.5px;
-  }
-  @media (max-width: 800px) {
-    .compare-table { font-size: 13px; }
-    .compare-table th,
-    .compare-table td { padding: 10px; }
-  }
+footer.site{border-top:.5px solid var(--cbs);margin-top:2.5rem;padding-block:2rem 3rem;background:var(--cs)}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter);display:flex;flex-wrap:wrap;gap:1rem 2rem;align-items:center;font-size:.84rem;color:var(--ct3)}
+.footer-inner .brand{font-family:var(--font-jp);color:var(--ct2);font-size:.95rem;font-weight:300;letter-spacing:.06em}
+.footer-inner nav{display:flex;flex-wrap:wrap;gap:1rem}
+.small{font-size:.8rem;color:var(--ct3)}
+ul.plain{font-size:.86rem;color:var(--ct2);padding-left:1.15rem;margin:.4rem 0 0}
+ul.plain li{margin-bottom:.35rem}
 </style>
 </head>
-<body data-nac-plugin="nac_landing">
+<body>
+<a href="#main" class="skip-link" data-i18n="skip">Skip to content</a>
 
-<!-- Topbar -->
-<header class="topbar" data-nac-id="nac_landing.topbar" data-nac-role="region">
-  <div class="container">
-    <span class="kanji" aria-hidden="true">&#27005;</span>
-    <span class="brand">NAC<small>Native Agent Contract</small></span>
-    <span class="pill">v2.5.0 &middot; stable</span>
-    <button class="icon-btn"
-            id="autopilot-toggle"
-            data-nac-id="nac_landing.autopilot.toggle"
-            data-nac-role="action"
-            data-nac-action="autopilot_toggle"
-            aria-pressed="false"
-            aria-label="Start guided tour (autopilot)">tour</button>
-    <button class="icon-btn"
-            id="chat-toggle"
-            data-nac-id="nac_landing.chat.toggle"
-            data-nac-role="action"
-            data-nac-action="chat_toggle"
-            aria-pressed="false"
-            aria-label="Toggle chat panel">chat</button>
+<header class="site">
+  <div class="header-inner">
+    <a class="logo-link" href="https://yujin.app/" data-i18n-attr="aria-label:logo.aria" aria-label="Yujin — home">
+      <span class="yujin">楽</span><span class="nac">NAC3</span>
+    </a>
+    <nav class="header-actions" data-i18n-attr="aria-label:nav.aria" aria-label="Main navigation">
+      <a class="nav-hide" href="#what" data-i18n="nav.what">What it is</a>
+      <a class="nav-hide" href="#review" data-i18n="nav.review">Review</a>
+      <a class="nav-hide" href="#testing" data-i18n="nav.testing">Testing</a>
+      <a class="nav-hide" href="#demos" data-i18n="nav.demos">Demos</a>
+      <a class="nav-hide" href="#limits" data-i18n="nav.limits">Limits</a>
+      <a href="SPEC.md" data-i18n="nav.spec">Spec</a>
+      <select class="yujin-lang-select" id="lang-select" data-i18n-attr="aria-label:nav.lang" aria-label="Language"></select>
+    </nav>
   </div>
 </header>
 
-<!-- Hero -->
-<section class="hero" data-nac-id="nac_landing.section.hero" data-nac-role="section">
-  <div class="container" style="position: relative;">
-    <span class="kanji-bg" aria-hidden="true">&#26412;</span>
-    <h1>Drive web UIs by <span class="accent">voice</span>, <span class="accent">chat</span>, <span class="accent">AI</span>.</h1>
-    <p class="lede">
-      <strong>NAC</strong> is a small public spec that lets your existing web UI be driven by AI assistants, voice runners, RPA bots, and accessibility tools -- without writing per-app glue code. Add a few HTML attributes; agents resolve names, click buttons, fill fields, and switch tabs the way a human would.
-    </p>
-    <div class="ctas">
-      <a class="cta primary"
-         href="peer-reviews.html"
-         data-nac-id="nac_landing.cta.peer_reviews"
-         data-nac-role="action"
-         data-nac-action="open_peer_reviews">6 AIs say it's inevitable &rarr;</a>
-      <a class="cta secondary"
-         href="SPEC.md"
-         data-nac-id="nac_landing.cta.spec"
-         data-nac-role="action"
-         data-nac-action="open_spec">Read the spec</a>
-      <a class="cta tertiary"
-         href="example-v21-data-table.php"
-         data-nac-id="nac_landing.cta.demo"
-         data-nac-role="action"
-         data-nac-action="open_demo">Try the demo</a>
-      <a class="cta tertiary"
-         href="https://www.npmjs.com/package/@nac3/runtime"
-         data-nac-id="nac_landing.cta.npm"
-         data-nac-role="action"
-         data-nac-action="open_npm">npm install</a>
-      <a class="cta tertiary"
-         href="benchmark/"
-         data-nac-id="nac_landing.cta.benchmark"
-         data-nac-role="action"
-         data-nac-action="open_benchmark">600-run benchmark &rarr;</a>
+<main id="main">
+
+<div class="wrap hero">
+  <div class="kanji-big">楽</div>
+  <p class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Native Agent Contract</span></p>
+  <h1 data-i18n-html="hero.h1">Stable names for the things an <em>agent</em> wants to act on.</h1>
+  <p class="vbadge"><span data-i18n="hero.version">v2.5.0 · stable</span></p>
+  <p class="lede" data-i18n="hero.lede">NAC3 is a small, free contract that lets a web UI you already shipped be driven by AI assistants, voice runners, RPA bots, accessibility tools and test runners — by name, not by brittle selectors. You add a few HTML attributes. Agents resolve names, click buttons, fill fields and switch tabs the way a person would, and the contract itself is published as data, with a hash you recompute.</p>
+  <div class="cta-row">
+    <a class="btn btn-p" href="SPEC.md" data-i18n="hero.cta1">Read the spec →</a>
+    <a class="btn btn-s" href="#demos" data-i18n="hero.cta2">Try a live demo</a>
+    <a class="btn btn-s" href="api/index.json" data-i18n="hero.cta3">The contract, as data</a>
+    <a class="btn btn-s" href="https://www.npmjs.com/package/@nac3/runtime" data-i18n="hero.cta4">npm install</a>
+  </div>
+  <p class="trust">
+    <span class="free" data-i18n="hero.t1">Apache-2.0 · free</span>
+    <span data-i18n="hero.t2">· Framework-neutral</span>
+    <span data-i18n="hero.t3">· Ten locales</span>
+    <span data-i18n="hero.t4">· Immutable runtime path, verified by hash</span>
+  </p>
+</div>
+
+<div class="wrap"><div class="divider"><span class="kanji">契</span></div></div>
+
+<section id="what"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="what.eyebrow">How small it is</span></p>
+    <h2 data-i18n="what.h2">A button you already shipped, with three extra attributes.</h2>
+    <p class="lede" data-i18n="what.lede">That is the whole adoption cost of one element. No framework to adopt, no build step to add, no runtime to rewrite your app around.</p>
+  </div>
+<pre><code><span class="cm">&lt;!-- decorate the button --&gt;</span>
+&lt;button <span class="kw">data-nac-id</span>=<span class="st">"invoice.save"</span>
+        <span class="kw">data-nac-role</span>=<span class="st">"action"</span>
+        <span class="kw">data-nac-action</span>=<span class="st">"save"</span>
+        onclick=<span class="st">"saveInvoice()"</span>&gt;Save&lt;/button&gt;
+
+<span class="cm">// now any agent can drive it</span>
+await NAC.click(<span class="st">'invoice.save'</span>);              <span class="cm">// by id</span>
+await NAC.click_by_verb(<span class="st">'invoice'</span>, <span class="st">'save'</span>);  <span class="cm">// by verb</span></code></pre>
+  <h3 style="font-size:1rem;margin:1.6rem 0 .5rem" data-i18n="what.runtime.h">Add the runtime once — and pin it</h3>
+  <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.0/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
+<pre><code>npm install @nac3/runtime
+
+<span class="cm">// or via CDN, pinned and verified:</span>
+&lt;script src=<span class="st">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
+        integrity=<span class="st">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
+        crossorigin=<span class="st">"anonymous"</span>&gt;&lt;/script&gt;
+
+<span class="cm"># do not take that hash on faith — recompute it. One line, no dependencies:</span>
+node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.createHash('sha384').update(f.readFileSync('nac.js')).digest('base64'))"</code></pre>
+</div></section>
+
+<div class="wrap"><div class="divider"><span class="kanji">鏡</span></div></div>
+
+<section id="review"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="review.eyebrow">Peer review · October 2026</span></p>
+    <h2 data-i18n="review.h2">A review by a model that read the whole thing.</h2>
+    <p class="lede" data-i18n="review.lede">This page used to carry one-line verdicts from six AI systems, collected in May 2026. They were enthusiastic and they were not useful: none of them had read the runtime, none had verified a single claim, and “architecturally inevitable” is not a finding. We took them down. What follows is one review instead of six, by a model given access to the source, the published contract, the deploy chain and the live site, and that says what it checked.</p>
+  </div>
+  <div class="review">
+    <blockquote data-i18n="review.quote">“The valuable idea here is not that an agent can click a button. It is that NAC3 turns an unbounded perception problem into a bounded naming problem — and then refuses to guess when the name is ambiguous. That second half is the engineering, and it is the half most of this category skips.”</blockquote>
+    <p class="who" data-i18n="review.who">— Claude (Opus 5), 26 October 2026, at the maintainer's request.</p>
+
+    <h4 data-i18n="review.h.checked">What I actually checked</h4>
+    <ul>
+      <li data-i18n="review.c1">The specification end to end: roles, names, verbs, the manifest, the public API, the event family, provenance, the three conformance levels, versioning and the stability guarantees.</li>
+      <li data-i18n="review.c2">The published contract as data — the directory, the version pointers, and the per-version contract, finding catalogue and conformance levels — fetched from the live site and read the way a consumer would.</li>
+      <li data-i18n="review.c3">The runtime bytes served from the immutable path, and the integrity hash in the install snippet above.</li>
+      <li data-i18n="review.c4">The deploy chain: every push to the default branch passes an integrity gate, a version-coherence gate, a validator lock and a contract-API gate — each with its own deliberate-red test — and then smoke-checks the live site from outside.</li>
+      <li data-i18n="review.c5">Every demo and document this page links, including the compiled React and Angular study cases.</li>
+    </ul>
+
+    <h4 data-i18n="review.h.good">What is genuinely strong</h4>
+    <ul>
+      <li data-i18n-html="review.g1"><strong>Failing closed on ambiguity.</strong> Two reservations sharing a suffix used to resolve to whichever matched first. Since v2.4 that throws, names the candidates and emits an event so the host can ask “did you mean A or B?”. An agent protocol that guesses quietly is worse than no protocol, because the damage is invisible. This one stopped guessing on purpose, and published the migration.</li>
+      <li data-i18n-html="review.g2"><strong>The contract is data, not prose.</strong> Roles, verbs, events, finding codes and conformance levels are fetchable as JSON, versioned, with a hash a consumer recomputes. Most specifications in this space ask you to parse a markdown file or read their implementation. This one does not.</li>
+      <li data-i18n-html="review.g3"><strong>It tells you when not to use it.</strong> The comparison table says plainly that if you are inside one app with one agent vendor, MCP plus a good ARIA pass covers most of it. A project that names the case against itself is a project you can plan around.</li>
+      <li data-i18n-html="review.g4"><strong>Every figure carries a receipt.</strong> Run date, runtime version, raw output, the command to re-run, and an explicit note when a number has not been re-measured on a later release. Cheap to write, rare to find, and the only reason the measurements below are worth reading.</li>
+      <li data-i18n-html="review.g5"><strong>The integrity story is complete.</strong> Immutable path, subresource hash, a gate that refuses to deploy a stale hash, and a smoke check that the live page still serves it. That chain did not exist five months ago.</li>
+    </ul>
+
+    <h4 data-i18n="review.h.bad">Where I would still push</h4>
+    <ul>
+      <li data-i18n-html="review.b1"><strong>The specification mandates ten locales for your labels and is published in one.</strong> Defensible — English is the working language of the trade — but it should be said rather than left as an apparent inconsistency. This landing page now ships in ten; the specification does not.</li>
+      <li data-i18n-html="review.b2"><strong>Adoption rests on a promise nothing enforces.</strong> Stable ids are the whole value, and the project correctly says it has no way to make you keep them. That is honest, and it is the single biggest risk to anyone building on it: rename an id and every caller breaks, exactly as a changed URL breaks a bookmark.</li>
+      <li data-i18n-html="review.b3"><strong>A declared payload schema is not a validated one.</strong> A manifest may carry one and the reference runtime never reads it. The spec says so. It still means a conformant host can advertise a shape it does not check.</li>
+      <li data-i18n-html="review.b4"><strong>Stewardship is one vendor.</strong> The RFC process and the governance page are real, but the editor, the reference runtime and the flagship adopter are the same organisation. Normal at this stage, and the thing a second independent implementer would change.</li>
+    </ul>
+
+    <h4 data-i18n="review.h.verdict">Verdict</h4>
+    <p style="font-size:.92rem;color:var(--ct2);margin:0" data-i18n-html="review.verdict">Worth adopting if you have more than one caller — voice and chat and tests and RPA — or workflows that cross apps, or you want integrations that survive a change of agent vendor. Not worth the mental cost if you only need stable selectors for a test suite: use <code>data-testid</code> and come back when the second caller arrives. And read the limits section before you migrate, not after.</p>
+
+    <div class="receipt">
+      <strong class="lbl" data-i18n="review.receipt.label">Receipt</strong>
+      <p data-i18n="review.receipt.p1">This is the opinion of a language model. It is not a measurement and not an audit certificate. What it rests on is listed above and can be repeated: the specification, the contract API, the runtime bytes, the deploy workflow and the live endpoints are all public.</p>
+      <p data-i18n-html="review.receipt.p2">The same reviewer audited this project earlier in 2026, and several items listed above as strengths — the integrity chain, the contract as data, the limits section, the receipts — were opened as defects then and closed since. That is a conflict of interest worth knowing about, and it is why the weaknesses are listed with the same specificity as the strengths.</p>
     </div>
   </div>
-</section>
+</div></section>
 
-<!-- Peer reviews featured callout -->
-<section class="peer-callout"
-         data-nac-id="nac_landing.section.peer_reviews"
-         data-nac-role="section">
-  <div class="container">
-    <a class="peer-card"
-       href="peer-reviews.html"
-       data-nac-id="nac_landing.peer_card.link"
-       data-nac-role="action"
-       data-nac-action="open_peer_reviews">
-      <div class="peer-card-left">
-        <span class="peer-kanji" aria-hidden="true">&#22768;</span>
-      </div>
-      <div class="peer-card-body">
-        <div class="peer-card-eyebrow">PEER REVIEWS &middot; 2026-05</div>
-        <h2 class="peer-card-title">
-          Six independent AI systems just evaluated NAC under the 2026 post-human paradigm.
-        </h2>
-        <p class="peer-card-quote">
-          <strong>"Architecturally inevitable."</strong> &mdash; ChatGPT-5
-          &nbsp;&middot;&nbsp;
-          <strong>"Right problems, right primitives."</strong> &mdash; Claude Opus
-          &nbsp;&middot;&nbsp;
-          <strong>"Not a luxury &mdash; a fundamental requirement."</strong> &mdash; DeepSeek
-        </p>
-        <p class="peer-card-stats">
-          <span><strong>80&ndash;90%</strong> less LLM hallucination</span>
-          <span class="peer-stat-sep">&middot;</span>
-          <span><strong>90%</strong> fewer tokens vs raw HTML</span>
-          <span class="peer-stat-sep">&middot;</span>
-          <span><strong>80&ndash;95%</strong> less visual RPA</span>
-          <span class="peer-stat-sep">&middot;</span>
-          <span><strong>~0</strong> test maintenance</span>
-        </p>
-        <span class="peer-card-cta">
-          Read the full peer reviews &rarr;
-        </span>
-      </div>
-    </a>
-    <p class="card-receipt" data-nac-id="nac_landing.peer_card.receipt" data-nac-role="region">
-      <span class="receipt-label">Receipt</span> &middot; Six AI systems were handed the spec and
-      asked to evaluate it; their answers are published verbatim, each in the language it was
-      written in, at <a href="peer-reviews.html" data-nac-id="nac_landing.peer_card.receipt_link"
-      data-nac-role="action" data-nac-action="open_peer_reviews">peer-reviews.html</a>.
-      Written 2026-05, against NAC3 v2.2&ndash;v2.3.
-      <strong>The percentages in this card are the reviewers&rsquo; own converging estimates, not
-      measurements.</strong> The measured numbers are the benchmark below.
-    </p>
+<div class="wrap"><div class="divider"><span class="kanji">証</span></div></div>
+
+<section id="testing"><div class="wrap">
+  <div class="hl">
+    <p class="eyebrow" style="color:var(--ctl)"><span class="dot" style="background:var(--ctl)"></span><span data-i18n="ura.eyebrow">End-to-end testing</span></p>
+    <h2 data-i18n-html="ura.h2"><span class="ura">裏付け</span>&nbsp; If you build with the Urazuke method, this is where NAC3 pays for itself.</h2>
+    <p class="lede" data-i18n="ura.lede">Urazuke is a free method for building software with AI in which the owner of the project verifies evidence instead of reading code. Its very first gate — step zero — excludes any technology that cannot be tested end to end: you have to be able to drive the screen by program, click, type and read state, and then verify that the change actually reached the backend. If you cannot, somebody ends up reading code, which is the one thing the method promises to avoid.</p>
+    <ol>
+      <li data-i18n-html="ura.l1"><strong>The method asks for the capability, not for us.</strong> Urazuke states explicitly that NAC3 is <em>not</em> a requirement — it is one way its author reaches that capability today. Any technology whose interface exposes its elements to a driver satisfies the gate.</li>
+      <li data-i18n-html="ura.l2"><strong>What NAC3 adds is that the names survive.</strong> A test says <code>NAC.click('invoice.save')</code>. The design team moves that button from a toolbar into a dropdown. The test keeps passing. That is the difference between a suite you maintain and a suite you rewrite.</li>
+      <li data-i18n-html="ura.l3"><strong>And the suite can be generated.</strong> From a manifest: one test per role and acknowledgement family, across Playwright, Cypress, Vitest and WebdriverIO. In the case study below that produced 66 end-to-end tests — 4.7× more cases than the fork's hand-written suite.</li>
+    </ol>
+    <div class="cta-row" style="margin:1.1rem 0 0">
+      <a class="btn btn-p" style="background:var(--ctl)" href="https://yujin.app/urazuke/" data-i18n="ura.cta">Read the Urazuke method →</a>
+      <a class="btn btn-s" href="guides/LLM_WIRING.md" data-i18n="ura.cta2">How the wiring works</a>
+    </div>
+    <p class="caveat" data-i18n-html="ura.caveat"><strong>Said plainly:</strong> you do not need NAC3 to apply Urazuke, and you do not need Urazuke to use NAC3. They are a method and a protocol, by different authors, under different licences. They meet at exactly one point — step zero's testability criterion — and that point is where using both costs less than using either alone.</p>
   </div>
-</section>
+</div></section>
 
-<!-- Benchmark callout -->
-<section class="bench-callout"
-         data-nac-id="nac_landing.section.benchmark"
-         data-nac-role="section">
-  <div class="container">
-    <a class="bench-card"
-       href="benchmark/"
-       data-nac-id="nac_landing.bench_card.link"
-       data-nac-role="action"
-       data-nac-action="open_benchmark">
-      <div class="bench-card-left">
-        <span class="bench-kanji" aria-hidden="true">&#35430;</span>
-      </div>
-      <div class="bench-card-body">
-        <div class="bench-card-eyebrow">EMPIRICAL BENCHMARK &middot; 2026-05</div>
-        <h2 class="bench-card-title">
-          600 runs across 5 models and 3 protocols. NAC3 caught zero phantom selectors; Raw DOM passed CI with broken selectors on 15% of runs.
-        </h2>
-        <p class="bench-card-quote">
-          <strong>95.5%</strong> NAC3 success
-          &nbsp;&middot;&nbsp;
-          <strong>0/200</strong> silent damage (vs 30/200 in Raw)
-          &nbsp;&middot;&nbsp;
-          <strong>3.5&times;</strong> fewer round-trips than MCP
-        </p>
-        <p class="bench-card-stats">
-          <span><strong>5 models</strong> tested</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>~US$15</strong> to re-run</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>1h 23min</strong> wall-clock</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>fully reproducible</strong> &middot; bundle included</span>
-        </p>
-        <span class="bench-card-cta">
-          See results &amp; methodology &rarr;
-        </span>
-      </div>
-    </a>
-    <p class="card-receipt" data-nac-id="nac_landing.bench_card.receipt" data-nac-role="region">
-      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-19</strong> against
-      <strong>NAC3 runtime v2.3</strong> &middot; 600 runs &middot; 5 models (Sonnet 4.6, Haiku 4.5,
-      DeepSeek-chat, Gemini 3.1 Flash Lite, GPT-4o-mini) &middot; 1h 23min wall-clock &middot; ~US$15.
-      Raw output: <a href="benchmark/results.html" data-nac-id="nac_landing.bench_card.receipt_results"
-      data-nac-role="action" data-nac-action="open_benchmark_results">results.html</a> &middot;
-      method: <a href="benchmark/methodology.html" data-nac-id="nac_landing.bench_card.receipt_method"
-      data-nac-role="action" data-nac-action="open_benchmark_methodology">methodology.html</a> &middot;
-      bundle: <a href="benchmark/nac3-benchmark-v2.3.tar.gz" data-nac-id="nac_landing.bench_card.receipt_bundle"
-      data-nac-role="action" data-nac-action="download_benchmark_bundle">nac3-benchmark-v2.3.tar.gz</a>.
-      Re-run it: <code>tar -xzf nac3-benchmark-v2.3.tar.gz &amp;&amp; npm install &amp;&amp; bash scripts/run_final_600.sh</code>.
-      <strong>These figures have not been re-measured on a later runtime</strong>, so read them as
-      what v2.3 did, not as a claim about the current release.
-    </p>
+<div class="wrap"><div class="divider"><span class="kanji">試</span></div></div>
+
+<section id="api"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="api.eyebrow">The contract, as data</span></p>
+    <h2 data-i18n="api.h2">Read the contract with a program, not with your eyes.</h2>
+    <p class="lede" data-i18n="api.lede">Roles, verbs, the event family, the finding codes and the three conformance levels are published as JSON, per version, with a hash you recompute over the canonicalised payload. A tool that consumes NAC3 never has to parse a markdown file or read our implementation to know what the contract says.</p>
   </div>
-</section>
-
-<!-- Conduit case study callout -->
-<section class="bench-callout"
-         data-nac-id="nac_landing.section.conduit"
-         data-nac-role="section">
-  <div class="container">
-    <a class="bench-card"
-       href="conduit/"
-       data-nac-id="nac_landing.conduit_card.link"
-       data-nac-role="action"
-       data-nac-action="open_conduit">
-      <div class="bench-card-left">
-        <span class="bench-kanji" aria-hidden="true">&#26085;</span>
-      </div>
-      <div class="bench-card-body">
-        <div class="bench-card-eyebrow">CASE STUDY &middot; 2026-05 &middot; CONDUIT (REALWORLD)</div>
-        <h2 class="bench-card-title">
-          Forge migrated Conduit -- 47 React components, $0.46, ~70 seconds -- and auto-generated 66 e2e tests across 4 frameworks. 4.7&times; more cases than the fork's hand-written Cypress.
-        </h2>
-        <p class="bench-card-quote">
-          <strong>--ai-apply</strong> walks JSX with Claude
-          &nbsp;&middot;&nbsp;
-          <strong>59 manifest elements</strong>, semantic IDs + imperative verbs
-          &nbsp;&middot;&nbsp;
-          <strong>4 frameworks</strong> (Playwright/Cypress/Vitest/WDIO)
-        </p>
-        <p class="bench-card-stats">
-          <span><strong>47 files</strong> scanned, 34 decorated</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>~$0.50</strong> end-to-end</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>SPA-aware</strong> bridge (MutationObserver on route change)</span>
-        </p>
-        <span class="bench-card-cta">
-          Read the Conduit case study &rarr;
-        </span>
-      </div>
-    </a>
-    <p class="card-receipt" data-nac-id="nac_landing.conduit_card.receipt" data-nac-role="region">
-      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-22</strong> against
-      <strong>NAC3 v2.3.1</strong> on the RealWorld &ldquo;Conduit&rdquo; React application, 47 components.
-      The full write-up, the two gate verdicts and the failure deep-dives &mdash; including what did
-      not work &mdash; are published at <a href="conduit/" data-nac-id="nac_landing.conduit_card.receipt_link"
-      data-nac-role="action" data-nac-action="open_conduit">conduit/</a>.
-      <strong>Not re-measured on a later runtime.</strong>
-    </p>
+  <div class="grid g4">
+    <div class="card"><span class="tag teal" data-i18n="api.c1.t">directory</span><h4><code>api/index.json</code></h4><p data-i18n="api.c1.p">What exists, with the append-only hash record.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c2.t">pointers</span><h4><code>api/latest.json</code></h4><p data-i18n="api.c2.p">Which version is stable and which is preview.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c3.t">contract</span><h4><code>api/v/2.5.0/contract.json</code></h4><p data-i18n="api.c3.p">Roles, attributes, verbs, events.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c4.t">levels</span><h4><code>api/v/2.5.0/levels.json</code></h4><p data-i18n="api.c4.p">Conformance levels and what each one requires. The finding catalogue sits next to it.</p></div>
   </div>
-</section>
+</div></section>
 
-<!-- Migration paper callout -->
-<section class="bench-callout"
-         data-nac-id="nac_landing.section.migration"
-         data-nac-role="section">
-  <div class="container">
-    <a class="bench-card"
-       href="migration/"
-       data-nac-id="nac_landing.migration_card.link"
-       data-nac-role="action"
-       data-nac-action="open_migration">
-      <div class="bench-card-left">
-        <span class="bench-kanji" aria-hidden="true">&#22411;</span>
-      </div>
-      <div class="bench-card-body">
-        <div class="bench-card-eyebrow">MIGRATION PAPER &middot; 2026-05</div>
-        <h2 class="bench-card-title">
-          One vanilla calculator, three NAC3 decoration paths -- Forge silent, Forge assisted, Sumi manual. All three hit 5/5 functional. The reading is in the deltas.
-        </h2>
-        <p class="bench-card-quote">
-          <strong>$0.045</strong> per decoration via Forge
-          &nbsp;&middot;&nbsp;
-          <strong>15/15</strong> dispatch tasks OK
-          &nbsp;&middot;&nbsp;
-          <strong>+24%</strong> manual i18n bloat
-        </p>
-        <p class="bench-card-stats">
-          <span><strong>3 decorations</strong> compared</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>byte-by-byte</strong> diff</span>
-          <span class="bench-stat-sep">&middot;</span>
-          <span><strong>live demos</strong> &middot; drive each calc with Pilot</span>
-        </p>
-        <span class="bench-card-cta">
-          Read the migration paper &rarr;
-        </span>
-      </div>
-    </a>
-    <p class="card-receipt" data-nac-id="nac_landing.migration_card.receipt" data-nac-role="region">
-      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-20</strong> against
-      <strong>NAC3 v2.3 / v2.3.1</strong> &middot; one vanilla calculator, three decoration paths.
-      Raw output: <a href="migration/results.html" data-nac-id="nac_landing.migration_card.receipt_results"
-      data-nac-role="action" data-nac-action="open_migration_results">results.html</a> &middot;
-      byte-by-byte diff: <a href="migration/byte-diff.html" data-nac-id="nac_landing.migration_card.receipt_diff"
-      data-nac-role="action" data-nac-action="open_migration_diff">byte-diff.html</a> &middot;
-      method: <a href="migration/methodology.html" data-nac-id="nac_landing.migration_card.receipt_method"
-      data-nac-role="action" data-nac-action="open_migration_methodology">methodology.html</a>.
-      <strong>Not re-measured on a later runtime.</strong>
-    </p>
+<div class="wrap"><div class="divider"><span class="kanji">見</span></div></div>
+
+<section id="demos"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="demos.eyebrow">Live demos</span></p>
+    <h2 data-i18n="demos.h2">All of them open in your browser.</h2>
+    <p class="lede" data-i18n="demos.lede">The data-table demo is wired to a live chat backend — talk to it. The others need nothing but the page.</p>
   </div>
-</section>
-
-<!-- How small -->
-<section data-nac-id="nac_landing.section.howsmall" data-nac-role="section">
-  <div class="container">
-    <h2>How small is small</h2>
-    <p class="section-lede">A button you already shipped, with three extra attributes:</p>
-<pre><span class="comment">&lt;!-- Decorate the button --&gt;</span>
-&lt;button <span class="keyword">data-nac-id</span>=<span class="string">"invoice.save"</span>
-        <span class="keyword">data-nac-role</span>=<span class="string">"action"</span>
-        <span class="keyword">data-nac-action</span>=<span class="string">"save"</span>
-        onclick=<span class="string">"saveInvoice()"</span>&gt;
-  Save
-&lt;/button&gt;
-
-<span class="comment">// Now any agent can drive it:</span>
-await NAC.click(<span class="string">'invoice.save'</span>);              <span class="comment">// by id</span>
-await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="string">'save'</span>);   <span class="comment">// by verb</span></pre>
-
-    <p class="section-lede" style="margin-top: 24px;">Add the runtime once. Production pins the immutable path and verifies it with a hash:</p>
-<pre>npm install @nac3/runtime
-<span class="comment">// or via CDN:</span>
-&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
-        integrity=<span class="string">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
-        crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;</pre>
-
-    <p class="section-lede"><strong>Which URL.</strong> <code>js/2.5.0/nac.js</code> is immutable -- those bytes never change, so pin it in production. <code>js/nac.js</code> is a moving alias that always serves the newest build; use it only to try things, never to pin. The <code>integrity</code> attribute makes the browser refuse a file that does not match the published hash, so a corrupted or substituted download fails loudly instead of running.</p>
-
-    <p class="section-lede"><strong>Recompute the hash yourself.</strong> Do not take the value above on faith:</p>
-<pre><span class="comment"># one line, no dependencies -- prints the same string that is in the tag</span>
-node -e <span class="string">"const c=require('crypto'),f=require('fs');console.log('sha384-'+c.createHash('sha384').update(f.readFileSync('nac.js')).digest('base64'))"</span>
-<span class="comment"># in this repository the same check runs as a gate</span>
-node scripts/build-integrity.mjs</pre>
+  <div class="grid g3">
+    <div class="card"><span class="tag">v1.9</span><h3 data-i18n="demos.d1.h">27 widgets, the full surface</h3><p data-i18n="demos.d1.p">The canonical reference demo: chat, calendar, autopilot, modals, tabs and charts in production-shaped UI.</p><a href="example.php" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d2.h">The primitives, one by one</h3><p data-i18n="demos.d2.p">A didactic showcase of the eight v2.0 primitives plus HMAC, isTrusted and the i18n contract. One section per primitive.</p><a href="example-v20-primitives-showcase.php" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d3.h">A brownfield migration</h3><p data-i18n="demos.d3.p">The same 27 widgets, the same HTML and handlers, with the strict layer applied in about 80 lines of setup. Adoption does not mean rewriting every widget.</p><a href="example-v20-full.php" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag rust">v2.1 · chat</span><h3 data-i18n="demos.d4.h">Talk to a data table</h3><p data-i18n="demos.d4.p">Wired to a live chat backend. Ask it to add a row, delete one, jump to a tab or read you the total.</p><a href="example-v21-data-table.php" data-i18n="demos.try">Try the chat →</a></div>
+    <div class="card"><span class="tag">v2.3</span><h3 data-i18n="demos.d5.h">The field editor</h3><p data-i18n="demos.d5.p">A modal with eight callable verbs: select word, select sentence, select all, replace, delete selection, correct syntax, save and cancel.</p><a href="example-v23-editor.php" data-i18n="demos.try">Try the editor →</a></div>
+    <div class="card"><span class="tag rust">v2.4</span><h3 data-i18n="demos.d6.h">Ambiguity, and refusing to guess</h3><p data-i18n="demos.d6.p">Two reservations share a suffix. The lenient path used to pick the first one silently; now it throws, names the candidates and asks. A button shows the old silent-damage path for contrast.</p><a href="example-v24-disambiguation.php" data-i18n="demos.try">Try disambiguation →</a></div>
+    <div class="card"><span class="tag">React 18 · npm</span><h3 data-i18n="demos.d7.h">React study case</h3><p data-i18n="demos.d7.p">A compiled React and Vite app consuming the real package from npm. Todos UI, chat panel, autopilot tour.</p><a href="demos/react/" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">Angular 17 · npm</span><h3 data-i18n="demos.d8.h">Angular study case</h3><p data-i18n="demos.d8.p">A standalone Angular mirror of the React case. Same UI, same flows, signals and a service wrapper.</p><a href="demos/angular/" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag rust">voice · live</span><h3 data-i18n="demos.d9.h">A voice-driven advertisement</h3><p data-i18n="demos.d9.p">The visitor speaks, the agent fills the form against a manifest and submits the lead. Ten languages.</p><a href="ads-demo/atlas-pro/" data-i18n="demos.try">Try the live demo →</a></div>
   </div>
-</section>
+</div></section>
 
-<!-- Live demos -->
-<section data-nac-id="nac_landing.section.demos" data-nac-role="section">
-  <div class="container">
-    <h2>Live demos</h2>
-    <p class="section-lede">All four open in your browser. The v21 data-table demo is wired to the Yujin chat backend -- talk to it.</p>
+<div class="wrap"><div class="divider"><span class="kanji">用</span></div></div>
 
-    <div class="demos">
-      <div class="demo-card" data-nac-id="nac_landing.democard.v19" data-nac-role="region">
-        <div class="head">
-          <span class="file">example.php</span>
-          <span class="version">v1.9 stable</span>
-        </div>
-        <p>The canonical NAC v1.9 demo. 27 widgets (chat, calendar, autopilot, modals, tabs, charts) covering the full v1.9 surface in production-shaped UI.</p>
-        <a class="open"
-           href="example.php"
-           data-nac-id="nac_landing.democard.v19.open"
-           data-nac-role="action"
-           data-nac-action="open">Open demo &rarr;</a>
-      </div>
+<section id="uses"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="uses.eyebrow">Use cases</span></p>
+    <h2 data-i18n="uses.h2">Voice and chat is the headline. The contract underneath unlocks four more.</h2>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3><span class="kanji">聲</span><span data-i18n="uses.u1.h">Voice and chat</span></h3><p data-i18n="uses.u1.p">Voice runners and chat agents drive the same UI a person uses, by stable name, in ten locales out of the box.</p></div>
+    <div class="card"><h3><span class="kanji">助</span><span data-i18n="uses.u2.h">Accessibility</span></h3><p data-i18n="uses.u2.p">Switch devices, head-trackers, eye-gaze, braille displays and predictive keyboards get a stable target tree without a per-app retrofit. Where ARIA stops at “this is a button”, NAC3 says “this button has a verb you can call”.</p></div>
+    <div class="card"><h3><span class="kanji">試</span><span data-i18n="uses.u3.h">Testing and QA</span></h3><p data-i18n="uses.u3.p">Names that survive redesigns, consumed by Selenium, Playwright, Cypress and headless browsers alike. Test corpora can be generated per role and acknowledgement family.</p></div>
+    <div class="card"><h3><span class="kanji">機</span><span data-i18n="uses.u4.h">RPA</span></h3><p data-i18n="uses.u4.p">No brittle CSS, no screenshot OCR, no XPath rituals: the bot reads the description, picks an action by verb and waits on the canonical event. One bot drives ten vendors' apps if all ten implement the contract.</p></div>
+    <div class="card"><h3><span class="kanji">代</span><span data-i18n="uses.u5.h">Agentic control</span></h3><p data-i18n="uses.u5.p">Models drive web UIs by name with no per-app fine-tuning, and a host agent can import a peer app's tree and proxy dispatches into it.</p></div>
+  </div>
+</div></section>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.v20p" data-nac-role="region">
-        <div class="head">
-          <span class="file">example-v20-primitives-showcase.php</span>
-          <span class="version">v2.0-rc4</span>
-        </div>
-        <p>Didactic showcase of the eight v2.0 primitives + HMAC + isTrusted + i18n contract. One section per primitive. Read this if you want to understand each new thing in isolation.</p>
-        <a class="open"
-           href="example-v20-primitives-showcase.php"
-           data-nac-id="nac_landing.democard.v20p.open"
-           data-nac-role="action"
-           data-nac-action="open">Open demo &rarr;</a>
-      </div>
+<div class="wrap"><div class="divider"><span class="kanji">層</span></div></div>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.v20" data-nac-role="region">
-        <div class="head">
-          <span class="file">example-v20-full.php</span>
-          <span class="version">v2.0-rc4</span>
-        </div>
-        <p>Brownfield migration of the v1.9 demo to v2.0 strict. Same 27 widgets, same HTML, same handlers -- v2.0 layer applied via ~80 lines of setup. Demonstrates that adoption does not require rewriting every widget.</p>
-        <a class="open"
-           href="example-v20-full.php"
-           data-nac-id="nac_landing.democard.v20.open"
-           data-nac-role="action"
-           data-nac-action="open">Open demo &rarr;</a>
-      </div>
+<section id="stack"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="stack.eyebrow">Where it fits</span></p>
+    <h2 data-i18n="stack.h2">NAC3 is the client-side half. MCP is the server-side half.</h2>
+    <p class="lede" data-i18n="stack.lede">It does not compete with the tools below: it overlaps narrowly and complements in others. If you have one of these problems, use the dedicated tool. If you have several, the contract unifies them.</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th data-i18n="stack.th1">Layer</th><th data-i18n="stack.th2">What it solves</th><th data-i18n="stack.th3">Where it stops</th><th data-i18n="stack.th4">Relationship</th></tr></thead>
+    <tbody>
+      <tr><td><strong>MCP</strong></td><td data-i18n="stack.r1a">The agent calls server-side tools and functions.</td><td data-i18n="stack.r1b">Does not touch the UI: the agent cannot navigate, fill a form or read on-screen state.</td><td data-i18n-html="stack.r1c"><strong>Complement.</strong> MCP for backend operations, NAC3 for the UI half.</td></tr>
+      <tr><td><strong>ARIA</strong></td><td data-i18n="stack.r2a">An accessibility tree for screen readers and switch devices.</td><td data-i18n="stack.r2b">Stops at “this is a button named Save”: no verb to call, no completion event.</td><td data-i18n-html="stack.r2c"><strong>Sits next to.</strong> Keep your roles. Many adopters carry both attributes on the same element.</td></tr>
+      <tr><td><strong><code>data-testid</code></strong></td><td data-i18n="stack.r3a">Stable selectors for test runners.</td><td data-i18n="stack.r3b">Test-only: no manifest, no event family, no provenance, no i18n.</td><td data-i18n-html="stack.r3c"><strong>Superset, at a higher mental cost.</strong> If you only need tests, <code>data-testid</code> is fine.</td></tr>
+      <tr><td><strong>AG-UI</strong></td><td data-i18n="stack.r4a">An agent-to-app protocol for chat-driven UIs.</td><td data-i18n="stack.r4b">Tied to its framework and runtime; less focus on RPA, accessibility and cross-vendor models.</td><td data-i18n-html="stack.r4c"><strong>Adjacent.</strong> A different bet on the same space, funded and with an ecosystem. Pick it if you build on that framework.</td></tr>
+      <tr><td><strong data-i18n="stack.r5n">Vision / computer use</strong></td><td data-i18n="stack.r5a">The agent reads pixels and reasons over screenshots.</td><td data-i18n="stack.r5b">Slow, expensive, brittle on dynamic content, and entirely dependent on the model.</td><td data-i18n-html="stack.r5c"><strong>Fallback layer.</strong> Vision is what the agent uses when the contract is absent.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="receipt"><strong class="lbl" data-i18n="stack.honest.label">Honest read</strong><p data-i18n="stack.honest.p">If you are inside a single app with a single agent vendor, MCP on the server plus a screen-reader-grade ARIA pass on the client covers most cases. NAC3 starts paying back when you have multiple callers, cross-app workflows, or you want integrations that outlive your choice of agent vendor.</p></div>
+</div></section>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.v21" data-nac-role="region">
-        <div class="head">
-          <span class="file">example-v21-data-table.php</span>
-          <span class="version">v2.1 + chat</span>
-        </div>
-        <p>Live data-table demo wired to the Yujin chat backend (Claude Sonnet). Talk to it: "agrega monitor cantidad 1 a 250", "borra el teclado", "ve a permisos", "leeme el total".</p>
-        <a class="open"
-           href="example-v21-data-table.php"
-           data-nac-id="nac_landing.democard.v21.open"
-           data-nac-role="action"
-           data-nac-action="open">Try the chat &rarr;</a>
-      </div>
+<div class="wrap"><div class="divider"><span class="kanji">限</span></div></div>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.v23editor" data-nac-role="region">
-        <div class="head">
-          <span class="file">example-v23-editor.php</span>
-          <span class="version">v2.3 preview</span>
-        </div>
-        <p>Field editor primitive. Click "Edit" on any field -- a Word-style modal opens with 8 NAC3-callable verbs: select_word, select_sentence, select_all, replace, delete_selection, ai_correct_syntax, save, cancel. Or ask the chat "edita la descripcion y corrige la gramatica".</p>
-        <a class="open"
-           href="example-v23-editor.php"
-           data-nac-id="nac_landing.democard.v23editor.open"
-           data-nac-role="action"
-           data-nac-action="open">Try the editor &rarr;</a>
-      </div>
+<section id="limits"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="limits.eyebrow">What it does not cover</span></p>
+    <h2 data-i18n="limits.h2">NAC3 names what lives in the DOM. Everything here is outside that line.</h2>
+    <p class="lede" data-i18n="limits.lede">We would rather you read this before you migrate than discover it after.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h4 data-i18n="limits.l1.h">Canvas and WebGL</h4><p data-i18n="limits.l1.p">NAC3 does not read pixels. In a document editor or a design tool the toolbar around the drawing can be named; the drawing cannot. A plugin can declare how its verbs route to the app's own API — somebody still has to write it.</p></div>
+    <div class="card"><h4 data-i18n="limits.l2.h">Closed shadow roots</h4><p data-i18n="limits.l2.p">A component mounted closed is unreachable unless its author exposes a resolver. That is a browser security boundary, not our decision, and the runtime reports it instead of guessing. Open roots are covered, nested.</p></div>
+    <div class="card"><h4 data-i18n="limits.l3.h">Cross-origin frames</h4><p data-i18n="limits.l3.p">An embedded page from another origin cannot be driven unless it cooperates. When it does not, the runtime fails closed rather than pretending the click landed.</p></div>
+    <div class="card"><h4 data-i18n="limits.l4.h">Anything that is not the web</h4><p data-i18n="limits.l4.p">NAC3 is HTML attributes. Desktop, mobile-native and terminal applications are out of scope.</p></div>
+    <div class="card"><h4 data-i18n="limits.l5.h">It is not a permission system</h4><p data-i18n="limits.l5.p">A named verb is an intent-level signal and the capability gate is a usability optimisation. Your server must still authorise every call.</p></div>
+    <div class="card"><h4 data-i18n="limits.l6.h">A declared schema is not a validated one</h4><p data-i18n="limits.l6.p">A manifest may carry a payload schema and the reference runtime never reads it. An agent must not assume a payload was checked.</p></div>
+    <div class="card"><h4 data-i18n="limits.l7.h">Stability is yours to keep</h4><p data-i18n="limits.l7.p">Stable names are a promise you keep, not one we enforce. Rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p></div>
+    <div class="card"><h4 data-i18n="limits.l8.h">It does not make an agent correct</h4><p data-i18n-html="limits.l8.p">In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is <em>silent</em> damage — 0 of 200 runs against 30 of 200 on raw DOM — not the need to check what an agent did.</p></div>
+  </div>
+</div></section>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.v24disambig" data-nac-role="region">
-        <div class="head">
-          <span class="file">example-v24-disambiguation.php</span>
-          <span class="version">v2.4 stable</span>
-        </div>
-        <p>Strict resolution + disambiguation contract. Two reservations share the suffix <code>__urgent</code>. A "cancel urgent" call would have silently picked the first match under the v2.3 lenient indexOf fallback. v2.4 throws <code>ambiguous_qualifier</code> with <code>err.candidates</code> + emits <code>nac:disambiguation_requested</code> so the chat / voice host can prompt "did you mean A or B?". The lenient-simulation button shows the silent damage path for contrast.</p>
-        <a class="open"
-           href="example-v24-disambiguation.php"
-           data-nac-id="nac_landing.democard.v24disambig.open"
-           data-nac-role="action"
-           data-nac-action="open">Try disambiguation &rarr;</a>
-      </div>
+<div class="wrap"><div class="divider"><span class="kanji">数</span></div></div>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.react" data-nac-role="region">
-        <div class="head">
-          <span class="file">demos/react/</span>
-          <span class="version">v2.2 npm + React 18</span>
-        </div>
-        <p>Compiled React + Vite study case running on this server. Real <code>@nac3/runtime</code> package consumed via npm. Todos UI + chat panel + autopilot tour. Yujin design tokens. <code>npm run build</code> output served as static assets.</p>
-        <a class="open"
-           href="demos/react/"
-           data-nac-id="nac_landing.democard.react.open"
-           data-nac-role="action"
-           data-nac-action="open">Open React demo &rarr;</a>
-      </div>
+<section id="evidence"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="ev.eyebrow">Measured, with receipts</span></p>
+    <h2 data-i18n="ev.h2">Two measurements, both reproducible, neither re-run on the current release.</h2>
+  </div>
 
-      <div class="demo-card" data-nac-id="nac_landing.democard.angular" data-nac-role="region">
-        <div class="head">
-          <span class="file">demos/angular/</span>
-          <span class="version">v2.2 npm + Angular 17</span>
-        </div>
-        <p>Compiled Angular 17 standalone mirror of the React study case. Same UI, signals + onChatAction overrides + <code>NacService</code> wrapper. <code>ng build</code> output served as static assets.</p>
-        <a class="open"
-           href="demos/angular/"
-           data-nac-id="nac_landing.democard.angular.open"
-           data-nac-role="action"
-           data-nac-action="open">Open Angular demo &rarr;</a>
-      </div>
+  <div class="card" style="margin-bottom:1rem">
+    <span class="tag rust" data-i18n="ev.b.tag">Benchmark · May 2026</span>
+    <h3 data-i18n="ev.b.h">600 runs, five models, three protocols</h3>
+    <p data-i18n="ev.b.p">NAC3 caught zero phantom selectors. Raw DOM passed CI with broken selectors on 15% of runs.</p>
+    <div class="figs">
+      <div class="fig"><div class="k">95.5%</div><div class="l" data-i18n="ev.b.f1">NAC3 success rate</div></div>
+      <div class="fig"><div class="k">0/200</div><div class="l" data-i18n="ev.b.f2">silent damage, against 30/200 on raw DOM</div></div>
+      <div class="fig"><div class="k">3.5×</div><div class="l" data-i18n="ev.b.f3">fewer round-trips than MCP</div></div>
+      <div class="fig"><div class="k">~US$15</div><div class="l" data-i18n="ev.b.f4">to re-run it yourself · 1 h 23 min</div></div>
+    </div>
+    <a href="benchmark/" data-i18n="ev.b.cta">See results and methodology →</a>
+    <div class="receipt"><strong class="lbl" data-i18n="ev.receipt">Receipt</strong>
+      <p data-i18n="ev.b.r1">Run 2026-05-19 against runtime v2.3. Five models, 1 h 23 min wall-clock, about US$15. Raw output, methodology and a reproducible bundle are published; the bundle re-runs with three commands.</p>
+      <p data-i18n-html="ev.b.r2"><strong>These figures have not been re-measured on a later runtime.</strong> Read them as what v2.3 did, not as a claim about the current release.</p>
     </div>
   </div>
-</section>
 
-<!-- Adopters / Made with NAC3 -->
-<section class="section" id="adopters" data-nac-id="nac_landing.section.adopters" data-nac-role="section">
-  <div class="container">
-    <h2>Made with NAC3</h2>
-    <p class="section-lede">Apps that ship the NAC3 contract today. Your project belongs here -- see the bounty program below.</p>
-    <div class="adopter-grid">
-      <div class="adopter-card" data-nac-id="nac_landing.adopter.yujin_crm" data-nac-role="region">
-        <span class="adopter-kanji" aria-hidden="true">&#27005;</span>
-        <h3>Yujin CRM</h3>
-        <p>The reference production app. Sales pipelines, deliveries, inventory, finance -- every screen NAC3-compliant.</p>
-        <a href="https://yujin.app" data-nac-id="nac_landing.adopter.yujin_crm.open" data-nac-role="action" data-nac-action="open">Visit &rarr;</a>
-      </div>
-      <div class="adopter-card" data-nac-id="nac_landing.adopter.demos" data-nac-role="region">
-        <span class="adopter-kanji" aria-hidden="true">&#35211;</span>
-        <h3>Reference demos</h3>
-        <p>Eight live demos (vanilla, React, Angular, data-table, interop). Public source, Apache-2.0.</p>
-        <a href="#demos" data-nac-id="nac_landing.adopter.demos.open" data-nac-role="action" data-nac-action="open">See demos &rarr;</a>
-      </div>
-      <div class="adopter-card" data-nac-id="nac_landing.adopter.atlas_pro" data-nac-role="region">
-        <span class="adopter-kanji" aria-hidden="true">&#36275;</span>
-        <h3>Atlas Pro voice ad</h3>
-        <p>Voice-driven advertisement that closes the sale itself. The visitor speaks, the agent fills the form against a NAC3 manifest, submits the lead to a CRM. Ten languages. Live.</p>
-        <a href="ads-demo/atlas-pro/" data-nac-id="nac_landing.adopter.atlas_pro.open" data-nac-role="action" data-nac-action="open">Try the live demo &rarr;</a>
-      </div>
-      <div class="adopter-card adopter-placeholder" data-nac-id="nac_landing.adopter.yours" data-nac-role="region">
-        <span class="adopter-kanji" aria-hidden="true">&#21531;</span>
-        <h3>Your app</h3>
-        <p>Run our AI playbook to migrate any web app to NAC3 in a single afternoon. Claim a bounty for the first 10 OSS apps.</p>
-        <a href="guides/AI_PLAYBOOK_NEW_PROJECT.md" data-nac-id="nac_landing.adopter.yours.playbook" data-nac-role="action" data-nac-action="open">AI playbook &rarr;</a>
-      </div>
+  <div class="card">
+    <span class="tag rust" data-i18n="ev.c.tag">Case study · May 2026</span>
+    <h3 data-i18n="ev.c.h">Migrating a real open-source app</h3>
+    <p data-i18n="ev.c.p">47 React components decorated for about US$0.46 in roughly 70 seconds, with 66 end-to-end tests generated across four frameworks — 4.7× more cases than the fork's hand-written suite.</p>
+    <div class="figs">
+      <div class="fig"><div class="k">47 → 34</div><div class="l" data-i18n="ev.c.f1">files scanned, files decorated</div></div>
+      <div class="fig"><div class="k">59</div><div class="l" data-i18n="ev.c.f2">manifest elements with semantic ids and verbs</div></div>
+      <div class="fig"><div class="k">4</div><div class="l" data-i18n="ev.c.f3">test frameworks generated</div></div>
+      <div class="fig"><div class="k">~$0.50</div><div class="l" data-i18n="ev.c.f4">end to end</div></div>
+    </div>
+    <a href="conduit/" data-i18n="ev.c.cta">Read the case study →</a>
+    <div class="receipt"><strong class="lbl" data-i18n="ev.receipt">Receipt</strong>
+      <p data-i18n="ev.c.r1">Run 2026-05-22 against v2.3.1 on the RealWorld “Conduit” React application. The full write-up, both gate verdicts and the failure deep-dives — including what did not work — are published.</p>
+      <p data-i18n-html="ev.c.r2"><strong>Not re-measured on a later runtime.</strong></p>
     </div>
   </div>
-</section>
+</div></section>
 
-<!-- Commercial layer on top of NAC3 -- Forge available, Pilot waitlist -->
-<section class="section section-waitlist" id="waitlist" data-nac-id="nac_landing.section.commercial" data-nac-role="section">
-  <div class="container">
-    <h2>Commercial layer on top of NAC3</h2>
-    <p class="section-lede">Two products built on the NAC3 contract. Forge is available now; Pilot ships next. Both are BYOK -- you bring your Claude / OpenAI / Gemini key, we ship the tooling.</p>
-    <div class="waitlist-grid">
-      <div class="waitlist-card" data-nac-id="nac_landing.commercial.forge" data-nac-role="region">
-        <h3>Yujin Forge -- USD 10 / mo  &middot;  Now in alpha</h3>
-        <p>The voice-first React dev framework. CLI + chat panel + voice loop + 10-format spec ingest. Every app Forge scaffolds is NAC3-compliant on day one.</p>
-        <ul>
-          <li>Multi-provider BYOK router (Anthropic / OpenAI / Google AI / DeepSeek)</li>
-          <li>E2E-encrypted key sync to mobile companion</li>
-          <li>"Convert existing React app" auditor</li>
-          <li>Auto-generated e2e tests (Playwright / Cypress / Vitest / WebdriverIO)</li>
-          <li>7-day free trial &middot; cancel anytime</li>
-        </ul>
-        <p style="margin-top:1rem">
-          <a href="https://yujin.app/yujin-forge/"
-             data-nac-id="nac_landing.commercial.forge_landing"
-             data-nac-role="action" data-nac-action="open"
-             style="display:inline-block;margin-right:1rem;font-weight:500">Forge landing  &rarr;</a>
-          <a href="https://polar.sh/checkout/polar_c_FXDtc94fvh5H8rXORu24IQcSpnOhp9ijG3Cxn4CUWxr"
-             target="_blank" rel="noopener"
-             data-nac-id="nac_landing.commercial.forge_buy"
-             data-nac-role="action" data-nac-action="open"
-             style="display:inline-block;font-weight:500">Start 7-day trial  &rarr;</a>
-        </p>
-      </div>
-      <div class="waitlist-card" data-nac-id="nac_landing.commercial.pilot" data-nac-role="region">
-        <h3>Yujin Pilot -- USD 5 / mo (free w/ Forge)  &middot;  Coming next</h3>
-        <p>The controller for NAC3 apps. Voice + chat + keyboard dispatch across every NAC3-compliant app in the registry. The first general-purpose accessibility tool that works on every app.</p>
-        <ul>
-          <li>Registry browser of NAC3 apps</li>
-          <li>Cross-app routing + pairing</li>
-          <li>Premium TTS + multi-device sync</li>
-          <li>Mobile companion</li>
-        </ul>
-      </div>
-    </div>
-    <form class="waitlist-form" id="waitlist-form"
-          data-nac-id="nac_landing.waitlist.form" data-nac-role="region"
-          onsubmit="return submitWaitlist(event)">
-      <p style="font-size:.94rem;color:var(--ct2,#615E58);margin-bottom:.6rem">Get notified when Pilot launches:</p>
-      <input type="email" id="waitlist-email" required
-             placeholder="you@example.com"
-             data-nac-id="nac_landing.waitlist.email" data-nac-role="field" />
-      <input type="hidden" id="waitlist-forge" />
-      <input type="hidden" id="waitlist-pilot" checked />
-      <button type="submit"
-              data-nac-id="nac_landing.waitlist.submit" data-nac-role="action"
-              data-nac-action="submit">Notify me about Pilot</button>
-      <span class="waitlist-status" id="waitlist-status" aria-live="polite"></span>
-    </form>
-    <p class="waitlist-disclaimer">BYOK: subscriptions cover the tooling -- guided setup, multi-provider routing, prompt caching, token-aware UI, app registry. They do not cover AI consumption. You pay Anthropic, OpenAI, or Google directly.</p>
+<div class="wrap"><div class="divider"><span class="kanji">作</span></div></div>
+
+<section id="adopters"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="ad.eyebrow">Made with NAC3</span></p>
+    <h2 data-i18n="ad.h2">Apps shipping the contract today.</h2>
+    <p class="lede" data-i18n="ad.lede">Your project belongs here. There is a bounty for the first ten open-source apps that adopt it.</p>
   </div>
-</section>
+  <div class="grid g4">
+    <div class="card"><h4><span class="kanji">楽</span><span data-i18n="ad.a1.h">Yujin CRM</span></h4><p data-i18n="ad.a1.p">The reference production app: pipelines, deliveries, inventory and finance, every screen compliant.</p><a href="https://yujin.app/crm/" data-i18n="ad.visit">Visit →</a></div>
+    <div class="card"><h4><span class="kanji">見</span><span data-i18n="ad.a2.h">Reference demos</span></h4><p data-i18n="ad.a2.p">Nine live demos — vanilla, React, Angular, data table, interop. Public source, Apache-2.0.</p><a href="#demos" data-i18n="ad.see">See demos →</a></div>
+    <div class="card"><h4><span class="kanji">聲</span><span data-i18n="ad.a3.h">Atlas Pro voice ad</span></h4><p data-i18n="ad.a3.p">A voice-driven advertisement that closes the sale itself, in ten languages. Live.</p><a href="ads-demo/atlas-pro/" data-i18n="ad.try">Try it →</a></div>
+    <div class="card"><h4><span class="kanji">君</span><span data-i18n="ad.a4.h">Your app</span></h4><p data-i18n="ad.a4.p">Run the playbook to migrate a web app in a single afternoon, and claim a bounty.</p><a href="guides/AI_PLAYBOOK_NEW_PROJECT.md" data-i18n="ad.playbook">The playbook →</a></div>
+  </div>
+</div></section>
 
-<!-- For builders -- grouped 4-column resources -->
-<section data-nac-id="nac_landing.section.resources" data-nac-role="section">
-  <div class="container">
-    <h2>For builders</h2>
-    <p class="section-lede">Pick what you need. All Apache-2.0; copy whatever fits.</p>
+<div class="wrap"><div class="divider"><span class="kanji">別</span></div></div>
 
-    <div class="resource-groups">
-      <div class="resource-group" data-nac-id="nac_landing.resgroup.spec" data-nac-role="region">
-        <h3>Specification</h3>
-        <ul>
-          <li><a class="resource-link" href="SPEC.md"
-                 data-nac-id="nac_landing.res.spec" data-nac-role="action" data-nac-action="open">
-              SPEC.md<span class="resource-desc">Canonical contract -- 14 sections.</span></a></li>
-          <li><a class="resource-link" href="ABOUT.md"
-                 data-nac-id="nac_landing.res.about" data-nac-role="action" data-nac-action="open">
-              ABOUT.md<span class="resource-desc">2-minute pitch + version status.</span></a></li>
-          <li><a class="resource-link" href="docs/NAC_V22_ROADMAP.md"
-                 data-nac-id="nac_landing.res.v22" data-nac-role="action" data-nac-action="open">
-              v2.2 roadmap<span class="resource-desc">Strict validator + bindAction + locale guard.</span></a></li>
-          <li><a class="resource-link" href="SECURITY.md"
-                 data-nac-id="nac_landing.res.security" data-nac-role="action" data-nac-action="open">
-              SECURITY.md<span class="resource-desc">Threat model by trust boundary.</span></a></li>
-        </ul>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.resgroup.guides" data-nac-role="region">
-        <h3>Adoption guides</h3>
-        <ul>
-          <li><a class="resource-link" href="guides/REACT.md"
-                 data-nac-id="nac_landing.res.react" data-nac-role="action" data-nac-action="open">
-              React guide<span class="resource-desc">Greenfield + brownfield + study case.</span></a></li>
-          <li><a class="resource-link" href="guides/ANGULAR.md"
-                 data-nac-id="nac_landing.res.angular" data-nac-role="action" data-nac-action="open">
-              Angular guide<span class="resource-desc">NacService + NacIdDirective + study case.</span></a></li>
-          <li><a class="resource-link" href="guides/LLM_WIRING.md"
-                 data-nac-id="nac_landing.res.llm" data-nac-role="action" data-nac-action="open">
-              LLM wiring<span class="resource-desc">The intermediary backend; reference Node code.</span></a></li>
-        </ul>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.resgroup.demos" data-nac-role="region">
-        <h3>Demos</h3>
-        <ul>
-          <li><a class="resource-link" href="example.php"
-                 data-nac-id="nac_landing.res.demo.v19" data-nac-role="action" data-nac-action="open">
-              v1.9 reference<span class="resource-desc">27 widgets, full v1.9 surface.</span></a></li>
-          <li><a class="resource-link" href="example-v20-primitives-showcase.php"
-                 data-nac-id="nac_landing.res.demo.v20p" data-nac-role="action" data-nac-action="open">
-              v2.0 primitives<span class="resource-desc">Didactic showcase.</span></a></li>
-          <li><a class="resource-link" href="example-v20-full.php"
-                 data-nac-id="nac_landing.res.demo.v20" data-nac-role="action" data-nac-action="open">
-              v2.0 brownfield<span class="resource-desc">Migration story.</span></a></li>
-          <li><a class="resource-link" href="example-v21-data-table.php"
-                 data-nac-id="nac_landing.res.demo.v21" data-nac-role="action" data-nac-action="open">
-              v2.1 data-table<span class="resource-desc">Wired to Yujin chat backend.</span></a></li>
-        </ul>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.resgroup.project" data-nac-role="region">
-        <h3>Project</h3>
-        <ul>
-          <li><a class="resource-link" href="https://www.npmjs.com/package/@nac3/runtime"
-                 data-nac-id="nac_landing.res.npm" data-nac-role="action" data-nac-action="open">
-              @nac3/runtime on NPM<span class="resource-desc">ESM + CJS + d.ts + CLI.</span></a></li>
-          <li><a class="resource-link" href="https://github.com/yujinapp/nac-spec"
-                 data-nac-id="nac_landing.res.github" data-nac-role="action" data-nac-action="open">
-              GitHub repo<span class="resource-desc">Source + issues + RFC discussions.</span></a></li>
-          <li><a class="resource-link" href="CONTRIBUTING.md"
-                 data-nac-id="nac_landing.res.contributing" data-nac-role="action" data-nac-action="open">
-              Contributing<span class="resource-desc">RFC process for spec changes.</span></a></li>
-          <li><a class="resource-link" href="LICENSE"
-                 data-nac-id="nac_landing.res.license" data-nac-role="action" data-nac-action="open">
-              License<span class="resource-desc">Apache-2.0.</span></a></li>
-        </ul>
-      </div>
+<section id="layers"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="pay.eyebrow">Free and paid, separated</span></p>
+    <h2 data-i18n="pay.h2">The contract is free. The tooling on top of it is not.</h2>
+    <p class="lede" data-i18n="pay.lede">This distinction matters more than it looks, so here it is in one place. Nothing on the paid side is required to implement, adopt, test or ship NAC3.</p>
+  </div>
+  <div class="grid g2">
+    <div class="card" style="border-top:3px solid var(--ctl)">
+      <span class="free" data-i18n="pay.f.badge">Free forever · Apache-2.0</span>
+      <h3 style="margin-top:.6rem" data-i18n="pay.f.h">NAC3, the contract</h3>
+      <p data-i18n="pay.f.p">The specification, the reference runtime, the published contract API, the validator, the CLI, every guide and all nine demos. Apache-2.0: use it, fork it, implement it, ship it commercially. No permission needed and nothing to pay.</p>
+      <ul class="plain">
+        <li data-i18n-html="pay.f.l1"><code>@nac3/runtime</code> on npm, and the pinned CDN path</li>
+        <li data-i18n="pay.f.l2">The contract as data, versioned and hashed</li>
+        <li data-i18n-html="pay.f.l3"><code>npx nac3 validate</code> for your CI</li>
+        <li data-i18n="pay.f.l4">An RFC process for changing the spec</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:3px solid var(--ci)">
+      <span class="price" data-i18n="pay.p.badge">Commercial tooling · optional</span>
+      <h3 style="margin-top:.6rem" data-i18n="pay.p.h">Forge and Pilot</h3>
+      <p data-i18n-html="pay.p.p">Two products built <em>on</em> the contract, by the same team that edits it. They make adoption faster. They are not the contract, and the contract does not need them.</p>
+      <ul class="plain">
+        <li data-i18n-html="pay.p.l1"><strong>Forge</strong> — USD 10/month, in alpha. A voice-first development framework whose output is compliant on day one, with generated end-to-end tests.</li>
+        <li data-i18n-html="pay.p.l2"><strong>Pilot</strong> — USD 5/month, free with Forge, shipping next. One controller — voice, chat, keyboard — across every compliant app in the registry.</li>
+      </ul>
+      <p class="small" style="margin-top:.7rem" data-i18n="pay.p.byok">Both are bring-your-own-key: the subscription covers the tooling, never the AI consumption. You pay your model provider directly.</p>
+      <a href="https://yujin.app/yujin-forge/" data-i18n="pay.p.cta">Forge →</a>
     </div>
   </div>
-</section>
+</div></section>
 
-<!-- Use cases -->
-<section data-nac-id="nac_landing.section.usecases" data-nac-role="section">
-  <div class="container">
-    <h2>Use cases</h2>
-    <p class="section-lede">Voice + chat is the headline. The contract underneath unlocks four more.</p>
+<div class="wrap"><div class="divider"><span class="kanji">工</span></div></div>
 
-    <div class="resource-groups">
-      <div class="resource-group" data-nac-id="nac_landing.usecase.voice" data-nac-role="region">
-        <h3>Voice + chat</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Voice runners (Siri-style, Whisper-fed, browser SpeechRecognition) and LLM chat agents drive the same UI a human uses, by stable name. Multi-locale out of the box (10 languages). The headline use case.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.usecase.a11y" data-nac-role="region">
-        <h3>Accessibility</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Users with motor impairment can drive the app by switch device, head-tracker, or eye-gaze through a NAC-aware adaptor -- without per-app retrofit. Braille displays, sip-and-puff controllers, and Dasher-style predictive keyboards get a stable target tree to render. Where ARIA stops at "this is a button," NAC says "this button has a verb the assistive tool can call."</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.usecase.testing" data-nac-role="region">
-        <h3>Testing &amp; QA</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Stable names that survive UI redesigns. Test code says <code>NAC.click('invoice.save')</code>, the design team moves the button from a toolbar to a dropdown, the test keeps passing. Selenium, Playwright, Cypress, and headless browsers all consume the same contract. Auto-generated test corpora (per role + ack family) make near-100% coverage cheap.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.usecase.rpa" data-nac-role="region">
-        <h3>RPA</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Robotic process automation traditionally scrapes the DOM with brittle CSS selectors that break on every UI change. With NAC, an RPA bot reads <code>NAC.describe()</code>, picks an action by verb, calls it, and waits on the canonical event family. No screenshot OCR, no XPath rituals. The same bot drives ten different vendors' apps if all ten implement NAC3.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.usecase.agentic" data-nac-role="region">
-        <h3>Agentic control</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">LLM agents (Claude, GPT, Gemini, local models) drive web UIs by name without per-app fine-tuning. Cross-app interop (v2.3 preview): a host agent imports a peer app's tree via MCP and proxies dispatches. "Yujin, jump to Excel" becomes one extra MCP call. The contract scales to a marketplace of NAC3 apps each addressable from any agent.</p>
-      </div>
+<section id="builders"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="bd.eyebrow">For builders</span></p>
+    <h2 data-i18n="bd.h2">Take what you need. All of it is Apache-2.0.</h2>
+  </div>
+  <div class="links">
+    <div>
+      <h4 data-i18n="bd.g1">Specification</h4>
+      <ul>
+        <li><a href="SPEC.md">SPEC.md</a> — <span data-i18n="bd.g1.a">the canonical contract</span></li>
+        <li><a href="ABOUT.md">ABOUT.md</a> — <span data-i18n="bd.g1.b">two-minute pitch and version status</span></li>
+        <li><a href="SECURITY.md">SECURITY.md</a> — <span data-i18n="bd.g1.c">threat model by trust boundary</span></li>
+        <li><a href="docs/ACCESSIBILITY.md">ACCESSIBILITY.md</a> — <span data-i18n="bd.g1.d">how it sits beside ARIA</span></li>
+      </ul>
+    </div>
+    <div>
+      <h4 data-i18n="bd.g2">Adoption</h4>
+      <ul>
+        <li><a href="guides/REACT.md">React guide</a> — <span data-i18n="bd.g2.a">greenfield, brownfield, study case</span></li>
+        <li><a href="guides/ANGULAR.md">Angular guide</a> — <span data-i18n="bd.g2.b">service, directive, study case</span></li>
+        <li><a href="guides/LLM_WIRING.md">LLM wiring</a> — <span data-i18n="bd.g2.c">the intermediary backend, with reference code</span></li>
+        <li><a href="guides/AI_PLAYBOOK_NEW_PROJECT.md">AI playbook</a> — <span data-i18n="bd.g2.d">migrate an app in an afternoon</span></li>
+      </ul>
+    </div>
+    <div>
+      <h4 data-i18n="bd.g3">Project</h4>
+      <ul>
+        <li><a href="https://www.npmjs.com/package/@nac3/runtime">@nac3/runtime</a> — <span data-i18n="bd.g3.a">ESM, CJS, types and CLI</span></li>
+        <li><a href="https://github.com/yujinapp/nac-spec">GitHub</a> — <span data-i18n="bd.g3.b">source, issues, RFC discussions</span></li>
+        <li><a href="CONTRIBUTING.md">Contributing</a> — <span data-i18n="bd.g3.c">the RFC process for spec changes</span></li>
+        <li><a href="LICENSE">LICENSE</a> — <span data-i18n="bd.g3.d">Apache-2.0</span></li>
+      </ul>
     </div>
   </div>
-</section>
+</div></section>
 
-<!-- Case studies -->
-<section data-nac-id="nac_landing.section.cases" data-nac-role="section">
-  <div class="container">
-    <h2>Case studies</h2>
-    <p class="section-lede">Existing apps that adopted NAC. The brownfield migration recipe is in the Yujin framework migration doc.</p>
+<div class="wrap"><div class="divider"><span class="kanji">理</span></div></div>
 
-    <div class="demos">
-      <div class="demo-card" data-nac-id="nac_landing.case.yujin_crm" data-nac-role="region">
-        <div class="head">
-          <span class="file">Yujin CRM</span>
-          <span class="version">brownfield in progress</span>
-        </div>
-        <p>Yujin CRM is the framework's first adopter -- a production multi-tenant SaaS being progressively migrated to NAC3. The 7-step migration recipe (decorate top-20 buttons -&gt; manifest -&gt; ack events -&gt; coverage -&gt; chat + autopilot -&gt; HMAC + isTrusted -&gt; field editor) is documented and re-runnable for any existing app.</p>
-        <a class="open"
-           href="https://github.com/pkuschnirof/yujin/blob/main/docs/MIGRATION_FROM_RPAFORCE.md"
-           data-nac-id="nac_landing.case.yujin_crm.open"
-           data-nac-role="action"
-           data-nac-action="open">Read the migration story &rarr;</a>
-      </div>
-
-      <div class="demo-card" data-nac-id="nac_landing.case.react_demo" data-nac-role="region">
-        <div class="head">
-          <span class="file">React + Vite study case</span>
-          <span class="version">greenfield</span>
-        </div>
-        <p>Vite + React 18 todos app that consumes <code>&#64;yujin/nac</code> from npm and wires chat + autopilot in ~250 lines. <code>npm install</code> + <code>npm run dev</code> -- runs against the production Yujin chat backend.</p>
-        <a class="open"
-           href="https://github.com/yujinapp/nac-spec/tree/main/packages/nac-react-demo"
-           data-nac-id="nac_landing.case.react_demo.open"
-           data-nac-role="action"
-           data-nac-action="open">Open packages/nac-react-demo &rarr;</a>
-      </div>
-
-      <div class="demo-card" data-nac-id="nac_landing.case.angular_demo" data-nac-role="region">
-        <div class="head">
-          <span class="file">Angular 17 study case</span>
-          <span class="version">greenfield</span>
-        </div>
-        <p>Angular 17 standalone mirror of the React study case. Same UI, same flows, framework-shaped service + signals. Useful side-by-side reference for shop-internal "should we use React or Angular" decisions.</p>
-        <a class="open"
-           href="https://github.com/yujinapp/nac-spec/tree/main/packages/nac-angular-demo"
-           data-nac-id="nac_landing.case.angular_demo.open"
-           data-nac-role="action"
-           data-nac-action="open">Open packages/nac-angular-demo &rarr;</a>
-      </div>
-    </div>
+<section id="governance"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="gov.eyebrow">Governance</span></p>
+    <h2 data-i18n="gov.h2">Three different things, three different licences.</h2>
   </div>
-</section>
-
-<!-- Why -->
-<section data-nac-id="nac_landing.section.why" data-nac-role="section">
-  <div class="container">
-    <h2>Why NAC, why now</h2>
-    <p>Voice assistants, LLM chat agents, and accessibility tools all face the same problem: <strong>they need stable names for the things they want to act on</strong>. CSS selectors break when you redesign the UI. ARIA was designed for human-driven assistive tech, not agent-driven automation, and its contract stops at "this is a button" rather than "this button has a verb the agent can call".</p>
-    <p>Today every team builds its own per-app glue: a custom voice grammar, a hand-written automation script, a one-off accessibility shim. That work does not transfer between apps, between teams, or between agent vendors.</p>
-    <p>NAC is a small experimental contract that lets those agents talk to those apps without per-pair integration. ARIA stays in place for the accessibility tree; NAC adds a parallel agent tree on the same elements.</p>
+  <div class="grid g3">
+    <div class="card"><h4 data-i18n="gov.c1.h">NAC3 is a protocol</h4><p data-i18n="gov.c1.p">A contract between web UIs and the agents that drive them. Apache-2.0, edited here, changed through a public RFC process.</p></div>
+    <div class="card"><h4 data-i18n="gov.c2.h">Urazuke is a method</h4><p data-i18n="gov.c2.p">A way of building software with AI in which the owner verifies evidence instead of reading code. Different author, Creative Commons BY-SA 4.0, and it works without us.</p><a href="https://yujin.app/urazuke/" data-i18n="gov.c2.a">yujin.app/urazuke →</a></div>
+    <div class="card"><h4 data-i18n="gov.c3.h">Forge is a tool</h4><p data-i18n="gov.c3.p">Commercial software that implements the method and speaks the protocol. Useful, optional, and not to be confused with either.</p><a href="https://yujin.app/yujin-forge/" data-i18n="gov.c3.a">yujin.app/yujin-forge →</a></div>
   </div>
-</section>
+  <div class="receipt"><strong class="lbl" data-i18n="gov.why.label">Why we say it this way</strong><p data-i18n="gov.why.p">Because readers — and the AI assistants they ask — keep collapsing the three into one product narrative. A protocol you can implement without us, a method you can follow with any tool, and a product we sell are not the same kind of thing, and conflating them is the fastest way to misjudge all three.</p></div>
+</div></section>
 
-<!-- Where NAC3 fits -->
-<section data-nac-id="nac_landing.section.where_fits" data-nac-role="section">
-  <div class="container">
-    <h2>Where NAC3 fits in the agent stack</h2>
-    <p class="section-lede"><strong>NAC3 is the client-side half of agent-driven software. MCP is the server-side half. Use both for full-stack agents: MCP exposes your business logic, NAC3 exposes your UI.</strong></p>
-    <p>NAC3 does not compete with any of these tools -- it overlaps in narrow ways and complements in others. If you only have one of the problems below, use the dedicated tool. If you have several, NAC3 unifies the contract.</p>
-    <table class="compare-table">
-      <thead>
-        <tr><th>Layer</th><th>What it solves</th><th>Where it stops</th><th>NAC3 relationship</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>MCP</strong> (Anthropic)</td>
-          <td>Agent calls server-side tools / functions</td>
-          <td>Does not touch the UI; agent cannot navigate, fill forms, or read on-screen state</td>
-          <td><strong>Complement.</strong> Use MCP for backend ops, NAC3 for the UI half. v2.3 preview adds an MCP bridge to route between NAC3 apps.</td>
-        </tr>
-        <tr>
-          <td><strong>ARIA</strong></td>
-          <td>Accessibility tree for screen readers + switch devices</td>
-          <td>Stops at "this is a button named Save"; no verb the agent can call, no completion event</td>
-          <td><strong>Sits next to.</strong> Keep your ARIA roles. Many adopters end up with <code>role="button"</code> and <code>data-nac-role="action"</code> on the same element.</td>
-        </tr>
-        <tr>
-          <td><strong><code>data-testid</code></strong></td>
-          <td>Stable selectors for test runners (Cypress, Playwright)</td>
-          <td>Test-only; no manifest, no event family, no provenance, no i18n</td>
-          <td><strong>Superset.</strong> NAC3 covers the testing case + voice + RPA + LLM with the same attribute, but at a higher mental cost. If you only need tests, <code>data-testid</code> is fine.</td>
-        </tr>
-        <tr>
-          <td><strong>AG-UI</strong> (CopilotKit)</td>
-          <td>Agent-to-app protocol for chat-driven UIs</td>
-          <td>Tied to the CopilotKit framework + JS runtime; less focus on RPA / a11y / cross-vendor LLMs</td>
-          <td><strong>Adjacent.</strong> Different bet on the same space. AG-UI has Series A funding and an existing ecosystem; NAC3 is open and framework-agnostic but earlier-stage. Pick AG-UI if you build on CopilotKit; NAC3 if you want a framework-neutral surface.</td>
-        </tr>
-        <tr>
-          <td><strong>Computer Use</strong> / browser-use (vision-based)</td>
-          <td>Agent reads pixels, reasons over screenshots</td>
-          <td>Slow, expensive, brittle on dynamic content; depends entirely on the LLM</td>
-          <td><strong>Fallback layer.</strong> Vision is what the agent uses when NAC3 is not there. NAC3 turns a 3-second pixel-reasoning round into a 30 ms named dispatch.</td>
-        </tr>
-      </tbody>
-    </table>
-    <p><strong>Honest read:</strong> if you are inside a single app with a single agent vendor, MCP (server) + a screen-reader-grade ARIA pass (client) covers most cases. NAC3 starts paying back when you have <strong>multiple callers</strong> (voice + chat + RPA + tests), <strong>cross-app</strong> workflows, or you want <strong>vendor-portable</strong> integrations.</p>
-  </div>
-</section>
+</main>
 
-<!-- Public limits section -- D-04 / N-09. Text approved by the owner phrase by
-     phrase on 2026-10-26; the per-phrase provenance of each sentence is in
-     docs/LIMITS_APPROVAL_2026-10-26.md. Do not reword without a new reading.
-     This comment deliberately avoids the literal heading: the owner's
-     verification item 3 greps the served page, and a comment carrying the
-     phrase would satisfy that grep without a reader ever seeing it. -->
-<section data-nac-id="nac_landing.section.limits" data-nac-role="section">
-  <div class="container">
-    <h2>What NAC3 does not cover</h2>
-    <p class="section-lede">NAC3 names what lives in the DOM. Everything below is outside that line. We would rather you read it here than discover it after you migrate.</p>
-
-    <div class="resource-groups">
-      <div class="resource-group" data-nac-id="nac_landing.limit.canvas" data-nac-role="region">
-        <h3>Canvas &amp; WebGL</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Canvas and WebGL surfaces. NAC3 does not read pixels: in a document editor, a design tool or a custom WebGL canvas, the toolbar around the drawing can be named, the drawing itself cannot. v2.5 adds a contract so a plugin can declare how its verbs route to the app's own public API (<code>postMessage</code>, plugin SDK), and the runtime learns one app only by reading that plugin's manifest -- somebody still has to write it.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.shadow" data-nac-role="region">
-        <h3>Closed shadow roots</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Closed shadow roots. A web component mounted with <code>attachShadow({mode:'closed'})</code> is unreachable unless its author voluntarily exposes a resolver -- that is a browser security boundary, not a NAC3 decision -- and the runtime reports it (<code>nac:shadow_blocked</code>) instead of guessing. Open shadow roots are covered, nested.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.cross_origin" data-nac-role="region">
-        <h3>Cross-origin frames</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Cross-origin frames. An embedded page from another origin cannot be driven unless it cooperates -- it has to run NAC3 and accept the message -- and when it does not, the runtime fails closed with <code>cross_origin_blocked</code> rather than pretending the click landed.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.native" data-nac-role="region">
-        <h3>Anything not web</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Native and non-web applications. NAC3 is HTML attributes: desktop, mobile-native and terminal applications are out of scope.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.permissions" data-nac-role="region">
-        <h3>Not a permission system</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">NAC3 is not a permission system. A named verb is an intent-level signal and the capability gate is a UX optimisation; your server must still authorise every call.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.schema" data-nac-role="region">
-        <h3>Declared is not validated</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">A declared payload schema is not a validated one. A manifest may carry <code>payload_schema</code> and the reference runtime never reads it, so an agent MUST NOT assume a payload was checked.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.stability" data-nac-role="region">
-        <h3>Stability is yours to keep</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Stable names are a promise you keep, not one we enforce. NAC3 asks ids to survive redesigns and has no way to make them: rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p>
-      </div>
-
-      <div class="resource-group" data-nac-id="nac_landing.limit.correctness" data-nac-role="region">
-        <h3>It does not make an agent correct</h3>
-        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">It does not make an agent correct. In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is silent damage -- 0 of 200 runs, against 30 of 200 on raw DOM -- not the need to check what an agent did.</p>
-      </div>
-    </div>
-
-    <p class="section-lede" style="margin-top: 28px;"><strong>Three different things, three different licenses.</strong> NAC3 is a protocol -- this site, <a href="LICENSE" data-nac-id="nac_landing.limits.license_nac3" data-nac-role="action" data-nac-action="open">Apache-2.0</a>. Urazuke is a method for building software with evidence -- <a href="https://yujin.app/urazuke/" data-nac-id="nac_landing.limits.urazuke" data-nac-role="action" data-nac-action="open">yujin.app/urazuke</a>, Creative Commons BY-SA 4.0. <a href="#waitlist" data-nac-id="nac_landing.limits.forge" data-nac-role="action" data-nac-action="open">Yujin Forge</a> is a commercial tool that implements both. You can adopt the protocol without the method and without the tool; that is the point of publishing it under Apache-2.0.</p>
-
-    <p class="section-lede">One more limit lives in its own section, because it is about who steers the contract rather than what it reaches: NAC3 is stewarded by one company, not a foundation. Read it in <a href="#governance" data-nac-id="nac_landing.limits.governance" data-nac-role="action" data-nac-action="open">Governance</a>, below.</p>
-  </div>
-</section>
-
-<section class="section" id="governance" data-nac-id="nac_landing.governance" data-nac-role="section">
-  <div class="container">
-    <h2>Governance</h2>
-    <p class="section-lede">NAC3 is stewarded by Yujin today -- one company, not a foundation. We say this up front because the difference matters: NAC3 is not yet an industry standard the way ARIA or MCP are. It is a vendor-authored contract published under permissive licenses (Apache 2.0 spec + Apache 2.0 runtime) so adopters do not depend on Yujin's continuity.</p>
-    <p>Spec changes follow an RFC process with at least 14 days of public comment for any change to the public API or wire format. We commit to moving NAC3 to a neutral foundation (W3C community group, Linux Foundation, or equivalent) if and when adoption justifies neutral governance. Until then, the Apache 2.0 licensing (spec + runtime) is what guarantees portability -- adopters can fork it, run it, and ship it, today and after we are gone.</p>
-    <p>Read the full statement in <a href="ABOUT.md" data-nac-id="nac_landing.gov.about" data-nac-role="action" data-nac-action="open">ABOUT.md</a> + <a href="CONTRIBUTING.md" data-nac-id="nac_landing.gov.contributing" data-nac-role="action" data-nac-action="open">CONTRIBUTING.md</a>. Accessibility commitment in <a href="docs/ACCESSIBILITY.md" data-nac-id="nac_landing.gov.accessibility" data-nac-role="action" data-nac-action="open">docs/ACCESSIBILITY.md</a>.</p>
-  </div>
-</section>
-
-<footer data-nac-id="nac_landing.footer" data-nac-role="region">
-  <div class="container footer-row">
-    <span class="kanji-mark" aria-hidden="true">&#27005;</span>
-    <span>NAC -- Native Agent Contract</span>
-    <span>&middot;</span>
-    <span>Page last reviewed 2026-10-26 &middot; evidence on this page dated 2026-05</span>
-    <span>&middot;</span>
-    <a href="LICENSE"
-       data-nac-id="nac_landing.footer.license"
-       data-nac-role="action" data-nac-action="open">Apache-2.0</a>
-    <span>&middot;</span>
-    <a href="https://github.com/yujinapp/nac-spec"
-       data-nac-id="nac_landing.footer.github"
-       data-nac-role="action" data-nac-action="open">GitHub</a>
-    <span>&middot;</span>
-    <a href="https://yujin.app/urazuke/"
-       data-nac-id="nac_landing.footer.urazuke"
-       data-nac-role="action" data-nac-action="open">Urazuke (CC BY-SA 4.0)</a>
-    <span>&middot;</span>
-    <a href="https://rpaforce.com"
-       data-nac-id="nac_landing.footer.yujin"
-       data-nac-role="action" data-nac-action="open">Yujin</a>
-    <span style="margin-left: auto; color: var(--color-text-3);">v2.5.0 &middot; 2026-10-26</span>
+<footer class="site">
+  <div class="footer-inner">
+    <span class="brand">楽 Yujin</span>
+    <nav>
+      <a href="SPEC.md" data-i18n="foot.spec">Specification</a>
+      <a href="api/index.json" data-i18n="foot.api">Contract API</a>
+      <a href="https://github.com/yujinapp/nac-spec" data-i18n="foot.gh">GitHub</a>
+      <a href="https://yujin.app/urazuke/" data-i18n="foot.ura">Urazuke</a>
+      <a href="https://yujin.app/yujin-forge/" data-i18n="foot.forge">Forge</a>
+      <a href="SECURITY.md" data-i18n="foot.sec">Security</a>
+    </nav>
+    <span style="margin-left:auto" data-i18n="foot.license">Apache-2.0 · the Native Agent Contract</span>
   </div>
 </footer>
 
-<!-- Chat panel -->
-<aside class="chat" data-nac-plugin="chat" aria-hidden="true">
-  <header class="chat-head">
-    <span class="brand">Yujin chat</span>
-    <select class="lang"
-            id="chat-lang"
-            data-nac-id="chat.lang"
-            data-nac-role="field"
-            aria-label="Chat language">
-      <option value="es">es</option>
-      <option value="en" selected>en</option>
-      <option value="pt">pt</option>
-      <option value="fr">fr</option>
-      <option value="it">it</option>
-      <option value="de">de</option>
-      <option value="ja">ja</option>
-      <option value="zh">zh</option>
-      <option value="hi">hi</option>
-      <option value="ar">ar</option>
-    </select>
-    <button id="chat-tts"
-            data-nac-id="chat.tts"
-            data-nac-role="action"
-            data-nac-action="toggle_tts"
-            aria-pressed="true"
-            aria-label="Toggle TTS">tts</button>
-  </header>
-  <div class="chat-log"
-       id="chat-log"
-       data-nac-id="chat.log"
-       data-nac-role="region"
-       aria-live="polite"
-       aria-relevant="additions"></div>
-  <div class="chat-tools">
-    <button id="chat-mic"
-            data-nac-id="chat.mic"
-            data-nac-role="action"
-            data-nac-action="push_to_talk"
-            aria-label="Push to talk"
-            aria-pressed="false"
-            data-state="idle">mic</button>
-    <button id="chat-handsfree"
-            data-nac-id="chat.voice.always_on"
-            data-nac-role="action"
-            data-nac-action="toggle_handsfree"
-            aria-pressed="false"
-            aria-label="Hands-free voice mode">hands-free</button>
-  </div>
-  <div class="chat-input-row">
-    <input id="chat-input"
-           data-nac-id="chat.input"
-           data-nac-role="field"
-           placeholder="ask anything / try: take me to the demos"
-           autocomplete="off">
-    <button id="chat-send"
-            data-nac-id="chat.send"
-            data-nac-role="action"
-            data-nac-action="send"
-            aria-label="Send">send</button>
-  </div>
-</aside>
-
-<!-- ============== NAC runtime + chat ============== -->
-<!-- Hashes are produced by scripts/build-integrity.mjs and checked in CI.
-     Never hand-edit them: a stale hash is a blocked deploy, on purpose. -->
-<script src="js/2.5.0/nac.js" integrity="sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE" crossorigin="anonymous"></script>
-<script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
-<script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
-
-<!-- ============== Landing wiring ============== -->
-<script>
-(function () {
-  'use strict';
-  console.log('[nac_landing] boot v22-2026-05-10b');
-
-  /* Wait for runtime, then register manifest + wire chat + autopilot. */
-  function whenReady(fn) {
-    if (window.NAC && window.NacChat) return fn();
-    setTimeout(function () { whenReady(fn); }, 30);
-  }
-
-  whenReady(function () {
-    /* === Manifest -- 10 locales for every label. === */
-    function li(es, en, pt, fr, it, de, ja, zh, hi, ar) {
-      return { es: es, en: en, pt: pt, fr: fr, it: it, de: de, ja: ja, zh: zh, hi: hi, ar: ar };
-    }
-
-    NAC.register({
-      plugin_slug: 'nac_landing',
-      version: '2.5.0',
-      nac_version: '2.5',
-      elements: [
-        /* Topbar */
-        { id: 'nac_landing.topbar', role: 'region',
-          label_i18n: li('Barra superior','Topbar','Barra superior','Barre haute','Barra alta','Topbar','上部バー','顶栏','navbar','شريط علوي') },
-        { id: 'nac_landing.autopilot.toggle', role: 'action',
-          actions: [{ verb: 'autopilot_toggle',
-            label_i18n: li('Activar tour guiado','Start guided tour','Iniciar tour guiado','Demarrer le tour','Tour guidato','Gefuehrte Tour','ガイドツアー','引导游览','tour shuru','جولة موجهة') }],
-          label_i18n: li('Tour','Tour','Tour','Tour','Tour','Tour','ツアー','游览','tour','جولة') },
-        { id: 'nac_landing.chat.toggle', role: 'action',
-          actions: [{ verb: 'chat_toggle',
-            label_i18n: li('Abrir chat','Open chat','Abrir chat','Ouvrir chat','Apri chat','Chat oeffnen','チャット','聊天','chat','محادثة') }],
-          label_i18n: li('Chat','Chat','Chat','Chat','Chat','Chat','チャット','聊天','chat','محادثة') },
-
-        /* Hero CTAs */
-        { id: 'nac_landing.section.hero', role: 'section',
-          label_i18n: li('Inicio','Hero','Inicio','Accueil','Inizio','Start','ヒーロー','首页','shuruwat','رئيسي') },
-        { id: 'nac_landing.cta.spec', role: 'action',
-          actions: [{ verb: 'open_spec',
-            label_i18n: li('Leer la especificacion','Read the spec','Ler a especificacao','Lire la spec','Leggi la spec','Spec lesen','仕様を読む','阅读规范','spec padhen','اقرأ المواصفات') }],
-          label_i18n: li('Leer la especificacion','Read the spec','Ler a especificacao','Lire la spec','Leggi la spec','Spec lesen','仕様を読む','阅读规范','spec padhen','اقرأ المواصفات') },
-        { id: 'nac_landing.cta.demo', role: 'action',
-          actions: [{ verb: 'open_demo',
-            label_i18n: li('Probar la demo','Try the demo','Testar a demo','Tester la demo','Prova la demo','Demo testen','デモを試す','试用演示','demo dekhe','جرب العرض') }],
-          label_i18n: li('Probar la demo','Try the demo','Testar a demo','Tester la demo','Prova la demo','Demo testen','デモを試す','试用演示','demo dekhe','جرب العرض') },
-        { id: 'nac_landing.cta.npm', role: 'action',
-          actions: [{ verb: 'open_npm',
-            label_i18n: li('Ir a NPM','Go to NPM','Ir ao NPM','Aller a NPM','Vai a NPM','Zu NPM','NPMへ','去 NPM','NPM','اذهب إلى NPM') }],
-          label_i18n: li('NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM') },
-
-        /* Section landmarks */
-        { id: 'nac_landing.section.howsmall', role: 'section',
-          label_i18n: li('Que tan chico','How small','Quao pequeno','Combien petit','Quanto piccolo','Wie klein','どれだけ小さい','有多小','kitna chota','كم صغير') },
-        { id: 'nac_landing.section.demos', role: 'section',
-          label_i18n: li('Demos en vivo','Live demos','Demos ao vivo','Demos en direct','Demo dal vivo','Live-Demos','ライブデモ','现场演示','live demo','عروض حية') },
-        { id: 'nac_landing.section.resources', role: 'section',
-          label_i18n: li('Para builders','For builders','Para builders','Pour builders','Per builders','Fuer Entwickler','開発者向け','给开发者','builders ke liye','للمطورين') },
-        { id: 'nac_landing.section.usecases', role: 'section',
-          label_i18n: li('Usos','Use cases','Usos','Cas d usage','Casi d uso','Anwendungsfaelle','ユースケース','用例','use cases','حالات استخدام') },
-        { id: 'nac_landing.usecase.voice', role: 'region',
-          label_i18n: li('Voz y chat','Voice and chat','Voz e chat','Voix et chat','Voce e chat','Sprache und Chat','音声とチャット','语音和聊天','voice chat','صوت ومحادثة') },
-        { id: 'nac_landing.usecase.a11y', role: 'region',
-          label_i18n: li('Accesibilidad','Accessibility','Acessibilidade','Accessibilite','Accessibilita','Barrierefreiheit','アクセシビリティ','无障碍','accessibility','إمكانية الوصول') },
-        { id: 'nac_landing.usecase.testing', role: 'region',
-          label_i18n: li('Testing','Testing','Testes','Tests','Test','Tests','テスト','测试','testing','اختبار') },
-        { id: 'nac_landing.usecase.rpa', role: 'region',
-          label_i18n: li('RPA','RPA','RPA','RPA','RPA','RPA','RPA','RPA','RPA','RPA') },
-        { id: 'nac_landing.usecase.agentic', role: 'region',
-          label_i18n: li('Control agentico','Agentic control','Controle agentico','Controle agentique','Controllo agentico','Agentensteuerung','エージェント制御','智能体控制','agentic','تحكم وكيل') },
-        { id: 'nac_landing.section.cases', role: 'section',
-          label_i18n: li('Casos de uso','Case studies','Casos de uso','Etudes de cas','Casi studio','Fallstudien','ケーススタディ','案例研究','use cases','دراسات حالة') },
-        { id: 'nac_landing.case.yujin_crm.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Leer migracion Yujin','Read Yujin migration','Ler migracao Yujin','Lire migration Yujin','Leggi migrazione Yujin','Yujin Migration','Yujin移行','Yujin 迁移','Yujin migration','هجرة Yujin') }],
-          label_i18n: li('Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM','Yujin CRM') },
-        { id: 'nac_landing.case.react_demo.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Ver React demo','Open React demo','Ver React demo','Voir React demo','Apri React demo','React-Demo','React デモ','React 演示','React demo','عرض React') }],
-          label_i18n: li('Demo React','React demo','Demo React','Demo React','Demo React','React-Demo','React デモ','React 演示','React demo','عرض React') },
-        { id: 'nac_landing.case.angular_demo.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Ver Angular demo','Open Angular demo','Ver Angular demo','Voir Angular demo','Apri Angular demo','Angular-Demo','Angular デモ','Angular 演示','Angular demo','عرض Angular') }],
-          label_i18n: li('Demo Angular','Angular demo','Demo Angular','Demo Angular','Demo Angular','Angular-Demo','Angular デモ','Angular 演示','Angular demo','عرض Angular') },
-        { id: 'nac_landing.section.why', role: 'section',
-          label_i18n: li('Por que NAC','Why NAC','Por que NAC','Pourquoi NAC','Perche NAC','Warum NAC','なぜNAC','为什么NAC','NAC kyon','لماذا NAC') },
-
-        /* Limits section (D-04 / N-09) -- declared so an agent sees the limits, not just reads them */
-        { id: 'nac_landing.section.limits', role: 'section',
-          label_i18n: li('Limites','Limits','Limites','Limites','Limiti','Grenzen','制限','限制','limits','حدود') },
-        { id: 'nac_landing.limit.canvas', role: 'region',
-          label_i18n: li('Canvas y WebGL','Canvas and WebGL','Canvas e WebGL','Canvas et WebGL','Canvas e WebGL','Canvas und WebGL','キャンバスとWebGL','Canvas 和 WebGL','canvas aur WebGL','كانفاس وWebGL') },
-        { id: 'nac_landing.limit.shadow', role: 'region',
-          label_i18n: li('Shadow DOM cerrado','Closed shadow roots','Shadow DOM fechado','Shadow DOM ferme','Shadow DOM chiuso','Geschlossenes Shadow DOM','閉じたShadow DOM','封闭 Shadow DOM','closed shadow DOM','شادو DOM مغلق') },
-        { id: 'nac_landing.limit.cross_origin', role: 'region',
-          label_i18n: li('Frames de otro origen','Cross-origin frames','Frames de outra origem','Frames d autre origine','Frame di altra origine','Fremde-Origin-Frames','クロスオリジンフレーム','跨源框架','cross-origin frames','إطارات من أصل آخر') },
-        { id: 'nac_landing.limit.native', role: 'region',
-          label_i18n: li('Lo que no es web','Anything not web','O que nao e web','Ce qui n est pas web','Cio che non e web','Nicht-Web','ウェブ以外','非网页','web ke bahar','ما ليس ويب') },
-        { id: 'nac_landing.limit.permissions', role: 'region',
-          label_i18n: li('No es un sistema de permisos','Not a permission system','Nao e sistema de permissoes','Pas un systeme de permissions','Non e un sistema di permessi','Kein Berechtigungssystem','権限システムではない','不是权限系统','permission system nahin','ليس نظام صلاحيات') },
-        { id: 'nac_landing.limit.schema', role: 'region',
-          label_i18n: li('Declarado no es validado','Declared is not validated','Declarado nao e validado','Declare n est pas valide','Dichiarato non e validato','Deklariert ist nicht validiert','宣言は検証ではない','声明不等于校验','declared validated nahin','المعلن ليس متحققا') },
-        { id: 'nac_landing.limit.stability', role: 'region',
-          label_i18n: li('La estabilidad la cumple el adoptante','Stability is yours to keep','A estabilidade e do adotante','La stabilite est a vous','La stabilita e tua','Stabilitaet liegt bei dir','安定性は実装者の責任','稳定性归你','stability aapki','الاستقرار مسؤوليتك') },
-        { id: 'nac_landing.limit.correctness', role: 'region',
-          label_i18n: li('No garantiza que el agente acierte','No guarantee of correctness','Nao garante acerto','Pas de garantie de justesse','Nessuna garanzia di correttezza','Keine Korrektheitsgarantie','正しさは保証しない','不保证正确','correctness ki guarantee nahin','لا يضمن الصحة') },
-        { id: 'nac_landing.limits.license_nac3', role: 'action', actions: [{ verb: 'open' }],
-          label_i18n: li('Licencia Apache-2.0','Apache-2.0 license','Licenca Apache-2.0','Licence Apache-2.0','Licenza Apache-2.0','Apache-2.0-Lizenz','Apache-2.0 ライセンス','Apache-2.0 许可证','Apache-2.0 license','ترخيص Apache-2.0') },
-        { id: 'nac_landing.limits.urazuke', role: 'action', actions: [{ verb: 'open' }],
-          label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') },
-        { id: 'nac_landing.limits.forge', role: 'action', actions: [{ verb: 'open' }],
-          label_i18n: li('Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge') },
-        { id: 'nac_landing.limits.governance', role: 'action', actions: [{ verb: 'open' }],
-          label_i18n: li('Gobernanza','Governance','Governanca','Gouvernance','Governance','Governance','ガバナンス','治理','governance','الحكامة') },
-
-        /* Demo card open links -- one per card */
-        { id: 'nac_landing.democard.v19.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Abrir demo v1.9','Open v1.9 demo','Abrir demo v1.9','Ouvrir demo v1.9','Apri demo v1.9','v1.9 oeffnen','v1.9 デモ','打开 v1.9','v1.9 demo','عرض v1.9') }],
-          label_i18n: li('Demo v1.9','v1.9 demo','Demo v1.9','Demo v1.9','Demo v1.9','v1.9-Demo','v1.9 デモ','v1.9 演示','v1.9 demo','عرض v1.9') },
-        { id: 'nac_landing.democard.v20p.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Abrir primitivos v2.0','Open v2.0 primitives','Abrir primitivos v2.0','Ouvrir primitives v2.0','Apri primitivi v2.0','v2.0 Primitive','v2.0 プリミティブ','打开 v2.0 原语','v2.0 primitives','أساسيات v2.0') }],
-          label_i18n: li('Primitivos v2.0','v2.0 primitives','Primitivos v2.0','Primitives v2.0','Primitivi v2.0','v2.0-Primitive','v2.0 プリミティブ','v2.0 原语','v2.0 primitives','أساسيات v2.0') },
-        { id: 'nac_landing.democard.v20.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Abrir brownfield v2.0','Open v2.0 brownfield','Abrir brownfield v2.0','Ouvrir brownfield v2.0','Apri brownfield v2.0','v2.0 Brownfield','v2.0 ブラウンフィールド','打开 v2.0 brownfield','v2.0 brownfield','مهجور v2.0') }],
-          label_i18n: li('Brownfield v2.0','v2.0 brownfield','Brownfield v2.0','Brownfield v2.0','Brownfield v2.0','v2.0-Brownfield','v2.0 ブラウンフィールド','v2.0 brownfield','v2.0 brownfield','مهجور v2.0') },
-        { id: 'nac_landing.democard.v21.open', role: 'action',
-          actions: [{ verb: 'open',
-            label_i18n: li('Abrir tabla v2.1','Open v2.1 table','Abrir tabela v2.1','Ouvrir table v2.1','Apri tabella v2.1','v2.1 Tabelle','v2.1 テーブル','打开 v2.1 表格','v2.1 table','جدول v2.1') }],
-          label_i18n: li('Tabla v2.1','v2.1 table','Tabela v2.1','Table v2.1','Tabella v2.1','v2.1-Tabelle','v2.1 テーブル','v2.1 表格','v2.1 table','جدول v2.1') },
-
-        /* Resource links -- compact labels */
-        { id: 'nac_landing.res.spec',         role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Spec','Spec','Spec','Spec','Spec','Spec','仕様','规范','spec','مواصفات') },
-        { id: 'nac_landing.res.about',        role: 'action', actions: [{ verb: 'open' }], label_i18n: li('About','About','About','About','About','About','概要','关于','about','حول') },
-        { id: 'nac_landing.res.v22',          role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Roadmap v2.2','v2.2 roadmap','Roadmap v2.2','Roadmap v2.2','Roadmap v2.2','v2.2 Roadmap','v2.2 ロードマップ','v2.2 路线图','v2.2 roadmap','v2.2 خارطة') },
-        { id: 'nac_landing.res.security',     role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Seguridad','Security','Seguranca','Securite','Sicurezza','Sicherheit','セキュリティ','安全','security','أمان') },
-        { id: 'nac_landing.res.react',        role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Guia React','React guide','Guia React','Guide React','Guida React','React-Anleitung','React ガイド','React 指南','React guide','دليل React') },
-        { id: 'nac_landing.res.angular',      role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Guia Angular','Angular guide','Guia Angular','Guide Angular','Guida Angular','Angular-Anleitung','Angular ガイド','Angular 指南','Angular guide','دليل Angular') },
-        { id: 'nac_landing.res.llm',          role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Guia LLM','LLM wiring','Guia LLM','Guide LLM','Guida LLM','LLM-Anleitung','LLM ガイド','LLM 指南','LLM guide','دليل LLM') },
-        { id: 'nac_landing.res.demo.v19',     role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Demo v1.9','v1.9 demo','Demo v1.9','Demo v1.9','Demo v1.9','v1.9-Demo','v1.9 デモ','v1.9 演示','v1.9 demo','عرض v1.9') },
-        { id: 'nac_landing.res.demo.v20p',    role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Primitivos v2.0','v2.0 primitives','Primitivos v2.0','Primitives v2.0','Primitivi v2.0','v2.0-Primitive','v2.0 プリミティブ','v2.0 原语','v2.0 primitives','أساسيات v2.0') },
-        { id: 'nac_landing.res.demo.v20',     role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Brownfield v2.0','v2.0 brownfield','Brownfield v2.0','Brownfield v2.0','Brownfield v2.0','v2.0-Brownfield','v2.0 ブラウンフィールド','v2.0 brownfield','v2.0 brownfield','مهجور v2.0') },
-        { id: 'nac_landing.res.demo.v21',     role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Tabla v2.1','v2.1 table','Tabela v2.1','Table v2.1','Tabella v2.1','v2.1-Tabelle','v2.1 テーブル','v2.1 表格','v2.1 table','جدول v2.1') },
-        { id: 'nac_landing.res.npm',          role: 'action', actions: [{ verb: 'open' }], label_i18n: li('NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM','NPM') },
-        { id: 'nac_landing.res.github',       role: 'action', actions: [{ verb: 'open' }], label_i18n: li('GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub') },
-        { id: 'nac_landing.res.contributing', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Contribuir','Contributing','Contribuir','Contribuer','Contribuire','Mitwirken','貢献','贡献','contribute','مساهمة') },
-        { id: 'nac_landing.res.license',      role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Licencia','License','Licenca','Licence','Licenza','Lizenz','ライセンス','许可证','license','ترخيص') },
-
-        /* Footer */
-        { id: 'nac_landing.footer.license', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Licencia','License','Licenca','Licence','Licenza','Lizenz','ライセンス','许可证','license','ترخيص') },
-        { id: 'nac_landing.footer.github',  role: 'action', actions: [{ verb: 'open' }], label_i18n: li('GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub') },
-        { id: 'nac_landing.footer.urazuke', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') },
-        { id: 'nac_landing.footer.yujin',   role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin') }
-      ]
-    });
-
-    /* Chat plugin manifest -- registered separately so chat is its own plugin scope. */
-    NAC.register({
-      plugin_slug: 'chat',
-      version: '2.5.0',
-      nac_version: '2.5',
-      elements: [
-        { id: 'chat.lang', role: 'field',
-          label_i18n: li('Idioma del chat','Chat language','Idioma do chat','Langue du chat','Lingua del chat','Chat-Sprache','チャット言語','聊天语言','chat ki bhasha','لغة المحادثة') },
-        { id: 'chat.tts', role: 'action',
-          actions: [{ verb: 'toggle_tts',
-            label_i18n: li('Activar voz','Toggle TTS','Alternar TTS','Activer TTS','Attiva TTS','TTS umschalten','TTS切替','切换 TTS','TTS','TTS') }],
-          label_i18n: li('TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS') },
-        { id: 'chat.mic', role: 'action',
-          actions: [{ verb: 'push_to_talk',
-            label_i18n: li('Hablar','Push to talk','Falar','Parler','Parla','Sprechen','話す','说话','bole','تحدث') }],
-          label_i18n: li('Microfono','Mic','Microfone','Micro','Microfono','Mikrofon','マイク','麦克风','mic','ميكروفون') },
-        { id: 'chat.voice.always_on', role: 'action',
-          actions: [{ verb: 'toggle_handsfree',
-            label_i18n: li('Manos libres','Hands-free','Maos livres','Mains libres','Mani libere','Freisprechen','ハンズフリー','免提','hands free','بدون يدين') }],
-          label_i18n: li('Manos libres','Hands-free','Maos livres','Mains libres','Mani libere','Freisprechen','ハンズフリー','免提','hands free','بدون يدين') },
-        { id: 'chat.input', role: 'field',
-          label_i18n: li('Mensaje','Message','Mensagem','Message','Messaggio','Nachricht','メッセージ','消息','sandesh','رسالة') },
-        { id: 'chat.send', role: 'action',
-          actions: [{ verb: 'send',
-            label_i18n: li('Enviar','Send','Enviar','Envoyer','Invia','Senden','送信','发送','bheje','إرسال') }],
-          label_i18n: li('Enviar','Send','Enviar','Envoyer','Invia','Senden','送信','发送','bheje','إرسال') },
-        { id: 'chat.log', role: 'region',
-          label_i18n: li('Conversacion','Conversation','Conversacao','Conversation','Conversazione','Unterhaltung','会話','对话','baat','محادثة') }
-      ]
-    });
-
-    console.log('[nac_landing] manifests registered; NAC.STRICT_VALIDATION=' + NAC.STRICT_VALIDATION);
-
-    /* === Chat toggle === */
-    function setChatOpen(open) {
-      document.body.setAttribute('data-chat-open', open ? '1' : '0');
-      var aside = document.querySelector('.chat');
-      if (aside) aside.setAttribute('aria-hidden', open ? 'false' : 'true');
-      var btn = document.getElementById('chat-toggle');
-      if (btn) btn.setAttribute('aria-pressed', open ? 'true' : 'false');
-    }
-
-    NAC.bindAction(document.getElementById('chat-toggle'),
-      function () {
-        var open = document.body.getAttribute('data-chat-open') === '1';
-        setChatOpen(!open);
-      },
-      { plugin: 'nac_landing', action_id: 'nac_landing.chat.toggle' });
-
-    /* === Autopilot === */
-    /* Walks visitors through the landing -- each step focuses a
-       section, highlights it (data-autopilot="active"), narrates
-       the title via TTS, waits ~3s, advances. Stops if the user
-       starts interacting (any keypress / mousedown). */
-    var AUTOPILOT_STEPS = [
-      { id: 'nac_landing.section.hero',      narrate: 'NAC lets web UIs be driven by voice, chat, and AI.' },
-      { id: 'nac_landing.section.howsmall',  narrate: 'Three HTML attributes make any button drivable.' },
-      { id: 'nac_landing.section.demos',     narrate: 'Four live demos. Try the chat one to see it end to end.' },
-      { id: 'nac_landing.section.resources', narrate: 'Spec, guides, demos and project links live here.' },
-      { id: 'nac_landing.section.usecases',  narrate: 'Voice plus chat is the headline. Accessibility, testing, RPA and agentic control are the other four wins.' },
-      { id: 'nac_landing.section.cases',     narrate: 'Yujin CRM, plus React and Angular study cases consuming the npm package.' },
-      { id: 'nac_landing.section.why',       narrate: 'Same problem voice and accessibility tools all face. NAC is the small contract that fits.' }
-    ];
-
-    var autopilotRunning = false;
-    var autopilotAbort   = false;
-
-    function highlight(el, on) {
-      if (!el) return;
-      if (on) el.setAttribute('data-autopilot', 'active');
-      else el.removeAttribute('data-autopilot');
-    }
-
-    async function runAutopilot() {
-      if (autopilotRunning) return;
-      autopilotRunning = true;
-      autopilotAbort   = false;
-      var btn = document.getElementById('autopilot-toggle');
-      if (btn) btn.setAttribute('aria-pressed', 'true');
-
-      function abortOnInteract() { autopilotAbort = true; }
-      window.addEventListener('keydown',   abortOnInteract, { once: true });
-      window.addEventListener('mousedown', abortOnInteract, { once: true });
-
-      for (var i = 0; i < AUTOPILOT_STEPS.length; i++) {
-        if (autopilotAbort) break;
-        var step = AUTOPILOT_STEPS[i];
-        var el = document.querySelector('[data-nac-id="' + step.id + '"]');
-        if (!el) continue;
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        highlight(el, true);
-        try { NacChat.botSpeak(step.narrate); } catch (_) {}
-        await new Promise(function (r) { setTimeout(r, 3500); });
-        highlight(el, false);
-      }
-
-      autopilotRunning = false;
-      if (btn) btn.setAttribute('aria-pressed', 'false');
-      window.removeEventListener('keydown',   abortOnInteract);
-      window.removeEventListener('mousedown', abortOnInteract);
-    }
-
-    NAC.bindAction(document.getElementById('autopilot-toggle'),
-      function () { runAutopilot(); },
-      { plugin: 'nac_landing', action_id: 'nac_landing.autopilot.toggle' });
-
-    /* === Wire chat client === */
-    NacChat.init({
-      endpoint:     '/crm/api/v1/yujin/nac-demo',
-      lang:         'en',
-      chatLog:      document.getElementById('chat-log'),
-      input:        document.getElementById('chat-input'),
-      langSelect:   document.getElementById('chat-lang'),
-      sendBtn:      document.getElementById('chat-send'),
-      micBtn:       document.getElementById('chat-mic'),
-      handsFreeBtn: document.getElementById('chat-handsfree'),
-      ttsBtn:       document.getElementById('chat-tts')
-    });
-
-    /* === Custom navigation handler -- when the LLM emits a click
-       on one of our anchor tags, just navigate (don't try to ack). */
-    var ORIGINAL_CLICK = NacChat._customHandlers && NacChat._customHandlers.click;
-    NacChat.onAction('click', function (a) {
-      var el = document.querySelector('[data-nac-id="' + a.nac_id + '"]');
-      if (el && el.tagName === 'A' && el.getAttribute('href')) {
-        window.location.href = el.getAttribute('href');
-        return { ok: true };
-      }
-      if (ORIGINAL_CLICK) return ORIGINAL_CLICK(a);
-      if (el) { el.click(); return { ok: true }; }
-      throw new Error('not found: ' + a.nac_id);
-    });
-
-    /* === Validate after wiring -- expect zero error-severity findings. === */
-    setTimeout(function () {
-      try {
-        var findings = NAC.validate_global({ probe: false });
-        var errors = (findings || []).filter(function (f) { return f.severity === 'error'; });
-        if (errors.length === 0) {
-          console.log('[nac_landing] NAC validate clean -- ' + (findings || []).length + ' total findings (none error severity)');
-        } else {
-          console.warn('[nac_landing] NAC validate found ' + errors.length + ' errors:', errors);
-        }
-      } catch (e) {
-        console.warn('[nac_landing] validate_global threw:', e.message);
-      }
-    }, 1000);
-  });
-})();
-</script>
-
-<script>
-  // Waitlist submission. Posts to /api/v1/waitlist-signup
-  // on yujin.app, which persists to marketing_waitlist table.
-  // Graceful degradation: if endpoint is unreachable, falls
-  // back to mailto.
-  async function submitWaitlist(ev) {
-    ev.preventDefault();
-    var email  = document.getElementById('waitlist-email').value.trim();
-    var forge  = document.getElementById('waitlist-forge').checked;
-    var pilot  = document.getElementById('waitlist-pilot').checked;
-    var status = document.getElementById('waitlist-status');
-    if (!email) { return false; }
-    var products = [];
-    if (forge) products.push('forge');
-    if (pilot) products.push('pilot');
-    status.textContent = 'Submitting...';
-    try {
-      var resp = await fetch('https://yujin.app/api/v1/waitlist-signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, products: products, source: 'nac-spec-landing' })
-      });
-      if (resp.ok) {
-        status.textContent = 'Got it. You will hear from us when Pilot launches.';
-        document.getElementById('waitlist-email').value = '';
-      } else {
-        throw new Error('non-ok response');
-      }
-    } catch (e) {
-      status.innerHTML = 'Submission failed -- email <a href="mailto:hello@yujin.app?subject=Waitlist:%20' + products.join('+') + '&body=Email:%20' + encodeURIComponent(email) + '">hello@yujin.app</a> instead.';
-    }
-    return false;
-  }
-</script>
-
+<script src="i18n.js" defer></script>
 </body>
 </html>

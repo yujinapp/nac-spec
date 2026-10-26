@@ -1875,6 +1875,91 @@ regresion.
 
 ---
 
+### N-45 (nuevo, 2026-10-26, encontrado AL PUBLICAR) La portada del repositorio anuncia un alpha como la version publicada, y la promocion de `latest` es lo que la volvio falsa
+
+**Como se encontro:** no leyendo. Se encontro **ejecutando el paso 6 del 4.3** -- publicar
+el paquete y promover `latest` -- y despues recorriendo las ocho casillas del dueno contra
+el servidor. La casilla 1 pide que *"la seccion 9 del SPEC diga lo mismo que el registro"*,
+y al abrir el SPEC servido para comprobarlo aparecio la linea 4.
+
+**Lo que se midio, en el arbol que acababa de salir en verde con 18 slots de version de
+acuerdo:**
+
+| superficie publicada | lo que declaraba |
+| --- | --- |
+| `SPEC.md` linea 3 | `**Version:** 2.5.0 (stable ...)` |
+| `SPEC.md` linea 4 | `**Status:** v2.5.0-alpha.5 -- ... Promoted to npm dist-tag latest.` |
+| `README.md` badge 1 | `status-2.5--alpha` (naranja) |
+| `README.md` badge 2 | `spec-v2.5_alpha.5` (naranja) |
+| `README.md` callout | `**v2.5.0-alpha.5 shipped** (2026-05-25) ... promoted to npm latest.` |
+| `README.md` seccion | `## Status: alpha + stable in parallel` |
+| `README.md` tabla | tres filas declarando `v2.5-alpha` |
+
+El documento cuyo argumento de venta es que **no se contradice a si mismo** (N-05,
+G3-DERIVA) se contradecia en sus primeras cuatro lineas, y la portada del repositorio
+-- que el deploy tambien publica en `/nac-spec/README.md`, verificado 200 -- llamaba
+alpha a la release estable.
+
+**La parte que importa de la causa raiz, y es nueva:** esas frases **eran verdaderas**
+hasta las 18:40 de hoy. `latest` apuntaba a `2.5.0-alpha.5`, asi que *"v2.5.0-alpha.5
+... promoted to npm latest"* era un hecho. **El acto de promover `latest` es lo que las
+volvio falsas.** No es una frase que se quedo vieja por olvido: es una asimetria
+productor/consumidor donde el productor es un comando que se corre una vez en la vida
+del release (`npm publish`) y los consumidores son dos documentos que nadie vuelve a
+leer ese dia. Es la forma de N-17 trasladada a una superficie humana: una version
+escrita a mano en un lugar que ningun candado podia ver.
+
+**Por que los 18 slots no lo vieron:** porque ninguno miraba estos dos archivos. El
+candado de versiones cubria el SPEC por su linea `**Version:**` y no por su linea
+`**Status:**`, y no cubria `README.md` en absoluto. El gate reportaba *"All 18 version
+slots agree on 2.5.0"* sobre una portada que decia alpha, y el reporte era correcto
+en lo que media: media dieciocho casillas de las veinte que existen.
+
+**Arreglado, la mitad que no cuesta una version:**
+
+- `README.md`: los dos badges pasan a `status-2.5.0_stable-green` y `spec-v2.5-blue`; el
+  callout anuncia `2.5.0 stable shipped (2026-10-26)` y nombra la seccion 9.1 como la
+  regla que reserva `latest` para una estable; la seccion pasa a `## Status` con la 2.5.0
+  estable como primer item y deja escrito que las cinco prereleases `2.5.0-alpha.N` siguen
+  publicadas bajo el tag `alpha` y nunca se purgan; las tres filas de la tabla dicen `v2.5`.
+- Se elimino tambien una promesa que la seccion de abajo ya contradecia en el mismo
+  archivo: *"V24-04 snapshot versioning + OCC is in implementation and targets
+  2.5.0-alpha.2 (or rc.1)"*, mientras la lista de SHIPPED mas abajo lo declara entregado.
+- **El candado**: dos slots nuevos en `scripts/check-version-coherence.mjs`
+  (`README status badge`, `README spec badge`), que llevan el gate de 18 a **20 slots**.
+  Los badges se **decodifican**, no se matchean con una regex: shields.io escribe un
+  guion literal como guion doble, asi que el badge de una prerelease se lee
+  `2.6.0--alpha.1` y ninguna regex de semver lo reconoceria -- el probe reportaria
+  "no nombra ninguna version" sobre un badge que nombra una.
+- **Probado en rojo, y el primer caso no es hipotetico: es el README con el que la 2.5.0
+  salio de verdad, restaurado textual.** Seis casos rojos nuevos (el README real, un badge
+  dejado en la release anterior, la portada sin badge, un badge sin version, el badge de
+  spec en la linea anterior, el badge de spec con cola de release) y un caso verde que es
+  la contraparte: una frase que nombra una release vieja **sigue siendo legal**, porque la
+  seccion de estado de este mismo README nombra las cinco alphas y las lineas 2.2 / 2.3 /
+  2.4 y todas son historia verdadera. Un candado que las refutara seria N-41 otra vez en
+  otro archivo. La suite pasa de **18 a 25 casos**.
+
+**La mitad que SI cuesta una version, y por que no se toco:** la linea 4 de `SPEC.md`.
+Se reescribio, se midio la consecuencia y se revirtio. Medido, no deducido:
+`api/v/2.5.0/contract.json` publica `spec_sha384`, la huella de los bytes de `SPEC.md`,
+asi que **cualquier edicion del SPEC mueve el contrato de una version ya publicada** --
+que es exactamente lo que el metodo prohibe. La correccion del Status line necesita
+**2.5.1**: salto de version, copia congelada nueva, entrada nueva en la cadena y **una
+firma nueva del dueno**. Y el tarball `@nac3/runtime@2.5.0` ya publicado lleva ese
+`SPEC.md` adentro, asi que tampoco se arregla deployando.
+
+**Severidad:** avisa fuerte. No rompe nada ejecutable: rompe la primera impresion y la
+coherencia del documento, en el unico dia en que el proyecto le pide a alguien que se
+crea que una estable es estable. **Quien decide:** el dueno, y solo la mitad del SPEC
+(publicar 2.5.1 hoy con esa linea arreglada, o llevarla a la 2.6). La mitad del README
+y el candado son mecanicos y ya estan.
+
+**Estado: CERRADO el README y el candado; ABIERTO el Status line del SPEC,**
+esperando la decision de version.
+
+---
+
 ## 4. Grupos de convergencia
 
 Estos son el mismo problema visto de dos lados y **tienen que cerrarse juntos**:
@@ -2079,6 +2164,53 @@ como defecto de la pagina. Se destraba solo con el paso 2 del salto de version, 
 regenera `js/2.5.0/nac.js`.
 
 ---
+
+**ESTADO AL 2026-10-26 19:05 UTC, MEDIDO CONTRA EL SERVIDOR Y CONTRA EL REGISTRO POR
+PRIMERA VEZ DESDE QUE LA 2.5.0 ESTA PUBLICADA. Pasa de 1/8 a 7/8, y el unico rojo que
+queda es el externo.**
+
+La 2.5.0 estable salio: el dueno firmo el indice (`signed_at 2026-10-26T18:36:51Z`),
+`main` se movio por fast-forward a `709b05f`, el deploy (run `40380029640`) dio **success
+en sus 17 pasos**, incluidos los cuatro chequeos de humo contra el sitio vivo y la
+verificacion del contrato publicado **desde afuera** con `--expect-head-from-repo`.
+
+| # | Comando del dueno | Devuelve ahora | Veredicto |
+|---|---|---|---|
+| 1 | `curl registry.npmjs.org/@nac3/runtime \| grep dist-tags` | `{"latest":"2.5.0","alpha":"2.5.0-alpha.5"}` | **VERDE en el registro.** `latest` apunta a la estable y las cinco prereleases quedan bajo `alpha`, que es exactamente lo que la seccion 9.1 manda y lo que D-01 opcion C decidio. El registry tardo unos 25 minutos en publicar el packument despues de aceptar el publish (*"being processed"*), asi que la primera medicion de esta casilla dio el valor viejo: **la aceptacion del publish no es la publicacion**, y conviene re-medir contra el packument y no contra la salida de `npm publish`. La otra mitad del criterio -- *"y la seccion 9 diciendo lo mismo"* -- es la que destapo **N-45**. |
+| 2 | `curl /nac-spec/ \| grep -c "integrity="` | `4` | **VERDE** |
+| 3 | `curl /nac-spec/ \| grep -c -i "does not cover"` | `1` | **VERDE.** Y como quedo escrito arriba, esta casilla se da por verde con el gate `e2e/landing-limits-check.mjs` (texto renderizado + declaracion en el manifest), no con el grep, que un comentario HTML satisface. |
+| 4 | `curl /nac-spec/ \| grep -c -i "urazuke"` | `7` | **VERDE**, misma salvedad que el 3 |
+| 5 | `curl /sitemap.xml \| grep -c "nac-spec"` | `0` | **ROJO Y EXTERNO.** El sitemap de la raiz `yujin.app` no vive en este repositorio. El propio de `/nac-spec/sitemap.xml` responde **200**. Es el unico item que puede quedar rojo sin ser deuda nuestra. |
+| 6 | `curl /nac-spec/SPEC.md \| grep -c "Asistive"` | `0` | **VERDE.** Estaba "hecho y en cola" desde el 2026-10-24; el servidor lo entrego hoy. |
+| 7 | `curl /nac-spec/SPEC.md \| grep -n "v2.1\|v2.3 stable\|v2.4 will"` | vacio (0 lineas) | **VERDE.** Idem: ocho lineas en el servidor el 2026-10-24, cero ahora. |
+| 8 | `npx nac3 validate <demo>` | corre y reporta nivel | **VERDE, y medido donde importa: desde un directorio adoptante vacio**, instalando solo lo que la casilla implica (`npm i -D playwright @nac3/runtime`). `npx nac3 validate https://yujin.app/nac-spec/` devuelve `runtime on the page 2.5.0 (spec v2.5)`, `validator 2.5.0`, los 11 requisitos uno por uno con su motivo medido, y `Conformance level: NONE ASSERTED` nombrando los tres que fallan medidos (L2-f6a7aa72, L3-cc540e31, L3-4bdc1b16 -- que son N-37, N-36 y N-35, los tres esperando decision del dueno) y los dos que no midio. Salida 1, que es correcto: no afirma un nivel. **Con `npx` a secas, sin playwright, da salida 3** y la causa con su arreglo en tres lineas, por decision de diseno: un runtime que arrastrara un navegador a cada instalacion le cobraria el navegador a todo adoptante que nunca lo corre. |
+
+**Los tres testigos de la cabeza de cadena, verificados de punta a punta y por separado
+(N-24).** Hasta hoy el tercero no existia; ahora se midieron los tres y coinciden:
+
+| testigo | de donde se leyo | cabeza |
+| --- | --- | --- |
+| host | `curl https://yujin.app/nac-spec/api/index.json` | `sha384-tBEQVA0WiCwv...` |
+| paquete | `npm pack @nac3/runtime@2.5.0` y leer `contract-head.json` del tarball | `sha384-tBEQVA0WiCwv...` |
+| repositorio | `api/index.json` en git | `sha384-tBEQVA0WiCwv...` |
+
+El del paquete es el que un host comprometido no puede alcanzar: npm no permite
+republicar una version. Y el CLI publicado se declara `@nac3/runtime CLI 2.5.0 (Native
+Agent Contract v2.5)`, con lo cual N-17 queda cerrado **en el registro** y no solo en el
+arbol -- era el hallazgo que decia que el tarball publicado anunciaba una version dos
+releases atras.
+
+**La advertencia sobre el instrumento quedo resuelta sola, y se midio.** El 2026-10-26 por
+la manana el validador avisaba que la portada servia una copia congelada anterior al
+arreglo de N-33 y reportaba **128 huerfanos falsos**. Contra el servidor de hoy:
+**64 ids declarados, 64 ids resueltos, 0 hallazgos de severidad error**, sin advertencia
+de instrumento. Los 128 ids del DOM contra 64 declarados son N-31 (`PND-038`), que es un
+hallazgo abierto y conocido, no el defecto del instrumento.
+
+**Y la casilla 1 destapo N-45**, que es el hallazgo nuevo de esta tanda: su criterio pide
+que *"la seccion 9 del SPEC diga lo mismo que el registro"*, y al abrir el SPEC servido
+para comprobarlo aparecio su linea 4 declarando un alpha como la version publicada. Ver
+la entrada N-45: el README y el candado estan cerrados, la linea del SPEC necesita 2.5.1.
 
 ## 6. Que no hice
 

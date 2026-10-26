@@ -70,6 +70,7 @@ function filesTheGateReads() {
     'runtime/dist/nac.d.ts',
     'runtime/dist/nac-v2-extensions.d.ts',
     'SPEC.md',
+    'README.md',
     'index.html',
     '.github/workflows/deploy.yml',
     'api/index.json',
@@ -311,6 +312,66 @@ expectRed(
   (dir) => patch(dir, 'js/nac.js', (s) =>
     s.replace("version:      '" + VERSION + "',", "version:      undefined,")),
   'carries no usable version'
+);
+
+/* ---- 7. the front page (audit N-45) -------------------------------
+     The first case is not a hypothetical: it is the README the 2.5.0
+     stable release actually shipped with, restored verbatim. The gate
+     reported eighteen slots green over it. ---------------------------- */
+
+expectRed(
+  'the front page the stable release really shipped with is refused',
+  (dir) => patch(dir, 'README.md', (s) => s
+    .replace('[![Status: stable](https://img.shields.io/badge/status-' + VERSION + '_stable-green)]',
+      '[![Status: alpha](https://img.shields.io/badge/status-2.5--alpha-orange)]')),
+  'README status badge'
+);
+
+expectRed(
+  'a status badge left on the previous release is refused',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s.replace('status-' + VERSION + '_stable-green', 'status-2.4.0_stable-green')),
+  'README status badge'
+);
+
+expectRed(
+  'a front page with no status badge at all is refused, not skipped',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s.replace(/\[!\[Status[^\n]*\n/, '')),
+  'no status badge'
+);
+
+expectRed(
+  'a status badge that names no version is refused',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s.replace('status-' + VERSION + '_stable-green', 'status-stable-green')),
+  'names no version'
+);
+
+expectRed(
+  'a spec badge left on the previous spec line is refused',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s.replace(/badge\/spec-v[0-9]+\.[0-9]+-/, 'badge/spec-v2.4-')),
+  'README spec badge'
+);
+
+expectRed(
+  'a spec badge carrying a release tail instead of the spec line is refused',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s.replace(/badge\/spec-v[0-9]+\.[0-9]+-/, 'badge/spec-v' + VERSION + '-')),
+  'README spec badge'
+);
+
+/* The counterpart, and the reason the probe reads the badges and not
+   the prose: the status section of this very README names all five
+   2.5.0-alpha.N prereleases and the 2.2 / 2.3 / 2.4 lines. Every one
+   of those sentences is true history. A lock that refused them would
+   be the N-41 defect again, in a different file. */
+expectGreen(
+  'a front page naming an older release historically stays legal',
+  (dir) => patch(dir, 'README.md', (s) =>
+    s + '\n<!-- The URL mode of the validator aborted with exit 2 before 2.5.0, and\n'
+      + '     2.5.0-alpha.5 was the last prerelease of the line. -->\n')
 );
 
 console.log('');

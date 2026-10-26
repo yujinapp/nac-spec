@@ -4,13 +4,13 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: alpha](https://img.shields.io/badge/status-2.5--alpha-orange)](https://yujin.app/nac-spec/)
-[![Spec: v2.5-alpha.5](https://img.shields.io/badge/spec-v2.5_alpha.5-orange)](SPEC.md)
+[![Status: stable](https://img.shields.io/badge/status-2.5.0_stable-green)](https://yujin.app/nac-spec/)
+[![Spec: v2.5](https://img.shields.io/badge/spec-v2.5-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 [![Tests: passing](https://img.shields.io/badge/tests-386_passing-success)](runtime/test/)
 
-> **v2.5.0-alpha.5 shipped** (2026-05-25) -- v2.5 line complete; 8 SHIPPED RFCs each with Layer 2 + Layer 3 LIVE evidence; promoted to npm latest.
+> **2.5.0 stable shipped** (2026-10-26) -- v2.5 line complete; 8 SHIPPED RFCs each with Layer 2 + Layer 3 LIVE evidence; promoted to the npm dist-tag `latest`, which [section 9.1](SPEC.md) reserves for a stable version.
 > Unifies the two parallel dev lines that diverged during May 2026 and
 > establishes `yujinapp/nac-spec` as the SOLE source of truth for NAC3
 > from this commit forward. Adds **V25-01** plugin extension contract
@@ -25,9 +25,6 @@
 > CI gate. Read [PROJECT.md](PROJECT.md) for the orientation +
 > programming norms; [CHANGELOG](runtime/CHANGELOG.md) for the full
 > entry; [rfcs/](rfcs/) for the RFC state index.
->
-> V24-04 snapshot versioning + OCC is in implementation and targets
-> 2.5.0-alpha.2 (or rc.1).
 
 ---
 
@@ -81,14 +78,14 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 
 | App | Type | NAC3 version |
 |-----|------|--------------|
-| [Yujin CRM](https://yujin.app) | Production reference | v2.5-alpha |
-| [Reference demos](https://yujin.app/nac-spec/) | Live: 13 vanilla PHP examples (v1.3 -> v2.4: primitives showcase, data-table, interop, shadow DOM, field editor, disambiguation, ...) + 10 framework/RFC demos under `demos/` (React, Angular, v24-* + v25-* RFC walkthroughs) + the Atlas Pro voice ad | v2.5-alpha |
-| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.5-alpha |
+| [Yujin CRM](https://yujin.app) | Production reference | v2.5 |
+| [Reference demos](https://yujin.app/nac-spec/) | Live: 13 vanilla PHP examples (v1.3 -> v2.4: primitives showcase, data-table, interop, shadow DOM, field editor, disambiguation, ...) + 10 framework/RFC demos under `demos/` (React, Angular, v24-* + v25-* RFC walkthroughs) + the Atlas Pro voice ad | v2.5 |
+| [Atlas Pro voice ad](https://yujin.app/nac-spec/ads-demo/atlas-pro/) | Voice-driven advertisement closing the sale via NAC3 | v2.5 |
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
-## Status: alpha + stable in parallel
+## Status
 
-- **v2.5.0-alpha.5** -- shipped 2026-05-25. **v2.5 line complete.**
+- **2.5.0** -- shipped 2026-10-26, **stable**. **v2.5 line complete.**
   All 8 SHIPPED RFCs of the v2.5 series have runtime + Layer 2
   visual + Layer 3 Pilot LIVE evidence:
   - V24-01 plugin slug uniqueness
@@ -100,9 +97,11 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
   - V25-03 assistive labels (narrate)
   - V25-04 effect detection (expect + diff)
 
-  Promoted to npm dist-tag `latest`. `yujinapp/nac-spec` is the
-  SOLE source of truth (rpaforce-crm working copy removed since
-  alpha.1).
+  Promoted to the npm dist-tag `latest`, which section 9.1 of the
+  SPEC reserves for a stable version. The five 2.5.0-alpha.N
+  prereleases that led here stay published under the `alpha` tag and
+  are never purged. `yujinapp/nac-spec` is the SOLE source of truth
+  (rpaforce-crm working copy removed since the first alpha).
 - **v2.4** -- shipped 2026-05-23. Zero-silent-damage strict resolution
   + disambiguation contract. `click_by_verb` / `tab` / `tab_by_label`
   throw `NacError` with `err.candidates` and emit

@@ -288,6 +288,94 @@ expectAll('DECLARED', 'landing version pills', 'index.html',
 expectAll('DECLARED', 'landing demo plugin manifests', 'index.html',
   'version:\\s*\'(' + SEMVER + ')\'', BY_HAND);
 
+/* --- the repository front page, which is ALSO a published document:
+       the deploy mirrors the whole tree, so this file is served at
+       /nac-spec/README.md, and on GitHub it is the first thing an
+       adopter reads about the project.
+
+       Audit N-45. The 2.5.0 stable release went out with a README
+       whose badge read `status-2.5--alpha` and whose headline
+       announced "v2.5.0-alpha.5 shipped ... promoted to npm latest".
+       Both sentences were TRUE until the promotion and false the
+       minute it happened -- the act of promoting `latest` is what
+       falsified them. Nothing watched this file, so this gate reported
+       eighteen slots green over a front page that called the stable
+       release an alpha. That is N-17's shape in a human surface
+       instead of a tarball: a version written by hand somewhere no
+       lock could see it.
+
+       The badges are DECODED, not pattern-matched, because shields.io
+       spells a literal dash as a doubled dash: the badge for a
+       prerelease reads 2.6.0--alpha.1, which no semver regex would
+       recognise, and the probe would then report "names no version"
+       about a badge that names one. Decoding is what lets this read
+       the same string a reader sees. --- */
+(() => {
+  const file = 'README.md';
+  if (!has(file)) {
+    drift('README badges', file, VERSION, '(file not found)', 'restore README.md');
+    return;
+  }
+  const src = read(file);
+  const DASH = '%%LITERAL-DASH%%';
+
+  /** the message segment of a shields.io badge, as a reader sees it */
+  const badgeMessage = (name) => {
+    const needle = '/badge/' + name + '-';
+    const at = src.indexOf(needle);
+    if (at < 0) return null;
+    const url = src.slice(at + needle.length).split(')')[0];
+    const parts = url.split('--').join(DASH).split('-');
+    /* the shape is <message>-<color>, so the colour is the last segment */
+    return parts.slice(0, -1).join('-').split(DASH).join('-').replace(/_/g, ' ');
+  };
+
+  (() => {
+    const label = 'README status badge';
+    const msg = badgeMessage('status');
+    if (msg === null) {
+      drift(label, file, 'a status badge naming ' + VERSION, '(no status badge)',
+        'README.md is published at /nac-spec/README.md and is the GitHub front page -- '
+        + 'give it a status badge that names the shipping version');
+      return;
+    }
+    const found = [...new Set(allMatches(msg, '(' + SEMVER + ')'))];
+    if (found.length === 0) {
+      drift(label, file, VERSION, JSON.stringify(msg) + ' -- names no version', BY_HAND);
+      return;
+    }
+    const bad = found.filter((v) => v !== VERSION);
+    if (bad.length) {
+      drift(label, file, VERSION, bad.join(', ') + ' (the badge reads ' + JSON.stringify(msg) + ')',
+        BY_HAND + ' -- a stable release whose front page still says alpha is audit N-45');
+      return;
+    }
+    ok(label + ' [DECLARED]', file, msg);
+  })();
+
+  (() => {
+    const label = 'README spec badge';
+    const msg = badgeMessage('spec');
+    if (msg === null) {
+      drift(label, file, 'a spec badge naming v' + SPEC_VERSION, '(no spec badge)', BY_HAND);
+      return;
+    }
+    const wanted = new RegExp('(^|[^0-9.])' + SPEC_VERSION.replace('.', '\\.') + '([^0-9.]|$)');
+    if (!wanted.test(msg)) {
+      drift(label, file, 'v' + SPEC_VERSION, JSON.stringify(msg), BY_HAND);
+      return;
+    }
+    /* the spec badge names the SPEC line (2.5), never a release tail */
+    const tails = [...new Set(allMatches(msg, '(' + SEMVER + ')'))];
+    if (tails.length) {
+      drift(label, file, 'v' + SPEC_VERSION + ' -- the spec line, not a release',
+        tails.join(', '), BY_HAND);
+      return;
+    }
+    ok(label + ' [DECLARED]', file, msg);
+  })();
+})();
+
 /* --- CI: the deploy smoke check used to hard-code the versioned path,
        which meant a version bump failed the deploy. It must now derive
        it, so finding NO version here is the passing case. --- */

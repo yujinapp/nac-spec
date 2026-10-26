@@ -132,8 +132,16 @@ try {
   const { execSync } = await import('node:child_process');
   head = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
   /* A measurement of a dirty tree is not a measurement of that commit.
-     Say which one it was, instead of letting the sha imply the wrong thing. */
-  tree = execSync('git status --porcelain', { encoding: 'utf8' }).trim() ? 'dirty' : 'clean';
+     Say which one it was, instead of letting the sha imply the wrong thing.
+     Its own output files do not count: the shell truncates them before this
+     runs, so including them would make every run report 'dirty' and the flag
+     would stop meaning anything. */
+  const OWN_OUTPUT = ['e2e/sweep.json', 'e2e/sweep.err'];
+  const dirty = execSync('git status --porcelain', { encoding: 'utf8' })
+    .split(/\r?\n/)
+    .map((l) => l.slice(3).trim())
+    .filter((f) => f && !OWN_OUTPUT.includes(f));
+  tree = dirty.length ? 'dirty' : 'clean';
 } catch (_) { /* not a git checkout -- say so rather than guess */ }
 
 console.log(JSON.stringify({

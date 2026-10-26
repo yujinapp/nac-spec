@@ -18,9 +18,17 @@
  * It serves the repository itself over an ephemeral local server, the same way
  * scripts/test-integrity-load.mjs does, so it needs nothing running. Point it
  * at the real site to verify the SERVER instead of the repository:
+ *   node e2e/landing-limits-check.mjs --base https://yujin.app/nac-spec/
  *   N0_BASE=https://yujin.app/nac-spec node e2e/landing-limits-check.mjs
  * That is the form that turns items 3 and 4 of the owner verification block
  * green, because that block measures the server and not this tree.
+ *
+ * The --base flag exists because the env-var form is not portable: on Windows
+ * cmd.exe `set N0_BASE=... && node ...` does not reach the process, and the
+ * gate then falls back to its local server and reports GREEN about the
+ * repository while the operator believes it measured the site. A receipt that
+ * names the wrong subject is worse than no receipt, so the base is now also
+ * an argument that every shell passes the same way.
  */
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
@@ -44,7 +52,13 @@ const TYPES = {
 };
 
 let server = null;
-let BASE = process.env.N0_BASE || null;
+const baseFlag = (() => {
+  const i = process.argv.indexOf('--base');
+  if (i >= 0 && process.argv[i + 1]) return process.argv[i + 1];
+  const inline = process.argv.find((a) => a.startsWith('--base='));
+  return inline ? inline.slice('--base='.length) : null;
+})();
+let BASE = baseFlag || process.env.N0_BASE || null;
 if (!BASE) {
   server = createServer((req, res) => {
     const urlPath = decodeURIComponent(req.url.split('?')[0]);

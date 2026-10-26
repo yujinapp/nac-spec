@@ -122,6 +122,20 @@ jobs:
         # localhost, no network.
         run: node scripts/test-contract-api-http.mjs
 
+      - name: Landing i18n guard
+        # The landing ships in ten locales and the switcher only serves a
+        # catalogue that declares itself complete. This refuses the ways that
+        # promise quietly breaks: a key set that drifts from English, an empty
+        # value, a declared language that contradicts the filename, markup drift
+        # (a translation dropping a <code> or a <strong>), foreign scripts inside
+        # a Latin-script catalogue, and a key index.html asks for that some
+        # catalogue lacks. Written after the first Portuguese draft shipped two
+        # Chinese characters mid-sentence and nothing would have caught it.
+        #
+        # A value identical to English is sometimes a real cognate. The
+        # catalogue declares those in _same_as_english, and the guard fails both
+        # on an undeclared match and on a declaration that no longer holds.
+        run: node scripts/test-landing-i18n.mjs
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |

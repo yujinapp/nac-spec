@@ -262,6 +262,17 @@ check('HONEST: directory mode says out loud that it cannot decide a level',
 
 /* ===================== group BUILD =================================== */
 
+/* The CLI source this suite builds against did not exist before 2.5.0
+   -- the CLI was a template literal inside the generator. Running this
+   file in a worktree at an older base (which is exactly what a
+   red_proof does) must therefore report a NAMED failure, not die
+   inside cpSync on a missing directory. Third time this lesson shows
+   up in this repository: a lock that crashes hides every case behind
+   it. */
+function cliSourceMissing() {
+  return !existsSync(join(ROOT, 'runtime', 'src', 'cli-url.mjs'));
+}
+
 function buildSandbox() {
   const dir = mkdtempSync(join(tmpdir(), 'nac3-cli-levels-'));
   mkdirSync(join(dir, 'scripts'), { recursive: true });
@@ -288,6 +299,22 @@ function patchMeta(dir, fn) {
   const m = JSON.parse(readFileSync(p, 'utf8'));
   fn(m);
   writeFileSync(p, JSON.stringify(m, null, 2) + '\n');
+}
+
+if (cliSourceMissing()) {
+  for (const name of [
+    'BUILD: an untouched sandbox builds the CLI green',
+    'BUILD: a machine-checkable requirement whose decider the CLI does not implement refuses the build',
+    'BUILD: a requirement published as machine-checkable with no decider refuses the build',
+    'BUILD: a decider the CLI implements that no requirement names refuses the build',
+    'BUILD: a section-8 sentence with no reviewed mapping refuses the build',
+  ]) {
+    check(name, false, 'runtime/src/cli-url.mjs does not exist in this tree');
+  }
+  server.close();
+  console.log('');
+  console.log(passed + ' passed, ' + failed + ' failed');
+  process.exit(1);
 }
 
 /* The sandbox has to be GREEN before any case breaks it, for the same

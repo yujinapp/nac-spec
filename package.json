@@ -22,6 +22,7 @@
     "test:contract-http": "node scripts/test-contract-api-http.mjs",
     "test:limits": "node e2e/landing-limits-check.mjs",
     "test:fill-setter": "node e2e/fill-native-setter-check.mjs",
+    "test:snippet": "node e2e/snippet-install-check.mjs",
     "test:validate-global": "node scripts/test-validate-global.mjs",
     "test:cli-levels": "node scripts/test-cli-levels.mjs"
   },

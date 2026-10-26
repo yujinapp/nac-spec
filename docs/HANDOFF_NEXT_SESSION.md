@@ -1,3 +1,90 @@
+# Handoff -- estado al 2026-10-26, 21:xx UTC (CONSOLIDADO: una sola rama, una sola portada, una sola firma pendiente)
+
+**Lo que cambio respecto de todo lo que sigue abajo: ya no hay dos sesiones ni dos
+arboles.** El dueno decidio consolidar, y esta hecho:
+
+- **Rama unica: `portada-look-urazuke`**, en el arbol principal `C:\yujin-nac-spec`.
+  `release/2.5.1` esta **fusionada** ahi (commit de merge `c9f9382`). **Nada empujado**:
+  la rama es local, cuatro commits de la portada + el merge, sobre `origin/main`
+  (`1937733`).
+- **`index.html` no se fusiono: se eligio.** La base es la reescritura de diez idiomas
+  (103 KB -> 70 KB, look de Urazuke, peer review propio, destaque de pruebas punta a
+  punta, API del contrato visible, libre separado de pago). Las 81 lineas del lado 2.5.1
+  se reaplicaron **a mano**, una por una. Fue el **unico conflicto** del merge; todo lo
+  demas entro limpio.
+- **El worktree `C:\yujin-nac-spec-251` ya no existe** y la rama `release/2.5.1` queda
+  como historia. **La firma se corre en `C:\yujin-nac-spec`**, no ahi.
+
+**Lo que se reaplico sobre la portada nueva** (esto es lo que un merge de lineas habria
+perdido en silencio):
+
+| Que | Por que no se podia dejar afuera |
+| --- | --- |
+| 2.5.1 en el sello, el fragmento de instalacion + su huella, las dos tarjetas de la API, el `<script>` y los dos manifiestos | el gate de integridad y el de versiones rechazan el arbol |
+| La seccion de traducciones (D-03 opcion C) en el sistema visual nuevo | `build-translation-banners.mjs` la exige enlazada y declarada |
+| **Los ocho limites como elementos direccionables** + las tres naturalezas con sus tres licencias | la reescritura los dejo como prosa y les saco los ids. `e2e/landing-limits-check.mjs` estaba **rojo en siete checks** sobre ese arbol. El dueno los aprobo **como dato** |
+| N-15: el enlace de vuelta a Urazuke en el pie, declarado | lo pedia el hallazgo, y el candado lo mide |
+| **El manifiesto del plugin `chat`** | el panel pinta siete `data-nac-id` y la reescritura no declaraba ninguno: siete elementos que un agente no ve, en la pagina cuyo argumento es que los ve |
+
+**Tres hallazgos nuevos, ninguno de leer: N-47, N-48, N-49** (fichas completas en
+`docs/PENDING_AUDITORIA_2026-10.md`).
+
+1. **N-47 -- la version vive ahora en los diez catalogos y ningun candado los miraba.**
+   `i18n.js` reemplaza el texto en tiempo de ejecucion **tambien para el ingles**, asi que
+   la cadena que el lector ve sale del JSON, no del marcado. El bump habia quedado en el
+   HTML con los diez catalogos en `v2.5.0`: dieciocho slots en verde y la portada
+   anunciando la version anterior a todo el mundo. Hay slot nuevo en
+   `check-version-coherence.mjs` (anclado **en la clave**, porque esos archivos llevan
+   cifras historicas) y cuatro casos en `test-version-gate.mjs`.
+2. **N-48 -- la autoverificacion de la portada nunca corrio.** Leia como arreglo lo que
+   `validate_global()` devuelve como objeto; reventaba en cada carga y lo tapaba un
+   `console.warn`. La pagina que argumenta contra el fallo silencioso fallaba en silencio
+   sobre su propia conformidad. Es anterior a estas sesiones.
+3. **N-49 -- dos candados de navegador median el idioma del sistema del operador.** En una
+   Windows en espanol, `test:limits` y `test:translations` se ponian rojos sobre frases que
+   la pagina si dice, en espanol. Los dos fijan `en-US` y el de limites gano una **segunda
+   pasada en otro idioma** que afirma que **los ids no dependen del idioma**, con su prueba
+   en rojo. **Regla que queda escrita: un `data-nac-id` nunca va adentro de un valor
+   traducible.**
+
+**La restriccion que ahora es de todos:** cualquier cadena visible que se agregue o cambie
+en la portada entra en los **diez** catalogos (`i18n/<lang>.json`), o
+`scripts/test-landing-i18n.mjs` se pone rojo -- y ya es compuerta del deploy. En esta
+consolidacion fueron **14 claves nuevas por catalogo** (264 por archivo). No se apaga
+`_same_as_english`: existe para que la excepcion quede escrita.
+
+**Estado medido en este arbol** (no recordado; se corrio entero):
+
+| Compuerta / suite | Estado |
+| --- | --- |
+| `check:integrity` | VERDE |
+| `check:version` | VERDE -- **23 slots** de acuerdo en 2.5.1 |
+| `check:translations` | VERDE -- 9 locales, cada uno declarando lo que cubre |
+| `test:version-gate` | VERDE -- 35 casos |
+| `test:translations-gate` | VERDE -- 21 casos |
+| `test:landing-i18n` | VERDE -- 10 catalogos, 264 claves |
+| `test:integrity-gate` / `test:contract` / `test:validate-global` / `test:cli-levels` | VERDE -- 21 / 36 / 33 / 29 |
+| `test:integrity` | VERDE |
+| `test:limits` | VERDE -- 16 checks, incluidos los dos de idioma |
+| `test:snippet` / `test:fill-setter` / `test:translations` | VERDE |
+| `check:contract` | **ROJO, y es el unico** |
+
+**El unico rojo y lo unico que falta** (la cadena tiene tres entradas y la firma cubre
+dos). En `C:\yujin-nac-spec`, en la maquina del dueno:
+
+```
+node scripts/sign-contract-api.mjs --sign
+npm run check:release
+```
+
+Despues: empujar la rama (**pendiente de autorizacion del dueno**, hoy es local),
+publicar y promover. Y sigue esperando **D-03 ya esta decidida y ejecutada**; lo que
+queda del lado del dueno es el push, el `PND-054` (casilla 5: un push a OTRO repositorio
+que despliega a produccion) y `PND-053` / N-46 (la hoja de estilos que da 404 en 262
+paginas, decision de dueno).
+
+---
+
 # Handoff -- estado al 2026-10-26, 17:4x UTC (la 2.5.1 esta cortada y espera UNA firma)
 
 Esto se escribio al final de la sesion que ejecuto las tres decisiones del dueno de

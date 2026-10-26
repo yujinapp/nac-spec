@@ -2001,8 +2001,127 @@ crea que una estable es estable. **Quien decide:** el dueno, y solo la mitad del
 (publicar 2.5.1 hoy con esa linea arreglada, o llevarla a la 2.6). La mitad del README
 y el candado son mecanicos y ya estan.
 
-**Estado: CERRADO el README y el candado; ABIERTO el Status line del SPEC,**
-esperando la decision de version.
+**Estado: CERRADO.** El README y su candado cerraron el mismo dia. El Status line del
+SPEC cerro al cortar la **2.5.1** (decision del dueno, 2026-10-26: "publicar 2.5.1 ahora"):
+la linea ya no repite ninguna version, apunta a la seccion que manda, y tiene su propio
+candado, cuyo primer caso en rojo es la linea real con la que salio la 2.5.0.
+
+---
+
+### N-47 (nuevo, 2026-10-26, encontrado AL CONSOLIDAR) La version vive ahora en diez catalogos de la portada, y ningun candado los miraba
+
+**Como se encontro:** no leyendo. Se encontro **consolidando** la portada de diez idiomas
+con el corte de la 2.5.1: al reaplicar las 81 lineas del release sobre la portada nueva,
+el `grep` de la version en `i18n/*.json` devolvio veinte ocurrencias que nadie habia
+tocado.
+
+**Lo que se midio, en un arbol que el gate daba por bueno:**
+
+| superficie | lo que decia |
+| --- | --- |
+| `index.html` (marcado) | `v2.5.1`, tres ocurrencias del path inmutable |
+| `i18n/en.json` y nueve mas | `"hero.version": "v2.5.0 . stable"` |
+| `i18n/en.json` y nueve mas | `"what.runtime.p": "... <code>js/2.5.0/nac.js</code> ..."` |
+| `check-version-coherence` | *"All 18 version slots agree on 2.5.1"* |
+
+**La causa raiz, y es la de siempre con una vuelta nueva:** `i18n.js` **reemplaza** el texto
+de la pagina en tiempo de ejecucion con el catalogo que corresponde al idioma del lector
+-- y lo hace tambien para el ingles, porque `en.json` es un catalogo como los otros. Asi
+que la cadena que un lector ve NO sale del marcado que el candado vigilaba: sale del JSON.
+El marcado es lo que se ve durante los primeros milisegundos. Un bump que toca el HTML y
+no los catalogos deja la portada anunciando la version anterior **a todo el mundo**, con
+dieciocho slots en verde. Es N-17 otra vez -- una version escrita a mano en un lugar que
+ningun candado podia ver -- esta vez en un archivo de traduccion.
+
+**El arreglo:** `check-version-coherence.mjs` tiene un slot nuevo que recorre
+`i18n/<lang>.json` (los **descubre**, no los enumera, igual que hace el switcher) y exige
+que toda version declarada sea la que manda. Esta anclado **en la clave**, no en una
+version suelta, porque estos archivos llevan cifras historicas deliberadas -- *"against
+v2.3.1 on the RealWorld Conduit app"* -- y una sonda mas laxa reportaria como deriva una
+frase verdadera: eso fue N-41 y no vale la pena repetirlo.
+
+**La prueba en rojo:** cuatro casos nuevos en `test-version-gate.mjs` (35 en total, 0
+fallando): un catalogo con la insignia en la version anterior, un catalogo que fija el path
+anterior, un catalogo que **no declara ninguna** version (refusado, no salteado) y el caso
+verde que importa -- una cifra historica dentro de un recibo sigue siendo legal.
+
+**Estado: CERRADO** en el commit de consolidacion.
+
+---
+
+### N-48 (nuevo, 2026-10-26, encontrado EN UN NAVEGADOR) La autoverificacion de la propia portada nunca corrio
+
+**Como se encontro:** no leyendo. Se encontro **abriendo la pagina en un navegador real**
+para diagnosticar otra cosa y mirando la consola.
+
+**Lo que dice la consola, en todas las cargas:**
+
+```
+[nac_landing] validate_global threw: (findings || []).filter is not a function
+```
+
+**La causa:** la pagina llamaba `NAC.validate_global({ probe: false })` y leia el resultado
+como un **arreglo de hallazgos con `.severity`**. `validate_global()` devuelve -- y siempre
+devolvio -- un **objeto estructurado**: `{ ok, duplicates, orphans, unmounted,
+convention_violations, plugin_instance_violations, plugin_count, total_ids, timestamp }`.
+El `.filter` reventaba dentro del `try`, el `catch` escribia un `console.warn` y la pagina
+seguia como si nada. El argumento `{ probe: false }` tampoco existe: la funcion no toma
+parametros.
+
+**Por que importa mas de lo que parece:** no es un bug de una linea, es **la pagina que
+argumenta contra el fallo silencioso fallando en silencio sobre su propia conformidad**.
+Cualquiera que copiara ese bloque -- y es el bloque que un adoptante copia, porque esta en
+la portada del protocolo -- se llevaba una autoverificacion que no verifica nada y que no
+avisa que no verifica. Es anterior a esta sesion: esta identico en la portada anterior.
+
+**El arreglo:** el bloque lee el objeto como lo que es. Trata como error de severidad real
+los `duplicates`, los `unmounted` y los `plugin_instance_violations`; informa el conteo de
+`orphans` (pintado y no declarado) nombrando el pendiente que lo sigue, en vez de
+esconderlo; y en el camino limpio imprime los numeros medidos -- plugins, ids declarados --
+en vez de un "clean" sin sujeto.
+
+**Estado: CERRADO** en el commit de consolidacion. Queda como leccion de interfaz: una
+funcion de diagnostico cuyo resultado se puede leer mal sin que nada avise es una funcion
+que se va a leer mal.
+
+---
+
+### N-49 (nuevo, 2026-10-26, encontrado AL CORRER LOS CANDADOS) Dos candados de navegador median el idioma del sistema del operador, no la pagina
+
+**Como se encontro:** corriendo `test:limits` y `test:translations` sobre el arbol
+consolidado. Los dos se pusieron rojos sobre frases que la pagina **si dice**.
+
+**Lo que se midio:** `document.documentElement.lang` = `es` en el navegador del candado.
+Playwright hereda el idioma del sistema, el sistema de esta maquina esta en espanol, y
+`i18n.js` sirvio el catalogo espanol. El candado buscaba `/does not cover/i` y la seccion
+renderizada decia **LO QUE NO CUBRE**. Lo mismo con `/non-normative/i` y `/English text
+governs/i` en el candado de traducciones.
+
+**La causa raiz:** los dos candados afirman sobre **texto renderizado** -- y lo hacen a
+proposito, porque la casilla del dueno es un `grep` sobre el HTML crudo y un comentario
+invisible la satisface sola (eso ya se arreglo una vez). Pero con diez catalogos el texto
+renderizado dejo de ser una propiedad de la pagina y paso a ser una propiedad **del
+operador**. Un candado cuyo veredicto depende del idioma de quien lo corre mide al
+operador, no al sujeto. En CI (en-US) habria seguido verde: el falso rojo aparece solo en
+la maquina del dueno, que es justo donde se mira.
+
+**El arreglo:** los dos candados **fijan `locale: 'en-US'`**, porque la frase inglesa es la
+afirmacion normativa, y los otros nueve idiomas los cubre el guard de catalogos, que
+rechaza un valor vacio, ausente o sin traducir. Y el candado de limites gano **una segunda
+pasada en otro idioma** que afirma la mitad que faltaba: que los **ids no dependen del
+idioma**. Los ids son el contrato; la prosa es la traduccion.
+
+**La prueba en rojo de esa segunda pasada** (y es el defecto exacto que existe para
+atrapar): se movio un `data-nac-id` adentro de un valor que el switcher inyecta como HTML,
+presente en `en.json` y ausente en `es.json`. Resultado: `FAIL every limits id survives a
+change of locale -- missing in es: nac_landing.limit.canvas`, con la pasada inglesa en
+verde. El caso dispara solo y por el motivo correcto.
+
+**La regla que deja escrita, y vale para cualquier adoptante de NAC3:** un `data-nac-id`
+**nunca** va adentro de un valor traducible. Un elemento declarado puede desaparecer en un
+solo idioma, y es el idioma que el autor no habla.
+
+**Estado: CERRADO** en el commit de consolidacion.
 
 ---
 

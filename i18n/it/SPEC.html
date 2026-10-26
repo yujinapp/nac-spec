@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,7 +39,7 @@
 <body data-nac-plugin="spec" data-nac-doc="true">
 
 <nav class="nac3-doc-toolbar" data-nac-id="spec.toolbar" data-nac-role="region">
-  <span class="badge">NAC3 v2.2</span>
+  <span class="badge">NAC3 v2.2 &middot; traduzione</span>
   <a href="/nac-spec/" data-nac-id="spec.toolbar.home"
      data-nac-role="action" data-nac-action="open">Spec home</a>
   <a href="audio:/nac-spec/audio/en/spec.mp3" data-nac-id="spec.toolbar.audio"
@@ -53,9 +53,11 @@
 </nav>
 
 <main data-nac-id="spec.main" data-nac-role="region">
-<hr />
-<p data-nac-id="spec.p.1" data-nac-role="paragraph">translation_source: SPEC.md translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76 translation_quality: machine_v1 translation_lang: it translation_date: 2026-05-11T12:55:43.753701+00:00</p>
-<hr />
+<aside data-nac-id="spec.translation_notice" data-nac-role="region">
+<p data-nac-id="spec.translation_notice.text" data-nac-role="paragraph"><strong>Traduzione automatica, non normativa.</strong> Traduce la versione inglese come era il 2026-05-11 (NAC3 v2.2) e copre 34 delle 83 sezioni dell'originale di oggi. Il testo normativo è l'inglese: in caso di divergenza tra questa traduzione e l'inglese, prevale l'inglese.</p>
+<p data-nac-id="spec.translation_notice.en" data-nac-role="paragraph" lang="en"><em>Non-normative machine translation. The normative text of NAC3 is the English one.</em></p>
+<p data-nac-id="spec.translation_notice.link_row" data-nac-role="paragraph"><a href="/nac-spec/SPEC.html" hreflang="en" data-nac-id="spec.translation_notice.canonical" data-nac-role="action" data-nac-action="open">Leggere il testo normativo in inglese</a></p>
+</aside>
 <h1 data-nac-id="spec.h1.nac3-native-agent-contract" data-nac-role="heading" data-nac-level="1" id="nac3-native-agent-contract">NAC3 -- Native Agent Contract</h1>
 <p data-nac-id="spec.p.4" data-nac-role="paragraph"><strong>Version:</strong> 2.2.0 <strong>Status:</strong> Stable <strong>License:</strong> Apache-2.0 <strong>Editor:</strong> Yujin (rpaforce.com)</p>
 <hr />
@@ -328,6 +330,11 @@ NAC.register({
     version: "1.0.0",
     nac_version: "2.2",
     elements: [
+      { id: "spec.translation_notice", role: "region",
+         label_i18n: { es: "Aviso de traducci\u00F3n", en: "Translation notice", pt: "Aviso de tradu\u00E7\u00E3o", fr: "Avis de traduction", it: "Avviso di traduzione", de: "\u00DCbersetzungshinweis", ja: "\u7FFB\u8A33\u306E\u6CE8\u8A18", zh: "\u7FFB\u8BD1\u8BF4\u660E", hi: "\u0905\u0928\u0941\u0935\u093E\u0926 \u0938\u0942\u091A\u0928\u093E", ar: "\u0625\u0634\u0639\u0627\u0631 \u0627\u0644\u062A\u0631\u062C\u0645\u0629" } },
+      { id: "spec.translation_notice.canonical", role: "action",
+         actions: [{ verb: "open" }],
+         label_i18n: { es: "Texto normativo en ingl\u00E9s", en: "Normative English text", pt: "Texto normativo em ingl\u00EAs", fr: "Texte normatif en anglais", it: "Testo normativo in inglese", de: "Normativer englischer Text", ja: "\u898F\u7BC4\u306E\u82F1\u8A9E\u672C\u6587", zh: "\u89C4\u8303\u6027\u82F1\u6587\u6587\u672C", hi: "\u092E\u093E\u0928\u0915 \u0905\u0902\u0917\u094D\u0930\u0947\u095B\u0940 \u092A\u093E\u0920", ar: "\u0627\u0644\u0646\u0635 \u0627\u0644\u0645\u0639\u064A\u0627\u0631\u064A \u0628\u0627\u0644\u0625\u0646\u062C\u0644\u064A\u0632\u064A\u0629" } },
       { id: "spec.toolbar.home",  role: "action",
          actions: [{ verb: "open" }],
          label_i18n: { es: "Inicio", en: "Home", pt: "Inicio", fr: "Accueil", it: "Home", de: "Start", ja: "ホーム", zh: "首页", hi: "घर", ar: "الرئيسية" } },

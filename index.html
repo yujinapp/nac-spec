@@ -1621,6 +1621,54 @@ node scripts/build-integrity.mjs</pre>
   </div>
 </section>
 
+<!-- The specification in other languages. The counts live on the nine
+     pages themselves, produced by scripts/build-translation-banners.mjs,
+     and are deliberately not restated here. -->
+<section id="translations" data-nac-id="nac_landing.section.translations" data-nac-role="section">
+  <div class="container">
+    <h2>The specification in other languages</h2>
+    <p class="section-lede">The normative text of NAC3 is the English one: <a href="SPEC.html" data-nac-id="nac_landing.translations.canonical" data-nac-role="action" data-nac-action="open">SPEC.html</a>. It is also published as nine machine translations, and those are <strong>non-normative</strong>. None of them is complete, and where a translation and the English text disagree, the English text governs -- a conformance claim is a claim against the English text. Each page states at the top, in its own language, which revision of the English text it translates and how much of the current text it carries.</p>
+    <p data-nac-id="nac_landing.translations.list" data-nac-role="region">
+      <a href="i18n/es/SPEC.html" hreflang="es" lang="es"
+         data-nac-id="nac_landing.translations.es"
+         data-nac-role="action" data-nac-action="open">Español</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/pt/SPEC.html" hreflang="pt" lang="pt"
+         data-nac-id="nac_landing.translations.pt"
+         data-nac-role="action" data-nac-action="open">Português</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/fr/SPEC.html" hreflang="fr" lang="fr"
+         data-nac-id="nac_landing.translations.fr"
+         data-nac-role="action" data-nac-action="open">Français</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/it/SPEC.html" hreflang="it" lang="it"
+         data-nac-id="nac_landing.translations.it"
+         data-nac-role="action" data-nac-action="open">Italiano</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/de/SPEC.html" hreflang="de" lang="de"
+         data-nac-id="nac_landing.translations.de"
+         data-nac-role="action" data-nac-action="open">Deutsch</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/ja/SPEC.html" hreflang="ja" lang="ja"
+         data-nac-id="nac_landing.translations.ja"
+         data-nac-role="action" data-nac-action="open">日本語</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/zh/SPEC.html" hreflang="zh" lang="zh"
+         data-nac-id="nac_landing.translations.zh"
+         data-nac-role="action" data-nac-action="open">中文</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/hi/SPEC.html" hreflang="hi" lang="hi"
+         data-nac-id="nac_landing.translations.hi"
+         data-nac-role="action" data-nac-action="open">हिन्दी</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="i18n/ar/SPEC.html" hreflang="ar" lang="ar"
+         data-nac-id="nac_landing.translations.ar"
+         data-nac-role="action" data-nac-action="open">العربية</a>
+    </p>
+    <p class="section-lede">We publish them anyway because a partial translation a reader can check against the English text is worth more than no translation -- as long as the page says which one governs before the reader starts trusting it. Bringing them up to the current text is open work, not a silent gap. The ten-locale requirement of section 4.3 is a requirement on the labels in <em>your</em> manifest, not on the language of this document.</p>
+  </div>
+</section>
+
 <section class="section" id="governance" data-nac-id="nac_landing.governance" data-nac-role="section">
   <div class="container">
     <h2>Governance</h2>
@@ -1839,6 +1887,23 @@ node scripts/build-integrity.mjs</pre>
           label_i18n: li('Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge') },
         { id: 'nac_landing.limits.governance', role: 'action', actions: [{ verb: 'open' }],
           label_i18n: li('Gobernanza','Governance','Governanca','Gouvernance','Governance','Governance','ガバナンス','治理','governance','الحكامة') },
+
+        /* The specification in other languages (D-03 option C) */
+        { id: 'nac_landing.section.translations', role: 'section',
+          label_i18n: li('La especificación en otros idiomas','The specification in other languages','A especificação em outros idiomas','La spécification dans d autres langues','La specifica in altre lingue','Die Spezifikation in anderen Sprachen','他の言語の仵様書','其他语言的规范','anya bhashaon mein spec','المواصفة بلغات أخرى') },
+        { id: 'nac_landing.translations.list', role: 'region',
+          label_i18n: li('Traducciones publicadas','Published translations','Traduções publicadas','Traductions publiées','Traduzioni pubblicate','Veröffentlichte Übersetzungen','公開された翻訳','已发布的译本','prakashit anuvad','الترجمات المنشورة') },
+        { id: 'nac_landing.translations.canonical', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Texto normativo en inglés','Normative English text','Texto normativo em inglês','Texte normatif en anglais','Testo normativo in inglese','Normativer englischer Text','規範の英語本文','规范性英文文本','manak angrezi path','النص المعياري بالإنجليزية') },
+        { id: 'nac_landing.translations.es', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Español','Español','Español','Español','Español','Español','Español','Español','Español','Español') },
+        { id: 'nac_landing.translations.pt', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Português','Português','Português','Português','Português','Português','Português','Português','Português','Português') },
+        { id: 'nac_landing.translations.fr', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Français','Français','Français','Français','Français','Français','Français','Français','Français','Français') },
+        { id: 'nac_landing.translations.it', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Italiano','Italiano','Italiano','Italiano','Italiano','Italiano','Italiano','Italiano','Italiano','Italiano') },
+        { id: 'nac_landing.translations.de', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Deutsch','Deutsch','Deutsch','Deutsch','Deutsch','Deutsch','Deutsch','Deutsch','Deutsch','Deutsch') },
+        { id: 'nac_landing.translations.ja', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('日本語','日本語','日本語','日本語','日本語','日本語','日本語','日本語','日本語','日本語') },
+        { id: 'nac_landing.translations.zh', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('中文','中文','中文','中文','中文','中文','中文','中文','中文','中文') },
+        { id: 'nac_landing.translations.hi', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी','हिन्दी') },
+        { id: 'nac_landing.translations.ar', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('العربية','العربية','العربية','العربية','العربية','العربية','العربية','العربية','العربية','العربية') },
 
         /* Demo card open links -- one per card */
         { id: 'nac_landing.democard.v19.open', role: 'action',

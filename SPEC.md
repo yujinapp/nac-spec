@@ -1,7 +1,7 @@
 # NAC3 -- Native Agent Contract
 
 **Version:** 2.5.0 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
-**Status:** v2.5.0-alpha.5 -- all 8 SHIPPED RFCs (V24-01/02/04/05 + V25-01/02/03/04) have runtime + Layer 2 visual + Layer 3 Pilot LIVE evidence. Promoted to npm dist-tag `latest`.
+**Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states what that guarantees and what a prerelease does not. This document states its version in exactly one place, the line above. The shipped RFCs and their Layer 2 + Layer 3 evidence are listed in `README.md` and `runtime/CHANGELOG.md`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
 
@@ -177,6 +177,28 @@ es, en, pt, fr, ja, zh, hi, ar, de, it
 `i18n_strict: 'permissive'` on `NAC.autoRegister.watch()` allows
 partial coverage during brownfield migration; production manifests
 should ship 10 locales.
+
+#### 4.3.1 What the ten locales are a requirement ON
+
+The requirement above is a requirement on the **adopter's manifest** --
+the `label_i18n` map an agent reads to name an element in the user's
+language. It is NOT a requirement on the language of this document, and
+nothing in NAC3 obliges an implementation to publish its own
+documentation in ten languages.
+
+#### 4.3.2 Normative language of this specification
+
+The normative text of NAC3 is the **English** one: `SPEC.md` at the root
+of the specification repository, rendered at
+`https://yujin.app/nac-spec/SPEC.html`.
+
+The specification is also published as machine translations under
+`i18n/<locale>/SPEC.md`. Those translations are **non-normative**. Each
+one is partial and each is frozen at the source revision its own banner
+declares; the banner is required, and a published translation that
+carries no banner is a defect of the publication, not a translation.
+Where a translation and the English text disagree, the English text
+governs, and a conformance claim is a claim against the English text.
 
 ---
 

@@ -1,10 +1,27 @@
 ---
-translation_source: SPEC.md
 translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76
 translation_quality: machine_v1
-translation_lang: hi
 translation_date: 2026-05-11T13:11:32.281564+00:00
+translation_normative: false
+translation_status: partial
+translation_lang: hi
+translation_source: SPEC.md
+translation_source_version: 2.2
+translation_source_date: 2026-05-11
+translation_sections: 34
+translation_sections_canonical: 83
+translation_canonical_url: /nac-spec/SPEC.html
 ---
+
+<!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
+
+> **मशीनी अनुवाद, गैर-मानक।** यह 2026-05-11 के अंग्रेज़ी संस्करण (NAC3 v2.2) का अनुवाद है और आज के मूल दस्तावेज़ के 83 में से 34 अनुब्हागों को शामिल करता है। मानक पाठ अंग्रेज़ी है: बेमेल होने पर अंग्रेज़ी पाठ मान्य होगा।
+>
+> *Non-normative machine translation. The normative text of NAC3 is the English one.*
+>
+> [अंग्रेज़ी मानक पाठ पढ़ें](/nac-spec/SPEC.html)
+
+<!-- /translation-banner -->
 
 # NAC3 -- Native Agent Contract
 

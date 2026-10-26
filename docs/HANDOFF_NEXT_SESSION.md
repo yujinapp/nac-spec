@@ -1,27 +1,146 @@
 # Handoff -- continuar sesion
 
-**Actualizado:** 2026-10-26, CUARTA sesion del dia.
-**Donde quedo:** el salto de version esta HECHO en la rama. El arbol declara **2.5.0**
-en sus 18 slots, la cadena del contrato publica la entrada 2.5.0 como **stable**, y
-todas las compuertas estan verdes salvo una. **Lo unico que falta es la firma offline
-del dueno** -- el paso 4 de 4.3 -- y despues publicar.
-**Lo que el dueno tiene que hacer, y es un solo comando:**
+**Actualizado:** 2026-10-26, QUINTA sesion del dia.
+**Donde quedo:** **la 2.5.0 estable ESTA PUBLICADA.** El dueno firmo el indice del
+contrato, el paquete salio a npm con el tag `latest` y el sitio esta deployado, las dos
+cosas medidas contra el registro y contra el servidor y no contra el arbol. El bloque de
+verificacion del dueno pasa de **1/8 a 7/8**, y el unico rojo que queda es externo.
+CUATRO pendings del release cerrados con expediente y recibos, y uno nuevo abierto.
 
-```
-node scripts/sign-contract-api.mjs --sign     # en SU maquina; la clave no vive aca
-npm run check:release                         # tiene que decir OK signature verifies
-```
-
-Ese `--sign` **tambien reescribe el registro testigo** de
-`docs/CONTRACT_API_SIGNING.md` por su cuenta (verificado en el codigo, no supuesto), asi
-que no hay un paso extra que recordar.
+**Lo que el dueno tiene pendiente, y es UNA decision:** `PND-051` -- la linea 4 del SPEC
+publicado todavia declara un alpha como la version vigente, y arreglarla cuesta una
+**2.5.1** con **una firma mas** suya. Recomendacion: hacerla. Detalle completo en la
+seccion 0, entrada N-45 del backlog.
 
 **Palabra de reanudacion:** cuando el dueno diga **"Continua"**, se sigue por la seccion
-0 de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
+0 de este documento.
 
 ---
 
-## 0. ULTIMO ESTADO -- 2026-10-26, CUARTA sesion del dia (MANDA SOBRE TODO LO DE ABAJO)
+## 0. ULTIMO ESTADO -- 2026-10-26, QUINTA sesion del dia: LA 2.5.0 ESTA PUBLICADA
+
+**Esta seccion MANDA sobre todo lo que sigue, incluida la vieja seccion 0.**
+
+### Lo que el dueno hizo en esta sesion, y era el unico paso que faltaba
+
+Firmo el indice del contrato en su maquina y pego la salida. `check:release` quedo
+verde entero. A partir de ahi Forge ejecuto el paso 6 del 4.3 completo.
+
+```
+key_id       nac3-contract-2026
+fingerprint  sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft
+chain head   sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4
+entries      2 (2.5.0-alpha.5, 2.5.0)
+signed at    2026-10-26T18:36:51Z
+```
+
+### La 2.5.0 esta publicada en los dos lugares, y medido contra los dos
+
+| que | donde se midio | resultado |
+| --- | --- | --- |
+| npm | `npm view @nac3/runtime dist-tags` | `{ latest: '2.5.0', alpha: '2.5.0-alpha.5' }` |
+| npm | `npx -p @nac3/runtime nac3 --version` | `@nac3/runtime CLI 2.5.0 (Native Agent Contract v2.5)` -- **N-17 cerrado EN EL REGISTRO** |
+| web | deploy runs `40380029640` y `40382269294` | **success, 17 pasos cada uno** (incluidos los 4 chequeos de humo contra el sitio vivo) |
+| web | `node scripts/verify-contract-api.mjs --base https://yujin.app/nac-spec/ --expect-head-from-repo` | **9 de 9 OK**, con testigo independiente |
+| tarball | `npm pack @nac3/runtime@2.5.0` y leer `contract-head.json` | cabeza `tBEQVA0WiCwv...` -- **el tercer testigo existe y coincide** |
+
+**Latencia que conviene recordar para la proxima:** `npm publish` contesto *"your package
+is being processed and may take a few minutes to become available"* y el packument tardo
+**unos 25 minutos** en publicar la version. La primera medicion del dist-tag dio el valor
+VIEJO. **La aceptacion del publish no es la publicacion**: se mide contra
+`registry.npmjs.org`, nunca contra la salida de `npm publish`.
+
+### El bloque de verificacion del dueno: de 1/8 a 7/8
+
+Recorrido contra el SERVIDOR y el REGISTRO (seccion 5 de
+`docs/PENDING_AUDITORIA_2026-10.md`, con la tabla medida fila por fila):
+
+1. dist-tags **VERDE**  |  2. integrity **VERDE** (4)  |  3. does not cover **VERDE** (1)
+4. urazuke **VERDE** (7)  |  5. sitemap raiz **ROJO Y EXTERNO** (no vive en este repo)
+6. Asistive **VERDE** (0)  |  7. promesas de version viejas **VERDE** (vacio)
+8. `npx nac3 validate <url>` **VERDE**, medido desde un directorio adoptante limpio
+
+El punto 8 reporta `Conformance level: NONE ASSERTED` con sus tres fallos medidos
+(L2-f6a7aa72 = N-37, L3-cc540e31 = N-36, L3-4bdc1b16 = N-35, las tres decisiones del
+dueno) y los dos que no midio. Salida 1, que es correcto: no afirma un nivel. Con `npx`
+a secas da salida 3 pidiendo playwright, por diseno.
+
+**Y la advertencia sobre el instrumento quedo resuelta sola:** el validador contra la
+portada servida de hoy ve **64 ids declarados, 64 resueltos, 0 hallazgos de severidad
+error**. A la manana reportaba 128 huerfanos falsos porque la copia congelada era anterior
+al arreglo de N-33. Los 128 ids del DOM contra 64 declarados son **N-31** (`PND-038`),
+abierto y conocido.
+
+### CUATRO pendings cerrados con expediente y recibos
+
+`PND-032` (el tren: 2.5.0 estable promovida a latest), `PND-033` (D-02, la API de
+contrato, que esperaba la firma), `PND-035` (G3-DERIVA, que esperaba al servidor),
+`PND-037` (G5+G6, la portada honesta, que esperaba al servidor). Cada uno con su
+`red_proof` + `green` + `regression` grabados (`RCP-031` a `RCP-048`).
+
+**Dos lecciones salieron de grabar esos recibos, y las dos son del tipo que este
+proyecto ya conoce:**
+
+- **Un recibo decia medir el servidor y media el repositorio.** En cmd.exe
+  `set N0_BASE=... && node ...` **no llega al proceso**: el gate cae a su server local,
+  imprime su base y reporta GREEN sobre el repositorio mientras el operador cree que
+  midio el sitio. Arreglado donde correspondia: `e2e/landing-limits-check.mjs` acepta
+  ahora `--base <url>`, que todo shell pasa igual (commit `ca68bde`). Un recibo que
+  nombra mal su sujeto es peor que no tenerlo.
+- **Un red_proof se ESTRELLO en vez de fallar**, por una dependencia que no viajo al
+  worktree base. Se re-corrio con las dependencias y ahi si refuto con nombre.
+
+### N-45, el hallazgo de esta sesion: no salio de leer, salio de PUBLICAR
+
+**La promocion de `latest` falsifico dos documentos publicados.** Hasta las 18:40 de hoy
+`latest` apuntaba a `2.5.0-alpha.5`, asi que *"v2.5.0-alpha.5 ... promoted to npm latest"*
+era un hecho. El acto de promover es lo que la volvio falsa. Es N-17 en una superficie
+humana: una version escrita a mano donde ningun candado podia verla.
+
+**Mitad CERRADA (`b8fb31b`):** el README -- que el deploy tambien publica en
+`/nac-spec/README.md`, verificado 200, y que es la portada de GitHub -- decia
+`status-2.5--alpha`, `spec-v2.5_alpha.5`, *"v2.5.0-alpha.5 shipped"* y
+*"## Status: alpha + stable in parallel"*. Arreglado, mas una promesa que el propio
+archivo contradecia dos pantallas abajo. **Candado: dos slots nuevos, el gate pasa de
+18 a 20**, y la suite de 18 a **25 casos** -- 6 rojos nuevos, y el primero no es
+hipotetico: **es el README con el que la 2.5.0 salio de verdad, restaurado textual.**
+Los badges se DECODIFICAN en vez de matchearse con regex, porque shields.io escribe un
+guion literal como guion doble y el badge de una prerelease se lee `2.6.0--alpha.1`.
+
+**Mitad ABIERTA (`PND-051`, decision del dueno):** la **linea 4 de `SPEC.md`** sigue
+declarando `Status: v2.5.0-alpha.5` al lado de una linea 3 que declara 2.5.0 estable.
+Se reescribio, **se midio la consecuencia y se revirtio**: `api/v/2.5.0/contract.json`
+publica `spec_sha384`, la huella de los bytes del SPEC, asi que cualquier edicion mueve
+el contrato de una version ya publicada -- lo que el metodo prohibe. Necesita **2.5.1**
+(salto, copia congelada, entrada nueva en la cadena y **una firma mas del dueno**), y el
+tarball ya publicado lo lleva adentro, asi que un deploy tampoco lo arregla.
+
+### Lo que sigue esperando al dueno
+
+1. **`PND-051` -- 2.5.1 ahora o a la 2.6.** Es una firma suya. Recomendacion: 2.5.1.
+2. **D-03 (idiomas).** Traba la pasada de traducciones + N-28 + N-31 + N-32.
+3. **N-35 a N-38** (`PND-044` a `PND-047`): cuatro decisiones sobre texto normativo de
+   niveles. Ninguna trababa el release y ninguna traba nada ahora, pero **tres de ellas
+   son exactamente los tres fallos que el punto 8 reporta** sobre la portada del propio
+   protocolo.
+
+### Trabajo abierto que no espera a nadie
+
+`PND-048` (N-39, seis acciones que no confirman nunca), `PND-038` (N-31, 116 ids pintados
+y 64 declarados), `PND-040` (re-medir el benchmark contra la 2.5.0, decidido historico),
+`PND-049` (los cinco gates de navegador fuera del CI), `PND-030` (el paraguas de la
+auditoria, cierra cuando cierren las decisiones), `PND-001`.
+
+**Urazuke sigue fuera de alcance hasta la 2.6** (`PND-002` a `PND-028`).
+
+### Palabra de reanudacion
+
+Cuando el dueno diga **"Continua"**, se sigue por esta seccion 0: lo primero es su
+respuesta a `PND-051`.
+
+---
+
+## 0-ante. ESTADO DE LA CUARTA SESION DEL 2026-10-26 (historico: lo mando la seccion 0)
 
 ### Lo que el dueno decidio en esta sesion
 

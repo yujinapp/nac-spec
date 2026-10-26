@@ -344,6 +344,22 @@
   }
   .bench-card-stats strong { color: var(--color-text); font-weight: 600; }
   .bench-stat-sep { opacity: 0.4; }
+  /* A figure and its receipt live in the same place (audit N-12): the date,
+     the runtime version it was measured against, and the command that
+     reproduces it, next to the claim instead of a click away. */
+  .card-receipt {
+    font-size: 12px; color: var(--color-text-2);
+    line-height: 1.75; margin: 10px 2px 0 2px;
+  }
+  .card-receipt code {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--color-text); word-break: break-word;
+  }
+  .card-receipt strong { color: var(--color-text); font-weight: 600; }
+  .card-receipt .receipt-label {
+    text-transform: uppercase; letter-spacing: 0.09em;
+    font-weight: 700; color: var(--color-text);
+  }
   .bench-card-cta {
     display: inline-block; color: var(--color-indigo);
     font-weight: 600; font-size: 14px;
@@ -920,6 +936,15 @@
         </span>
       </div>
     </a>
+    <p class="card-receipt" data-nac-id="nac_landing.peer_card.receipt" data-nac-role="region">
+      <span class="receipt-label">Receipt</span> &middot; Six AI systems were handed the spec and
+      asked to evaluate it; their answers are published verbatim, each in the language it was
+      written in, at <a href="peer-reviews.html" data-nac-id="nac_landing.peer_card.receipt_link"
+      data-nac-role="action" data-nac-action="open_peer_reviews">peer-reviews.html</a>.
+      Written 2026-05, against NAC3 v2.2&ndash;v2.3.
+      <strong>The percentages in this card are the reviewers&rsquo; own converging estimates, not
+      measurements.</strong> The measured numbers are the benchmark below.
+    </p>
   </div>
 </section>
 
@@ -962,6 +987,20 @@
         </span>
       </div>
     </a>
+    <p class="card-receipt" data-nac-id="nac_landing.bench_card.receipt" data-nac-role="region">
+      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-19</strong> against
+      <strong>NAC3 runtime v2.3</strong> &middot; 600 runs &middot; 5 models (Sonnet 4.6, Haiku 4.5,
+      DeepSeek-chat, Gemini 3.1 Flash Lite, GPT-4o-mini) &middot; 1h 23min wall-clock &middot; ~US$15.
+      Raw output: <a href="benchmark/results.html" data-nac-id="nac_landing.bench_card.receipt_results"
+      data-nac-role="action" data-nac-action="open_benchmark_results">results.html</a> &middot;
+      method: <a href="benchmark/methodology.html" data-nac-id="nac_landing.bench_card.receipt_method"
+      data-nac-role="action" data-nac-action="open_benchmark_methodology">methodology.html</a> &middot;
+      bundle: <a href="benchmark/nac3-benchmark-v2.3.tar.gz" data-nac-id="nac_landing.bench_card.receipt_bundle"
+      data-nac-role="action" data-nac-action="download_benchmark_bundle">nac3-benchmark-v2.3.tar.gz</a>.
+      Re-run it: <code>tar -xzf nac3-benchmark-v2.3.tar.gz &amp;&amp; npm install &amp;&amp; bash scripts/run_final_600.sh</code>.
+      <strong>These figures have not been re-measured on a later runtime</strong>, so read them as
+      what v2.3 did, not as a claim about the current release.
+    </p>
   </div>
 </section>
 
@@ -1002,6 +1041,14 @@
         </span>
       </div>
     </a>
+    <p class="card-receipt" data-nac-id="nac_landing.conduit_card.receipt" data-nac-role="region">
+      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-22</strong> against
+      <strong>NAC3 v2.3.1</strong> on the RealWorld &ldquo;Conduit&rdquo; React application, 47 components.
+      The full write-up, the two gate verdicts and the failure deep-dives &mdash; including what did
+      not work &mdash; are published at <a href="conduit/" data-nac-id="nac_landing.conduit_card.receipt_link"
+      data-nac-role="action" data-nac-action="open_conduit">conduit/</a>.
+      <strong>Not re-measured on a later runtime.</strong>
+    </p>
   </div>
 </section>
 
@@ -1042,6 +1089,17 @@
         </span>
       </div>
     </a>
+    <p class="card-receipt" data-nac-id="nac_landing.migration_card.receipt" data-nac-role="region">
+      <span class="receipt-label">Receipt</span> &middot; Run <strong>2026-05-20</strong> against
+      <strong>NAC3 v2.3 / v2.3.1</strong> &middot; one vanilla calculator, three decoration paths.
+      Raw output: <a href="migration/results.html" data-nac-id="nac_landing.migration_card.receipt_results"
+      data-nac-role="action" data-nac-action="open_migration_results">results.html</a> &middot;
+      byte-by-byte diff: <a href="migration/byte-diff.html" data-nac-id="nac_landing.migration_card.receipt_diff"
+      data-nac-role="action" data-nac-action="open_migration_diff">byte-diff.html</a> &middot;
+      method: <a href="migration/methodology.html" data-nac-id="nac_landing.migration_card.receipt_method"
+      data-nac-role="action" data-nac-action="open_migration_methodology">methodology.html</a>.
+      <strong>Not re-measured on a later runtime.</strong>
+    </p>
   </div>
 </section>
 
@@ -1517,6 +1575,8 @@ node scripts/build-integrity.mjs</pre>
   <div class="container footer-row">
     <span class="kanji-mark" aria-hidden="true">&#27005;</span>
     <span>NAC -- Native Agent Contract</span>
+    <span>&middot;</span>
+    <span>Page last reviewed 2026-10-26 &middot; evidence on this page dated 2026-05</span>
     <span>&middot;</span>
     <a href="LICENSE"
        data-nac-id="nac_landing.footer.license"

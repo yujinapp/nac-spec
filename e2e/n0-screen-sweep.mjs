@@ -123,4 +123,24 @@ const summary = {
   unmarked_interactive_total: rows.reduce((a, r) => a + r.unmarked, 0)
 };
 
-console.log(JSON.stringify({ base: BASE, summary, rows }, null, 1));
+/* The output is cited by docs/EVIDENCE_N0.md, so it dates itself: an
+   undated measurement cannot be told apart from a current one, and this
+   file ages the moment any page gains or loses a data-nac-id. */
+let head = 'unknown';
+let tree = 'unknown';
+try {
+  const { execSync } = await import('node:child_process');
+  head = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+  /* A measurement of a dirty tree is not a measurement of that commit.
+     Say which one it was, instead of letting the sha imply the wrong thing. */
+  tree = execSync('git status --porcelain', { encoding: 'utf8' }).trim() ? 'dirty' : 'clean';
+} catch (_) { /* not a git checkout -- say so rather than guess */ }
+
+console.log(JSON.stringify({
+  measured_at: new Date().toISOString(),
+  measured_at_commit: head,
+  tree: tree,
+  base: BASE,
+  summary,
+  rows
+}, null, 1));

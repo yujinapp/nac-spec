@@ -18,7 +18,8 @@
     "test:integrity": "node scripts/test-integrity-load.mjs",
     "test:integrity-gate": "node scripts/test-integrity-gate.mjs",
     "test:contract": "node scripts/test-contract-api.mjs",
-    "test:contract-http": "node scripts/test-contract-api-http.mjs"
+    "test:contract-http": "node scripts/test-contract-api-http.mjs",
+    "test:limits": "node e2e/landing-limits-check.mjs"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

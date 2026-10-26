@@ -190,6 +190,15 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 
 **Se escribe.** No es una eleccion nueva: el **punto 3 del bloque de verificacion del dueno** (seccion 5) ya exige `curl /nac-spec/ | grep -c -i "does not cover"` mayor que cero. El dueno pidio ese criterio cuando aprobo el backlog, y hoy devuelve `0`. Cumplirlo ES escribir la seccion. Queda como trabajo pendiente de redaccion, con aprobacion frase por frase del dueno antes de publicar.
 
+**RESUELTA Y EJECUTADA el 2026-10-26.** La seccion esta escrita, **leida frase por frase por
+el dueno y aprobada sin cambios**: ocho limites mas la frase de las tres naturalezas con las
+dos licencias. Respuesta textual del dueno: *"Todo leido, decision declararlas historicas.
+Publicar 2.5 con cifras historicas y remedir despues."* Registro en
+`docs/LIMITS_APPROVAL_2026-10-26.md`. La segunda mitad de esa frase decide tambien lo de las
+cifras: **se publica la 2.5.0 con las cuatro corridas declaradas historicas y la re-medicion
+contra la 2.5.0 sale del camino critico** (`PND-040`, con su costo medido y su criterio de
+aceptacion). D-04 deja de estar abierta.
+
 ---
 
 ## 3. Entradas
@@ -525,7 +534,18 @@ Por eso el gate de integridad esta en rojo en esta rama, y **no por la misma raz
 - Agente externo: encuentra el limite declarado como texto, no como ausencia.
 - Auditor: `grep -c -i "does not cover"` sobre la portada devuelve mas de cero, y ningun enlace lleva al documento interno.
 
-**Severidad:** bloquea. **Quien decide:** el dueno, frase por frase (ver D-04). **Estado:** abierto, bloqueado por N-20.
+**Severidad:** bloquea. **Quien decide:** el dueno, frase por frase (ver D-04).
+
+**CERRADO EN EL REPOSITORIO el 2026-10-26.** La seccion publica de limites esta escrita
+y publicada en `index.html` (`nac_landing.section.limits`): ocho limites, cada uno con la
+linea del SPEC o la medicion de donde salio, mas la frase que distingue protocolo, metodo
+y herramienta. **El dueno la leyo frase por frase y la aprobo sin cambios** ese mismo dia
+-- registro en `docs/LIMITS_APPROVAL_2026-10-26.md`, artefacto leido en el `.html` del
+mismo nombre. Los ocho limites estan tambien **declarados en el manifest** (13 ids
+nuevos), asi que un agente los encuentra como dato y no solo como prosa, que es el criterio
+del perfil "agente externo". `grep -c -i "does not cover"` sobre `index.html` devuelve
+**1** (el encabezado, texto visible). Gate: `node e2e/landing-limits-check.mjs`.
+**Estado:** hecho y en cola -- pasa a verde en el servidor con la 2.5.0.
 
 ---
 
@@ -674,7 +694,14 @@ Las tres preguntas originales se resolvieron **leyendo el codigo**, no suponiend
 - Agente externo: no mete las tres cosas en la misma bolsa al resumir el sitio.
 - Auditor: `grep -c -i "urazuke"` sobre la portada devuelve mas de cero, y la frase distingue las tres naturalezas.
 
-**Severidad:** registra. **Quien decide:** Forge propone la frase; el dueno aprueba. **Estado:** abierto.
+**Severidad:** registra. **Quien decide:** Forge propone la frase; el dueno aprueba.
+
+**CERRADO EN EL REPOSITORIO el 2026-10-26.** Dos arreglos, no uno: la frase que distingue
+las tres naturalezas vive en la seccion de limites, y el enlace de vuelta tambien esta
+**en el pie**, donde la entrada lo pedia (`nac_landing.footer.urazuke` ->
+`https://yujin.app/urazuke/`, declarado en el manifest como cualquier otro enlace del pie).
+`grep -c -i "urazuke"` sobre `index.html` devuelve mas de cero. Frase aprobada por el dueno
+el 2026-10-26 (`docs/LIMITS_APPROVAL_2026-10-26.md`). **Estado:** hecho y en cola.
 
 ---
 
@@ -695,7 +722,17 @@ Las tres preguntas originales se resolvieron **leyendo el codigo**, no suponiend
 - Auditor de seguridad: la licencia declarada coincide en las cuatro fuentes (repo, portada, metadata npm, cabecera del artefacto).
 - Auditor: las dos portadas declaran las dos licencias, y la cabecera del paquete coincide con su metadata.
 
-**Severidad:** registra. **Quien decide:** Forge. **Estado:** abierto.
+**Severidad:** registra. **Quien decide:** Forge.
+
+**CERRADO EN EL REPOSITORIO el 2026-10-26, la mitad que vive en este repo.** Las dos
+licencias se declaran juntas en la seccion de limites: NAC3 protocolo Apache-2.0, Urazuke
+metodo Creative Commons BY-SA 4.0, Forge herramienta comercial que implementa los dos. El
+pie repite la de Urazuke al lado del enlace. **Verificado en vivo el 2026-10-26, no
+recordado:** `https://yujin.app/urazuke/` responde 200 y su propia portada declara
+"Creative Commons BY-SA 4.0". La cuarta fuente del criterio del auditor de seguridad -- la
+cabecera del artefacto publicado, que dice MIT -- **es N-17 y se arregla en la regeneracion
+del salto de version**, no aca. **Estado:** hecho y en cola; la coincidencia de las cuatro
+fuentes se verifica recien con la 2.5.0 publicada.
 
 ---
 
@@ -1063,6 +1100,63 @@ Cero apariciones en el runtime. Las cinco que hay son **productores** (manifests
 
 ---
 
+### N-31 (nuevo, 2026-10-26) La portada pinta 116 ids y su manifest declaraba 50
+
+**Que esta mal:** la vidriera del protocolo no declara la mitad de su propia superficie. Un
+agente que hace lo que el protocolo manda -- leer el manifest -- ve menos de la mitad de lo
+que la pagina tiene marcado en el DOM.
+
+**Evidencia medida (2026-10-26):** `data-nac-id` distintos pintados en `index.html` = **116**;
+ids declarados en los dos `NAC.register` de la pagina = **50**; pintados y no declarados =
+**66 crudos / 64 reales** (los 2 restantes son interpolaciones de plantilla dentro del script:
+`' + step.id + '` y `' + a.nac_id + '`). Declarados y no pintados = **0**, que es la buena
+noticia: no hay entradas fantasma.
+
+**Tras la seccion de limites de hoy: 130 pintados / 64 declarados, y la brecha sigue siendo
+exactamente la misma -- 66 crudos, 64 reales.** Se sumaron 14 pintados y 14 declarados en el
+mismo commit. Eso es el punto: la seccion nueva **no empeora** la deuda, y es la razon por la
+que sus 13 ids se declararon en lugar de solo pintarlos.
+
+**Por que NO se arreglo hoy:** declarar los 64 que faltan son ~640 etiquetas en diez idiomas,
+y eso choca de frente con **D-03**, que sigue sin decidirse. Hacerlo antes de D-03 es hacerlo
+dos veces.
+
+**Donde vive el arreglo:** `index.html`, los dos `NAC.register`. **Registro:** `PND-038`.
+
+**Severidad:** avisa. **Estado:** abierto, atado a D-03.
+
+---
+
+### N-32 (nuevo, 2026-10-26) El generador del SPEC pinta un rol sin id en los enlaces de texto
+
+**Que esta mal:** `scripts/build-spec-html.mjs` emite los enlaces embebidos en la prosa como
+`<a href="..." data-nac-role="link">` **sin `data-nac-id`**. En el documento que es la
+vidriera del protocolo, un agente ve el rol y no tiene como direccionar el elemento -- que es
+exactamente lo que el protocolo existe para evitar.
+
+**Como aparecio, y vale la pena decirlo:** no lo encontro una lectura. Lo encontro **volver a
+correr el barrido de pantallas** (`e2e/n0-screen-sweep.mjs`) despues de los arreglos de G3:
+`SPEC.html` paso de **4 elementos interactivos, 0 sin marcar** a **6 interactivos, 2 sin
+marcar**. Los dos enlaces nuevos son los que el arreglo de N-13 agrego al decir donde viven
+las preguntas abiertas (`rfcs/README.md` y `CONTRIBUTING.md`). El defecto del generador
+estaba desde antes; lo que faltaba era un enlace en la prosa para exponerlo.
+
+**Por que NO se arreglo hoy:** el id natural seria posicional (`spec.p.<n>.link.<k>`) y eso es
+**exactamente el anti-patron de N-28** -- ids que se renumeran cuando el texto se mueve.
+Arreglarlo ahora seria agregar dos ids posicionales mas al conjunto que N-28 manda renumerar.
+Viaja con N-28, en la pasada que depende de **D-03**.
+
+**Donde vive el arreglo:** `scripts/build-spec-html.mjs` (linea del emisor de enlaces) + la
+regeneracion de `SPEC.html`. **Registro:** `PND-041`.
+
+**Severidad:** avisa. **Estado:** abierto, atado a N-28 y a D-03.
+
+**Efecto colateral ya aplicado:** el barrido escribia su salida **sin fecha**, asi que
+`e2e/sweep.json` no se podia distinguir de una medicion actual aunque fuera de dos dias antes.
+Ahora el artefacto se fecha a si mismo (`measured_at`, `measured_at_commit`, `tree`).
+
+---
+
 ## 4. Grupos de convergencia
 
 Estos son el mismo problema visto de dos lados y **tienen que cerrarse juntos**:
@@ -1225,6 +1319,25 @@ Uno de ocho. Al escribirse esta tabla daba cero de ocho; el punto 2 pasa a verde
 **Al cierre de N-06 (2026-10-25 00:30 UTC) sigue en uno de ocho, y ninguna casilla se movio.** Es correcto que no se moviera: N-06 renombro los niveles en el documento y en el contrato, y esta tabla mide el **servidor**. El punto 8 -- el unico que habla de niveles -- necesita la segunda mitad de N-18 (el modo URL del validador), no el nombre. Lo que si cambio es que **ahora existe contra que reportar un nivel**: `levels.json` publica los tres niveles con id no ambiguo, los 11 requisitos y cuales son decidibles por una maquina.
 
 **Nota del tramo anterior, que se mantiene:** el trabajo de N-17 de esa tarde no mueve ninguna casilla de esta tabla. No las mueve porque esta tabla mide la **superficie publica** (lo que la portada y el SPEC dicen) y N-17 arreglo la **maquinaria de publicacion** (que lo que se publique coincida consigo mismo). Era el prerrequisito de la 2.5.0 estable, no un arreglo de contenido. Las seis casillas rojas que viven en este repositorio -- los puntos 3, 4, 6 y 7 -- se mueven con G3 y con la redaccion de limites, que son el trabajo siguiente. El punto 5 es externo y el 8 espera D-02. El punto 5 sigue en rojo y es externo: el sitemap de la raiz yujin.app no vive en este repo, aunque el sitemap.xml propio de /nac-spec/ ya responde 200 con los 61 urls. Los otros seis siguen esperando los arreglos de contenido.
+
+**Estado al 2026-10-26, tras la redaccion de la superficie publica.** Los puntos **3 y 4
+pasan a "hechos y en cola"**, el mismo estado que ya tenian 6 y 7: el texto esta escrito,
+aprobado por el dueno y declarado en el manifest, y el servidor no lo entrega hasta el
+salto a 2.5.0. Medido contra el repositorio el 2026-10-26: `does not cover` = **1**
+(encabezado, texto visible), `urazuke` = **mas de cero** (seccion de limites + enlace del
+pie). **La tabla sigue diciendo uno de ocho** y es correcto que lo diga: mide el servidor.
+
+**Y una leccion sobre esta tabla misma, que salio de probar el candado en rojo.** Los
+criterios de los puntos 3 y 4 son un `curl | grep -c`, y **un comentario HTML los satisface
+sin que ningun lector vea nada**. Paso de verdad: la primera version de la seccion llevaba
+el encabezado repetido en un comentario de provenance, se borro la seccion entera para
+probar el gate en rojo, y los dos greps siguieron en verde. El comentario se reescribio
+para no contener la frase, y el gate `e2e/landing-limits-check.mjs` mide ahora el **texto
+renderizado** de la seccion y la **declaracion en el manifest**, con el grep crudo apenas
+como espejo del comando del dueno. Es el mismo corolario de la seccion 8 del handoff: una
+comparacion que no puede fallar no es una verificacion, es una ceremonia. **Cuando se
+recorran las ocho casillas contra el servidor, los puntos 3 y 4 se dan por verdes con el
+gate, no con el grep.**
 
 ---
 

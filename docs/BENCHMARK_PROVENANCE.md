@@ -55,6 +55,36 @@ are RFC draft (see `/rfcs/`), not in the 2.3.0 runtime.
 
 ---
 
+## Status for the 2.5.0 release -- the figures are published as historical
+
+**Owner decision, 2026-10-26.** The 2.5.0 release ships these numbers
+**declared historical**: they are published as what the 2.3 line did, not as a
+claim about the current runtime. Re-measuring against 2.5.0 was taken off the
+critical path of the release and tracked as its own work (`PND-040`).
+
+| Run | Date | Measured against | Re-measured since |
+|---|---|---|---|
+| 600-run benchmark | 2026-05-19 | runtime v2.3 (dataset field `2.2.1`, same commit) | no |
+| Conduit case study | 2026-05-22 | runtime v2.3.1 | no |
+| Migration paper | 2026-05-20 | runtime v2.3 / v2.3.1 | no |
+
+Each of the three measured runs carries this in its own receipt on the landing
+page. The benchmark card says it in full -- *"These figures have not been
+re-measured on a later runtime, so read them as what v2.3 did, not as a claim
+about the current release"* -- and the Conduit and migration receipts carry the
+short form, *"Not re-measured on a later runtime."* The fourth evidence card on
+that page, peer reviews, is not in this table on purpose: its percentages are
+the six reviewers' own converging estimates and never were measurements, which
+is what its receipt now says. The public
+limits section says the same thing as a declared limit (sentence 8, approved by
+the owner on 2026-10-26 -- see `docs/LIMITS_APPROVAL_2026-10-26.md`).
+
+Cost of the re-measurement, from the original run and not estimated: ~US$15,
+1h 23min wall-clock, 600 runs across 5 models, and the owner's keys for the five
+providers. Acceptance criteria are in `PND-040`.
+
+---
+
 ## Reproducibility
 
 To re-run the benchmark and verify the dataset:

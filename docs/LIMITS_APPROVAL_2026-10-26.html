@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Limites publicos de NAC3 -- aprobacion frase por frase</title><style>body{font-family:Georgia,"Times New Roman",serif;max-width:760px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}h1,h2,h3{font-weight:600;color:#2e3a5e}table{border-collapse:collapse}td,th{border:1px solid #b8ad95;padding:6px 10px}code,pre{font-family:Consolas,monospace;background:#f5f0e6}</style></head><body>
+<h1>Lo que NAC3 no cubre</h1>
+<p style="border:2px solid #2e3a5e;background:#f5f0e6;padding:12px 16px;margin:16px 0">
+<strong>RESUELTO -- 2026-10-26.</strong> El dueno leyo las ocho frases y la frase de las
+tres naturalezas y las dos licencias, y las aprobo sin cambios. Respuesta textual:
+<em>"Todo leido, decision declararlas historicas. Publicar 2.5 con cifras historicas y
+remedir despues."</em> La unica decision de plata que quedaba abierta al pie de este
+documento queda resuelta por esa misma frase: <strong>las cifras del benchmark se publican
+declaradas historicas y la re-medicion se hace despues del release, como trabajo propio</strong>
+(pendiente <code>PND-040</code>). El texto aprobado esta publicado en la portada
+(<code>index.html</code>, seccion <code>nac_landing.section.limits</code>) y el registro
+canonico de esta aprobacion es <code>docs/LIMITS_APPROVAL_2026-10-26.md</code>.
+</p>
+<p><strong>Para que es esto:</strong> es el texto nuevo de la portada que vos pediste aprobar <em>frase por frase</em> antes de publicar. Cada frase lleva su numero. Me alcanza con "1 a 8 ok", o "3 cambiala por esto". Nada de esto esta publicado: vive en la rama, y la web no lo ve hasta el salto a 2.5.0.</p>
+<p><strong>Regla que segui al escribirlo:</strong> ninguna frase afirma un limite que no haya medido en el codigo o en el spec. Al lado de cada una te dejo de donde la saque.</p>
+
+<h2>Encabezado y entrada</h2>
+<blockquote><p><strong>What NAC3 does not cover</strong></p>
+<p>NAC3 names what lives in the DOM. Everything below is outside that line. We would rather you read it here than discover it after you migrate.</p></blockquote>
+<p><em>(Esa frase es la que hace verde la casilla 3 de tu bloque de verificacion: hoy <code>grep -c -i "does not cover"</code> sobre la portada da 0.)</em></p>
+
+<h2>Las ocho frases</h2>
+
+<h3>1 &mdash; Canvas y WebGL</h3>
+<blockquote><p><strong>Canvas and WebGL surfaces.</strong> NAC3 does not read pixels: in a document editor, a design tool or a custom WebGL canvas, the toolbar around the drawing can be named, the drawing itself cannot. v2.5 adds a contract so a plugin can declare how its verbs route to the app's own public API (postMessage, plugin SDK), and the runtime learns one app only by reading that plugin's manifest &mdash; somebody still has to write it.</p></blockquote>
+<p><small>De donde: seccion 15 del SPEC, que ya lo dice con estas palabras ("It does not work for apps where part of the surface is canvas") y nombra Collabora, Figma, Excalidraw, Miro. El limite ya estaba escrito en el spec; lo que falta es que este en la portada.</small></p>
+
+<h3>2 &mdash; Shadow DOM cerrado</h3>
+<blockquote><p><strong>Closed shadow roots.</strong> A web component mounted with <code>attachShadow({mode:'closed'})</code> is unreachable unless its author voluntarily exposes a resolver &mdash; that is a browser security boundary, not a NAC3 decision &mdash; and the runtime reports it (<code>nac:shadow_blocked</code>) instead of guessing. Open shadow roots are covered, nested.</p></blockquote>
+<p><small>De donde: SPEC 5.1.5 (abiertos, recursivo) y 5.1.6 (cerrados, exposicion voluntaria). El nombre del evento lo lei del runtime.</small></p>
+
+<h3>3 &mdash; Frames de otro origen</h3>
+<blockquote><p><strong>Cross-origin frames.</strong> An embedded page from another origin cannot be driven unless it cooperates &mdash; it has to run NAC3 and accept the message &mdash; and when it does not, the runtime fails closed with <code>cross_origin_blocked</code> rather than pretending the click landed.</p></blockquote>
+<p><small>De donde: lo lei en <code>js/nac.js</code>: el backend same-origin-window devuelve <code>cross_origin_blocked</code> cuando el acceso falla el chequeo de origen.</small></p>
+
+<h3>4 &mdash; Lo que no es web</h3>
+<blockquote><p><strong>Native and non-web applications.</strong> NAC3 is HTML attributes: desktop, mobile-native and terminal applications are out of scope.</p></blockquote>
+<p><small>De donde: por construccion. Todo el spec asume DOM.</small></p>
+
+<h3>5 &mdash; No es un sistema de permisos</h3>
+<blockquote><p><strong>NAC3 is not a permission system.</strong> A named verb is an intent-level signal and the capability gate is a UX optimisation; your server must still authorise every call.</p></blockquote>
+<p><small>De donde: SPEC seccion 5, textual: "This complements -- it does not replace -- server-side authorisation. Hosts MUST still enforce permissions on the server... not a security boundary." Otra vez: ya esta en el spec, no en la portada.</small></p>
+
+<h3>6 &mdash; Un esquema declarado no es un esquema validado</h3>
+<blockquote><p><strong>A declared payload schema is not a validated one.</strong> A manifest may carry <code>payload_schema</code> and the reference runtime never reads it, so an agent MUST NOT assume a payload was checked.</p></blockquote>
+<p><small>De donde: hallazgo N-26, medido &mdash; cero apariciones de <code>payload_schema</code> en el runtime; los que hay en el repo son productores. La parte documental ya quedo escrita en el spec.</small></p>
+
+<h3>7 &mdash; La estabilidad la cumple el adoptante</h3>
+<blockquote><p><strong>Stable names are a promise you keep, not one we enforce.</strong> NAC3 asks ids to survive redesigns and has no way to make them: rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p></blockquote>
+<p><small>De donde: la regla de estabilidad de la seccion 2 del SPEC es una obligacion para el adoptante; nada en el runtime la verifica. Es tambien lo que N-28 mostro adentro de casa.</small></p>
+
+<h3>8 &mdash; No hace que el agente acierte</h3>
+<blockquote><p><strong>It does not make an agent correct.</strong> In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is silent damage &mdash; 0 of 200 runs, against 30 of 200 on raw DOM &mdash; not the need to check what an agent did.</p></blockquote>
+<p><small>De donde: las cifras del propio benchmark que la portada ya publica. Es la frase que convierte una cifra de marketing en un limite declarado.</small></p>
+
+<h2>Lo que deje AFUERA, a proposito</h2>
+<ul>
+<li><strong>Los idiomas.</strong> Las 9 traducciones publicadas son parciales (30-38% del canonico) y eso es exactamente la decision D-03, que todavia no tomaste. No escribo una frase sobre idiomas antes de que elijas.</li>
+<li><strong>La gobernanza.</strong> Que NAC3 todavia no es un estandar de industria ya esta dicho en la seccion Governance de la portada, con estas palabras: "one company, not a foundation". No lo repito; enlazo.</li>
+<li><strong>Los 5 baldes de <code>validate_global</code> sin codigo</strong> (N-14). Es un limite real hoy, pero se arregla en el mismo tren (paso 4.2), asi que publicarlo como limite seria publicar algo que deja de ser cierto en la misma version.</li>
+</ul>
+
+<h2>Y la otra frase que necesita tu lectura: las tres naturalezas y las dos licencias</h2>
+<p>Esto cubre dos hallazgos juntos: el enlace de vuelta a Urazuke (N-15, casilla 4 de tu bloque) y las licencias declaradas juntas (N-16).</p>
+<blockquote><p><strong>Three different things, three different licenses.</strong> <strong>NAC3</strong> is a protocol &mdash; this site, Apache-2.0. <strong>Urazuke</strong> is a method for building software with evidence &mdash; <code>yujin.app/urazuke</code>, Creative Commons BY-SA 4.0. <strong>Yujin Forge</strong> is a commercial tool that implements both. You can adopt the protocol without the method and without the tool; that is the point of publishing it under Apache-2.0.</p></blockquote>
+<p><small>Verificado hoy, no recordado: <code>yujin.app/urazuke/</code> responde 200 y su propia portada declara "Creative Commons BY-SA 4.0". Apache-2.0 de NAC3 ya esta declarado en tres lugares de la portada y en el LICENSE del repo.</small></p>
+
+<h2>Lo que ya aplique sin molestarte (lo decide Forge)</h2>
+<ul>
+<li><strong>Recibo al lado de cada cifra</strong> (N-12), en las cuatro tarjetas de evidencia: fecha de corrida, version del runtime contra la que se midio, modelos, costo, tiempo de reloj, el comando exacto para re-correrlo y el enlace a la <em>salida cruda</em> en vez de a una pagina que vuelve a afirmar.</li>
+<li><strong>El hallazgo mas incomodo, dicho en la portada:</strong> los porcentajes de la tarjeta de peer reviews (80-90% menos alucinacion, 90% menos tokens) <strong>no son mediciones</strong>, son las estimaciones convergentes de los seis revisores. Lo lei en <code>peer-reviews.html</code>: "six AIs converged". Ahora la tarjeta lo dice.</li>
+<li><strong>Las cuatro corridas se midieron en la linea 2.3</strong> (benchmark 2026-05-19 en v2.3, Conduit 2026-05-22 en v2.3.1, migration paper 2026-05-20 en v2.3/v2.3.1) y ninguna se re-midio despues. Cada recibo lo dice con esas palabras.</li>
+<li><strong>Nota de vigencia</strong> (N-11): "Page last reviewed 2026-10-26 &middot; evidence on this page dated 2026-05".</li>
+</ul>
+
+<h2>La unica decision de plata que me queda abierta</h2>
+<p><strong>Las cifras del benchmark: re-medir o declararlas historicas.</strong></p>
+<ul>
+<li><strong>Declararlas historicas</strong> (lo que ya escribi): costo cero, y la portada deja de afirmar sobre la version vigente lo que midio dos menores atras. El riesgo es que un adoptante lea "no re-medido" como "no sabemos si sigue andando".</li>
+<li><strong>Re-medir contra la 2.5.0</strong>: ~US$15 y 1h 23min de reloj, mas tu clave de los cinco modelos. Devuelve una cifra que habla de la version que publicamos, y el bundle deja de ser v2.3.</li>
+</ul>
+<p>Mi recomendacion: <strong>publicar la 2.5.0 con las cifras declaradas historicas</strong> y re-medir despues, como trabajo propio con su pendiente. Re-medir ahora mete una corrida de 600 llamadas en el camino critico del release por una mejora de credibilidad que la frase de "no re-medido" ya cubre honestamente. Pero son tus US$15 y es tu portada: deci cual.</p>
+
+</body></html>

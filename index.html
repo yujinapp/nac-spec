@@ -1562,6 +1562,65 @@ node scripts/build-integrity.mjs</pre>
   </div>
 </section>
 
+<!-- Public limits section -- D-04 / N-09. Text approved by the owner phrase by
+     phrase on 2026-10-26; the per-phrase provenance of each sentence is in
+     docs/LIMITS_APPROVAL_2026-10-26.md. Do not reword without a new reading.
+     This comment deliberately avoids the literal heading: the owner's
+     verification item 3 greps the served page, and a comment carrying the
+     phrase would satisfy that grep without a reader ever seeing it. -->
+<section data-nac-id="nac_landing.section.limits" data-nac-role="section">
+  <div class="container">
+    <h2>What NAC3 does not cover</h2>
+    <p class="section-lede">NAC3 names what lives in the DOM. Everything below is outside that line. We would rather you read it here than discover it after you migrate.</p>
+
+    <div class="resource-groups">
+      <div class="resource-group" data-nac-id="nac_landing.limit.canvas" data-nac-role="region">
+        <h3>Canvas &amp; WebGL</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Canvas and WebGL surfaces. NAC3 does not read pixels: in a document editor, a design tool or a custom WebGL canvas, the toolbar around the drawing can be named, the drawing itself cannot. v2.5 adds a contract so a plugin can declare how its verbs route to the app's own public API (<code>postMessage</code>, plugin SDK), and the runtime learns one app only by reading that plugin's manifest -- somebody still has to write it.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.shadow" data-nac-role="region">
+        <h3>Closed shadow roots</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Closed shadow roots. A web component mounted with <code>attachShadow({mode:'closed'})</code> is unreachable unless its author voluntarily exposes a resolver -- that is a browser security boundary, not a NAC3 decision -- and the runtime reports it (<code>nac:shadow_blocked</code>) instead of guessing. Open shadow roots are covered, nested.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.cross_origin" data-nac-role="region">
+        <h3>Cross-origin frames</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Cross-origin frames. An embedded page from another origin cannot be driven unless it cooperates -- it has to run NAC3 and accept the message -- and when it does not, the runtime fails closed with <code>cross_origin_blocked</code> rather than pretending the click landed.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.native" data-nac-role="region">
+        <h3>Anything not web</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Native and non-web applications. NAC3 is HTML attributes: desktop, mobile-native and terminal applications are out of scope.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.permissions" data-nac-role="region">
+        <h3>Not a permission system</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">NAC3 is not a permission system. A named verb is an intent-level signal and the capability gate is a UX optimisation; your server must still authorise every call.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.schema" data-nac-role="region">
+        <h3>Declared is not validated</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">A declared payload schema is not a validated one. A manifest may carry <code>payload_schema</code> and the reference runtime never reads it, so an agent MUST NOT assume a payload was checked.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.stability" data-nac-role="region">
+        <h3>Stability is yours to keep</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">Stable names are a promise you keep, not one we enforce. NAC3 asks ids to survive redesigns and has no way to make them: rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p>
+      </div>
+
+      <div class="resource-group" data-nac-id="nac_landing.limit.correctness" data-nac-role="region">
+        <h3>It does not make an agent correct</h3>
+        <p style="font-size: 14px; color: var(--color-text-2); margin: 0;">It does not make an agent correct. In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is silent damage -- 0 of 200 runs, against 30 of 200 on raw DOM -- not the need to check what an agent did.</p>
+      </div>
+    </div>
+
+    <p class="section-lede" style="margin-top: 28px;"><strong>Three different things, three different licenses.</strong> NAC3 is a protocol -- this site, <a href="LICENSE" data-nac-id="nac_landing.limits.license_nac3" data-nac-role="action" data-nac-action="open">Apache-2.0</a>. Urazuke is a method for building software with evidence -- <a href="https://yujin.app/urazuke/" data-nac-id="nac_landing.limits.urazuke" data-nac-role="action" data-nac-action="open">yujin.app/urazuke</a>, Creative Commons BY-SA 4.0. <a href="#waitlist" data-nac-id="nac_landing.limits.forge" data-nac-role="action" data-nac-action="open">Yujin Forge</a> is a commercial tool that implements both. You can adopt the protocol without the method and without the tool; that is the point of publishing it under Apache-2.0.</p>
+
+    <p class="section-lede">One more limit lives in its own section, because it is about who steers the contract rather than what it reaches: NAC3 is stewarded by one company, not a foundation. Read it in <a href="#governance" data-nac-id="nac_landing.limits.governance" data-nac-role="action" data-nac-action="open">Governance</a>, below.</p>
+  </div>
+</section>
+
 <section class="section" id="governance" data-nac-id="nac_landing.governance" data-nac-role="section">
   <div class="container">
     <h2>Governance</h2>
@@ -1585,6 +1644,10 @@ node scripts/build-integrity.mjs</pre>
     <a href="https://github.com/yujinapp/nac-spec"
        data-nac-id="nac_landing.footer.github"
        data-nac-role="action" data-nac-action="open">GitHub</a>
+    <span>&middot;</span>
+    <a href="https://yujin.app/urazuke/"
+       data-nac-id="nac_landing.footer.urazuke"
+       data-nac-role="action" data-nac-action="open">Urazuke (CC BY-SA 4.0)</a>
     <span>&middot;</span>
     <a href="https://rpaforce.com"
        data-nac-id="nac_landing.footer.yujin"
@@ -1749,6 +1812,34 @@ node scripts/build-integrity.mjs</pre>
         { id: 'nac_landing.section.why', role: 'section',
           label_i18n: li('Por que NAC','Why NAC','Por que NAC','Pourquoi NAC','Perche NAC','Warum NAC','なぜNAC','为什么NAC','NAC kyon','لماذا NAC') },
 
+        /* Limits section (D-04 / N-09) -- declared so an agent sees the limits, not just reads them */
+        { id: 'nac_landing.section.limits', role: 'section',
+          label_i18n: li('Limites','Limits','Limites','Limites','Limiti','Grenzen','制限','限制','limits','حدود') },
+        { id: 'nac_landing.limit.canvas', role: 'region',
+          label_i18n: li('Canvas y WebGL','Canvas and WebGL','Canvas e WebGL','Canvas et WebGL','Canvas e WebGL','Canvas und WebGL','キャンバスとWebGL','Canvas 和 WebGL','canvas aur WebGL','كانفاس وWebGL') },
+        { id: 'nac_landing.limit.shadow', role: 'region',
+          label_i18n: li('Shadow DOM cerrado','Closed shadow roots','Shadow DOM fechado','Shadow DOM ferme','Shadow DOM chiuso','Geschlossenes Shadow DOM','閉じたShadow DOM','封闭 Shadow DOM','closed shadow DOM','شادو DOM مغلق') },
+        { id: 'nac_landing.limit.cross_origin', role: 'region',
+          label_i18n: li('Frames de otro origen','Cross-origin frames','Frames de outra origem','Frames d autre origine','Frame di altra origine','Fremde-Origin-Frames','クロスオリジンフレーム','跨源框架','cross-origin frames','إطارات من أصل آخر') },
+        { id: 'nac_landing.limit.native', role: 'region',
+          label_i18n: li('Lo que no es web','Anything not web','O que nao e web','Ce qui n est pas web','Cio che non e web','Nicht-Web','ウェブ以外','非网页','web ke bahar','ما ليس ويب') },
+        { id: 'nac_landing.limit.permissions', role: 'region',
+          label_i18n: li('No es un sistema de permisos','Not a permission system','Nao e sistema de permissoes','Pas un systeme de permissions','Non e un sistema di permessi','Kein Berechtigungssystem','権限システムではない','不是权限系统','permission system nahin','ليس نظام صلاحيات') },
+        { id: 'nac_landing.limit.schema', role: 'region',
+          label_i18n: li('Declarado no es validado','Declared is not validated','Declarado nao e validado','Declare n est pas valide','Dichiarato non e validato','Deklariert ist nicht validiert','宣言は検証ではない','声明不等于校验','declared validated nahin','المعلن ليس متحققا') },
+        { id: 'nac_landing.limit.stability', role: 'region',
+          label_i18n: li('La estabilidad la cumple el adoptante','Stability is yours to keep','A estabilidade e do adotante','La stabilite est a vous','La stabilita e tua','Stabilitaet liegt bei dir','安定性は実装者の責任','稳定性归你','stability aapki','الاستقرار مسؤوليتك') },
+        { id: 'nac_landing.limit.correctness', role: 'region',
+          label_i18n: li('No garantiza que el agente acierte','No guarantee of correctness','Nao garante acerto','Pas de garantie de justesse','Nessuna garanzia di correttezza','Keine Korrektheitsgarantie','正しさは保証しない','不保证正确','correctness ki guarantee nahin','لا يضمن الصحة') },
+        { id: 'nac_landing.limits.license_nac3', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Licencia Apache-2.0','Apache-2.0 license','Licenca Apache-2.0','Licence Apache-2.0','Licenza Apache-2.0','Apache-2.0-Lizenz','Apache-2.0 ライセンス','Apache-2.0 许可证','Apache-2.0 license','ترخيص Apache-2.0') },
+        { id: 'nac_landing.limits.urazuke', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') },
+        { id: 'nac_landing.limits.forge', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge','Yujin Forge') },
+        { id: 'nac_landing.limits.governance', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Gobernanza','Governance','Governanca','Gouvernance','Governance','Governance','ガバナンス','治理','governance','الحكامة') },
+
         /* Demo card open links -- one per card */
         { id: 'nac_landing.democard.v19.open', role: 'action',
           actions: [{ verb: 'open',
@@ -1787,6 +1878,7 @@ node scripts/build-integrity.mjs</pre>
         /* Footer */
         { id: 'nac_landing.footer.license', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Licencia','License','Licenca','Licence','Licenza','Lizenz','ライセンス','许可证','license','ترخيص') },
         { id: 'nac_landing.footer.github',  role: 'action', actions: [{ verb: 'open' }], label_i18n: li('GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub','GitHub') },
+        { id: 'nac_landing.footer.urazuke', role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') },
         { id: 'nac_landing.footer.yujin',   role: 'action', actions: [{ verb: 'open' }], label_i18n: li('Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin','Yujin') }
       ]
     });

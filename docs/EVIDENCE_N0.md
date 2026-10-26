@@ -76,6 +76,20 @@ Inventory (`e2e/n0-screen-sweep.mjs`, machine output in `e2e/sweep.json`):
 | Screens with console errors on load | 12 (see F-2 and F-3) |
 | Interactive elements with **no** `data-nac-id` | 324 |
 
+**Re-measured on 2026-10-26** (same script, after the G3 spec fixes and the new
+public limits section). Two rows moved, and one of them is a finding:
+
+| Page | 2026-10-24 | 2026-10-26 | Reading |
+|---|---|---|---|
+| `index.html` | 109 reported / 109 addressable / 57 interactive / 0 unmarked | 135 / 135 / 70 / 0 | the receipts (N-12) and the limits section (N-09) added marked elements; still 100 % addressable and still nothing interactive left unmarked |
+| `SPEC.html` | 4 interactive / 0 unmarked | 6 interactive / **2 unmarked** | **new finding N-32**: the SPEC generator emits prose links with `data-nac-role` and no `data-nac-id`. The two links are the ones the N-13 fix added. Deferred on purpose with N-28 (`PND-041`) |
+
+The aggregate `unmarked_interactive_total` therefore moves from 324 to **326**;
+every other row is unchanged. Both runs are in `e2e/sweep.json`, which **from
+this date stamps itself** (`measured_at`, `measured_at_commit`, `tree`): an
+undated measurement cannot be told apart from a current one, and this one ages
+the moment any page gains or loses a `data-nac-id`.
+
 End-to-end proof (`e2e/n0-eligibility-v21.mjs`, **verdict GREEN**, exit 0),
 flow: *open invoice -> add line -> edit quantity -> save*, in a real Chromium:
 

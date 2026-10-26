@@ -184,6 +184,23 @@ jobs:
           curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' "https://yujin.app/nac-spec/$IMMUTABLE" | grep -qx 200 || { echo "::error::Immutable runtime path is not being served ($IMMUTABLE)"; exit 1; }
           echo "Integrity is live."
 
+      - name: Smoke check the declared limits are live
+        # Audit N-09 / N-15 / N-16, and items 3 and 4 of the owner
+        # verification block, measured where the block measures them:
+        # on the server. The owner's own criterion is a grep, and a grep
+        # can be satisfied by an HTML comment -- so this asserts the
+        # HEADING and the link target, not the loose phrase. The browser
+        # half of the same check (visible text + the 13 ids declared in
+        # the manifest) is e2e/landing-limits-check.mjs, which runs
+        # against this URL with N0_BASE and is not in CI because it
+        # needs a browser download.
+        run: |
+          BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/)"
+          grep -qF '<h2>What NAC3 does not cover</h2>' <<< "$BODY" || { echo "::error::The published landing page declares no limits section (audit N-09)"; exit 1; }
+          grep -qF 'https://yujin.app/urazuke/' <<< "$BODY" || { echo "::error::The published landing page has no link back to Urazuke (audit N-15)"; exit 1; }
+          grep -qF 'Creative Commons BY-SA 4.0' <<< "$BODY" || { echo "::error::The published landing page does not declare the Urazuke license next to its own (audit N-16)"; exit 1; }
+          echo "Declared limits, the Urazuke link and both licenses are live."
+
       - name: Verify the published contract API from outside
         # The producer checked itself before the upload; this checks the
         # HOST. It fetches the published chain, recomputes it, compares

@@ -1,4 +1,7 @@
 {
+ "measured_at": "2026-10-26T12:00:19.878Z",
+ "measured_at_commit": "057eb7c",
+ "tree": "dirty",
  "base": "http://localhost:8855",
  "summary": {
   "pages": 51,
@@ -6,7 +9,7 @@
   "with_nac": 27,
   "fully_addressable": 27,
   "with_console_errors": 12,
-  "unmarked_interactive_total": 324
+  "unmarked_interactive_total": 326
  },
  "rows": [
   {
@@ -14,9 +17,9 @@
    "page": "index.html",
    "status": 200,
    "nac": true,
-   "reported": 109,
-   "addressable": 109,
-   "interactive": 57,
+   "reported": 135,
+   "addressable": 135,
+   "interactive": 70,
    "unmarked": 0,
    "errors": 0,
    "note": ""
@@ -40,8 +43,8 @@
    "nac": false,
    "reported": 0,
    "addressable": 0,
-   "interactive": 4,
-   "unmarked": 0,
+   "interactive": 6,
+   "unmarked": 2,
    "errors": 3,
    "note": "Failed to load resource: the server responded with a status of 404 (Not Found)"
   },

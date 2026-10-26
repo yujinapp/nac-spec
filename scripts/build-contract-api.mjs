@@ -82,6 +82,10 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
 import { loadRuntimeInFixtureDom } from './fixture-dom.mjs';
+/* Section 8 is read in ONE place, shared with runtime/build.mjs, which
+   stamps the same level definitions into the CLI validator. See the
+   header of spec-levels.mjs for why that is not optional. */
+import { extractLevels, extractLocales, extractTiers } from './spec-levels.mjs';
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WRITE = process.argv.includes('--write');
@@ -366,19 +370,16 @@ function readGlobalBuckets() {
 }
 
 /* ---- extraction from SPEC.md --------------------------------------
-   Two facts live only in the prose. Both are anchored, and both fail
-   the build when the anchor moves, so the published contract can
-   never quietly disagree with the document. */
+   Several facts live only in the prose. All of them are anchored, and
+   all of them fail the build when the anchor moves, so the published
+   contract can never quietly disagree with the document.
 
-function extractLocales(specSrc) {
-  const m = specSrc.match(/MUST cover all 10 NAC3 locales:\s*```\s*([^`]+)```/);
-  if (!m) throw new Error('cannot find the locale list in SPEC.md section 4.3');
-  const locales = m[1].split(',').map((s) => s.trim()).filter(Boolean);
-  if (locales.length !== 10) {
-    throw new Error('SPEC.md section 4.3 announces 10 locales and lists ' + locales.length);
-  }
-  return locales;
-}
+   The locale list and the whole of section 8 now live in
+   scripts/spec-levels.mjs, because runtime/build.mjs needs the same
+   two facts to stamp the CLI validator and a second private copy of
+   section 8 would let the validator certify pages against a spec
+   nobody is reading. The role table and the verb list stay here:
+   nothing else reads them. */
 
 /* The role table of section 1, so the contract can say which of the
    roles the runtime accepts are actually declared in the document.
@@ -407,105 +408,6 @@ function extractCommonVerbs(specSrc) {
   while ((v = rx.exec(m[1]))) verbs.push(v[1]);
   if (verbs.length < 10) throw new Error('the common verb list came out suspiciously short');
   return verbs;
-}
-
-/* The names the levels carried before 2.5.0, read out of the
-   compatibility subsection that promises them.
-
-   api/ publishes these as `legacy_display_name` so a document written
-   before the rename can still be mapped onto a level. That makes
-   section 8.1 load-bearing: if it stops recording an alias and this
-   function just composed 'NAC-' + n anyway, api/ would keep promising
-   a mapping no document explains -- the same shape of lie as a
-   fingerprint compared against itself. So the gate refuses instead. */
-function extractLegacyLevelNames(sectionBody) {
-  const subStart = sectionBody.indexOf('### 8.1');
-  if (subStart < 0) {
-    throw new Error('cannot find SPEC.md section 8.1 -- api/ publishes legacy_display_name and that subsection is what documents it');
-  }
-  const sub = sectionBody.slice(subStart);
-  const out = {};
-  for (const n of [1, 2, 3]) {
-    const name = 'NAC-' + n;
-    if (sub.indexOf('`' + name + '`') < 0) {
-      throw new Error('SPEC.md section 8.1 no longer records `' + name + '` as the historical name of level ' + n + ', but api/ still publishes it as legacy_display_name');
-    }
-    out[n] = name;
-  }
-  return out;
-}
-
-/* The three conformance levels, requirement by requirement, lifted
-   verbatim from section 8. The TEXT is extracted; whether a
-   requirement is machine-decidable, and which finding code falsifies
-   it, is in the meta sidecar keyed by a hash of that text. Edit the
-   bullet in the spec and the gate goes red until someone re-reads the
-   mapping -- which is the only way a published "level" stays honest. */
-function extractLevels(specSrc) {
-  const secStart = specSrc.indexOf('## 8. Conformance levels');
-  if (secStart < 0) throw new Error('cannot find SPEC.md section 8');
-  const secEnd = specSrc.indexOf('## 9. Versioning', secStart);
-  if (secEnd < 0) throw new Error('cannot find the end of SPEC.md section 8');
-  const body = specSrc.slice(secStart, secEnd);
-
-  const legacy = extractLegacyLevelNames(body);
-
-  const levels = [];
-  /* The display name is CAPTURED from the heading, not composed here:
-     two places writing the same string is how the version ended up
-     typed in 13 places (audit N-17). What section 8 calls a level is
-     what api/ publishes as its display_name, by construction. */
-  const blockRx = /A page is at \*\*(NAC3 Conformance Level ([123]))\*\*([\s\S]*?)(?=A page is at \*\*NAC3 Conformance Level |\n\nThe NPM package)/g;
-  let m;
-  while ((m = blockRx.exec(body))) {
-    const displayName = m[1];
-    const n = Number(m[2]);
-    const bullets = [];
-    const lines = m[3].split('\n');
-    let current = null;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^-\s+/.test(line)) {
-        if (current) bullets.push(current);
-        current = line.replace(/^-\s+/, '');
-      } else if (current && line && !/^(A page is|The NPM|###)/.test(line)) {
-        current += ' ' + line;
-      } else if (current && !line) {
-        bullets.push(current);
-        current = null;
-      }
-    }
-    if (current) bullets.push(current);
-
-    levels.push({
-      level: n,
-      /* Audit N-06, resolved in 2.5.0 by owner decision (option A):
-         the pre-2.5.0 names NAC-1/2/3 were one dash away from the
-         protocol name NAC3, so a report could not be told apart from
-         a statement about the protocol. A machine must never have to
-         disambiguate by string shape, so the published id stays the
-         key, the display name now says what it is, and the old name
-         travels beside it as an alias for documents that predate the
-         rename. */
-      id: 'nac3-conformance-level-' + n,
-      display_name: displayName,
-      legacy_display_name: legacy[n],
-      cumulative: n > 1,
-      requirements: bullets.map((text) => ({
-        /* Hex, not a slice of the base64 hash: an id that can contain
-           '/' or '+' is hostile to anything that puts it in a URL or a
-           JSON pointer. */
-        id: 'L' + n + '-' + createHash('sha256').update(text, 'utf8').digest('hex').slice(0, 8),
-        text,
-        text_sha384: sha384(Buffer.from(text, 'utf8')),
-      })),
-    });
-  }
-
-  if (levels.length !== 3) {
-    throw new Error('SPEC.md section 8 yielded ' + levels.length + ' levels, expected 3');
-  }
-  return levels;
 }
 
 /* ---- channel ------------------------------------------------------
@@ -546,7 +448,55 @@ function gitHeadCommit() {
 
 /* ---- artefact builders --------------------------------------------- */
 
-function buildContract(rt, specSrc, meta) {
+/* The conformance_tier vocabulary, published as a vocabulary and not
+   as `type: "string"` (audit N-29).
+
+   The values come from the RFC, the LIVE value from the runtime, and
+   the human meaning from the sidecar. All three have to agree: a tier
+   the runtime declares and the RFC does not define is a wire value
+   with no contract behind it, and a tier the RFC defines and the
+   sidecar does not explain is a published enum whose members mean
+   nothing. Either way the contract would be describing something
+   nobody can act on, which is the exact shape of N-14. */
+function buildTierVocabulary(rt, rfcSrc, meta) {
+  const { NAC } = rt;
+  const values = extractTiers(rfcSrc);
+  const sidecar = meta.conformance_tiers || {};
+
+  for (const v of values) {
+    if (!sidecar[v]) {
+      fail('RFC V24-04 section 6 defines conformance_tier value "' + v
+        + '" and scripts/contract-api.meta.json does not say what it means');
+    }
+  }
+  for (const v of Object.keys(sidecar)) {
+    if (values.indexOf(v) < 0) {
+      fail('the meta sidecar explains a conformance_tier value "' + v
+        + '" that RFC V24-04 section 6 no longer defines (remove it, or restore the tier)');
+    }
+  }
+  const live = NAC.conformance_tier;
+  if (values.indexOf(live) < 0) {
+    fail('the runtime declares conformance_tier "' + live
+      + '" and RFC V24-04 section 6 does not define it: the wire value and the contract disagree');
+  }
+
+  return {
+    note: 'A TIER is not a LEVEL. A tier describes what the RUNTIME on the page implements (RFC V24-04 section 6, read off NAC.conformance_tier); a conformance level describes what the PAGE declares and does (SPEC.md section 8, reported by the CLI validator against the identifiers in levels.json). They are separate taxonomies with separate identifiers and neither implies the other. Published as a vocabulary since 2.5.0: before that the contract published this field as type "string" and not its values, so a machine saw the field and had no way to learn that "NAC-3-versioned" is not a level name (audit N-29).',
+    field: 'conformance_tier',
+    defined_in: 'docs/RFC_V24-04.md section 6',
+    not_a_level: true,
+    level_vocabulary: 'levels.json -- id pattern nac3-conformance-level-<1|2|3>',
+    declared_by_this_runtime: live,
+    values: values.map((value) => ({
+      value,
+      what: (sidecar[value] && sidecar[value].what) || null,
+      requires: (sidecar[value] && sidecar[value].requires) || null,
+    })),
+  };
+}
+
+function buildContract(rt, specSrc, rfcSrc, meta) {
   const { NAC, src, bytes } = rt;
   const roles = extractRoles(src);
   const families = extractEventFamilies(src);
@@ -603,6 +553,7 @@ function buildContract(rt, specSrc, meta) {
       functions: apiSurface,
       values: dataKeys,
     },
+    conformance_tier: buildTierVocabulary(rt, rfcSrc, meta),
   };
 }
 
@@ -690,12 +641,31 @@ function buildLevels(rt, specSrc, meta) {
              human       = not decidable by a tool at all */
           check: m ? m.check : null,
           falsified_by: m ? m.falsified_by : null,
+          /* Audit N-18: the NAME of the check the reference validator
+             runs for this requirement, published so a report can be
+             audited against the thing that produced it instead of
+             taken on faith. null means no tool decides this one.
+             runtime/build.mjs refuses to emit a CLI that does not
+             implement a decider named here. */
+          decider: m ? (m.decider || null) : null,
+          /* true when the decider has to DRIVE the page (click things)
+             to decide. The validator does not mutate a page unless it
+             is asked to, so these report unverified without --drive. */
+          requires_drive: m ? !!m.requires_drive : null,
           note: m ? (m.note || null) : null,
         };
       }),
     })),
     reporting: {
       note: 'A validator MAY report a level only when every machine_checkable requirement of that level and of every lower level passes. Requirements with machine_checkable=false cannot be decided by a tool and MUST be reported as unverified rather than assumed.',
+      /* Added in 2.5.0 while building the validator (audit N-18). The
+         rule above is necessary and not sufficient: on its own it lets
+         a report say "level 1" without saying that three of the four
+         requirements at that level were never measured. A level is a
+         MEASUREMENT, not a certificate, so the ratio travels with it. */
+      must_report_coverage: true,
+      coverage_note: 'A report that cites a level MUST also state how many requirements of that level were decided and how many were not, and MUST NOT present the level as a certification. The reference CLI prints "asserted on N of M requirements" beside every level it reports, and names each undecided requirement by its published id.',
+      reference_validator: 'npx nac3 validate <url>  (add --drive to decide the behavioural requirements)',
     },
   };
 }
@@ -1006,6 +976,11 @@ function verifyWitnessRecord(index, indexBytes, hard) {
 function main() {
   const rt = loadRuntime();
   const specSrc = readFileSync(join(ROOT, 'SPEC.md'), 'utf8');
+  /* The conformance_tier vocabulary is defined in the RFC, not in the
+     spec, and the contract publishes it (audit N-29). Read here so a
+     missing RFC fails the build loudly instead of publishing an enum
+     with no members. */
+  const rfcSrc = readFileSync(join(ROOT, 'docs', 'RFC_V24-04.md'), 'utf8');
   if (!existsSync(META_PATH)) {
     console.error('FAIL  missing ' + META_PATH);
     console.error('      the catalogue needs the human meaning of each code; it is not derivable.');
@@ -1021,7 +996,7 @@ function main() {
 
   /* ---- 1. generate the three surfaces ---- */
   const built = {
-    'contract.json': buildContract(rt, specSrc, meta),
+    'contract.json': buildContract(rt, specSrc, rfcSrc, meta),
     'findings.json': buildFindings(rt, meta),
     'levels.json':   buildLevels(rt, specSrc, meta),
   };
@@ -1091,6 +1066,29 @@ function main() {
     const stillThere = built['levels.json'].levels.some((lv) => lv.requirements.some((r) => r.text_sha384 === h));
     if (!stillThere) {
       fail('the meta sidecar maps a level requirement that SPEC.md section 8 no longer contains (' + h + ')');
+    }
+  }
+  /* ---- 3b. a decidable requirement needs a decider, and only a
+     decidable one may have it (audit N-18) ----
+     Without this, "machine_checkable: true" is an adjective nobody
+     has to honour: the published contract would promise a tool can
+     decide a requirement while no tool names the check it runs. And a
+     decider on a human requirement is the opposite lie -- a check
+     attached to something the sidecar itself says no tool decides. */
+  for (const lv of built['levels.json'].levels) {
+    for (const r of lv.requirements) {
+      if (r.machine_checkable && !r.decider) {
+        fail('level requirement ' + r.id + ' is published as machine_checkable and names no decider: '
+          + 'add `decider` to scripts/contract-api.meta.json, or stop claiming a tool can decide it');
+      }
+      if (!r.machine_checkable && r.decider) {
+        fail('level requirement ' + r.id + ' is published as not machine_checkable and names the decider "'
+          + r.decider + '": one of the two is wrong');
+      }
+      if (r.requires_drive && !r.machine_checkable) {
+        fail('level requirement ' + r.id + ' is marked requires_drive and is not machine_checkable: '
+          + 'driving a page cannot decide something the sidecar says no tool decides');
+      }
     }
   }
 

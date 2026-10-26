@@ -2,7 +2,9 @@
 
 - Fecha de este documento: 2026-10-24
 - Auditoria de origen: Claude Code, revision externa de portada publica, SPEC.md, registro npm, cabeceras HTTP y sitemap.
-- Estado global: **ABIERTO -- 6 de 24 cerrados** (N-21, N-02, N-03, N-20, N-22 y N-04; todos el 2026-10-24). Parciales: N-14, N-17 y N-18. N-10 esta cerrado en la parte que vive en este repositorio y abierto en la que no.
+- Estado global: **ABIERTO -- 10 de 29 cerrados** (N-18 y N-33/N-34 cerrados el 2026-10-26; N-14 cerrado con el catalogo de codigos; el conteo de abajo es el del 2026-10-24 y se mantiene como historia)
+- Hallazgos nuevos del 2026-10-26, todos salidos de CONSTRUIR el validador de niveles (N-18): **N-35, N-36, N-37, N-38, N-39**. Ninguno salio de leer.
+- Estado global del 2026-10-24: **ABIERTO -- 6 de 24 cerrados** (N-21, N-02, N-03, N-20, N-22 y N-04; todos el 2026-10-24). Parciales: N-14, N-17 y N-18. N-10 esta cerrado en la parte que vive en este repositorio y abierto en la que no.
 - **Alcance de la 2.5.0, fijado por el dueno el 2026-10-24:** *"Todos los pendientes son todos los que no sean urazuke. Urazuke no es requisito, lo vamos a avanzar despues de la 2.5, lo dejamos para la 2.6."* O sea: **este backlog ES el trabajo de la 2.5.0**. Los 27 peldanos del metodo Urazuke (PND-002 a PND-028) quedan fuera y se retoman despues. En el registro de pendientes eso son exactamente **tres** items no-Urazuke -- PND-001, PND-030 y PND-032 -- mas los dos que abrio D-02 (PND-033, PND-034).
 - Cambio de situacion del 2026-10-24 (17:00 UTC): **N-21 esta resuelto**. El dueno destrabo la facturacion, el pipeline volvio a correr y los arreglos de distribucion ya estan publicados y comprobados contra el servidor. A partir de ahora "corregido en el repositorio" ya no significa "invisible en la web": cada arreglo se puede verificar desde afuera en el push siguiente.
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
@@ -852,7 +854,74 @@ Verificacion (no alcanza con que este verde):
 
 Ninguno de los dos es un arreglo de una linea: el punto 2 necesita que exista una definicion comprobable de "nivel", y eso es justamente lo que **D-02** decide. Hacerlo antes de D-02 seria inventar el criterio.
 
-**Estado:** parcial -- version del CLI cerrada; modo URL y reporte de nivel abiertos, el segundo en espera de D-02.
+**CERRADO el 2026-10-26.** Los dos sintomas de fondo estan resueltos y el criterio de
+aceptacion del punto 8 se puede cumplir.
+
+- **Modo URL.** `nac validate <url>` carga la pagina en un Chromium real, espera a que el
+  registro de manifests **deje de moverse** (no un sleep fijo, que mide el humor de la
+  maquina), y lee de la pagina lo que el runtime dice de si mismo. Playwright es
+  **opcional y se resuelve en tiempo de llamada**: no entra como dependencia de
+  `@nac3/runtime`, porque meter un navegador en el `node_modules` de cada adoptante para
+  ofrecer una herramienta que la mayoria no corre es cobrarles por algo que no piden. Si
+  falta, el CLI sale con codigo 3 y dice la linea exacta para instalarlo.
+- **Reporte de nivel.** Reporta contra los identificadores publicados en `levels.json`,
+  con la regla publicada: un nivel solo se afirma cuando **todos** los requisitos
+  `machine_checkable` de ese nivel y de los inferiores pasan; los que ninguna herramienta
+  decide salen **unverified**, nunca asumidos. Tres veredictos y la diferencia entre los
+  dos ultimos es todo el punto: `pass` medido y se cumple, `fail` medido y no se cumple,
+  `unverified` **no medido**.
+- **Y la cobertura viaja con el nivel.** La regla publicada, sola, permite decir "nivel 1"
+  sin decir que tres de sus cuatro requisitos no se midieron -- y, peor, marcar un
+  requisito como no decidible lo **saca** del gate, asi que cuanto mas honesto es el
+  sidecar mas laxo seria el reporte. Por eso `levels.json` publica desde 2.5.0
+  `reporting.must_report_coverage` y el CLI imprime "asserted on N of M requirements" al
+  lado de todo nivel que reporta, mas la frase de que es una **medicion y no un
+  certificado**.
+- **`--drive`.** Los dos requisitos conductuales del nivel 1 no se deciden leyendo: hay
+  que hacer click. El validador lo hace **solo si se lo pide**, porque clickear todos los
+  controles de la pagina de produccion de alguien no es una operacion de lectura y no
+  puede ser el default.
+- **De donde salen las definiciones de nivel.** De `SPEC.md` seccion 8, a traves de
+  `scripts/spec-levels.mjs` -- **el mismo modulo** que genera
+  `api/v/<version>/levels.json`. El CLI no lleva copia propia de la seccion 8: un
+  validador que reporta contra su copia privada del spec certifica contra un documento
+  que nadie esta leyendo, que es N-17 con mucho peor radio.
+- **Simetria productor/consumidor sobre los decididores.** Cada requisito publica el
+  `decider` que lo juzga. `runtime/build.mjs` se niega a emitir un CLI si un requisito
+  declarado `machine_checkable` nombra un decididor que el CLI no implementa, si nombra
+  ninguno, o si el CLI implementa uno que ningun requisito nombra.
+- **Donde vive ahora.** El CLI dejo de ser un template literal dentro del generador y es
+  codigo real en `runtime/src/cli.mjs` + `runtime/src/cli-url.mjs`; el build solo
+  sustituye la version. `scripts/check-version-coherence.mjs` extendio el candado de
+  N-17 a esos dos archivos, asi que el hardcodeo no puede mudarse un directorio.
+
+**Medido el 2026-10-26, antes y despues:**
+
+| | antes | despues |
+|---|---|---|
+| `validate <url>` | aborta, salida 2 | corre y reporta |
+| nivel en modo URL | nunca | `nac3-conformance-level-N` o "NONE ASSERTED" con el requisito que lo bloquea |
+| nivel en modo directorio | nunca, y sin decirlo | "NOT DECIDABLE IN THIS MODE", con el motivo |
+| slots de version coherentes | 16 | 18 |
+
+**Candado:** `scripts/test-cli-levels.mjs`, 29 casos en cuatro grupos (REPORTS / REFUSES /
+HONEST / BUILD). **Probado en rojo contra el CLI anterior: 29 de 34 casos caen y solo
+quedan verdes los 5 del grupo BUILD, que prueban el build y no el binario.** Dos cosas
+que ese rojo delato y estan arregladas: la suite se **estrellaba** en la primera llamada
+en vez de fallar un caso -- el mismo defecto de los dos candados anteriores -- y dos
+casos daban verde **sobre una lista vacia de veredictos**, es decir justo sobre la
+regresion que existen para atrapar. Ademas se probo que el gate de simetria de
+decididores es lo que refuta el caso: con el gate, salida 1; sin el, la misma rotura pasa
+con salida 0.
+
+**Hallazgos que salio de construirlo, y ninguno salio de leer:** N-35 (`probe` normativo y
+sin lector), N-36 (el nivel 3 pide una firma de manifest que el runtime no sabe hacer),
+N-37 (el nivel 2 exige la forma de manifest heredada), N-38 (el nivel 1 pide un evento que
+un enlace no puede emitir) y N-39 (seis acciones de la portada que nunca confirman). Es
+la octava vez que una capa de verificacion encuentra lo que cinco meses de lectura no
+habian encontrado.
+
+**Estado:** CERRADO el 2026-10-26.
 
 ---
 
@@ -1115,7 +1184,33 @@ Cero apariciones en el runtime. Las cinco que hay son **productores** (manifests
 
 **Grupo de convergencia:** G2-CONTRATO-LEGIBLE (toca el runtime, asi que viaja con N-14 y la segunda mitad de N-18).
 
-**Severidad:** avisa. **Quien decide:** el dueno decide si el valor se renombra; Forge puede publicar el vocabulario sin decision.
+**MITAD HECHA el 2026-10-26: el vocabulario esta publicado.** `contract.json` deja de
+publicar `conformance_tier` como un `type: "string"` sin valores y publica el vocabulario
+entero: los tres valores, que exige cada uno, cual declara **este** runtime, donde estan
+definidos, y la frase que separa las dos taxonomias -- *un tier describe lo que
+implementa el RUNTIME (RFC V24-04 seccion 6), un nivel describe lo que la PAGINA declara
+y hace (SPEC.md seccion 8), son identificadores distintos y ninguno implica al otro*. Los
+tres valores se **extraen** de la seccion 6 del RFC con un patron anclado, nunca se
+escriben a mano, y el generador cruza tres fuentes y refuta cualquier desacuerdo: un
+valor que el RFC define y el sidecar no explica, un valor que el sidecar explica y el RFC
+ya no define, y un valor que el runtime declara y el RFC no conoce.
+
+El CLI lo imprime en la misma linea que mide la pagina, con la etiqueta
+`[tier != level: the tier is what the RUNTIME implements]`, porque la unica manera de que
+un lector deje de confundirlos es verlos nombrados distinto en la misma frase.
+
+Con esto el criterio de aceptacion del **agente externo** -- "puede distinguir un tier de
+un nivel leyendo solo el contrato" -- esta cumplido, y el del **auditor** -- "el contrato
+publica el vocabulario de todo campo enumerado que publica" -- tambien.
+
+**Lo que sigue abierto es solo la decision:** si `NAC-3-versioned` se **renombra**. Es un
+valor de cable que un host puede estar comparando, asi que renombrarlo es un cambio de
+compatibilidad. Si se renombra, conviene que sea en la 2.5.0: mover un valor de cable
+despues cuesta otra version. Si se deja, el vocabulario publicado ya resuelve la
+ambiguedad para una maquina sin tocar a nadie.
+
+**Severidad:** avisa. **Quien decide:** el dueno decide si el valor se renombra; el
+vocabulario ya esta publicado sin necesidad de decision.
 
 ---
 
@@ -1281,6 +1376,180 @@ codigo y la severidad de cada balde, la firma de la 5.2 dice `GlobalReport` en v
 array").
 
 **Severidad:** avisa. **Estado:** CERRADO el 2026-10-26.
+
+---
+
+### N-35 (nuevo, 2026-10-26) La opcion `probe` es normativa en el SPEC y el runtime no la lee nunca
+
+**Que esta mal:** la seccion 10.1 publica la firma
+`NAC.validate_global(opts?: {probe?: boolean})`, y los requisitos de nivel 2 y 3 de la
+seccion 8 estan escritos sobre esa opcion -- nivel 2 pide `{probe: false}` con cero
+hallazgos de severidad `error`, nivel 3 pide `{probe: true}` con cero hallazgos de
+cualquier severidad. El runtime declara `function validate_global()` **sin un solo
+parametro** y en sus 23 apariciones de la palabra `probe` en `js/nac.js` ninguna
+pertenece a esta funcion.
+
+**Evidencia (2026-10-26):** `SPEC.md:745` publica la firma con `opts`. `js/nac.js:4694`
+declara `function validate_global()`. Pasarle `{probe: true}` es aceptado y descartado en
+silencio, porque JavaScript no se queja de un argumento de mas.
+
+**Por que importa:** los dos requisitos quedan distinguidos **solo** por el umbral de
+severidad, no por la profundidad del sondeo que la frase promete. Un validador que
+reporta "pasa nivel 3" esta diciendo algo mas debil que lo que la frase dice, y nada en
+el contrato lo avisaba. Es la misma familia que N-26 (`payload_schema` normativo y sin
+lector) y N-34 (una forma documentada que el runtime nunca devolvio): el documento
+describe una capacidad que el codigo no tiene.
+
+**Como se encontro:** construyendo el modo URL del validador (N-18). Para ponerle un
+decididor al requisito de nivel 3 hubo que preguntarse que hace `probe: true`, y la
+respuesta fue: nada.
+
+**Mitigado mientras tanto, no tapado:** el decididor `validate_global_no_findings` del
+CLI imprime la advertencia junto al veredicto, y el sidecar la deja escrita en la nota
+del requisito, que es lo que `api/v/<version>/levels.json` publica.
+
+**Donde vive el arreglo:** `js/nac.js` (cablear `probe`, que es lo que haria que los dos
+requisitos midan cosas distintas) **o** `SPEC.md` 10.1 + seccion 8 (retirar la opcion y
+escribir los dos requisitos por su umbral). Lo primero es trabajo de runtime; lo segundo
+es una frase.
+
+**Severidad:** avisa. **Quien decide:** el dueno -- cablear o retirar. **Estado:** abierto.
+
+---
+
+### N-36 (nuevo, 2026-10-26) El nivel 3 pide manifests firmados y el runtime no sabe firmar ni verificar un manifest
+
+**Que esta mal:** el primer requisito de nivel 3 es "Carries HMAC-signed manifests", y el
+sidecar lo publicaba como `machine_checkable: true` con la nota "decidible como la
+presencia de un bloque de provenance cuyo HMAC el runtime verifica". **No existe tal
+verificacion.** `NAC.sign_provenance` y `NAC.verify_provenance` operan sobre
+`detail.source` de un **evento**, nunca sobre un manifest; `register()` guarda el objeto
+tal cual y no mira ningun campo de firma.
+
+**Evidencia (2026-10-26):** las 12 apariciones de `hmac`/`signature` en `js/nac.js` estan
+todas dentro del bloque de provenance de eventos (`js/nac.js:6784` en adelante). Ni una
+toca `_manifests`.
+
+**Consecuencia medida:** **ninguna herramienta puede afirmar el nivel 3 hoy.** No por
+falta de ganas del validador: un validador sin el secreto del tenant solo puede ver si el
+bloque esta, y no hay nada en la pagina a quien preguntarle si es autentico.
+
+**Como se encontro:** escribiendo el decididor de ese requisito para N-18.
+
+**Lo que hace el validador mientras tanto, y por que asi:** el decididor
+`manifest_hmac_block_present` devuelve **fail** cuando ningun manifest trae bloque -- eso
+si es decidible, y en negativo es definitivo -- y **unverified** cuando alguno lo trae.
+Nunca **pass**. La alternativa, marcar el requisito como no decidible por maquina, suena
+mas honesta y es peor: por la regla de reporte publicada, un requisito no decidible
+**sale del gate**, asi que declararlo indecidible volveria el nivel 3 mas facil de
+afirmar, no mas dificil. Esa propiedad de la regla quedo anotada y mitigada en N-18 con
+`must_report_coverage`.
+
+**Donde vive el arreglo:** `js/nac.js` (firma y verificacion de manifests, que es una
+funcionalidad de 2.6) **o** `SPEC.md` seccion 8 (escribir el requisito en terminos de lo
+que una herramienta puede ver).
+
+**Severidad:** avisa. **Quien decide:** el dueno. **Estado:** abierto.
+
+---
+
+### N-37 (nuevo, 2026-10-26) El nivel 2 exige la forma de manifest que la seccion 4 llama heredada
+
+**Que esta mal:** el primer requisito de nivel 2 dice "Registers `tabs[]`, `fields[]`,
+`actions[]` arrays explicitly in its manifest". Esas tres arrays son la forma
+**heredada**. La seccion 4 documenta `elements: [{id, role, ...}]` como la forma
+canonica, y N-33 es el expediente de lo que costo que el validador leyera solo las
+heredadas. Leido literalmente -- que es como un validador tiene que leerlo -- **una
+pagina escrita como el documento manda no alcanza el nivel 2**.
+
+**Evidencia (2026-10-26):** la portada del propio protocolo registra dos manifests
+(`nac_landing` y `chat`), los dos con `elements[]` y ninguno con las tres arrays. El
+validador la deja en `FAIL L2-f6a7aa72` con el detalle "estos manifests usan la forma
+canonica elements[] en su lugar". El fixture `e2e/fixtures/level-2-page.html` declara las
+dos formas a proposito y por eso puede llegar a nivel 2: es la unica manera de tener un
+caso verde contra la frase tal como esta escrita.
+
+**Por que no lo reinterpreto el validador:** porque el mapeo requisito -> decididor esta
+revisado contra **esa** frase y versionado por el hash de su texto. Un validador que
+decide que la frase "en realidad queria decir" otra cosa es un validador que certifica
+contra un documento que nadie escribio.
+
+**Donde vive el arreglo:** `SPEC.md` seccion 8, una frase: declarar la superficie
+explicitamente en el manifest (en cualquiera de las dos formas) en vez de nombrar solo
+las tres arrays heredadas. Al cambiar la frase cambia su hash, asi que el gate del
+contrato exige que alguien vuelva a leer el mapeo -- que es exactamente lo que
+corresponde.
+
+**Severidad:** avisa. **Quien decide:** el dueno (es texto normativo). **Estado:** abierto.
+
+---
+
+### N-38 (nuevo, 2026-10-26) El nivel 1 pide un evento que un enlace no puede emitir despues de su propio unload
+
+**Que esta mal:** el segundo requisito de nivel 1 dice que todo elemento
+`data-nac-role="action"` emite `nac:action:succeeded` **despues de su efecto**. Cuando el
+efecto es navegar, no hay despues: la pagina se descarga y no queda nadie para emitir ni
+para escuchar. El requisito no tiene, para un enlace, ningun resultado que una
+herramienta pueda registrar -- ni verde ni rojo.
+
+**Evidencia medida (2026-10-26), portada del protocolo, corrida con `--drive`:** de los 39
+elementos con rol `action` que la portada declara, **31 son enlaces planos con `href`**.
+Dos emiten el evento. Los seis restantes son el caso de N-39.
+
+**Como lo trata el validador, y por que no lo cuenta como defecto de la pagina:** los
+clasifica aparte y devuelve **unverified** nombrandolos, en vez de **fail**. Contarlos
+como fallas seria culpar a la pagina por un agujero del requisito; contarlos como pases
+seria inventar una medicion. El validador cancela la navegacion en la fase de burbuja
+para que la pagina sobreviva -- los handlers de la pagina ya corrieron para entonces, asi
+que el efecto bajo prueba ocurre y el evento, si lo hubiera, se veria.
+
+**Donde vive el arreglo:** `SPEC.md` seccion 8 -- o se exceptua la navegacion, o se exige
+que el elemento emita **antes** de navegar (que es implementable y es lo que hace que un
+agente pueda esperar la confirmacion). Mientras no se decida, el nivel 1 de cualquier
+pagina con enlaces queda sin poder afirmarse.
+
+**Severidad:** avisa. **Quien decide:** el dueno (es texto normativo). **Estado:** abierto.
+
+---
+
+### N-39 (nuevo, 2026-10-26) Seis acciones declaradas de la portada no confirman nunca, y un agente que las llama espera cinco segundos y se come un timeout
+
+**Que esta mal:** seis elementos de la portada declaran `data-nac-role="action"` y no
+emiten ningun evento de completitud. No son enlaces que navegan (ese es N-38): dos son
+anclas de fragmento, que dejan la pagina en su sitio, y cuatro son controles del chat con
+handler propio. Para los seis, `NAC.click(id)` se queda esperando y termina en
+`timeout`.
+
+**Evidencia medida (2026-10-26), `nac validate <portada> --drive`:**
+
+| id | que es |
+|---|---|
+| `nac_landing.limits.forge` | ancla a `#waitlist` |
+| `nac_landing.limits.governance` | ancla a `#governance` |
+| `chat.tts` | control del chat |
+| `chat.mic` | control del chat |
+| `chat.voice.always_on` | control del chat |
+| `chat.send` | control del chat |
+
+De los 39 actions declarados: 2 confirman, 31 son enlaces que navegan (N-38) y estos 6
+fallan de verdad.
+
+**Por que importa:** es la vidriera del protocolo. Un agente que hace exactamente lo que
+NAC3 le dice que haga -- leer el manifest y llamar `NAC.click` por id -- se cuelga cinco
+segundos por control y no recibe confirmacion de ninguno. Y a diferencia de N-38, estos
+seis **se pueden arreglar en la pagina**: la pagina sigue viva despues del click, asi que
+hay un despues en el que emitir.
+
+**Como se encontro:** es el primer hallazgo que no salio de leer. Salio de **manejar** la
+pagina: el modo `--drive` de N-18 hizo click en los 39 y conto quien contesto.
+
+**Donde vive el arreglo:** `index.html` -- `NAC.bindAction` en los seis, o un emit
+explicito en su handler. Mas un caso en `e2e/landing-limits-check.mjs` para los dos de la
+seccion de limites, que son ids que se agregaron en `c64fcf2`.
+
+**Severidad:** avisa (no rompe la pagina para una persona; la rompe para un agente, que es
+el publico del protocolo). **Quien decide:** nadie, es trabajo. **Estado:** abierto, no
+empezado -- queda fuera del alcance de las dos piezas de este tramo.
 
 ---
 
@@ -1465,6 +1734,27 @@ como espejo del comando del dueno. Es el mismo corolario de la seccion 8 del han
 comparacion que no puede fallar no es una verificacion, es una ceremonia. **Cuando se
 recorran las ocho casillas contra el servidor, los puntos 3 y 4 se dan por verdes con el
 gate, no con el grep.**
+
+**Estado al 2026-10-26, tras cerrarse N-18.** El **punto 8 pasa a "hecho y en cola"**, el
+mismo estado que ya tenian 3, 4, 6 y 7. El comando del pedido es `npx nac3 validate`, que
+baja el paquete de npm: el CLI ya hace lo que la casilla pide --
+`node runtime/dist/cli.js validate <url> --drive` reporta
+`nac3-conformance-level-N` con su identificador publicado y su cobertura -- y el
+**`npx` sigue trayendo el CLI viejo hasta que la 2.5.0 se publique**. Asi que la tabla
+sigue diciendo **uno de ocho** y sigue siendo correcto que lo diga: mide lo que un
+adoptante recibe, no lo que hay en el arbol.
+
+Lo que esto cambia de verdad: **las ocho casillas estan ahora en un solo estado --
+una verde, seis hechas y en cola detras del salto de version, y la quinta externa.**
+Ninguna espera trabajo nuestro.
+
+Y una advertencia medida al correr el validador nuevo contra la portada servida desde
+este repositorio: **la portada sirve hoy una copia congelada del runtime que es anterior
+al arreglo de N-33**, asi que su `validate_global` no ve sus propios manifests y reporta
+128 huerfanos falsos. El validador lo detecta por su firma (manifests registrados + ids
+en el DOM + cero ids declarados) y lo dice como **advertencia sobre el instrumento**, no
+como defecto de la pagina. Se destraba solo con el paso 2 del salto de version, que
+regenera `js/2.5.0/nac.js`.
 
 ---
 

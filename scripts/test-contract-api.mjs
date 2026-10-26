@@ -85,8 +85,17 @@ function sandbox() {
   /* The generator reads the bucket codes off a fixture that provokes every
      validate_global bucket, so the fixture is part of what it reads (N-14). */
   copyFileSync(join(ROOT, 'scripts', 'fixture-dom.mjs'), join(dir, 'scripts', 'fixture-dom.mjs'));
+  /* Section 8, the locale list and the conformance_tier vocabulary are
+     read by one shared module so the CLI validator and the published
+     contract cannot drift apart (audit N-18/N-29). The generator
+     imports it, so the sandbox needs it like it needs the fixture. */
+  copyFileSync(join(ROOT, 'scripts', 'spec-levels.mjs'), join(dir, 'scripts', 'spec-levels.mjs'));
   copyFileSync(join(ROOT, 'js', 'nac.js'), join(dir, 'js', 'nac.js'));
   copyFileSync(join(ROOT, 'SPEC.md'), join(dir, 'SPEC.md'));
+  /* The tier vocabulary is defined in RFC V24-04 section 6 and the
+     contract publishes it, so the RFC is part of what the generator
+     reads (audit N-29). */
+  copyFileSync(join(ROOT, 'docs', 'RFC_V24-04.md'), join(dir, 'docs', 'RFC_V24-04.md'));
   /* The witness record lives in this document and the gate compares it,
      so a sandbox without it would test a tree that cannot exist. */
   copyFileSync(join(ROOT, 'docs', 'CONTRACT_API_SIGNING.md'), join(dir, 'docs', 'CONTRACT_API_SIGNING.md'));

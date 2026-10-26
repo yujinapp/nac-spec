@@ -11,9 +11,18 @@
     "entry here, and an entry here for a code the runtime no longer emits. Level",
     "requirements are keyed by the sha384 of their text in SPEC.md section 8, so",
     "editing the sentence turns the gate red until someone re-reads the mapping.",
-    "A published conformance level that nobody re-read is how a guarantee rots."
+    "A published conformance level that nobody re-read is how a guarantee rots.",
+    "",
+    "Since 2.5.0 each level requirement also carries `decider`: the name of the",
+    "check the CLI validator runs for it, or null when no tool can decide it. The",
+    "name is reviewed against THAT sentence, and runtime/build.mjs refuses to emit a",
+    "CLI that does not implement a decider named here -- and refuses a requirement",
+    "marked machine_checkable with no decider at all. A validator that reports a",
+    "level it did not measure is worse than one that reports nothing.",
+    "",
+    "`conformance_tiers` holds the human meaning of NAC.conformance_tier, whose",
+    "values come from RFC V24-04 section 6. A tier is NOT a level (audit N-29)."
   ],
-
   "finding_codes": {
     "manifest_role_unknown": {
       "what": "A manifest element declares a data-nac-role that is not in the runtime's accepted role set.",
@@ -156,7 +165,6 @@
       "since": "2.5.0"
     }
   },
-
   "global_buckets": {
     "duplicates": {
       "severity": "error",
@@ -179,73 +187,113 @@
       "what": "Plugin slug uniqueness is broken: the same slug is mounted more than once without distinct instance ids. Reported in its own bucket so CI can gate on it separately."
     }
   },
-
   "level_requirements": {
     "sha384-j3EccnTJffrFyTGTBhktgDu5jcTnAu1msfFNT2wFDLyUsNksotJjbCzerlDLPTf8": {
       "machine_checkable": false,
       "check": "human",
       "falsified_by": [],
-      "note": "A tool cannot decide which widgets an agent SHOULD be able to operate. It can report unannotated interactive elements as candidates; whether each one belongs in the contract is the author's call. Any validator that reports this requirement as passed is overreaching."
+      "note": "A tool cannot decide which widgets an agent SHOULD be able to operate. It can report unannotated interactive elements as candidates; whether each one belongs in the contract is the author's call. Any validator that reports this requirement as passed is overreaching.",
+      "decider": null,
+      "requires_drive": false
     },
     "sha384-6IyP2dxizNAvAGFY8nPrMQ6+0eKeerkXDFGJEF/aaFAVUtVSMFzxjuefOJpoviVy": {
       "machine_checkable": true,
       "check": "behavioural",
       "falsified_by": [],
-      "note": "Decidable only by clicking every advertised action and waiting for its completion event. No finding code covers it: a validator must drive the page and report the ids that never completed."
+      "note": "Decidable only by clicking every advertised action and waiting for its completion event. No finding code covers it: a validator must drive the page and report the ids that never completed.",
+      "decider": "action_completion_events",
+      "requires_drive": true
     },
     "sha384-h4xO/CCA+qJNBu7Xp2vJEylobWm0k2De7YIdEQI1EjeLJ78yk85ROMDQZEc4odIx": {
       "machine_checkable": true,
       "check": "static",
-      "falsified_by": ["no_manifest"],
-      "note": "Decidable by asking the runtime for its registered manifests after the page settles."
+      "falsified_by": [
+        "no_manifest"
+      ],
+      "note": "Decidable by asking the runtime for its registered manifests after the page settles.",
+      "decider": "manifest_registered",
+      "requires_drive": false
     },
     "sha384-ndiKxR+qIPGNkI4eZwE158BPjbtXD+s1vZs1oZqSGl0mAaq/V/HpPHfC8Wb6d6SY": {
       "machine_checkable": true,
       "check": "behavioural",
-      "falsified_by": ["missing_in_dom", "plugin_not_mounted"],
-      "note": "Resolution can be checked statically; that the click actually lands needs the page driven."
+      "falsified_by": [
+        "missing_in_dom",
+        "plugin_not_mounted"
+      ],
+      "note": "Resolution can be checked statically; that the click actually lands needs the page driven.",
+      "decider": "click_resolves_and_lands",
+      "requires_drive": true
     },
     "sha384-qfF53+n/AsHuAeu0Lfbo/3PoKFd+rlJL/xf88CO4qLLQban9Hdk1yEU4NlmbA2NS": {
       "machine_checkable": true,
       "check": "static",
       "falsified_by": [],
-      "note": "Decidable by reading the registered manifest: the three arrays are present and non-empty, rather than inferred from the DOM. No finding code reports their absence today."
+      "note": "Decidable by reading the registered manifest: the three arrays are present and non-empty, rather than inferred from the DOM. No finding code reports their absence today. Read LITERALLY, as the validator must: the sentence names tabs[] / fields[] / actions[], which is the LEGACY manifest shape. Section 4 documents `elements: [{id, role}]` as the canonical one, and audit N-33 is the record of what reading only the legacy groups cost. A page written the documented way therefore fails this requirement as worded. The validator does not reinterpret the sentence -- that is what the hash-keyed review is for. Tracked as audit N-37.",
+      "decider": "manifest_declares_groups",
+      "requires_drive": false
     },
     "sha384-/SmujOyfyfbhHD/JB/DmJfkBS0w5F2RsJJZJ7uIH9d2ckfccP1kuFayhb/Ea/8te": {
       "machine_checkable": true,
       "check": "static",
       "falsified_by": [],
-      "note": "Decidable by comparing every label_i18n against the 10 required locales published in contract.json. Gap worth naming: no finding code reports incomplete locale coverage, so a page can miss this and no validator currently says so."
+      "note": "Decidable by comparing every label_i18n against the 10 required locales published in contract.json. Gap worth naming: no finding code reports incomplete locale coverage, so a page can miss this and no validator currently says so.",
+      "decider": "label_i18n_covers_locales",
+      "requires_drive": false
     },
     "sha384-aUm/oI5UhZdQCNrxIO1olGuEaU46HASMg1Aga2tWVV27PrGIc9/g2PmCd3ht2mOG": {
       "machine_checkable": false,
       "check": "human",
       "falsified_by": [],
-      "note": "A tool cannot distinguish a page that does not need the brownfield primitives from one that needed them and skipped them. Observing that they were called proves use, not conformance."
+      "note": "A tool cannot distinguish a page that does not need the brownfield primitives from one that needed them and skipped them. Observing that they were called proves use, not conformance.",
+      "decider": null,
+      "requires_drive": false
     },
     "sha384-34d0xK6T07qc7Z5B6CTrQCBBTKqSa1mR4kLsJVHhoiGWOSPLlzuqUYahKUnQS6d9": {
       "machine_checkable": true,
       "check": "static",
       "falsified_by": [],
-      "note": "Decided today by the counts in the error-severity buckets of validate_global, because those findings carry no codes yet. When the buckets get codes this becomes falsified_by a code list."
+      "note": "Decided today by the counts in the error-severity buckets of validate_global, because those findings carry no codes yet. When the buckets get codes this becomes falsified_by a code list.",
+      "decider": "validate_global_no_errors",
+      "requires_drive": false
     },
     "sha384-SCzRE3480NmJW1pwZDYGdd4BND5eO/hWImjUMV3YijdWwMNaYeFVX9/0af9SSHAF": {
       "machine_checkable": true,
       "check": "static",
       "falsified_by": [],
-      "note": "Decidable as the presence of a provenance block whose HMAC the runtime verifies. A validator without the tenant secret can confirm the block is present and verified by the page, not recompute it."
+      "note": "Decidable only in the NEGATIVE, and that is the whole of it. A manifest that carries no provenance block definitively does not satisfy this, so the validator can FAIL it. Whether a block that IS present is authentic cannot be decided: the validator has no tenant secret, and -- measured while building the validator for audit N-18 -- the runtime exposes no manifest verification at all. NAC.sign_provenance / NAC.verify_provenance operate on an event's detail.source, never on a manifest, so there is nothing on the page that can say 'I verified this'. Tracked as audit N-36. Until that exists, this requirement reports fail or unverified and never pass, which is why no tool can assert level 3 today.",
+      "decider": "manifest_hmac_block_present",
+      "requires_drive": false
     },
     "sha384-yb/vat4c8XyXR9Y5SaMjmKW+TniJJnyahGXkGkvkP/6Bobff090sDLbKTxbV4q+D": {
       "machine_checkable": false,
       "check": "human",
       "falsified_by": [],
-      "note": "Which verbs are security-sensitive is a product decision. A tool can report which actions refuse untrusted clicks; it cannot know which ones should."
+      "note": "Which verbs are security-sensitive is a product decision. A tool can report which actions refuse untrusted clicks; it cannot know which ones should.",
+      "decider": null,
+      "requires_drive": false
     },
     "sha384-LsrEiYGyTKFsR2QbpYaAkZLnHunuHKScq0LLlRHPIRSw/7mAkVCKAtE1Mp5vAzQz": {
       "machine_checkable": true,
       "check": "static",
       "falsified_by": [],
-      "note": "Same shape as the level 2 requirement above, with probing on and zero findings of any severity."
+      "note": "Same call as the level 2 requirement above with a stricter threshold: zero findings of ANY severity. Gap measured while building the validator for audit N-18: validate_global() takes NO arguments and never reads `probe`, although SPEC.md section 10.1 publishes the signature as validate_global(opts?: {probe?: boolean}). So passing {probe: true} is accepted and ignored, and this check is exactly the level 2 one with a stricter threshold rather than the deeper probing the sentence implies. Tracked as audit N-35.",
+      "decider": "validate_global_no_findings",
+      "requires_drive": false
+    }
+  },
+  "conformance_tiers": {
+    "NAC-3": {
+      "what": "The v2.3 baseline: the runtime implements the roles, verbs and completion events of the main spec and nothing of the V24-04 snapshot machinery. A mutating call that arrives carrying an expected_* parameter MUST be rejected with feature_not_supported; silently ignoring it is non-conformant, because an agent that believes its optimistic-concurrency guard was honoured is worse off than one that knows it was refused.",
+      "requires": "Reject every expected_* parameter with feature_not_supported."
+    },
+    "NAC-3-versioned": {
+      "what": "The baseline plus snapshot versioning: describe() returns plugin_version per plugin, tree_version at the top level and element_state_hash on every agent-relevant element; the runtime emits nac:plugin:invalidated, nac:tree:invalidated and the hydration completion event; and every mutating call honours expected_plugin_version, expected_tree_version and expected_element_state_hash. This is the tier the reference runtime declares.",
+      "requires": "Honour every expected_* parameter on every mutating call, and expose the three version tokens in describe()."
+    },
+    "NAC-3-strict": {
+      "what": "The versioned tier plus enforcement: STRICT_VERSIONING is on before any agent interaction and every mutating call that arrives WITHOUT at least one expected_* parameter is rejected. It differs from the versioned tier only in enforcement, not in features exposed -- which is what closed the silent-ignore hole where a versioned runtime received expected_element_state_hash and discarded it.",
+      "requires": "Set STRICT_VERSIONING = true and reject every mutating call that carries no expected_* parameter."
     }
   }
 }

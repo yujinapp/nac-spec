@@ -267,10 +267,15 @@ expectAll('DERIVED', 'type declaration headers', 'runtime/dist/nac-v2-extensions
 
 /* --- the root cause lock: the generator must not carry a version of
        its own. If it does, every artefact it writes can go stale again
-       exactly the way N-17 did. --- */
-(() => {
+       exactly the way N-17 did.
+
+       Since 2.5.0 the CLI is real source under runtime/src/ instead of
+       a template string inside the generator (audit N-18), so the lock
+       has to cover that source too -- otherwise the hard-coding simply
+       moves one directory over and the gate keeps reporting green
+       about a file nobody writes a version into any more. --- */
+for (const file of ['runtime/build.mjs', 'runtime/src/cli.mjs', 'runtime/src/cli-url.mjs']) (() => {
   const label = 'generator carries no hard-coded version';
-  const file = 'runtime/build.mjs';
   const src = read(file);
   /* What counts as a package version hard-coded into the generator:
      anything carrying a prerelease tail (2.3.0-alpha.2 -- unambiguously

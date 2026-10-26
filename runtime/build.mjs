@@ -19,6 +19,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
+/* ONE reader of SPEC.md section 8, shared with the contract generator.
+   A second copy would let the validator certify pages against a spec
+   nobody is reading. */
+import { extractLevels, extractLocales } from '../scripts/spec-levels.mjs';
+/* The decider table, imported from the SOURCE the CLI is stamped from,
+   so the build compares against what will actually ship instead of
+   against a list repeated here. */
+import { IMPLEMENTED_DECIDERS } from './src/cli-url.mjs';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const SRC_DIR  = path.resolve(__dirname, '..', 'js');
@@ -49,6 +57,21 @@ if (!fs.existsSync(NAC_SRC_PATH)) {
   process.exit(1);
 }
 const NAC_SRC = fs.readFileSync(NAC_SRC_PATH, 'utf8');
+
+/* SPEC.md section 8 and the reviewed sidecar: the validator's level
+   definitions come from the same two inputs as the published contract,
+   through the same module. See buildCliLevels below. */
+const SPEC_SRC_PATH = path.resolve(__dirname, '..', 'SPEC.md');
+const META_SRC_PATH = path.resolve(__dirname, '..', 'scripts', 'contract-api.meta.json');
+for (const p of [SPEC_SRC_PATH, META_SRC_PATH]) {
+  if (!fs.existsSync(p)) {
+    console.error('build: cannot find ' + p);
+    console.error('build: refusing to emit a validator with no definition of a conformance level.');
+    process.exit(1);
+  }
+}
+const SPEC_SRC = fs.readFileSync(SPEC_SRC_PATH, 'utf8');
+const META = JSON.parse(fs.readFileSync(META_SRC_PATH, 'utf8'));
 
 function readConstant(label, rx) {
   const m = NAC_SRC.match(rx);
@@ -417,79 +440,155 @@ export const NacChat: NacChatClient;
 `;
 }
 
-function buildCli() {
-  return `#!/usr/bin/env node
-// NAC CLI v${VERSION}
-// Usage:
-//   nac validate <url-or-dir> [--severity=error|warn|info]
-//   nac --version
-//
-// Modes:
-//   - URL: spawn headless Chromium, load URL, run NAC.validate_global(),
-//     report findings.
-//   - Directory: static lint of HTML/PHP files for data-nac-id /
-//     data-nac-role coherence.
+/* ---- the CLI, stamped from runtime/src ------------------------------
+   The CLI used to be a template literal in this file. It stopped being
+   one when it grew a URL mode and a conformance-level report (audit
+   N-18, second half): a 400-line program living inside a template
+   string is a program nobody reviews, nobody lints, and nobody can
+   read a stack trace against.
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { staticLint } from './cli-lint.mjs';
+   So it lives in runtime/src/*.mjs as real source, and this function
+   does one thing: substitute the version placeholders from the
+   authoritative constant in js/nac.js. "The version is read, never
+   written" still holds -- and the placeholders are what makes it hold
+   in a file that is no longer generated line by line. */
 
-const args = process.argv.slice(2);
-const cmd = args[0];
+const CLI_SRC_DIR = path.resolve(__dirname, 'src');
 
-function showHelp() {
-  console.log('NAC CLI v${VERSION}');
-  console.log('');
-  console.log('Usage:');
-  console.log('  nac validate <url-or-dir> [--severity=error|warn|info]');
-  console.log('  nac --version');
-  console.log('  nac --help');
+function stampCliSource(fileName) {
+  const srcPath = path.join(CLI_SRC_DIR, fileName);
+  if (!fs.existsSync(srcPath)) {
+    console.error('build: cannot find the CLI source at ' + srcPath);
+    console.error('build: refusing to emit a CLI that is not the one in src/.');
+    process.exit(1);
+  }
+  let code = read(srcPath);
+  const before = code;
+  code = code.split('__NAC_CLI_VERSION__').join(VERSION)
+             .split('__NAC_SPEC_VERSION__').join(SPEC_VERSION);
+  /* cli.mjs carries the banner the coherence gate reads. If the
+     placeholder ever disappears from it, the gate would start reading
+     a literal somebody typed -- which is the N-17 root cause coming
+     back through a new door. */
+  if (fileName === 'cli.mjs' && code === before) {
+    console.error('build: runtime/src/cli.mjs no longer contains a version placeholder.');
+    console.error('build: refusing to emit a CLI whose banner cannot be stamped (audit N-17/N-18).');
+    process.exit(1);
+  }
+  return code;
 }
 
-function showVersion() {
-  console.log('@nac3/runtime CLI ${VERSION} (Native Agent Contract v${SPEC_VERSION})');
+/* The roles whose click the runtime can OBSERVE, read off the runtime's
+   own completion-event map rather than listed here. --drive-roles=all
+   needs this list, and a hand-typed copy would drift the moment a role
+   gained or lost a completion event -- which is how v1.6.3 and v1.6.6
+   went wrong in the other direction. */
+function extractClickObservableRoles() {
+  const m = NAC_SRC.match(/const\s+_CLICK_EVENT_FAMILY\s*=\s*\{([\s\S]*?)\n\s*\};/);
+  if (!m) {
+    console.error('build: cannot find _CLICK_EVENT_FAMILY in js/nac.js.');
+    console.error('build: refusing to emit a validator that would guess which roles it can drive.');
+    process.exit(1);
+  }
+  const out = {};
+  const rx = /'([a-z][a-z0-9-]*)'\s*:\s*\[([^\]]*)\]/g;
+  let e;
+  while ((e = rx.exec(m[1]))) {
+    const events = [];
+    const erx = /'([^']+)'/g;
+    let ev;
+    while ((ev = erx.exec(e[2]))) events.push(ev[1]);
+    out[e[1]] = events;
+  }
+  if (Object.keys(out).length < 8) {
+    console.error('build: _CLICK_EVENT_FAMILY yielded only ' + Object.keys(out).length + ' role(s).');
+    console.error('build: refusing to emit a validator with a truncated drive map.');
+    process.exit(1);
+  }
+  return out;
 }
 
-if (!cmd || cmd === '--help' || cmd === '-h') { showHelp(); process.exit(0); }
-if (cmd === '--version' || cmd === '-v')      { showVersion(); process.exit(0); }
+/* ---- the level definitions the validator reports against -----------
+   Generated from SPEC.md section 8 through scripts/spec-levels.mjs --
+   the SAME module that produces api/v/<version>/levels.json. The CLI
+   never carries its own copy of section 8: a validator reporting
+   levels against a private copy of the spec would certify pages
+   against a document nobody is reading.
 
-if (cmd === 'validate') {
-  const target = args[1];
-  if (!target) {
-    console.error('error: validate requires a URL or directory argument');
-    process.exit(2);
+   Producer/consumer symmetry, both directions, enforced here:
+     - a requirement published as machine_checkable whose decider this
+       CLI does not implement would be a level the contract says a tool
+       can decide and this tool silently skips;
+     - a decider implemented here and named by no requirement is dead
+       code pretending to be a check.
+   Either one is refused. */
+function buildCliLevels(implementedDeciders) {
+  const levels = extractLevels(SPEC_SRC);
+  const named = [];
+
+  const out = {
+    generated_by: 'runtime/build.mjs from SPEC.md section 8 via scripts/spec-levels.mjs',
+    note: 'Build input for the CLI validator. The published, signed copy of the same facts is api/v/<version>/levels.json.',
+    version: VERSION,
+    spec_version: SPEC_VERSION,
+    locales_required: extractLocales(SPEC_SRC),
+    click_observable_roles: extractClickObservableRoles(),
+    reporting: {
+      note: 'A level may be reported only when every machine_checkable requirement of that level and of every lower level passes. Requirements that no tool can decide are reported unverified, never assumed. A report that cites a level must also state how many of its requirements were decided.',
+    },
+    levels: levels.map((lv) => ({
+      id: lv.id,
+      level: lv.level,
+      display_name: lv.display_name,
+      legacy_display_name: lv.legacy_display_name,
+      cumulative: lv.cumulative,
+      requirements: lv.requirements.map((r) => {
+        const meta = META.level_requirements[r.text_sha384];
+        if (!meta) {
+          console.error('build: SPEC.md section 8 requirement "' + r.text.slice(0, 60) + '..." has no');
+          console.error('build: reviewed mapping in scripts/contract-api.meta.json (key ' + r.text_sha384 + ').');
+          console.error('build: refusing to emit a validator that would judge a sentence nobody re-read.');
+          process.exit(1);
+        }
+        if (meta.machine_checkable && !meta.decider) {
+          console.error('build: requirement ' + r.id + ' is marked machine_checkable and names no decider.');
+          process.exit(1);
+        }
+        if (meta.decider) {
+          named.push(meta.decider);
+          if (implementedDeciders.indexOf(meta.decider) < 0) {
+            console.error('build: requirement ' + r.id + ' names the decider "' + meta.decider + '"');
+            console.error('build: and runtime/src/cli-url.mjs implements: ' + implementedDeciders.join(', '));
+            console.error('build: refusing to emit a validator that would skip a requirement the');
+            console.error('build: contract says a tool can decide.');
+            process.exit(1);
+          }
+        }
+        return {
+          id: r.id,
+          text: r.text,
+          text_sha384: r.text_sha384,
+          machine_checkable: !!meta.machine_checkable,
+          check: meta.check,
+          decider: meta.decider || null,
+          requires_drive: !!meta.requires_drive,
+          falsified_by: meta.falsified_by || [],
+          note: meta.note || null,
+        };
+      }),
+    })),
+  };
+
+  for (const d of implementedDeciders) {
+    if (named.indexOf(d) < 0) {
+      console.error('build: runtime/src/cli-url.mjs implements a decider "' + d + '" that no');
+      console.error('build: requirement in SPEC.md section 8 names. Dead code in a validator reads');
+      console.error('build: as a check that happens, so it is refused.');
+      process.exit(1);
+    }
   }
-  const sevArg = args.find(a => a.startsWith('--severity='));
-  const minSev = sevArg ? sevArg.split('=')[1] : 'error';
 
-  const isUrl = /^https?:\\/\\//.test(target);
-  if (isUrl) {
-    console.error('error: URL validation requires Playwright. Run:');
-    console.error('  npm install --save-dev @playwright/test');
-    console.error('  npx playwright install chromium');
-    console.error('then re-run. Static lint of a directory works without Playwright.');
-    process.exit(2);
-  }
-
-  const dir = path.resolve(target);
-  if (!fs.existsSync(dir)) { console.error('error: not found:', dir); process.exit(2); }
-  const findings = staticLint(dir);
-  const sevRank = { info: 0, warn: 1, error: 2 };
-  const min = sevRank[minSev] ?? 2;
-  const failing = findings.filter(f => (sevRank[f.severity] ?? 2) >= min);
-  for (const f of findings) {
-    const tag = '[' + f.severity.toUpperCase() + ']';
-    console.log(tag, f.code, '--', f.message, f.file ? '(' + f.file + ')' : '');
-  }
-  console.log('');
-  console.log('Total findings:', findings.length, '|', 'Failing at severity >=', minSev + ':', failing.length);
-  process.exit(failing.length > 0 ? 1 : 0);
-}
-
-console.error('error: unknown command:', cmd);
-showHelp();
-process.exit(2);
-`;
+  return JSON.stringify(out, null, 2) + '\n';
 }
 
 function buildCliLint() {
@@ -661,11 +760,17 @@ function main() {
     write(path.join(DIST_DIR, e.name + '.d.ts'),        buildDts(e.name));
     console.log('built:', e.name);
   }
-  write(path.join(DIST_DIR, 'cli.js'),       buildCli());
+  /* The levels go FIRST: it is the step that can refuse, and emitting
+     a CLI before knowing whether its decider table matches the
+     contract would leave a validator on disk that the build then
+     declared invalid. */
+  write(path.join(DIST_DIR, 'cli-levels.json'), buildCliLevels(IMPLEMENTED_DECIDERS));
+  write(path.join(DIST_DIR, 'cli.js'),       stampCliSource('cli.mjs'));
+  write(path.join(DIST_DIR, 'cli-url.mjs'),  stampCliSource('cli-url.mjs'));
   write(path.join(DIST_DIR, 'cli-lint.mjs'), buildCliLint());
   // Make CLI executable on POSIX.
   try { fs.chmodSync(path.join(DIST_DIR, 'cli.js'), 0o755); } catch (_) {}
-  console.log('built: cli.js + cli-lint.mjs');
+  console.log('built: cli.js + cli-url.mjs + cli-lint.mjs + cli-levels.json');
 
   // Copy SPEC.md + LICENSE for npm publish (files: dist/ + tracked).
   const specSrc = path.resolve(__dirname, '..', 'SPEC.md');

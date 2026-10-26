@@ -1,13 +1,110 @@
 # Handoff -- continuar sesion
 
-**Actualizado:** 2026-10-26 (cierre de sesion por actualizacion de Forge)
-**Motivo del corte:** el dueno cierra el panel para actualizar la version de Forge.
+**Actualizado:** 2026-10-26, tercera sesion del dia.
+**Donde quedo:** las dos piezas que faltaban antes del salto de version estan hechas
+(N-18 segunda mitad y el vocabulario de N-29). Lo siguiente es el paso 4.3, el salto de
+version, y su paso 4 es del dueno: la firma offline.
 **Palabra de reanudacion:** cuando el dueno diga **"Continua"**, se ejecuta la seccion 4
 de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
 
 ---
 
-## 0. ULTIMO ESTADO -- 2026-10-26, segunda sesion del dia (MANDA SOBRE LO DE ABAJO)
+## 0. ULTIMO ESTADO -- 2026-10-26, TERCERA sesion del dia (MANDA SOBRE TODO LO DE ABAJO)
+
+Lo de la seccion 0-bis y de las secciones 1 a 8 sigue siendo cierto salvo donde esta
+seccion diga otra cosa.
+
+### Lo que el dueno decidio en esta sesion
+
+Textual: **"Terminemos las piezas."** Es decir: NO publicar la 2.5.0 con el punto 8 en
+rojo, sino cerrar primero N-18 y N-29 y despues saltar la version. Eso se hizo.
+
+### Las dos piezas que faltaban: HECHAS
+
+**N-18, segunda mitad -- CERRADO.** `nac validate <url>` carga la pagina en un Chromium
+real y **reporta un nivel de conformidad** contra los identificadores de `levels.json`.
+Playwright es opcional y se resuelve en tiempo de llamada (no entra como dependencia del
+paquete; si falta, salida 3 con las dos lineas que lo instalan). `--drive` clickea los
+controles anunciados, que es lo que decide los dos requisitos conductuales del nivel 1, y
+esta apagado por default porque clickear la pagina de produccion de alguien no es una
+operacion de lectura. Todo nivel que reporta viene con su cobertura ("asserted on N of M
+requirements") y con la frase de que es una medicion y no un certificado. El modo
+directorio ahora **dice en voz alta** que no puede decidir un nivel, en vez de imprimir
+un conteo de hallazgos que un lector podia tomar por uno.
+
+Las definiciones de nivel NO estan en el CLI: se generan de `SPEC.md` seccion 8 por
+`scripts/spec-levels.mjs`, **el mismo modulo** que genera `api/v/<version>/levels.json`.
+Cada requisito publica el `decider` que lo juzga, y el build se niega a emitir un CLI
+cuya tabla de decididores no coincida con el contrato en ninguna de las dos direcciones.
+
+**N-29 -- la mitad que no necesitaba decision: HECHA.** `contract.json` publica el
+vocabulario entero de `conformance_tier` (los tres valores, que exige cada uno, cual
+declara este runtime, donde estan definidos) y la frase que separa tier de nivel. Los
+valores se extraen de la seccion 6 del RFC, nunca se escriben a mano, y el generador
+refuta cualquier desacuerdo entre el RFC, el sidecar y lo que el runtime declara.
+**Lo unico que queda abierto de N-29 es la decision de renombrar `NAC-3-versioned`.**
+
+### Donde quedo el bloque de verificacion del dueno
+
+**Las ocho casillas estan ahora en un solo estado: una verde, seis hechas y en cola
+detras del salto de version, y la quinta externa. Ninguna espera trabajo nuestro.** El
+punto 8 se suma a esa cola: el CLI ya hace lo que pide, y `npx nac3 validate` seguira
+bajando el CLI viejo hasta que la 2.5.0 se publique. La tabla sigue diciendo uno de ocho
+y es correcto que lo diga -- mide lo que un adoptante recibe.
+
+### Cinco hallazgos nuevos, y ninguno salio de leer
+
+Todos salieron de **construir** el validador, y tres de ellos de **manejar** una pagina
+con el:
+
+- **N-35** (`PND-044`): `validate_global(opts?: {probe?: boolean})` es normativo en 10.1 y
+  el runtime no lee `probe` nunca. Los requisitos de nivel 2 y 3 quedan distinguidos solo
+  por el umbral de severidad. **Decision del dueno:** cablear o retirar.
+- **N-36** (`PND-045`): el nivel 3 pide manifests firmados con HMAC y el runtime **no sabe
+  firmar ni verificar un manifest** -- `sign_provenance` / `verify_provenance` son de
+  eventos. **Ninguna herramienta puede afirmar el nivel 3 hoy.** Decision del dueno.
+- **N-37** (`PND-046`): el nivel 2 exige `tabs[]/fields[]/actions[]`, la forma que la
+  seccion 4 llama heredada. Una pagina escrita como el documento manda no alcanza el
+  nivel 2 -- la portada del protocolo incluida. Decision del dueno (texto normativo).
+- **N-38** (`PND-047`): el nivel 1 pide un evento que un enlace no puede emitir despues de
+  su propio unload. 31 de los 39 actions de la portada son enlaces. Decision del dueno.
+- **N-39** (`PND-048`): seis acciones declaradas de la portada **no confirman nunca** y un
+  agente que las llama se come un timeout de cinco segundos cada vez. No es decision, es
+  trabajo, y no esta empezado: queda fuera del alcance de estas dos piezas.
+
+### Lo que falta para publicar, en orden
+
+1. **El salto de version, paso 4.3 tal cual esta escrito abajo.** Ya no lo precede nada.
+2. **El paso 4 de 4.3 es del dueno: la firma offline en su maquina.** Sin eso el CI se
+   niega a publicar.
+
+**Lo unico que sigue esperando al dueno ademas de su firma:** **D-03 (idiomas)**, que
+traba la pasada de traducciones + N-28 + N-32, y ahora **la decision de N-29** (renombrar
+o no `NAC-3-versioned`), que conviene resolver ANTES del salto porque mover un valor de
+cable despues cuesta otra version. Las cuatro decisiones de N-35 a N-38 no traban el
+release.
+
+### Estado de los gates al cierre de esta sesion
+
+version coherence **18/18 verde** (eran 16; el candado de N-17 ahora cubre
+`runtime/src/cli.mjs` y `cli-url.mjs`); contract **36/36**; contract-http **8/8**;
+integrity-gate **16/16**; integrity load **verde**; validate-global **33/33**; limits
+**verde**; suite del runtime (14 stages) **verde**; **cli-levels 29/29 (nuevo)**.
+Integridad y contrato **siguen en rojo por el unico motivo documentado**: falta el salto
+de version.
+
+**El candado nuevo se probo en rojo contra el CLI anterior: 29 de 34 casos caen, y los 5
+que quedan verdes son los del grupo BUILD, que prueban el build y no el binario.** Ese
+rojo delato dos defectos del propio candado, los dos arreglados: se **estrellaba** en la
+primera llamada en vez de fallar un caso -- el mismo defecto de los dos candados
+anteriores -- y dos casos daban verde **sobre una lista vacia de veredictos**, es decir
+justo sobre la regresion que existen para atrapar. Ademas se probo por separado que el
+gate de simetria de decididores es lo que refuta la rotura: con el gate, salida 1; sin
+el, la misma rotura pasa con salida 0.
+
+---
+
+## 0-bis. ESTADO DE LA SEGUNDA SESION DEL 2026-10-26 (historico)
 
 Lo de las secciones 1 a 8 sigue siendo cierto salvo donde esta seccion diga otra cosa.
 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NAC3 conformance fixture -- level 2</title>
+</head>
+<body>
+<!--
+  A deliberately conformant page, used by scripts/test-cli-levels.mjs to
+  prove the CLI validator can REPORT a level and not only refuse one
+  (audit N-18, second half).
+
+  A gate that only ever watches the validator say "none asserted" is not
+  testing the validator, it is testing that nothing passes. So this page
+  is built to satisfy every machine-checkable requirement of levels 1
+  and 2 as those sentences are LITERALLY written -- including the
+  legacy tabs[] / fields[] / actions[] arrays of L2-f6a7aa72, which is
+  the requirement a page written the documented elements[] way fails
+  (audit N-37).
+
+  It cannot reach level 3 and that is the point: L3-cc540e31 asks for an
+  HMAC-signed manifest and no tool can confirm one is authentic, so the
+  highest level any validator can assert today is 2 (audit N-36).
+
+  Every action here is a scripted button, never a link: a plain link
+  cannot emit a completion event after its own unload (audit N-38).
+-->
+<div data-nac-plugin="fixture">
+  <section data-nac-id="fixture.region.main" data-nac-role="region">
+    <button data-nac-id="fixture.action.save" data-nac-role="action" data-nac-action="save">Save</button>
+    <button data-nac-id="fixture.action.cancel" data-nac-role="action" data-nac-action="cancel">Cancel</button>
+    <input data-nac-id="fixture.field.name" data-nac-role="field" aria-label="Name">
+    <button data-nac-id="fixture.tab.one" data-nac-role="tab" data-nac-tab="one">One</button>
+  </section>
+</div>
+
+<script src="/js/nac.js"></script>
+<script>
+(function () {
+  function li(v) {
+    return { es: v, en: v, pt: v, fr: v, it: v, de: v, ja: v, zh: v, hi: v, ar: v };
+  }
+
+  NAC.register({
+    plugin_slug: 'fixture',
+    version: '1.0.0',
+    nac_version: '2.5',
+    /* The canonical shape. */
+    elements: [
+      { id: 'fixture.region.main', role: 'region', label_i18n: li('Main') },
+      { id: 'fixture.action.save', role: 'action', label_i18n: li('Save'),
+        actions: [{ verb: 'save', label_i18n: li('Save') }] },
+      { id: 'fixture.action.cancel', role: 'action', label_i18n: li('Cancel'),
+        actions: [{ verb: 'cancel', label_i18n: li('Cancel') }] },
+      { id: 'fixture.field.name', role: 'field', label_i18n: li('Name') },
+      { id: 'fixture.tab.one', role: 'tab', label_i18n: li('One') }
+    ],
+    /* The legacy groups, declared on purpose: L2-f6a7aa72 names these
+       three arrays by name. Same ids as above, so the manifest declares
+       one surface in two shapes rather than two surfaces. */
+    tabs:    [{ id: 'fixture.tab.one', role: 'tab', label_i18n: li('One') }],
+    fields:  [{ id: 'fixture.field.name', role: 'field', label_i18n: li('Name') }],
+    actions: [
+      { id: 'fixture.action.save', role: 'action', label_i18n: li('Save') },
+      { id: 'fixture.action.cancel', role: 'action', label_i18n: li('Cancel') }
+    ]
+  });
+
+  /* Every role="action" element fires nac:action:succeeded after its
+     side effect -- which is what L1-fc278d09 asks for, and what the
+     drive mode of the validator measures. */
+  ['save', 'cancel'].forEach(function (verb) {
+    var id = 'fixture.action.' + verb;
+    NAC.bindAction(
+      document.querySelector('[data-nac-id="' + id + '"]'),
+      function () { document.title = 'did ' + verb; },
+      { plugin: 'fixture', action_id: id });
+  });
+
+  /* The tab needs a completion event of its own family
+     (nac:tab:activated) for a driven run with --drive-roles=all. */
+  NAC.bindTab(
+    document.querySelector('[data-nac-id="fixture.tab.one"]'),
+    function () { document.title = 'tab one'; },
+    { plugin: 'fixture', tab_id: 'fixture.tab.one' });
+
+  window.__fixtureReady = true;
+})();
+</script>
+</body>
+</html>

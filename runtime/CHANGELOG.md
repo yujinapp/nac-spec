@@ -25,6 +25,58 @@ the heading takes its date then.
 
 ### Added
 
+- **`nac validate <url>` loads the page and REPORTS A CONFORMANCE
+  LEVEL** (audit N-18, second half). Until now URL mode aborted with
+  exit 2 and a message about Playwright, and no mode of the CLI ever
+  printed a level -- while SPEC section 8 said, in those words, that
+  this command "reports the highest level a page reaches".
+
+  The validator loads the page in a real browser, waits for the manifest
+  registry to stop moving rather than for a fixed sleep, and reports
+  against the identifiers published in `levels.json`. It follows the
+  published rule: a level is asserted only when every machine-checkable
+  requirement of that level and of every lower level passes, and
+  anything no tool can decide is reported `unverified` -- never assumed.
+  Three verdicts, and the difference between the last two is the point:
+  `pass` measured and it holds, `fail` measured and it does not,
+  `unverified` **not measured**.
+
+  Every level it reports carries its coverage -- "asserted on N of M
+  requirements" -- and the words *this is a measurement, not a
+  certification*. Directory mode now says out loud that it cannot decide
+  a level, instead of printing a finding count a reader could mistake
+  for one.
+
+  - `--drive` clicks the advertised controls, which is what decides the
+    two behavioural requirements of level 1. Off by default: clicking
+    every control on somebody's production page is not a read-only
+    operation.
+  - `--json` emits the whole report. `--timeout`, `--drive-roles`,
+    `--drive-limit` for the rest.
+  - **Playwright is optional and is NOT a dependency of this package.**
+    It is resolved at call time; when it is missing the CLI exits 3 and
+    prints the two commands that install it. A runtime that pulled a
+    browser into every adopter's `node_modules` to offer a tool most of
+    them never run would be charging everyone for nobody.
+
+  The level definitions are NOT in the CLI. They are generated from
+  SPEC section 8 through the same module that produces
+  `api/v/<version>/levels.json`, and each requirement publishes the name
+  of the `decider` that judges it. The build refuses to emit a CLI whose
+  decider table disagrees with the contract in either direction.
+
+- **The contract publishes the `conformance_tier` vocabulary**
+  (audit N-29). `contract.json` used to publish the field as
+  `type: "string"` and not its values, so a machine could see the field
+  and had no way to learn that `NAC-3-versioned` is not a level name.
+  It now publishes the three values with what each one requires, which
+  one this runtime declares, where they are defined, and the sentence
+  that separates the two taxonomies: a **tier** describes what the
+  runtime implements (RFC V24-04 section 6); a **level** describes what
+  the page declares and does (SPEC section 8). The values are extracted
+  from the RFC, never typed, and the build refuses any disagreement
+  between the RFC, the sidecar and the value the runtime declares.
+
 - **Every `validate_global()` bucket carries `code` + `severity`**
   (audit N-14, SPEC sec 10.1 + 12 promise 4). New codes:
   `nac_id_duplicate_across_plugins` (error),

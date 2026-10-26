@@ -32,6 +32,25 @@ function redOk(name, cond, detail) {
   console.log('FAIL(red) ' + name + (detail ? ' -- ' + detail : ''));
 }
 
+/*
+ * Plants a defect and hands back the report, or hands back the reason it could
+ * not. Two worlds have to end cleanly here:
+ *   - on HEAD, a mutation anchor that rotted must come out as a NAMED failure,
+ *     because a silently skipped red case is a lock that stopped locking;
+ *   - at a base ref that predates the fix the anchors do not exist at all, and
+ *     this suite is run there on purpose to prove it goes red. A crash in the
+ *     middle would hide every case after it, so the reason is reported and the
+ *     run continues.
+ */
+function planted(mutate) {
+  try {
+    return { result: loadRuntimeInFixtureDom({ mutate }).result };
+  } catch (e) {
+    return { unavailable: String((e && e.message) || e) };
+  }
+}
+
+
 /* ------------------------------------------------------------------ GREEN */
 
 const { result } = loadRuntimeInFixtureDom();
@@ -88,11 +107,13 @@ ok('each bucket uses its own code, never another condition\'s',
 
 /* 1. The N-33 defect itself: the collector stops reading elements[]. */
 {
-  const broken = loadRuntimeInFixtureDom({
-    mutate: (src) => src.replace(
-      "    const elems = (m && m.elements) || [];",
-      "    const elems = [];"),
-  }).result;
+  const run = planted((src) => src.replace(
+    "    const elems = (m && m.elements) || [];",
+    "    const elems = [];"));
+  const broken = run.result || {};
+  if (run.unavailable) {
+    redOk('the N-33 defect could not be planted', false, run.unavailable);
+  }
   /* 5 ids down to 1: only the legacy-shaped manifest survives, which is
      exactly the asymmetry N-33 was -- the documented shape invisible, the
      legacy one fine. */
@@ -100,9 +121,9 @@ ok('each bucket uses its own code, never another condition\'s',
     broken.total_ids === 1 && result.total_ids === 5,
     'total_ids = ' + broken.total_ids + ' (whole runtime: ' + result.total_ids + ')');
   redOk('a collector blind to elements[] is refused: declared ids turn into orphans',
-    broken.orphans.some((i) => i.nac_id === 'alpha.ok'));
+    (broken.orphans || []).some((i) => i.nac_id === 'alpha.ok'));
   redOk('a collector blind to elements[] is refused: duplicates can no longer fire',
-    broken.duplicates.length === 0 && broken.has_errors === false);
+    (broken.duplicates || []).length === 0 && broken.has_errors === false);
 }
 
 /* 2. A bucket losing its code -- the N-14 state, one bucket at a time. */
@@ -112,24 +133,25 @@ for (const [code, bucket] of [
   ['nac_id_declared_not_mounted', 'unmounted'],
   ['nac_id_missing_plugin_prefix', 'convention_violations'],
 ]) {
-  const broken = loadRuntimeInFixtureDom({
-    mutate: (src) => src.replace("code:     '" + code + "',", ''),
-  }).result;
+  const run = planted((src) => src.replace("code:     '" + code + "',", ''));
+  const broken = run.result || {};
   redOk('an uncoded ' + bucket + ' item is refused',
-    broken[bucket].length > 0 && broken[bucket].every((i) => !i.code),
-    JSON.stringify(broken[bucket].map((i) => i.code)));
+    !run.unavailable
+      && (broken[bucket] || []).length > 0
+      && broken[bucket].every((i) => !i.code),
+    run.unavailable || JSON.stringify((broken[bucket] || []).map((i) => i.code)));
 }
 
 /* 3. A code reused for a different condition -- promise 4 of section 12. */
 {
-  const broken = loadRuntimeInFixtureDom({
-    mutate: (src) => src.replace(
-      "code:     'nac_id_orphan_in_dom',",
-      "code:     'nac_id_duplicate_across_plugins',"),
-  }).result;
-  const codes = FIXTURE_BUCKETS.map((b) => broken[b][0].code);
+  const run = planted((src) => src.replace(
+    "code:     'nac_id_orphan_in_dom',",
+    "code:     'nac_id_duplicate_across_plugins',"));
+  const broken = run.result || {};
+  const codes = FIXTURE_BUCKETS.map((b) => ((broken[b] || [])[0] || {}).code || null);
   redOk('a code reused by two buckets is refused',
-    new Set(codes).size < FIXTURE_BUCKETS.length, codes.join(', '));
+    !run.unavailable && new Set(codes).size < FIXTURE_BUCKETS.length,
+    run.unavailable || codes.join(', '));
 }
 
 /* 4. The mutation harness itself must fail loudly on a stale pattern. */

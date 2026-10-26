@@ -1,7 +1,7 @@
 {
- "measured_at": "2026-10-26T12:00:19.878Z",
- "measured_at_commit": "057eb7c",
- "tree": "dirty",
+ "measured_at": "2026-10-26T12:10:31.599Z",
+ "measured_at_commit": "1e07550",
+ "tree": "clean",
  "base": "http://localhost:8855",
  "summary": {
   "pages": 51,

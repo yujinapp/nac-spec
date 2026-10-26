@@ -123,9 +123,9 @@ section{padding-block:clamp(2.4rem,6vw,4rem)}
 
 pre{background:var(--ink);color:#E4DFD3;border-radius:var(--rlg);padding:1.1rem 1.25rem;overflow-x:auto;font-family:var(--font-mono);font-size:.8rem;line-height:1.65;margin:1rem 0}
 pre code{background:none;color:inherit;padding:0;font-size:inherit}
-.cm{color:#8F8878}
-.st{color:#C8A04D}
-.kw{color:#D98B6A}
+.comment{color:#8F8878}
+.string{color:#C8A04D}
+.keyword{color:#D98B6A}
 
 .tw{overflow-x:auto;border:.5px solid var(--cbs);border-radius:var(--rlg);background:var(--cs);margin:1.1rem 0}
 table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:640px}
@@ -150,12 +150,29 @@ footer.site{border-top:.5px solid var(--cbs);margin-top:2.5rem;padding-block:2re
 .small{font-size:.8rem;color:var(--ct3)}
 ul.plain{font-size:.86rem;color:var(--ct2);padding-left:1.15rem;margin:.4rem 0 0}
 ul.plain li{margin-bottom:.35rem}
+
+/* chat panel, header buttons, autopilot highlight */
+.hdr-btn{font-family:var(--font-mono);font-size:.74rem;color:var(--ct2);background:var(--cs);border:.5px solid var(--cbs);border-radius:6px;padding:.22rem .55rem;cursor:pointer}
+.hdr-btn:hover{border-color:var(--ca);color:var(--ci)}
+.hdr-btn[aria-pressed="true"]{background:var(--ci50);color:var(--ci);border-color:var(--ci100)}
+[data-autopilot="active"]{outline:2px solid var(--ca400);outline-offset:6px;border-radius:var(--rlg);transition:outline-color .3s}
+.chat{position:fixed;top:0;right:0;width:var(--chat-w,340px);max-width:92vw;height:100vh;background:var(--cs);border-left:.5px solid var(--cbs);box-shadow:-4px 0 24px rgba(26,24,21,.08);display:flex;flex-direction:column;z-index:60;transform:translateX(100%);transition:transform .22s ease}
+body[data-chat-open="1"] .chat{transform:translateX(0)}
+@media(min-width:1100px){body[data-chat-open="1"]{padding-right:var(--chat-w,340px)}}
+.chat-head{display:flex;align-items:center;gap:.5rem;padding:.7rem .9rem;border-bottom:.5px solid var(--cbs)}
+.chat-head .brand{font-family:var(--font-jp);font-weight:300;color:var(--ct2);font-size:.9rem;margin-right:auto}
+.chat-head select,.chat-head button,.chat-tools button,.chat-input-row button{font-family:var(--font-mono);font-size:.72rem;color:var(--ct2);background:var(--cp);border:.5px solid var(--cbs);border-radius:6px;padding:.2rem .45rem;cursor:pointer}
+.chat-log{flex:1;overflow-y:auto;padding:.9rem;font-size:.86rem;line-height:1.5;color:var(--ct2)}
+.chat-tools{display:flex;gap:.4rem;padding:0 .9rem .5rem}
+.chat-input-row{display:flex;gap:.4rem;padding:.7rem .9rem;border-top:.5px solid var(--cbs)}
+.chat-input-row input{flex:1;font-family:inherit;font-size:.84rem;padding:.42rem .6rem;border:.5px solid var(--cbs);border-radius:6px;background:var(--cp);color:var(--ct)}
+.chat-input-row input:focus{outline:none;border-color:var(--ca)}
 </style>
 </head>
 <body>
 <a href="#main" class="skip-link" data-i18n="skip">Skip to content</a>
 
-<header class="site">
+<header class="site" data-nac-id="nac_landing.topbar" data-nac-role="region">
   <div class="header-inner">
     <a class="logo-link" href="https://yujin.app/" data-i18n-attr="aria-label:logo.aria" aria-label="Yujin — home">
       <span class="yujin">楽</span><span class="nac">NAC3</span>
@@ -167,6 +184,8 @@ ul.plain li{margin-bottom:.35rem}
       <a class="nav-hide" href="#demos" data-i18n="nav.demos">Demos</a>
       <a class="nav-hide" href="#limits" data-i18n="nav.limits">Limits</a>
       <a href="SPEC.md" data-i18n="nav.spec">Spec</a>
+      <button class="hdr-btn" id="autopilot-toggle" data-nac-id="nac_landing.autopilot.toggle" data-nac-role="action" data-nac-action="autopilot_toggle" aria-pressed="false" data-i18n="nav.tour">tour</button>
+      <button class="hdr-btn" id="chat-toggle" data-nac-id="nac_landing.chat.toggle" data-nac-role="action" data-nac-action="chat_toggle" aria-pressed="false" data-i18n="nav.chat">chat</button>
       <select class="yujin-lang-select" id="lang-select" data-i18n-attr="aria-label:nav.lang" aria-label="Language"></select>
     </nav>
   </div>
@@ -174,17 +193,17 @@ ul.plain li{margin-bottom:.35rem}
 
 <main id="main">
 
-<div class="wrap hero">
+<div class="wrap hero" data-nac-id="nac_landing.section.hero" data-nac-role="section">
   <div class="kanji-big">楽</div>
   <p class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Native Agent Contract</span></p>
   <h1 data-i18n-html="hero.h1">Stable names for the things an <em>agent</em> wants to act on.</h1>
-  <p class="vbadge"><span data-i18n="hero.version">v2.5.0 · stable</span></p>
+  <p class="vbadge"><span data-i18n="hero.version">v2.5.0 &middot; stable</span></p>
   <p class="lede" data-i18n="hero.lede">NAC3 is a small, free contract that lets a web UI you already shipped be driven by AI assistants, voice runners, RPA bots, accessibility tools and test runners — by name, not by brittle selectors. You add a few HTML attributes. Agents resolve names, click buttons, fill fields and switch tabs the way a person would, and the contract itself is published as data, with a hash you recompute.</p>
   <div class="cta-row">
-    <a class="btn btn-p" href="SPEC.md" data-i18n="hero.cta1">Read the spec →</a>
-    <a class="btn btn-s" href="#demos" data-i18n="hero.cta2">Try a live demo</a>
-    <a class="btn btn-s" href="api/index.json" data-i18n="hero.cta3">The contract, as data</a>
-    <a class="btn btn-s" href="https://www.npmjs.com/package/@nac3/runtime" data-i18n="hero.cta4">npm install</a>
+    <a class="btn btn-p" href="SPEC.md" data-nac-id="nac_landing.cta.spec" data-nac-role="action" data-nac-action="open_spec" data-i18n="hero.cta1">Read the spec →</a>
+    <a class="btn btn-s" href="#demos" data-nac-id="nac_landing.cta.demo" data-nac-role="action" data-nac-action="open_demo" data-i18n="hero.cta2">Try a live demo</a>
+    <a class="btn btn-s" href="api/index.json" data-nac-id="nac_landing.cta.api" data-nac-role="action" data-nac-action="open_api" data-i18n="hero.cta3">The contract, as data</a>
+    <a class="btn btn-s" href="https://www.npmjs.com/package/@nac3/runtime" data-nac-id="nac_landing.cta.npm" data-nac-role="action" data-nac-action="open_npm" data-i18n="hero.cta4">npm install</a>
   </div>
   <p class="trust">
     <span class="free" data-i18n="hero.t1">Apache-2.0 · free</span>
@@ -196,37 +215,37 @@ ul.plain li{margin-bottom:.35rem}
 
 <div class="wrap"><div class="divider"><span class="kanji">契</span></div></div>
 
-<section id="what"><div class="wrap">
+<section id="what" data-nac-id="nac_landing.section.what" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="what.eyebrow">How small it is</span></p>
     <h2 data-i18n="what.h2">A button you already shipped, with three extra attributes.</h2>
     <p class="lede" data-i18n="what.lede">That is the whole adoption cost of one element. No framework to adopt, no build step to add, no runtime to rewrite your app around.</p>
   </div>
-<pre><code><span class="cm">&lt;!-- decorate the button --&gt;</span>
-&lt;button <span class="kw">data-nac-id</span>=<span class="st">"invoice.save"</span>
-        <span class="kw">data-nac-role</span>=<span class="st">"action"</span>
-        <span class="kw">data-nac-action</span>=<span class="st">"save"</span>
-        onclick=<span class="st">"saveInvoice()"</span>&gt;Save&lt;/button&gt;
+<pre><code><span class="comment">&lt;!-- decorate the button --&gt;</span>
+&lt;button <span class="keyword">data-nac-id</span>=<span class="string">"invoice.save"</span>
+        <span class="keyword">data-nac-role</span>=<span class="string">"action"</span>
+        <span class="keyword">data-nac-action</span>=<span class="string">"save"</span>
+        onclick=<span class="string">"saveInvoice()"</span>&gt;Save&lt;/button&gt;
 
-<span class="cm">// now any agent can drive it</span>
-await NAC.click(<span class="st">'invoice.save'</span>);              <span class="cm">// by id</span>
-await NAC.click_by_verb(<span class="st">'invoice'</span>, <span class="st">'save'</span>);  <span class="cm">// by verb</span></code></pre>
+<span class="comment">// now any agent can drive it</span>
+await NAC.click(<span class="string">'invoice.save'</span>);              <span class="comment">// by id</span>
+await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="string">'save'</span>);  <span class="comment">// by verb</span></code></pre>
   <h3 style="font-size:1rem;margin:1.6rem 0 .5rem" data-i18n="what.runtime.h">Add the runtime once — and pin it</h3>
   <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.0/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
 <pre><code>npm install @nac3/runtime
 
-<span class="cm">// or via CDN, pinned and verified:</span>
-&lt;script src=<span class="st">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
-        integrity=<span class="st">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
-        crossorigin=<span class="st">"anonymous"</span>&gt;&lt;/script&gt;
+<span class="comment">// or via CDN, pinned and verified:</span>
+&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
+        integrity=<span class="string">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
+        crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;
 
-<span class="cm"># do not take that hash on faith — recompute it. One line, no dependencies:</span>
+<span class="comment"># do not take that hash on faith — recompute it. One line, no dependencies:</span>
 node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.createHash('sha384').update(f.readFileSync('nac.js')).digest('base64'))"</code></pre>
 </div></section>
 
 <div class="wrap"><div class="divider"><span class="kanji">鏡</span></div></div>
 
-<section id="review"><div class="wrap">
+<section id="review" data-nac-id="nac_landing.section.review" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="review.eyebrow">Peer review · October 2026</span></p>
     <h2 data-i18n="review.h2">A review by a model that read the whole thing.</h2>
@@ -275,7 +294,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">証</span></div></div>
 
-<section id="testing"><div class="wrap">
+<section id="testing" data-nac-id="nac_landing.section.testing" data-nac-role="section"><div class="wrap">
   <div class="hl">
     <p class="eyebrow" style="color:var(--ctl)"><span class="dot" style="background:var(--ctl)"></span><span data-i18n="ura.eyebrow">End-to-end testing</span></p>
     <h2 data-i18n-html="ura.h2"><span class="ura">裏付け</span>&nbsp; If you build with the Urazuke method, this is where NAC3 pays for itself.</h2>
@@ -295,7 +314,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">試</span></div></div>
 
-<section id="api"><div class="wrap">
+<section id="api" data-nac-id="nac_landing.section.api" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="api.eyebrow">The contract, as data</span></p>
     <h2 data-i18n="api.h2">Read the contract with a program, not with your eyes.</h2>
@@ -311,28 +330,28 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">見</span></div></div>
 
-<section id="demos"><div class="wrap">
+<section id="demos" data-nac-id="nac_landing.section.demos" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="demos.eyebrow">Live demos</span></p>
     <h2 data-i18n="demos.h2">All of them open in your browser.</h2>
     <p class="lede" data-i18n="demos.lede">The data-table demo is wired to a live chat backend — talk to it. The others need nothing but the page.</p>
   </div>
   <div class="grid g3">
-    <div class="card"><span class="tag">v1.9</span><h3 data-i18n="demos.d1.h">27 widgets, the full surface</h3><p data-i18n="demos.d1.p">The canonical reference demo: chat, calendar, autopilot, modals, tabs and charts in production-shaped UI.</p><a href="example.php" data-i18n="demos.open">Open demo →</a></div>
-    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d2.h">The primitives, one by one</h3><p data-i18n="demos.d2.p">A didactic showcase of the eight v2.0 primitives plus HMAC, isTrusted and the i18n contract. One section per primitive.</p><a href="example-v20-primitives-showcase.php" data-i18n="demos.open">Open demo →</a></div>
-    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d3.h">A brownfield migration</h3><p data-i18n="demos.d3.p">The same 27 widgets, the same HTML and handlers, with the strict layer applied in about 80 lines of setup. Adoption does not mean rewriting every widget.</p><a href="example-v20-full.php" data-i18n="demos.open">Open demo →</a></div>
-    <div class="card"><span class="tag rust">v2.1 · chat</span><h3 data-i18n="demos.d4.h">Talk to a data table</h3><p data-i18n="demos.d4.p">Wired to a live chat backend. Ask it to add a row, delete one, jump to a tab or read you the total.</p><a href="example-v21-data-table.php" data-i18n="demos.try">Try the chat →</a></div>
-    <div class="card"><span class="tag">v2.3</span><h3 data-i18n="demos.d5.h">The field editor</h3><p data-i18n="demos.d5.p">A modal with eight callable verbs: select word, select sentence, select all, replace, delete selection, correct syntax, save and cancel.</p><a href="example-v23-editor.php" data-i18n="demos.try">Try the editor →</a></div>
-    <div class="card"><span class="tag rust">v2.4</span><h3 data-i18n="demos.d6.h">Ambiguity, and refusing to guess</h3><p data-i18n="demos.d6.p">Two reservations share a suffix. The lenient path used to pick the first one silently; now it throws, names the candidates and asks. A button shows the old silent-damage path for contrast.</p><a href="example-v24-disambiguation.php" data-i18n="demos.try">Try disambiguation →</a></div>
-    <div class="card"><span class="tag">React 18 · npm</span><h3 data-i18n="demos.d7.h">React study case</h3><p data-i18n="demos.d7.p">A compiled React and Vite app consuming the real package from npm. Todos UI, chat panel, autopilot tour.</p><a href="demos/react/" data-i18n="demos.open">Open demo →</a></div>
-    <div class="card"><span class="tag">Angular 17 · npm</span><h3 data-i18n="demos.d8.h">Angular study case</h3><p data-i18n="demos.d8.p">A standalone Angular mirror of the React case. Same UI, same flows, signals and a service wrapper.</p><a href="demos/angular/" data-i18n="demos.open">Open demo →</a></div>
-    <div class="card"><span class="tag rust">voice · live</span><h3 data-i18n="demos.d9.h">A voice-driven advertisement</h3><p data-i18n="demos.d9.p">The visitor speaks, the agent fills the form against a manifest and submits the lead. Ten languages.</p><a href="ads-demo/atlas-pro/" data-i18n="demos.try">Try the live demo →</a></div>
+    <div class="card"><span class="tag">v1.9</span><h3 data-i18n="demos.d1.h">27 widgets, the full surface</h3><p data-i18n="demos.d1.p">The canonical reference demo: chat, calendar, autopilot, modals, tabs and charts in production-shaped UI.</p><a href="example.php" data-nac-id="nac_landing.demo.d1" data-nac-role="action" data-nac-action="open" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d2.h">The primitives, one by one</h3><p data-i18n="demos.d2.p">A didactic showcase of the eight v2.0 primitives plus HMAC, isTrusted and the i18n contract. One section per primitive.</p><a href="example-v20-primitives-showcase.php" data-nac-id="nac_landing.demo.d2" data-nac-role="action" data-nac-action="open" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">v2.0</span><h3 data-i18n="demos.d3.h">A brownfield migration</h3><p data-i18n="demos.d3.p">The same 27 widgets, the same HTML and handlers, with the strict layer applied in about 80 lines of setup. Adoption does not mean rewriting every widget.</p><a href="example-v20-full.php" data-nac-id="nac_landing.demo.d3" data-nac-role="action" data-nac-action="open" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag rust">v2.1 · chat</span><h3 data-i18n="demos.d4.h">Talk to a data table</h3><p data-i18n="demos.d4.p">Wired to a live chat backend. Ask it to add a row, delete one, jump to a tab or read you the total.</p><a href="example-v21-data-table.php" data-nac-id="nac_landing.demo.d4" data-nac-role="action" data-nac-action="open" data-i18n="demos.try">Try the chat →</a></div>
+    <div class="card"><span class="tag">v2.3</span><h3 data-i18n="demos.d5.h">The field editor</h3><p data-i18n="demos.d5.p">A modal with eight callable verbs: select word, select sentence, select all, replace, delete selection, correct syntax, save and cancel.</p><a href="example-v23-editor.php" data-nac-id="nac_landing.demo.d5" data-nac-role="action" data-nac-action="open" data-i18n="demos.try">Try the editor →</a></div>
+    <div class="card"><span class="tag rust">v2.4</span><h3 data-i18n="demos.d6.h">Ambiguity, and refusing to guess</h3><p data-i18n="demos.d6.p">Two reservations share a suffix. The lenient path used to pick the first one silently; now it throws, names the candidates and asks. A button shows the old silent-damage path for contrast.</p><a href="example-v24-disambiguation.php" data-nac-id="nac_landing.demo.d6" data-nac-role="action" data-nac-action="open" data-i18n="demos.try">Try disambiguation →</a></div>
+    <div class="card"><span class="tag">React 18 · npm</span><h3 data-i18n="demos.d7.h">React study case</h3><p data-i18n="demos.d7.p">A compiled React and Vite app consuming the real package from npm. Todos UI, chat panel, autopilot tour.</p><a href="demos/react/" data-nac-id="nac_landing.demo.d7" data-nac-role="action" data-nac-action="open" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag">Angular 17 · npm</span><h3 data-i18n="demos.d8.h">Angular study case</h3><p data-i18n="demos.d8.p">A standalone Angular mirror of the React case. Same UI, same flows, signals and a service wrapper.</p><a href="demos/angular/" data-nac-id="nac_landing.demo.d8" data-nac-role="action" data-nac-action="open" data-i18n="demos.open">Open demo →</a></div>
+    <div class="card"><span class="tag rust">voice · live</span><h3 data-i18n="demos.d9.h">A voice-driven advertisement</h3><p data-i18n="demos.d9.p">The visitor speaks, the agent fills the form against a manifest and submits the lead. Ten languages.</p><a href="ads-demo/atlas-pro/" data-nac-id="nac_landing.demo.d9" data-nac-role="action" data-nac-action="open" data-i18n="demos.try">Try the live demo →</a></div>
   </div>
 </div></section>
 
 <div class="wrap"><div class="divider"><span class="kanji">用</span></div></div>
 
-<section id="uses"><div class="wrap">
+<section id="uses" data-nac-id="nac_landing.section.uses" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="uses.eyebrow">Use cases</span></p>
     <h2 data-i18n="uses.h2">Voice and chat is the headline. The contract underneath unlocks four more.</h2>
@@ -348,7 +367,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">層</span></div></div>
 
-<section id="stack"><div class="wrap">
+<section id="stack" data-nac-id="nac_landing.section.stack" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="stack.eyebrow">Where it fits</span></p>
     <h2 data-i18n="stack.h2">NAC3 is the client-side half. MCP is the server-side half.</h2>
@@ -369,7 +388,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">限</span></div></div>
 
-<section id="limits"><div class="wrap">
+<section id="limits" data-nac-id="nac_landing.section.limits" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="limits.eyebrow">What it does not cover</span></p>
     <h2 data-i18n="limits.h2">NAC3 names what lives in the DOM. Everything here is outside that line.</h2>
@@ -389,7 +408,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">数</span></div></div>
 
-<section id="evidence"><div class="wrap">
+<section id="evidence" data-nac-id="nac_landing.section.evidence" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="ev.eyebrow">Measured, with receipts</span></p>
     <h2 data-i18n="ev.h2">Two measurements, both reproducible, neither re-run on the current release.</h2>
@@ -432,7 +451,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">作</span></div></div>
 
-<section id="adopters"><div class="wrap">
+<section id="adopters" data-nac-id="nac_landing.section.adopters" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="ad.eyebrow">Made with NAC3</span></p>
     <h2 data-i18n="ad.h2">Apps shipping the contract today.</h2>
@@ -448,7 +467,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">別</span></div></div>
 
-<section id="layers"><div class="wrap">
+<section id="layers" data-nac-id="nac_landing.section.layers" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="pay.eyebrow">Free and paid, separated</span></p>
     <h2 data-i18n="pay.h2">The contract is free. The tooling on top of it is not.</h2>
@@ -482,7 +501,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">工</span></div></div>
 
-<section id="builders"><div class="wrap">
+<section id="builders" data-nac-id="nac_landing.section.builders" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="bd.eyebrow">For builders</span></p>
     <h2 data-i18n="bd.h2">Take what you need. All of it is Apache-2.0.</h2>
@@ -520,7 +539,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 <div class="wrap"><div class="divider"><span class="kanji">理</span></div></div>
 
-<section id="governance"><div class="wrap">
+<section id="governance" data-nac-id="nac_landing.section.governance" data-nac-role="section"><div class="wrap">
   <div class="sec-h">
     <p class="eyebrow"><span class="dot"></span><span data-i18n="gov.eyebrow">Governance</span></p>
     <h2 data-i18n="gov.h2">Three different things, three different licences.</h2>
@@ -535,7 +554,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
 </main>
 
-<footer class="site">
+<footer class="site" data-nac-id="nac_landing.footer" data-nac-role="region">
   <div class="footer-inner">
     <span class="brand">楽 Yujin</span>
     <nav>
@@ -550,6 +569,202 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   </div>
 </footer>
 
+<aside class="chat" data-nac-plugin="chat" aria-hidden="true">
+  <header class="chat-head">
+    <span class="brand">Yujin chat</span>
+    <select class="lang" id="chat-lang" data-nac-id="chat.lang" data-nac-role="field" aria-label="Chat language">
+      <option value="es">es</option><option value="en" selected>en</option><option value="pt">pt</option>
+      <option value="fr">fr</option><option value="it">it</option><option value="de">de</option>
+      <option value="ja">ja</option><option value="zh">zh</option><option value="hi">hi</option><option value="ar">ar</option>
+    </select>
+    <button id="chat-tts" data-nac-id="chat.tts" data-nac-role="action" data-nac-action="toggle_tts" aria-pressed="true" aria-label="Toggle TTS">tts</button>
+  </header>
+  <div class="chat-log" id="chat-log" data-nac-id="chat.log" data-nac-role="region" aria-live="polite" aria-relevant="additions"></div>
+  <div class="chat-tools">
+    <button id="chat-mic" data-nac-id="chat.mic" data-nac-role="action" data-nac-action="push_to_talk" aria-label="Push to talk" aria-pressed="false" data-state="idle">mic</button>
+    <button id="chat-handsfree" data-nac-id="chat.voice.always_on" data-nac-role="action" data-nac-action="toggle_handsfree" aria-pressed="false" aria-label="Hands-free voice mode">hands-free</button>
+  </div>
+  <div class="chat-input-row">
+    <input id="chat-input" data-nac-id="chat.input" data-nac-role="field" placeholder="ask anything / try: take me to the demos" autocomplete="off">
+    <button id="chat-send" data-nac-id="chat.send" data-nac-role="action" data-nac-action="send" aria-label="Send">send</button>
+  </div>
+</aside>
+
+<script src="js/2.5.0/nac.js" integrity="sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE" crossorigin="anonymous"></script>
+<script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
+<script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
 <script src="i18n.js" defer></script>
+<script>
+/* The landing is itself a NAC3 app: it registers its own manifest, so an agent
+   can drive this page by name. Labels carry all ten locales, which is what
+   conformance level 2 asks of every adopter -- including us. */
+(function () {
+  'use strict';
+  function whenReady(fn) {
+    if (window.NAC && window.NAC.register) return fn();
+    setTimeout(function () { whenReady(fn); }, 50);
+  }
+  whenReady(function () {
+    function li(es, en, pt, fr, it, de, ja, zh, hi, ar) {
+      return { es: es, en: en, pt: pt, fr: fr, it: it, de: de, ja: ja, zh: zh, hi: hi, ar: ar };
+    }
+    function section(key, l) { return { id: 'nac_landing.section.' + key, role: 'section', label_i18n: l }; }
+    function cta(key, verb, l) {
+      return { id: 'nac_landing.cta.' + key, role: 'action', actions: [{ verb: verb, label_i18n: l }], label_i18n: l };
+    }
+    function demo(key, l) {
+      return { id: 'nac_landing.demo.' + key, role: 'action', actions: [{ verb: 'open', label_i18n: l }], label_i18n: l };
+    }
+
+    NAC.register({
+      plugin_slug: 'nac_landing',
+      version: '2.5.0',
+      nac_version: '2.5',
+      elements: [
+        { id: 'nac_landing.topbar', role: 'region',
+          label_i18n: li('Barra superior','Topbar','Barra superior','Barre haute','Barra alta','Topbar','上部バー','顶栏','upar ki patti','شريط علوي') },
+        { id: 'nac_landing.autopilot.toggle', role: 'action',
+          actions: [{ verb: 'autopilot_toggle',
+            label_i18n: li('Iniciar el recorrido guiado','Start the guided tour','Iniciar o tour guiado','Demarrer la visite guidee','Avvia il tour guidato','Gefuehrte Tour starten','ガイドツアーを開始','开始引导游览','guided tour shuru karen','ابدأ الجولة الموجهة') }],
+          label_i18n: li('Recorrido','Tour','Tour','Visite','Tour','Tour','ツアー','游览','tour','جولة') },
+        { id: 'nac_landing.chat.toggle', role: 'action',
+          actions: [{ verb: 'chat_toggle',
+            label_i18n: li('Abrir el chat','Open the chat','Abrir o chat','Ouvrir le chat','Apri la chat','Chat oeffnen','チャットを開く','打开聊天','chat kholen','افتح المحادثة') }],
+          label_i18n: li('Chat','Chat','Chat','Chat','Chat','Chat','チャット','聊天','chat','محادثة') },
+
+        section('hero', li('Inicio','Start','Inicio','Accueil','Inizio','Start','冒頭','首页','shuruaat','البداية')),
+        cta('spec','open_spec', li('Leer la especificacion','Read the spec','Ler a especificacao','Lire la spec','Leggi la spec','Spec lesen','仕様を読む','阅读规范','spec padhen','اقرأ المواصفات')),
+        cta('demo','open_demo', li('Probar un demo','Try a demo','Testar uma demo','Tester une demo','Prova una demo','Demo testen','デモを試す','试用演示','demo dekhen','جرب العرض')),
+        cta('api','open_api', li('El contrato como dato','The contract as data','O contrato como dado','Le contrat en donnees','Il contratto come dato','Der Vertrag als Daten','データとしての契約','数据化的契约','anubandh data ke roop mein','العقد كبيانات')),
+        cta('npm','open_npm', li('Instalar con npm','Install with npm','Instalar com npm','Installer avec npm','Installa con npm','Mit npm installieren','npmで導入','用 npm 安装','npm se install karen','التثبيت بـ npm')),
+
+        section('what', li('Que es','What it is','O que e','Ce que c est','Cos e','Was es ist','概要','是什么','kya hai','ما هو')),
+        section('review', li('Revision','Review','Revisao','Revue','Revisione','Review','レビュー','评审','sameeksha','مراجعة')),
+        section('testing', li('Pruebas de punta a punta','End-to-end testing','Testes de ponta a ponta','Tests de bout en bout','Test end-to-end','Ende-zu-Ende-Tests','エンドツーエンドテスト','端到端测试','end to end parikshan','اختبار شامل')),
+        section('api', li('El contrato como dato','The contract as data','O contrato como dado','Le contrat en donnees','Il contratto come dato','Der Vertrag als Daten','データとしての契約','数据化的契约','anubandh data','العقد كبيانات')),
+        section('demos', li('Demos en vivo','Live demos','Demos ao vivo','Demos en direct','Demo dal vivo','Live-Demos','ライブデモ','在线演示','live demo','عروض حية')),
+        section('uses', li('Casos de uso','Use cases','Casos de uso','Cas d usage','Casi d uso','Anwendungsfaelle','ユースケース','用例','upyog ke maamle','حالات الاستخدام')),
+        section('stack', li('Donde encaja','Where it fits','Onde encaixa','Ou cela s insere','Dove si colloca','Wo es passt','位置づけ','定位','kahan fit hota hai','أين يناسب')),
+        section('limits', li('Lo que no cubre','What it does not cover','O que nao cobre','Ce qu il ne couvre pas','Cosa non copre','Was es nicht abdeckt','対象外','不覆盖的范围','kya cover nahin karta','ما لا يغطيه')),
+        section('evidence', li('Mediciones','Measurements','Medicoes','Mesures','Misure','Messungen','計測','测量','maap','قياسات')),
+        section('adopters', li('Hecho con NAC3','Made with NAC3','Feito com NAC3','Fait avec NAC3','Fatto con NAC3','Mit NAC3 gebaut','NAC3で作成','用 NAC3 构建','NAC3 se bana','مصنوع بـ NAC3')),
+        section('layers', li('Libre y pago','Free and paid','Livre e pago','Gratuit et payant','Gratis e a pagamento','Frei und bezahlt','無料と有料','免费与付费','muft aur sashulk','مجاني ومدفوع')),
+        section('builders', li('Para quien construye','For builders','Para quem constroi','Pour ceux qui construisent','Per chi costruisce','Fuer Entwickler','開発者向け','面向构建者','banane walon ke liye','للمطورين')),
+        section('governance', li('Gobernanza','Governance','Governanca','Gouvernance','Governance','Governance','ガバナンス','治理','shasan','الحوكمة')),
+
+        demo('d1', li('Demo de referencia, 27 componentes','Reference demo, 27 widgets','Demo de referencia, 27 widgets','Demo de reference, 27 widgets','Demo di riferimento, 27 widget','Referenzdemo, 27 Widgets','リファレンスデモ','参考演示','reference demo','العرض المرجعي')),
+        demo('d2', li('Las primitivas, una por una','The primitives, one by one','As primitivas, uma a uma','Les primitives, une a une','Le primitive, una a una','Die Primitive, einzeln','プリミティブ','基本原语','primitives','العناصر الأساسية')),
+        demo('d3', li('Migracion de sistema heredado','Brownfield migration','Migracao de sistema legado','Migration d un existant','Migrazione brownfield','Brownfield-Migration','既存からの移行','遗留系统迁移','legacy migration','ترحيل نظام قائم')),
+        demo('d4', li('Hablale a una tabla de datos','Talk to a data table','Fale com uma tabela','Parler a un tableau','Parla con una tabella','Mit einer Tabelle sprechen','データ表と対話','与数据表对话','data table se baat','تحدث إلى جدول')),
+        demo('d5', li('El editor de campos','The field editor','O editor de campos','L editeur de champs','L editor di campi','Der Feldeditor','フィールドエディタ','字段编辑器','field editor','محرر الحقول')),
+        demo('d6', li('Ambiguedad y negarse a adivinar','Ambiguity, refusing to guess','Ambiguidade sem adivinhar','Ambiguite sans deviner','Ambiguita senza indovinare','Mehrdeutigkeit ohne Raten','曖昧さの解決','歧义与拒绝猜测','ambiguity','الغموض')),
+        demo('d7', li('Caso de estudio en React','React study case','Caso de estudo React','Cas d etude React','Caso studio React','React-Fallstudie','Reactの事例','React 案例','React case','دراسة React')),
+        demo('d8', li('Caso de estudio en Angular','Angular study case','Caso de estudo Angular','Cas d etude Angular','Caso studio Angular','Angular-Fallstudie','Angularの事例','Angular 案例','Angular case','دراسة Angular')),
+        demo('d9', li('Aviso manejado por voz','Voice-driven advertisement','Anuncio por voz','Annonce pilotee par la voix','Annuncio guidato dalla voce','Sprachgesteuerte Anzeige','音声広告','语音广告','voice ad','إعلان صوتي')),
+
+        { id: 'nac_landing.footer', role: 'region',
+          label_i18n: li('Pie de pagina','Footer','Rodape','Pied de page','Pie di pagina','Fusszeile','フッター','页脚','footer','تذييل') }
+      ]
+    });
+
+    /* === Chat toggle === */
+    function setChatOpen(open) {
+      document.body.setAttribute('data-chat-open', open ? '1' : '0');
+      var aside = document.querySelector('.chat');
+      if (aside) aside.setAttribute('aria-hidden', open ? 'false' : 'true');
+      var btn = document.getElementById('chat-toggle');
+      if (btn) btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+    }
+    NAC.bindAction(document.getElementById('chat-toggle'), function () {
+      setChatOpen(document.body.getAttribute('data-chat-open') !== '1');
+    }, { plugin: 'nac_landing', action_id: 'nac_landing.chat.toggle' });
+
+    /* === Autopilot: walks the page, narrates, stops on any interaction. === */
+    var AUTOPILOT_STEPS = [
+      { id: 'nac_landing.section.hero', narrate: 'NAC3 gives stable names to the things an agent wants to act on.' },
+      { id: 'nac_landing.section.what', narrate: 'Three HTML attributes make any button drivable.' },
+      { id: 'nac_landing.section.review', narrate: 'A peer review that lists what it checked, and where it would still push.' },
+      { id: 'nac_landing.section.testing', narrate: 'If you build with the Urazuke method, this is where the contract pays for itself.' },
+      { id: 'nac_landing.section.api', narrate: 'The contract is published as data, with a hash you recompute.' },
+      { id: 'nac_landing.section.demos', narrate: 'Nine live demos. Try the data table to see it end to end.' },
+      { id: 'nac_landing.section.limits', narrate: 'And here is what it does not cover. Read this before you migrate.' },
+      { id: 'nac_landing.section.layers', narrate: 'The contract is free. The tooling on top of it is not.' }
+    ];
+    var autopilotRunning = false, autopilotAbort = false;
+    function highlight(el, on) {
+      if (!el) return;
+      if (on) el.setAttribute('data-autopilot', 'active'); else el.removeAttribute('data-autopilot');
+    }
+    async function runAutopilot() {
+      if (autopilotRunning) return;
+      autopilotRunning = true; autopilotAbort = false;
+      var btn = document.getElementById('autopilot-toggle');
+      if (btn) btn.setAttribute('aria-pressed', 'true');
+      function abortOnInteract() { autopilotAbort = true; }
+      window.addEventListener('keydown', abortOnInteract, { once: true });
+      window.addEventListener('mousedown', abortOnInteract, { once: true });
+      for (var i = 0; i < AUTOPILOT_STEPS.length; i++) {
+        if (autopilotAbort) break;
+        var step = AUTOPILOT_STEPS[i];
+        var el = document.querySelector('[data-nac-id="' + step.id + '"]');
+        if (!el) continue;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        highlight(el, true);
+        try { NacChat.botSpeak(step.narrate); } catch (_) {}
+        await new Promise(function (r) { setTimeout(r, 3500); });
+        highlight(el, false);
+      }
+      autopilotRunning = false;
+      if (btn) btn.setAttribute('aria-pressed', 'false');
+      window.removeEventListener('keydown', abortOnInteract);
+      window.removeEventListener('mousedown', abortOnInteract);
+    }
+    NAC.bindAction(document.getElementById('autopilot-toggle'), function () { runAutopilot(); },
+      { plugin: 'nac_landing', action_id: 'nac_landing.autopilot.toggle' });
+
+    /* === Wire the chat client === */
+    NacChat.init({
+      endpoint:     '/crm/api/v1/yujin/nac-demo',
+      lang:         'en',
+      chatLog:      document.getElementById('chat-log'),
+      input:        document.getElementById('chat-input'),
+      langSelect:   document.getElementById('chat-lang'),
+      sendBtn:      document.getElementById('chat-send'),
+      micBtn:       document.getElementById('chat-mic'),
+      handsFreeBtn: document.getElementById('chat-handsfree'),
+      ttsBtn:       document.getElementById('chat-tts')
+    });
+
+    /* When the model emits a click on one of our anchors, just navigate. */
+    var ORIGINAL_CLICK = NacChat._customHandlers && NacChat._customHandlers.click;
+    NacChat.onAction('click', function (a) {
+      var el = document.querySelector('[data-nac-id="' + a.nac_id + '"]');
+      if (el && el.tagName === 'A' && el.getAttribute('href')) {
+        window.location.href = el.getAttribute('href');
+        return { ok: true };
+      }
+      if (ORIGINAL_CLICK) return ORIGINAL_CLICK(a);
+      if (el) { el.click(); return { ok: true }; }
+      throw new Error('not found: ' + a.nac_id);
+    });
+
+    /* === Validate after wiring -- expect zero error-severity findings. === */
+    setTimeout(function () {
+      try {
+        var findings = NAC.validate_global({ probe: false });
+        var errors = (findings || []).filter(function (f) { return f.severity === 'error'; });
+        if (errors.length === 0) {
+          console.log('[nac_landing] NAC validate clean -- ' + (findings || []).length + ' total findings (none error severity)');
+        } else {
+          console.warn('[nac_landing] NAC validate found ' + errors.length + ' errors:', errors);
+        }
+      } catch (e) {
+        console.warn('[nac_landing] validate_global threw:', e.message);
+      }
+    }, 1000);
+  });
+})();
+</script>
+
 </body>
 </html>

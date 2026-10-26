@@ -1,6 +1,6 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.0 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
+**Version:** 2.5.1 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
 **Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states what that guarantees and what a prerelease does not. This document states its version in exactly one place, the line above. The shipped RFCs and their Layer 2 + Layer 3 evidence are listed in `README.md` and `runtime/CHANGELOG.md`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)

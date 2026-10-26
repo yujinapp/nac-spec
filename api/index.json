@@ -1,6 +1,6 @@
 {
   "api_schema": 1,
-  "chain_head": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
+  "chain_head": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
   "entries": [
     {
       "channel": "prerelease",
@@ -53,9 +53,35 @@
       "published_at": "2026-10-26",
       "runtime_sha384": "sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE",
       "version": "2.5.0"
+    },
+    {
+      "channel": "stable",
+      "entry_sha384": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
+      "files": [
+        {
+          "bytes": 20595,
+          "path": "api/v/2.5.1/contract.json",
+          "sha384": "sha384-SIZsqeJFdqChxi4U7M3vSChuiNJj3dw6aOmtB7yzjx0RgaBW8kvyQuYGem3XIb2F"
+        },
+        {
+          "bytes": 15055,
+          "path": "api/v/2.5.1/findings.json",
+          "sha384": "sha384-zHZB2V3CC4x27aqZHWPFVunr4grnvBu3z9fvvKyAR3c41dDL7lnDmTBsG/advJX/"
+        },
+        {
+          "bytes": 10397,
+          "path": "api/v/2.5.1/levels.json",
+          "sha384": "sha384-WNGwiKYNcfChdwz2fK45sOAZYqi04M643Goi2iNhEz+anMgZa3Bw5oj2rM+FE+U4"
+        }
+      ],
+      "generated_at_commit": "016b351fe7db889f826743578b6cf0b54e008cfe",
+      "prev_entry_sha384": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
+      "published_at": "2026-10-26",
+      "runtime_sha384": "sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS",
+      "version": "2.5.1"
     }
   ],
-  "entry_count": 2,
+  "entry_count": 3,
   "generated_by": "scripts/build-contract-api.mjs",
   "policy": {
     "append_only": true,

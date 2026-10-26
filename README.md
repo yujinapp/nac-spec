@@ -4,13 +4,13 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-2.5.0_stable-green)](https://yujin.app/nac-spec/)
+[![Status: stable](https://img.shields.io/badge/status-2.5.1_stable-green)](https://yujin.app/nac-spec/)
 [![Spec: v2.5](https://img.shields.io/badge/spec-v2.5-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 [![Tests: passing](https://img.shields.io/badge/tests-386_passing-success)](runtime/test/)
 
-> **2.5.0 stable shipped** (2026-10-26) -- v2.5 line complete; 8 SHIPPED RFCs each with Layer 2 + Layer 3 LIVE evidence; promoted to the npm dist-tag `latest`, which [section 9.1](SPEC.md) reserves for a stable version.
+> **2.5.1 shipped** (2026-10-26) -- a patch release with two surface fixes and no runtime behaviour change. The SPEC header stopped contradicting itself: its Status line restated a prerelease as the promoted version, which the promotion to stable falsified, and a new slot in the version lock keeps that line from ever naming a version again. And the specification now declares, in section 4.3.2, that the English text is normative and the nine published translations are not -- each of them says so at the top, in its own language, with the revision it translates and how much of the current text it carries. The 2.5.0 entry below is the release that completed the v2.5 line.
 > Unifies the two parallel dev lines that diverged during May 2026 and
 > establishes `yujinapp/nac-spec` as the SOLE source of truth for NAC3
 > from this commit forward. Adds **V25-01** plugin extension contract
@@ -85,6 +85,15 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 
 ## Status
 
+- **2.5.1** -- shipped 2026-10-26, **stable**. Patch release, no
+  runtime behaviour change. Two published surfaces that contradicted
+  themselves: the SPEC `**Status:**` line (it restated `2.5.0-alpha.5` as the
+  promoted version, true until the promotion and false after it -- audit
+  N-45) and the nine translations, which never said they were partial,
+  non-normative, or frozen at an older revision (decision D-03, option C).
+  Both now have a lock: the Status line may name no version at all, and
+  `scripts/build-translation-banners.mjs` produces and verifies the nine
+  banners byte for byte.
 - **2.5.0** -- shipped 2026-10-26, **stable**. **v2.5 line complete.**
   All 8 SHIPPED RFCs of the v2.5 series have runtime + Layer 2
   visual + Layer 3 Pilot LIVE evidence:

@@ -70,6 +70,7 @@ function filesTheGateReads() {
     'runtime/dist/nac.d.ts',
     'runtime/dist/nac-v2-extensions.d.ts',
     'SPEC.md',
+    'SPEC.html',
     'README.md',
     'index.html',
     '.github/workflows/deploy.yml',
@@ -372,6 +373,69 @@ expectGreen(
   (dir) => patch(dir, 'README.md', (s) =>
     s + '\n<!-- The URL mode of the validator aborted with exit 2 before 2.5.0, and\n'
       + '     2.5.0-alpha.5 was the last prerelease of the line. -->\n')
+);
+
+/* --- N-45, second half: the Status line of the published SPEC.
+       The first case is not hypothetical -- it is the line the 2.5.0
+       went out with, restored verbatim. --- */
+expectRed(
+  'the Status line the 2.5.0 shipped with is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m,
+    '**Status:** v2.5.0-alpha.5 -- all 8 SHIPPED RFCs (V24-01/02/04/05 + V25-01/02/03/04) '
+    + 'have runtime + Layer 2 visual + Layer 3 Pilot LIVE evidence. Promoted to npm dist-tag `latest`.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a Status line that merely restates the version being shipped is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m, '**Status:** ' + VERSION + ' stable.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a Status line naming a spec line as vX.Y is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m, '**Status:** Stable release of the v2.5 line.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a SPEC with no Status line at all is refused, not defaulted',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(/^\*\*Status:\*\*.*\n/m, '')),
+  'SPEC status line restates no version'
+);
+
+/* And the shape that has to STAY legal, for the same reason N-41
+   exists: the rewritten line points at the section that owns the
+   release channel, and a cross-reference is not a version. */
+expectGreen(
+  'a Status line that points at its section instead of restating the version stays legal',
+  (dir) => {
+    /* Both copies, because another slot asserts the packaged SPEC is
+       byte-identical to the canonical one -- editing only SPEC.md here
+       would fail this case on a different probe and prove nothing
+       about the Status line. */
+    const rewrite = (s) => s.replace(
+      /^\*\*Status:\*\*.*$/m,
+      '**Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states '
+      + 'what that guarantees and what a prerelease does not. This document states its version '
+      + 'in exactly one place, the line above.');
+    patch(dir, 'SPEC.md', rewrite);
+    patch(dir, 'runtime/SPEC.md', rewrite);
+  }
+);
+
+/* --- the rendered page beside the source document. The defect is not
+       a typo, it is forgetting the generator, so the case plants
+       exactly that: a SPEC.md that moved on and a SPEC.html that did
+       not. --- */
+expectRed(
+  'a rendered SPEC.html left on the previous version is refused',
+  (dir) => patch(dir, 'SPEC.html', (s) => s.replace(
+    /Version:<\/strong>\s*[0-9][^<\s]*/, 'Version:</strong> 2.4.0')),
+  'rendered SPEC.html version'
 );
 
 console.log('');

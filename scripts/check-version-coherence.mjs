@@ -195,6 +195,67 @@ expectAll('DECLARED', 'runtime version constant + header', 'js/nac.js',
 expectAll('DECLARED', 'SPEC document version', 'SPEC.md',
   '^\\*\\*Version:\\*\\*\\s*(' + SEMVER + ')', BY_HAND);
 
+/* --- the RENDERED spec page, which is what an adopter actually reads:
+       SPEC.md is the source, SPEC.html is published beside it, and
+       nothing asserted the second was the rendering of the first. It is
+       generated, so the failure mode is not a typo -- it is forgetting
+       to run the generator, and then the published page announces the
+       previous version while SPEC.md announces this one. That happened
+       while cutting this very release and only surfaced because a human
+       read `git status`. --- */
+expectAll('DERIVED', 'rendered SPEC.html version', 'SPEC.html',
+  'Version:</strong>\\s*(' + SEMVER + ')',
+  'run: node scripts/build-spec-html.mjs   (SPEC.html is generated from SPEC.md)');
+
+/* --- the Status line of that same document, where finding NO version
+       is the only pass. Audit N-45, second half.
+
+       The published 2.5.0 SPEC.md declared its version TWICE in its
+       first four lines and the two disagreed: line 3 said 2.5.0
+       (stable) and line 4 said `v2.5.0-alpha.5 ... Promoted to npm
+       dist-tag latest`. Line 4 was TRUE until 18:40 on 2026-10-26 --
+       the act of promoting `latest` to the stable release is what
+       falsified it, in both halves. Same shape as N-17 and as the
+       README half of N-45: a version written by hand where no lock
+       looked. The cure is not a second slot to keep in sync, it is to
+       stop restating the version: the document declares it once, on
+       the line above, and the Status line points at section 9.1.
+
+       WHAT THIS ENFORCES, exactly, so the claim is not larger than the
+       code: it refuses a full x.y.z (with or without a prerelease
+       tail) and a `vX.Y` token anywhere on the Status line. A bare
+       two-part number is allowed only in a cross-reference ("section
+       9.1"), which is stripped before scanning, because this document
+       references its own sections that way throughout and a gate that
+       cannot tell 9.1 from 2.5 without guessing should not guess. Every
+       real occurrence of this defect took one of the two refused
+       shapes. --- */
+(() => {
+  const label = 'SPEC status line restates no version';
+  const file = 'SPEC.md';
+  if (!has(file)) {
+    drift(label, file, 'a Status line', '(file not found)', 'restore SPEC.md');
+    return;
+  }
+  const m = read(file).match(/^\*\*Status:\*\*[ \t]*(.*)$/m);
+  if (!m) {
+    drift(label, file, 'a Status line naming no version', '(no Status line at all)',
+      'restore the **Status:** line of SPEC.md -- it is what tells an adopter whether this is a release');
+    return;
+  }
+  const scanned = m[1].replace(/\bsections?\s+[0-9]+(?:\.[0-9]+)*/gi, '');
+  const found = [...new Set(allMatches(scanned, '(' + SEMVER + '|v[0-9]+\\.[0-9]+)'))];
+  if (found.length) {
+    drift(label, file, 'no version on this line at all', found.join(', '),
+      'rewrite the Status line so it does not restate the version: the document declares it '
+      + 'once, on the **Version:** line above, and the release channel is section 9.1. '
+      + 'A Status line that names a version is true until the next release and false after it '
+      + '-- that is audit N-45.');
+  } else {
+    ok(label + ' [DECLARED]', file, 'names no version (correct)');
+  }
+})();
+
 (() => {
   const label = 'packaged SPEC is the canonical SPEC';
   const file = 'runtime/SPEC.md';

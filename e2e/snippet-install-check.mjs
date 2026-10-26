@@ -44,6 +44,24 @@ console.log('advertised integrity ' + advertisedSri);
 /* The path an adopter would fetch, mapped onto this repository. */
 const pathOnly = advertisedUrl.replace(/^https?:\/\/[^/]+\/nac-spec\//, '');
 console.log('resolved locally to  ' + pathOnly);
+
+/* The version this gate expects is DERIVED from the URL the page
+   advertises, not typed. It was typed -- `got.version === '2.5.0'` --
+   which made this gate go red on the 2.5.1 for a reason that had
+   nothing to do with an adopter: the only gate in the repository with
+   a hard-coded version was the one written to catch a hand-written
+   hash. Audit N-17 and N-42 are the same shape, and this is now the
+   stronger assertion anyway: the runtime the page pins must report the
+   version in the path the page pins it at. */
+const advertisedVersion = (() => {
+  const v = pathOnly.match(/^js\/([^/]+)\/nac\.js$/);
+  if (!v) {
+    console.error('FAIL  the advertised URL is not an immutable versioned path: ' + pathOnly);
+    process.exit(1);
+  }
+  return v[1];
+})();
+console.log('advertised version   ' + advertisedVersion);
 const bytes = readFileSync(pathOnly);
 console.log('bytes                ' + bytes.length);
 
@@ -91,14 +109,18 @@ console.log('NAC.version          ' + got.version);
 const checks = [
   ['the browser did NOT refuse the file for its hash', digestRefusal.length === 0],
   ['the runtime executed (window.NAC exists)', got.nacPresent === true],
-  ['and it is the version the page advertises', got.version === '2.5.0'],
+  ['and it is the version the page advertises', got.version === advertisedVersion,
+   'the page pins js/' + advertisedVersion + '/nac.js and the runtime reports ' + got.version],
   ['no console errors at all', consoleErrors.length === 0],
 ];
 
 let bad = 0;
 console.log('');
-for (const [name, ok] of checks) {
-  console.log((ok ? 'PASS  ' : 'FAIL  ') + name);
+for (const [name, ok, detail] of checks) {
+  /* The detail is printed on failure only, and it is the whole value of
+     a red line: "FAIL and it is the version the page advertises" sent
+     the reader to read the gate instead of the defect. */
+  console.log((ok ? 'PASS  ' : 'FAIL  ') + name + (!ok && detail ? ' -- ' + detail : ''));
   if (!ok) bad += 1;
 }
 console.log('');

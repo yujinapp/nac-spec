@@ -1,0 +1,424 @@
+{
+  "api_schema": 1,
+  "channel": "stable",
+  "coded_findings": [
+    {
+      "code": "aria_nac_state_mismatch",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Mirror the two: update data-nac-state wherever the ARIA attribute changes.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "The ARIA state of an element and its data-nac-state disagree, so a screen reader and an agent see different truths about the same widget."
+    },
+    {
+      "code": "backend_unknown",
+      "emitted_by": [
+        "_v25_validateManifest"
+      ],
+      "fix": "Use a term from the backend vocabulary published in the spec, or register the extension that defines it.",
+      "severity": "error",
+      "shapes": [
+        "thrown_error"
+      ],
+      "since": "2.5.0",
+      "what": "Thrown, not reported: an action named a backend vocabulary term the runtime does not know."
+    },
+    {
+      "code": "breadcrumb_item_missing",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Render the breadcrumb item, or remove the hop from the manifest.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "A declared breadcrumb hop has no matching breadcrumb-item element in the DOM."
+    },
+    {
+      "code": "depends_on_orphan",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Declare the referenced id, or remove the dependency.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "A manifest entry depends on an id that nothing in the manifest declares."
+    },
+    {
+      "code": "drag_type_unknown",
+      "emitted_by": [
+        "pushErr"
+      ],
+      "fix": "Use a registered drag type, or document the custom one for the agents that must handle it.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.9.0",
+      "what": "A drag type or accept value falls outside the registry. Custom types still work; this is a heads-up that no agent can guess the semantics."
+    },
+    {
+      "code": "duplicate_plugin_no_instance_id",
+      "emitted_by": [
+        "_installPluginDedupBootGate",
+        "_scanPluginInstances",
+        "checkPresence"
+      ],
+      "fix": "Give every mounted instance a unique data-nac-plugin-id, or mount the plugin once.",
+      "severity": "error",
+      "shapes": [
+        "finding_object",
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "The same plugin slug is mounted more than once and the instances carry no distinct data-nac-plugin-id, so no id under that slug resolves to one element."
+    },
+    {
+      "code": "duplicate_tab_label",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Make the labels distinct, or address those tabs by id only.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "Two tabs under one plugin share a label, so NAC.tab_by_label() is ambiguous."
+    },
+    {
+      "code": "duplicate_verb",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Make the verb unique within the plugin, or address those actions by id.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "Two actions under one plugin declare the same data-nac-action verb, so NAC.click_by_verb() cannot resolve it. SPEC.md section 3 names this a manifest error."
+    },
+    {
+      "code": "field_type_mismatch",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Align the manifest type with data-nac-field-type on the element.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "The manifest declares a field type the mounted element contradicts."
+    },
+    {
+      "code": "field_type_undeclared",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Declare the field type in the manifest.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "A field is advertised without a type, so an agent has to guess how to fill it."
+    },
+    {
+      "code": "invalid",
+      "emitted_by": [
+        "_v25_validateManifest"
+      ],
+      "fix": "Read the message on the error; it names the argument and what it expected.",
+      "severity": "error",
+      "shapes": [
+        "thrown_error"
+      ],
+      "since": null,
+      "what": "Thrown, not reported: an argument failed validation at the API boundary."
+    },
+    {
+      "code": "manifest_dom_role_mismatch",
+      "emitted_by": [
+        "check"
+      ],
+      "fix": "Make the data-nac-role attribute on the element match the role declared in the manifest.",
+      "severity": null,
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.2.0",
+      "what": "The manifest and the mounted DOM element disagree about the role of the same id."
+    },
+    {
+      "code": "manifest_role_unknown",
+      "emitted_by": [
+        "check"
+      ],
+      "fix": "Use one of the roles published in contract.json, or drop the role and let the element default to action behaviour.",
+      "severity": null,
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.2.0",
+      "what": "A manifest element declares a data-nac-role that is not in the runtime's accepted role set."
+    },
+    {
+      "code": "missing_in_dom",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Render the element, or remove the id from the manifest while it is not mounted.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "An id the manifest advertises has no element in the DOM, so an agent that trusts the manifest will fail to operate it."
+    },
+    {
+      "code": "nac_id_declared_not_mounted",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Nothing, if the view is simply closed. If the manifest claims a permanent surface, mount it or stop declaring it.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "A manifest declares an id that is not currently in the DOM."
+    },
+    {
+      "code": "nac_id_duplicate_across_plugins",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Namespace the ids with the plugin slug (plugin.element), or remove the declaration from the manifest that should not own it.",
+      "severity": "error",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "Two or more registered manifests declare the same nac_id, so an agent addressing it by id cannot know which element it gets."
+    },
+    {
+      "code": "nac_id_missing_plugin_prefix",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Rename the id to slug.element. Renaming an id breaks every caller that used the old one, so do it with the same care as changing a URL.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "A declared nac_id does not start with its plugin slug followed by a dot, so it loses the namespacing that keeps two plugins from colliding."
+    },
+    {
+      "code": "nac_id_orphan_in_dom",
+      "emitted_by": [
+        "validate_global"
+      ],
+      "fix": "Declare it in the manifest, or drop the attribute if the element is not meant to be agent-addressable. Common and sometimes legitimate mid-migration, which is why it is a warning.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.5.0",
+      "what": "An element in the DOM carries a data-nac-id that no registered manifest declares, so it is reachable by name but not discoverable by an agent that reads the manifest."
+    },
+    {
+      "code": "no_manifest",
+      "emitted_by": [
+        "validate"
+      ],
+      "fix": "Call NAC.register() for that slug before validating it, or correct the slug.",
+      "severity": null,
+      "shapes": [
+        "finding_object"
+      ],
+      "since": null,
+      "what": "Validation was asked for a plugin slug that was never registered."
+    },
+    {
+      "code": "options_unresolved",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Provide the options resolver, or mark the field as free text.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "1.4.1",
+      "what": "A field advertises options and no resolver or option element produces them."
+    },
+    {
+      "code": "plugin_not_mounted",
+      "emitted_by": [
+        "validate"
+      ],
+      "fix": "Mount the plugin root before validating, or unregister it when the view unmounts.",
+      "severity": null,
+      "shapes": [
+        "finding_object"
+      ],
+      "since": null,
+      "what": "The plugin is registered but no element with its data-nac-plugin root is in the DOM."
+    },
+    {
+      "code": "row_cell_missing",
+      "emitted_by": [
+        "checkPresence"
+      ],
+      "fix": "Render every declared column in every row, or drop the column declaration.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": "2.1.0",
+      "what": "A data table declares a column with no matching cell in a row, so cell addressing by column breaks."
+    },
+    {
+      "code": "skip_no_remediate_date",
+      "emitted_by": [
+        "pushErr"
+      ],
+      "fix": "Add the date by which the exclusion is expected to be gone.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "A validation exclusion carries no remediation date, so it has no expiry and becomes permanent debt."
+    },
+    {
+      "code": "skip_remediation_overdue",
+      "emitted_by": [
+        "pushErr"
+      ],
+      "fix": "Remediate the subtree, or renegotiate the date deliberately.",
+      "severity": "warn",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "A validation exclusion is past the remediation date it declared."
+    },
+    {
+      "code": "skip_subtree_contains_interactives",
+      "emitted_by": [
+        "_candidateLabel",
+        "pushErr"
+      ],
+      "fix": "Narrow the exclusion to the part that genuinely cannot be annotated.",
+      "severity": "warn",
+      "shapes": [
+        "finding_object",
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "An excluded subtree contains operable widgets, so the page is hiding agent-operable surface behind the exclusion."
+    },
+    {
+      "code": "skip_without_reason",
+      "emitted_by": [
+        "pushErr"
+      ],
+      "fix": "State the reason on the skip annotation.",
+      "severity": "error",
+      "shapes": [
+        "validate_errors"
+      ],
+      "since": null,
+      "what": "A subtree is excluded from validation with no reason recorded, so the exclusion cannot be reviewed."
+    },
+    {
+      "code": "strict_validation",
+      "emitted_by": [
+        "check"
+      ],
+      "fix": "Fix the findings carried on the error, or register with strict validation off while migrating.",
+      "severity": "error",
+      "shapes": [
+        "thrown_error"
+      ],
+      "since": "2.2.0",
+      "what": "Thrown, not reported: strict validation is on and register-time findings were raised, so the registration was refused."
+    },
+    {
+      "code": "tab_id_manifest_role_drift",
+      "emitted_by": [
+        "check"
+      ],
+      "fix": "Set role to tab, or rename the id out of the reserved tab. prefix.",
+      "severity": null,
+      "shapes": [
+        "finding_object"
+      ],
+      "since": "2.2.0",
+      "what": "An id matching the reserved tab. prefix carries a role other than tab, so NAC.tab() and NAC.tab_by_label() will never resolve it."
+    }
+  ],
+  "generated_by": "scripts/build-contract-api.mjs",
+  "global_buckets": {
+    "buckets": [
+      {
+        "bucket": "convention_violations",
+        "code": "nac_id_missing_plugin_prefix",
+        "severity": "warn",
+        "what": "A declared nac_id does not start with its plugin slug, so it loses the namespacing that keeps two plugins from colliding."
+      },
+      {
+        "bucket": "duplicates",
+        "code": "nac_id_duplicate_across_plugins",
+        "severity": "error",
+        "what": "The same nac_id is declared by two or more registered plugins, so an agent addressing it by id cannot know which element it gets."
+      },
+      {
+        "bucket": "orphans",
+        "code": "nac_id_orphan_in_dom",
+        "severity": "warn",
+        "what": "An element in the DOM carries a data-nac-id that no registered manifest declares. Common and sometimes legitimate during brownfield migration, which is why it is a warning."
+      },
+      {
+        "bucket": "plugin_instance_violations",
+        "code": "duplicate_plugin_no_instance_id",
+        "severity": "error",
+        "what": "Plugin slug uniqueness is broken: the same slug is mounted more than once without distinct instance ids. Reported in its own bucket so CI can gate on it separately."
+      },
+      {
+        "bucket": "unmounted",
+        "code": "nac_id_declared_not_mounted",
+        "severity": "warn",
+        "what": "A manifest declares an id that is not currently in the DOM. Expected while a view is closed; a defect when the manifest claims a permanent surface."
+      }
+    ],
+    "note": "validate_global() reports findings as named buckets of objects, not as a flat array. Since 2.5.0 every item of every bucket carries code + severity, so section 12 promise 4 covers a real set. The code and the severity below are READ off items a fixture provokes on purpose (scripts/fixture-dom.mjs), not written here: the previous version of this generator wrote them by hand and published a null for a bucket that had carried a code since 2.5.0 (audit N-14)."
+  },
+  "protocol": "NAC3",
+  "spec_version": "2.5",
+  "stability": {
+    "codes_are_append_only": true,
+    "note": "SPEC.md section 12 promise 4: finding codes are not reused for a different condition across minor versions. This catalogue is the artefact that promise is checked against: compare two published versions and a reused code is visible.",
+    "since_note": "since records the release that introduced a code. null means the code predates this catalogue (first published at 2.5.0-alpha.5) and its introducing release was not reconstructed from history -- it is not a claim that the code is new."
+  },
+  "surface": "findings",
+  "uncoded_findings": {
+    "buckets": [],
+    "note": "Kept for schema compatibility with 2.5.0-alpha.5 and earlier, where validate_global attached no code to any bucket. Empty since 2.5.0: every bucket is coded, and the codes are in global_buckets above (audit N-14, closed)."
+  },
+  "version": "2.5.1"
+}

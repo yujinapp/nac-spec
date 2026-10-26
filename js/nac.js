@@ -2361,11 +2361,34 @@
      fields[], tabs[], kpis[], rows.cells[], breadcrumbs[], etc. */
   function _collectManifestIds(m) {
     const out = [];
+    /* v2.5 fix (audit N-33): the CANONICAL manifest shape is
+       `elements: [{ id, role, ... }]` -- that is what section 4
+       documents, what every demo ships and what the rest of this
+       runtime reads (see _capabilityFor, which walks
+       m.elements.concat(m.tabs) by `.id`). This collector used to
+       read ONLY the legacy groups below, keyed by `nac_id`, so for
+       a manifest written the documented way it returned an empty
+       list. Everything built on top went quietly wrong in the same
+       direction: validate_global() reported total_ids = 0, called
+       every declared element an orphan, could never report a
+       duplicate, an unmounted id or a convention violation, and
+       still answered ok = true. A validator that cannot see the
+       manifest is not a lenient validator, it is a green light
+       with nothing behind it. Both shapes are read now; the legacy
+       groups stay because manifests in the wild still use them. */
+    const elems = (m && m.elements) || [];
+    elems.forEach(function (e) {
+      if (e && e.id) out.push(String(e.id));
+    });
     const groups = ['actions', 'fields', 'tabs', 'kpis', 'charts'];
     groups.forEach(function (g) {
       const arr = (m && m[g]) || [];
       arr.forEach(function (x) {
+        /* tabs are declared with `.id` in the canonical shape and
+           with `.nac_id` in the legacy one; take whichever is there
+           instead of choosing a winner. */
         if (x && x.nac_id) out.push(String(x.nac_id));
+        else if (x && x.id) out.push(String(x.id));
       });
     });
     if (m && m.rows && Array.isArray(m.rows.cells)) {
@@ -2382,7 +2405,14 @@
         }
       });
     }
-    return out;
+    /* Unique: an id declared in two shapes of the SAME manifest is one
+       id, not a cross-plugin duplicate. */
+    const seen = Object.create(null);
+    return out.filter(function (id) {
+      if (seen[id]) return false;
+      seen[id] = true;
+      return true;
+    });
   }
 
   function unregister(slug) {
@@ -4628,16 +4658,36 @@
      DOM that belong to no manifest?" The per-plugin validate(slug)
      cannot see across boundaries; this one can.
 
-     Returns:
+     Returns an OBJECT OF NAMED BUCKETS -- not a flat array of
+     findings. Every item of every bucket carries `code` and
+     `severity` since 2.5.0 (audit N-14), so a CI integration can
+     gate on a code without parsing a message:
        {
          ok:         boolean,
-         duplicates: [{nac_id, plugins:[...]}],   // same id in 2+ manifests
-         orphans:    [{nac_id, in_dom:true, in_manifest:false, plugin_root:?}],
-         unmounted:  [{nac_id, in_manifest:true, in_dom:false, plugin}],
-         convention_violations: [{nac_id, plugin}], // nac_id missing 'plugin.' prefix
+         has_errors: boolean,
+         duplicates: [{code nac_id_duplicate_across_plugins,
+                       severity error, nac_id, plugins:[...]}],
+         orphans:    [{code nac_id_orphan_in_dom, severity warn,
+                       nac_id, in_dom:true, in_manifest:false,
+                       plugin_root:?}],
+         unmounted:  [{code nac_id_declared_not_mounted,
+                       severity warn, nac_id, in_manifest:true,
+                       in_dom:false, plugin}],
+         convention_violations:
+                     [{code nac_id_missing_plugin_prefix,
+                       severity warn, nac_id, plugin, hint}],
+         plugin_instance_violations:
+                     [{code duplicate_plugin_no_instance_id,
+                       severity error, slug, ...}],
+         tolerated:  [{kind, nac_id, until, original}],
          plugin_count, total_ids,
          timestamp
        }
+     The five codes are published, with their severity and what to do
+     about each, in api/latest/findings.json. (The code names above are
+     written unquoted on purpose: the catalogue generator greps the
+     emission shape out of this file, and a comment is not an
+     emission.)
 
      A NAC-3 codebase that wants drift to be a CI blocker should run
      this in addition to the per-plugin validate(slug) loop. */
@@ -4676,6 +4726,13 @@
       ids.forEach(function (id) {
         if (id.indexOf(slug + '.') !== 0 && id !== slug) {
           out.convention_violations.push({
+            /* v2.5 / audit N-14: every finding of this validator carries
+               a code from the published catalogue, so section 12 promise
+               4 ("the validate_global finding codes will not be reused")
+               covers a real set instead of an empty one. The code is the
+               stable identity; the message is not. */
+            code:     'nac_id_missing_plugin_prefix',
+            severity: 'warn',
             nac_id: id, plugin: slug,
             hint:   'expected prefix "' + slug + '."',
           });
@@ -4687,7 +4744,11 @@
     /* Duplicates: any id that appears in 2+ manifests. */
     for (const id in idIndex) {
       if (idIndex[id].length >= 2) {
-        out.duplicates.push({ nac_id: id, plugins: idIndex[id].slice() });
+        out.duplicates.push({
+          code:     'nac_id_duplicate_across_plugins',
+          severity: 'error',
+          nac_id: id, plugins: idIndex[id].slice(),
+        });
       }
     }
 
@@ -4708,6 +4769,8 @@
              severity for the caller to decide. */
           const root = el.closest('[data-nac-plugin]');
           out.orphans.push({
+            code:     'nac_id_orphan_in_dom',
+            severity: 'warn',
             nac_id: id,
             in_dom: true,
             in_manifest: false,
@@ -4721,6 +4784,8 @@
     for (const id in idIndex) {
       if (!inDom[id]) {
         out.unmounted.push({
+          code:     'nac_id_declared_not_mounted',
+          severity: 'warn',
           nac_id: id, in_manifest: true, in_dom: false,
           plugin: idIndex[id][0],
         });

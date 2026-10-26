@@ -134,6 +134,26 @@
       "what": "Thrown, not reported: an argument failed validation at the API boundary.",
       "fix": "Read the message on the error; it names the argument and what it expected.",
       "since": null
+    },
+    "nac_id_duplicate_across_plugins": {
+      "what": "Two or more registered manifests declare the same nac_id, so an agent addressing it by id cannot know which element it gets.",
+      "fix": "Namespace the ids with the plugin slug (plugin.element), or remove the declaration from the manifest that should not own it.",
+      "since": "2.5.0"
+    },
+    "nac_id_orphan_in_dom": {
+      "what": "An element in the DOM carries a data-nac-id that no registered manifest declares, so it is reachable by name but not discoverable by an agent that reads the manifest.",
+      "fix": "Declare it in the manifest, or drop the attribute if the element is not meant to be agent-addressable. Common and sometimes legitimate mid-migration, which is why it is a warning.",
+      "since": "2.5.0"
+    },
+    "nac_id_declared_not_mounted": {
+      "what": "A manifest declares an id that is not currently in the DOM.",
+      "fix": "Nothing, if the view is simply closed. If the manifest claims a permanent surface, mount it or stop declaring it.",
+      "since": "2.5.0"
+    },
+    "nac_id_missing_plugin_prefix": {
+      "what": "A declared nac_id does not start with its plugin slug followed by a dot, so it loses the namespacing that keeps two plugins from colliding.",
+      "fix": "Rename the id to slug.element. Renaming an id breaks every caller that used the old one, so do it with the same care as changing a URL.",
+      "since": "2.5.0"
     }
   },
 

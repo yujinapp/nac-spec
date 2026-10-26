@@ -1,5 +1,48 @@
 # Changelog
 
+## 2.5.0 -- unreleased
+
+Stabilises the 2.5 line. The entries below land with the version bump;
+the heading takes its date then.
+
+### Fixed
+
+- **`validate_global()` can see a manifest written the documented way**
+  (audit N-33). The id collector behind it read only the legacy manifest
+  groups (`actions`, `fields`, `tabs`, `kpis`, `charts`, keyed by
+  `nac_id`) and never the canonical `elements: [{ id }]` shape of SPEC
+  section 4 -- the shape every demo ships and the rest of the runtime
+  reads. Against a canonical manifest it reported `total_ids: 0`, listed
+  every declared element as an orphan, could not report a duplicate, an
+  unmounted id or a convention violation at all, and still answered
+  `ok: true`. Measured on this project's own landing page: 2 plugins,
+  64 declared elements, `total_ids: 0`, 128 orphans. After the fix:
+  `total_ids: 64`, 64 orphans -- and those 64 are exactly the undeclared
+  ids a separate audit had counted by hand.
+  **Upgrade note:** a host that gates CI on `has_errors` may see its
+  first failure after upgrading. That is a true positive that was always
+  there, not a new rule. Both manifest shapes are read from now on.
+
+### Added
+
+- **Every `validate_global()` bucket carries `code` + `severity`**
+  (audit N-14, SPEC sec 10.1 + 12 promise 4). New codes:
+  `nac_id_duplicate_across_plugins` (error),
+  `nac_id_orphan_in_dom` (warn),
+  `nac_id_declared_not_mounted` (warn),
+  `nac_id_missing_plugin_prefix` (warn).
+  `plugin_instance_violations` already carried
+  `duplicate_plugin_no_instance_id`. Promise 4 of section 12 named this
+  validator while every bucket was uncoded, so it covered an empty set;
+  it covers a real one now. The codes are published with their severity
+  and a fix under `global_buckets` in `api/latest/findings.json`.
+
+### Changed
+
+- **SPEC section 10.1 describes the shape the runtime actually returns**
+  (audit N-34): an object of named buckets, not the flat array of
+  findings the section had documented since before 1.0.
+
 ## 2.5.0-alpha.5 -- 2026-05-25
 
 NAC3 v2.5.0-alpha.5 ships the remaining three assistive blocks of

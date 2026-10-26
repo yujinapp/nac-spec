@@ -742,7 +742,7 @@ All async methods reject with `NacError` whose `code` is one of:
 NAC.describe():    { active: string|null, plugins: PluginSnap[] }
 NAC.describe_v2(): { v2_scope_entries: [...], sitemap: ..., data_tables: [...] }
 NAC.manifest(plugin_slug: string): Manifest|null
-NAC.validate_global(opts?: {probe?: boolean}): Findings[]
+NAC.validate_global(opts?: {probe?: boolean}): GlobalReport   // named buckets, see 10.1
 ```
 
 ### 5.3 Data tables (since 2.1)
@@ -1162,21 +1162,58 @@ version string to parse and no tag to trust.
 
 ### 10.1 Runtime: `NAC.validate_global()`
 
-Walks the live DOM + the registered manifests + the i18n catalog
-and returns an array of findings:
+Walks the live DOM + the registered manifests and returns an
+**object of named buckets** -- one bucket per condition, each one an
+array of findings. Since 2.5.0 every finding of every bucket carries
+`code` and `severity`, so a CI integration can gate on a code
+without parsing a message:
 
 ```ts
 {
-  severity: 'error' | 'warn' | 'info',
-  code:     string,                     // e.g. 'tab_role_drift'
-  nac_id:   string | null,
-  message:  string,
-  detail:   Record<string, any>
+  ok:         boolean,       // false when any error-severity finding exists
+  has_errors: boolean,
+  duplicates: [{ code: 'nac_id_duplicate_across_plugins',
+                 severity: 'error', nac_id, plugins: string[] }],
+  orphans:    [{ code: 'nac_id_orphan_in_dom',
+                 severity: 'warn', nac_id, in_dom, in_manifest,
+                 plugin_root }],
+  unmounted:  [{ code: 'nac_id_declared_not_mounted',
+                 severity: 'warn', nac_id, in_manifest, in_dom,
+                 plugin }],
+  convention_violations:
+              [{ code: 'nac_id_missing_plugin_prefix',
+                 severity: 'warn', nac_id, plugin, hint }],
+  plugin_instance_violations:
+              [{ code: 'duplicate_plugin_no_instance_id',
+                 severity: 'error', slug, instance_count, ... }],
+  tolerated:  [{ kind, nac_id, until, original }],
+  plugin_count: number,
+  total_ids:    number,
+  timestamp:    number
 }
 ```
 
-Findings codes are stable across patch releases; new codes only
-in minor bumps.
+The five codes, their severity and what to do about each are
+published as data at `api/latest/findings.json`, under
+`global_buckets`. Finding codes are stable across patch releases;
+new codes only in minor bumps, and a code is never reused for a
+different condition (section 12, promise 4).
+
+**Versions before 2.5.0 attached no code to these buckets**, and
+this section described a flat array of findings that the reference
+runtime never returned (audit N-14, N-34).
+
+**Behaviour change in 2.5.0 (audit N-33).** Before 2.5.0 the
+collector behind this validator read only the legacy manifest
+groups (`actions`, `fields`, `tabs`, `kpis`, `charts`, keyed by
+`nac_id`) and never the canonical `elements: [{ id }]` shape of
+section 4. Against a manifest written the documented way it
+therefore reported `total_ids: 0`, listed every declared element as
+an orphan, could not report a duplicate, an unmounted id or a
+convention violation at all, and still answered `ok: true`. Both
+shapes are read from 2.5.0 on. A host that gated CI on `has_errors`
+may see its first failure after upgrading: that is a true positive
+that was always there, not a new rule.
 
 ### 10.2 CLI: `npx nac3 validate <target>`
 
@@ -1227,7 +1264,11 @@ What this spec promises:
 3. The verbs of `NAC.click`, `NAC.fill`, etc. will not change
    shape in minor versions. New optional `opts` fields MAY appear.
 4. The `validate_global` finding codes will not be reused for
-   different conditions across minor versions.
+   different conditions across minor versions. Since 2.5.0 every
+   bucket of that validator carries a code, and all of them are
+   published with their severity at `api/latest/findings.json`:
+   compare two published versions and a reused code is visible
+   without reading any source.
 
 What this spec does NOT promise:
 
@@ -1263,7 +1304,7 @@ to make about `payload_schema`.
 | Should `NAC.click()` accept relative ids (e.g. `'./save'`)? | **OPEN, not implemented** | v2.5 | The resolver matches `data-nac-id` exactly and scopes by plugin -- the active one, or `opts.plugin`. That scoping already covers the case the question was asking for (`NAC.click('save', {plugin:'invoice'})`), so the pressure for a relative syntax is low and nothing is in progress. Deciding it would mean adding a path grammar to section 2, where ids are declared opaque to the runtime. |
 | Should manifests support inheritance / extension across plugins (one base manifest extended by a tenant)? | **OPEN, candidate for the next major** | v2.5 | Not implemented. **Not to be confused with section 15**, "plugin extension contract": that shipped in v2.5 and is a backend-routing mechanism (`registerPlugin` / `call` / `read` / `subscribe`), not manifest inheritance. The question here is about one manifest deriving from another, which touches the id-uniqueness rules of section 2 and is why it is held for a major. |
 | Should `payload_schema` enforcement be formalised and turned on? | **OPEN, undated** | v2.5 | Moved here from section 5, which promised it for v2.4. It did not land in v2.4 and has not landed through v2.5; the reference runtime does not read the field. See section 5 for exactly what is and is not validated today. |
-| Should `validate_global()` findings carry a code from the published catalogue? | **OPEN, in progress** | v2.5 | `validate_global()` returns named buckets of objects with no `code` field, while section 12 promises code stability for this validator by name. The catalogue exists and is published at `api/latest/findings.json`, which marks these buckets as uncoded. Until the buckets carry codes, that promise covers an empty set. |
+| Should `validate_global()` findings carry a code from the published catalogue? | **DECIDED: yes, shipped in 2.5.0** | v2.5 | Every item of every bucket carries `code` + `severity`, so section 12 promise 4 now covers a real set instead of an empty one. The five codes are published under `global_buckets` in `api/latest/findings.json`, and the generator READS them off a fixture that provokes each bucket rather than writing them by hand -- the previous version wrote `code: null` for a bucket that had carried a code since 2.5.0 and published both claims in the same file. Building that fixture is also what found audit N-33: the validator could not see a manifest written in the canonical shape. See 10.1. |
 
 ---
 

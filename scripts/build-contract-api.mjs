@@ -81,6 +81,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import vm from 'node:vm';
+import { loadRuntimeInFixtureDom } from './fixture-dom.mjs';
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), '..');
 const WRITE = process.argv.includes('--write');
@@ -274,9 +275,20 @@ function extractFindingCodes(src) {
     add(m[2], m[1], enclosingFunction(src, m.index), 'validate_errors');
   }
 
+  /* Object-shaped emissions often declare their severity next to the code:
+       findings.push({ code: 'x', severity: 'error', ... })
+     Read it when it is there instead of publishing null. The window stops at
+     the next `code:` so one finding can never borrow the severity of the one
+     after it, and an emission that declares no severity still publishes
+     null -- which is the truth about it. */
   const objRx = /code:\s*'([a-z0-9_]+)'/g;
   while ((m = objRx.exec(src))) {
-    add(m[1], null, enclosingFunction(src, m.index), 'finding_object');
+    const from = m.index + m[0].length;
+    const window = src.slice(from, from + 240);
+    const nextCode = window.search(/code:\s*'/);
+    const scope = nextCode < 0 ? window : window.slice(0, nextCode);
+    const sev = scope.match(/severity:\s*'([a-z]+)'/);
+    add(m[1], sev ? sev[1] : null, enclosingFunction(src, m.index), 'finding_object');
   }
 
   const throwRx = /\.code\s*=\s*'([a-z0-9_]+)'/g;
@@ -294,18 +306,63 @@ function extractFindingCodes(src) {
     .sort((a, b) => (a.code < b.code ? -1 : 1));
 }
 
-/* The buckets validate_global() actually returns, read by CALLING it.
-   This is the gap the spec's section 12 promise sits on: it promises
-   that "the validate_global finding codes will not be reused", and
-   validate_global returns buckets with no code field at all. The
-   catalogue says so in writing rather than inventing codes that the
-   runtime does not emit. */
-function extractGlobalBuckets(NAC) {
-  const result = NAC.validate_global();
-  const meta = new Set(['ok', 'has_errors', 'plugin_count', 'total_ids', 'timestamp', 'tolerated']);
-  return Object.keys(result)
-    .filter((k) => !meta.has(k))
-    .sort();
+/* The buckets validate_global() returns, WITH the code each one attaches,
+   read off items the runtime really produced.
+
+   This used to call validate_global() on an empty document. With no findings
+   there is not one item to look at, so it took the bucket NAMES from the
+   result keys and the generator then wrote `code: null` for every one of
+   them. That was wrong in a way nobody could see from the outside: the
+   plugin_instance_violations bucket has carried a code since 2.5.0, the same
+   artefact published it in the catalogue AND as uncoded, and the two claims
+   sat two keys apart (audit N-14 / PND-039).
+
+   Now a fixture provokes all five conditions and the code is read. Three
+   things make it refuse instead of publishing a guess:
+     - a bucket the fixture does not provoke (we would have nothing to read),
+     - items of one bucket disagreeing on the code (two conditions, one name),
+     - an item with no code at all (the N-14 state, back again).
+   A generator that composes what it should read is a second opinion, not a
+   contract. */
+const BUCKET_META_KEYS = new Set([
+  'ok', 'has_errors', 'plugin_count', 'total_ids', 'timestamp', 'tolerated',
+]);
+
+function readGlobalBuckets() {
+  const { result } = loadRuntimeInFixtureDom();
+  const names = Object.keys(result).filter((k) => !BUCKET_META_KEYS.has(k)).sort();
+  return names.map((bucket) => {
+    const items = result[bucket] || [];
+    if (!Array.isArray(items)) {
+      throw new Error('validate_global bucket "' + bucket + '" is not an array');
+    }
+    if (items.length === 0) {
+      throw new Error(
+        'the fixture no longer provokes validate_global bucket "' + bucket
+        + '": there is nothing to read its code off, so the catalogue would '
+        + 'have to invent one. Teach scripts/fixture-dom.mjs to provoke it.');
+    }
+    const codes = Array.from(new Set(items.map((i) => i.code)));
+    if (codes.length !== 1) {
+      throw new Error(
+        'validate_global bucket "' + bucket + '" attaches more than one code ('
+        + codes.join(', ') + '): one bucket is one condition, or the catalogue '
+        + 'cannot describe it with one entry');
+    }
+    if (!codes[0]) {
+      throw new Error(
+        'validate_global bucket "' + bucket + '" attaches no code. SPEC.md '
+        + 'section 12 promise 4 names this validator; an uncoded bucket makes '
+        + 'that promise cover an empty set (audit N-14).');
+    }
+    const severities = Array.from(new Set(items.map((i) => i.severity)));
+    if (severities.length !== 1 || !severities[0]) {
+      throw new Error(
+        'validate_global bucket "' + bucket + '" does not attach one severity ('
+        + severities.join(', ') + ')');
+    }
+    return { bucket, code: codes[0], severity: severities[0], sample_size: items.length };
+  });
 }
 
 /* ---- extraction from SPEC.md --------------------------------------
@@ -552,7 +609,7 @@ function buildContract(rt, specSrc, meta) {
 function buildFindings(rt, meta) {
   const { NAC, src } = rt;
   const codes = extractFindingCodes(src);
-  const buckets = extractGlobalBuckets(NAC);
+  const buckets = readGlobalBuckets();
 
   return {
     api_schema: API_SCHEMA,
@@ -579,14 +636,18 @@ function buildFindings(rt, meta) {
         since: m.since || null,
       };
     }),
-    uncoded_findings: {
-      note: 'validate_global() reports these as named buckets of objects and attaches no code field. SPEC.md section 12 promise 4 names this validator, so until each bucket carries a code from the catalogue above, that promise covers an empty set. Tracked as audit N-14 / PND-033; the codes land with 2.5.0 because changing the runtime requires a version bump.',
+    global_buckets: {
+      note: 'validate_global() reports findings as named buckets of objects, not as a flat array. Since 2.5.0 every item of every bucket carries code + severity, so section 12 promise 4 covers a real set. The code and the severity below are READ off items a fixture provokes on purpose (scripts/fixture-dom.mjs), not written here: the previous version of this generator wrote them by hand and published a null for a bucket that had carried a code since 2.5.0 (audit N-14).',
       buckets: buckets.map((b) => ({
-        bucket: b,
-        code: null,
-        severity: (meta.global_buckets[b] && meta.global_buckets[b].severity) || null,
-        what: (meta.global_buckets[b] && meta.global_buckets[b].what) || null,
+        bucket: b.bucket,
+        code: b.code,
+        severity: b.severity,
+        what: (meta.global_buckets[b.bucket] && meta.global_buckets[b.bucket].what) || null,
       })),
+    },
+    uncoded_findings: {
+      note: 'Kept for schema compatibility with 2.5.0-alpha.5 and earlier, where validate_global attached no code to any bucket. Empty since 2.5.0: every bucket is coded, and the codes are in global_buckets above (audit N-14, closed).',
+      buckets: [],
     },
   };
 }
@@ -981,7 +1042,7 @@ function main() {
       fail('finding code "' + c + '" is documented in the meta sidecar and the runtime no longer emits it (remove it, or restore the emitter)');
     }
   }
-  const liveBuckets = built['findings.json'].uncoded_findings.buckets.map((b) => b.bucket);
+  const liveBuckets = built['findings.json'].global_buckets.buckets.map((b) => b.bucket);
   for (const b of liveBuckets) {
     if (!meta.global_buckets[b]) {
       fail('validate_global bucket "' + b + '" has no entry in the meta sidecar');
@@ -990,6 +1051,27 @@ function main() {
   for (const b of Object.keys(meta.global_buckets)) {
     if (liveBuckets.indexOf(b) < 0) {
       fail('meta sidecar documents a validate_global bucket "' + b + '" that validate_global no longer returns');
+    }
+  }
+  /* The severity is now READ from the runtime, and the sidecar carries the
+     severity a human reviewed. If the two disagree, somebody changed how
+     grave a condition is without saying so -- publish neither silently. */
+  for (const b of built['findings.json'].global_buckets.buckets) {
+    const declared = meta.global_buckets[b.bucket] && meta.global_buckets[b.bucket].severity;
+    if (declared && declared !== b.severity) {
+      fail('validate_global bucket "' + b.bucket + '" attaches severity "' + b.severity
+        + '" and the meta sidecar says "' + declared
+        + '". One of the two changed its mind about how grave this is.');
+    }
+  }
+  /* The bucket codes are finding codes too: they must be in the catalogue
+     and in the sidecar like any other, or the contract would describe the
+     same condition twice with two different meanings. */
+  for (const b of built['findings.json'].global_buckets.buckets) {
+    if (liveCodes.indexOf(b.code) < 0) {
+      fail('validate_global bucket "' + b.bucket + '" attaches code "' + b.code
+        + '" and the catalogue does not list it: the emission shape changed and '
+        + 'extractFindingCodes no longer sees it.');
     }
   }
 

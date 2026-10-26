@@ -82,6 +82,9 @@ function sandbox() {
   copyFileSync(join(ROOT, 'scripts', 'build-contract-api.mjs'), join(dir, 'scripts', 'build-contract-api.mjs'));
   copyFileSync(join(ROOT, 'scripts', 'sign-contract-api.mjs'), join(dir, 'scripts', 'sign-contract-api.mjs'));
   copyFileSync(join(ROOT, 'scripts', 'contract-api.meta.json'), join(dir, 'scripts', 'contract-api.meta.json'));
+  /* The generator reads the bucket codes off a fixture that provokes every
+     validate_global bucket, so the fixture is part of what it reads (N-14). */
+  copyFileSync(join(ROOT, 'scripts', 'fixture-dom.mjs'), join(dir, 'scripts', 'fixture-dom.mjs'));
   copyFileSync(join(ROOT, 'js', 'nac.js'), join(dir, 'js', 'nac.js'));
   copyFileSync(join(ROOT, 'SPEC.md'), join(dir, 'SPEC.md'));
   /* The witness record lives in this document and the gate compares it,
@@ -269,6 +272,43 @@ expectRed(
     o.finding_codes.code_that_never_existed = { what: 'x', fix: 'y', since: null };
   }),
   'the runtime no longer emits it'
+);
+
+/* 10a to 10c. The validate_global buckets (audit N-14, and the defect that
+       audit found inside the fix itself: the generator used to WRITE
+       `code: null` for every bucket, and one of those nulls contradicted the
+       catalogue two keys above it. The codes are read off a fixture now, so
+       these three cases guard the reading rather than the writing. */
+expectRed(
+  'a bucket whose items carry no code is refused',
+  (dir) => patch(dir, 'js/nac.js', (s) => {
+    const out = s.replace("code:     'nac_id_orphan_in_dom',", '');
+    if (out === s) throw new Error('the orphan emission anchor moved; fix this test');
+    return out;
+  }),
+  'attaches no code'
+);
+
+expectRed(
+  'a fixture that stops provoking a bucket is refused, not published as uncoded',
+  (dir) => patch(dir, 'scripts/fixture-dom.mjs', (s) => {
+    const out = s.replace("    elements: [{ id: 'shared.collision', role: 'action' }],", '    elements: [],');
+    if (out === s) throw new Error('the beta manifest anchor moved; fix this test');
+    return out;
+  }),
+  'no longer provokes'
+);
+
+expectRed(
+  'a bucket whose severity disagrees with the reviewed one is refused',
+  (dir) => patch(dir, 'js/nac.js', (s) => {
+    const out = s.replace(
+      ["code:     'nac_id_orphan_in_dom',", "            severity: 'warn',"].join('\n'),
+      ["code:     'nac_id_orphan_in_dom',", "            severity: 'error',"].join('\n'));
+    if (out === s) throw new Error('the orphan severity anchor moved; fix this test');
+    return out;
+  }),
+  'changed its mind about how grave this is'
 );
 
 /* 11. A conformance requirement reworded in the spec. The mapping that

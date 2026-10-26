@@ -675,6 +675,43 @@ Las tres preguntas originales se resolvieron **leyendo el codigo**, no suponiend
 
 **Grupo:** G2-CONTRATO-LEGIBLE. Ya no esta bloqueado por N-04.
 
+**CERRADO EN EL REPOSITORIO el 2026-10-26, y la premisa estaba corrida en uno.**
+Antes de escribir una linea fui a leer los cinco baldes: **`plugin_instance_violations`
+YA llevaba codigo** (`duplicate_plugin_no_instance_id`, que ademas esta entre los 24
+publicados y cuyo `emitted_by` nombra a `_scanPluginInstances`), y **el mismo artefacto
+publicado lo declaraba dos claves mas abajo con `code: null`**. O sea que el artefacto
+afirmaba las dos cosas a la vez sobre la misma condicion: no mentia por exceso, mentia
+por defecto, subdeclarando lo que el runtime ya hacia. **Causa raiz, de la familia que
+este proyecto ya conoce:** el extractor corria `validate_global()` sobre un documento
+vacio -- sin hallazgos no hay un solo item que mirar -- asi que sacaba los NOMBRES de los
+baldes de las claves del resultado y el generador escribia `code: null` a mano. Un
+generador que compone lo que deberia leer no es un generador, es una segunda opinion.
+
+**Lo entregado, las dos mitades juntas (si va una sola, la asimetria la creo yo):**
+1. **Runtime:** los cuatro baldes que de verdad no llevaban codigo ahora llevan `code` +
+   `severity`, con la severidad que el catalogo ya publicaba para no cambiar de opinion
+   sobre la gravedad: `nac_id_duplicate_across_plugins` (error),
+   `nac_id_orphan_in_dom` (warn), `nac_id_declared_not_mounted` (warn),
+   `nac_id_missing_plugin_prefix` (warn). Ninguno reusa un codigo existente (promesa 4).
+2. **Generador:** `readGlobalBuckets()` LEE el codigo y la severidad de items que un
+   fixture provoca a proposito (`scripts/fixture-dom.mjs`), y **se niega** si un balde no
+   se provoca, si los items de un balde no coinciden en el codigo, si un item no trae
+   codigo, o si la severidad que adjunta el runtime no coincide con la que un humano
+   reviso en el sidecar. `uncoded_findings` queda vacio y se conserva por compatibilidad
+   de schema; los datos pasan a `global_buckets`.
+3. **Candados:** `scripts/test-validate-global.mjs` (33 casos, 9 de ellos en rojo con el
+   defecto plantado EN MEMORIA, nunca en disco) y tres casos rojos nuevos en
+   `scripts/test-contract-api.mjs` (36 pasan): balde sin codigo, fixture que deja de
+   provocar, y severidad que discrepa de la revisada.
+4. **SPEC:** la seccion 10.1 documenta la forma real y la promesa 4 dice donde viven los
+   codigos; la pregunta abierta de la seccion 13 pasa a DECIDIDA.
+
+**Lo que armar ese fixture encontro, y vale mas que el arreglo: N-33.** Cuatro de los
+cinco baldes salian vacios contra un manifest invalido a proposito. No era el fixture.
+
+**Estado:** hecho en el repositorio; el artefacto publicado lo dira cuando la 2.5.0 se
+regenere (el salto de version es lo que destraba la cadena del contrato).
+
 ---
 
 ### N-15 El enlace a Urazuke es de ida sin vuelta
@@ -1154,6 +1191,96 @@ regeneracion de `SPEC.html`. **Registro:** `PND-041`.
 **Efecto colateral ya aplicado:** el barrido escribia su salida **sin fecha**, asi que
 `e2e/sweep.json` no se podia distinguir de una medicion actual aunque fuera de dos dias antes.
 Ahora el artefacto se fecha a si mismo (`measured_at`, `measured_at_commit`, `tree`).
+
+---
+
+### N-33 (nuevo, 2026-10-26, GRAVE -- CERRADO el mismo dia) `validate_global` no veia un manifest escrito como el documento manda
+
+**Que estaba mal:** `_collectManifestIds(m)` -- la funcion sobre la que se apoya todo el
+validador global -- leia **solo** los grupos legados (`actions`, `fields`, `tabs`, `kpis`,
+`charts`) y por la clave `nac_id`. La forma **canonica** del manifest es
+`elements: [{ id, role, ... }]`: la que documenta la seccion 4, la que usan todas las
+demos, y la que lee **el resto del runtime** (`_capabilityFor` recorre
+`m.elements.concat(m.tabs)` por `.id`). Para un manifest escrito como el documento manda,
+el colector devolvia **lista vacia**.
+
+**Todo lo que se apoya encima salia mal, y para el mismo lado:** `total_ids` = 0 con dos
+manifests registrados; los elementos **declarados** reportados como **huerfanos**, que es
+exactamente lo contrario de lo que son; `duplicates`, `unmounted` y
+`convention_violations` **incapaces de disparar nunca**, porque se calculan contra el
+indice vacio; y con todo eso, `ok: true` y `has_errors: false`. Un validador que no ve el
+manifest no es un validador indulgente: **es una luz verde sin nada atras.** Y es el
+validador que la seccion 10.1 documenta y que la promesa 4 de la seccion 12 nombra por su
+nombre.
+
+**Evidencia, medida sobre la portada real en un navegador (2026-10-26):**
+
+| | `total_ids` | huerfanos | duplicados | no montados | convencion | `ok` |
+| --- | --- | --- | --- | --- | --- | --- |
+| antes | **0** | **128** | 0 | 0 | 0 | true |
+| despues | **64** | **64** | 0 | 0 | 0 | true |
+
+El primer huerfano de la columna "antes" era `nac_landing.topbar`, **que esta declarado**.
+Y los 64 huerfanos de la columna "despues" son **exactamente** los 64 ids reales sin
+declarar que N-31 habia contado por otro camino: dos mediciones independientes que
+coinciden.
+
+**Como aparecio:** armando el fixture que N-14 necesitaba para que el generador LEYERA los
+codigos en vez de escribirlos. Cuatro de los cinco baldes salian vacios contra un manifest
+invalido a proposito. No era el fixture. **Es el patron de la seccion 8 del handoff por
+cuarta vez: cada capa de verificacion que se construye encuentra un hallazgo que meses de
+lectura no encontraron.** Esta vez lo encontro tener que PROVOCAR un hallazgo en vez de
+observar su ausencia.
+
+**El arreglo:** se leen las dos formas (`elements[].id`, y en los grupos legados `nac_id`
+o `id`, porque los tabs se declaran con `.id` en la canonica y con `.nac_id` en la
+legada), con deduplicacion final para que un id declarado en las dos formas del MISMO
+manifest no cuente como duplicado cruzado. La legada se queda: hay manifests en la calle
+que la usan.
+
+**Los tres consumidores, auditados (SQ 14):** `validate_global` pasa a medir de verdad; el
+lint de duplicados de `register()` pasa a avisar para manifests canonicos (es un
+`console.warn`, no un throw); nada mas lo llama.
+
+**Aviso de compatibilidad, declarado y no escondido:** un host que gateaba su CI en
+`has_errors` puede ver su primer rojo al actualizar. **No es una regresion: es el primer
+true positive.** Esta en el CHANGELOG y en la seccion 10.1.
+
+**Candado:** `scripts/test-validate-global.mjs`, probado en rojo plantando el defecto en
+memoria -- con el colector ciego, `total_ids` cae de 5 a 1 (sobrevive solo el manifest
+legado, que es la asimetria exacta) y los declarados vuelven a figurar como huerfanos.
+
+**Severidad:** bloquea (era una compuerta que decia verde sin mirar). **Registro:**
+`PND-042`. **Estado:** CERRADO en el repositorio el 2026-10-26.
+
+---
+
+### N-34 (nuevo, 2026-10-26 -- CERRADO el mismo dia) La seccion 10.1 documentaba una forma de retorno que el runtime nunca tuvo
+
+**Que estaba mal:** la seccion 10.1 y la firma de la seccion 5.2 decian que
+`validate_global()` devuelve **un array plano de hallazgos**
+(`{severity, code, nac_id, message, detail}`). El runtime devuelve **un objeto de baldes
+con nombre** (`ok`, `has_errors`, `duplicates`, `orphans`, `unmounted`,
+`convention_violations`, `plugin_instance_violations`, `tolerated`, `plugin_count`,
+`total_ids`, `timestamp`). No es una deriva de version: es una forma que la
+implementacion de referencia **nunca** devolvio.
+
+**Evidencia (2026-10-26):** `NAC.validate_global()` en un sandbox del runtime publicado
+devuelve `typeof object`, `Array.isArray === false`, con esas once claves.
+
+**Por que importa mas de lo que parece:** un adoptante que programa contra el documento
+escribe `findings.filter(f => f.severity === 'error')` sobre un objeto, recibe
+`undefined is not a function`, y el documento no le da ninguna pista. Y la promesa 4 de la
+seccion 12 habla de "los codigos de `validate_global`" apoyada en una descripcion que no
+corresponde a lo que el validador devuelve.
+
+**Arreglado el mismo dia**, junto con N-14: la seccion 10.1 publica la forma real con el
+codigo y la severidad de cada balde, la firma de la 5.2 dice `GlobalReport` en vez de
+`Findings[]`, y el candado que lo sostiene es el primer caso de
+`scripts/test-validate-global.mjs` ("the validator returns named buckets, not a flat
+array").
+
+**Severidad:** avisa. **Estado:** CERRADO el 2026-10-26.
 
 ---
 

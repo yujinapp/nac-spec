@@ -62,6 +62,16 @@ jobs:
         # in a throwaway git repo, asserting the right refusal.
         run: node scripts/test-integrity-gate.mjs
 
+      - name: Global validator lock
+        # Audit N-14 (the validate_global buckets carried no code) and audit
+        # N-33 (the id collector could not see a manifest written the way the
+        # SPEC documents, so the validator answered ok = true without ever
+        # reading the manifest). Pure node, no browser: it loads the published
+        # runtime bytes in a sandbox with the smallest DOM that makes the
+        # validator speak, and plants each defect back in memory to prove the
+        # lock goes red on the real regression.
+        run: node scripts/test-validate-global.mjs
+
       - name: Version coherence gate
         # Audit N-17. The published tarball once announced a version two
         # releases behind its own package.json, because the version was

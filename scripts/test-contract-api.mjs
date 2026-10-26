@@ -123,7 +123,21 @@ const VERSION = currentVersion();
 function expectRed(name, mutate, expectText) {
   const dir = sandbox();
   try {
-    mutate(dir);
+    try {
+      mutate(dir);
+    } catch (e) {
+      /* The mutation is anchored on a literal, and the anchor guard throwing
+         means this case tested nothing. That is a failure, never a pass -- but
+         it is reported as one case rather than killing the run, so the rest of
+         the suite still speaks. It matters twice: on HEAD an anchor that rotted
+         is named instead of hidden, and when the suite is run against an older
+         ref to record a red proof, the anchors that do not exist yet come out
+         as a list instead of a stack trace. */
+      failed += 1;
+      console.log('RED-FAIL  ' + name);
+      console.log('          the defect could not be planted: ' + ((e && e.message) || e));
+      return;
+    }
     const { code, out } = runGate(dir);
     if (code === 0) {
       failed += 1;

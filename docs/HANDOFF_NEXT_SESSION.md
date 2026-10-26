@@ -7,6 +7,68 @@ de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
 
 ---
 
+## 0. ULTIMO ESTADO -- 2026-10-26, segunda sesion del dia (MANDA SOBRE LO DE ABAJO)
+
+Lo de las secciones 1 a 8 sigue siendo cierto salvo donde esta seccion diga otra cosa.
+
+### Lo que el dueno decidio en esta sesion
+
+- **Las ocho frases de limites y la frase de las tres naturalezas: LEIDAS Y APROBADAS SIN
+  CAMBIOS** (2026-10-26). Textual: *"Todo leido, decision declararlas historicas. Publicar
+  2.5 con cifras historicas y remedir despues."* Expediente en
+  `docs/LIMITS_APPROVAL_2026-10-26.md`.
+- **Cifras del benchmark: historicas.** La 2.5.0 sale con las cuatro corridas declaradas
+  historicas; la re-medicion es `PND-040`, fuera del camino critico.
+- **D-03 (idiomas) SIGUE SIN DECIDIRSE.** Es lo unico que falta del dueno ademas de su
+  firma offline, y lo unico que traba la pasada de traducciones + N-28 + N-32.
+
+### Lo que quedo hecho y commiteado (branch `release/2.5.0`, pusheado, sin deploy)
+
+| Commit | Que dejo |
+| --- | --- |
+| `c64fcf2` | La seccion publica de limites, el enlace de vuelta a Urazuke (tambien en el pie) y las dos licencias juntas. 13 ids nuevos pintados **y declarados**. Gate `npm run test:limits`. |
+| `1e07550`, `7250d06` | El barrido de pantallas se fecha a si mismo y se re-corrio con el arbol limpio. |
+| `c7eb0ef` | **N-33** (el validador global no veia los manifests canonicos) + **N-14** (los cinco baldes llevan codigo; el generador los LEE de un fixture en vez de escribirlos). SPEC 10.1 con la forma real (**N-34**). |
+| `781d769`, `366ee73`, `9d34dbf` | Los dos candados fallan con nombre en vez de estrellarse: lo delataron los propios recibos de evidencia. |
+
+### Hallazgos nuevos de esta sesion (todos escritos en el backlog)
+
+- **N-31** (`PND-038`): la portada pinta 130 ids y declara 64. La brecha quedo igual que
+  antes -- 66 crudos, 64 reales -- porque los 14 nuevos se declararon en el mismo commit.
+  Atado a D-03.
+- **N-32** (`PND-041`): el generador del SPEC emite enlaces de prosa con `data-nac-role` y
+  sin `data-nac-id`. Atado a N-28 y a D-03.
+- **N-33** (`PND-042`, **CERRADO**): `validate_global` devolvia `total_ids: 0`, llamaba
+  huerfano a todo lo declarado, no podia disparar tres de sus baldes y contestaba
+  `ok: true`. Medido en la portada: 0 -> 64 ids vistos, 128 -> 64 huerfanos.
+- **N-34** (**CERRADO**): la seccion 10.1 documentaba un array plano que el runtime nunca
+  devolvio.
+
+### Lo que falta ANTES del salto de version (paso 4.3), en orden
+
+1. **N-18, segunda mitad** -- el validador de CLI acepta una URL y **reporta nivel**. Es la
+   casilla **punto 8** del bloque del dueno. `levels.json` ya publica los tres niveles con
+   sus 11 requisitos, asi que es trabajo, no espera. **No empezado.**
+2. **N-29** -- publicar el vocabulario de `NAC.conformance_tier` (renombrar el valor de
+   cable sigue siendo decision del dueno). **No empezado.**
+3. Recien despues, el paso 4.3 tal cual esta escrito abajo. **El paso 4 de 4.3 es del
+   dueno: la firma offline en su maquina.** Sin eso el CI se niega a publicar.
+
+**Decision abierta para el dueno, y es de alcance, no tecnica:** publicar la 2.5.0 ya,
+con el punto 8 todavia en rojo, o terminar primero N-18 + N-29 y publicar con las ocho
+casillas en su mejor estado. Lo primero saca la 2.5.0 hoy; lo segundo agrega un tramo de
+trabajo antes del salto.
+
+### Estado de los gates al cierre de esta sesion
+
+- version coherence **16/16 verde**; validate-global lock **33/33**; contract **36/36**;
+  contract-http **8/8**; integrity-gate **16/16**; integrity load test **verde**; limits
+  gate **verde**; suite del runtime (14 stages) **verde**.
+- integridad y contrato **siguen en rojo por el unico motivo documentado**: falta el salto
+  de version. Es lo esperado.
+
+---
+
 ## 1. Estado verificado al cerrar (medido, no recordado)
 
 | Dato | Valor |

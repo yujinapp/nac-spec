@@ -148,10 +148,14 @@ que no existe aca) y pega contra un endpoint de LLM en produccion. Lo verde medi
 - **N-31** (`PND-038`): la portada declara 50 ids y pinta 116.
 - **PND-040**: re-medir el benchmark contra la 2.5.0 (las cifras salen declaradas
   historicas, por decision del dueno).
-- **PND-049**: los gates que necesitan navegador no corren en CI. Ahora son **cuatro**,
-  no dos: `test:integrity`, `test:limits`, `test:cli-levels` y el nuevo
-  `test:fill-setter`. Deliberadamente no cablee el nuevo al CI: cablearlos es el trabajo
-  de ese pendiente y hay que instalar el navegador en el runner.
+- **PND-049**: los gates que necesitan navegador no corren en CI. Ahora son **cinco**,
+  no dos: `test:integrity`, `test:limits`, `test:cli-levels` y los dos nuevos de esta
+  sesion, `test:fill-setter` y `test:snippet`. Deliberadamente no cablee los nuevos al
+  CI: cablearlos es el trabajo de ese pendiente y hay que instalar el navegador en el
+  runner. El riesgo crecio: `test:fill-setter` es el UNICO que puede contestar si
+  `fill()` sigue usando el setter nativo (la suite unitaria no puede, su shim no tiene
+  constructores de elemento), y `test:snippet` es el unico que mide el camino de
+  instalacion como lo vive un adoptante.
 
 ---
 

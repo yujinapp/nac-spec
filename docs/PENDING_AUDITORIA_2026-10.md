@@ -1261,3 +1261,11 @@ Lista original del 2026-10-24, con lo que se resolvio tachado al pie.
 - **(5) Sigue en pie la mitad que falta**, y ya no depende de una decision: existe `levels.json` con los niveles como dato, asi que el reporte de nivel del validador es trabajo, no espera.
 
 **Lo unico que te pido ahora: D-03.** Todo lo demas que esta desbloqueado puede avanzar sin vos.
+
+**Estado al 2026-10-26 (cierre de sesion por actualizacion de Forge).** El alcance quedo
+acotado por el dueno: **Urazuke sale de la 2.5.0 y pasa a la 2.6**; "todos los pendientes"
+son los que NO son peldanos del metodo. **D-03 sigue siendo lo unico que se espera del dueno**,
+y no frena el arranque: el trabajo de redaccion de la superficie publica (D-04/N-09, N-15,
+N-16, N-12, N-11, N-14) no depende de ella. El orden exacto de reanudacion, los dos gates
+rojos con su lectura y los tres cierres que el clasificador de Forge rechazaba estan en
+`docs/HANDOFF_NEXT_SESSION.md`.

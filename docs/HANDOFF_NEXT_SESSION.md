@@ -1,62 +1,212 @@
 # Handoff -- continuar sesion
 
-**Actualizado:** 2026-10-24 12:24 (hora local del runtime)
-**Motivo del corte:** el owner cierra y reabre el panel. Se anota el estado para retomar sin perder contexto.
+**Actualizado:** 2026-10-26 (cierre de sesion por actualizacion de Forge)
+**Motivo del corte:** el dueno cierra el panel para actualizar la version de Forge.
+**Palabra de reanudacion:** cuando el dueno diga **"Continua"**, se ejecuta la seccion 4
+de este documento sin volver a preguntar nada de lo que ya esta decidido aca.
 
 ---
 
-## 1. Estado verificado al cerrar
+## 1. Estado verificado al cerrar (medido, no recordado)
 
 | Dato | Valor |
 | --- | --- |
-| Branch | `main`, upstream `origin/main` |
-| Sincronizacion | 0 ahead / 0 behind (limpio en commits) |
-| HEAD | `96a0ea4` -- fix(landing): drop the last MIT runtime reference (governance section) |
-| Publicacion | verificada en turno previo: yujin.app/nac-spec responde 200 y sirve el HEAD (sin menciones residuales a MIT) |
-| Pending registry | 0 items abiertos |
-| Workflow | sin fase/step activo nuevo |
-
-Archivos sin commitear (dejar como estan salvo indicacion):
-- `.yujin-forge/` -- estado local de Forge, no commiteable.
-- `docs/verificacion-de-publicacion-yujin-app-nac-spec.html` -- informe de la verificacion de publicacion.
-
----
-
-## 2. Trabajo EN VUELO (no cerrado)
-
-**Claude Code esta ejecutando una AUDITORIA del proyecto.**
-El resultado todavia NO lo tenemos. No hay informe recibido ni leido.
+| Branch | `release/2.5.0`, upstream `origin/release/2.5.0`, 0 ahead / 0 behind |
+| Worktree | limpio |
+| HEAD | `d40725c` -- docs(audit): N-30 was recorded and deferred, not newly found |
+| `main` | `ebfe261` -- es lo que el deploy publica; **no tiene nada de G3** |
+| Produccion | `yujin.app/nac-spec` sirve todavia los textos viejos. **Ningun deploy se disparo con el trabajo de G3.** |
+| Version en el arbol | `2.5.0-alpha.5` en las 16 casillas (gate de version VERDE) |
+| Gate de integridad | **ROJO** -- `js/2.5.0-alpha.5/nac.js differs from js/nac.js` (el typo de N-07 movio 3 bytes de comentarios del runtime: 344.665 publicado vs 344.668 en el arbol) |
+| Gate de contrato | **ROJO** -- `api/v/2.5.0-alpha.5/ differs from what the runtime generates, and that version is already in the chain` |
+| Lectura de los dos rojos | **correcta y esperada.** Los dos dicen lo mismo: *bump the version*. Editar el SPEC ES una version nueva del contrato. Se destraban con el salto a 2.5.0, no antes. |
+| Bloque de verificacion del dueno | **1 de 8** (solo el punto 2). Puntos 3 y 4 medidos hoy en `index.html`: `does not cover` = 0, `urazuke` = 0. |
+| Firma offline | operativa. Clave en custodia del dueno (fuera del repositorio), respaldada offline por el dueno el 2026-10-25. |
+| Tarea de fondo viva | `task-mvmk444d-2` -- `php -S localhost:8855` de una sesion anterior. Nadie la usa; proponer pararla. |
 
 ---
 
-## 3. Al volver -- orden de trabajo
+## 2. Alcance acordado con el dueno (NO reabrir)
 
-1. **Recibir / leer** el informe de la auditoria del owner.
-2. **Validar cada hallazgo** antes de aceptarlo: reproducir con evidencia real
-   sobre el workspace (leer el archivo, correr el test, pedir el endpoint).
-   Descartar falsos positivos sin discutir: se informa el veredicto por hallazgo.
-   (SQ 9a: un hecho sobre el workspace no se toma a la ligera -- se verifica.)
-3. **Convertir solo los hallazgos validados** en pendings del registry
-   (`yujin.pending.add`), uno por pieza de trabajo distinta.
-4. **Implementar por prioridad**, con test de regresion por cada fix en el mismo
-   commit (SQ 2 -- cero deuda tecnica).
-5. **Cerrar** cada item con `pending.close` + `reason=shipped` y el registro de
-   implementacion (funcional / casos de uso / estado de tests).
-
----
-
-## 4. Reglas explicitas del owner para este tramo
-
-- **NO implementar nada antes de validar.** El owner pidio: "implementaremos los
-  pendientes luego de validarlos".
-- **NO asumir** el contenido ni el veredicto de la auditoria.
-- El alcance del tramo es *corregir lo que la auditoria marque como real*, no
-  refactorizar de paso (SQ 5).
+- **"Todos los pendientes" = todos los que NO son Urazuke.** Urazuke sale de la 2.5.0
+  y pasa a la **2.6**. Los 27 peldanos (`PND-002` .. `PND-028`) **no son requisito**
+  del release y no se avanzan en este tramo.
+- **D-01 = opcion C**: terminar el backlog de auditoria y publicar una **2.5.0 estable
+  de verdad**, coherente consigo misma, promovida a `latest`.
+- **D-02 = SI**, ampliado: contrato como API estatica validada, multiversion,
+  `latest` sin purga, a prueba de manipulacion. **Construido y publicado.**
+- **D-04 = se escribe** la seccion publica de limites.
+- **N-06 = opcion A**: los niveles se llaman `NAC3 Conformance Level 1/2/3`.
+- **N-20 = aceptado por el dueno**: los documentos internos se publican. Razon textual
+  del dueno: *"no vendo perfeccion, sino trabajo y evolucion"*. Verificado antes de
+  aceptar: cero claves privadas y cero credenciales en todo el arbol publicable.
+- **Custodia de la clave = opcion A**: clave privada **offline, en la maquina del dueno**.
+  Nunca entra al repositorio ni al CI.
 
 ---
 
-## 5. Pregunta a retomar
+## 3. Lo unico que sigue esperando al dueno
 
-Cuando vuelvas, decime el resultado de la auditoria (pegado o como archivo) y
-arrancamos por el punto 2: valido hallazgo por hallazgo y te digo cuales son
-reales, cuales no, y en que orden los ataco.
+**D-03 -- que se declara sobre idiomas.** Es la unica decision abierta de las cuatro.
+Hecho medido: la spec se publica en 10 idiomas y **9 de esas 10 son traducciones
+parciales (30%-38% del canonico)**.
+
+- **A** -- declarar el ingles canonico; las traducciones, no normativas. Costo: una frase.
+- **B** -- internacionalizar portada y pagina del spec. Costo alto y permanente; no toca
+  el problema real. **No recomendada.**
+- **C** -- A, mas que cada traduccion declare que es parcial y de que version, enlazado
+  desde la portada. Costo medio (9 archivos + portada).
+  **Es la recomendacion**: convierte "10 idiomas" en un dato verdadero en vez de un
+  conteo de archivos, y es la misma forma que el dueno eligio en D-01 y D-02
+  (el minimo honesto que desbloquea, con el destino completo escrito al lado).
+
+**Por que importa el orden:** las 9 traducciones se regeneran **de una sola vez**, y en
+esa misma pasada entra el arreglo de N-28 (los 85 `data-nac-id` renumerados). Hacerlo
+antes de decidir D-03 es hacerlo dos veces.
+
+**Si el dueno dice "Continua" sin responder D-03:** se arranca igual por el paso 4.1,
+que no depende de D-03, y se le vuelve a pedir D-03 recien cuando toque la pasada de
+traducciones (paso 4.4). **No se asume una opcion por el.**
+
+---
+
+## 4. Al volver -- orden de trabajo exacto
+
+### 4.0 Higiene de reanudacion (minutos)
+
+1. `git fetch && git status` -- confirmar `release/2.5.0` limpio en `d40725c`.
+2. **Reintentar los tres cierres que el clasificador de Forge rechazaba** (el defecto que
+   el prompt de `.tmp/prompt-forge-clasificador-rojo.md` manda arreglar; si la version
+   nueva de Forge ya lo trae, cierran sin forzar):
+   - `PND-034` -- metodo a prueba de manipulacion + custodia de la clave (expediente y
+     3 recibos adentro; la decision del dueno ya esta tomada y ejecutada).
+   - `PND-035` -- G3-DERIVA (N-05, N-07, N-13, N-23 + 4 defectos del gate de integridad).
+   - `PND-036` -- N-06 opcion A.
+   **Criterio de aceptacion del arreglo de Forge: estos cierran SIN `force_reason`.**
+   Si siguen rechazados, no insistir: dejarlo anotado y seguir.
+3. Proponer parar la tarea de fondo `task-mvmk444d-2`.
+
+### 4.1 Redaccion de la superficie publica -- NO depende de D-03 (este es el trabajo que arranca)
+
+Todo esto se acumula en la misma publicacion, porque el gate de contrato hashea el SPEC
+entero. **No se publica de a goteo: se junta y sale con la 2.5.0.**
+
+| # | Trabajo | Hallazgo | Casilla del bloque |
+| --- | --- | --- | --- |
+| a | **Seccion publica de limites** ("what NAC3 does not cover") | D-04 / N-09 | punto 3 (`does not cover` > 0) |
+| b | **Enlace de vuelta a Urazuke** desde la portada | N-15 | punto 4 (`urazuke` > 0) |
+| c | **Licencias declaradas juntas** (falta la de Urazuke; NAC3 ya declara Apache-2.0) | N-16 | -- |
+| d | **Recibos anclados al lado de cada cifra** de la portada | N-12 | -- |
+| e | **Nota de vigencia** (el documento tiene 5 meses) | N-11 | -- |
+| f | **Garantia de estabilidad verificable** | N-14 | -- |
+
+**Regla del dueno sobre (a):** la seccion de limites se aprueba **frase por frase** antes
+de publicar. No se publica texto de limites sin su lectura.
+
+### 4.2 Trabajo que toca el runtime (obliga al bump, entra en el mismo tren)
+
+- **N-18, segunda mitad:** el validador acepta una URL y **reporta nivel**. Ya no espera
+  una decision: `levels.json` publica los 3 niveles con id no ambiguo, los 11 requisitos
+  y cuales de ellos son decidibles por una maquina (8 si, 3 no). Es la casilla **punto 8**.
+- **Codigos en el validador:** existen 24 codigos de hallazgo y **ninguno esta en el
+  validador que la garantia del SPEC nombra textualmente** -- devuelve 5 grupos sin codigo.
+  Ponerle codigo a esos 5 grupos es barato y es lo que hace que la garantia deje de cubrir
+  un conjunto vacio.
+- **N-29:** `NAC.conformance_tier` sigue devolviendo `NAC-3-versioned`. Es valor de cable,
+  no prosa. **Renombrarlo es decision de compatibilidad del dueno**; lo barato mientras
+  tanto es publicar su vocabulario.
+
+### 4.3 El salto de version (lo que destraba los dos gates rojos)
+
+Orden, y **no se puede saltear ningun paso**:
+
+1. Subir la version a `2.5.0` (un solo lugar: la fuente derivada -- **nunca a mano en 16 sitios**).
+2. `node scripts/build-integrity.mjs --write` -- regenera **tambien la copia congelada**
+   del runtime (`js/2.5.0/nac.js`), no solo el contrato. El typo de N-07 movio bytes del
+   runtime: un typo en un comentario cuesta una version, y ese es el precio correcto de
+   que la ruta inmutable sea de verdad inmutable.
+3. `node scripts/build-contract-api.mjs --write` -- nueva entrada en la cadena.
+   **Aca entra N-24**: el texto de `api/trust.json` que declara tres testigos cuando el
+   tercero (tarball de npm) no existe. Se corrige **en esta regeneracion y no antes**,
+   porque corregirlo exige mover el indice y mover el indice de una version ya publicada
+   es exactamente lo que el metodo prohibe.
+4. **Firma offline del dueno** -- `node scripts/sign-contract-api.mjs --sign` en su maquina
+   (la clave no vive aca). Sin esto el CI se niega a publicar.
+5. `node scripts/build-contract-api.mjs` (sin `--write`) -- tiene que decir
+   `OK signature verifies: key nac3-contract-2026 ...`.
+6. Publicar el paquete y **promover `latest` a la 2.5.0 estable** (D-01 opcion C), y que
+   la seccion 9 del SPEC diga lo mismo -- casilla **punto 1**.
+
+### 4.4 La pasada de traducciones -- DEPENDE de D-03
+
+Se hace **una sola vez**, con las 9 traducciones y N-28 (los 85 `data-nac-id` posicionales
+renumerados, incluidos los de las traducciones) en la misma pasada.
+
+### 4.5 Verificacion final, contra el servidor y no contra el repositorio
+
+Recorrer **las 8 casillas** del bloque de verificacion del dueno
+(`docs/PENDING_AUDITORIA_2026-10.md`, seccion 5) pidiendo las URLs reales. Hoy da **1/8**.
+Las casillas 6 y 7 **ya estan hechas en el repositorio** y pasan a verde solas cuando el
+servidor entregue la 2.5.0: estan *hechas y en cola*, no pendientes.
+El **punto 5 es externo** (el sitemap raiz de `yujin.app` no vive en este repo) y sigue
+sin ubicarse ese repositorio -- es el unico item que puede quedar rojo sin ser deuda nuestra.
+
+---
+
+## 5. Pendientes abiertos que SI son de la 2.5.0
+
+| Id | Que es | Estado |
+| --- | --- | --- |
+| `PND-030` | Paraguas de la remediacion de la auditoria | abierto, cierra al final |
+| `PND-032` | D-01 = opcion C, 2.5.0 estable promovida a `latest` | abierto, es el tren |
+| `PND-033` | D-02, la API de contrato | hecho; cierra con el release |
+| `PND-034` | Metodo a prueba de manipulacion + custodia de la clave | **hecho y verificado**, bloqueado solo por el clasificador de Forge |
+| `PND-035` | G3-DERIVA | **hecho**, bloqueado solo por el clasificador de Forge |
+| `PND-036` | N-06 opcion A | **hecho**, bloqueado solo por el clasificador de Forge |
+| `PND-001` | Hallazgos validados de la auditoria | superado por `PND-030`; revisar si se funde o se cierra |
+
+`PND-002` .. `PND-028` son los 27 peldanos de Urazuke: **fuera de alcance hasta la 2.6**.
+
+---
+
+## 6. Decisiones del dueno que quedaron pedidas y no son del release
+
+No frenan nada; se le preguntan cuando haya aire:
+
+- **N-26** -- `payload_schema` es normativo en el SPEC y el runtime **no lo lee nunca**
+  (3 ejemplos lo declaran, cero consumidores lo miran). Cablearlo o retirar el campo.
+  Parte documental ya cerrada.
+- **N-23** -- el runtime acepta 20 roles y la tabla normativa lista 17 (sobran arrastrar,
+  soltar y boton heredado). Las 3 filas nuevas estan escritas, **esperando su lectura**.
+- **N-29** -- renombrar o no el valor de cable `NAC-3-versioned`.
+- **Los dos recibos en rojo "por estrellon"** -- el prompt de Forge se lo plantea como
+  decision: si una suite que **se estrella** (en vez de fallar un caso) cuenta como prueba
+  en rojo valida.
+
+---
+
+## 7. Lo que NO se debe hacer al volver
+
+- **No publicar de a goteo.** Cualquier edicion del SPEC pone rojo el gate de contrato.
+  Se junta todo y sale en un solo salto de version.
+- **No escribir una version a mano.** Se deriva de un solo lugar; escribirla a mano fue
+  el bug de las 13 copias.
+- **No cerrar un pending con `force_reason`** para esquivar el clasificador de Forge.
+- **No avanzar Urazuke** ni cerrar `PND-002`: cerrarlo abre N1, que es un frente propio.
+- **No asumir D-03.** Si el dueno no la respondio, se arranca por 4.1 y se le pide cuando
+  toque 4.4.
+- **No cantar verde contra el repositorio.** El bloque de verificacion mide el **servidor**.
+
+---
+
+## 8. El patron que esta sesion dejo anotado
+
+**Cada capa de verificacion que se construye encuentra un hallazgo que cinco meses de
+lectura no habian encontrado.** El contrato como dato delato los 3 roles de mas. La firma
+delato el testigo fantasma (N-24). El registro testigo delato la huella que se comparaba
+contra si misma. El gate de integridad delato sus propios 4 defectos.
+
+Corolario operativo, que se repitio tres veces: **una comparacion que no puede fallar no
+es una verificacion, es una ceremonia.** Antes de dar por bueno un candado, probarlo en
+rojo -- y desactivando **solo** la pieza nueva, para que los rojos que caen sean los suyos
+y no el ruido de un arbol a medio publicar.

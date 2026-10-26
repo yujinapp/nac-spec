@@ -420,5 +420,5 @@
     "buckets": [],
     "note": "Kept for schema compatibility with 2.5.0-alpha.5 and earlier, where validate_global attached no code to any bucket. Empty since 2.5.0: every bucket is coded, and the codes are in global_buckets above (audit N-14, closed)."
   },
-  "version": "2.5.0"
+  "version": "2.5.1"
 }

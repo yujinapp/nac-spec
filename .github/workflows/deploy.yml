@@ -136,6 +136,28 @@ jobs:
         # catalogue declares those in _same_as_english, and the guard fails both
         # on an undeclared match and on a declaration that no longer holds.
         run: node scripts/test-landing-i18n.mjs
+
+      - name: Translation banner gate
+        # Different surface, same promise. The nine SPEC translations are
+        # machine translations of an older revision, and each page states so
+        # at the top, in its own language, with the revision it came from and
+        # how much of the current text it carries. The banner is GENERATED, so
+        # this redraws the expected banner and compares it letter by letter:
+        # a translation whose coverage moved and whose banner did not is a page
+        # that lies about itself, which is the one thing these pages exist to
+        # stop. Before the generator existed, the nine files were orphans from
+        # May with nothing producing them.
+        run: node scripts/build-translation-banners.mjs
+
+      - name: Translation banner gate goes red when it should
+        # And the proof that the gate above is not decorative: a tampered
+        # banner, a missing banner, a coverage number that moved, a locale
+        # declared in the wrong language. Each case asserts the gate refuses
+        # it for the right reason -- two of these cases were written after the
+        # first version of the gate passed green over the very defect it
+        # existed to catch.
+        run: node scripts/test-translations-gate.mjs
+
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |

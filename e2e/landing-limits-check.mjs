@@ -100,7 +100,16 @@ function check(name, ok, detail) {
 }
 
 const browser = await chromium.launch();
-const page = await browser.newPage();
+/* The locale is PINNED, and that is not a detail.
+   The landing now ships ten catalogues and i18n.js rewrites the page from the
+   one that matches the reader's browser -- English included. So the rendered
+   text this gate asserts on is whatever language the MACHINE running it
+   happens to be in: on the maintainer's Windows the page came up in Spanish
+   and the English-prose checks below went red over a page that was perfectly
+   correct. A gate whose verdict depends on the operator's system locale
+   measures the operator, not the page. The second pass further down covers
+   the other half: that the ids do not depend on the locale at all. */
+const page = await browser.newPage({ locale: 'en-US' });
 const consoleErrors = [];
 page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
 page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
@@ -175,6 +184,48 @@ check('N-15: the footer link is declared in the manifest', footer.declared);
 
 check('zero console errors on load', consoleErrors.length === 0,
   consoleErrors.slice(0, 3).join(' | '));
+
+/* A second reader, in another language. The ids are the contract and the prose
+   is the translation: a limit must stay addressable by the same name whatever
+   the reader's locale, and the section must still say something. This is the
+   case that would catch a catalogue carrying the markup -- and therefore the
+   ids -- inside a translated value, which is how a declared element can go
+   missing in one language only. */
+{
+  const es = await browser.newPage({ locale: 'es-ES' });
+  const errs = [];
+  es.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+  es.on('pageerror', (e) => errs.push('pageerror: ' + e.message));
+  await es.goto(url, { waitUntil: 'load' });
+  await es.waitForFunction(
+    () => window.NAC && typeof window.NAC.manifest === 'function' &&
+          window.NAC.manifest('nac_landing') !== null,
+    null, { timeout: 10000 }
+  ).catch(() => {});
+  /* give the switcher its fetch */
+  await es.waitForFunction(() => document.documentElement.lang === 'es', null, { timeout: 5000 })
+    .catch(() => {});
+  const other = await es.evaluate(() => {
+    const sec = document.querySelector('[data-nac-id="nac_landing.section.limits"]');
+    return {
+      lang: document.documentElement.lang,
+      text: sec ? sec.innerText.trim().length : 0,
+      painted: [...document.querySelectorAll('[data-nac-id^="nac_landing.limit"]')]
+        .map((e) => e.getAttribute('data-nac-id')),
+      urazuke: sec ? /urazuke/i.test(sec.innerText) : false,
+    };
+  });
+  check('another locale renders the section', other.lang === 'es' && other.text > 200,
+    'lang=' + other.lang + ' rendered ' + other.text + ' chars');
+  const lost = EXPECTED_IDS
+    .filter((id) => id !== 'nac_landing.section.limits')
+    .filter((id) => !other.painted.includes(id));
+  check('every limits id survives a change of locale', lost.length === 0,
+    lost.length ? 'missing in es: ' + lost.join(', ') : other.painted.length + ' ids painted in es');
+  check('block item 4 holds in the other locale too', other.urazuke);
+  check('zero console errors in the other locale', errs.length === 0, errs.slice(0, 3).join(' | '));
+  await es.close();
+}
 
 await browser.close();
 if (server) server.close();

@@ -14,7 +14,7 @@
     "verify:contract": "node scripts/verify-contract-api.mjs --expect-head-from-repo",
     "keygen:contract": "node scripts/sign-contract-api.mjs --keygen",
     "sign:contract": "node scripts/sign-contract-api.mjs --sign",
-    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs && node scripts/build-contract-api.mjs && node scripts/test-version-gate.mjs",
+    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs && node scripts/build-contract-api.mjs && node scripts/test-version-gate.mjs && node scripts/build-translation-banners.mjs && node scripts/test-landing-i18n.mjs",
     "test:integrity": "node scripts/test-integrity-load.mjs",
     "test:integrity-gate": "node scripts/test-integrity-gate.mjs",
     "test:version-gate": "node scripts/test-version-gate.mjs",
@@ -24,7 +24,12 @@
     "test:fill-setter": "node e2e/fill-native-setter-check.mjs",
     "test:snippet": "node e2e/snippet-install-check.mjs",
     "test:validate-global": "node scripts/test-validate-global.mjs",
-    "test:cli-levels": "node scripts/test-cli-levels.mjs"
+    "test:cli-levels": "node scripts/test-cli-levels.mjs",
+    "check:translations": "node scripts/build-translation-banners.mjs",
+    "build:translations": "node scripts/build-translation-banners.mjs --write",
+    "test:translations-gate": "node scripts/test-translations-gate.mjs",
+    "test:translations": "node e2e/translations-check.mjs",
+    "test:landing-i18n": "node scripts/test-landing-i18n.mjs"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

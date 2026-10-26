@@ -1,10 +1,27 @@
 ---
-translation_source: SPEC.md
 translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76
 translation_quality: machine_v1
-translation_lang: de
 translation_date: 2026-05-11T12:59:09.388858+00:00
+translation_normative: false
+translation_status: partial
+translation_lang: de
+translation_source: SPEC.md
+translation_source_version: 2.2
+translation_source_date: 2026-05-11
+translation_sections: 34
+translation_sections_canonical: 83
+translation_canonical_url: /nac-spec/SPEC.html
 ---
+
+<!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
+
+> **Maschinelle Übersetzung, nicht normativ.** Sie übersetzt die englische Fassung vom 2026-05-11 (NAC3 v2.2) und deckt 34 von 83 Abschnitten des heutigen Originals ab. Der normative Text ist der englische: bei Abweichungen gilt der englische Text.
+>
+> *Non-normative machine translation. The normative text of NAC3 is the English one.*
+>
+> [Den normativen englischen Text lesen](/nac-spec/SPEC.html)
+
+<!-- /translation-banner -->
 
 # NAC3 -- Native Agent Contract
 

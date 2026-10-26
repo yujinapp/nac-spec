@@ -1,3 +1,189 @@
+# Handoff -- estado al 2026-10-26, 17:4x UTC (la 2.5.1 esta cortada y espera UNA firma)
+
+Esto se escribio al final de la sesion que ejecuto las tres decisiones del dueno de
+ese dia: **A) D-03 = opcion C**, **B) publicar la 2.5.1 ahora**, **C) el sitio raiz de
+yujin.app vive en `C:\rpaforce\yujin.app`** (la ubicacion hubo que corregirla midiendo;
+ver mas abajo). Lo anterior a este bloque sigue siendo valido como historia.
+
+## 0. LO PRIMERO, porque cambia como hay que trabajar: DOS SESIONES EN EL MISMO ARBOL
+
+Mientras esta sesion trabajaba, **otra sesion creo la rama `portada-look-urazuke` y la
+checkouteo en `C:\yujin-nac-spec`**, el worktree principal. Se detecto porque `index.html`
+desaparecio del arbol a mitad de sesion (`git status` lo mostraba como ` D index.html`) y
+el reflog registraba un `checkout: moving from main to portada-look-urazuke` a las 17:05.
+Esa rama ya lleva tres commits (`9a76a83`, `0077a5b`, `910de67`): una reescritura casi
+total de la portada con el look de Urazuke, su propio peer review y catalogos i18n.
+
+Por eso **todo el trabajo de esta sesion se hizo en un worktree aislado**:
+`C:\yujin-nac-spec-251`, rama **`release/2.5.1`** sobre `main` (`1937733`). No se toco ni
+una vez el checkout de la otra sesion. `node_modules` y `runtime/node_modules` estan ahi
+como junctions al worktree principal, asi que los gates de navegador corren.
+
+**EL CHOQUE ES REAL Y ESTA MEDIDO.** Las dos ramas editan `index.html`:
+
+| Que | Medido |
+| --- | --- |
+| Su reescritura contra la base de la 2.5.0 | 604 lineas agregadas, 1907 borradas (la pagina paso de ~2500 a ~600 lineas) |
+| Que runtime fija su portada | `js/2.5.0/nac.js` -- despues de la 2.5.1 el **gate de integridad la rechaza** (exige que la pagina fije el path inmutable vigente). Mecanico: `node scripts/build-integrity.mjs --write` |
+| Su sello del pie | dice `v2.5.0 &middot;` -- el gate de versiones lo rechaza contra 2.5.1. A mano |
+| Traducciones que enlaza | **cero** -- el gate nuevo `build-translation-banners.mjs` la rechaza. Hay que volver a poner la seccion (65 lineas, ver seccion 2) |
+| Fusion automatica de `index.html` | **no se puede.** Las dos ramas reescriben las mismas regiones; hay que rehacer la portada SOBRE la 2.5.1, no fusionarla |
+| Lo que SI sobrevive en su version | los 52 ids `nac_landing`, la seccion de limites (`does not cover` x3, `urazuke` x3) y el ancla del snippet del adoptante |
+
+Lo bueno: **los tres choques son auto-detectables**. Ningun candado se los come en silencio.
+
+**Y una consecuencia a dejar escrita: esta sesion NO pudo dejar recibos con**
+**`yujin.evidence.run`.** Ese verbo corre el comando en el **project root**
+(`C:\yujin-nac-spec`), que es justo el checkout que tiene la otra sesion en otra rama. Un
+recibo que dice medir la 2.5.1 y en realidad mide `portada-look-urazuke` nombra mal a su
+sujeto, y eso es peor que no tener recibo -- es el mismo error que el 2026-10-26 a la
+manana, cuando un recibo decia medir el servidor y media el repositorio. Asi que la
+evidencia de esta sesion son las salidas de los gates, citadas con sus numeros en
+`PND-052`, `PND-053`, `PND-054` y en la seccion 1 de aca. **Cuando la otra sesion libere el
+worktree principal, re-correr los gates con `yujin.evidence.run` y dejar los recibos.**
+
+**Y una observacion sobre el gate de versiones que salio de medir esto, y que NO se
+arreglo (fuera de alcance):** la sonda `landing version pills` usa el patron
+`v(SEMVER)\s*&middot;`, que tambien lo satisface el **sello del pie**. O sea: si la pildora
+de version *desaparece* de la portada, nadie se da cuenta (solo se detecta si queda
+VIEJA). Su reescritura ya borro la pildora y el parrafo "`js/<v>/nac.js` is immutable", y
+el gate no dijo nada. Es una garantia mas debil que la que promete el nombre de la sonda.
+
+## 1. La 2.5.1: cortada, verificada, y lo unico que falta es la firma
+
+Dos commits en `release/2.5.1`:
+
+- **`016b351`** -- D-03 opcion C (las nueve traducciones y su productor).
+- **`dc9250b`** -- el salto a 2.5.1.
+
+Medido despues del salto, no recordado: **integridad verde**, **22 de 22 slots de version
+de acuerdo en 2.5.1** (eran 20), **31/31** casos del gate de versiones, **21/21**
+integrity-gate, **36/36** contrato, **33/33** validate-global, **29/29** cli-levels,
+**21/21** el gate nuevo de traducciones, la suite del runtime en verde con cero fallas, y
+los cuatro gates de navegador en verde (SRI, snippet, limits, translations).
+**El UNICO rojo es la firma del dueno**, que es el diseno: la clave no vive en el repo.
+
+Lo que el dueno tiene que correr, **en el worktree de la 2.5.1**:
+
+```
+cd C:\yujin-nac-spec-251
+node scripts/sign-contract-api.mjs --sign
+npm run check:release
+```
+
+La clave se lee de `~/.nac3-keys/nac3-contract-2026.pem` (o `NAC3_CONTRACT_SIGNING_KEY`),
+que es `$HOME`, asi que el worktree no cambia nada. Despues: `npm publish` + `git push`.
+
+**Por que hubo que hacer una version para esto** (medido y revertido el 2026-10-26, antes
+de decidirlo): `api/v/<v>/contract.json` publica `spec_sha384`, la huella de los bytes de
+`SPEC.md`. Editar ese documento mueve el contrato de una version ya publicada, que es lo
+que el metodo prohibe. Y el tarball 2.5.0 ya publicado lleva ese `SPEC.md` adentro.
+
+### Lo que entro en la 2.5.1
+
+- **N-45, segunda mitad.** La linea `**Status:**` del SPEC dejo de restatear la version.
+  Decia `v2.5.0-alpha.5 ... Promoted to npm dist-tag latest`, que era **verdad hasta las
+  18:40 del 2026-10-26**: el acto de promover `latest` es lo que la volvio falsa, en sus
+  dos mitades. Ahora apunta a la seccion 9.1 y no nombra ninguna version, y **hay un slot
+  nuevo que rechaza una linea Status que nombre una**, cuyo primer caso rojo es la linea
+  con la que la 2.5.0 salio de verdad.
+- **Un slot que no existia: `SPEC.html`.** `SPEC.md` es la fuente y `SPEC.html` se publica
+  al lado, y nada afirmaba que el segundo fuera el renderizado del primero. El modo de
+  falla no es un typo: es olvidarse del generador. **Paso en esta misma release** y se vio
+  solo porque una persona leyo `git status`.
+- **`e2e/snippet-install-check.mjs` tenia la version escrita a mano** (`=== '2.5.0'`). El
+  unico gate del repo con una version tipeada era el que se escribio para cazar un hash
+  tipeado: se puso rojo en la 2.5.1 por un motivo que ningun adoptante sufre. Ahora la
+  **deriva del path inmutable que la pagina anuncia**, que es la afirmacion mas fuerte:
+  el runtime que la pagina fija tiene que reportar la version del path donde lo fija.
+  Probado en rojo apuntando el snippet al runtime congelado anterior.
+
+## 2. D-03 = opcion C, ejecutada (`PND-052`)
+
+**La medicion con la que se argumento la decision estaba mal, y la correccion ES el
+hallazgo.** El rango "30% a 38%" se midio en **bytes**, y los bytes son el instrumento
+equivocado (un caracter CJK pesa tres, uno ASCII pesa uno). Contado en **secciones**, las
+nueve traducciones cubren **exactamente las mismas 34 de las 83** que `SPEC.md` tiene hoy:
+no son nueve traducciones de calidad distinta, son **nueve copias del mismo desfasaje**. Y
+no estan truncadas: traducen completo el documento de mayo (llegaba a la seccion 14) y el
+ingles crecio 49 secciones desde entonces.
+
+**La causa raiz de que se podriera en silencio: no habia productor.** Ningun script del
+repo generaba `i18n/*/SPEC.html`. Ahora `scripts/build-translation-banners.mjs` los
+produce y los verifica **re-renderizando el cartel esperado y comparando byte a byte**, no
+grepeando un numero. `check:release` lo corre.
+
+Scripts nuevos: `check:translations`, `build:translations`, `test:translations-gate`,
+`test:translations` (navegador).
+
+Tres defectos que salieron de ESCRIBIR el cartel, no de leer: los nueve `SPEC.html`
+declaraban `<html lang="en">` sobre prosa traducida (un lector de pantalla los leia con
+voz inglesa) y el arabe sin `dir="rtl"`; el generador de mayo renderizaba el frontmatter
+YAML **como parrafo visible** (lo primero que leia un visitante era
+`translation_source_hash`); y la insignia decia `NAC3 v2.2` a secas.
+
+Dos defectos **del propio candado**, que encontraron sus tests: uno rechazaba por el
+motivo equivocado y el otro **pasaba en verde** sobre un id de portada roto, porque
+comparaba subcadenas y `nac_landing.translations.de` es prefijo de `...deXX`.
+
+## 3. Hallazgo nuevo que NO es de D-03: `PND-053` / N-46
+
+**262 paginas publicadas -- `SPEC.html` entre ellas -- enlazan `css/yujin-tokens.css`, que
+nunca se publico y da 404 en el servidor.** Lo encontro el gate de navegador nuevo al
+exigir cero errores de consola. Es decision del dueno (publicar el archivo, o sacarle el
+`<link>` al generador), asi que el gate lo **tolera por URL**, lo imprime como WARN
+nombrando el pendiente, y sigue rojo ante cualquier otro error. **Cuando `PND-053` cierre
+hay que sacarle esa tolerancia al gate: es parte de su criterio de aceptacion.**
+
+## 4. Casilla 5 del bloque del dueno: hecha y esperando UN push (`PND-054`)
+
+El dueno dijo `C:\rpaforce\yujin.app`. **Ese directorio ya no publica nada:** el
+`deploy.yml` de `rpaforce-crm` declara un CUTOVER del 2026-06-29 que movio las landings a
+**`pkuschnirof/rpaforce`, carpeta `web/yujin.app/`** y borro los rsync que publicaban ese
+arbol (quedo congelado el 23 de mayo). Confirmado comparando el contenido servido: el
+archivo que sirve `https://yujin.app/sitemap.xml` es **`C:\RPAForce\web\yujin.app\sitemap.xml`**.
+
+Hecho ahi, commit **`d503ce4`**, rama `main`, **SIN pushear**: +7 urls de entrada de
+nac-spec en el sitemap y `+Sitemap: https://yujin.app/nac-spec/sitemap.xml` en
+`robots.txt`. Siete y no las 63 a proposito: duplicar una lista generada dentro de un
+archivo a mano es como empieza a podrirse una segunda copia de la verdad. Escrito con los
+CRLF del propio archivo (escribir LF en un documento CRLF es el N-40 con otro sombrero).
+
+**No se pusheo porque ese repo despliega a produccion en cada push a main**, es un acto
+hacia afuera y en otro proyecto. Falta: `cd C:\RPAForce\web && git push`.
+
+## 5. El bloque de verificacion del dueno, despues de esta sesion
+
+Sigue en **7 de 8 medido contra el servidor**, y es correcto que lo diga: todo lo de esta
+sesion esta en una rama, no publicado. La casilla 5 pasa a verde cuando se pushee el repo
+web (seccion 4). Las casillas 6, 7 y 8 ya estaban verdes con la 2.5.0 y la 2.5.1 no las
+mueve. **No cantar verde contra el repositorio.**
+
+## 6. Lo que NO se debe hacer al volver
+
+- **No checkoutear ni resetear `C:\yujin-nac-spec`.** Otra sesion esta trabajando ahi.
+- **No fusionar `index.html` a ciegas.** Hay que rehacer la portada sobre la 2.5.1.
+- **No sacarle la tolerancia del 404 al gate de traducciones** hasta cerrar `PND-053`.
+- **No tocar `SPEC.md` sin un salto de version:** mueve `spec_sha384` del contrato.
+- **No cerrar `PND-054` sin medir contra el servidor.**
+
+## 7. El patron, otra vez, y van nueve
+
+**Cada capa de verificacion que se construye encuentra un hallazgo que meses de lectura no
+habian encontrado.** El cartel de traduccion delato el `lang="en"` de nueve paginas, el
+frontmatter renderizado como prosa y la insignia mentirosa. El gate de navegador delato un
+404 en 262 paginas publicadas. El salto de version delato un slot que no existia
+(`SPEC.html`) y una version tipeada a mano en el unico gate que existia para cazar algo
+tipeado a mano. Y los tests del candado nuevo delataron dos defectos del candado nuevo,
+uno de ellos **verde sobre el defecto que existia para atrapar**.
+
+Corolario operativo, van tres sesiones seguidas: **una comparacion que no puede fallar no
+es una verificacion, es una ceremonia.** Y el corolario del corolario, que es nuevo:
+**medir con el instrumento equivocado es peor que no medir**, porque el numero que sale se
+cita despues como si fuera un hecho -- el "30% a 38%" de D-03 era ruido de UTF-8 y
+sobrevivio dos sesiones.
+
+---
 # Handoff -- continuar sesion
 
 **Actualizado:** 2026-10-26, QUINTA sesion del dia.

@@ -28,7 +28,7 @@
 
 import {
   mkdtempSync, mkdirSync, copyFileSync, readFileSync, writeFileSync,
-  rmSync, existsSync,
+  rmSync, existsSync, readdirSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -70,12 +70,21 @@ function filesTheGateReads() {
     'runtime/dist/nac.d.ts',
     'runtime/dist/nac-v2-extensions.d.ts',
     'SPEC.md',
+    'SPEC.html',
     'README.md',
     'index.html',
     '.github/workflows/deploy.yml',
     'api/index.json',
     'api/latest.json',
   ];
+  /* The landing catalogues are DISCOVERED, not enumerated, because the
+     gate discovers them the same way: it lists i18n/<lang>.json and
+     checks every file it finds. Enumerating ten locales here would mean
+     an eleventh locale travels into no sandbox and the cases below would
+     quietly stop covering it. */
+  for (const f of readdirSync(abs('i18n'))) {
+    if (/^[a-z]{2}\.json$/.test(f)) list.push('i18n/' + f);
+  }
   /* The contract probe asserts every artefact the published entry names
      is on disk, so those travel too. */
   const idx = JSON.parse(readFileSync(abs('api/index.json'), 'utf8'));
@@ -281,6 +290,39 @@ expectRed(
   'landing version pills'
 );
 
+/* The catalogue cases. A reader never sees the markup above for longer
+   than it takes i18n.js to replace it, so a landing bumped in the HTML
+   and left stale in the ten catalogues is a landing that advertises the
+   previous version to everybody. The gate reported eighteen slots green
+   over exactly that tree before this probe existed. */
+
+expectRed(
+  'a landing catalogue left on the previous version is refused',
+  (dir) => patch(dir, 'i18n/es.json', (s) =>
+    s.replace('"hero.version": "v' + VERSION, '"hero.version": "v0.0.1-stale')),
+  'landing catalogues: hero version badge'
+);
+
+expectRed(
+  'a landing catalogue that pins the previous runtime path is refused',
+  (dir) => patch(dir, 'i18n/ja.json', (s) =>
+    s.replace('js/' + VERSION + '/nac.js', 'js/0.0.1-stale/nac.js')),
+  'landing catalogues: pinned runtime path'
+);
+
+expectRed(
+  'a landing catalogue that declares no version at all is refused, not skipped',
+  (dir) => patch(dir, 'i18n/de.json', (s) =>
+    s.replace('"hero.version": "v' + VERSION, '"hero.version": "stable')),
+  '(not declared)'
+);
+
+expectGreen(
+  'a catalogue naming an older runtime inside a dated receipt stays legal',
+  (dir) => patch(dir, 'i18n/en.json', (s) =>
+    s.replace('"ev.c.r1": "', '"ev.c.r1": "Run 2026-05-22 against v2.3.1. '))
+);
+
 expectRed(
   'an integrity receipt left on the previous version is refused',
   (dir) => patch(dir, 'js/integrity.json', (s) =>
@@ -372,6 +414,69 @@ expectGreen(
   (dir) => patch(dir, 'README.md', (s) =>
     s + '\n<!-- The URL mode of the validator aborted with exit 2 before 2.5.0, and\n'
       + '     2.5.0-alpha.5 was the last prerelease of the line. -->\n')
+);
+
+/* --- N-45, second half: the Status line of the published SPEC.
+       The first case is not hypothetical -- it is the line the 2.5.0
+       went out with, restored verbatim. --- */
+expectRed(
+  'the Status line the 2.5.0 shipped with is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m,
+    '**Status:** v2.5.0-alpha.5 -- all 8 SHIPPED RFCs (V24-01/02/04/05 + V25-01/02/03/04) '
+    + 'have runtime + Layer 2 visual + Layer 3 Pilot LIVE evidence. Promoted to npm dist-tag `latest`.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a Status line that merely restates the version being shipped is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m, '**Status:** ' + VERSION + ' stable.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a Status line naming a spec line as vX.Y is refused',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(
+    /^\*\*Status:\*\*.*$/m, '**Status:** Stable release of the v2.5 line.')),
+  'SPEC status line restates no version'
+);
+
+expectRed(
+  'a SPEC with no Status line at all is refused, not defaulted',
+  (dir) => patch(dir, 'SPEC.md', (s) => s.replace(/^\*\*Status:\*\*.*\n/m, '')),
+  'SPEC status line restates no version'
+);
+
+/* And the shape that has to STAY legal, for the same reason N-41
+   exists: the rewritten line points at the section that owns the
+   release channel, and a cross-reference is not a version. */
+expectGreen(
+  'a Status line that points at its section instead of restating the version stays legal',
+  (dir) => {
+    /* Both copies, because another slot asserts the packaged SPEC is
+       byte-identical to the canonical one -- editing only SPEC.md here
+       would fail this case on a different probe and prove nothing
+       about the Status line. */
+    const rewrite = (s) => s.replace(
+      /^\*\*Status:\*\*.*$/m,
+      '**Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states '
+      + 'what that guarantees and what a prerelease does not. This document states its version '
+      + 'in exactly one place, the line above.');
+    patch(dir, 'SPEC.md', rewrite);
+    patch(dir, 'runtime/SPEC.md', rewrite);
+  }
+);
+
+/* --- the rendered page beside the source document. The defect is not
+       a typo, it is forgetting the generator, so the case plants
+       exactly that: a SPEC.md that moved on and a SPEC.html that did
+       not. --- */
+expectRed(
+  'a rendered SPEC.html left on the previous version is refused',
+  (dir) => patch(dir, 'SPEC.html', (s) => s.replace(
+    /Version:<\/strong>\s*[0-9][^<\s]*/, 'Version:</strong> 2.4.0')),
+  'rendered SPEC.html version'
 );
 
 console.log('');

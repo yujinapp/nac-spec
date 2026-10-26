@@ -10,7 +10,7 @@
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
 - Regla aplicada: lo que no se pudo medir se informa como "declarado y no medido", nunca como verde.
 - Nombre: este archivo se llamaba `PENDIENTES_AUDITORIA_2026-10.md`. Se renombro el 2026-10-24 por pedido del dueno ("fuera del alcance del deploy"). El rsync de publicacion excluye el patron `PENDING_*.md` (deploy.yml, linea 62, sin barra inicial: aplica a cualquier carpeta), asi que este documento no se publica. Verificado en vivo: https://yujin.app/nac-spec/docs/PENDING_AUDITORIA_2026-10.md devuelve 404.
-- Estado de las cuatro decisiones del dueno: D-01, D-02, D-03 y D-04 ABIERTAS. Se presentan de a una; ninguna se resuelve sin respuesta explicita.
+- Estado de las cuatro decisiones del dueno: **las cuatro CERRADAS al 2026-10-26** -- D-01 (opcion C, la 2.5.0 estable promovida a `latest`), D-02 (la API de contrato firmada), D-03 (opcion C, el ingles normativo y cada traduccion declarando lo que cubre) y D-04 (la seccion publica de limites, aprobada frase por frase). Se presentaron de a una; ninguna se resolvio sin respuesta explicita.
 
 ---
 
@@ -163,7 +163,9 @@ Registrado como **PND-033** (la API) y **PND-034** (el metodo de integridad).
 
 ### D-03 (sobre N-08, reencuadrado por N-19) -- que se declara sobre idiomas
 
-Antes las opciones, el hecho medido que cambia el planteo: la especificacion **si** se publica en diez idiomas, y **nueve de esas diez versiones son traducciones parciales** (30% a 38% del canonico). El requisito de la seccion 5 ("every `label_i18n` MUST cover all 10 NAC3 locales") es una obligacion sobre las etiquetas de la interfaz del adoptante, no sobre el idioma de la especificacion.
+Antes las opciones, el hecho medido que cambia el planteo: la especificacion **si** se publica en diez idiomas, y **nueve de esas diez versiones son traducciones parciales**.
+
+**CORRECCION DE LA MEDICION, 2026-10-26 (el planteo original decia "30% a 38% del canonico").** Ese rango se midio en **bytes**, y los bytes son el instrumento equivocado: un caracter CJK pesa tres bytes y uno ASCII pesa uno, asi que el "rango" era ruido de codificacion UTF-8 y no cobertura. Medido en **secciones** -- los encabezados del documento, que no dependen del alfabeto -- **las nueve traducciones cubren exactamente las mismas 34 de las 83 secciones** que el SPEC canonico tiene hoy. Y no estan truncadas: traducen completo el documento de mayo (que llegaba hasta la seccion 14) y el texto en ingles crecio 49 secciones desde entonces. O sea: no son nueve traducciones distintas de calidad distinta, son **nueve copias del mismo desfasaje**. Lo que estaba mal no era la traduccion, era que nadie lo decia. El requisito de la seccion 5 ("every `label_i18n` MUST cover all 10 NAC3 locales") es una obligacion sobre las etiquetas de la interfaz del adoptante, no sobre el idioma de la especificacion.
 
 **Opcion A: declarar canonico.** Una frase en la seccion 5: el texto normativo es el ingles; las traducciones se publican como no normativas; el requisito de diez locales aplica a `label_i18n` del adoptante, no al documento.
 - Costo: una frase. Cierra la incoherencia aparente.
@@ -175,6 +177,50 @@ Antes las opciones, el hecho medido que cambia el planteo: la especificacion **s
 **Opcion C: A, mas marcar el estado real de cada traduccion.** Declarar canonico el ingles, y que cada traduccion publicada diga que es parcial y de que version, enlazada desde la portada.
 - Costo: medio. Toca los nueve archivos y la portada.
 - Beneficio: convierte "diez idiomas" en un dato verdadero en vez de un conteo de archivos.
+
+**RESUELTA Y EJECUTADA el 2026-10-26. Respuesta textual del dueno: "TU recomendacion: C".**
+Registro en el pending registry como `PND-052`. Lo que se hizo, y lo que se encontro
+haciendolo:
+
+- **La regla, en el documento normativo.** `SPEC.md` 4.3.1 dice que el requisito de los
+  diez locales es sobre el `label_i18n` del manifest del adoptante y **no** sobre el idioma
+  del documento; 4.3.2 declara que el texto normativo es el ingles, que las traducciones son
+  **no normativas**, que cada una esta congelada en la revision que su propio cartel declara,
+  y que una afirmacion de conformidad es una afirmacion contra el texto en ingles. Toca
+  `SPEC.md`, asi que **viaja en la 2.5.1** junto con `PND-051`.
+- **El cartel, en las nueve.** Arriba del texto traducido, en el idioma de la pagina, con el
+  numero medido (34 de 83), la revision de origen (v2.2, 2026-05-11), la frase en ingles que
+  se entiende igual aunque la traduccion sea mala, y el enlace al texto normativo. Tambien
+  como dato en el frontmatter, para que no haya que leer prosa para saberlo.
+- **El productor que no existia.** La causa raiz de que todo eso se podriera en silencio es
+  que **ningun script de este repo generaba las nueve paginas**: eran artefactos huerfanos de
+  mayo. Ahora `scripts/build-translation-banners.mjs` las produce y las verifica, y no
+  compara un grep contra un numero: **re-renderiza el cartel esperado y lo compara byte a
+  byte**. `check:release` lo corre, asi que la publicacion se niega a salir con una
+  traduccion que miente sobre si misma.
+- **Tres defectos que se encontraron escribiendo el cartel, no leyendo:**
+  (1) los nueve `SPEC.html` traducidos declaraban `<html lang="en">` sobre prosa traducida --
+  un lector de pantalla los leia con voz inglesa -- y el arabe sin `dir="rtl"`;
+  (2) el generador de mayo renderizaba el frontmatter YAML **como un parrafo visible**, asi
+  que lo primero que leia un visitante era `translation_source_hash`;
+  (3) la insignia de la barra decia `NAC3 v2.2` a secas, que es una afirmacion sobre NAC3 y
+  no sobre la pagina.
+- **Dos defectos del propio candado, que encontraron sus tests.** `scripts/test-translations-gate.mjs`
+  planta 20 defectos reales y exige que el candado los rechace **con el nombre correcto**. Dos
+  casos no se comportaron: uno rechazaba por el motivo equivocado (decia "derivo" cuando la
+  entrada del manifest estaba **ausente**), y el otro **pasaba en verde** sobre un id de
+  portada roto, porque comparaba subcadenas y `nac_landing.translations.de` es prefijo de
+  `...deXX`. Los dos arreglados; 21 de 21 casos se comportan.
+- **Y un hallazgo nuevo que no es de D-03, que salio del gate de navegador:** las nueve
+  paginas (y **262 paginas publicadas**, incluida `SPEC.html`) enlazan
+  `css/yujin-tokens.css`, que **nunca se publico y da 404 en el servidor**. Es `PND-053` /
+  N-46, decision del dueno. El gate lo tolera **por URL**, lo imprime como WARN nombrando el
+  pendiente, y se pone rojo ante cualquier otro error de consola: no se puso ciego.
+
+**LO QUE ESTA DECISION DESTRABA, y sigue abierto:** la pasada de traducciones contra el texto
+actual, N-28 (los 85 `data-nac-id` posicionales), N-31 (`PND-038`) y N-32 (`PND-041`). Los
+cuatro tocan el mismo material; ahora se pueden hacer en una sola pasada sin rehacerla.
+D-03 deja de estar abierta.
 
 ### D-04 (sobre N-09, y no se puede decidir sin N-20) -- que se publica sobre los limites
 

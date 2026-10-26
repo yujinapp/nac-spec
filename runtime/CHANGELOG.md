@@ -1,5 +1,39 @@
 # Changelog
 
+## 2.5.1 -- 2026-10-26
+
+A patch release with no runtime behaviour change. It exists because two
+PUBLISHED surfaces contradicted themselves, and neither could be fixed
+without a version: the contract API publishes `spec_sha384`, the hash of
+SPEC.md's bytes, so editing that document moves the contract of a version
+already in the chain.
+
+### Fixed
+
+- **The `**Status:**` line of SPEC.md stopped restating the version**
+  (audit N-45, second half). The published 2.5.0 declared its version
+  twice in its first four lines and the two disagreed: line 3 said
+  `2.5.0 (stable)` and line 4 said `v2.5.0-alpha.5 ... Promoted to npm
+  dist-tag latest`. Line 4 was TRUE until 18:40 on 2026-10-26 -- the act of
+  promoting `latest` to the stable release is what falsified it, in both
+  halves. It now points at section 9.1 and names no version, and the
+  version coherence gate has a slot that refuses a Status line naming one,
+  with the line the 2.5.0 shipped with as its first red case.
+
+### Changed
+
+- **Section 4.3 says what the ten-locale requirement is a requirement ON,
+  and section 4.3.2 declares the normative language** (decision D-03,
+  option C). The ten locales are a requirement on the adopter manifest's
+  `label_i18n`, not on the language of this document. The English text is
+  normative; the nine published translations are non-normative, each
+  partial and frozen at the revision its own banner declares; where they
+  disagree the English text governs, and a conformance claim is a claim
+  against the English text. Measured rather than estimated: all nine
+  carry the same 34 of the 83 sections SPEC.md has today -- they translate
+  the May document in full and the English text has grown 49 sections
+  since. No runtime surface changes.
+
 ## 2.5.0 -- 2026-10-26
 
 Stabilises the 2.5 line. First stable release of the 2.5 series: `latest`

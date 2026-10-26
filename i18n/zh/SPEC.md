@@ -1,10 +1,27 @@
 ---
-translation_source: SPEC.md
 translation_source_hash: 5ebb8103746daf5bf7877b67ebb3a44cf98b4e2cba1fd8ba30093e0fce1b9b76
 translation_quality: machine_v1
-translation_lang: zh
 translation_date: 2026-05-11T13:07:28.549236+00:00
+translation_normative: false
+translation_status: partial
+translation_lang: zh
+translation_source: SPEC.md
+translation_source_version: 2.2
+translation_source_date: 2026-05-11
+translation_sections: 34
+translation_sections_canonical: 83
+translation_canonical_url: /nac-spec/SPEC.html
 ---
+
+<!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
+
+> **机器翻译，非规范性文本。** 本文翻译的是 2026-05-11 的英文版 (NAC3 v2.2)，覆盖当前原文的 34 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。
+>
+> *Non-normative machine translation. The normative text of NAC3 is the English one.*
+>
+> [阅读规范性的英文版本](/nac-spec/SPEC.html)
+
+<!-- /translation-banner -->
 
 # NAC3 -- Native Agent Contract
 

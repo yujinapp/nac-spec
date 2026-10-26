@@ -197,7 +197,7 @@ body[data-chat-open="1"] .chat{transform:translateX(0)}
   <div class="kanji-big">楽</div>
   <p class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Native Agent Contract</span></p>
   <h1 data-i18n-html="hero.h1">Stable names for the things an <em>agent</em> wants to act on.</h1>
-  <p class="vbadge"><span data-i18n="hero.version">v2.5.0 &middot; stable</span></p>
+  <p class="vbadge"><span data-i18n="hero.version">v2.5.1 &middot; stable</span></p>
   <p class="lede" data-i18n="hero.lede">NAC3 is a small, free contract that lets a web UI you already shipped be driven by AI assistants, voice runners, RPA bots, accessibility tools and test runners — by name, not by brittle selectors. You add a few HTML attributes. Agents resolve names, click buttons, fill fields and switch tabs the way a person would, and the contract itself is published as data, with a hash you recompute.</p>
   <div class="cta-row">
     <a class="btn btn-p" href="SPEC.md" data-nac-id="nac_landing.cta.spec" data-nac-role="action" data-nac-action="open_spec" data-i18n="hero.cta1">Read the spec →</a>
@@ -231,12 +231,12 @@ body[data-chat-open="1"] .chat{transform:translateX(0)}
 await NAC.click(<span class="string">'invoice.save'</span>);              <span class="comment">// by id</span>
 await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="string">'save'</span>);  <span class="comment">// by verb</span></code></pre>
   <h3 style="font-size:1rem;margin:1.6rem 0 .5rem" data-i18n="what.runtime.h">Add the runtime once — and pin it</h3>
-  <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.0/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
+  <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.1/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
 <pre><code>npm install @nac3/runtime
 
 <span class="comment">// or via CDN, pinned and verified:</span>
-&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.0/nac.js"</span>
-        integrity=<span class="string">"sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE"</span>
+&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.1/nac.js"</span>
+        integrity=<span class="string">"sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS"</span>
         crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;
 
 <span class="comment"># do not take that hash on faith — recompute it. One line, no dependencies:</span>
@@ -275,7 +275,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
     <h4 data-i18n="review.h.bad">Where I would still push</h4>
     <ul>
-      <li data-i18n-html="review.b1"><strong>The specification mandates ten locales for your labels and is published in one.</strong> Defensible — English is the working language of the trade — but it should be said rather than left as an apparent inconsistency. This landing page now ships in ten; the specification does not.</li>
+      <li data-i18n-html="review.b1"><strong>The specification mandates ten locales for your labels and has a single normative language.</strong> Defensible — English is the working language of the trade — and now said out loud instead of left as an apparent inconsistency: the English text governs, and the nine translations published beside it declare themselves non-normative, with the revision they came from and how much of the current text they carry. What is still open is that none of them is complete.</li>
       <li data-i18n-html="review.b2"><strong>Adoption rests on a promise nothing enforces.</strong> Stable ids are the whole value, and the project correctly says it has no way to make you keep them. That is honest, and it is the single biggest risk to anyone building on it: rename an id and every caller breaks, exactly as a changed URL breaks a bookmark.</li>
       <li data-i18n-html="review.b3"><strong>A declared payload schema is not a validated one.</strong> A manifest may carry one and the reference runtime never reads it. The spec says so. It still means a conformant host can advertise a shape it does not check.</li>
       <li data-i18n-html="review.b4"><strong>Stewardship is one vendor.</strong> The RFC process and the governance page are real, but the editor, the reference runtime and the flagship adopter are the same organisation. Normal at this stage, and the thing a second independent implementer would change.</li>
@@ -323,8 +323,8 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   <div class="grid g4">
     <div class="card"><span class="tag teal" data-i18n="api.c1.t">directory</span><h4><code>api/index.json</code></h4><p data-i18n="api.c1.p">What exists, with the append-only hash record.</p></div>
     <div class="card"><span class="tag teal" data-i18n="api.c2.t">pointers</span><h4><code>api/latest.json</code></h4><p data-i18n="api.c2.p">Which version is stable and which is preview.</p></div>
-    <div class="card"><span class="tag teal" data-i18n="api.c3.t">contract</span><h4><code>api/v/2.5.0/contract.json</code></h4><p data-i18n="api.c3.p">Roles, attributes, verbs, events.</p></div>
-    <div class="card"><span class="tag teal" data-i18n="api.c4.t">levels</span><h4><code>api/v/2.5.0/levels.json</code></h4><p data-i18n="api.c4.p">Conformance levels and what each one requires. The finding catalogue sits next to it.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c3.t">contract</span><h4><code>api/v/2.5.1/contract.json</code></h4><p data-i18n="api.c3.p">Roles, attributes, verbs, events.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c4.t">levels</span><h4><code>api/v/2.5.1/levels.json</code></h4><p data-i18n="api.c4.p">Conformance levels and what each one requires. The finding catalogue sits next to it.</p></div>
   </div>
 </div></section>
 
@@ -395,14 +395,25 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
     <p class="lede" data-i18n="limits.lede">We would rather you read this before you migrate than discover it after.</p>
   </div>
   <div class="grid g2">
-    <div class="card"><h4 data-i18n="limits.l1.h">Canvas and WebGL</h4><p data-i18n="limits.l1.p">NAC3 does not read pixels. In a document editor or a design tool the toolbar around the drawing can be named; the drawing cannot. A plugin can declare how its verbs route to the app's own API — somebody still has to write it.</p></div>
-    <div class="card"><h4 data-i18n="limits.l2.h">Closed shadow roots</h4><p data-i18n="limits.l2.p">A component mounted closed is unreachable unless its author exposes a resolver. That is a browser security boundary, not our decision, and the runtime reports it instead of guessing. Open roots are covered, nested.</p></div>
-    <div class="card"><h4 data-i18n="limits.l3.h">Cross-origin frames</h4><p data-i18n="limits.l3.p">An embedded page from another origin cannot be driven unless it cooperates. When it does not, the runtime fails closed rather than pretending the click landed.</p></div>
-    <div class="card"><h4 data-i18n="limits.l4.h">Anything that is not the web</h4><p data-i18n="limits.l4.p">NAC3 is HTML attributes. Desktop, mobile-native and terminal applications are out of scope.</p></div>
-    <div class="card"><h4 data-i18n="limits.l5.h">It is not a permission system</h4><p data-i18n="limits.l5.p">A named verb is an intent-level signal and the capability gate is a usability optimisation. Your server must still authorise every call.</p></div>
-    <div class="card"><h4 data-i18n="limits.l6.h">A declared schema is not a validated one</h4><p data-i18n="limits.l6.p">A manifest may carry a payload schema and the reference runtime never reads it. An agent must not assume a payload was checked.</p></div>
-    <div class="card"><h4 data-i18n="limits.l7.h">Stability is yours to keep</h4><p data-i18n="limits.l7.p">Stable names are a promise you keep, not one we enforce. Rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p></div>
-    <div class="card"><h4 data-i18n="limits.l8.h">It does not make an agent correct</h4><p data-i18n-html="limits.l8.p">In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is <em>silent</em> damage — 0 of 200 runs against 30 of 200 on raw DOM — not the need to check what an agent did.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.canvas" data-nac-role="region"><h4 data-i18n="limits.l1.h">Canvas and WebGL</h4><p data-i18n="limits.l1.p">NAC3 does not read pixels. In a document editor or a design tool the toolbar around the drawing can be named; the drawing cannot. A plugin can declare how its verbs route to the app's own API — somebody still has to write it.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.shadow" data-nac-role="region"><h4 data-i18n="limits.l2.h">Closed shadow roots</h4><p data-i18n="limits.l2.p">A component mounted closed is unreachable unless its author exposes a resolver. That is a browser security boundary, not our decision, and the runtime reports it instead of guessing. Open roots are covered, nested.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.cross_origin" data-nac-role="region"><h4 data-i18n="limits.l3.h">Cross-origin frames</h4><p data-i18n="limits.l3.p">An embedded page from another origin cannot be driven unless it cooperates. When it does not, the runtime fails closed rather than pretending the click landed.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.native" data-nac-role="region"><h4 data-i18n="limits.l4.h">Anything that is not the web</h4><p data-i18n="limits.l4.p">NAC3 is HTML attributes. Desktop, mobile-native and terminal applications are out of scope.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.permissions" data-nac-role="region"><h4 data-i18n="limits.l5.h">It is not a permission system</h4><p data-i18n="limits.l5.p">A named verb is an intent-level signal and the capability gate is a usability optimisation. Your server must still authorise every call.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.schema" data-nac-role="region"><h4 data-i18n="limits.l6.h">A declared schema is not a validated one</h4><p data-i18n="limits.l6.p">A manifest may carry a payload schema and the reference runtime never reads it. An agent must not assume a payload was checked.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.stability" data-nac-role="region"><h4 data-i18n="limits.l7.h">Stability is yours to keep</h4><p data-i18n="limits.l7.p">Stable names are a promise you keep, not one we enforce. Rename an id and every caller that used it breaks, the same way a changed URL breaks a bookmark.</p></div>
+    <div class="card" data-nac-id="nac_landing.limit.correctness" data-nac-role="region"><h4 data-i18n="limits.l8.h">It does not make an agent correct</h4><p data-i18n-html="limits.l8.p">In our own 600-run benchmark NAC3 reached 95.5%, not 100%. What it removes is <em>silent</em> damage — 0 of 200 runs against 30 of 200 on raw DOM — not the need to check what an agent did.</p></div>
+  </div>
+  <div class="receipt">
+    <strong class="lbl" data-i18n="limits.three.label">Three different things, three different licences</strong>
+    <p data-i18n="limits.three.p">NAC3 is a protocol, Urazuke is a method for building software with evidence, and Forge is a commercial tool that implements both. You can adopt the protocol without the method and without the tool — that is what publishing it under Apache-2.0 is for.</p>
+    <p>
+      <a href="LICENSE" data-nac-id="nac_landing.limits.license_nac3" data-nac-role="action" data-nac-action="open" data-i18n="limits.lic.nac3">NAC3, the protocol — Apache-2.0</a> <span aria-hidden="true">&middot;</span>
+      <a href="https://yujin.app/urazuke/" data-nac-id="nac_landing.limits.urazuke" data-nac-role="action" data-nac-action="open" data-i18n="limits.lic.urazuke">Urazuke, the method — Creative Commons BY-SA 4.0</a> <span aria-hidden="true">&middot;</span>
+      <a href="https://yujin.app/yujin-forge/" data-nac-id="nac_landing.limits.forge" data-nac-role="action" data-nac-action="open" data-i18n="limits.lic.forge">Forge, the tool — commercial</a>
+    </p>
+    <p data-i18n="limits.steward">One more limit lives in its own section, because it is about who steers the contract rather than what it reaches: NAC3 is stewarded by one company, not a foundation.</p>
+    <p><a href="#governance" data-nac-id="nac_landing.limits.governance" data-nac-role="action" data-nac-action="open" data-i18n="limits.gov.link">Read it in Governance, below →</a></p>
   </div>
 </div></section>
 
@@ -537,6 +548,35 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   </div>
 </div></section>
 
+<div class="wrap"><div class="divider"><span class="kanji">訳</span></div></div>
+
+<section id="translations" data-nac-id="nac_landing.section.translations" data-nac-role="section"><div class="wrap">
+  <div class="sec-h">
+    <p class="eyebrow"><span class="dot"></span><span data-i18n="tr.eyebrow">The specification in other languages</span></p>
+    <h2 data-i18n="tr.h2">The English text governs. Nine machine translations stand beside it.</h2>
+    <p class="lede" data-i18n-html="tr.lede">The normative text of NAC3 is the English specification. The nine translations below are <strong>non-normative</strong> machine translations: none of them is complete, and where a translation and the English text disagree the English text governs — a conformance claim is a claim against the English text. Each page states at the top, in its own language, which revision it was translated from and how much of the current text it carries.</p>
+  </div>
+  <div class="card">
+    <p><a href="SPEC.html" data-nac-id="nac_landing.translations.canonical" data-nac-role="action" data-nac-action="open" data-i18n="tr.canonical">Read the English specification →</a></p>
+    <h4 style="margin-top:.9rem" data-i18n="tr.list.h">Non-normative machine translations</h4>
+    <p data-nac-id="nac_landing.translations.list" data-nac-role="region">
+      <a href="i18n/es/SPEC.html" hreflang="es" lang="es" data-nac-id="nac_landing.translations.es" data-nac-role="action" data-nac-action="open">Español</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/pt/SPEC.html" hreflang="pt" lang="pt" data-nac-id="nac_landing.translations.pt" data-nac-role="action" data-nac-action="open">Português</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/fr/SPEC.html" hreflang="fr" lang="fr" data-nac-id="nac_landing.translations.fr" data-nac-role="action" data-nac-action="open">Français</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/it/SPEC.html" hreflang="it" lang="it" data-nac-id="nac_landing.translations.it" data-nac-role="action" data-nac-action="open">Italiano</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/de/SPEC.html" hreflang="de" lang="de" data-nac-id="nac_landing.translations.de" data-nac-role="action" data-nac-action="open">Deutsch</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/ja/SPEC.html" hreflang="ja" lang="ja" data-nac-id="nac_landing.translations.ja" data-nac-role="action" data-nac-action="open">日本語</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/zh/SPEC.html" hreflang="zh" lang="zh" data-nac-id="nac_landing.translations.zh" data-nac-role="action" data-nac-action="open">中文</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/hi/SPEC.html" hreflang="hi" lang="hi" data-nac-id="nac_landing.translations.hi" data-nac-role="action" data-nac-action="open">हिन्दी</a> <span aria-hidden="true">&middot;</span>
+      <a href="i18n/ar/SPEC.html" hreflang="ar" lang="ar" data-nac-id="nac_landing.translations.ar" data-nac-role="action" data-nac-action="open">العربية</a>
+    </p>
+    <div class="receipt">
+      <strong class="lbl" data-i18n="tr.note.label">Why we publish them anyway</strong>
+      <p data-i18n-html="tr.note">A partial translation a reader can check against the English text is worth more than no translation — as long as the page says which one governs before the reader starts trusting it. Bringing them up to the current text is open work, not a silent gap. And the ten-locale requirement of the specification is a requirement on the labels in <em>your</em> manifest, not on the language of this document.</p>
+    </div>
+  </div>
+</div></section>
+
 <div class="wrap"><div class="divider"><span class="kanji">理</span></div></div>
 
 <section id="governance" data-nac-id="nac_landing.section.governance" data-nac-role="section"><div class="wrap">
@@ -561,7 +601,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
       <a href="SPEC.md" data-i18n="foot.spec">Specification</a>
       <a href="api/index.json" data-i18n="foot.api">Contract API</a>
       <a href="https://github.com/yujinapp/nac-spec" data-i18n="foot.gh">GitHub</a>
-      <a href="https://yujin.app/urazuke/" data-i18n="foot.ura">Urazuke</a>
+      <a href="https://yujin.app/urazuke/" data-nac-id="nac_landing.footer.urazuke" data-nac-role="action" data-nac-action="open" data-i18n="foot.ura">Urazuke</a>
       <a href="https://yujin.app/yujin-forge/" data-i18n="foot.forge">Forge</a>
       <a href="SECURITY.md" data-i18n="foot.sec">Security</a>
     </nav>
@@ -590,7 +630,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   </div>
 </aside>
 
-<script src="js/2.5.0/nac.js" integrity="sha384-ykdpjqu9hgZiAsftXYoFKR3zuvG7iugaYqMrf9cSC4RwCsXImFsk+1dlQviiKrhE" crossorigin="anonymous"></script>
+<script src="js/2.5.1/nac.js" integrity="sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS" crossorigin="anonymous"></script>
 <script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
 <script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
 <script src="i18n.js" defer></script>
@@ -615,10 +655,17 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
     function demo(key, l) {
       return { id: 'nac_landing.demo.' + key, role: 'action', actions: [{ verb: 'open', label_i18n: l }], label_i18n: l };
     }
+    /* A language link is labelled with its own endonym in every locale: the name
+       of a language does not translate, and inventing ten variants of "Deutsch"
+       would be a translation the reader never asked for. The ids below are
+       written out in full rather than assembled from the locale code, because
+       the translation gate greps this file for each one -- and so does a person
+       looking for where an id is declared. */
+    function endonym(n) { return li(n, n, n, n, n, n, n, n, n, n); }
 
     NAC.register({
       plugin_slug: 'nac_landing',
-      version: '2.5.0',
+      version: '2.5.1',
       nac_version: '2.5',
       elements: [
         { id: 'nac_landing.topbar', role: 'region',
@@ -646,10 +693,40 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
         section('uses', li('Casos de uso','Use cases','Casos de uso','Cas d usage','Casi d uso','Anwendungsfaelle','ユースケース','用例','upyog ke maamle','حالات الاستخدام')),
         section('stack', li('Donde encaja','Where it fits','Onde encaixa','Ou cela s insere','Dove si colloca','Wo es passt','位置づけ','定位','kahan fit hota hai','أين يناسب')),
         section('limits', li('Lo que no cubre','What it does not cover','O que nao cobre','Ce qu il ne couvre pas','Cosa non copre','Was es nicht abdeckt','対象外','不覆盖的范围','kya cover nahin karta','ما لا يغطيه')),
+        /* The eight published limits, one addressable element each (D-04 /
+           N-09, owner-approved 2026-10-26), and the three natures with their
+           three licences. e2e/landing-limits-check.mjs refuses a tree where
+           any of these is painted and not declared, or declared and not
+           painted. */
+        { id: 'nac_landing.limit.canvas', role: 'region',
+          label_i18n: li('Canvas y WebGL','Canvas and WebGL','Canvas e WebGL','Canvas et WebGL','Canvas e WebGL','Canvas und WebGL','キャンバスとWebGL','Canvas 与 WebGL','canvas aur WebGL','كانفاس وWebGL') },
+        { id: 'nac_landing.limit.shadow', role: 'region',
+          label_i18n: li('Shadow roots cerrados','Closed shadow roots','Shadow roots fechados','Shadow roots fermes','Shadow root chiusi','Geschlossene Shadow Roots','閉じたシャドウルート','封闭的影子根','band shadow roots','جذور ظل مغلقة') },
+        { id: 'nac_landing.limit.cross_origin', role: 'region',
+          label_i18n: li('Frames de otro origen','Cross-origin frames','Frames de outra origem','Frames d autre origine','Frame di altra origine','Fremde-Origin-Frames','クロスオリジンフレーム','跨源框架','cross-origin frames','إطارات من أصل آخر') },
+        { id: 'nac_landing.limit.native', role: 'region',
+          label_i18n: li('Lo que no es web','Anything not web','O que nao e web','Ce qui n est pas web','Cio che non e web','Nicht-Web','ウェブ以外','非网页','web ke bahar','ما ليس ويب') },
+        { id: 'nac_landing.limit.permissions', role: 'region',
+          label_i18n: li('No es un sistema de permisos','Not a permission system','Nao e sistema de permissoes','Pas un systeme de permissions','Non e un sistema di permessi','Kein Berechtigungssystem','権限システムではない','不是权限系统','permission system nahin','ليس نظام صلاحيات') },
+        { id: 'nac_landing.limit.schema', role: 'region',
+          label_i18n: li('Declarado no es validado','Declared is not validated','Declarado nao e validado','Declare n est pas valide','Dichiarato non e validato','Deklariert ist nicht validiert','宣言は検証ではない','声明不等于校验','declared validated nahin','المعلن ليس متحققا') },
+        { id: 'nac_landing.limit.stability', role: 'region',
+          label_i18n: li('La estabilidad la cumple el adoptante','Stability is yours to keep','A estabilidade e do adotante','La stabilite est a vous','La stabilita e tua','Stabilitaet liegt bei dir','安定性は実装者の責任','稳定性归你','stability aapki','الاستقرار مسؤوليتك') },
+        { id: 'nac_landing.limit.correctness', role: 'region',
+          label_i18n: li('No garantiza que el agente acierte','No guarantee of correctness','Nao garante acerto','Pas de garantie de justesse','Nessuna garanzia di correttezza','Keine Korrektheitsgarantie','正しさは保証しない','不保证正确','correctness ki guarantee nahin','لا يضمن الصحة') },
+        { id: 'nac_landing.limits.license_nac3', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Licencia Apache-2.0','Apache-2.0 license','Licenca Apache-2.0','Licence Apache-2.0','Licenza Apache-2.0','Apache-2.0-Lizenz','Apache-2.0 ライセンス','Apache-2.0 许可证','Apache-2.0 license','ترخيص Apache-2.0') },
+        { id: 'nac_landing.limits.urazuke', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') },
+        { id: 'nac_landing.limits.forge', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Yujin Forge, la herramienta','Yujin Forge, the tool','Yujin Forge, a ferramenta','Yujin Forge, l outil','Yujin Forge, lo strumento','Yujin Forge, das Werkzeug','Yujin Forge（ツール）','Yujin Forge 工具','Yujin Forge tool','Yujin Forge الأداة') },
+        { id: 'nac_landing.limits.governance', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Gobernanza, mas abajo','Governance, below','Governanca, abaixo','Gouvernance, plus bas','Governance, sotto','Governance, weiter unten','ガバナンス（下部）','治理（见下）','governance niche','الحكامة أدناه') },
         section('evidence', li('Mediciones','Measurements','Medicoes','Mesures','Misure','Messungen','計測','测量','maap','قياسات')),
         section('adopters', li('Hecho con NAC3','Made with NAC3','Feito com NAC3','Fait avec NAC3','Fatto con NAC3','Mit NAC3 gebaut','NAC3で作成','用 NAC3 构建','NAC3 se bana','مصنوع بـ NAC3')),
         section('layers', li('Libre y pago','Free and paid','Livre e pago','Gratuit et payant','Gratis e a pagamento','Frei und bezahlt','無料と有料','免费与付费','muft aur sashulk','مجاني ومدفوع')),
         section('builders', li('Para quien construye','For builders','Para quem constroi','Pour ceux qui construisent','Per chi costruisce','Fuer Entwickler','開発者向け','面向构建者','banane walon ke liye','للمطورين')),
+        section('translations', li('La especificacion en otros idiomas','The specification in other languages','A especificacao em outros idiomas','La specification dans d autres langues','La specifica in altre lingue','Die Spezifikation in anderen Sprachen','他の言語の仕様書','其他语言的规范','anya bhashaon mein vinirdesh','المواصفة بلغات أخرى')),
         section('governance', li('Gobernanza','Governance','Governanca','Gouvernance','Governance','Governance','ガバナンス','治理','shasan','الحوكمة')),
 
         demo('d1', li('Demo de referencia, 27 componentes','Reference demo, 27 widgets','Demo de referencia, 27 widgets','Demo de reference, 27 widgets','Demo di riferimento, 27 widget','Referenzdemo, 27 Widgets','リファレンスデモ','参考演示','reference demo','العرض المرجعي')),
@@ -662,8 +739,63 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
         demo('d8', li('Caso de estudio en Angular','Angular study case','Caso de estudo Angular','Cas d etude Angular','Caso studio Angular','Angular-Fallstudie','Angularの事例','Angular 案例','Angular case','دراسة Angular')),
         demo('d9', li('Aviso manejado por voz','Voice-driven advertisement','Anuncio por voz','Annonce pilotee par la voix','Annuncio guidato dalla voce','Sprachgesteuerte Anzeige','音声広告','语音广告','voice ad','إعلان صوتي')),
 
+        /* The specification in other languages (D-03 option C): the English text
+           is the normative one, the nine translations declare themselves not. */
+        { id: 'nac_landing.translations.canonical', role: 'action',
+          actions: [{ verb: 'open',
+            label_i18n: li('Leer la especificacion en ingles','Read the English specification','Ler a especificacao em ingles','Lire la specification en anglais','Leggi la specifica in inglese','Die englische Spezifikation lesen','英語の仕様書を読む','阅读英文规范','angrezi vinirdesh padhen','اقرأ المواصفة بالإنجليزية') }],
+          label_i18n: li('Texto normativo en ingles','Normative English text','Texto normativo em ingles','Texte normatif en anglais','Testo normativo in inglese','Normativer englischer Text','規範となる英語本文','规范性英文文本','manak angrezi path','النص المعياري بالإنجليزية') },
+        { id: 'nac_landing.translations.list', role: 'region',
+          label_i18n: li('Traducciones automaticas no normativas','Non-normative machine translations','Traducoes automaticas nao normativas','Traductions automatiques non normatives','Traduzioni automatiche non normative','Nicht normative maschinelle Uebersetzungen','非規範の機械翻訳','非规范性机器翻译','gair-manak machine anuvad','ترجمات آلية غير معيارية') },
+        { id: 'nac_landing.translations.es', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('Español') }], label_i18n: endonym('Español') },
+        { id: 'nac_landing.translations.pt', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('Português') }], label_i18n: endonym('Português') },
+        { id: 'nac_landing.translations.fr', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('Français') }], label_i18n: endonym('Français') },
+        { id: 'nac_landing.translations.it', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('Italiano') }], label_i18n: endonym('Italiano') },
+        { id: 'nac_landing.translations.de', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('Deutsch') }], label_i18n: endonym('Deutsch') },
+        { id: 'nac_landing.translations.ja', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('日本語') }], label_i18n: endonym('日本語') },
+        { id: 'nac_landing.translations.zh', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('中文') }], label_i18n: endonym('中文') },
+        { id: 'nac_landing.translations.hi', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('हिन्दी') }], label_i18n: endonym('हिन्दी') },
+        { id: 'nac_landing.translations.ar', role: 'action', actions: [{ verb: 'open', label_i18n: endonym('العربية') }], label_i18n: endonym('العربية') },
+
         { id: 'nac_landing.footer', role: 'region',
-          label_i18n: li('Pie de pagina','Footer','Rodape','Pied de page','Pie di pagina','Fusszeile','フッター','页脚','footer','تذييل') }
+          label_i18n: li('Pie de pagina','Footer','Rodape','Pied de page','Pie di pagina','Fusszeile','フッター','页脚','footer','تذييل') },
+        /* N-15 asked for the link back to the method to live in the footer
+           as well, and asked for it declared like every other link. */
+        { id: 'nac_landing.footer.urazuke', role: 'action', actions: [{ verb: 'open' }],
+          label_i18n: li('Metodo Urazuke','Urazuke method','Metodo Urazuke','Methode Urazuke','Metodo Urazuke','Urazuke-Methode','裏付けの方法','Urazuke 方法','Urazuke method','طريقة Urazuke') }
+      ]
+    });
+
+    /* Chat plugin manifest -- registered separately so chat is its own plugin
+       scope. The aside above paints seven data-nac-ids; an element painted and
+       not declared is invisible to an agent that does what the protocol says. */
+    NAC.register({
+      plugin_slug: 'chat',
+      version: '2.5.1',
+      nac_version: '2.5',
+      elements: [
+        { id: 'chat.lang', role: 'field',
+          label_i18n: li('Idioma del chat','Chat language','Idioma do chat','Langue du chat','Lingua del chat','Chat-Sprache','チャット言語','聊天语言','chat ki bhasha','لغة المحادثة') },
+        { id: 'chat.tts', role: 'action',
+          actions: [{ verb: 'toggle_tts',
+            label_i18n: li('Activar voz','Toggle TTS','Alternar TTS','Activer TTS','Attiva TTS','TTS umschalten','TTS切替','切换 TTS','TTS','TTS') }],
+          label_i18n: li('TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS','TTS') },
+        { id: 'chat.mic', role: 'action',
+          actions: [{ verb: 'push_to_talk',
+            label_i18n: li('Hablar','Push to talk','Falar','Parler','Parla','Sprechen','話す','说话','bole','تحدث') }],
+          label_i18n: li('Microfono','Mic','Microfone','Micro','Microfono','Mikrofon','マイク','麦克风','mic','ميكروفون') },
+        { id: 'chat.voice.always_on', role: 'action',
+          actions: [{ verb: 'toggle_handsfree',
+            label_i18n: li('Manos libres','Hands-free','Maos livres','Mains libres','Mani libere','Freisprechen','ハンズフリー','免提','hands free','بدون يدين') }],
+          label_i18n: li('Manos libres','Hands-free','Maos livres','Mains libres','Mani libere','Freisprechen','ハンズフリー','免提','hands free','بدون يدين') },
+        { id: 'chat.input', role: 'field',
+          label_i18n: li('Mensaje','Message','Mensagem','Message','Messaggio','Nachricht','メッセージ','消息','sandesh','رسالة') },
+        { id: 'chat.send', role: 'action',
+          actions: [{ verb: 'send',
+            label_i18n: li('Enviar','Send','Enviar','Envoyer','Invia','Senden','送信','发送','bheje','إرسال') }],
+          label_i18n: li('Enviar','Send','Enviar','Envoyer','Invia','Senden','送信','发送','bheje','إرسال') },
+        { id: 'chat.log', role: 'region',
+          label_i18n: li('Conversacion','Conversation','Conversacao','Conversation','Conversazione','Unterhaltung','会話','对话','baat','محادثة') }
       ]
     });
 
@@ -688,7 +820,8 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
       { id: 'nac_landing.section.api', narrate: 'The contract is published as data, with a hash you recompute.' },
       { id: 'nac_landing.section.demos', narrate: 'Nine live demos. Try the data table to see it end to end.' },
       { id: 'nac_landing.section.limits', narrate: 'And here is what it does not cover. Read this before you migrate.' },
-      { id: 'nac_landing.section.layers', narrate: 'The contract is free. The tooling on top of it is not.' }
+      { id: 'nac_landing.section.layers', narrate: 'The contract is free. The tooling on top of it is not.' },
+      { id: 'nac_landing.section.translations', narrate: 'The English specification governs. Nine machine translations stand beside it, and each one says so.' }
     ];
     var autopilotRunning = false, autopilotAbort = false;
     function highlight(el, on) {
@@ -751,12 +884,25 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
     /* === Validate after wiring -- expect zero error-severity findings. === */
     setTimeout(function () {
       try {
-        var findings = NAC.validate_global({ probe: false });
-        var errors = (findings || []).filter(function (f) { return f.severity === 'error'; });
-        if (errors.length === 0) {
-          console.log('[nac_landing] NAC validate clean -- ' + (findings || []).length + ' total findings (none error severity)');
+        var r = NAC.validate_global();
+        var hard = []
+          .concat(r.duplicates || [])
+          .concat(r.unmounted || [])
+          .concat(r.plugin_instance_violations || []);
+        var orphans = (r.orphans || []).length;
+        if (hard.length) {
+          console.warn('[nac_landing] NAC validate: ' + hard.length
+            + ' error-severity finding(s) -- duplicate ids, declared-and-unmounted'
+            + ' or plugin-slug collisions:', hard);
         } else {
-          console.warn('[nac_landing] NAC validate found ' + errors.length + ' errors:', errors);
+          console.log('[nac_landing] NAC validate clean -- ' + r.plugin_count
+            + ' plugin(s), ' + r.total_ids + ' declared ids, no duplicates and nothing unmounted.');
+        }
+        if (orphans) {
+          /* Painted and not declared. Not an error for the runtime, and the
+             number is the one PND-039 tracks: it is reported, not hidden. */
+          console.log('[nac_landing] NAC validate: ' + orphans
+            + ' painted element(s) not yet in a manifest (tracked, PND-039).');
         }
       } catch (e) {
         console.warn('[nac_landing] validate_global threw:', e.message);

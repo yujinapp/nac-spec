@@ -39,6 +39,7 @@
  */
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { execFileSync } from 'node:child_process';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -250,6 +251,12 @@ function serve(overlay = {}) {
 
 /* ---------- the red cases ---------- */
 async function selftest() {
+  /* The red cases ARE refusals, so they must not reach the workflow log
+     as ::error:: annotations. Letting them through made the first green
+     deploy of this check read as a run with eleven errors in it, which
+     is how a reader learns to ignore errors. Same mistake the retry
+     path was already written to avoid, in the one place it was not. */
+  ANNOTATE = false;
   const quiet = () => {};
   const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
   const receipt = JSON.parse(readFileSync(join(ROOT, 'js', 'integrity.json'), 'utf8'));
@@ -311,6 +318,31 @@ async function selftest() {
     /nac_landing\.(section\.limits|limits?\.[a-z0-9_]+)/g, 'blinded.$1'));
   await run('a tree whose limits section declares no ids is refused, not passed over',
     true, {}, blind);
+
+  /* And the behavioural guard for the line above, because a comment is
+     not a lock: run this same selftest as a child with the CI variable
+     set and assert that not one annotation comes out of a green run.
+     The child skips this case, so there is no recursion. */
+  if (!process.env.SMOKE_SELFTEST_CHILD) {
+    let out = '';
+    let childFailed = false;
+    try {
+      out = execFileSync(process.execPath, [process.argv[1], '--selftest'], {
+        env: { ...process.env, GITHUB_ACTIONS: 'true', SMOKE_SELFTEST_CHILD: '1' },
+        encoding: 'utf8',
+      });
+    } catch (err) {
+      out = (err.stdout || '') + (err.stderr || '');
+      childFailed = true;
+    }
+    const annotations = (out.match(/::error::/g) || []).length;
+    const good = !childFailed && annotations === 0;
+    results.push({ label: 'a green selftest annotates nothing in CI', good, red: false, failures: [] });
+    console.log((good ? 'GREEN-OK ' : 'BROKEN   ')
+      + 'a green selftest annotates nothing in CI'
+      + (good ? '' : '  [' + annotations + ' annotation(s)'
+        + (childFailed ? ', and the child run itself failed' : '') + ']'));
+  }
 
   const broken = results.filter((r) => !r.good);
   console.log('');

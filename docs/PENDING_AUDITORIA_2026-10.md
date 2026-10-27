@@ -70,9 +70,11 @@ Y una advertencia que no es del pedido pero afecta su cumplimiento literal: el p
 
 ---
 
-## 2. Los cuatro hallazgos que son DECISION DEL DUENO
+## 2. Los hallazgos que son DECISION DEL DUENO
 
-Ninguno esta resuelto. Van opciones y costo de adopcion.
+Al 2026-10-27: **D-01, D-02, D-03 y D-04 estan resueltas y ejecutadas**, cada una con la
+frase textual del dueno al pie de su entrada. **D-05 esta abierta** y es la unica que
+espera una palabra. Van opciones y costo de adopcion.
 
 ### D-01 (sobre N-01) -- a donde apunta `latest`
 
@@ -246,6 +248,93 @@ Publicar 2.5 con cifras historicas y remedir despues."* Registro en
 cifras: **se publica la 2.5.0 con las cuatro corridas declaradas historicas y la re-medicion
 contra la 2.5.0 sale del camino critico** (`PND-040`, con su costo medido y su criterio de
 aceptacion). D-04 deja de estar abierta.
+
+### D-05 (nueva, 2026-10-27, ABIERTA) -- que se hace de aca en adelante con las nueve traducciones
+
+D-03 decidio **que se declara** sobre las traducciones. No decidio **que destino tienen**, y
+esa pregunta quedo flotando: el cierre de `PND-052` la nombra y este documento la deja
+escrita antes de preguntarla, por la misma razon que se escribio D-01 -- una decision que
+solo vive en el chat se pierde cuando la sesion se corta.
+
+**Los hechos medidos, hoy, contra el repositorio y contra el servidor:**
+
+1. **Las nueve estan vivas y dicen lo que son.** Verificado en produccion el 2026-10-27:
+   `i18n/{es,ja,ar}/SPEC.html` sirven su cartel con la frase de normatividad en ingles, la
+   portada enlaza las nueve, y `SPEC.md` servido trae 4.3.2. Esa mitad esta cerrada.
+2. **Cobertura: 34 de las 83 secciones (41%).** Lo que falta son **49 secciones**, 48.329
+   bytes, unas **6.644 palabras** de ingles.
+3. **N-48, nuevo, y es el hecho que cambia la pregunta.** Dentro de las 34 secciones que
+   **si** cubren, **256 de las 465 lineas no vacias de la revision de mayo (55%) ya no
+   existen verbatim en el ingles de hoy**. Muestras: `**Version:** 2.2.0`,
+   `**Status:** Stable`, `Reserved id prefixes (v2.1):`,
+   `### 5.1.3 Field editor (v2.3 preview)`. O sea: el cartel es honesto sobre la
+   **cobertura** y **mudo sobre la deriva** de lo que cubre. Un lector puede leer
+   "cubre 34 de 83" como "esas 34 estan al dia", y no lo estan.
+4. **La cobertura se auto-mantiene; la deriva no.** El candado ya tiene un caso en rojo
+   para un SPEC que crecio (`a canonical SPEC that grew leaves every banner stale`), asi
+   que la **cifra** no puede mentir en silencio. No hay ningun caso para la deriva, porque
+   hoy nada la mide.
+5. **El costo de la opcion B de D-03 ya se pago en parte, y no lo pago este trabajo.** La
+   **portada** esta internacionalizada a diez locales: `i18n/<lang>.json`, **10 catalogos x
+   264 claves** con paridad de marcado, con su candado (`scripts/test-landing-i18n.mjs`)
+   enganchado a `check:release`. Vino de la consolidacion de la portada, no de D-03.
+6. **Las nueve estan publicadas y deliberadamente fuera del sitemap**, y enlazadas desde la
+   portada. Retirarlas es retirar URLs publicadas.
+7. **Calidad declarada: `machine_v1`.** Hay productor del **cartel**
+   (`scripts/build-translation-banners.mjs`); **no hay productor del texto traducido**.
+
+**Opcion A: se quedan congeladas, y se arregla solo el silencio (N-48).** El cartel pasa a
+declarar tambien la deriva medida del tramo que cubre, con su caso en el candado.
+- Costo: una medicion y un caso de candado. **Cero traduccion.**
+- Beneficio: el artefacto deja de prometer de mas. Es la opcion mas barata que sigue siendo
+  verdadera.
+- Riesgo: el documento se queda en 41% para siempre y la brecha crece en cada version. "Se
+  publica en diez idiomas" sigue necesitando asterisco.
+
+**Opcion B: se regeneran completas (83 de 83) con un productor del texto.** Traduccion
+automatica con la clave del dueno, el cartel declarando fecha, revision de origen y 100% de
+cobertura, y regeneracion por release.
+- Costo: el productor; unas 11.000 palabras por idioma por regeneracion (medido: 73.418
+  bytes de canonico), nueve veces; y **una regla de acoplamiento que hay que escribir**: una
+  traduccion vieja **no** puede bloquear la publicacion del ingles normativo, o nueve
+  traducciones automaticas ganan poder de veto sobre el release.
+- Beneficio: es la unica opcion donde "la especificacion se publica en diez idiomas" es
+  verdad sin asterisco.
+- Riesgo, y es el que no se puede tapar: **son nueve artefactos que el dueno no puede leer
+  ni verificar.** La mitigacion que lo vuelve verificable **mecanicamente**, sin leer la
+  prosa: exigir que los `code spans`, los ids, los nombres de atributos, los numeros y las
+  URLs sean **byte identicos** al ingles en las nueve. Es exactamente la leccion de hoy de
+  la portada -- un id adentro de un valor traducible se rompe -- convertida en candado.
+
+**Opcion C: se retiran.** Se deja de publicar el documento traducido, con redireccion al
+ingles, y "diez idiomas" queda donde hoy **es** verdad: la portada (10 catalogos) y el
+`label_i18n` del adoptante.
+- Costo: el mas bajo. Hay que decidir la redireccion: el proyecto no borra URLs publicadas.
+- Beneficio: una superficie menos que puede podrirse.
+- Riesgo: se pierde el alcance que una traduccion parcial igual da -- orientacion para quien
+  no lee ingles.
+
+**Opcion D: intermedia.** Se retiran las nueve traducciones parciales del documento completo
+y en su lugar se publica, en los diez locales y **completo**, un texto corto de orientacion
+("que es NAC3 y como se adopta"), que se puede mantener al 100% barato.
+- Costo: escribir ese texto una vez, mas su productor. Menor que B.
+- Beneficio: lo que un lector que no lee ingles realmente necesita, al dia y sin asterisco;
+  la especificacion normativa queda solo en ingles, que es lo que 4.3.2 ya dice.
+- Riesgo: un artefacto nuevo mas que mantener, y tambien deriva si no tiene candado.
+
+**Dato que pesa y que no elijo yo:** el texto normativo **ya es el ingles** y una afirmacion
+de conformidad **ya se mide contra el ingles** (4.3.2). Asi que ninguna de las cuatro
+opciones cambia lo que una implementacion tiene que leer: la decision es sobre **alcance**
+(a quien le llega) contra **verificabilidad** (cuanto texto publicado el dueno no puede
+leer).
+
+**Recomendacion de Forge: B, con el candado de identidades.** Motivo: es la unica donde la
+frase se vuelve verdadera sin asterisco, el costo quedo medido y es chico, y el riesgo real
+-- publicar texto que el dueno no puede leer -- se vuelve **mecanicamente verificable** con
+el candado de code spans / ids / numeros / URLs byte identicos. Si el dueno prefiere no
+sostener nueve artefactos regenerados, la caida honesta es **A**, que cuesta un candado y
+deja de prometer de mas. **Registrado como `PND-058`; la decision es del dueno y no se
+ejecuta nada hasta que la escriba.**
 
 ---
 

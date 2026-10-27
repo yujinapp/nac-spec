@@ -1,3 +1,82 @@
+# Handoff -- estado al 2026-10-27, 01:55 UTC (PUBLICADO: la 2.5.1 esta afuera, en los dos lugares)
+
+**Lo que cambio respecto de todo lo que sigue abajo: ya no falta la firma y ya no hay
+nada sin empujar.** El dueno autorizo el movimiento completo ("commit, push y deploy en
+PRD") y esta hecho y medido desde afuera:
+
+- **`origin/main` esta en `6e666c1`.** La rama `portada-look-urazuke` se empujo y se
+  llevo a `main` con un avance lineal (sin commit de merge). Once commits que antes eran
+  locales.
+- **npm: `latest` = 2.5.1.** Publicado con `npm publish` desde `runtime/`, tag `latest`,
+  shasum `c2fcd21f...`. Verificado **instalando desde el registro en una carpeta vacia**:
+  el CLI reporta `@nac3/runtime CLI 2.5.1` y el `SPEC.md` de adentro ya no se contradice.
+  Las cinco preversiones siguen publicadas bajo el tag `alpha`.
+- **El sitio sirve 2.5.1.** Dos deploys verdes (runs `40434620113` y `40434848218`), los
+  21 pasos de cada uno. Medido contra `https://yujin.app/nac-spec/` con
+  `scripts/smoke-live-landing.mjs`: el sello dice `v2.5.1 - stable`, las tres huellas de
+  integridad coinciden, la ruta inmutable `js/2.5.1/nac.js` responde 200, los **13 ids de
+  la seccion de limites** estan declarados, las dos licencias y el enlace al metodo estan.
+- **El contrato publicado verifica desde afuera**: la cadena recomputa sobre **tres**
+  entradas, `latest` dice `stable=2.5.1`, y la firma del dueno (`nac3-contract-2026`,
+  firmada 2026-10-26T22:47:56Z) verifica contra el testigo independiente del repositorio
+  y contra el testigo empaquetado.
+- **PND-051 y PND-057 cerrados** con expediente y recibos (RCP-057 a RCP-062).
+
+**Dos defectos que salieron de PUBLICAR, no de leer** (ninguno estaba en el arbol de ayer):
+
+1. **El chequeo post-deploy afirmaba la portada con literales tipeados dentro del YAML**,
+   entre ellos el marcado textual `<h2>What NAC3 does not cover</h2>`. La reescritura de
+   la portada reformulo ese encabezado y lo movio detras de `data-i18n`. Ese paso es
+   `::error::` + `exit 1`, asi que este deploy **habria subido el arbol entero y DESPUES
+   se habria puesto rojo**, sobre una release por lo demas correcta y firmada. Es la forma
+   de N-17 -- un consumidor con una copia tipeada a mano de algo que no le pertenece --
+   aplicada a la propia compuerta del deploy. El otro literal, `Now in alpha`, ya no
+   existia desde que la portada paso a estable: un `::warning::` que iba a dispararse en
+   todos los deploys desde hoy.
+   **Arreglado en `2c5b61d`**: `scripts/smoke-live-landing.mjs` reemplaza los tres pasos
+   tipeados por una sola llamada que **deriva** todo del arbol que se despliega (titulo,
+   sello de version, cada par src/huella, la ruta inmutable y que el host la sirva, los
+   13 atributos `data-nac-id` de la seccion de limites, las dos licencias, el enlace al
+   metodo). Nada que mantener a mano, y lee igual en los diez idiomas -- el literal viejo
+   no podia, y esa es la segunda razon por la que se rompio. `--selftest` para cada
+   regresion que dice vigilar (9 casos), y **la primera corrida encontro un defecto del
+   propio chequeo**: comparaba los ids como subcadenas, y todos ellos aparecen tambien en
+   el manifiesto de la pagina y en una cadena de narracion, asi que un host que borrara el
+   marcado y dejara el script lo satisfacia. Ahora afirma el **atributo pintado**.
+2. **Los casos en rojo llegaban al log de CI como once errores anotados sobre una corrida
+   verde.** El primer deploy del chequeo nuevo salio verde en sus 21 pasos y llego con
+   once `::error::` encima: eran los rechazos **intencionales** del `--selftest`. Nada
+   estaba mal, que es el problema -- una corrida verde que se lee como una corrida con
+   once errores ensena a quien mire despues que los errores de este workflow no significan
+   nada, y el proximo va a ser real. No se puede ver localmente: las anotaciones solo
+   aparecen con `GITHUB_ACTIONS` puesta.
+   **Arreglado en `6e666c1`**, y el caso que lo sostiene no es una linea: el selftest se
+   re-corre **como proceso hijo** con la variable de CI puesta y afirma que una corrida
+   verde no emite ni una anotacion. Probado en rojo quitando la unica linea de supresion:
+   reporta exactamente las once anotaciones que produjo el deploy real. **Medido despues
+   del arreglo: el segundo deploy tiene 0 lineas `::error::` en su log.**
+
+**Un recibo con veredicto no-ok queda a proposito en el registro (RCP-059).** Fue el
+primer intento de prueba en rojo para la linea Status: se corrio contra `52f0a76`, donde
+todavia no existian los catalogos de idioma, y **se estrello** (ENOENT) antes de llegar a
+los casos que interesaban. Un estrellon esconde todos los casos que vienen atras, asi que
+no vale como evidencia. La prueba valida es **RCP-060**, contra `edccbf8`, que es el primer
+arbol que tiene los diez catalogos **y** todavia la linea Status contradictoria: ahi fallan
+8 casos **con nombre**, incluidos los cuatro de la linea Status.
+
+**Lo que sigue esperando al dueno, por orden** (ninguno lo traba el release, que ya salio):
+
+| Que | Pendiente |
+| --- | --- |
+| **La hoja de estilos que da 404 en 262 paginas publicadas** -- publicar el archivo o sacarle el enlace al generador. Las dos salidas cambian como se ve la documentacion publica | PND-053 |
+| **La clave de firma sin passphrase** en una maquina donde corren varias sesiones de agente, asi que la firma no es tecnicamente atribuible. Ponerle passphrase no rota la clave | PND-056 |
+| **El push del repositorio web** para que la casilla 5 pase a verde -- dispara un despliegue a produccion de **otro** sitio | PND-054 |
+| **Las cuatro decisiones sobre el texto de los niveles** -- tres de ellas son lo que la casilla 8 reporta en rojo sobre la portada del propio protocolo | PND-044 a PND-047 |
+| La mitad de la portada que no esta declarada (128 ids pintados, 64 declarados) | PND-038 |
+| Seis acciones declaradas que no confirman nunca | PND-048 |
+
+---
+
 # Handoff -- estado al 2026-10-26, 21:xx UTC (CONSOLIDADO: una sola rama, una sola portada, una sola firma pendiente)
 
 **Lo que cambio respecto de todo lo que sigue abajo: ya no hay dos sesiones ni dos

@@ -2377,6 +2377,39 @@ que *"la seccion 9 del SPEC diga lo mismo que el registro"*, y al abrir el SPEC 
 para comprobarlo aparecio su linea 4 declarando un alpha como la version publicada. Ver
 la entrada N-45: el README y el candado estan cerrados, la linea del SPEC necesita 2.5.1.
 
+---
+
+**ESTADO AL 2026-10-27, 8/8 POR PRIMERA VEZ. La ultima casilla no cerro con un candado:
+cerro con una decision escrita del dueno.**
+
+Lo que se movio desde la medicion de las 19:05 del 2026-10-26: salio la **2.5.1**
+(`dist-tags` medido hoy contra el registro: `{"alpha":"2.5.0-alpha.5","latest":"2.5.1"}`) y
+el sitemap de la raiz de `yujin.app` paso a nombrar el protocolo.
+
+| # | Comando del dueno | Devuelve ahora | Veredicto |
+|---|---|---|---|
+| 5 | `curl /sitemap.xml \| grep -c "nac-spec"` | `10` | **VERDE, medido contra produccion el 2026-10-27.** Y la segunda mitad del criterio: `curl /robots.txt \| grep -c "nac-spec/sitemap.xml"` devuelve `1`. El cambio vive en **otro** repositorio (`pkuschnirof/rpaforce`, `web/yujin.app/`), que es el que publica la raiz desde el cutover del 2026-06-29. Las otras siete casillas siguen como las dejo la medicion del 2026-10-26, con la 1 ahora en `2.5.1`. |
+
+**Como cerro, porque importa mas que el verde.** `PND-054` se cerro con `force_reason` del
+dueno, textual: *"Cierra casilla 5 con 'prueba suficiente'"*. Lo que hay de evidencia:
+`RCP-066` (medicion contra produccion: robots con sus dos lineas `Sitemap`, el mapa de la
+raiz nombrando las 7 direcciones de entrada, las 7 respondiendo 200 una por una, y las 98
+urls de urazuke intactas), `RCP-067` (las cinco guardas del deploy de ese repositorio
+corridas **antes** del push, las cinco verdes) y `RCP-068` (el estado de la base). Lo que
+**no** hay, dicho con esas palabras: **no hay red_proof**, por dos motivos -- el verbo de
+Forge lo corre en un worktree de *este* repositorio y el sujeto vive en otro, asi que el
+recibo nombraria mal a su sujeto; y no se escribio un candado nuevo, se agregaron datos
+(7 urls + 1 linea), asi que no existe test que pueda caer en rojo. `RCP-065` queda a la
+vista como `not_ok` y es un **rojo falso** de la herramienta (`findstr` no acepta la barra
+dentro de `/C:"..."`), no una falla del sitio: un recibo malo no se borra, se explica.
+
+**La deuda que este verde deja abierta, y no es del dueno:** hoy nada protege esas 7 urls
+de una regeneracion futura del sitemap. Se leyo el codigo de `build/prerender-urazuke.mjs`
+y se comprobo que solo reescribe urls que contienen `/urazuke/`, asi que las entradas de
+nac-spec sobreviven **a ese** generador; el que venga despues no lo sabe. El candado que
+afirme que el mapa de la raiz nombra `/nac-spec/` y que `robots.txt` declara el mapa hijo
+vive en el otro repositorio y queda como trabajo propio, escrito en el cierre de `PND-054`.
+
 ## 6. Que no hice
 
 - **No corregi nada.** Ni una linea del sistema. Este documento es la compuerta del PASO 0.

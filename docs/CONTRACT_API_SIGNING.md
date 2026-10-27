@@ -137,7 +137,7 @@ una comparacion que da verde contra el valor equivocado.
 | index_sha384 | sha384-U/KsjOEcqPKwBs5JJy5Lbv1XYsaOkwWqDYtofd6Q4xziq9BylFYrfdKCI6Zxqj98 |
 | entry_count | 3 |
 | versions | 2.5.0-alpha.5 2.5.0 2.5.1 |
-| signed_at | 2026-10-26T18:36:51Z |
+| signed_at | 2026-10-26T22:47:56Z |
 
 Comando listo para pegar, para un tercero que no confia en el servidor
 ni en este repositorio:

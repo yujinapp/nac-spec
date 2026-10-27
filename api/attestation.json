@@ -4,20 +4,21 @@
   "generated_by": "scripts/sign-contract-api.mjs",
   "payload": {
     "api_schema": 1,
-    "chain_head": "sha384-tBEQVA0WiCwvJAQDkH4zAoE7BuCTweehwiYphpDJr//fm7ANhKFwzBQwK1F8/Jv4",
-    "entry_count": 2,
-    "index_sha384": "sha384-A74DN0CN03HTclmohc7/2JTmnYJkyOIcqr/2M4lX0BsHPGGmmKuvPnScEQupZOW+",
+    "chain_head": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
+    "entry_count": 3,
+    "index_sha384": "sha384-U/KsjOEcqPKwBs5JJy5Lbv1XYsaOkwWqDYtofd6Q4xziq9BylFYrfdKCI6Zxqj98",
     "key_id": "nac3-contract-2026",
     "protocol": "NAC3",
-    "signed_at": "2026-10-26T18:36:51Z",
+    "signed_at": "2026-10-26T22:47:56Z",
     "surface": "attestation-payload",
     "versions": [
       "2.5.0-alpha.5",
-      "2.5.0"
+      "2.5.0",
+      "2.5.1"
     ]
   },
   "protocol": "NAC3",
-  "signature_b64": "WziveGRLrDsjXFxhuQesAD4WFU+Lrp9cZcmjjOmeBhJ2ioSiOU+kCaHoS24lgz0/CA0xwHQbYnWQRL77eImDAA==",
+  "signature_b64": "PB9mJnCHGmbCDogVZso2BwdHrFdhCNNXMJJQC8SxrGVdGlOzvjQHof6S27yLD99sz8tJNFgUi5zUAkqJeJr+Bw==",
   "statement": "The holder of the offline key published as nac3-contract-2026 in api/trust.json attests that api/index.json, with the sha384 and chain head recorded in payload below, is the contract index this project published. The signature is over the canonical JSON of payload: keys sorted at every depth, two-space indent, LF, one trailing newline.",
   "surface": "attestation",
   "verify_with": "node scripts/verify-contract-api.mjs --base <url> --expect-head-from-repo"

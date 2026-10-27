@@ -1,6 +1,6 @@
 # D-05 — Qué hacemos con las nueve traducciones
 
-**Para que decidas vos. 27 de octubre de 2026.** Registrado como PND-058 y escrito en el documento de la auditoría antes de preguntártelo, para que la decisión no se pierda si se corta la sesión.
+**Decidida el 27 de octubre de 2026: opción B, con la ejecución diferida** (tu respuesta textual está al pie, en "Tu decisión"). La hoja se conserva **tal como se te presentó**, para que lo auditable sea también lo que se te mostró y no sólo lo que elegiste. Registrada como PND-058; la ejecución quedó abierta como PND-059.
 
 ---
 
@@ -22,7 +22,7 @@ D-03 decidió **qué se declara** sobre las nueve traducciones. No decidió **qu
 
 **1. Cubren 41% y lo dicen.** 34 de las 83 secciones. Lo que falta son 49 secciones, unas 6.600 palabras de inglés.
 
-**2. Lo que medí hoy y cambia la pregunta.** Dentro de las 34 secciones que **sí** cubren, **el 55% de las líneas de mayo ya no existe en el inglés de hoy** (256 de 465). Ejemplos de lo que todavía dicen: que la versión es la 2.2.0, que el estado es "estable", y una sección rotulada "preview de la v2.3" que hace rato dejó de ser preview.
+**2. Lo que medí hoy y cambia la pregunta.** ~~Dentro de las 34 secciones que **sí** cubren, **el 55% de las líneas de mayo ya no existe en el inglés de hoy** (256 de 465).~~ **CIFRA RETIRADA el 2026-10-27** — al re-medirla con otro recorte de líneas da 70%, así que no es una medición; ver "Una corrección de medición" al pie. Lo que sí se sostiene es el hecho, no el porcentaje: las nueve siguen diciendo que la versión es la 2.2.0, que el estado es "estable", y una sección rotulada "preview de la v2.3" que hace rato dejó de ser preview.
 
 O sea: **el cartel es honesto sobre cuánto cubre, y mudo sobre cuán viejo es lo que cubre.** Un lector puede leer "cubre 34 de 83" entendiendo "esas 34 están al día". No lo están. Eso no lo encontró una lectura: salió de medirlo para poder plantearte bien la opción A.
 
@@ -59,4 +59,20 @@ Y una regla que hay que escribir si elegís B: **una traducción vieja no puede 
 
 Ninguna de las cuatro cambia lo que una implementación tiene que leer: el inglés ya es el texto que manda y una afirmación de conformidad ya se mide contra el inglés. **La decisión es entre alcance** (a cuánta gente le llega) **y verificabilidad** (cuánto texto publicado no podés controlar).
 
-**No ejecuto nada hasta que me digas tu letra.**
+---
+
+## Tu decisión — 27 de octubre de 2026
+
+**Opción B, con la ejecución diferida.** Tu respuesta, textual:
+
+> *"B. Asiéntalo como pendiente, pero lo vamos a completar debido a su extensión cuando avancemos en el método urazuke y sus pendientes."*
+
+Lo que eso fija:
+
+- Las nueve traducciones **no se retiran ni se quedan congeladas**: se completan al 100% y se vuelven a generar en cada versión.
+- **No se hace ahora.** Queda encolada detrás del avance del método, por su extensión: la primera pasada completa son **6.643 palabras por idioma**, nueve veces. Esa cifra está medida hoy, no estimada.
+- Quedó anotada como **PND-059**, con su criterio de aceptación: las tres piezas que B exige (el productor del texto, el candado que compara letra por letra los nombres técnicos, los números y las direcciones, y la regla escrita de que una traducción vieja no puede frenar la publicación del inglés), cada una con su verificación. Ordenada en el registro **detrás del último peldaño del método**, para que el orden refleje la secuencia que pediste.
+
+**Y lo incómodo, que hay que decir:** la decisión es B, pero lo que está publicado hoy es A **sin su arreglo**. El cartel de cada traducción dice honestamente **cuánto** cubre y no dice **cuán viejo** es lo que cubre — y el tramo que cubre describe la versión 2.2: las nueve llevan ese número adentro del texto. Hasta que B se ejecute, alguien puede leer "cubre 34 de 83" entendiendo que esas 34 están al día. Arreglar ese silencio cuesta **una línea en el cartel**, pero esa línea **es la opción A**, que no elegiste: no la aplico por mi cuenta. Queda escrita como hallazgo N-50 y como una pregunta de una sola línea para vos.
+
+**Una corrección de medición, de paso.** Al plantearte esta hoja te di una cifra de deriva ("el 55% de las líneas de mayo ya no existe en el inglés de hoy"). **La retiro.** Al re-medirla con otro recorte de líneas da 70%: una cifra que se mueve 15 puntos según cómo se cuente no es una medición, es el mismo error de los bytes que ya corregimos una vez. Lo que queda escrito son los hechos estables: 34 de 83 secciones, 49 secciones y 6.643 palabras faltantes, y el número de versión viejo que las nueve declaran. La cifra de deriva vuelve cuando exista un medidor con su propio test, que es un peldaño del método.

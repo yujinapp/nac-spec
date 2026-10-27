@@ -70,10 +70,17 @@ arbol que tiene los diez catalogos **y** todavia la linea Status contradictoria:
 | --- | --- |
 | **La hoja de estilos que da 404 en 262 paginas publicadas** -- publicar el archivo o sacarle el enlace al generador. Las dos salidas cambian como se ve la documentacion publica | PND-053 |
 | **La clave de firma sin passphrase** en una maquina donde corren varias sesiones de agente, asi que la firma no es tecnicamente atribuible. Ponerle passphrase no rota la clave | PND-056 |
-| **El push del repositorio web** para que la casilla 5 pase a verde -- dispara un despliegue a produccion de **otro** sitio | PND-054 |
+| ~~**El push del repositorio web** para que la casilla 5 pase a verde~~ **HECHO el 2026-10-27** con autorizacion del dueno: deploy verde, medido contra produccion, casilla 5 en verde. Cerrado con "prueba suficiente" del dueno porque el red_proof nombraria mal a su sujeto (vive en otro repo) | PND-054, cerrado |
+| **Una linea sobre el cartel de las nueve traducciones (N-50):** el cartel declara la cobertura y calla la antiguedad, y el tramo que cubre describe la v2.2. Arreglarlo cuesta una linea, **pero esa linea es la opcion A** y el dueno eligio B: no se aplica por cuenta propia | N-50 / PND-059 |
 | **Las cuatro decisiones sobre el texto de los niveles** -- tres de ellas son lo que la casilla 8 reporta en rojo sobre la portada del propio protocolo | PND-044 a PND-047 |
 | La mitad de la portada que no esta declarada (128 ids pintados, 64 declarados) | PND-038 |
 | Seis acciones declaradas que no confirman nunca | PND-048 |
+
+**Lo que NO espera al dueno y es trabajo de Forge, para que no se pierda:** `PND-059` (D-05
+= opcion B, la pasada completa de las nueve traducciones, **diferida por el dueno** al avance
+del metodo: prioridad 47, detras del ultimo peldano) y `PND-060` (el candado en el repo
+`rpaforce` que proteja las 7 urls de nac-spec de una regeneracion futura; hoy nada las
+protege, y eso se declaro al cerrar la casilla 5).
 
 ---
 

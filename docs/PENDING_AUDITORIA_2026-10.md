@@ -10,7 +10,7 @@
 - Metodo: cada hallazgo fue re-medido desde este repositorio el 2026-10-24. La evidencia del auditor se transcribe; la mia es la salida real de los comandos, pegada.
 - Regla aplicada: lo que no se pudo medir se informa como "declarado y no medido", nunca como verde.
 - Nombre: este archivo se llamaba `PENDIENTES_AUDITORIA_2026-10.md`. Se renombro el 2026-10-24 por pedido del dueno ("fuera del alcance del deploy"). El rsync de publicacion excluye el patron `PENDING_*.md` (deploy.yml, linea 62, sin barra inicial: aplica a cualquier carpeta), asi que este documento no se publica. Verificado en vivo: https://yujin.app/nac-spec/docs/PENDING_AUDITORIA_2026-10.md devuelve 404.
-- Estado de las cuatro decisiones del dueno: **las cuatro CERRADAS al 2026-10-26** -- D-01 (opcion C, la 2.5.0 estable promovida a `latest`), D-02 (la API de contrato firmada), D-03 (opcion C, el ingles normativo y cada traduccion declarando lo que cubre) y D-04 (la seccion publica de limites, aprobada frase por frase). Se presentaron de a una; ninguna se resolvio sin respuesta explicita.
+- Estado de las cuatro decisiones del dueno: **las cuatro CERRADAS al 2026-10-26** -- D-01 (opcion C, la 2.5.0 estable promovida a `latest`), D-02 (la API de contrato firmada), D-03 (opcion C, el ingles normativo y cada traduccion declarando lo que cubre) y D-04 (la seccion publica de limites, aprobada frase por frase). Se presentaron de a una; ninguna se resolvio sin respuesta explicita. **D-05 (el destino de las nueve traducciones) se abrio y se cerro el 2026-10-27: opcion B, con la ejecucion diferida por el dueno al avance del metodo Urazuke (`PND-059`).**
 
 ---
 
@@ -72,9 +72,11 @@ Y una advertencia que no es del pedido pero afecta su cumplimiento literal: el p
 
 ## 2. Los hallazgos que son DECISION DEL DUENO
 
-Al 2026-10-27: **D-01, D-02, D-03 y D-04 estan resueltas y ejecutadas**, cada una con la
-frase textual del dueno al pie de su entrada. **D-05 esta abierta** y es la unica que
-espera una palabra. Van opciones y costo de adopcion.
+Al 2026-10-27: **las cinco estan resueltas**, cada una con la frase textual del dueno al pie
+de su entrada. D-01, D-02, D-03 y D-04 estan ademas **ejecutadas**; **D-05 esta decidida
+(opcion B) y su ejecucion esta diferida por el dueno** al avance del metodo Urazuke, con su
+tarea abierta y su criterio de aceptacion en `PND-059`. **Ninguna decision del dueno queda
+esperando una palabra.** Van opciones y costo de adopcion.
 
 ### D-01 (sobre N-01) -- a donde apunta `latest`
 
@@ -249,7 +251,7 @@ cifras: **se publica la 2.5.0 con las cuatro corridas declaradas historicas y la
 contra la 2.5.0 sale del camino critico** (`PND-040`, con su costo medido y su criterio de
 aceptacion). D-04 deja de estar abierta.
 
-### D-05 (nueva, 2026-10-27, ABIERTA) -- que se hace de aca en adelante con las nueve traducciones
+### D-05 (nueva, 2026-10-27, RESUELTA) -- que se hace de aca en adelante con las nueve traducciones
 
 D-03 decidio **que se declara** sobre las traducciones. No decidio **que destino tienen**, y
 esa pregunta quedo flotando: el cierre de `PND-052` la nombra y este documento la deja
@@ -263,7 +265,7 @@ solo vive en el chat se pierde cuando la sesion se corta.
    portada enlaza las nueve, y `SPEC.md` servido trae 4.3.2. Esa mitad esta cerrada.
 2. **Cobertura: 34 de las 83 secciones (41%).** Lo que falta son **49 secciones**, 48.329
    bytes, unas **6.644 palabras** de ingles.
-3. **N-48, nuevo, y es el hecho que cambia la pregunta.** Dentro de las 34 secciones que
+3. **N-50, nuevo (se planteo como N-48; ese id ya estaba usado, ver la entrada N-50), y es el hecho que cambia la pregunta.** Dentro de las 34 secciones que
    **si** cubren, **256 de las 465 lineas no vacias de la revision de mayo (55%) ya no
    existen verbatim en el ingles de hoy**. Muestras: `**Version:** 2.2.0`,
    `**Status:** Stable`, `Reserved id prefixes (v2.1):`,
@@ -283,7 +285,7 @@ solo vive en el chat se pierde cuando la sesion se corta.
 7. **Calidad declarada: `machine_v1`.** Hay productor del **cartel**
    (`scripts/build-translation-banners.mjs`); **no hay productor del texto traducido**.
 
-**Opcion A: se quedan congeladas, y se arregla solo el silencio (N-48).** El cartel pasa a
+**Opcion A: se quedan congeladas, y se arregla solo el silencio (N-50).** El cartel pasa a
 declarar tambien la deriva medida del tramo que cubre, con su caso en el candado.
 - Costo: una medicion y un caso de candado. **Cero traduccion.**
 - Beneficio: el artefacto deja de prometer de mas. Es la opcion mas barata que sigue siendo
@@ -335,6 +337,36 @@ el candado de code spans / ids / numeros / URLs byte identicos. Si el dueno pref
 sostener nueve artefactos regenerados, la caida honesta es **A**, que cuesta un candado y
 deja de prometer de mas. **Registrado como `PND-058`; la decision es del dueno y no se
 ejecuta nada hasta que la escriba.**
+
+**RESUELTA el 2026-10-27: OPCION B, CON LA EJECUCION DIFERIDA. Respuesta textual del dueno:
+*"B. Asientalo como pendiente, pero lo vamos a completar debido a su extension cuando
+avancemos en el metodo urazuke y sus pendientes."***
+
+Lo que la decision fija:
+
+- Las nueve traducciones **no se retiran y no se quedan congeladas**: se regeneran completas
+  (83 de 83) con un productor del texto, y se vuelven a generar por release.
+- **La ejecucion no entra ahora.** El dueno la encola detras del avance del metodo por su
+  extension: la primera pasada completa son **6.643 palabras de ingles por idioma** (49
+  secciones, 48.329 bytes), nueve veces, mas el delta por release. Medido hoy, no estimado.
+- Queda abierta como `PND-059` con su propio criterio de aceptacion -- las tres piezas que B
+  exige (el productor del texto, el candado de identidades y la regla de no-veto), cada una
+  con su verificacion. Prioridad 47, detras del ultimo peldano del metodo (`PND-028`, 46),
+  para que el orden del registro refleje la secuencia que el dueno pidio. Anclaje natural
+  **propuesto y no decidido**: peldano 20 (documentacion viva) para la pasada, 07 (medidor con
+  su propio test) para el medidor de deriva, 11 (simetria productor-consumidor) para el
+  candado de identidades.
+- `PND-058` cierra con esto: su criterio de aceptacion era exactamente la eleccion escrita con
+  la frase textual del dueno mas la tarea de ejecucion abierta con su criterio.
+
+**Lo que sigue vivo durante la espera, y hay que decirlo:** la decision es B, pero **el arbol de
+hoy es A sin su arreglo**. El cartel de las nueve declara la **cobertura** (34 de 83) y calla la
+**antiguedad** de lo que cubre, y el tramo que cubren describe la v2.2: las nueve llevan
+`2.2.0` adentro del texto, una ocurrencia por idioma (medido el 2026-10-27). O sea que hasta
+que B se ejecute, un lector puede leer "cubre 34 de 83" entendiendo "esas 34 estan al dia". El
+arreglo barato de ese silencio es **una linea en el cartel**, que es exactamente la opcion A, y
+el dueno eligio B: **no se aplica por cuenta propia.** Queda escrito como N-50 y como pregunta
+de una sola linea al dueno.
 
 ---
 
@@ -2211,6 +2243,70 @@ verde. El caso dispara solo y por el motivo correcto.
 solo idioma, y es el idioma que el autor no habla.
 
 **Estado: CERRADO** en el commit de consolidacion.
+
+---
+
+### N-46 (nuevo, 2026-10-26, encontrado EN EL GATE DE NAVEGADOR) 262 paginas publicadas enlazan una hoja de estilos que no existe
+
+**Esta entrada faltaba.** El id `N-46` se citaba en el cierre de D-03 (seccion 2) y en
+`PND-053`, y no tenia seccion propia en la seccion 3: un id colgante en el documento cuyo
+argumento es que no se contradice a si mismo. Escrita el 2026-10-27.
+
+**Que esta mal:** las nueve traducciones y, en total, **262 paginas publicadas** -- `SPEC.html`
+incluida -- enlazan `css/yujin-tokens.css`, que **nunca se publico**. Verificado en vivo el
+2026-10-27: `https://yujin.app/nac-spec/css/yujin-tokens.css` devuelve **404** y la carpeta
+`css/` del repositorio solo tiene las tres hojas de los ejemplos.
+
+**Como se encontro:** el gate de navegador exige cero errores de consola y se puso rojo sobre
+las nueve paginas.
+
+**Las dos salidas, y las dos cambian como se ve la documentacion publica:** publicar el archivo
+(la documentacion adopta los tokens del sistema visual) o sacarle el enlace al generador (se
+queda con el estilo que ya tiene). Por eso es decision del dueno y no un arreglo mecanico.
+
+**Lo que ya esta hecho para que no se vuelva ruido:** el gate lo tolera **por URL**, lo imprime
+como WARN nombrando el pendiente, y se pone rojo ante cualquier otro error de consola. No se
+puso ciego.
+
+**Severidad:** avisa. **Quien decide:** el dueno. **Estado:** abierto (`PND-053`).
+
+---
+
+### N-50 (nuevo, 2026-10-27, encontrado AL MEDIR PARA PLANTEAR D-05) El cartel de las nueve traducciones declara la cobertura y calla la antiguedad
+
+**Numeracion:** se planteo como `N-48` en la hoja de D-05 de esta manana. Ese id ya estaba
+usado por "la autoverificacion de la propia portada nunca corrio", asi que **dos hallazgos
+distintos compartian un id**. Renumerado a `N-50` el 2026-10-27; la colision era un defecto de
+este documento.
+
+**Como se encontro:** midiendo para poder plantearle al dueno la opcion A de D-05. No salio de
+leer.
+
+**Lo que esta mal:** el cartel de las nueve traducciones es honesto sobre **cuanto** cubre y
+mudo sobre **cuan viejo** es lo que cubre. Un lector puede leer "cubre 34 de las 83 secciones"
+entendiendo "esas 34 estan al dia", y no lo estan.
+
+**Lo que se midio, estable y reproducible (2026-10-27):**
+
+- Las nueve cubren **34 de las 83** secciones de hoy (encabezados de nivel 1 a 4, contados sobre
+  `SPEC.md` y `i18n/*/SPEC.md`), y son las mismas 34 en las nueve.
+- Falta: **49 secciones, 48.329 bytes, 6.643 palabras** de ingles por idioma.
+- Las nueve declaran **`2.2.0`** adentro del texto, una ocurrencia por idioma
+  (`grep -oE "2\.2\.0" i18n/*/SPEC.md`); ocho dicen tambien `Stable` y cinco conservan una
+  seccion rotulada `v2.3 preview`. Eso es la antiguedad, dicha por el propio artefacto.
+
+**Lo que NO se puede afirmar, y se retira:** la cifra "el 55% de las lineas de mayo ya no existe
+verbatim en el ingles de hoy" (256 de 465) que se escribio esta manana al plantear D-05. **Al
+re-medirla con otra normalizacion de linea da 70% (333 de 473).** Una metrica que se mueve 15
+puntos segun como se recorten las lineas no es una medicion: es la misma leccion de los bytes de
+D-03 con otro disfraz. La entrada se queda con los hechos estables de arriba, y la cifra de
+deriva se retira hasta que exista un medidor con su propio test -- que es, literalmente, el
+peldano 07 del metodo.
+
+**Severidad:** registra. **Estado:** **absorbido por D-05 = opcion B** (una regeneracion por
+release lleva la deriva a cero y el silencio desaparece), con la ejecucion **diferida** por el
+dueno (`PND-059`). Mientras tanto el silencio sigue publicado, y taparlo hoy con una linea en
+el cartel seria aplicar la opcion A que el dueno no eligio.
 
 ---
 

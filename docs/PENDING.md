@@ -65,6 +65,47 @@ item becomes blocking and P6 returns to red.
 
 ---
 
+## D-05 -- The nine SPEC translations, completed  [NOT BLOCKING, DEFERRED BY THE OWNER]
+
+**Origin:** decision D-05 (`docs/PENDING_AUDITORIA_2026-10.md#D-05`), owner's
+answer of 2026-10-27: option **B**, *"lo vamos a completar debido a su
+extension cuando avancemos en el metodo urazuke y sus pendientes"*.
+**Status:** open, not blocking, queued **behind the ladder**. Registry id
+`PND-059`, priority 47 -- one past the last rung (`PND-028`, 46), so the
+registry order carries the sequence the owner asked for.
+
+**What it is:** the nine translations of the specification are regenerated
+complete (83 of 83 sections) by a producer, and regenerated per release. Three
+pieces: the text producer (automatic translation, needs the owner's key), the
+identity lock (code spans, ids, attribute names, numbers and URLs byte
+identical to the English in all nine -- what makes B verifiable without reading
+the prose), and the written no-veto rule (a stale translation never blocks the
+publication of the normative English).
+
+**Measured, not estimated (2026-10-27):** 34 of 83 sections covered today, the
+same 34 in all nine; 49 sections missing = 48 329 bytes = 6 643 English words
+**per language**, nine times for the first full pass, then the per-release
+delta. That extension is the owner's reason for deferring it.
+
+**Acceptance criterion:** full detail in `PND-059`. In one line: all nine
+declare 83 of 83 and the producer -- not a hand edit -- made them; the identity
+lock exists **with its proven red case**; the no-veto rule is written and
+proven; `check:release` stays green and the nine pages keep serving 200.
+
+**Natural anchor, proposed and not decided:** rung 20 (living documentation) for
+the pass, rung 07 (a meter with its own test) for the drift meter that does not
+exist today, rung 11 (producer/consumer symmetry) for the identity lock.
+
+**What stays alive while it waits:** the decision is B, but the published tree
+is A **without its fix**. The banner declares coverage (34 of 83) and is silent
+about the **vintage** of what it covers, and the covered tranche describes v2.2
+-- all nine carry `2.2.0` inside the text, one occurrence per language,
+measured. Recorded as `N-50`. Closing that silence costs one line in the
+banner, but that line **is option A**, which the owner did not choose: it is a
+one-line question for the owner, not an agent's call.
+
+---
+
 ## Retired
 
 **PRE-2 -- Edge stub for the chat intermediary.** Not needed: the client takes

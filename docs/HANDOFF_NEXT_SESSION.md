@@ -1,3 +1,54 @@
+# Handoff -- estado al 2026-10-27, 20:10 UTC (D-05 EJECUTADA: las nueve traducciones estan completas)
+
+**Lo que cambio respecto de todo lo que sigue abajo.** El dueno revirtio el
+diferimiento de D-05 el mismo dia ("Hagamos las traducciones ahora, asi luego
+durante la evolucion solo las vamos manteniendo") y la pasada esta hecha:
+
+- **Las nueve traducciones del SPEC estan completas**: 282 de 282 unidades y 83
+  de 83 secciones en cada idioma. 2.538 unidades, ~80.000 palabras de ingles.
+  El cartel de cada pagina y su frontmatter lo declaran medido, no tipeado.
+- **Hay un productor del texto** (`scripts/build-spec-translations.mjs` +
+  `scripts/lib/spec-units.mjs`) y las paginas publicadas **ya no se tocan a
+  mano**: una edicion a mano es un rechazo con nombre.
+- **El candado de identidades** compara code spans, enlaces, URLs, numeros,
+  filas de tabla, items de lista, nivel de encabezado y numero de seccion.
+  2.538 unidades reales lo pasan; 10 casos en rojo lo prueban.
+- **La regla de no-veto** esta escrita y **hecha valer por el codigo de salida**:
+  atraso = reporte por unidad + exit 0. Un idioma viejo no frena el ingles.
+- **Enganchado a `npm run check:release`** (verde, salida 0), mas
+  `test:spec-translations` (33 casos, 0 fallos) y el candado de ayer reparado
+  (22 casos, 0 fallos).
+- **El mantenimiento esta probado sobre el documento real:** se edito un parrafo
+  del ingles y cada idioma pidio **2 unidades**, con 281 de 283 intactas.
+- **Nada publicado todavia.** Son commits locales: la rama no se empujo y no se
+  desplego. Lo que esta afuera sigue siendo la 2.5.1 de ayer.
+
+**Lo que NO entro y por que (medido):** la redaccion de la regla de no-veto en
+**SPEC 4.3.2**. Al aplicarla, `check-version-coherence` y `build-contract-api`
+la rechazaron: el contrato publicado lleva la huella de los bytes de `SPEC.md`,
+asi que tocar el normativo mueve el contrato de una version ya firmada. Se
+revirtio. El texto y sus nueve traducciones quedan listos en
+`docs/d-05-4.3.2-delta.md` y `docs/delta-4.3.2/`; necesita una **2.5.2** con la
+firma del dueno. Es **PND-061**, junto con la palabra "partial" que 4.3.2 sigue
+usando para traducciones que ya no son parciales.
+
+**Cuatro hallazgos nuevos, ninguno de una lectura:** N-51 (lo de arriba), N-52
+(cinco defectos de mis propios instrumentos, encontrados al correrlos contra el
+corpus real), N-53 (la suite de los carteles se **estrellaba** entera por un
+import nuevo, y uno de sus casos en rojo estaba clavado al numero de mayo y ya
+no podia ponerse rojo), N-54 (el frontmatter heredaba la procedencia de mayo
+sobre un texto traducido hoy). Todos en
+`docs/PENDING_AUDITORIA_2026-10.md`.
+
+**Lo que sigue esperando al dueno:** PND-061 (la 2.5.2), PND-053 (el 404 de
+`css/yujin-tokens.css` en 262 paginas), PND-056 (la clave de firma sin
+passphrase), las cuatro decisiones sobre el texto de los niveles, y el push de
+estos commits.
+
+---
+
+<!-- lo anterior se conserva como registro de la publicacion de la 2.5.1 -->
+
 # Handoff -- estado al 2026-10-27, 01:55 UTC (PUBLICADO: la 2.5.1 esta afuera, en los dos lugares)
 
 **Lo que cambio respecto de todo lo que sigue abajo: ya no falta la firma y ya no hay

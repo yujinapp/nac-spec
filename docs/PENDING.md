@@ -65,44 +65,45 @@ item becomes blocking and P6 returns to red.
 
 ---
 
-## D-05 -- The nine SPEC translations, completed  [NOT BLOCKING, DEFERRED BY THE OWNER]
+## D-05 -- The nine SPEC translations  [DONE 2026-10-27]
 
-**Origin:** decision D-05 (`docs/PENDING_AUDITORIA_2026-10.md#D-05`), owner's
-answer of 2026-10-27: option **B**, *"lo vamos a completar debido a su
-extension cuando avancemos en el metodo urazuke y sus pendientes"*.
-**Status:** open, not blocking, queued **behind the ladder**. Registry id
-`PND-059`, priority 47 -- one past the last rung (`PND-028`, 46), so the
-registry order carries the sequence the owner asked for.
+**Origin:** decision D-05 (`docs/PENDING_AUDITORIA_2026-10.md#D-05`), option
+**B**. The owner deferred it and then reversed the deferral the same day:
+*"Hagamos las traducciones ahora, asi luego durante la evolucion solo las vamos
+manteniendo."* Registry id `PND-059`.
 
-**What it is:** the nine translations of the specification are regenerated
-complete (83 of 83 sections) by a producer, and regenerated per release. Three
-pieces: the text producer (automatic translation, needs the owner's key), the
-identity lock (code spans, ids, attribute names, numbers and URLs byte
-identical to the English in all nine -- what makes B verifiable without reading
-the prose), and the written no-veto rule (a stale translation never blocks the
-publication of the normative English).
+**Delivered.** All nine locales are complete: 282 of 282 units, 83 of 83
+sections each -- 2 538 units, about 80 000 English words, engine recorded in
+each store header. The three pieces D-05 required:
 
-**Measured, not estimated (2026-10-27):** 34 of 83 sections covered today, the
-same 34 in all nine; 49 sections missing = 48 329 bytes = 6 643 English words
-**per language**, nine times for the first full pass, then the per-release
-delta. That extension is the owner's reason for deferring it.
+| piece | where | proven by |
+|---|---|---|
+| the text producer | `scripts/build-spec-translations.mjs` + `scripts/lib/spec-units.mjs` | a block round trip over `SPEC.md`, byte for byte |
+| the identity lock | the same library | 10 red cases, each asserting the finding NAMES what was broken, plus all 2 538 real units green |
+| the no-veto rule | `docs/TRANSLATION_PASS.md`, enforced by the producer's **exit code** | the one case in the suite that asserts an ALLOWED state |
 
-**Acceptance criterion:** full detail in `PND-059`. In one line: all nine
-declare 83 of 83 and the producer -- not a hand edit -- made them; the identity
-lock exists **with its proven red case**; the no-veto rule is written and
-proven; `check:release` stays green and the nine pages keep serving 200.
+Wired into `npm run check:release`; `scripts/test-spec-translations.mjs` is 33
+cases, 0 failures. The procedure for every later release is
+`docs/TRANSLATION_PASS.md`.
 
-**Natural anchor, proposed and not decided:** rung 20 (living documentation) for
-the pass, rung 07 (a meter with its own test) for the drift meter that does not
-exist today, rung 11 (producer/consumer symmetry) for the identity lock.
+**The maintenance claim, measured on the real document and not promised:** one
+paragraph of English was edited and each locale asked for **2 units**, with 281
+of 283 untouched. That is what content-addressed keys buy.
 
-**What stays alive while it waits:** the decision is B, but the published tree
-is A **without its fix**. The banner declares coverage (34 of 83) and is silent
-about the **vintage** of what it covers, and the covered tranche describes v2.2
--- all nine carry `2.2.0` inside the text, one occurrence per language,
-measured. Recorded as `N-50`. Closing that silence costs one line in the
-banner, but that line **is option A**, which the owner did not choose: it is a
-one-line question for the owner, not an agent's call.
+**What did NOT land, and why:** the wording of the no-veto rule in **SPEC
+4.3.2**. It is written, translated into the nine and verified; applying it made
+`check-version-coherence` and `build-contract-api` refuse, because the
+published contract carries the sha384 of `SPEC.md` and that version already
+shipped and is signed in the chain. It was reverted, not forced. The text and
+the nine translations are in `docs/d-05-4.3.2-delta.md` and
+`docs/delta-4.3.2/`; it needs a 2.5.2, which needs the owner's signature.
+Tracked as **`PND-061`** (N-51), together with the word **"partial"** that
+4.3.2 still uses for translations that are no longer partial.
+
+**N-50 closed by consequence, as the sheet predicted:** there is no vintage to
+be silent about. Each banner declares the English revision it translates
+(today's) and the coverage (83 of 83), and the `2.2.0` the nine carried inside
+their text went away on its own.
 
 ---
 

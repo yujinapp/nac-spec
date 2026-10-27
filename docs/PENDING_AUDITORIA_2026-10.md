@@ -2310,6 +2310,97 @@ el cartel seria aplicar la opcion A que el dueno no eligio.
 
 ---
 
+### N-51 (nuevo, 2026-10-27, encontrado AL EJECUTAR D-05) SPEC 4.3.2 quedo con una palabra falsa, y la regla de no-veto no esta en el normativo
+
+**Que paso.** La ejecucion de D-05 llevo las nueve traducciones de 34 a
+83 de 83 secciones. Eso volvio falsa una palabra del documento
+normativo publicado: 4.3.2 dice de ellas "Each one **is partial**".
+
+**Y lo que falta.** La tercera pieza de D-05, la regla de no-veto, esta
+escrita en `docs/TRANSLATION_PASS.md` y hecha valer por el codigo de
+salida del productor, pero no en SPEC 4.3.2.
+
+**Por que no entro -- medido, no supuesto.** Se aplico y el proyecto lo
+refuto: `check-version-coherence` FAIL en `runtime/SPEC.md`, y
+`build-contract-api` FAIL "api/v/2.5.1/ differs ... and that version is
+already in the chain". La causa es una linea,
+`scripts/build-contract-api.mjs:537`, que publica el `spec_sha384` de
+los bytes de `SPEC.md`: tocar el normativo mueve el contrato de una
+version ya publicada y ya firmada. Se revirtio.
+
+**Separacion que si se pudo hacer.** El contrato no cubre
+`i18n/*/SPEC.{md,html}`, asi que las nueve traducciones completas se
+publican sin saltar version.
+
+**Estado:** PND-061. El texto y las nueve traducciones de esos dos
+parrafos estan hechos y verificados en `docs/d-05-4.3.2-delta.md` y
+`docs/delta-4.3.2/`. Necesita una 2.5.2, que lleva la firma del dueno.
+
+### N-52 (nuevo, 2026-10-27, encontrado AL CORRER LA SUITE NUEVA) Cinco defectos de mis propios instrumentos de traduccion, ninguno de una lectura
+
+Se listan porque son la evidencia de que el candado sirve: los cinco
+salieron de correrlo contra el corpus real, no de revisarlo.
+
+1. **El marcador del almacen se cortaba en el primer `>`.** La seccion
+   10.2 se titula ``CLI: `npx nac3 validate <target>` ``, asi que cuatro
+   marcadores por idioma quedaban tragados como si fueran texto, y el
+   almacen reportaba el INGLES como traduccion. Arreglado: el marcador
+   se lee hasta el ultimo `-->` de la linea, y el localizador se sanea
+   al escribirlo.
+2. **El candado inventaba un item de lista.** Al borrar los code spans
+   para medir lo demas, el parrafo con ``  `/parse` + `/tts`  `` dejaba
+   un `+` al principio de linea. Rechazaba traducciones correctas.
+   Arreglado: la estructura se cuenta sobre el texto CRUDO.
+3. **No veia los code spans partidos en dos lineas.** El ingles lo hace
+   cinco veces; la expresion se detenia en el salto de linea, emparejaba
+   mal las comillas invertidas (convirtiendo ". See " en un "code span")
+   y contaba el 3 de `@nac3` como cifra de prosa. Arreglado, y el
+   espaciado interno se normaliza antes de comparar: lo que tiene que
+   ser identico es el CODIGO, no la columna donde el ingles corto.
+4. **Exigia el 11 de `a11y` como si fuera una cifra.** Y al corregirlo
+   a medias, el retroceso de la expresion dejaba pasar el `1`.
+   Arreglado con una vuelta de verificacion sobre numeronimos y
+   versiones (`a11y`, `i18n`, `l10n` no; `v2.5`, `NAC3` si).
+5. **El clasificador acusaba de "editado a mano" a las nueve paginas**
+   en cuanto el ingles crecia un parrafo: cambiaba el conteo de bloques,
+   y solo el ingles puede hacer eso. Arreglado, con su caso de
+   regresion.
+
+### N-53 (nuevo, 2026-10-27, encontrado AL CORRER LA SUITE DE AYER) El candado de los carteles se estrellaba entero, y uno de sus casos en rojo no podia ponerse rojo
+
+**Lo primero.** `scripts/test-translations-gate.mjs` arma un arbol de
+prueba copiando el script del cartel. Cuando el cartel gano un import
+(`scripts/lib/spec-units.mjs`), ese arbol dejo de ser una copia
+ejecutable: **los 21 casos se estrellaban** con
+`ERR_MODULE_NOT_FOUND` en lugar de fallar. Un estrellon esconde todos
+los casos que vienen atras.
+
+**Lo segundo, peor.** Su caso "un conteo que exagera la cobertura es
+rechazado" parcheaba la cadena literal `translation_sections: 34`. Al
+pasar las nueve a 83, el parche dejo de coincidir: **no provocaba nada
+y el caso pasaba por la razon equivocada.** Un caso en rojo que no
+puede ponerse rojo es una ceremonia.
+
+Arreglados los dos: el arbol copia `scripts/lib` y los almacenes, el
+caso se ancla en la CLAVE y no en el valor, y se agrego el mismo engano
+desde el otro lado (una pagina que afirma una cobertura que su almacen
+ya no sostiene). 22 casos, 0 fallos.
+
+### N-54 (nuevo, 2026-10-27, encontrado AL PRODUCIR) El frontmatter heredaba la procedencia de mayo sobre un texto traducido hoy
+
+El productor de carteles conservaba a proposito las claves que habia
+escrito el generador de mayo (`translation_source_hash`,
+`translation_quality`, `translation_date`), con el argumento de que
+"agrega lo que faltaba, no borra la procedencia". Eso era correcto
+mientras el cuerpo seguia siendo el texto de mayo. Al producirse el
+cuerpo desde un almacen, esas claves pasaron a declarar la huella de
+una revision del ingles que la pagina ya no traduce y una fecha cinco
+meses anterior al trabajo: **procedencia falsa es peor que ninguna.**
+
+Arreglado: las tres son derivadas (huella del `SPEC.md` de hoy, fecha
+de la pasada leida del almacen) y se agrego `translation_engine`, que
+nombra el motor que la produjo.
+
 ## 4. Grupos de convergencia
 
 Estos son el mismo problema visto de dos lados y **tienen que cerrarse juntos**:

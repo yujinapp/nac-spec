@@ -1,6 +1,6 @@
 # D-05 — Qué hacemos con las nueve traducciones
 
-**Decidida el 27 de octubre de 2026: opción B, con la ejecución diferida** (tu respuesta textual está al pie, en "Tu decisión"). La hoja se conserva **tal como se te presentó**, para que lo auditable sea también lo que se te mostró y no sólo lo que elegiste. Registrada como PND-058; la ejecución quedó abierta como PND-059.
+**Decidida el 27 de octubre de 2026: opción B. Diferida primero y luego EJECUTADA el mismo día** (tu respuesta textual está al pie, en "Tu decisión"). La hoja se conserva **tal como se te presentó**, para que lo auditable sea también lo que se te mostró y no sólo lo que elegiste. Registrada como PND-058; la ejecución quedó abierta como PND-059.
 
 ---
 
@@ -76,3 +76,61 @@ Lo que eso fija:
 **Y lo incómodo, que hay que decir:** la decisión es B, pero lo que está publicado hoy es A **sin su arreglo**. El cartel de cada traducción dice honestamente **cuánto** cubre y no dice **cuán viejo** es lo que cubre — y el tramo que cubre describe la versión 2.2: las nueve llevan ese número adentro del texto. Hasta que B se ejecute, alguien puede leer "cubre 34 de 83" entendiendo que esas 34 están al día. Arreglar ese silencio cuesta **una línea en el cartel**, pero esa línea **es la opción A**, que no elegiste: no la aplico por mi cuenta. Queda escrita como hallazgo N-50 y como una pregunta de una sola línea para vos.
 
 **Una corrección de medición, de paso.** Al plantearte esta hoja te di una cifra de deriva ("el 55% de las líneas de mayo ya no existe en el inglés de hoy"). **La retiro.** Al re-medirla con otro recorte de líneas da 70%: una cifra que se mueve 15 puntos según cómo se cuente no es una medición, es el mismo error de los bytes que ya corregimos una vez. Lo que queda escrito son los hechos estables: 34 de 83 secciones, 49 secciones y 6.643 palabras faltantes, y el número de versión viejo que las nueve declaran. La cifra de deriva vuelve cuando exista un medidor con su propio test, que es un peldaño del método.
+
+
+---
+
+## El dueño revirtió el diferimiento, el mismo día
+
+Su frase, textual:
+
+> *"Mira, me convenciste: Hagamos las traducciones ahora, así luego
+> durante la evolución sólo las vamos manteniendo."*
+
+Esa segunda mitad agrega un requisito que esta hoja no tenía explícito:
+el entregable no es la pasada, es **la maquinaria de mantenimiento**. Por
+eso lo primero que se construyó, antes de traducir una sola palabra, fue
+el productor con detección de delta por unidad.
+
+## Qué quedó hecho
+
+| | |
+|---|---|
+| las nueve traducciones | 282 de 282 unidades, 83 de 83 secciones, cada una |
+| el volumen real | 2.538 unidades, ~80.000 palabras de inglés |
+| el productor | `scripts/build-spec-translations.mjs` + `scripts/lib/spec-units.mjs` |
+| el candado de identidades | 2.538 unidades reales lo pasan; 10 casos en rojo lo prueban |
+| la suite | `scripts/test-spec-translations.mjs`, 33 casos, 0 fallos |
+| la regla de no-veto | escrita y **hecha valer por el código de salida**, no sólo prometida |
+| enganchado a | `npm run check:release` (verde, salida 0) |
+| el procedimiento | `docs/TRANSLATION_PASS.md` |
+
+**La maquinaria se probó sobre el documento real, no en un ejemplo:** se
+editó un párrafo del inglés y las nueve pidieron 2 unidades cada una, con
+281 de 283 intactas. Eso es lo que "sólo las vamos manteniendo" significa
+en números.
+
+## Lo que no entró, y por qué
+
+La redacción de la regla de no-veto **en SPEC 4.3.2**. Se escribió, se
+tradujo a los nueve idiomas y se verificó; al aplicarla, la compuerta del
+contrato la rechazó: el contrato publicado lleva la huella de los bytes
+de `SPEC.md`, así que tocar el normativo mueve el contrato de la 2.5.1,
+que ya salió y ya está firmada. Se revirtió. El texto, las nueve
+traducciones y la medición quedan en `docs/d-05-4.3.2-delta.md` y
+`docs/delta-4.3.2/`, y la decisión de publicar una 2.5.2 es del dueño
+porque lleva su firma. Queda como **PND-061**.
+
+Y una consecuencia incómoda que hay que decir: con las nueve completas,
+la palabra **"partial"** que el 4.3.2 publicado usa para describirlas
+quedó falsa. El cartel de cada página dice la verdad medida, así que un
+adoptante no se confunde; lo que quedó contradiciéndose es el documento
+cuyo argumento es que no se contradice a sí mismo.
+
+## Y N-50 se cerró por consecuencia, como estaba previsto
+
+El silencio del cartel sobre la antigüedad desapareció sin escribir una
+línea de la opción A: no hay antigüedad. Cada cartel declara la revisión
+del inglés que traduce (la de hoy) y la cobertura (83 de 83), y el
+`2.2.0` que las nueve llevaban adentro del texto se fue solo al
+retraducir desde el inglés de hoy.

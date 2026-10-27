@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>NAC3 -- Native Agent Contract -- NAC3</title>
 <meta name="nac3-doc-slug" content="spec" />
-<meta name="nac3-spec-version" content="2.2" />
+<meta name="nac3-spec-version" content="2.5.1" />
 <link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css" />
 <style>
   body { font-family: var(--font-sans, -apple-system, sans-serif);
@@ -19,6 +19,14 @@
   pre { background: var(--color-bg-subtle, #f5f2ea); padding: 14px 16px;
          border-radius: 6px; overflow-x: auto; }
   pre code { background: transparent; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0;
+          font-size: 0.94em; }
+  th, td { border: 1px solid var(--color-border-subtle, #e6e3da);
+           padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--color-bg-subtle, #f5f2ea); }
+  blockquote { border-left: 3px solid var(--color-accent, #4f5b87);
+               margin: 1em 0; padding: 2px 16px;
+               color: var(--color-text-muted, #555); }
   .nac3-doc-toolbar { position: sticky; top: 0; z-index: 5;
                        background: rgba(255,253,247,0.95);
                        backdrop-filter: blur(6px);
@@ -39,7 +47,7 @@
 <body data-nac-plugin="spec" data-nac-doc="true">
 
 <nav class="nac3-doc-toolbar" data-nac-id="spec.toolbar" data-nac-role="region">
-  <span class="badge">NAC3 v2.2 &middot; 翻译</span>
+  <span class="badge">NAC3 v2.5.1 &middot; 翻译</span>
   <a href="/nac-spec/" data-nac-id="spec.toolbar.home"
      data-nac-role="action" data-nac-action="open">Spec home</a>
   <a href="audio:/nac-spec/audio/en/spec.mp3" data-nac-id="spec.toolbar.audio"
@@ -54,39 +62,38 @@
 
 <main data-nac-id="spec.main" data-nac-role="region">
 <aside data-nac-id="spec.translation_notice" data-nac-role="region">
-<p data-nac-id="spec.translation_notice.text" data-nac-role="paragraph"><strong>机器翻译，非规范性文本。</strong> 本文翻译的是 2026-05-11 的英文版 (NAC3 v2.2)，覆盖当前原文的 34 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。</p>
+<p data-nac-id="spec.translation_notice.text" data-nac-role="paragraph"><strong>机器翻译，非规范性文本。</strong> 本文翻译的是 2026-10-27 的英文版 (NAC3 v2.5.1)，覆盖当前原文的 83 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。</p>
 <p data-nac-id="spec.translation_notice.en" data-nac-role="paragraph" lang="en"><em>Non-normative machine translation. The normative text of NAC3 is the English one.</em></p>
 <p data-nac-id="spec.translation_notice.link_row" data-nac-role="paragraph"><a href="/nac-spec/SPEC.html" hreflang="en" data-nac-id="spec.translation_notice.canonical" data-nac-role="action" data-nac-action="open">阅读规范性的英文版本</a></p>
 </aside>
 <h1 data-nac-id="spec.h1.nac3-native-agent-contract" data-nac-role="heading" data-nac-level="1" id="nac3-native-agent-contract">NAC3 -- Native Agent Contract</h1>
-<p data-nac-id="spec.p.4" data-nac-role="paragraph"><strong>版本：</strong> 2.2.0 <strong>状态：</strong> 稳定 <strong>许可证：</strong> Apache-2.0 <strong>编辑：</strong> Yujin (rpaforce.com)</p>
+<p data-nac-id="spec.p.2" data-nac-role="paragraph"><strong>版本:</strong> 2.5.1 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff) <strong>状态:</strong> 稳定发布。npm 的 dist-tag <code data-nac-role="code-inline">latest</code> 指向这里; 9.1 节说明它保证什么、预发布版不保证什么。本文档只在一个地方写明自己的版本, 就是上面那一行。已发布的 RFC 及其第 2 层 + 第 3 层证据列在 <code data-nac-role="code-inline">README.md</code> 和 <code data-nac-role="code-inline">runtime/CHANGELOG.md</code> 中。 <strong>许可:</strong> Apache-2.0 <strong>编者:</strong> Yujin (yujin.app)</p>
 <hr />
-<h2 data-nac-id="spec.h2.0-目的" data-nac-role="heading" data-nac-level="2" id="0-目的">0. 目的</h2>
-<p data-nac-id="spec.p.7" data-nac-role="paragraph">NAC3 是 Web UI 与驱动它们的 Agent 之间的契约。 Agent 包括语音运行器、LLM 中间件、RPA 机器人、 无障碍工具以及端到端测试运行器。该契约规定了：</p>
-<p data-nac-id="spec.p.8" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.fill(id, value)</code>、<code data-nac-role="code-inline">NAC.tab(plugin, key)</code> 等，无需针对每个应用编写胶水代码。</p>
-<ol data-nac-id="spec.list.9" data-nac-role="list"><li data-nac-id="spec.list.9.item.1" data-nac-role="list-item"><strong>元素如何命名</strong> —— 使 Agent 能够请求"点击保存按钮"并将其解析到唯一的 DOM 节点。</li><li data-nac-id="spec.list.9.item.2" data-nac-role="list-item"><strong>动词如何应用</strong> —— 使 Agent 能够调用 <code data-nac-role="code-inline">NAC.click(id)</code>、</li><li data-nac-id="spec.list.9.item.3" data-nac-role="list-item"><strong>如何发出完成信号</strong> —— 使 Agent 知道某个步骤何时完成，每个角色对应一组确定性事件。</li><li data-nac-id="spec.list.9.item.4" data-nac-role="list-item"><strong>如何保留来源信息</strong> —— 使下游系统能够区分真实用户点击与合成点击。</li></ol>
-<p data-nac-id="spec.p.10" data-nac-role="paragraph">NAC3 在你现有的渲染框架之上添加了一层薄薄的抽象，不会替代 ARIA、React、Vue 或你的设计系统。</p>
+<h2 data-nac-id="spec.h2.0" data-nac-role="heading" data-nac-level="2" id="0">0. 目的</h2>
+<p data-nac-id="spec.p.5" data-nac-role="paragraph">NAC3 是网页界面与驱动它们的代理之间的契约。代理包括语音执行器、LLM 中介、RPA 机器人、无障碍工具, 以及端到端测试执行器。该契约规定:</p>
+<ol data-nac-id="spec.list.6" data-nac-role="list"><li data-nac-id="spec.list.6.item.1" data-nac-role="list-item"><strong>元素如何命名</strong> -- 使代理可以说&quot;点击保存按钮&quot;, 并把它解析到唯一的 DOM 节点。</li><li data-nac-id="spec.list.6.item.2" data-nac-role="list-item"><strong>动词如何适用</strong> -- 使代理可以调用 <code data-nac-role="code-inline">NAC.click(id)</code>、 <code data-nac-role="code-inline">NAC.fill(id, value)</code>、<code data-nac-role="code-inline">NAC.tab(plugin, key)</code> 等, 而不需要逐个应用 的粘合代码。</li><li data-nac-id="spec.list.6.item.3" data-nac-role="list-item"><strong>完成如何示意</strong> -- 使代理知道一个步骤何时结束, 并且每个角色都有 确定的事件族。</li><li data-nac-id="spec.list.6.item.4" data-nac-role="list-item"><strong>来源如何保留</strong> -- 使下游系统能够区分用户真实的点击与合成的点击。</li></ol>
+<p data-nac-id="spec.p.7" data-nac-role="paragraph">NAC3 只在你已经使用的渲染框架之上加一层薄薄的东西。它不替代 ARIA、 React、Vue, 也不替代你的设计系统。</p>
 <hr />
-<h2 data-nac-id="spec.h2.1-角色roles" data-nac-role="heading" data-nac-level="2" id="1-角色roles">1. 角色（Roles）</h2>
-<p data-nac-id="spec.p.13" data-nac-role="paragraph">每个与 Agent 相关的 DOM 元素都携带 <code data-nac-role="code-inline">data-nac-role</code>。规范角色如下：</p>
-<p data-nac-id="spec.p.14" data-nac-role="paragraph">| 角色 | 含义 | 示例 | |------|------|------| | <code data-nac-role="code-inline">plugin</code> | 一个自包含的 UI 模块（页面、面板、组件集合）。 | <code data-nac-role="code-inline">&lt;article data-nac-plugin="invoice"&gt;</code> | | <code data-nac-role="code-inline">section</code> | plugin 内部的地标区域（页头、正文、页脚、侧边栏）。 | <code data-nac-role="code-inline">&lt;section data-nac-role="section"&gt;</code> | | <code data-nac-role="code-inline">region</code> | section 内部的可命名区域（卡片组、结果列表）。 | <code data-nac-role="code-inline">&lt;div data-nac-role="region"&gt;</code> | | <code data-nac-role="code-inline">action</code> | 触发动词的可点击组件（按钮、用作按钮的链接）。 | <code data-nac-role="code-inline">&lt;button data-nac-role="action" data-nac-action="save"&gt;</code> | | <code data-nac-role="code-inline">field</code> | 用户输入或切换的输入框（文本、数字、复选框、单选框、日期、文件）。 | <code data-nac-role="code-inline">&lt;input data-nac-role="field"&gt;</code> | | <code data-nac-role="code-inline">option</code> | field 内部的可选选项（combobox / select / 单选组子项）。 | <code data-nac-role="code-inline">&lt;li data-nac-role="option"&gt;</code> | | <code data-nac-role="code-inline">tab</code> | 可切换的面板选择器。<strong>当 <code data-nac-role="code-inline">data-nac-id</code> 匹配 <code data-nac-role="code-inline">^tab\.</code> 时必须使用。</strong> | <code data-nac-role="code-inline">&lt;button data-nac-role="tab" data-nac-id="tab.lines"&gt;</code> | | <code data-nac-role="code-inline">breadcrumb-item</code> | 面包屑导航节点。 | <code data-nac-role="code-inline">&lt;a data-nac-role="breadcrumb-item"&gt;</code> | | <code data-nac-role="code-inline">accordion-toggle</code> | 展开/折叠控件。 | <code data-nac-role="code-inline">&lt;button data-nac-role="accordion-toggle"&gt;</code> | | <code data-nac-role="code-inline">step</code> | 向导步骤指示器。 | <code data-nac-role="code-inline">&lt;li data-nac-role="step"&gt;</code> | | <code data-nac-role="code-inline">pagination-item</code> | 分页列表中的页码跳转控件。 | <code data-nac-role="code-inline">&lt;button data-nac-role="pagination-item"&gt;</code> | | <code data-nac-role="code-inline">confirm-button</code> | 确认对话框内的确认/取消按钮。 | <code data-nac-role="code-inline">&lt;button data-nac-role="confirm-button"&gt;</code> | | <code data-nac-role="code-inline">sort-control</code> | 列排序表头。 | <code data-nac-role="code-inline">&lt;th data-nac-role="sort-control"&gt;</code> | | <code data-nac-role="code-inline">filter-control</code> | 列筛选触发器。 | <code data-nac-role="code-inline">&lt;button data-nac-role="filter-control"&gt;</code> | | <code data-nac-role="code-inline">data-table</code> | 数据表宿主元素（v2.1）。 | <code data-nac-role="code-inline">&lt;table data-nac-role="data-table"&gt;</code> | | <code data-nac-role="code-inline">navigation</code> | 地标导航区域。<strong>不是 tab。</strong> | <code data-nac-role="code-inline">&lt;nav data-nac-role="navigation"&gt;</code> | | <code data-nac-role="code-inline">confirm-dialog</code> | 确认请求的模态框。 | <code data-nac-role="code-inline">&lt;div data-nac-role="confirm-dialog"&gt;</code> |</p>
-<p data-nac-id="spec.p.15" data-nac-role="paragraph">此列表之外的角色保留供将来使用。NAC-strict 运行时在注册时应（SHOULD）拒绝未知角色（v2.2）。NAC-permissive 运行时可（MAY）将未知角色视为 <code data-nac-role="code-inline">action</code> 以保持向后兼容（v1.9 和 v2.0 默认行为）。</p>
+<h2 data-nac-id="spec.h2.1" data-nac-role="heading" data-nac-level="2" id="1">1. 角色</h2>
+<p data-nac-id="spec.p.10" data-nac-role="paragraph">每个与代理有关的 DOM 元素都带有 <code data-nac-role="code-inline">data-nac-role</code>。规范的角色如下:</p>
+<table data-nac-id="spec.table.11" data-nac-role="data-table"><thead><tr><th>角色</th><th>含义</th><th>示例</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">plugin</code></td><td>自成一体的界面模块 (一个页面、一个面板、一组控件)。</td><td><code data-nac-role="code-inline">&lt;article data-nac-plugin=&quot;invoice&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">section</code></td><td>插件内部的地标 (页头、主体、页脚、侧栏)。</td><td><code data-nac-role="code-inline">&lt;section data-nac-role=&quot;section&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">region</code></td><td>区块内部可命名的区域 (一组卡片、一个结果列表)。</td><td><code data-nac-role="code-inline">&lt;div data-nac-role=&quot;region&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">action</code></td><td>触发动词的可点击控件 (按钮、当作按钮用的链接)。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;action&quot; data-nac-action=&quot;save&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">field</code></td><td>用户输入或切换的输入项 (文本、数字、复选框、单选、日期、文件)。</td><td><code data-nac-role="code-inline">&lt;input data-nac-role=&quot;field&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">option</code></td><td>字段内部可选的选项 (组合框 / select / 单选组的子元素)。</td><td><code data-nac-role="code-inline">&lt;li data-nac-role=&quot;option&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">tab</code></td><td>可切换的面板选择器。<strong>当 <code data-nac-role="code-inline">data-nac-id</code> 匹配 <code data-nac-role="code-inline">^tab\.</code> 时必须使用</strong></td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;tab&quot; data-nac-id=&quot;tab.lines&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">breadcrumb-item</code></td><td>面包屑的一级。</td><td><code data-nac-role="code-inline">&lt;a data-nac-role=&quot;breadcrumb-item&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">accordion-toggle</code></td><td>展开 / 折叠的控制件。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;accordion-toggle&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">step</code></td><td>向导的步骤指示。</td><td><code data-nac-role="code-inline">&lt;li data-nac-role=&quot;step&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">pagination-item</code></td><td>分页列表中的翻页控制件。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;pagination-item&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">confirm-button</code></td><td>确认对话框中的确认 / 取消按钮。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;confirm-button&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">sort-control</code></td><td>可排序的列标题。</td><td><code data-nac-role="code-inline">&lt;th data-nac-role=&quot;sort-control&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">filter-control</code></td><td>列筛选的触发件。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;filter-control&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">data-table</code></td><td>数据表的宿主 (自 2.1 起)。</td><td><code data-nac-role="code-inline">&lt;table data-nac-role=&quot;data-table&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">navigation</code></td><td>作为地标的导航区域。<strong>不是选项卡。</strong></td><td><code data-nac-role="code-inline">&lt;nav data-nac-role=&quot;navigation&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">confirm-dialog</code></td><td>确认请求的模态框。</td><td><code data-nac-role="code-inline">&lt;div data-nac-role=&quot;confirm-dialog&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">draggable</code></td><td>用户可以拿起并移动的元素 (自 1.6.2 起)。</td><td><code data-nac-role="code-inline">&lt;li data-nac-role=&quot;draggable&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">drop-target</code></td><td>可以放下 <code data-nac-role="code-inline">draggable</code> 的位置 (自 1.6.2 起)。</td><td><code data-nac-role="code-inline">&lt;ul data-nac-role=&quot;drop-target&quot;&gt;</code></td></tr><tr><td><code data-nac-role="code-inline">button</code></td><td><strong>容忍, 但不推荐。</strong> 只需要可点击、没有动作契约的旧式按钮。运行时把它当作 <code data-nac-role="code-inline">action</code>。请优先使用带明确 <code data-nac-role="code-inline">data-nac-action</code> 的 <code data-nac-role="code-inline">action</code>。</td><td><code data-nac-role="code-inline">&lt;button data-nac-role=&quot;button&quot;&gt;</code></td></tr></tbody></table>
+<p data-nac-id="spec.p.12" data-nac-role="paragraph">不在此列表中的角色保留给将来使用。NAC-strict 的运行时应该在注册时拒绝 未知的角色 (v2.2)。NAC-permissive 的运行时可以为了向后兼容, 把未知的 角色当作 <code data-nac-role="code-inline">action</code> (v1.9 和 v2.0 的默认行为)。</p>
+<p data-nac-id="spec.p.13" data-nac-role="paragraph">这张表就是规范性的清单, 并且它也作为数据发布: <code data-nac-role="code-inline">api/latest/contract.json</code> 里的机器可读目录载有参考运行时接受的每一个角色, 每个都标注了 <code data-nac-role="code-inline">declared_in_spec_table</code>, 于是两份清单可以不读散文就相互比对。到 v2.5 为止它们一致。将来的任何分歧都会显示在那个标记里, 而不是藏在文档与 实现的意见分歧中。</p>
 <hr />
-<h2 data-nac-id="spec.h2.2-名称names" data-nac-role="heading" data-nac-level="2" id="2-名称names">2. 名称（Names）</h2>
-<p data-nac-id="spec.p.18" data-nac-role="paragraph">每个可被 Agent 解析的元素都携带 <code data-nac-role="code-inline">data-nac-id</code>。该 id 具有以下特征：</p>
-<p data-nac-id="spec.p.19" data-nac-role="paragraph">点号分隔语义层级；运行时不对其进行解析，但人类和 LLM 会理解其含义。</p>
-<ul data-nac-id="spec.list.20" data-nac-role="list"><li data-nac-id="spec.list.20.item.1" data-nac-role="list-item"><strong>点分路径</strong>（例如 <code data-nac-role="code-inline">deals.list.row.42.actions.delete</code>）。</li><li data-nac-id="spec.list.20.item.2" data-nac-role="list-item"><strong>在 <code data-nac-role="code-inline">data-nac-plugin</code> 作用域内全局唯一。</strong> 不同 plugin 可以共享相同的 id；运行时通过 <code data-nac-role="code-inline">(plugin, id)</code> 对进行解析。</li><li data-nac-id="spec.list.20.item.3" data-nac-role="list-item"><strong>在重新渲染时保持稳定。</strong> 每次渲染都生成新 id 的框架（随机哈希、实例计数器）会破坏此契约。</li><li data-nac-id="spec.list.20.item.4" data-nac-role="list-item"><strong>在 UI 重新设计时保持稳定。</strong> 按钮从工具栏移至下拉菜单时，其 id 必须（MUST）保持不变。</li></ul>
-<p data-nac-id="spec.p.21" data-nac-role="paragraph">保留的 id 前缀（v2.1）：</p>
-<p data-nac-id="spec.p.22" data-nac-role="paragraph">| 前缀 | 保留用途 | |------|----------| | <code data-nac-role="code-inline">tab.</code> | Tab 按钮。角色必须（MUST）为 <code data-nac-role="code-inline">tab</code>。 | | <code data-nac-role="code-inline">modal.</code> | 模态框作用域内的元素。角色为叶子组件的角色。 | | <code data-nac-role="code-inline">field.</code> | 表单字段简写。角色必须（MUST）为 <code data-nac-role="code-inline">field</code> 或 <code data-nac-role="code-inline">option</code>。 | | <code data-nac-role="code-inline">confirm.</code> | 确认对话框。 |</p>
+<h2 data-nac-id="spec.h2.2" data-nac-role="heading" data-nac-level="2" id="2">2. 名称</h2>
+<p data-nac-id="spec.p.16" data-nac-role="paragraph">每个代理可解析的元素都带有 <code data-nac-role="code-inline">data-nac-id</code>。这个 id 是:</p>
+<ul data-nac-id="spec.list.17" data-nac-role="list"><li data-nac-id="spec.list.17.item.1" data-nac-role="list-item"><strong>一条点号路径</strong> (例如 <code data-nac-role="code-inline">deals.list.row.42.actions.delete</code>)。点号分隔 语义层级; 运行时不解释它们, 但人和 LLM 会。</li><li data-nac-id="spec.list.17.item.2" data-nac-role="list-item"><strong>在一个 <code data-nac-role="code-inline">data-nac-plugin</code> 的范围内全局唯一。</strong> 两个不同的插件可以 共用一个 id; 运行时按 <code data-nac-role="code-inline">(plugin, id)</code> 这一对来解析。</li><li data-nac-id="spec.list.17.item.3" data-nac-role="list-item"><strong>跨重新渲染保持稳定。</strong> 每次渲染都生成新 id 的框架 (随机哈希、 实例计数器) 会破坏这个契约。</li><li data-nac-id="spec.list.17.item.4" data-nac-role="list-item"><strong>跨界面改版保持稳定。</strong> 一个按钮从工具栏搬到下拉菜单; 它的 id 必须保持不变。</li></ul>
+<p data-nac-id="spec.p.18" data-nac-role="paragraph">保留的 id 前缀 (自 2.1 起):</p>
+<table data-nac-id="spec.table.19" data-nac-role="data-table"><thead><tr><th>前缀</th><th>保留用于</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">tab.</code></td><td>选项卡按钮。角色必须是 <code data-nac-role="code-inline">tab</code>。</td></tr><tr><td><code data-nac-role="code-inline">modal.</code></td><td>模态框范围内的元素。角色是末端控件的角色。</td></tr><tr><td><code data-nac-role="code-inline">field.</code></td><td>表单字段的简写。角色必须是 <code data-nac-role="code-inline">field</code> 或 <code data-nac-role="code-inline">option</code>。</td></tr><tr><td><code data-nac-role="code-inline">confirm.</code></td><td>确认对话框。</td></tr></tbody></table>
 <hr />
-<h2 data-nac-id="spec.h2.3-动词verbs" data-nac-role="heading" data-nac-level="2" id="3-动词verbs">3. 动词（Verbs）</h2>
-<p data-nac-id="spec.p.25" data-nac-role="paragraph"><code data-nac-role="code-inline">data-nac-role="action"</code> 元素可（MAY）携带 <code data-nac-role="code-inline">data-nac-action="&lt;verb&gt;"</code>， 用于描述其功能。动词是宿主与 Agent 之间约定的自由格式 snake_case 标识符。常用动词：</p>
-<p data-nac-id="spec.p.26" data-nac-role="paragraph"><code data-nac-role="code-inline">save</code>、<code data-nac-role="code-inline">cancel</code>、<code data-nac-role="code-inline">submit</code>、<code data-nac-role="code-inline">delete</code>、<code data-nac-role="code-inline">edit</code>、<code data-nac-role="code-inline">view</code>、<code data-nac-role="code-inline">create</code>、 <code data-nac-role="code-inline">approve</code>、<code data-nac-role="code-inline">reject</code>、<code data-nac-role="code-inline">send</code>、<code data-nac-role="code-inline">download</code>、<code data-nac-role="code-inline">upload</code>、<code data-nac-role="code-inline">refresh</code>、 <code data-nac-role="code-inline">expand</code>、<code data-nac-role="code-inline">collapse</code>、<code data-nac-role="code-inline">open</code>、<code data-nac-role="code-inline">close</code>、<code data-nac-role="code-inline">add_row</code>、<code data-nac-role="code-inline">remove_row</code>。</p>
-<p data-nac-id="spec.p.27" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> 将动词解析为该 plugin 下唯一的 action 并点击它。同一 plugin 下多个 action 共享相同动词属于明显错误（lint：<code data-nac-role="code-inline">duplicate_verb</code>）。</p>
+<h2 data-nac-id="spec.h2.3" data-nac-role="heading" data-nac-level="2" id="3">3. 动词</h2>
+<p data-nac-id="spec.p.22" data-nac-role="paragraph">带 <code data-nac-role="code-inline">data-nac-role=&quot;action&quot;</code> 的元素可以带上 <code data-nac-role="code-inline">data-nac-action=&quot;&lt;verb&gt;&quot;</code> 来说明它做什么。动词是宿主与代理之间约定的 自由形式 snake-case 标识符。常见动词:</p>
+<p data-nac-id="spec.p.23" data-nac-role="paragraph"><code data-nac-role="code-inline">save</code>、<code data-nac-role="code-inline">cancel</code>、<code data-nac-role="code-inline">submit</code>、<code data-nac-role="code-inline">delete</code>、<code data-nac-role="code-inline">edit</code>、<code data-nac-role="code-inline">view</code>、<code data-nac-role="code-inline">create</code>、 <code data-nac-role="code-inline">approve</code>、<code data-nac-role="code-inline">reject</code>、<code data-nac-role="code-inline">send</code>、<code data-nac-role="code-inline">download</code>、<code data-nac-role="code-inline">upload</code>、<code data-nac-role="code-inline">refresh</code>、 <code data-nac-role="code-inline">expand</code>、<code data-nac-role="code-inline">collapse</code>、<code data-nac-role="code-inline">open</code>、<code data-nac-role="code-inline">close</code>、<code data-nac-role="code-inline">add_row</code>、<code data-nac-role="code-inline">remove_row</code>。</p>
+<p data-nac-id="spec.p.24" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code> 把一个动词解析到该插件下唯一的 action 并点击它。同一个插件下多个 action 共用同一个动词是清单错误 (lint: <code data-nac-role="code-inline">duplicate_verb</code>)。</p>
 <hr />
-<h2 data-nac-id="spec.h2.4-清单manifest" data-nac-role="heading" data-nac-level="2" id="4-清单manifest">4. 清单（Manifest）</h2>
-<p data-nac-id="spec.p.30" data-nac-role="paragraph">每个 plugin 可（MAY）通过以下方式注册清单：</p>
-<pre data-nac-id="spec.code.1" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
+<h2 data-nac-id="spec.h2.4" data-nac-role="heading" data-nac-level="2" id="4">4. 清单</h2>
+<p data-nac-id="spec.p.27" data-nac-role="paragraph">每个插件都可以通过下面的方式注册一份清单:</p>
+<pre data-nac-id="spec.code.28" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
   plugin_slug: &#x27;invoice&#x27;,
   version:     &#x27;1.0.0&#x27;,
   nac_version: &#x27;2.1&#x27;,
@@ -107,19 +114,24 @@
   ],
   data_tables: [...]
 });</code></pre>
-<p data-nac-id="spec.p.32" data-nac-role="paragraph">清单是面向 Agent 的权威数据来源。当 LLM 中间件判断"用户说了 'guardar'"时，会查找 plugin 清单，找到动词 <code data-nac-role="code-inline">save</code>，并发出 <code data-nac-role="code-inline">NAC.click_by_verb('invoice', 'save')</code>。</p>
-<h3 data-nac-id="spec.h3.41-必填字段" data-nac-role="heading" data-nac-level="3" id="41-必填字段">4.1 必填字段</h3>
-<ul data-nac-id="spec.list.34" data-nac-role="list"><li data-nac-id="spec.list.34.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">plugin_slug</code> —— 与宿主元素上的 <code data-nac-role="code-inline">data-nac-plugin</code> 匹配。</li><li data-nac-id="spec.list.34.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac_version</code> —— 该清单声明遵循的 NAC3 版本。运行时会拒绝声明版本高于自身版本的清单。</li></ul>
-<h3 data-nac-id="spec.h3.42-可选字段" data-nac-role="heading" data-nac-level="3" id="42-可选字段">4.2 可选字段</h3>
-<ul data-nac-id="spec.list.36" data-nac-role="list"><li data-nac-id="spec.list.36.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">elements[]</code> —— 已命名组件的目录。每个条目必须（MUST）包含 <code data-nac-role="code-inline">id</code> 和 <code data-nac-role="code-inline">role</code>。</li><li data-nac-id="spec.list.36.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tabs[]</code> —— 专用于 tab 的顶层数组。等同于 <code data-nac-role="code-inline">elements[]</code> 中 <code data-nac-role="code-inline">role:'tab'</code> 的条目，两种写法均有效。</li><li data-nac-id="spec.list.36.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code>、<code data-nac-role="code-inline">kpis[]</code>、<code data-nac-role="code-inline">data_tables[]</code> —— 按类型划分的子集合；语义与按角色过滤后的 <code data-nac-role="code-inline">elements[]</code> 相同。示例代码会选择对人类阅读最友好的写法。</li></ul>
+<p data-nac-id="spec.p.29" data-nac-role="paragraph">清单是面向代理的真相来源。一个判定&quot;用户说了 &#x27;guardar&#x27;&quot;的 LLM 中介会 去查插件的清单, 找到动词 <code data-nac-role="code-inline">save</code>, 然后发出 <code data-nac-role="code-inline">NAC.click_by_verb(&#x27;invoice&#x27;, &#x27;save&#x27;)</code>。</p>
+<h3 data-nac-id="spec.h3.41" data-nac-role="heading" data-nac-level="3" id="41">4.1 必填字段</h3>
+<ul data-nac-id="spec.list.31" data-nac-role="list"><li data-nac-id="spec.list.31.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">plugin_slug</code> -- 与宿主元素上的 <code data-nac-role="code-inline">data-nac-plugin</code> 一致。</li><li data-nac-id="spec.list.31.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">nac_version</code> -- 这份清单声称遵循的 NAC3 版本。运行时会拒绝声称版本 高于自身的清单。</li></ul>
+<h3 data-nac-id="spec.h3.42" data-nac-role="heading" data-nac-level="3" id="42">4.2 可选字段</h3>
+<ul data-nac-id="spec.list.33" data-nac-role="list"><li data-nac-id="spec.list.33.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">elements[]</code> -- 具名控件的目录。每一项都必须有 <code data-nac-role="code-inline">id</code> 和 <code data-nac-role="code-inline">role</code>。</li><li data-nac-id="spec.list.33.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tabs[]</code> -- 给选项卡用的另一个顶层数组。等价于 <code data-nac-role="code-inline">elements[]</code> 中 <code data-nac-role="code-inline">role:&#x27;tab&#x27;</code> 的项。两种写法都有效。</li><li data-nac-id="spec.list.33.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code>、<code data-nac-role="code-inline">kpis[]</code>、<code data-nac-role="code-inline">data_tables[]</code> -- 带类型的子集合; 语义与按角色过滤后的 <code data-nac-role="code-inline">elements[]</code> 相同。演示会选择对人最易读的写法。</li></ul>
 <h3 data-nac-id="spec.h3.43-i18n" data-nac-role="heading" data-nac-level="3" id="43-i18n">4.3 i18n</h3>
-<p data-nac-id="spec.p.38" data-nac-role="paragraph">每个 <code data-nac-role="code-inline">label_i18n</code> 必须（MUST）覆盖 NAC3 的全部 10 个语言区域：</p>
-<pre data-nac-id="spec.code.2" data-nac-role="code" data-nac-lang="text"><code>es, en, pt, fr, ja, zh, hi, ar, de, it</code></pre>
-<p data-nac-id="spec.p.40" data-nac-role="paragraph">在 <code data-nac-role="code-inline">NAC.autoRegister.watch()</code> 上设置 <code data-nac-role="code-inline">i18n_strict: 'permissive'</code> 允许在棕地迁移期间使用不完整的语言覆盖；生产环境的清单应提供全部 10 个语言区域。</p>
+<p data-nac-id="spec.p.35" data-nac-role="paragraph">每个 <code data-nac-role="code-inline">label_i18n</code> 都必须覆盖 NAC3 的全部 10 个区域设置:</p>
+<pre data-nac-id="spec.code.36" data-nac-role="code" data-nac-lang="text"><code>es, en, pt, fr, ja, zh, hi, ar, de, it</code></pre>
+<p data-nac-id="spec.p.37" data-nac-role="paragraph">在 <code data-nac-role="code-inline">NAC.autoRegister.watch()</code> 上使用 <code data-nac-role="code-inline">i18n_strict: &#x27;permissive&#x27;</code> 允许在 棕地迁移期间只做部分覆盖; 生产用的清单应当提供全部 10 个区域设置。</p>
+<h4 data-nac-id="spec.h4.431" data-nac-role="heading" data-nac-level="4" id="431">4.3.1 十个区域设置这项要求落在谁身上</h4>
+<p data-nac-id="spec.p.39" data-nac-role="paragraph">上面那项要求落在<strong>采用方的清单</strong>上, 也就是代理读取、用来以用户语言 称呼元素的那张 <code data-nac-role="code-inline">label_i18n</code> 映射表。它<strong>不是</strong>对本文档语言的要求, 并且 NAC3 中没有任何内容强制一个实现用十种语言发布自己的文档。</p>
+<h4 data-nac-id="spec.h4.432" data-nac-role="heading" data-nac-level="4" id="432">4.3.2 本规范的规范性语言</h4>
+<p data-nac-id="spec.p.41" data-nac-role="paragraph">NAC3 的规范性文本是<strong>英文</strong>的那一份: 规范仓库根目录下的 <code data-nac-role="code-inline">SPEC.md</code>, 渲染在 <code data-nac-role="code-inline">https://yujin.app/nac-spec/SPEC.html</code>。</p>
+<p data-nac-id="spec.p.42" data-nac-role="paragraph">本规范也以机器翻译的形式发布在 <code data-nac-role="code-inline">i18n/&lt;locale&gt;/SPEC.md</code> 下。那些译文 <strong>不具规范性</strong>。每一份都是部分的, 每一份都冻结在它自己的提示横幅所 声明的源修订上; 横幅是必须的, 而一份没有横幅的已发布译文是发布的缺陷, 不是翻译的缺陷。当译文与英文文本不一致时, 以英文文本为准, 而一项合规 声明是针对英文文本的声明。</p>
 <hr />
-<h2 data-nac-id="spec.h2.5-公共-api" data-nac-role="heading" data-nac-level="2" id="5-公共-api">5. 公共 API</h2>
-<h3 data-nac-id="spec.h3.51-命令式" data-nac-role="heading" data-nac-level="3" id="51-命令式">5.1 命令式</h3>
-<pre data-nac-id="spec.code.3" data-nac-role="code" data-nac-lang="ts"><code>NAC.click(nac_id: string, opts?: ClickOpts): Promise&lt;{ok: true}&gt;
+<h2 data-nac-id="spec.h2.5-api" data-nac-role="heading" data-nac-level="2" id="5-api">5. 公开 API</h2>
+<h3 data-nac-id="spec.h3.51" data-nac-role="heading" data-nac-level="3" id="51">5.1 命令式</h3>
+<pre data-nac-id="spec.code.46" data-nac-role="code" data-nac-lang="ts"><code>NAC.click(nac_id: string, opts?: ClickOpts): Promise&lt;{ok: true}&gt;
 NAC.click_by_verb(plugin: string|null, verb: string, opts?): Promise&lt;...&gt;
 NAC.fill(nac_id: string, value: string|number|boolean): Promise&lt;...&gt;
 NAC.select(nac_id: string, value: string): Promise&lt;...&gt;
@@ -130,31 +142,200 @@ NAC.drag_drop(source_id, target_id, opts?: {to_index?: number}): Promise&lt;...&
 NAC.set_mode(mode: &#x27;modal&#x27;|&#x27;maximized&#x27;|&#x27;new_tab&#x27;|&#x27;new_window&#x27;): void
 NAC.screenshot(): Promise&lt;string&gt;  // data URL
 NAC.bindAction(el, handler, {plugin, action_id}): () =&gt; void  // v2.2</code></pre>
-<h3 data-nac-id="spec.h3.511-合规辅助方法v22" data-nac-role="heading" data-nac-level="3" id="511-合规辅助方法v22">5.1.1 合规辅助方法（v2.2）</h3>
-<p data-nac-id="spec.p.46" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> 是规范推荐的点击处理器绑定方式。它会在处理器执行完毕后（无论是同步返回、抛出异常还是 Promise 完成）自动触发 <code data-nac-role="code-inline">nac:action:succeeded</code>（或 <code data-nac-role="code-inline">:failed</code>）事件，并返回一个解绑函数。在宿主支持的情况下，应优先使用此方法替代原始的 <code data-nac-role="code-inline">addEventListener('click', ...)</code>；存量代码仍可像以前一样手动触发事件。</p>
-<h3 data-nac-id="spec.h3.513-字段编辑器v23-预览" data-nac-role="heading" data-nac-level="3" id="513-字段编辑器v23-预览">5.1.3 字段编辑器（v2.3 预览）</h3>
-<p data-nac-id="spec.p.48" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.edit_field(nac_id)</code> 会打开一个模态框，允许用户（或代表用户的智能体）使用类 Word 工具编辑任意文本字段：</p>
-<pre data-nac-id="spec.code.4" data-nac-role="code" data-nac-lang="ts"><code>NAC.edit_field(nac_id: string): Promise&lt;{ok:true}&gt;</code></pre>
-<p data-nac-id="spec.p.50" data-nac-role="paragraph">该模态框以 <code data-nac-role="code-inline">plugin_slug='nac_editor'</code> 注册，支持以下 NAC-3 可调用动词：</p>
-<p data-nac-id="spec.p.51" data-nac-role="paragraph">| 动词 | 效果 | |------|--------| | <code data-nac-role="code-inline">select_word</code> | 选中光标处的单词 | | <code data-nac-role="code-inline">select_sentence</code> | 选中光标处的句子 | | <code data-nac-role="code-inline">select_all</code> | 在编辑器内执行全选（Ctrl-A） | | <code data-nac-role="code-inline">replace</code> | 用指定文本替换当前选中内容 | | <code data-nac-role="code-inline">delete_selection</code> | 删除当前选中内容 | | <code data-nac-role="code-inline">ai_correct_syntax</code> | 将当前值通过 POST 请求发送至 LLM 中间层，系统提示为"修正语法和拼写，仅返回修正后的文本"；并以响应结果替换当前值 | | <code data-nac-role="code-inline">save</code> | 将内容写回源字段，触发 input 和 change 事件，然后关闭 | | <code data-nac-role="code-inline">cancel</code> | 放弃更改并关闭 |</p>
-<p data-nac-id="spec.p.52" data-nac-role="paragraph">按 Esc 关闭（取消）。按 Ctrl/Cmd+Enter 保存。点击遮罩层背景取消。</p>
-<p data-nac-id="spec.p.53" data-nac-role="paragraph">规范第 13 节将在 v2.3 中正式确立该契约；v2.2 运行时已附带一个可用的参考实现，供接入方立即使用。可通过以下方式在任意字段上调用：</p>
-<pre data-nac-id="spec.code.5" data-nac-role="code" data-nac-lang="js"><code>NAC.edit_field(&#x27;invoice.client_name&#x27;);
-// 或通过中间层调用：
+<h3 data-nac-id="spec.h3.511-v22" data-nac-role="heading" data-nac-level="3" id="511-v22">5.1.1 合规辅助函数 (v2.2)</h3>
+<p data-nac-id="spec.p.48" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code> 是符合本规范的点击处理函数接线方式。 处理函数运行之后 (同步、抛出异常或 Promise), 它会自动发出 <code data-nac-role="code-inline">nac:action:succeeded</code> (或 <code data-nac-role="code-inline">:failed</code>)。它返回一个解绑函数。只要宿主 支持, 就用它来代替裸的 <code data-nac-role="code-inline">addEventListener(&#x27;click&#x27;, ...)</code>; 棕地代码仍然 可以像以前那样手动发事件。</p>
+<h3 data-nac-id="spec.h3.513-v23" data-nac-role="heading" data-nac-level="3" id="513-v23">5.1.3 字段编辑器 (v2.3)</h3>
+<p data-nac-id="spec.p.50" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.edit_field(nac_id)</code> 打开一个模态框, 让人 (或代替他的代理) 用类似 文字处理软件的工具编辑任意文本字段:</p>
+<pre data-nac-id="spec.code.51" data-nac-role="code" data-nac-lang="ts"><code>NAC.edit_field(nac_id: string): Promise&lt;{ok:true}&gt;</code></pre>
+<p data-nac-id="spec.p.52" data-nac-role="paragraph">这个模态框以 <code data-nac-role="code-inline">plugin_slug=&#x27;nac_editor&#x27;</code> 注册, 带有下面这些可由 NAC3 调用的动词:</p>
+<table data-nac-id="spec.table.53" data-nac-role="data-table"><thead><tr><th>动词</th><th>效果</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">select_word</code></td><td>选中光标处的词</td></tr><tr><td><code data-nac-role="code-inline">select_sentence</code></td><td>选中光标处的句子</td></tr><tr><td><code data-nac-role="code-inline">select_all</code></td><td>在编辑器内按 ctrl-A</td></tr><tr><td><code data-nac-role="code-inline">replace</code></td><td>用给定文本替换选区</td></tr><tr><td><code data-nac-role="code-inline">delete_selection</code></td><td>移除当前选区</td></tr><tr><td><code data-nac-role="code-inline">ai_correct_syntax</code></td><td>把当前值 POST 给 LLM 中介, 系统提示为 &quot;fix grammar + spelling, return only fixed text&quot;; 用回应替换该值</td></tr><tr><td><code data-nac-role="code-inline">save</code></td><td>写回源字段, 派发 input 与 change 事件, 关闭</td></tr><tr><td><code data-nac-role="code-inline">cancel</code></td><td>丢弃, 关闭</td></tr></tbody></table>
+<p data-nac-id="spec.p.54" data-nac-role="paragraph">Esc 关闭 (取消)。Ctrl/Cmd+Enter 保存。点击遮罩背景取消。</p>
+<p data-nac-id="spec.p.55" data-nac-role="paragraph">本规范第 13 节将在 v2.3 把这个契约正式化; v2.2 的运行时已提供一个可用的 参考实现, 让采用方今天就能接上。在任何字段上都可通过下面的方式使用:</p>
+<pre data-nac-id="spec.code.56" data-nac-role="code" data-nac-lang="js"><code>NAC.edit_field(&#x27;invoice.client_name&#x27;);
+// or by intermediary:
 NAC.click_by_verb(&#x27;myplugin&#x27;, &#x27;edit_field&#x27;, { nac_id: &#x27;invoice.client_name&#x27; });</code></pre>
-<h3 data-nac-id="spec.h3.512-严格校验标志v22" data-nac-role="heading" data-nac-level="3" id="512-严格校验标志v22">5.1.2 严格校验标志（v2.2）</h3>
-<p data-nac-id="spec.p.56" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code>（布尔值，v2.2 中默认为 <code data-nac-role="code-inline">false</code>）。当设为 <code data-nac-role="code-inline">true</code> 时，若出现以下任一情况，<code data-nac-role="code-inline">NAC.register()</code> 将抛出 <code data-nac-role="code-inline">code='strict_validation'</code> 的 <code data-nac-role="code-inline">Error</code>，并附带 <code data-nac-role="code-inline">findings</code> 数组：</p>
-<ul data-nac-id="spec.list.57" data-nac-role="list"><li data-nac-id="spec.list.57.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> —— 条目的 role 不在规范集合内。</li><li data-nac-id="spec.list.57.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tab_id_manifest_role_drift</code> —— id 匹配 <code data-nac-role="code-inline">^tab\.</code> 但 role 不为 <code data-nac-role="code-inline">'tab'</code>。</li><li data-nac-id="spec.list.57.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> —— 已挂载 DOM 元素的 <code data-nac-role="code-inline">data-nac-role</code> 与 manifest 条目的 role 不一致。</li></ul>
-<p data-nac-id="spec.p.58" data-nac-role="paragraph">v2.3 中该标志默认值将改为 <code data-nac-role="code-inline">true</code>。v3.0 中该标志将被移除（届时严格模式为唯一模式）。</p>
-<p data-nac-id="spec.p.59" data-nac-role="paragraph">所有异步方法在失败时均以 <code data-nac-role="code-inline">NacError</code> 拒绝，其 <code data-nac-role="code-inline">code</code> 为以下之一：</p>
-<ul data-nac-id="spec.list.60" data-nac-role="list"><li data-nac-id="spec.list.60.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">not_found</code> —— 指定的元素/role/动词不在 DOM 中。</li><li data-nac-id="spec.list.60.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">invalid</code> —— 参数格式错误。</li><li data-nac-id="spec.list.60.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">timeout</code> —— 副作用已触发，但合规确认事件未在 5 秒内到达。<strong>超时意味着真实失败</strong>：处理器可能已挂起、确认事件从未被绑定，或发生了网络竞态。除非调用方能通过其他渠道确认副作用已完成，否则<strong>必须</strong>将超时视为失败。</li></ul>
-<h3 data-nac-id="spec.h3.52-内省" data-nac-role="heading" data-nac-level="3" id="52-内省">5.2 内省</h3>
-<pre data-nac-id="spec.code.6" data-nac-role="code" data-nac-lang="ts"><code>NAC.describe():    { active: string|null, plugins: PluginSnap[] }
+<h3 data-nac-id="spec.h3.514-invoke-v23" data-nac-role="heading" data-nac-level="3" id="514-invoke-v23">5.1.4 动作载荷 + invoke (v2.3)</h3>
+<p data-nac-id="spec.p.58" data-nac-role="paragraph">NAC v2.2 的动作是点一下就走: 代理触发 <code data-nac-role="code-inline">NAC.click(id)</code> 或 <code data-nac-role="code-inline">NAC.click_by_verb(plugin, verb)</code>, 宿主做它该做的事。这对&quot;动词加状态&quot; 型的动作 (<code data-nac-role="code-inline">save</code>、<code data-nac-role="code-inline">cancel</code>、<code data-nac-role="code-inline">submit</code>、<code data-nac-role="code-inline">delete</code>) 成立, 但当一个动作需要 代理提供<strong>数据</strong>时就崩了 -- <code data-nac-role="code-inline">utter(text)</code>、<code data-nac-role="code-inline">search(query)</code>、 <code data-nac-role="code-inline">send_message(body)</code>、<code data-nac-role="code-inline">upload(file)</code>、<code data-nac-role="code-inline">schedule(date)</code>、 <code data-nac-role="code-inline">translate(text, target_lang)</code>。宿主没有办法通过一次合成点击接收代理的 载荷。</p>
+<p data-nac-id="spec.p.59" data-nac-role="paragraph">v2.3 补上了这个缺口。契约是叠加式的: 点击式的动词照旧工作, 不受影响。</p>
+<pre data-nac-id="spec.code.60" data-nac-role="code" data-nac-lang="ts"><code>NAC.invoke(action_id: string, payload: object, opts?: { timeout?: number })
+  : Promise&lt;{ok: true, request_id: string, ack: object|null}&gt;
+
+NAC.utter(action_id: string,
+          opts: { text: string, lang?: string, voice?: string, metadata?: object })
+  : Promise&lt;{ok: true, request_id: string, ack: object|null}&gt;</code></pre>
+<p data-nac-id="spec.p.61" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.invoke</code> 在宿主元素上派发一个 <code data-nac-role="code-inline">nac:action:requested</code> 的 <code data-nac-role="code-inline">CustomEvent</code> (冒泡到 document), 内容是:</p>
+<pre data-nac-id="spec.code.62" data-nac-role="code" data-nac-lang="ts"><code>detail: {
+  action_id:  string,    // canonical nac_id of the host element
+  verb:       string,    // payload.verb || el&#x27;s data-nac-action
+  payload:    object,    // arbitrary, action-specific
+  plugin:     string|null,
+  request_id: string,    // correlation token assigned by the runtime
+  ts:         number,    // Date.now()
+}</code></pre>
+<p data-nac-id="spec.p.63" data-nac-role="paragraph">宿主监听 <code data-nac-role="code-inline">nac:action:requested</code>, 处理载荷, 然后在 detail 中带上同一个 <code data-nac-role="code-inline">request_id</code> 发出 <code data-nac-role="code-inline">nac:action:succeeded</code> (或 <code data-nac-role="code-inline">nac:action:failed</code>)。 运行时按 <code data-nac-role="code-inline">request_id</code> 关联, 并解决代理的 Promise。</p>
+<p data-nac-id="spec.p.64" data-nac-role="paragraph">默认超时是 <strong>30 秒</strong> (点击是 5 s)。可以用 <code data-nac-role="code-inline">opts.timeout</code> 覆盖。超时时 Promise 会以 <code data-nac-role="code-inline">NacError(&#x27;timeout&#x27;, ...)</code> 被拒绝。和点击一样, 超时意味着 真正的失败: 除非调用方通过别的通道拿到了副作用的证据, 否则必须按失败 对待。</p>
+<p data-nac-id="spec.p.65" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.utter(id, opts)</code> 是最常用的带载荷动词的便捷快捷方式。它等价于:</p>
+<pre data-nac-id="spec.code.66" data-nac-role="code" data-nac-lang="js"><code>NAC.invoke(id, { verb: &#x27;utter&#x27;, text: opts.text, lang: opts.lang });</code></pre>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">在清单中的声明</h4>
+<p data-nac-id="spec.p.68" data-nac-role="paragraph">一个带载荷的动作, 会在它的清单条目里声明该载荷的模式, 以便追溯和 配套工具使用:</p>
+<pre data-nac-id="spec.code.69" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
+  plugin_slug: &#x27;atlas_pro_ad&#x27;,
+  version:     &#x27;2.1.0&#x27;,
+  nac_version: &#x27;2.3&#x27;,
+  elements: [
+    { id: &#x27;atlas_pro_ad.mic&#x27;, role: &#x27;action&#x27;,
+      actions: [
+        { verb: &#x27;listen&#x27; },
+        { verb: &#x27;utter&#x27;,
+          payload_schema: {
+            text: { type: &#x27;string&#x27;, required: true, max: 4000 },
+            lang: { type: &#x27;string&#x27;,
+                    enum: [&#x27;en&#x27;,&#x27;es&#x27;,&#x27;pt&#x27;,&#x27;fr&#x27;,&#x27;it&#x27;,&#x27;de&#x27;,&#x27;ja&#x27;,&#x27;zh&#x27;,&#x27;hi&#x27;,&#x27;ar&#x27;] }
+          },
+          label_i18n: { es:&#x27;Decir&#x27;, en:&#x27;Utter&#x27;, /* ... 10 locales */ } }
+      ],
+      label_i18n: { /* ... */ } }
+  ]
+});</code></pre>
+<p data-nac-id="spec.p.70" data-nac-role="paragraph"><code data-nac-role="code-inline">payload_schema</code> 在 <strong>v2.5 时仍只是信息性的</strong>, 参考运行时根本不读它: 这个字段在清单里会被接受, 会随 <code data-nac-role="code-inline">NAC.manifest()</code> 一起带走, 但从不与 任何东西对照校验。<code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> -- 它的默认值确实在 2.3.0 改成了 <code data-nac-role="code-inline">true</code> -- 只覆盖清单与 DOM 角色方面的发现项; 它从来没有覆盖过 载荷。所以代理不得因为声明了模式就假定载荷已被检查: 今天唯一发生的 校验, 是代理在发送之前自己做的那一次。</p>
+<p data-nac-id="spec.p.71" data-nac-role="paragraph">这些模式是刻意保持简单的 (形状像 JSON-Schema 的一个子集), 好让运行时 不必携带完整的 JSON-Schema 校验器就能校验, 而这仍然是将来真正强制时的 设计意图。</p>
+<p data-nac-id="spec.p.72" data-nac-role="paragraph">本节较早的一版曾承诺, 在 2.4 这个版本里把模式的文法正式化, 并把强制 作为默认。<strong>那在 2.4 没有发生, 直到 2.5 也没有发生。</strong>那句话被删掉而 不是改个日期: 一个贴着版本号的承诺, 过了那个版本还立在那里, 在代理 看来就像是一项可以指望的能力。把文法正式化并接上强制, 作为未决的问题 记在第 13 节, 在那里它被标为未决且没有日期。</p>
+<h4 data-nac-id="spec.h4.alpha2-v23" data-nac-role="heading" data-nac-level="4" id="alpha2-v23">禁用状态的语义 (来自 alpha.2 的 v2.3 热修复)</h4>
+<p data-nac-id="spec.p.74" data-nac-role="paragraph">当目标元素设置了 <code data-nac-role="code-inline">disabled</code> 或 <code data-nac-role="code-inline">aria-disabled=&#x27;true&#x27;</code> 时, <code data-nac-role="code-inline">NAC.invoke</code> 并不拒绝。HTML 的 <code data-nac-role="code-inline">disabled</code> 属性是界面层面的点击护栏; <code data-nac-role="code-inline">invoke</code> 是一次带载荷的逻辑请求, 不是合成点击。需要根据界面状态拒绝 一次 invoke 的宿主, 必须在自己的 <code data-nac-role="code-inline">nac:action:requested</code> 监听器里做, 并发出带有有意义错误码的 <code data-nac-role="code-inline">nac:action:failed</code>。</p>
+<p data-nac-id="spec.p.75" data-nac-role="paragraph">相对地, <code data-nac-role="code-inline">NAC.click</code> 在被禁用的元素上仍然拒绝 (点击的语义被保留)。 测试覆盖: <code data-nac-role="code-inline">runtime/test/v23-invoke.mjs</code> T7/T8/T9。</p>
+<h4 data-nac-id="spec.h4.invoke" data-nac-role="heading" data-nac-level="4" id="invoke">合规: 支持 invoke 的宿主必须</h4>
+<ol data-nac-id="spec.list.77" data-nac-role="list"><li data-nac-id="spec.list.77.item.1" data-nac-role="list-item">在清单条目中声明 <code data-nac-role="code-inline">actions[].payload_schema</code>。</li><li data-nac-id="spec.list.77.item.2" data-nac-role="list-item">监听 <code data-nac-role="code-inline">nac:action:requested</code> (或使用按 <code data-nac-role="code-inline">detail.action_id</code> + <code data-nac-role="code-inline">detail.verb</code> 过滤的通用监听器)。</li><li data-nac-id="spec.list.77.item.3" data-nac-role="list-item">处理完成后发出 <code data-nac-role="code-inline">nac:action:succeeded</code> -- 并把 <code data-nac-role="code-inline">detail.request_id</code> 原样回带 -- 或在失败时发出 <code data-nac-role="code-inline">nac:action:failed</code> (错误码放在 <code data-nac-role="code-inline">detail.error</code>)。</li><li data-nac-id="spec.list.77.item.4" data-nac-role="list-item">绝不发出带着自己没有收到过的 <code data-nac-role="code-inline">request_id</code> 的 <code data-nac-role="code-inline">:succeeded</code> 事件 (这可防止并发调用之间串台)。</li></ol>
+<p data-nac-id="spec.p.78" data-nac-role="paragraph">不支持 invoke 的宿主, 在 <code data-nac-role="code-inline">NAC.click()</code> 和 <code data-nac-role="code-inline">NAC.click_by_verb()</code> 之下 照常运作。对没有 <code data-nac-role="code-inline">actions[].payload_schema</code> 条目的宿主调用 <code data-nac-role="code-inline">NAC.invoke()</code> 的代理, 仍然会收到一个 <code data-nac-role="code-inline">request_id</code>, 但运行时无法保证 送达; 超时会在 30 s 后触发。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">这为什么重要</h4>
+<p data-nac-id="spec.p.80" data-nac-role="paragraph">整个面向代理的表面不再是&quot;一串按钮&quot;, 而成了&quot;一串按钮 + 结构化输入&quot;。 一条语音广告变得可以用 NAC.invoke 调用。一个搜索框变得可以用 NAC.invoke 调用。一次文件上传变得可以用 NAC.invoke 调用。同样的协议, 同样的来源, 同样的确认语义。</p>
+<p data-nac-id="spec.p.81" data-nac-role="paragraph">第一个参考采用方是 <strong>Atlas Pro</strong>: 它的元素 <code data-nac-role="code-inline">atlas_pro_ad.mic</code> 同时 声明了动词 <code data-nac-role="code-inline">listen</code> (仅点击, 原有的) 和 <code data-nac-role="code-inline">utter</code> (带载荷)。两种情况下都 由同一个 <code data-nac-role="code-inline">/parse</code> + <code data-nac-role="code-inline">/tts</code> 的对话回路驱动; 有语音识别的代理调用 <code data-nac-role="code-inline">listen</code>, 有自己语言模型的代理调用 <code data-nac-role="code-inline">utter</code>。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">将来的模态 (已预计, 无需改规范)</h4>
+<p data-nac-id="spec.p.83" data-nac-role="paragraph"><code data-nac-role="code-inline">invoke</code> 刻意与模态无关, 好让将来的输入族可以接进来而不破坏契约:</p>
+<table data-nac-id="spec.table.84" data-nac-role="data-table"><thead><tr><th>模态</th><th>动词 (草拟)</th><th>载荷 (草拟)</th></tr></thead><tbody><tr><td>文本</td><td><code data-nac-role="code-inline">utter</code></td><td><code data-nac-role="code-inline">{text, lang?}</code></td></tr><tr><td>搜索</td><td><code data-nac-role="code-inline">search</code></td><td><code data-nac-role="code-inline">{query, scope?, limit?}</code></td></tr><tr><td>文件</td><td><code data-nac-role="code-inline">upload</code></td><td>`{filename, mime, data_url \</td></tr><tr><td>图像</td><td><code data-nac-role="code-inline">analyze_image</code></td><td>`{image_url \</td></tr><tr><td>视频</td><td><code data-nac-role="code-inline">analyze_stream</code></td><td><code data-nac-role="code-inline">{stream_url, frame_window_ms?, return?}</code></td></tr><tr><td>日程</td><td><code data-nac-role="code-inline">schedule</code></td><td><code data-nac-role="code-inline">{datetime, duration_min, attendees?}</code></td></tr><tr><td>代码</td><td><code data-nac-role="code-inline">apply_diff</code></td><td><code data-nac-role="code-inline">{file_path, unified_diff}</code></td></tr><tr><td>语音</td><td><code data-nac-role="code-inline">transcribe</code></td><td>`{audio_url \</td></tr></tbody></table>
+<p data-nac-id="spec.p.85" data-nac-role="paragraph">每种模态都遵循同一套 <code data-nac-role="code-inline">nac:action:requested</code> -&gt; <code data-nac-role="code-inline">nac:action:succeeded</code> / <code data-nac-role="code-inline">:failed</code> 的事件协议, 同样的 <code data-nac-role="code-inline">request_id</code> 关联, 同样的超时语义。运行时保持小巧; 动词的词汇表按宿主与代理之间的 约定生长。便捷快捷方式 (<code data-nac-role="code-inline">NAC.utter</code>、<code data-nac-role="code-inline">NAC.search</code>、<code data-nac-role="code-inline">NAC.watch</code> 等) 以后可以添加而不必重新制定规范, 因为每一个都只是 <code data-nac-role="code-inline">invoke</code> 之上的一层 薄包装。</p>
+<h3 data-nac-id="spec.h3.515-shadow-dom-v23" data-nac-role="heading" data-nac-level="3" id="515-shadow-dom-v23">5.1.5 shadow DOM 的解析 -- 开放的根 (v2.3)</h3>
+<p data-nac-id="spec.p.87" data-nac-role="paragraph">运行时会递归地穿过开放的 shadow 根来解析 <code data-nac-role="code-inline">data-nac-id</code> 引用。页面可以 用 <code data-nac-role="code-inline">attachShadow({mode:&#x27;open&#x27;})</code> 挂载 Web Components, 在 shadow 树内部 的元素上放 <code data-nac-role="code-inline">data-nac-*</code> 属性, 而任何 NAC3 的调用方 (<code data-nac-role="code-inline">NAC.click</code>、 <code data-nac-role="code-inline">NAC.fill</code>、<code data-nac-role="code-inline">NAC.invoke</code> 等) 都能透明地解析到目标。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">解析算法</h4>
+<p data-nac-id="spec.p.89" data-nac-role="paragraph">对于选择器 <code data-nac-role="code-inline">S</code> (通常是 <code data-nac-role="code-inline">[data-nac-id=&quot;...&quot;]</code>) 与根 <code data-nac-role="code-inline">R</code> (通常是 <code data-nac-role="code-inline">document</code>):</p>
+<ol data-nac-id="spec.list.90" data-nac-role="list"><li data-nac-id="spec.list.90.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">R.querySelector(S)</code> -&gt; 若非 null, 立即返回。</li><li data-nac-id="spec.list.90.item.2" data-nac-role="list-item">对 <code data-nac-role="code-inline">R</code> 的每个后代 <code data-nac-role="code-inline">el</code>:</li><li data-nac-id="spec.list.90.item.3" data-nac-role="list-item">若 <code data-nac-role="code-inline">el.shadowRoot</code> 非 null (即开放的 shadow 根): 以 <code data-nac-role="code-inline">R := el.shadowRoot</code> 递归, 深度 +1。</li><li data-nac-id="spec.list.90.item.4" data-nac-role="list-item">否则, 若 <code data-nac-role="code-inline">el.nac3</code> 是一个暴露 <code data-nac-role="code-inline">query</code> 方法的对象, 则委派 (见 5.1.6 节)。</li><li data-nac-id="spec.list.90.item.5" data-nac-role="list-item">递归<strong>在 10 层深度处封顶</strong>。比 10 更深的目标无法到达; 调用方会收到 <code data-nac-role="code-inline">code=&#x27;not_found&#x27;</code>。这个上限的存在是为了防止病态的遍历; 实践中没有 任何生产代码库把 shadow 嵌套超过 3-4 层。</li><li data-nac-id="spec.list.90.item.6" data-nac-role="list-item">遍历按 DOM 顺序逐层展开: 先兄弟, 后嵌套的 shadow。第一个匹配者 胜出。</li></ol>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">事件传播</h4>
+<p data-nac-id="spec.p.92" data-nac-role="paragraph">shadow 根内部的宿主发出的事件必须设置 <code data-nac-role="code-inline">composed: true</code>, 文档层面的 监听器才能收到。NAC3 的运行时已经用 <code data-nac-role="code-inline">composed:true</code> 发出自己全部的 事件; 手动发出 <code data-nac-role="code-inline">nac:*</code> 事件的宿主代码也要负同样的责任。没有 <code data-nac-role="code-inline">composed:true</code> 的话, 事件会停在 shadow 的边界上, 运行时的关联机制 永远看不到它。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">组件作者的责任</h4>
+<p data-nac-id="spec.p.94" data-nac-role="paragraph">写组件的人需要:</p>
+<ol data-nac-id="spec.list.95" data-nac-role="list"><li data-nac-id="spec.list.95.item.1" data-nac-role="list-item">在 shadow 根内部可操作的元素上放 <code data-nac-role="code-inline">data-nac-id</code>、<code data-nac-role="code-inline">data-nac-role</code>、 <code data-nac-role="code-inline">data-nac-action</code>。</li><li data-nac-id="spec.list.95.item.2" data-nac-role="list-item">在宿主为示意 NAC3 契约而发出的任何自定义事件上设置 <code data-nac-role="code-inline">composed:true</code> (<code data-nac-role="code-inline">nac:action:succeeded</code>、<code data-nac-role="code-inline">nac:field:changed</code> 等)。</li><li data-nac-id="spec.list.95.item.3" data-nac-role="list-item">对需要被 shadow 隔离的元素避免使用 <code data-nac-role="code-inline">&lt;slot&gt;</code> -- 放进插槽的节点活在 light DOM 里, 并在那里被解析。</li></ol>
+<p data-nac-id="spec.p.96" data-nac-role="paragraph">开放的 shadow 根不需要清单里的任何提示, 也不需要在运行时开启什么; 解析是自动的。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">参考实现</h4>
+<p data-nac-id="spec.p.98" data-nac-role="paragraph">参考运行时暴露了两个内部辅助函数, <code data-nac-role="code-inline">_deepQuery(selector, root)</code> 和 <code data-nac-role="code-inline">_deepQueryAll(selector, root)</code>, 由它们 执行遍历。公开的辅助函数 <code data-nac-role="code-inline">NAC.click</code>、<code data-nac-role="code-inline">NAC.fill</code>、<code data-nac-role="code-inline">NAC.invoke</code>、 <code data-nac-role="code-inline">NAC.describe</code> 等, 全都走深度变体。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">演示与测试</h4>
+<ul data-nac-id="spec.list.100" data-nac-role="list"><li data-nac-id="spec.list.100.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">example-v23-shadow-open.php</code> -- 嵌套 1、2、3 层的开放 shadow 演示。</li><li data-nac-id="spec.list.100.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">runtime/test/v23-shadow.mjs</code> T1-T3、T10 -- 单元覆盖, 包括深度上限。</li></ul>
+<h3 data-nac-id="spec.h3.516-shadow-dom-v23" data-nac-role="heading" data-nac-level="3" id="516-shadow-dom-v23">5.1.6 shadow DOM 的解析 -- 封闭的根, 自愿暴露 (v2.3)</h3>
+<p data-nac-id="spec.p.102" data-nac-role="paragraph">封闭的 shadow 根 (<code data-nac-role="code-inline">attachShadow({mode:&#x27;closed&#x27;})</code>) 从组件作者的代码之外 看是不透明的 -- 这是浏览器的安全边界, 不是 NAC3 的决定。除非组件作者 通过下面的契约自愿暴露一个可查询的表面, 否则 NAC3 伸不进去。</p>
+<h4 data-nac-id="spec.h4.elnac3" data-nac-role="heading" data-nac-level="4" id="elnac3"><code data-nac-role="code-inline">el.nac3</code> 接口契约</h4>
+<p data-nac-id="spec.p.104" data-nac-role="paragraph">自定义元素可以通过一个名为 <code data-nac-role="code-inline">nac3</code> 的 getter, 在自己的宿主上暴露一个 接口对象:</p>
+<pre data-nac-id="spec.code.105" data-nac-role="code" data-nac-lang="ts"><code>interface NAC3HostInterface {
+  query(selector: string): Element | null;        // MANDATORY
+  queryAll(selector: string): Element[];          // RECOMMENDED
+  describe?(): Array&lt;{                            // OPTIONAL
+    id:    string;
+    role:  string;
+    action?: string;
+    label?: string;
+  }&gt;;
+}</code></pre>
+<p data-nac-id="spec.p.106" data-nac-role="paragraph">组件通过实现这个 getter 来加入。不加入的组件对 NAC3 的调用方仍然不可 触及 (它们的内部保持私有, 正如浏览器所希望的)。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">解析的语义</h4>
+<p data-nac-id="spec.p.108" data-nac-role="paragraph">在 <code data-nac-role="code-inline">_deepQuery(selector)</code> 期间, 对每个访问到的、满足 <code data-nac-role="code-inline">el.shadowRoot === null</code> 的元素 <code data-nac-role="code-inline">el</code>:</p>
+<ol data-nac-id="spec.list.109" data-nac-role="list"><li data-nac-id="spec.list.109.item.1" data-nac-role="list-item">若 <code data-nac-role="code-inline">typeof el.nac3 === &#x27;object&#x27;</code> 且 <code data-nac-role="code-inline">el.nac3.query</code> 是函数, 运行时 调用 <code data-nac-role="code-inline">el.nac3.query(selector)</code>:</li><li data-nac-id="spec.list.109.item.2" data-nac-role="list-item">返回值是一个 Element -&gt; 解析成功。</li><li data-nac-id="spec.list.109.item.3" data-nac-role="list-item">返回值是 <code data-nac-role="code-inline">null</code> -&gt; 这个 shadow 里没有匹配。</li><li data-nac-id="spec.list.109.item.4" data-nac-role="list-item">返回值是别的任何东西 -&gt; 发出 <code data-nac-role="code-inline">nac:shadow_protocol_violation</code> (每个宿主一次) 并跳过。</li><li data-nac-id="spec.list.109.item.5" data-nac-role="list-item">抛出异常 -&gt; 发出 <code data-nac-role="code-inline">nac:shadow_blocked</code> (原因 <code data-nac-role="code-inline">&#x27;exposure_threw&#x27;</code>, 每个宿主一次) 并跳过。</li><li data-nac-id="spec.list.109.item.6" data-nac-role="list-item">否则, 若 <code data-nac-role="code-inline">el.hasAttribute(&#x27;data-nac-shadow&#x27;) === true</code> 且属性值为 <code data-nac-role="code-inline">&#x27;closed&#x27;</code>, 并且不存在 <code data-nac-role="code-inline">nac3</code> 接口, 运行时发出 <code data-nac-role="code-inline">nac:shadow_blocked</code> (原因 <code data-nac-role="code-inline">&#x27;not_exposed&#x27;</code>, 每个宿主一次)。这是 作者对&quot;我是一个刻意封闭的组件&quot;这一调试信号的主动加入。</li><li data-nac-id="spec.list.109.item.7" data-nac-role="list-item">否则: 该元素被当作没有 shadow 根的普通 light DOM 元素对待。</li></ol>
+<h4 data-nac-id="spec.h4.detail" data-nac-role="heading" data-nac-level="4" id="detail">错误事件 detail 的形状</h4>
+<p data-nac-id="spec.p.111" data-nac-role="paragraph"><code data-nac-role="code-inline">nac:shadow_blocked</code> 的 detail:</p>
+<pre data-nac-id="spec.code.112" data-nac-role="code" data-nac-lang="ts"><code>{
+  host:   Element,     // the closed-shadow host
+  reason: &#x27;exposure_threw&#x27; | &#x27;not_exposed&#x27;,
+  ts:     number       // Date.now()
+}</code></pre>
+<p data-nac-id="spec.p.113" data-nac-role="paragraph"><code data-nac-role="code-inline">nac:shadow_protocol_violation</code> 的 detail:</p>
+<pre data-nac-id="spec.code.114" data-nac-role="code" data-nac-lang="ts"><code>{
+  host:           Element,
+  message:        string,            // diagnostic message
+  value_snapshot: string,            // truncated value preview
+  ts:             number
+}</code></pre>
+<p data-nac-id="spec.p.115" data-nac-role="paragraph">两个事件都会冒泡 (<code data-nac-role="code-inline">bubbles: true</code>) 并跨越 shadow 的边界 (<code data-nac-role="code-inline">composed: true</code>)。去重是按宿主来的, 依靠运行时维护的一个 WeakSet; 同一个宿主发出每个事件<strong>每次页面加载最多一次</strong>。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">为什么是自愿的</h4>
+<p data-nac-id="spec.p.117" data-nac-role="paragraph">封闭 shadow 的不透明性是浏览器强制的。即使 NAC3 定义了一种非自愿的 机制, 浏览器也会阻止它。自愿暴露把&quot;自己的公开表面在代理眼里长什么样&quot; 的全部控制权, 留在组件作者手里。</p>
+<p data-nac-id="spec.p.118" data-nac-role="paragraph">代价是逐个组件主动加入; 好处是符合 NAC3 的代理能够面对带封闭 shadow 组件的设计系统 (Salesforce Lightning、GitHub Primer 的部分组件、 对安全敏感的控件) 正常工作, 而不需要逐个组件写适配代码。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">演示与测试</h4>
+<ul data-nac-id="spec.list.120" data-nac-role="list"><li data-nac-id="spec.list.120.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">example-v23-shadow-closed.php</code> -- 正面例子 (<code data-nac-role="code-inline">&lt;todo-card-closed-exposed&gt;</code>) 与负面例子 (<code data-nac-role="code-inline">&lt;todo-card-closed-blind&gt;</code>) 并排摆放, 配有判定面板 + 实时事件日志。</li><li data-nac-id="spec.list.120.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">runtime/test/v23-shadow.mjs</code> T4-T9 -- 覆盖每一类错误事件以及去重 语义的单元测试。</li><li data-nac-id="spec.list.120.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">guides/SHADOW_DOM_CLOSED.md</code> -- 给编写者的指南。</li></ul>
+<h3 data-nac-id="spec.h3.517-v23" data-nac-role="heading" data-nac-level="3" id="517-v23">5.1.7 感知授权的能力 (v2.3)</h3>
+<p data-nac-id="spec.p.122" data-nac-role="paragraph">NAC3 v2.3 允许清单按动作声明所需的能力, 并据此在派发之前拦住 <code data-nac-role="code-inline">NAC.click</code> 和 <code data-nac-role="code-inline">NAC.invoke</code>。代理会收到一次快速拒绝 (<code data-nac-role="code-inline">code=&#x27;capability_required&#x27;</code>), 而不是一次在服务端失败的往返。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">在清单中的声明</h4>
+<p data-nac-id="spec.p.124" data-nac-role="paragraph">能力要求可以挂在元素层面或动词层面。两者都存在时, 动词层面胜出。</p>
+<pre data-nac-id="spec.code.125" data-nac-role="code" data-nac-lang="js"><code>NAC.register({
+  plugin_slug: &#x27;fin&#x27;,
+  version:     &#x27;1.0.0&#x27;,
+  nac_version: &#x27;2.3&#x27;,
+  elements: [
+    // Element-level (covers all verbs on this id).
+    { id: &#x27;fin.invoice.delete&#x27;, role: &#x27;action&#x27;,
+      requires_capability: &#x27;finance.delete_invoice&#x27;,
+      actions: [{ verb: &#x27;delete&#x27; }] },
+
+    // Verb-level (more granular).
+    { id: &#x27;fin.invoice.edit&#x27;, role: &#x27;action&#x27;,
+      actions: [
+        { verb: &#x27;edit&#x27;,
+          requires_capability: &#x27;finance.edit_invoice&#x27; },
+        { verb: &#x27;view&#x27;,
+          /* no capability -&gt; always allowed */ }
+      ] },
+
+    // Array value: OR semantics.
+    // (&quot;at least one of these capabilities matches&quot;)
+    { id: &#x27;fin.invoice.approve&#x27;, role: &#x27;action&#x27;,
+      requires_capability: [&#x27;finance.approve&#x27;,
+                            &#x27;finance.admin&#x27;],
+      actions: [{ verb: &#x27;approve&#x27; }] }
+  ]
+});</code></pre>
+<p data-nac-id="spec.p.126" data-nac-role="paragraph">若要&quot;与&quot;的语义 (&quot;用户需要具备所有这些能力&quot;), 请通过分开的受拦动作分别 声明, 或者在宿主一侧的 <code data-nac-role="code-inline">nac:action:requested</code> 监听器里组合。</p>
+<h4 data-nac-id="spec.h4.api" data-nac-role="heading" data-nac-level="4" id="api">公开 API</h4>
+<pre data-nac-id="spec.code.128" data-nac-role="code" data-nac-lang="ts"><code>NAC.setCapabilities(caps: string | string[] | null): void
+NAC.grantCapability(cap: string): void
+NAC.revokeCapability(cap: string): void
+NAC.userCapabilities(): string[]</code></pre>
+<p data-nac-id="spec.p.129" data-nac-role="paragraph"><code data-nac-role="code-inline">setCapabilities</code> 整体替换这个集合 (用于登录或会话刷新)。 <code data-nac-role="code-inline">grantCapability</code> / <code data-nac-role="code-inline">revokeCapability</code> 是增量的。<code data-nac-role="code-inline">userCapabilities</code> 返回一个快照数组。<code data-nac-role="code-inline">setCapabilities(null)</code> 清空该集合。</p>
+<p data-nac-id="spec.p.130" data-nac-role="paragraph">每当用户的角色发生变化, 宿主就调用它们。这个集合活在运行时里; 不需要重新加载清单。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">门禁的语义</h4>
+<p data-nac-id="spec.p.132" data-nac-role="paragraph">在派发之前, <code data-nac-role="code-inline">NAC.click(id)</code> 和 <code data-nac-role="code-inline">NAC.invoke(id, payload)</code> 会查出对应的 清单条目 (元素 + 动词), 读取 <code data-nac-role="code-inline">requires_capability</code>, 并调用 <code data-nac-role="code-inline">_hasCapability</code>:</p>
+<ul data-nac-id="spec.list.133" data-nac-role="list"><li data-nac-id="spec.list.133.item.1" data-nac-role="list-item">没有声明任何要求 -&gt; 允许。</li><li data-nac-id="spec.list.133.item.2" data-nac-role="list-item">声明了要求, 且当前集合满足它 -&gt; 允许。</li><li data-nac-id="spec.list.133.item.3" data-nac-role="list-item">声明了要求, 而当前集合不满足 -&gt; 以 <code data-nac-role="code-inline">NacError(&#x27;capability_required&#x27;, ...)</code> 拒绝, 并发出带 <code data-nac-role="code-inline">detail.reason=&#x27;capability_required&#x27;</code> 的 <code data-nac-role="code-inline">nac:command:rejected</code>。</li></ul>
+<p data-nac-id="spec.p.134" data-nac-role="paragraph">在 <code data-nac-role="code-inline">click</code> 上, 门禁在 <code data-nac-role="code-inline">not_found</code> / <code data-nac-role="code-inline">disabled</code> / <code data-nac-role="code-inline">hidden</code> 的检查之后 运行, 以便让最具体的失败浮上来。在 <code data-nac-role="code-inline">invoke</code> 上, 门禁在请求事件发出 之前运行 (宿主永远看不到一次未授权的尝试)。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">这为什么重要</h4>
+<p data-nac-id="spec.p.136" data-nac-role="paragraph">没有门禁时, 一个调用 <code data-nac-role="code-inline">NAC.click(&#x27;finance.delete&#x27;)</code> 的代理, 要么成功 (完全没有授权门禁 -&gt; 安全漏洞), 要么在几秒之后由服务端以 403 失败。 有了门禁, 代理会同步地得知自己缺少该能力, 并能作出恰当反应 (请求另一 条流程、申请提权、把这个限制呈现给用户)。</p>
+<p data-nac-id="spec.p.137" data-nac-role="paragraph">这是对服务端授权的补充 -- 不是替代。宿主仍然必须在服务端执行权限。 客户端的门禁是一次体验上的优化, 以及一个意图层面的信号, 不是安全 边界。</p>
+<h4 data-nac-id="spec.h4." data-nac-role="heading" data-nac-level="4" id="">演示与测试</h4>
+<ul data-nac-id="spec.list.139" data-nac-role="list"><li data-nac-id="spec.list.139.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">runtime/test/v23-capabilities.mjs</code> -- 17 条断言, 覆盖集合的设置与 读取、授予与撤销、点击的门禁、invoke 的门禁、动词层面与元素层面的 解析、&quot;或&quot;的语义、用 null 清空、对无效输入的拒绝, 以及无门禁动作的 回归。</li></ul>
+<h3 data-nac-id="spec.h3.512-v22-v23" data-nac-role="heading" data-nac-level="3" id="512-v22-v23">5.1.2 严格校验开关 (v2.2; 默认值在 v2.3 翻转)</h3>
+<p data-nac-id="spec.p.141" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.STRICT_VALIDATION</code> (布尔)。为 <code data-nac-role="code-inline">true</code> 时, 遇到下列任一情况, <code data-nac-role="code-inline">NAC.register()</code> 会抛出一个带 <code data-nac-role="code-inline">code=&#x27;strict_validation&#x27;</code> 和 <code data-nac-role="code-inline">findings</code> 数组的 <code data-nac-role="code-inline">Error</code>:</p>
+<ul data-nac-id="spec.list.142" data-nac-role="list"><li data-nac-id="spec.list.142.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_role_unknown</code> -- 条目的角色在规范集合之外。</li><li data-nac-id="spec.list.142.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">tab_id_manifest_role_drift</code> -- id 匹配 <code data-nac-role="code-inline">^tab\.</code> 但角色不是 <code data-nac-role="code-inline">&#x27;tab&#x27;</code>。</li><li data-nac-id="spec.list.142.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">manifest_dom_role_mismatch</code> -- 挂载在 DOM 上的元素的 <code data-nac-role="code-inline">data-nac-role</code> 与清单条目的角色不同。</li></ul>
+<p data-nac-id="spec.p.143" data-nac-role="paragraph"><strong>默认值:</strong></p>
+<ul data-nac-id="spec.list.144" data-nac-role="list"><li data-nac-id="spec.list.144.item.1" data-nac-role="list-item"><strong>v2.2.x:</strong> <code data-nac-role="code-inline">false</code> (仅警告)。采用方需要一个迁移窗口。</li><li data-nac-id="spec.list.144.item.2" data-nac-role="list-item"><strong>v2.3.x:</strong> <strong><code data-nac-role="code-inline">true</code></strong> (抛出)。迁移窗口随 v2.2 这条线关闭。清单里 带着大量偏差的采用方, 可在任何 <code data-nac-role="code-inline">register()</code> 调用之前设置 <code data-nac-role="code-inline">NAC.STRICT_VALIDATION = false</code> 退出。</li><li data-nac-id="spec.list.144.item.3" data-nac-role="list-item"><strong>v3.0:</strong> 这个开关被移除 (严格是唯一的模式)。</li></ul>
+<p data-nac-id="spec.p.145" data-nac-role="paragraph">清理偏差发现项的操作手册见 <code data-nac-role="code-inline">guides/MIGRATION_v2.2_to_v2.3.md</code>。</p>
+<p data-nac-id="spec.p.146" data-nac-role="paragraph">所有异步方法都会以一个 <code data-nac-role="code-inline">NacError</code> 拒绝, 其 <code data-nac-role="code-inline">code</code> 是下列之一:</p>
+<ul data-nac-id="spec.list.147" data-nac-role="list"><li data-nac-id="spec.list.147.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">not_found</code> -- 指名的元素、角色或动词不在 DOM 中。</li><li data-nac-id="spec.list.147.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">invalid</code> -- 参数的形状不对。</li><li data-nac-id="spec.list.147.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">disabled</code> -- 元素带有 <code data-nac-role="code-inline">disabled</code> 或 <code data-nac-role="code-inline">aria-disabled=&#x27;true&#x27;</code> (仅 <code data-nac-role="code-inline">NAC.click</code>; 自 v2.3 的热修复起, <code data-nac-role="code-inline">NAC.invoke</code> 不再检查, 见 5.1.4 节)。</li><li data-nac-id="spec.list.147.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">hidden</code> -- 元素在屏幕之外、带 <code data-nac-role="code-inline">aria-hidden=&#x27;true&#x27;</code>, 或尺寸为零。</li><li data-nac-id="spec.list.147.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">capability_required</code> -- 清单声明了 <code data-nac-role="code-inline">requires_capability</code>, 而当前的 <code data-nac-role="code-inline">NAC.userCapabilities()</code> 集合不满足它 (v2.3, 见 5.1.7 节)。</li><li data-nac-id="spec.list.147.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">timeout</code> -- 副作用已派发, 但合规确认事件在 5 秒内没有到达 (<code data-nac-role="code-inline">invoke</code> 是 30 秒)。<strong>超时意味着真正的失败</strong>: 处理函数可能挂住了, 确认可能从未接线, 也可能发生了一次网络竞态。除非调用方通过别的通道 拿到了副作用的证据, 否则必须把超时当作失败。</li></ul>
+<h3 data-nac-id="spec.h3.52" data-nac-role="heading" data-nac-level="3" id="52">5.2 自省</h3>
+<pre data-nac-id="spec.code.149" data-nac-role="code" data-nac-lang="ts"><code>NAC.describe():    { active: string|null, plugins: PluginSnap[] }
 NAC.describe_v2(): { v2_scope_entries: [...], sitemap: ..., data_tables: [...] }
 NAC.manifest(plugin_slug: string): Manifest|null
-NAC.validate_global(opts?: {probe?: boolean}): Findings[]</code></pre>
-<h3 data-nac-id="spec.h3.53-数据表v21" data-nac-role="heading" data-nac-level="3" id="53-数据表v21">5.3 数据表（v2.1）</h3>
-<pre data-nac-id="spec.code.7" data-nac-role="code" data-nac-lang="ts"><code>NAC.registerDataTable(spec: DataTableSpec): void
+NAC.validate_global(opts?: {probe?: boolean}): GlobalReport   // named buckets, see 10.1</code></pre>
+<h3 data-nac-id="spec.h3.53-21" data-nac-role="heading" data-nac-level="3" id="53-21">5.3 数据表 (自 2.1 起)</h3>
+<p data-nac-id="spec.p.151" data-nac-role="paragraph">数据表的原语<strong>不是</strong>核心运行时 (<code data-nac-role="code-inline">js/nac.js</code> / <code data-nac-role="code-inline">@nac3/runtime</code> 的 <code data-nac-role="code-inline">nac.mjs</code>) 的一部分。它们随棕地扩展模块 <code data-nac-role="code-inline">js/nac-v2-extensions.js</code> (发布为 <code data-nac-role="code-inline">@nac3/runtime/extensions</code>) 一起提供, 该模块加载后会把它们挂到同一个 <code data-nac-role="code-inline">window.NAC</code> 对象上。要得到 <code data-nac-role="code-inline">dt_*</code> 这一表面, 请在核心运行时之后加载扩展模块:</p>
+<pre data-nac-id="spec.code.152" data-nac-role="code" data-nac-lang="html"><code>&lt;script src=&quot;https://yujin.app/nac-spec/js/nac.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://yujin.app/nac-spec/js/nac-v2-extensions.js&quot;&gt;&lt;/script&gt;</code></pre>
+<pre data-nac-id="spec.code.153" data-nac-role="code" data-nac-lang="js"><code>// or with the npm package:
+import &#x27;@nac3/runtime&#x27;;
+import &#x27;@nac3/runtime/extensions&#x27;;</code></pre>
+<p data-nac-id="spec.p.154" data-nac-role="paragraph">下面这些方法只在扩展模块已加载时存在; 在只有核心的运行时上调用它们 不会有任何效果 / 返回 <code data-nac-role="code-inline">undefined</code>。</p>
+<pre data-nac-id="spec.code.155" data-nac-role="code" data-nac-lang="ts"><code>NAC.registerDataTable(spec: DataTableSpec): string   // returns table_id
 NAC.dt_add_row(table_id, values): {ok, row_id}
 NAC.dt_remove_row(table_id, row_id): {ok}
 NAC.dt_edit_cell(table_id, row_id, column, value): {ok} | {ok:false, error}
@@ -165,15 +346,52 @@ NAC.dt_discard(table_id): {ok}
 NAC.dt_state(table_id): TableState
 NAC.dt_read_aggregate(table_id, agg_key, column): number|null
 NAC.registerDataTableComputed(table_id, column, fn): void</code></pre>
-<p data-nac-id="spec.p.65" data-nac-role="paragraph">数据表具有 <code data-nac-role="code-inline">subkind</code> 属性：</p>
-<ul data-nac-id="spec.list.66" data-nac-role="list"><li data-nac-id="spec.list.66.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">collection</code> —— 有序行集合，支持可选的事务性提交。适用于发票明细行、购物车条目、日志记录等场景。</li><li data-nac-id="spec.list.66.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">matrix</code> —— 行列网格，每个单元格均携带一个值。适用于权限矩阵、排班网格等场景。</li><li data-nac-id="spec.list.66.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">matrix-singletree</code> —— 每行可折叠为树形结构的矩阵（较少见）。</li></ul>
+<p data-nac-id="spec.p.156" data-nac-role="paragraph">一张数据表有一个 <code data-nac-role="code-inline">subkind</code>:</p>
+<ul data-nac-id="spec.list.157" data-nac-role="list"><li data-nac-id="spec.list.157.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">collection</code> -- 有序的行, 可选带事务性提交。用于发票行、购物车条目、 日志记录。</li><li data-nac-id="spec.list.157.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">matrix</code> -- 行 x 列的网格, 每个格子都带一个值。用于权限矩阵、排班 网格。</li><li data-nac-id="spec.list.157.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">matrix-singletree</code> -- 每一行折叠成一棵树的矩阵 (少见)。</li></ul>
 <hr />
-<h2 data-nac-id="spec.h2.6-事件" data-nac-role="heading" data-nac-level="2" id="6-事件">6. 事件</h2>
-<p data-nac-id="spec.p.69" data-nac-role="paragraph">每个操作都会触发一个确定性的完成事件。运行时的 <code data-nac-role="code-inline">NAC.click()</code> 会轮询该事件，并在事件触发时完成 Promise。</p>
-<p data-nac-id="spec.p.70" data-nac-role="paragraph">| Role | 成功事件 | 失败事件 | |------|---------------|---------------| | <code data-nac-role="code-inline">action</code> | <code data-nac-role="code-inline">nac:action:succeeded</code> | <code data-nac-role="code-inline">nac:action:failed</code> | | <code data-nac-role="code-inline">field</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">option</code> | <code data-nac-role="code-inline">nac:field:changed</code> | -- | | <code data-nac-role="code-inline">tab</code> | <code data-nac-role="code-inline">nac:tab:activated</code> | -- | | <code data-nac-role="code-inline">breadcrumb-item</code> | <code data-nac-role="code-inline">nac:breadcrumb:navigated</code> | -- | | <code data-nac-role="code-inline">accordion-toggle</code> | <code data-nac-role="code-inline">nac:accordion:expanded</code> / <code data-nac-role="code-inline">:collapsed</code> | -- | | <code data-nac-role="code-inline">step</code> | <code data-nac-role="code-inline">nac:step:advanced</code> | -- | | <code data-nac-role="code-inline">pagination-item</code> | <code data-nac-role="code-inline">nac:table:page_changed</code> | -- | | <code data-nac-role="code-inline">confirm-button</code> | <code data-nac-role="code-inline">nac:confirm:resolved</code> / <code data-nac-role="code-inline">:cancelled</code> | -- | | <code data-nac-role="code-inline">sort-control</code> | <code data-nac-role="code-inline">nac:table:sort_changed</code> | -- | | <code data-nac-role="code-inline">filter-control</code> | <code data-nac-role="code-inline">nac:table:filter_changed</code> | -- |</p>
-<h3 data-nac-id="spec.h3.61-事件-detail-结构" data-nac-role="heading" data-nac-level="3" id="61-事件-detail-结构">6.1 事件 detail 结构</h3>
-<p data-nac-id="spec.p.72" data-nac-role="paragraph">每个事件的 detail 均包含规范 id 字段及 <code data-nac-role="code-inline">plugin</code>：</p>
-<pre data-nac-id="spec.code.8" data-nac-role="code" data-nac-lang="js"><code>nac:action:succeeded {
+<h3 data-nac-id="spec.h3.54-v24" data-nac-role="heading" data-nac-level="3" id="54-v24">5.4 严格解析 + 消歧 (v2.4)</h3>
+<p data-nac-id="spec.p.160" data-nac-role="paragraph">NAC3 v2.4 把 id、动词、限定词、标签的解析变得<strong>严格</strong>。那些把一次请求 解析到单个 DOM 元素的动词 -- <code data-nac-role="code-inline">click_by_verb</code>、<code data-nac-role="code-inline">tab</code> (单参数形式) 和 <code data-nac-role="code-inline">tab_by_label</code> -- 不再猜了。当一次请求解析到零个候选或多于一个候选时, 运行时会抛出一个带着候选清单的 <code data-nac-role="code-inline">NacError</code>, 并发出一个 <code data-nac-role="code-inline">nac:disambiguation_requested</code> 事件, 而不是默默派发给第一个大致相似 的那个。</p>
+<p data-nac-id="spec.p.161" data-nac-role="paragraph">这就是<strong>零静默损害</strong>这条不变式。它为辅助软件和代理调用方而存在: 在 那里, 默默派发到错误的元素又没有恢复的路径, 是一个安全层面的阻塞项。 2.4 之前那种宽松的行为 -- 一个按子串 <code data-nac-role="code-inline">indexOf</code> 的兜底, 会解析到第一个 大致相似的那个 -- 已被移除。</p>
+<blockquote data-nac-id="spec.quote.162" data-nac-role="note">向后兼容: v2.4 是一次<em>契约行为</em>的变更。本来就传入无歧义参数的代码 路径照旧工作。依赖宽松的 <code data-nac-role="code-inline">indexOf</code> 兜底来解析到第一个大致相似者的 代码路径, 现在会抛出异常 -- 这是设计使然。</blockquote>
+<h4 data-nac-id="spec.h4.541-clickbyverb" data-nac-role="heading" data-nac-level="4" id="541-clickbyverb">5.4.1 限定词的严格匹配 (<code data-nac-role="code-inline">click_by_verb</code>)</h4>
+<p data-nac-id="spec.p.164" data-nac-role="paragraph"><code data-nac-role="code-inline">click_by_verb(plugin, verb, opts?)</code> 在共享 <code data-nac-role="code-inline">data-nac-action=&quot;&lt;verb&gt;&quot;</code> 的 DOM 节点之间挑选。当提供了 <code data-nac-role="code-inline">opts.qualifier</code> (一个字符串) 时, 一个元素<strong>只有</strong>在它的 <code data-nac-role="code-inline">data-nac-id</code> 满足下面条件时才算匹配:</p>
+<pre data-nac-id="spec.code.165" data-nac-role="code" data-nac-lang="js"><code>id === qualifier || id.endsWith(&#x27;__&#x27; + qualifier)</code></pre>
+<p data-nac-id="spec.p.166" data-nac-role="paragraph">也就是: id 完全相等, 或者是分隔符 <code data-nac-role="code-inline">__</code> 之后锚定的后缀。<strong>没有按子串的 兜底。</strong>一个只是某个 id 的子串的限定词 (既不相等, 也不是锚定的 <code data-nac-role="code-inline">__suffix</code>) 不算匹配。</p>
+<ul data-nac-id="spec.list.167" data-nac-role="list"><li data-nac-id="spec.list.167.item.1" data-nac-role="list-item">0 个匹配 -&gt; 抛出 <code data-nac-role="code-inline">NacError(&#x27;no_matching_instance&#x27;, ...)</code>。</li><li data-nac-id="spec.list.167.item.2" data-nac-role="list-item">恰好 1 个匹配 -&gt; 解析并点击。</li><li data-nac-id="spec.list.167.item.3" data-nac-role="list-item">多于 1 个匹配 -&gt; 抛出 <code data-nac-role="code-inline">NacError(&#x27;ambiguous_qualifier&#x27;, ...)</code>。</li></ul>
+<p data-nac-id="spec.p.168" data-nac-role="paragraph"><code data-nac-role="code-inline">opts.qualifier_ordinal</code> (一个数) 跳过限定词匹配, 在共享该动词的所有 DOM 元素之间按位置挑选。</p>
+<h4 data-nac-id="spec.h4.542-id-tab" data-nac-role="heading" data-nac-level="4" id="542-id-tab">5.4.2 id 的严格解析 (<code data-nac-role="code-inline">tab</code>)</h4>
+<p data-nac-id="spec.p.170" data-nac-role="paragraph"><code data-nac-role="code-inline">tab(plugin, id)</code> 的单参数形式: DOM 中 <code data-nac-role="code-inline">data-nac-id</code> 的完全匹配胜出。 否则运行时会去找 id 以 <code data-nac-role="code-inline">id + &quot;__&quot;</code> 开头的实例:</p>
+<ul data-nac-id="spec.list.171" data-nac-role="list"><li data-nac-id="spec.list.171.item.1" data-nac-role="list-item">0 个受限定的实例且没有完全匹配的 id -&gt; <code data-nac-role="code-inline">no_matching_instance</code>。</li><li data-nac-id="spec.list.171.item.2" data-nac-role="list-item">恰好 1 个 -&gt; 解析成功。</li><li data-nac-id="spec.list.171.item.3" data-nac-role="list-item">多于 1 个 -&gt; <code data-nac-role="code-inline">ambiguous_tab</code> (请传入完整的受限定 id)。</li></ul>
+<h4 data-nac-id="spec.h4.543-tabbylabel" data-nac-role="heading" data-nac-level="4" id="543-tabbylabel">5.4.3 标签的严格解析 (<code data-nac-role="code-inline">tab_by_label</code>)</h4>
+<p data-nac-id="spec.p.173" data-nac-role="paragraph"><code data-nac-role="code-inline">tab_by_label(plugin, label)</code> 把一个人类可读的标签解析到一个选项卡, 依次尝试: 与清单标签的完全匹配、清单里的模糊 / 子串匹配、与 DOM 文本的 完全匹配、与 DOM 文本的模糊匹配。若任一层得到多于一个匹配, 它会抛出 <code data-nac-role="code-inline">NacError(&#x27;ambiguous_label&#x27;, ...)</code>; 若没有任何一层匹配, 它会抛出 <code data-nac-role="code-inline">NacError(&#x27;not_found&#x27;, ...)</code>。所发出事件的 <code data-nac-role="code-inline">reason</code> 字段会记下是哪一层 出现了歧义 (<code data-nac-role="code-inline">ambiguous_label_exact</code>、<code data-nac-role="code-inline">ambiguous_label_fuzzy</code>、 <code data-nac-role="code-inline">ambiguous_label_exact_dom</code>、<code data-nac-role="code-inline">ambiguous_label_fuzzy_dom</code>, 或 <code data-nac-role="code-inline">no_matching_label</code>)。</p>
+<h4 data-nac-id="spec.h4.544" data-nac-role="heading" data-nac-level="4" id="544">5.4.4 错误码</h4>
+<table data-nac-id="spec.table.175" data-nac-role="data-table"><thead><tr><th><code data-nac-role="code-inline">err.code</code></th><th>由谁抛出</th><th>含义</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">no_matching_instance</code></td><td><code data-nac-role="code-inline">click_by_verb</code> (限定词)、<code data-nac-role="code-inline">tab</code></td><td>没有元素匹配该限定词 / id</td></tr><tr><td><code data-nac-role="code-inline">ambiguous_qualifier</code></td><td><code data-nac-role="code-inline">click_by_verb</code></td><td>多于 1 个元素匹配该限定词</td></tr><tr><td><code data-nac-role="code-inline">ambiguous_tab</code></td><td><code data-nac-role="code-inline">tab</code></td><td>多于 1 个受限定的 <code data-nac-role="code-inline">id__</code> 实例匹配</td></tr><tr><td><code data-nac-role="code-inline">ambiguous_label</code></td><td><code data-nac-role="code-inline">tab_by_label</code></td><td>多于 1 个选项卡匹配该标签 (任一层)</td></tr><tr><td><code data-nac-role="code-inline">not_found</code></td><td><code data-nac-role="code-inline">tab_by_label</code></td><td>没有任何选项卡匹配该标签</td></tr></tbody></table>
+<h4 data-nac-id="spec.h4.545-errcandidates" data-nac-role="heading" data-nac-level="4" id="545-errcandidates">5.4.5 <code data-nac-role="code-inline">err.candidates</code> 的形状</h4>
+<p data-nac-id="spec.p.177" data-nac-role="paragraph">每个消歧错误都带着一个 <code data-nac-role="code-inline">candidates</code> 数组。每个候选恰好是:</p>
+<pre data-nac-id="spec.code.178" data-nac-role="code" data-nac-lang="ts"><code>{ nac_id: string, label: string }</code></pre>
+<p data-nac-id="spec.p.179" data-nac-role="paragraph"><code data-nac-role="code-inline">nac_id</code> 是该元素的 <code data-nac-role="code-inline">data-nac-id</code>。<code data-nac-role="code-inline">label</code> 的解析顺序是: 优先 <code data-nac-role="code-inline">aria-label</code>, 然后是修剪过的 <code data-nac-role="code-inline">textContent</code> (截到 120 个字符), 最后退回 到 <code data-nac-role="code-inline">data-nac-id</code>。这份清单是对照 DOM 校验过的 -- 它列出的是调用方可以 从中挑选的真实元素。<code data-nac-role="code-inline">NacError</code> 把 <code data-nac-role="code-inline">candidates</code> 合并到抛出的 <code data-nac-role="code-inline">Error</code> 上, 于是 <code data-nac-role="code-inline">err.code</code>、<code data-nac-role="code-inline">err.message</code> 和 <code data-nac-role="code-inline">err.candidates</code> 三者都有值。</p>
+<h4 data-nac-id="spec.h4.546-nacdisambiguationrequested" data-nac-role="heading" data-nac-level="4" id="546-nacdisambiguationrequested">5.4.6 <code data-nac-role="code-inline">nac:disambiguation_requested</code> 事件</h4>
+<p data-nac-id="spec.p.181" data-nac-role="paragraph">每当一次严格解析的调用失败 (没有匹配, 或者匹配太多), 运行时都会在 抛出异常<em>之外</em>, 向 <code data-nac-role="code-inline">document</code> 派发一个 <code data-nac-role="code-inline">nac:disambiguation_requested</code> 的 <code data-nac-role="code-inline">CustomEvent</code>。这次发出是尽力而为的: 若派发失败, 运行时照样抛出。</p>
+<pre data-nac-id="spec.code.182" data-nac-role="code" data-nac-lang="ts"><code>document.addEventListener(&#x27;nac:disambiguation_requested&#x27;, (e) =&gt; {
+  e.detail; /* {
+    method:     &#x27;click_by_verb&#x27; | &#x27;tab&#x27; | &#x27;tab_by_label&#x27;,
+    plugin:     string | null,
+    query:      { verb?, qualifier?, label?, id? },
+    reason:     string,   // finer-grained than err.code (see 5.4.3)
+    candidates: Array&lt;{ nac_id: string, label: string }&gt;,
+  } */
+});</code></pre>
+<h4 data-nac-id="spec.h4.547" data-nac-role="heading" data-nac-level="4" id="547">5.4.7 调用方如何消歧</h4>
+<p data-nac-id="spec.p.184" data-nac-role="paragraph">拿到候选清单 (来自 <code data-nac-role="code-inline">err.candidates</code> 或 <code data-nac-role="code-inline">event.detail.candidates</code>) 之后, 调用方挑一个, 并用下面任一方式重新派发:</p>
+<ol data-nac-id="spec.list.185" data-nac-role="list"><li data-nac-id="spec.list.185.item.1" data-nac-role="list-item"><strong>完整的 <code data-nac-role="code-inline">nac_id</code></strong> -- <code data-nac-role="code-inline">NAC.click(candidate.nac_id)</code>。这是规范的 恢复路径: 候选本身已经带着那个精确的 id。</li><li data-nac-id="spec.list.185.item.2" data-nac-role="list-item"><strong>锚定的 <code data-nac-role="code-inline">__suffix</code></strong> -- 把该实例精确的后缀作为限定词传给 <code data-nac-role="code-inline">click_by_verb</code>。</li><li data-nac-id="spec.list.185.item.3" data-nac-role="list-item"><strong><code data-nac-role="code-inline">opts.qualifier_ordinal</code></strong> -- 在共享该动词的元素之间按位置选择 (按 DOM 顺序)。</li></ol>
+<p data-nac-id="spec.p.186" data-nac-role="paragraph">完整走通的参考是 <code data-nac-role="code-inline">example-v24-disambiguation.php</code>; 这个契约由 <code data-nac-role="code-inline">runtime/test/stage2-disambiguation.mjs</code> 和 <code data-nac-role="code-inline">runtime/test/stage7-strict-resolution.mjs</code> 覆盖。</p>
+<hr />
+<h2 data-nac-id="spec.h2.6" data-nac-role="heading" data-nac-level="2" id="6">6. 事件</h2>
+<p data-nac-id="spec.p.189" data-nac-role="paragraph">每个动作都会发出一个确定的完成事件。运行时的 <code data-nac-role="code-inline">NAC.click()</code> 会等候这个 事件, 并在它发出时解决。</p>
+<table data-nac-id="spec.table.190" data-nac-role="data-table"><thead><tr><th>角色</th><th>成功事件</th><th>失败事件</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">action</code></td><td><code data-nac-role="code-inline">nac:action:succeeded</code></td><td><code data-nac-role="code-inline">nac:action:failed</code></td></tr><tr><td><code data-nac-role="code-inline">field</code></td><td><code data-nac-role="code-inline">nac:field:changed</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">option</code></td><td><code data-nac-role="code-inline">nac:field:changed</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">tab</code></td><td><code data-nac-role="code-inline">nac:tab:activated</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">breadcrumb-item</code></td><td><code data-nac-role="code-inline">nac:breadcrumb:navigated</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">accordion-toggle</code></td><td><code data-nac-role="code-inline">nac:accordion:expanded</code> / <code data-nac-role="code-inline">:collapsed</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">step</code></td><td><code data-nac-role="code-inline">nac:step:advanced</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">pagination-item</code></td><td><code data-nac-role="code-inline">nac:table:page_changed</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">confirm-button</code></td><td><code data-nac-role="code-inline">nac:confirm:resolved</code> / <code data-nac-role="code-inline">:cancelled</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">sort-control</code></td><td><code data-nac-role="code-inline">nac:table:sort_changed</code></td><td>--</td></tr><tr><td><code data-nac-role="code-inline">filter-control</code></td><td><code data-nac-role="code-inline">nac:table:filter_changed</code></td><td>--</td></tr></tbody></table>
+<h3 data-nac-id="spec.h3.61-detail" data-nac-role="heading" data-nac-level="3" id="61-detail">6.1 事件 detail 的形状</h3>
+<p data-nac-id="spec.p.192" data-nac-role="paragraph">每个事件的 detail 都带着规范的 id 字段, 再加上 <code data-nac-role="code-inline">plugin</code>:</p>
+<pre data-nac-id="spec.code.193" data-nac-role="code" data-nac-lang="js"><code>nac:action:succeeded {
   detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27;, ... }
 }
 nac:tab:activated {
@@ -183,26 +401,26 @@ nac:field:changed {
   detail: { plugin: &#x27;invoice&#x27;, field_id: &#x27;field.client_name&#x27;,
             value: &#x27;Acme Corp&#x27;, ... }
 }</code></pre>
-<h3 data-nac-id="spec.h3.62-在宿主处理器中触发事件" data-nac-role="heading" data-nac-level="3" id="62-在宿主处理器中触发事件">6.2 在宿主处理器中触发事件</h3>
-<p data-nac-id="spec.p.75" data-nac-role="paragraph">点击处理器<strong>必须</strong>在同步副作用完成后触发对应的成功事件：</p>
-<pre data-nac-id="spec.code.9" data-nac-role="code" data-nac-lang="js"><code>button.addEventListener(&#x27;click&#x27;, function (ev) {
-  // ... 执行操作 ...
+<h3 data-nac-id="spec.h3.62" data-nac-role="heading" data-nac-level="3" id="62">6.2 从宿主的处理函数里发出</h3>
+<p data-nac-id="spec.p.195" data-nac-role="paragraph">点击处理函数必须在它的同步副作用之后, 发出对应的成功事件:</p>
+<pre data-nac-id="spec.code.196" data-nac-role="code" data-nac-lang="js"><code>button.addEventListener(&#x27;click&#x27;, function (ev) {
+  // ... do the work ...
   document.dispatchEvent(new CustomEvent(&#x27;nac:action:succeeded&#x27;, {
     detail: { plugin: &#x27;invoice&#x27;, action_id: &#x27;invoice.save&#x27; }
   }));
 });</code></pre>
-<p data-nac-id="spec.p.77" data-nac-role="paragraph">若操作为异步，则应在 Promise resolve 后触发事件。若操作失败，则触发 <code data-nac-role="code-inline">nac:action:failed</code>，并附带 <code data-nac-role="code-inline">{detail: {plugin, action_id, error: &lt;message&gt;}}</code>。</p>
-<p data-nac-id="spec.p.78" data-nac-role="paragraph">v2.2 运行时将提供 <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code>，它封装了 <code data-nac-role="code-inline">addEventListener</code> 并可自动触发事件。</p>
-<h3 data-nac-id="spec.h3.63-为何不直接使用-click-事件" data-nac-role="heading" data-nac-level="3" id="63-为何不直接使用-click-事件">6.3 为何不直接使用 click 事件？</h3>
-<p data-nac-id="spec.p.80" data-nac-role="paragraph">DOM 的 <code data-nac-role="code-inline">click</code> 事件在处理器执行<strong>之前</strong>就已触发。NAC3 的契约需要知道<strong>副作用何时完成</strong>，而非点击何时开始。因此需要独立的事件体系。</p>
+<p data-nac-id="spec.p.197" data-nac-role="paragraph">若这项工作是异步的, 请在解决之后发出。若这项工作失败, 请发出 <code data-nac-role="code-inline">nac:action:failed</code>, 带上 <code data-nac-role="code-inline">{detail: {plugin, action_id, error: &lt;message&gt;}}</code>。</p>
+<p data-nac-id="spec.p.198" data-nac-role="paragraph">v2.2 的运行时将提供 <code data-nac-role="code-inline">NAC.bindAction(el, handler, ctx)</code>, 它包住 <code data-nac-role="code-inline">addEventListener</code> 并自动发出。</p>
+<h3 data-nac-id="spec.h3.63" data-nac-role="heading" data-nac-level="3" id="63">6.3 为什么不直接用点击事件本身?</h3>
+<p data-nac-id="spec.p.200" data-nac-role="paragraph">DOM 的 <code data-nac-role="code-inline">click</code> 事件在处理函数运行之前就发出了。NAC3 的契约需要知道的是 <strong>副作用何时完成</strong>, 而不是点击何时开始。因此才有这一族独立的事件。</p>
 <hr />
-<h2 data-nac-id="spec.h2.7-来源溯源" data-nac-role="heading" data-nac-level="2" id="7-来源溯源">7. 来源溯源</h2>
+<h2 data-nac-id="spec.h2.7" data-nac-role="heading" data-nac-level="2" id="7">7. 来源</h2>
 <h3 data-nac-id="spec.h3.71-istrusted" data-nac-role="heading" data-nac-level="3" id="71-istrusted">7.1 isTrusted</h3>
-<p data-nac-id="spec.p.84" data-nac-role="paragraph"><code data-nac-role="code-inline">event.isTrusted</code> 在用户主动触发的点击（真实鼠标、真实按键、屏幕阅读器激活）时为 <code data-nac-role="code-inline">true</code>，在合成点击（<code data-nac-role="code-inline">element.click()</code>、通过 dispatchEvent 派发的 MouseEvent、自动化脚本）时为 <code data-nac-role="code-inline">false</code>。</p>
-<p data-nac-id="spec.p.85" data-nac-role="paragraph">NAC3 必须通过成功事件中的 <code data-nac-role="code-inline">event.detail.is_trusted</code> 字段暴露此信息。对于涉及安全敏感操作（支付、删除）的宿主，可以要求 <code data-nac-role="code-inline">is_trusted === true</code>，并拒绝合成点击。参考示例 <code data-nac-role="code-inline">example-v20-full.php</code> 包含一对按钮（<code data-nac-role="code-inline">v20_panel.istrusted_real</code> 和 <code data-nac-role="code-inline">v20_panel.istrusted_fake</code>），用于演示两者的区别。</p>
-<h3 data-nac-id="spec.h3.72-hmac-签名清单" data-nac-role="heading" data-nac-level="3" id="72-hmac-签名清单">7.2 HMAC 签名清单</h3>
-<p data-nac-id="spec.p.87" data-nac-role="paragraph">清单可以携带 <code data-nac-role="code-inline">provenance</code> 块：</p>
-<pre data-nac-id="spec.code.10" data-nac-role="code" data-nac-lang="js"><code>NAC.set_provenance_secret(&#x27;your-tenant-secret&#x27;);
+<p data-nac-id="spec.p.204" data-nac-role="paragraph">对于由人发起的点击 (真实的鼠标、真实的按键、屏幕阅读器的激活), <code data-nac-role="code-inline">event.isTrusted</code> 是 <code data-nac-role="code-inline">true</code>; 对于合成的点击 (<code data-nac-role="code-inline">element.click()</code>、对手工 构造的 MouseEvent 调用 dispatchEvent、自动化), 它是 <code data-nac-role="code-inline">false</code>。</p>
+<p data-nac-id="spec.p.205" data-nac-role="paragraph">NAC3 必须通过成功事件里的 <code data-nac-role="code-inline">event.detail.is_trusted</code> 把它暴露出来。 执行对安全敏感动作的宿主 (付款、删除) 可以要求 <code data-nac-role="code-inline">is_trusted === true</code> 并拒绝合成的点击。参考演示 <code data-nac-role="code-inline">example-v20-full.php</code> 里有一对按钮 (<code data-nac-role="code-inline">v20_panel.istrusted_real</code> 和 <code data-nac-role="code-inline">v20_panel.istrusted_fake</code>) 演示了这个 区别。</p>
+<h3 data-nac-id="spec.h3.72-hmac" data-nac-role="heading" data-nac-level="3" id="72-hmac">7.2 用 HMAC 签名的清单</h3>
+<p data-nac-id="spec.p.207" data-nac-role="paragraph">清单可以带一个 <code data-nac-role="code-inline">provenance</code> 块:</p>
+<pre data-nac-id="spec.code.208" data-nac-role="code" data-nac-lang="js"><code>NAC.set_provenance_secret(&#x27;your-tenant-secret&#x27;);
 NAC.register({
   plugin_slug: &#x27;invoice&#x27;,
   ...,
@@ -212,79 +430,266 @@ NAC.register({
     signature: &#x27;&lt;HMAC-SHA256 of manifest body&gt;&#x27;
   }
 });</code></pre>
-<p data-nac-id="spec.p.89" data-nac-role="paragraph">运行时会对清单主体（不含签名字段本身）进行稳定序列化，并计算预期的 HMAC 值，若签名不匹配则拒绝该清单。此机制用于多租户部署场景，防止某个租户伪造其他租户的清单。</p>
-<h3 data-nac-id="spec.h3.73-威胁模型" data-nac-role="heading" data-nac-level="3" id="73-威胁模型">7.3 威胁模型</h3>
-<p data-nac-id="spec.p.91" data-nac-role="paragraph">完整威胁模型请参见 <code data-nac-role="code-inline">SECURITY.md</code>。简要说明如下：</p>
-<ul data-nac-id="spec.list.92" data-nac-role="list"><li data-nac-id="spec.list.92.item.1" data-nac-role="list-item">NAC3 不对<strong>用户</strong>进行身份验证，这是你的认证层的职责。</li><li data-nac-id="spec.list.92.item.2" data-nac-role="list-item">NAC3 对<strong>清单</strong>进行身份验证（HMAC）。</li><li data-nac-id="spec.list.92.item.3" data-nac-role="list-item">NAC3 区分真实点击与合成点击（isTrusted），宿主可据此拒绝敏感操作中的合成点击。</li><li data-nac-id="spec.list.92.item.4" data-nac-role="list-item">NAC3 无法防御以用户级别权限运行的恶意代理，此类代理可以执行用户能做的任何操作。</li></ul>
+<p data-nac-id="spec.p.209" data-nac-role="paragraph">运行时会在清单的稳定序列化结果上 (排除签名本身) 计算期望的 HMAC, 并 拒绝签名不符的清单。多租户部署用它来防止一个租户伪造另一个租户的 清单。</p>
+<h3 data-nac-id="spec.h3.73" data-nac-role="heading" data-nac-level="3" id="73">7.3 威胁模型</h3>
+<p data-nac-id="spec.p.211" data-nac-role="paragraph">完整的威胁模型见 <code data-nac-role="code-inline">SECURITY.md</code>。简短版本:</p>
+<ul data-nac-id="spec.list.212" data-nac-role="list"><li data-nac-id="spec.list.212.item.1" data-nac-role="list-item">NAC3 不认证<strong>用户</strong>。那是你的认证层的工作。</li><li data-nac-id="spec.list.212.item.2" data-nac-role="list-item">NAC3 认证<strong>清单</strong> (HMAC)。</li><li data-nac-id="spec.list.212.item.3" data-nac-role="list-item">NAC3 区分真实点击与合成点击 (isTrusted), 这样宿主可以对敏感动词 拒绝后者。</li><li data-nac-id="spec.list.212.item.4" data-nac-role="list-item">NAC3 不防护以用户权限运行的恶意代理。这样的代理能做用户能做的一切。</li></ul>
 <hr />
-<h2 data-nac-id="spec.h2.8-合规级别" data-nac-role="heading" data-nac-level="2" id="8-合规级别">8. 合规级别</h2>
-<p data-nac-id="spec.p.95" data-nac-role="paragraph">若一个页面满足以下条件，则为 <strong>NAC-1 合规</strong>：</p>
-<ul data-nac-id="spec.list.96" data-nac-role="list"><li data-nac-id="spec.list.96.item.1" data-nac-role="list-item">所有代理应能操作的可点击组件均携带 <code data-nac-role="code-inline">data-nac-id</code> 和 <code data-nac-role="code-inline">data-nac-role</code>。</li><li data-nac-id="spec.list.96.item.2" data-nac-role="list-item">所有 <code data-nac-role="code-inline">data-nac-role="action"</code> 元素在其副作用完成后触发 <code data-nac-role="code-inline">nac:action:succeeded</code>。</li><li data-nac-id="spec.list.96.item.3" data-nac-role="list-item">页面通过 <code data-nac-role="code-inline">NAC.register()</code> 注册至少一个插件清单。</li><li data-nac-id="spec.list.96.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click(id)</code> 对所有已声明的 id 均可正常工作。</li></ul>
-<p data-nac-id="spec.p.97" data-nac-role="paragraph">若页面还满足以下条件，则为 <strong>NAC-2 合规</strong>：</p>
-<ul data-nac-id="spec.list.98" data-nac-role="list"><li data-nac-id="spec.list.98.item.1" data-nac-role="list-item">在清单中显式注册 <code data-nac-role="code-inline">tabs[]</code>、<code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code> 数组（而非从 DOM 推断）。</li><li data-nac-id="spec.list.98.item.2" data-nac-role="list-item">为所有面向用户的标签提供覆盖全部 10 个 NAC3 语言区域的 <code data-nac-role="code-inline">label_i18n</code>。</li><li data-nac-id="spec.list.98.item.3" data-nac-role="list-item">实现 v2.0 棕地原语：作用域树、临时捕获、autoRegister.watch。</li><li data-nac-id="spec.list.98.item.4" data-nac-role="list-item">以 <code data-nac-role="code-inline">NAC.validate_global({probe: false})</code> 检查，零 <code data-nac-role="code-inline">error</code> 级别发现。</li></ul>
-<p data-nac-id="spec.p.99" data-nac-role="paragraph">若页面还满足以下条件，则为 <strong>NAC-3 合规</strong>：</p>
-<ul data-nac-id="spec.list.100" data-nac-role="list"><li data-nac-id="spec.list.100.item.1" data-nac-role="list-item">携带 HMAC 签名清单。</li><li data-nac-id="spec.list.100.item.2" data-nac-role="list-item">对安全敏感操作区分 <code data-nac-role="code-inline">isTrusted</code>。</li><li data-nac-id="spec.list.100.item.3" data-nac-role="list-item">以 <code data-nac-role="code-inline">NAC.validate_global({probe: true})</code> 检查，零发现。</li></ul>
-<p data-nac-id="spec.p.101" data-nac-role="paragraph">NPM 包的 CLI（<code data-nac-role="code-inline">npx @nac3/runtime validate &lt;url&gt;</code>）会报告页面所达到的最高合规级别。</p>
+<h2 data-nac-id="spec.h2.8" data-nac-role="heading" data-nac-level="2" id="8">8. 合规级别</h2>
+<p data-nac-id="spec.p.215" data-nac-role="paragraph">级别写作 <strong>NAC3 Conformance Level 1</strong>、<strong>2</strong> 或 <strong>3</strong>。级别的名称不是 协议的名称: 校验器、报告或合规声明必须用 <code data-nac-role="code-inline">api/latest/levels.json</code> 中发布的标识符 <code data-nac-role="code-inline">nac3-conformance-level-&lt;1|2|3&gt;</code> 来引用级别, 绝不用显示名称。8.1 节 记录了这些级别在 2.5.0 之前所用的名称。</p>
+<p data-nac-id="spec.p.216" data-nac-role="paragraph">一个页面达到 <strong>NAC3 Conformance Level 1</strong>, 条件是:</p>
+<ul data-nac-id="spec.list.217" data-nac-role="list"><li data-nac-id="spec.list.217.item.1" data-nac-role="list-item">每个代理应当能够操作的可点击控件都带有 <code data-nac-role="code-inline">data-nac-id</code> 和 <code data-nac-role="code-inline">data-nac-role</code>。</li><li data-nac-id="spec.list.217.item.2" data-nac-role="list-item">每个 <code data-nac-role="code-inline">data-nac-role=&quot;action&quot;</code> 的元素都在它的副作用之后发出 <code data-nac-role="code-inline">nac:action:succeeded</code>。</li><li data-nac-id="spec.list.217.item.3" data-nac-role="list-item">该页面通过 <code data-nac-role="code-inline">NAC.register()</code> 至少注册一份插件清单。</li><li data-nac-id="spec.list.217.item.4" data-nac-role="list-item">对每个已公布的 id, <code data-nac-role="code-inline">NAC.click(id)</code> 都能工作。</li></ul>
+<p data-nac-id="spec.p.218" data-nac-role="paragraph">一个页面达到 <strong>NAC3 Conformance Level 2</strong>, 还要:</p>
+<ul data-nac-id="spec.list.219" data-nac-role="list"><li data-nac-id="spec.list.219.item.1" data-nac-role="list-item">在它的清单里显式注册 <code data-nac-role="code-inline">tabs[]</code>、<code data-nac-role="code-inline">fields[]</code>、<code data-nac-role="code-inline">actions[]</code> 数组 (不是从 DOM 推断的)。</li><li data-nac-id="spec.list.219.item.2" data-nac-role="list-item">对每个面向用户的标签, 提供覆盖 NAC3 全部 10 个区域设置的 <code data-nac-role="code-inline">label_i18n</code>。</li><li data-nac-id="spec.list.219.item.3" data-nac-role="list-item">实现 v2.0 的棕地原语: 作用域树、瞬时捕获、autoRegister.watch。</li><li data-nac-id="spec.list.219.item.4" data-nac-role="list-item">通过 <code data-nac-role="code-inline">NAC.validate_global({probe: false})</code>, 且严重度为 <code data-nac-role="code-inline">error</code> 的 发现项为零。</li></ul>
+<p data-nac-id="spec.p.220" data-nac-role="paragraph">一个页面达到 <strong>NAC3 Conformance Level 3</strong>, 还要:</p>
+<ul data-nac-id="spec.list.221" data-nac-role="list"><li data-nac-id="spec.list.221.item.1" data-nac-role="list-item">带有用 HMAC 签名的清单。</li><li data-nac-id="spec.list.221.item.2" data-nac-role="list-item">对安全敏感的动词区分 <code data-nac-role="code-inline">isTrusted</code>。</li><li data-nac-id="spec.list.221.item.3" data-nac-role="list-item">通过 <code data-nac-role="code-inline">NAC.validate_global({probe: true})</code>, 且发现项为零。</li></ul>
+<p data-nac-id="spec.p.222" data-nac-role="paragraph">NPM 包的命令行 (<code data-nac-role="code-inline">npx nac3 validate &lt;url&gt;</code>) 会报告一个页面所达到的最高 级别。(该包提供 <code data-nac-role="code-inline">nac3</code> 和 <code data-nac-role="code-inline">nac</code> 两个可执行名; 两者都指向同一个命令 行。)</p>
+<h3 data-nac-id="spec.h3.81-v25" data-nac-role="heading" data-nac-level="3" id="81-v25">8.1 级别的历史名称 (v2.5)</h3>
+<p data-nac-id="spec.p.224" data-nac-role="paragraph">在 2.5.0 之前, 这三个级别写作 <code data-nac-role="code-inline">NAC-1</code>、<code data-nac-role="code-inline">NAC-2</code> 和 <code data-nac-role="code-inline">NAC-3</code>。那些名称 与协议名 <code data-nac-role="code-inline">NAC3</code> 只差一个连字符, 于是&quot;本页符合 NAC-3&quot;无法与&quot;本页实现了 NAC3&quot;区分开来, 而被要求报告级别的代理, 也没有一个无歧义的字符串可报。</p>
+<p data-nac-id="spec.p.225" data-nac-role="paragraph">旧名称作为历史别名仍然可读: <code data-nac-role="code-inline">api/latest/levels.json</code> 把每一个都作为 <code data-nac-role="code-inline">legacy_display_name</code> 发布在它原属的级别旁边, 这样 2.5.0 之前写的文档 仍然能对应到一个级别。它们<strong>不具</strong>规范性。新的文本、校验器的输出和 合规声明, 都使用级别编号或已发布的标识符。</p>
 <hr />
-<h2 data-nac-id="spec.h2.9-版本管理" data-nac-role="heading" data-nac-level="2" id="9-版本管理">9. 版本管理</h2>
-<p data-nac-id="spec.p.104" data-nac-role="paragraph">NAC3 遵循语义化版本规范（semver）：</p>
-<ul data-nac-id="spec.list.105" data-nac-role="list"><li data-nac-id="spec.list.105.item.1" data-nac-role="list-item"><strong>主版本</strong>升级：公共 API 或传输格式存在破坏性变更，接入方需修改代码。</li><li data-nac-id="spec.list.105.item.2" data-nac-role="list-item"><strong>次版本</strong>升级：新增功能，向后兼容，旧代码无需改动。</li><li data-nac-id="spec.list.105.item.3" data-nac-role="list-item"><strong>补丁版本</strong>升级：缺陷修复、仅文档变更。</li></ul>
-<p data-nac-id="spec.p.106" data-nac-role="paragraph">废弃策略：在版本 <code data-nac-role="code-inline">X.Y.0</code> 中标记为 <code data-nac-role="code-inline">@deprecated</code> 的功能，最早在 <code data-nac-role="code-inline">(X+1).0.0</code> 版本中移除。发布说明会明确记录每一项移除内容。</p>
-<p data-nac-id="spec.p.107" data-nac-role="paragraph">NPM 包版本与规范版本保持一致：<code data-nac-role="code-inline">@nac3/runtime@2.1.3</code> 实现 NAC3 v2.1，含三个补丁修订。</p>
+<h2 data-nac-id="spec.h2.9" data-nac-role="heading" data-nac-level="2" id="9">9. 版本管理</h2>
+<p data-nac-id="spec.p.228" data-nac-role="paragraph">NAC3 遵循 semver:</p>
+<ul data-nac-id="spec.list.229" data-nac-role="list"><li data-nac-id="spec.list.229.item.1" data-nac-role="list-item"><strong>主版本</strong>跃进: 对公开 API 或传输格式的破坏性变更。采用方需要改 代码。</li><li data-nac-id="spec.list.229.item.2" data-nac-role="list-item"><strong>次版本</strong>跃进: 新功能, 向后兼容。旧代码继续工作。</li><li data-nac-id="spec.list.229.item.3" data-nac-role="list-item"><strong>补丁</strong>跃进: 缺陷修复, 仅文档的变更。</li></ul>
+<p data-nac-id="spec.p.230" data-nac-role="paragraph">弃用策略: 在版本 <code data-nac-role="code-inline">X.Y.0</code> 中被标记为 <code data-nac-role="code-inline">@deprecated</code> 的功能, 不会早于 <code data-nac-role="code-inline">(X+1).0.0</code> 被移除。发布说明会明确记录每一次移除。</p>
+<p data-nac-id="spec.p.231" data-nac-role="paragraph">NPM 包的版本映射规范的版本: <code data-nac-role="code-inline">@nac3/runtime@X.Y.Z</code> 实现 NAC3 vX.Y, 其上再加 Z 个补丁修订。这个例子刻意用占位符写成: 在这句话里写一个具体 版本, 到下一个发布就过期了, 而本文档确实在该包早已前进之后, 还长期 带着 <code data-nac-role="code-inline">2.1.3</code>。</p>
+<h3 data-nac-id="spec.h3.91-disttag" data-nac-role="heading" data-nac-level="3" id="91-disttag">9.1 预发布版与 dist-tag</h3>
+<p data-nac-id="spec.p.233" data-nac-role="paragraph">带预发布尾巴的版本 (<code data-nac-role="code-inline">-alpha.N</code>、<code data-nac-role="code-inline">-beta.N</code>、<code data-nac-role="code-inline">-rc.N</code>) <strong>不是</strong>本规范的 一次发布。它存在的目的, 是让一项变更在被承诺之前先被演练。</p>
+<ul data-nac-id="spec.list.234" data-nac-role="list"><li data-nac-id="spec.list.234.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">latest</code> 永远只指向一个稳定版本。</strong> 不带标签的 <code data-nac-role="code-inline">npm install @nac3/runtime</code> 必须解析到一个没有预发布尾巴的版本。 按默认安装的采用方, 绝不会意外拿到预发布版。</li><li data-nac-id="spec.list.234.item.2" data-nac-role="list-item"><strong>预发布版在它们自己的 dist-tag 下发布</strong> (<code data-nac-role="code-inline">alpha</code>、<code data-nac-role="code-inline">beta</code>、<code data-nac-role="code-inline">rc</code>)。 加入是显式的: <code data-nac-role="code-inline">npm install @nac3/runtime@alpha</code>。</li><li data-nac-id="spec.list.234.item.3" data-nac-role="list-item"><strong>预发布版里的任何东西都不是承诺。</strong> 在其中引入的任何表面, 都可能 在承载它的稳定版本之前改变或消失。第 10 节的稳定性保证和第 12 节的 发现项编码保证, 都从稳定版本开始。</li><li data-nac-id="spec.list.234.item.4" data-nac-role="list-item"><strong>预发布版绝不会被撤销发布</strong>, 也绝不会被追溯地重贴成 <code data-nac-role="code-inline">latest</code>。 已发布内容的记录会保持可读。</li></ul>
+<p data-nac-id="spec.p.235" data-nac-role="paragraph">参考运行时的权威版本是 <code data-nac-role="code-inline">js/nac.js</code> 里的常量 <code data-nac-role="code-inline">NAC.version</code>, 并且它也 作为数据发布: <code data-nac-role="code-inline">api/latest.json</code> 分别带着 <code data-nac-role="code-inline">stable</code> 和 <code data-nac-role="code-inline">prerelease</code> 两个 指针 (任一个都可以是 <code data-nac-role="code-inline">null</code>), 而每个已发布的产物都带着自己的 <code data-nac-role="code-inline">channel</code> 字段。需要稳定契约的消费方只读一个字段就能拒绝, 不必解析 任何版本字符串, 也不必相信任何标签。</p>
 <hr />
-<h2 data-nac-id="spec.h2.10-验证器" data-nac-role="heading" data-nac-level="2" id="10-验证器">10. 验证器</h2>
-<h3 data-nac-id="spec.h3.101-运行时nacvalidate_global" data-nac-role="heading" data-nac-level="3" id="101-运行时nacvalidate_global">10.1 运行时：<code data-nac-role="code-inline">NAC.validate_global()</code></h3>
-<p data-nac-id="spec.p.111" data-nac-role="paragraph">遍历实时 DOM、已注册清单及 i18n 目录，返回发现项数组：</p>
-<pre data-nac-id="spec.code.11" data-nac-role="code" data-nac-lang="ts"><code>{
-  severity: &#x27;error&#x27; | &#x27;warn&#x27; | &#x27;info&#x27;,
-  code:     string,                     // e.g. &#x27;tab_role_drift&#x27;
-  nac_id:   string | null,
-  message:  string,
-  detail:   Record&lt;string, any&gt;
+<h2 data-nac-id="spec.h2.10" data-nac-role="heading" data-nac-level="2" id="10">10. 校验器</h2>
+<h3 data-nac-id="spec.h3.101-nacvalidateglobal" data-nac-role="heading" data-nac-level="3" id="101-nacvalidateglobal">10.1 运行时: <code data-nac-role="code-inline">NAC.validate_global()</code></h3>
+<p data-nac-id="spec.p.239" data-nac-role="paragraph">它遍历活的 DOM 以及已注册的清单, 返回一个<strong>具名分组的对象</strong>: 每个条件 一个分组, 每个分组都是一个发现项数组。自 2.5.0 起, 每个分组的每个 发现项都带着 <code data-nac-role="code-inline">code</code> 和 <code data-nac-role="code-inline">severity</code>, 于是 CI 的集成可以按编码拦截, 而 不必解析消息:</p>
+<pre data-nac-id="spec.code.240" data-nac-role="code" data-nac-lang="ts"><code>{
+  ok:         boolean,       // false when any error-severity finding exists
+  has_errors: boolean,
+  duplicates: [{ code: &#x27;nac_id_duplicate_across_plugins&#x27;,
+                 severity: &#x27;error&#x27;, nac_id, plugins: string[] }],
+  orphans:    [{ code: &#x27;nac_id_orphan_in_dom&#x27;,
+                 severity: &#x27;warn&#x27;, nac_id, in_dom, in_manifest,
+                 plugin_root }],
+  unmounted:  [{ code: &#x27;nac_id_declared_not_mounted&#x27;,
+                 severity: &#x27;warn&#x27;, nac_id, in_manifest, in_dom,
+                 plugin }],
+  convention_violations:
+              [{ code: &#x27;nac_id_missing_plugin_prefix&#x27;,
+                 severity: &#x27;warn&#x27;, nac_id, plugin, hint }],
+  plugin_instance_violations:
+              [{ code: &#x27;duplicate_plugin_no_instance_id&#x27;,
+                 severity: &#x27;error&#x27;, slug, instance_count, ... }],
+  tolerated:  [{ kind, nac_id, until, original }],
+  plugin_count: number,
+  total_ids:    number,
+  timestamp:    number
 }</code></pre>
-<p data-nac-id="spec.p.113" data-nac-role="paragraph">发现项代码在补丁版本间保持稳定；新代码仅在次版本升级时引入。</p>
-<h3 data-nac-id="spec.h3.102-clinpx-yujinnac-validate-target" data-nac-role="heading" data-nac-level="3" id="102-clinpx-yujinnac-validate-target">10.2 CLI：<code data-nac-role="code-inline">npx @nac3/runtime validate &lt;target&gt;</code></h3>
-<p data-nac-id="spec.p.115" data-nac-role="paragraph">封装了 <code data-nac-role="code-inline">validate_global</code>，并对 HTML/清单一致性进行静态检查。退出码说明：</p>
-<ul data-nac-id="spec.list.116" data-nac-role="list"><li data-nac-id="spec.list.116.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">0</code> —— 无严重程度达到或超过配置阈值的发现项。</li><li data-nac-id="spec.list.116.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">1</code> —— 存在发现项。</li><li data-nac-id="spec.list.116.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">2</code> —— 目标本身加载失败。</li></ul>
-<p data-nac-id="spec.p.117" data-nac-role="paragraph">适用于 CI 场景：<code data-nac-role="code-inline">npx @nac3/runtime validate ./dist/index.html --severity=error</code>。</p>
+<p data-nac-id="spec.p.241" data-nac-role="paragraph">这五个编码、它们的严重度以及各自该怎么处理, 都作为数据发布在 <code data-nac-role="code-inline">api/latest/findings.json</code> 的 <code data-nac-role="code-inline">global_buckets</code> 之下。发现项的编码跨 补丁发布保持稳定; 新编码只在次版本跃进时出现, 而且一个编码绝不会被 重新用于另一个条件 (第 12 节, 承诺 4)。</p>
+<p data-nac-id="spec.p.242" data-nac-role="paragraph"><strong>2.5.0 之前的版本不给这些分组附上任何编码</strong>, 而本节描述的是一个扁平 的发现项数组 -- 参考运行时从未返回过那种形状 (审计 N-14、N-34)。</p>
+<p data-nac-id="spec.p.243" data-nac-role="paragraph"><strong>2.5.0 的行为变更 (审计 N-33)。</strong> 在 2.5.0 之前, 这个校验器背后的 收集器只读清单的旧式分组 (<code data-nac-role="code-inline">actions</code>、<code data-nac-role="code-inline">fields</code>、<code data-nac-role="code-inline">tabs</code>、<code data-nac-role="code-inline">kpis</code>、 <code data-nac-role="code-inline">charts</code>, 以 <code data-nac-role="code-inline">nac_id</code> 为键), 从不读第 4 节那个规范形状 <code data-nac-role="code-inline">elements: [{ id }]</code>。因此, 面对一份按文档方式写成的清单, 它报告 <code data-nac-role="code-inline">total_ids: 0</code>, 把每个已声明的元素都列为孤儿, 根本无法报告重复、未挂载 的 id 或违反约定的情况, 却仍然回答 <code data-nac-role="code-inline">ok: true</code>。自 2.5.0 起两种形状都 会读。曾用 <code data-nac-role="code-inline">has_errors</code> 拦截 CI 的宿主, 在升级之后可能看到第一次失败: 那是一直都在那里的真实问题, 不是新规则。</p>
+<h3 data-nac-id="spec.h3.102-npx-nac3-validate-target" data-nac-role="heading" data-nac-level="3" id="102-npx-nac3-validate-target">10.2 命令行: <code data-nac-role="code-inline">npx nac3 validate &lt;target&gt;</code></h3>
+<p data-nac-id="spec.p.245" data-nac-role="paragraph">它包住 <code data-nac-role="code-inline">validate_global</code>, 再加上一次 HTML 与清单一致性的静态检查。 退出码:</p>
+<ul data-nac-id="spec.list.246" data-nac-role="list"><li data-nac-id="spec.list.246.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">0</code> -- 没有严重度 &gt;= 所配置阈值的发现项。</li><li data-nac-id="spec.list.246.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">1</code> -- 有发现项。</li><li data-nac-id="spec.list.246.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">2</code> -- 目标自身加载失败。</li></ul>
+<p data-nac-id="spec.p.247" data-nac-role="paragraph">在 CI 里很有用: <code data-nac-role="code-inline">npx nac3 validate ./dist/index.html --severity=error</code>。 该包以两个可执行名 <code data-nac-role="code-inline">nac3</code> 和 <code data-nac-role="code-inline">nac</code> 暴露这个命令行; 用哪个取决于哪个 不与你 PATH 上的其他工具冲突。</p>
 <hr />
-<h2 data-nac-id="spec.h2.11-nac3-的周边系统" data-nac-role="heading" data-nac-level="2" id="11-nac3-的周边系统">11. NAC3 的周边系统</h2>
-<p data-nac-id="spec.p.120" data-nac-role="paragraph">NAC3 是一个契约层。要将 NAC 合规页面转变为语音驱动的应用，还需要：</p>
-<ol data-nac-id="spec.list.121" data-nac-role="list"><li data-nac-id="spec.list.121.item.1" data-nac-role="list-item"><strong>语音转文字来源</strong>（浏览器 SpeechRecognition、Whisper API 等）。</li><li data-nac-id="spec.list.121.item.2" data-nac-role="list-item"><strong>LLM 中间层</strong>：接收用户文本、页面的 <code data-nac-role="code-inline">NAC.describe()</code> 快照及 i18n 提示，输出结构化操作：<code data-nac-role="code-inline">[{kind: 'click', nac_id: 'X'}, {kind: 'fill', nac_id: 'Y', value: 'Z'}]</code>。详见 <code data-nac-role="code-inline">guides/LLM_WIRING.md</code>。</li><li data-nac-id="spec.list.121.item.3" data-nac-role="list-item"><strong>聊天客户端</strong>：维护对话上下文并派发操作，参考实现为 <code data-nac-role="code-inline">js/nac-chat-client.js</code>。</li><li data-nac-id="spec.list.121.item.4" data-nac-role="list-item"><strong>文字转语音输出</strong>：用于语音回复（浏览器 SpeechSynthesis、ElevenLabs 等）。</li></ol>
-<p data-nac-id="spec.p.122" data-nac-role="paragraph">NAC3 仅规范第 2 步的输入/输出格式（<code data-nac-role="code-inline">NAC.describe()</code> 快照与操作结构）。第 1、3、4 步不在规范范围内，由你自由组合。</p>
+<h2 data-nac-id="spec.h2.11-nac3" data-nac-role="heading" data-nac-level="2" id="11-nac3">11. NAC3 周围的系统</h2>
+<p data-nac-id="spec.p.250" data-nac-role="paragraph">NAC3 是一个契约层。要把一个符合 NAC3 的页面变成一个语音驱动的应用, 你还需要:</p>
+<ol data-nac-id="spec.list.251" data-nac-role="list"><li data-nac-id="spec.list.251.item.1" data-nac-role="list-item"><strong>一个语音转文字的来源</strong> (浏览器的 SpeechRecognition、Whisper 的 API 等)。</li><li data-nac-id="spec.list.251.item.2" data-nac-role="list-item"><strong>一个 LLM 中介</strong>, 它接收用户的文本 + 页面的 <code data-nac-role="code-inline">NAC.describe()</code> 快照 + 一个 i18n 提示, 然后发出结构化的动作: <code data-nac-role="code-inline">[{kind: &#x27;click&#x27;, nac_id: &#x27;X&#x27;}, {kind: &#x27;fill&#x27;, nac_id: &#x27;Y&#x27;, value: &#x27;Z&#x27;}]</code>。见 <code data-nac-role="code-inline">guides/LLM_WIRING.md</code>。</li><li data-nac-id="spec.list.251.item.3" data-nac-role="list-item"><strong>一个聊天客户端</strong>, 它维持对话并派发这些动作。参考实现是 <code data-nac-role="code-inline">js/nac-chat-client.js</code>。</li><li data-nac-id="spec.list.251.item.4" data-nac-role="list-item"><strong>一个文字转语音的出口</strong>, 用于口头回应 (浏览器的 SpeechSynthesis、ElevenLabs 等)。</li></ol>
+<p data-nac-id="spec.p.252" data-nac-role="paragraph">NAC3 只标准化第 2 步的输入 / 输出形状 (<code data-nac-role="code-inline">NAC.describe()</code> 的快照 + 动作 的形状)。第 1、3、4 步在规范之外; 你可以随意组合。</p>
 <hr />
-<h2 data-nac-id="spec.h2.12-稳定性保证" data-nac-role="heading" data-nac-level="2" id="12-稳定性保证">12. 稳定性保证</h2>
-<p data-nac-id="spec.p.125" data-nac-role="paragraph">本规范承诺：</p>
-<ol data-nac-id="spec.list.126" data-nac-role="list"><li data-nac-id="spec.list.126.item.1" data-nac-role="list-item">第 1 节中的规范角色集合不会缩减，次版本升级时可能新增角色。</li><li data-nac-id="spec.list.126.item.2" data-nac-role="list-item">第 6 节中的事件族不会被重命名，次版本升级时可能新增事件。</li><li data-nac-id="spec.list.126.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click</code>、<code data-nac-role="code-inline">NAC.fill</code> 等方法的参数结构在次版本间不会变更，可能新增可选的 <code data-nac-role="code-inline">opts</code> 字段。</li><li data-nac-id="spec.list.126.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global</code> 的发现项代码在次版本间不会被复用于不同含义的条件。</li></ol>
-<p data-nac-id="spec.p.127" data-nac-role="paragraph">本规范不承诺：</p>
-<ol data-nac-id="spec.list.128" data-nac-role="list"><li data-nac-id="spec.list.128.item.1" data-nac-role="list-item">错误消息的具体措辞（这些是 i18n 目录字符串，本地化内容可能变化）。</li><li data-nac-id="spec.list.128.item.2" data-nac-role="list-item">查找元素的 DOM 策略（当前使用 <code data-nac-role="code-inline">querySelector</code>，未来可能改用更快的索引方式）。</li><li data-nac-id="spec.list.128.item.3" data-nac-role="list-item">内部清单缓存的布局。宿主侧应将清单视为只写，代理侧视为只读。</li></ol>
+<h2 data-nac-id="spec.h2.12" data-nac-role="heading" data-nac-level="2" id="12">12. 稳定性保证</h2>
+<p data-nac-id="spec.p.255" data-nac-role="paragraph">本规范所承诺的:</p>
+<ol data-nac-id="spec.list.256" data-nac-role="list"><li data-nac-id="spec.list.256.item.1" data-nac-role="list-item">第 1 节那组规范角色不会缩减。次版本里可以添加新角色。</li><li data-nac-id="spec.list.256.item.2" data-nac-role="list-item">第 6 节那族事件不会改名。次版本里可以添加新事件。</li><li data-nac-id="spec.list.256.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click</code>、<code data-nac-role="code-inline">NAC.fill</code> 等的动词, 在次版本里不会改变形状。<code data-nac-role="code-inline">opts</code> 里可以出现新的可选字段。</li><li data-nac-id="spec.list.256.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">validate_global</code> 的发现项编码, 不会跨次版本被重新用于不同的条件。 自 2.5.0 起, 这个校验器的每个分组都带一个编码, 并且全部连同严重度 发布在 <code data-nac-role="code-inline">api/latest/findings.json</code>: 比较两个已发布的版本, 被重用的 编码不读任何源码就能看见。</li></ol>
+<p data-nac-id="spec.p.257" data-nac-role="paragraph">本规范<strong>不</strong>承诺的:</p>
+<ol data-nac-id="spec.list.258" data-nac-role="list"><li data-nac-id="spec.list.258.item.1" data-nac-role="list-item">错误消息的确切措辞 (那些是 i18n 目录里的字符串; 各语言版本可能 变动)。</li><li data-nac-id="spec.list.258.item.2" data-nac-role="list-item">查找元素所用的 DOM 策略 (今天是 <code data-nac-role="code-inline">querySelector</code>; 以后可能改成更快 的索引)。</li><li data-nac-id="spec.list.258.item.3" data-nac-role="list-item">清单内部缓存的布局。请把清单当作: 宿主一侧只写, 代理一侧只读。</li></ol>
 <hr />
-<h2 data-nac-id="spec.h2.13-待解决问题单独跟踪" data-nac-role="heading" data-nac-level="2" id="13-待解决问题单独跟踪">13. 待解决问题（单独跟踪）</h2>
-<ul data-nac-id="spec.list.131" data-nac-role="list"><li data-nac-id="spec.list.131.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-role="navigation"</code> 是否应解析为 tab？当前版本（v2.1）不支持，v22 路线图倾向于更严格地拒绝此类用法。</li><li data-nac-id="spec.list.131.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.click()</code> 是否应支持相对 id（例如 <code data-nac-role="code-inline">'./save'</code> 表示"当前活跃插件下的 save"）？v2.1 不支持，可能在 v2.3 中引入。</li><li data-nac-id="spec.list.131.item.3" data-nac-role="list-item">清单是否应支持跨插件的继承/扩展（一个基础清单由租户扩展）？已列为 v3.0 候选议题。</li></ul>
+<h2 data-nac-id="spec.h2.13" data-nac-role="heading" data-nac-level="2" id="13">13. 未决的问题</h2>
+<p data-nac-id="spec.p.261" data-nac-role="paragraph">它们就在<strong>这里</strong>、在本节里被追踪。较早的一版把这里题为&quot;未决的问题 (另行追踪)&quot;, 却从未说&quot;另行&quot;是在哪里; 当时没有别的登记册。一个得出 决定的问题会离开下面这张表, 进入它所影响的那一节。一个变成具体提案的 问题会获得一个 RFC, 而那些 RFC 索引在 <a href="rfcs/README.md" data-nac-role="link"><code data-nac-role="code-inline">rfcs/README.md</code></a>, 流程在 <a href="CONTRIBUTING.md" data-nac-role="link"><code data-nac-role="code-inline">CONTRIBUTING.md</code></a>。</p>
+<p data-nac-id="spec.p.262" data-nac-role="paragraph">每一行都带着它最后一次被评估的版本, 这样读者就能把一个活着的问题与一个 被放弃的问题区分开来。<strong>没有任何一行带着目标版本</strong>: 一个带日期的承诺 过了它的日期, 比一个不带日期的更糟 -- 那正是第 5 节在 <code data-nac-role="code-inline">payload_schema</code> 上犯过的错。</p>
+<table data-nac-id="spec.table.263" data-nac-role="data-table"><thead><tr><th>问题</th><th>状态</th><th>最后评估</th><th>现状如何</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">data-nac-role=&quot;navigation&quot;</code> 是否应该在某些情况下解析到选项卡?</td><td><strong>已决定: 不</strong></td><td>v2.5</td><td>在 2.2.0 决定, 此后一直强制: 带 <code data-nac-role="code-inline">tab.</code> 前缀而角色为 <code data-nac-role="code-inline">navigation</code> 的 id 会触发 <code data-nac-role="code-inline">tab_id_manifest_role_drift</code>, 而在 <code data-nac-role="code-inline">STRICT_VALIDATION</code> (自 2.3.0 起默认为 <code data-nac-role="code-inline">true</code>) 之下 <code data-nac-role="code-inline">NAC.register</code> 会抛出。<code data-nac-role="code-inline">tab_by_label</code> 只从 <code data-nac-role="code-inline">m.tabs[]</code> 和 <code data-nac-role="code-inline">elements[role==&#x27;tab&#x27;]</code> 解析选项卡。<code data-nac-role="code-inline">navigation</code> 是一个地标区域, 绝不是可切换的面板。见第 1 节和第 10 节。</td></tr><tr><td><code data-nac-role="code-inline">NAC.click()</code> 是否应该接受相对的 id (例如 <code data-nac-role="code-inline">&#x27;./save&#x27;</code>)?</td><td><strong>未决, 未实现</strong></td><td>v2.5</td><td>解析器完全匹配 <code data-nac-role="code-inline">data-nac-id</code> 并按插件限定范围: 当前活动的插件, 或 <code data-nac-role="code-inline">opts.plugin</code> 指定的那个。那种限定已经覆盖了这个问题当初要解决的场景 (<code data-nac-role="code-inline">NAC.click(&#x27;save&#x27;, {plugin:&#x27;invoice&#x27;})</code>), 所以对相对写法的压力很低, 也没有任何进行中的工作。要决定它, 就意味着给第 2 节加上一套路径文法 -- 而在那一节里, id 被明确声明为对运行时不透明。</td></tr><tr><td>清单是否应该支持跨插件的继承 / 扩展 (一份基础清单被某个租户扩展)?</td><td><strong>未决, 下一个主版本的候选</strong></td><td>v2.5</td><td>未实现。<strong>不要与第 15 节混淆</strong>, 那个&quot;插件扩展契约&quot;在 v2.5 已经发布, 是一套面向 backend 的路由机制 (<code data-nac-role="code-inline">registerPlugin</code> / <code data-nac-role="code-inline">call</code> / <code data-nac-role="code-inline">read</code> / <code data-nac-role="code-inline">subscribe</code>), 不是清单的继承。这里的问题是一份清单派生自另一份, 它触及第 2 节关于 id 唯一性的规则, 这也是它被留到主版本的原因。</td></tr><tr><td><code data-nac-role="code-inline">payload_schema</code> 的强制是否应该正式化并打开?</td><td><strong>未决, 无日期</strong></td><td>v2.5</td><td>从第 5 节移到这里, 那一节曾把它承诺给 v2.4。它没有在 v2.4 落地, 直到 v2.5 也没有落地; 参考运行时不读这个字段。今天究竟什么被校验、什么没有, 见第 5 节。</td></tr><tr><td><code data-nac-role="code-inline">validate_global()</code> 的发现项是否应该带上已发布目录里的编码?</td><td><strong>已决定: 是, 在 2.5.0 发布</strong></td><td>v2.5</td><td>每个分组的每一项都带着 <code data-nac-role="code-inline">code</code> + <code data-nac-role="code-inline">severity</code>, 于是第 12 节的承诺 4 现在覆盖的是一个真实的集合, 而不是一个空集。这五个编码发布在 <code data-nac-role="code-inline">api/latest/findings.json</code> 的 <code data-nac-role="code-inline">global_buckets</code> 之下, 而生成器是从一个会触发每个分组的测试样例里<strong>读出</strong>它们的, 不是手写: 上一版给一个自 2.5.0 起就带编码的分组写了 <code data-nac-role="code-inline">code: null</code>, 并把两种说法发布在同一个文件里。构造那个样例也正是发现审计 N-33 的过程: 那个校验器看不见一份按规范形状写成的清单。见 10.1。</td></tr></tbody></table>
 <hr />
-<h2 data-nac-id="spec.h2.135-治理" data-nac-role="heading" data-nac-level="2" id="135-治理">13.5 治理</h2>
-<p data-nac-id="spec.p.134" data-nac-role="paragraph">NAC3 目前由 Yujin 负责维护。规范以 Apache 2.0 协议发布，参考运行时以 MIT 协议发布。若采用规模足以支撑中立治理，Yujin 承诺将 NAC3 移交至中立基金会（W3C 社区组、Linux Foundation 或同等行业机构）。在此之前，规范变更遵循 <code data-nac-role="code-inline">CONTRIBUTING.md</code> 中记录的 RFC 流程，任何影响公共 API 或传输格式的变更须经过至少 14 天的公开评议期。</p>
-<p data-nac-id="spec.p.135" data-nac-role="paragraph">致接入方：Apache 2.0 + MIT 的许可证组合保证了规范和运行时不受 Yujin 公司状态变化的影响。无论现在还是将来，你均可自由 fork、运行和分发两者。本文件明确记录这一承诺，使延续路径清晰可见，而非隐含其中。</p>
+<h2 data-nac-id="spec.h2.135" data-nac-role="heading" data-nac-level="2" id="135">13.5 治理</h2>
+<p data-nac-id="spec.p.266" data-nac-role="paragraph">NAC3 目前由 Yujin 看护。规范、文档和参考运行时全部以 Apache-2.0 发布。(在 2.5 之前双仓库的时期, 运行时被标为 MIT; 在 2026-05-23 的 整合中, 它在 NAC3 的所有产物上被统一为 Apache-2.0。见 <code data-nac-role="code-inline">LICENSE</code> 和 <code data-nac-role="code-inline">runtime/LICENSE</code>。) Yujin 承诺: 当采用程度足以证明需要中立治理时, 就把 NAC3 移交给一个中立的基金会 (W3C 社区组、Linux Foundation, 或 同等的行业机构)。在那之前, 规范的变更遵循 <code data-nac-role="code-inline">CONTRIBUTING.md</code> 中记录的 RFC 流程, 任何影响公开 API 或传输格式的变更, 都有至少 14 天的公开评论 期。</p>
+<p data-nac-id="spec.p.267" data-nac-role="paragraph">给采用方: 统一的 Apache-2.0 许可保证, 无论 Yujin 的公司状态如何变化, 规范与运行时都能存续。你可以分叉其中任何一个、运行其中任何一个、发布 其中任何一个, 今天可以, 我们不在之后也可以。本文档记录下这个承诺, 是 为了让通往这种存续的路径是明示的, 而不是默认的。</p>
 <hr />
-<h2 data-nac-id="spec.h2.14-参考实现" data-nac-role="heading" data-nac-level="2" id="14-参考实现">14. 参考实现</h2>
-<p data-nac-id="spec.p.138" data-nac-role="paragraph">规范实现为 NPM 包 <code data-nac-role="code-inline">@nac3/runtime</code> 所分发的参考运行时。该运行时已完整实现 v2.1，包含：</p>
-<ul data-nac-id="spec.list.139" data-nac-role="list"><li data-nac-id="spec.list.139.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac.js</code> —— v1.9 基础版本及第 5 节中的公共 API。</li><li data-nac-id="spec.list.139.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-v2-extensions.js</code> —— v2.0 棕地原语（作用域树、临时捕获、autoRegister、HMAC、isTrusted）。</li><li data-nac-id="spec.list.139.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-chat-client.js</code> —— 参考聊天客户端，集成语音、LLM 与调度器。</li></ul>
-<p data-nac-id="spec.p.140" data-nac-role="paragraph">欢迎其他语言的实现（用于原生自动化运行器的 Python、用于嵌入式代理的 Rust 等）。规范本身，而非 JavaScript 代码，才是最终权威。</p>
+<h2 data-nac-id="spec.h2.14" data-nac-role="heading" data-nac-level="2" id="14">14. 参考实现</h2>
+<p data-nac-id="spec.p.270" data-nac-role="paragraph">规范的实现就是作为 NPM 包 <code data-nac-role="code-inline">@nac3/runtime</code> 分发的参考运行时。版本的 规范来源是运行时自己的常量 <code data-nac-role="code-inline">NAC.version</code>, 它作为数据发布在 <code data-nac-role="code-inline">api/latest.json</code> (见 9.1 节)。本节刻意不再重述一个版本号: 它曾在该包 早已前进之后还带着 <code data-nac-role="code-inline">2.5.0-alpha.5</code>, 那与从第 5 节和第 9 节移除的过时 例子属于同一类缺陷。它提供:</p>
+<ul data-nac-id="spec.list.271" data-nac-role="list"><li data-nac-id="spec.list.271.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac.js</code> -- 核心运行时: 第 5 节那套公开的命令式 + 自省 API (click/fill/select/tab、click_by_verb/tab_by_label、invoke/utter、 edit_field、setCapabilities、syncPlugin、 request_authority/confirm_action、 registerPlugin/call/read/subscribe、narrate/context/tree、 expect/diff、describe、validate_global、...)。作为该包的 <code data-nac-role="code-inline">main</code>/<code data-nac-role="code-inline">module</code>/<code data-nac-role="code-inline">browser</code> 入口发布 (<code data-nac-role="code-inline">dist/nac.mjs</code>)。</li><li data-nac-id="spec.list.271.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-v2-extensions.js</code> -- 棕地 + 数据表的原语, 它们在核心加载 之后挂到同一个 <code data-nac-role="code-inline">window.NAC</code> 上: 作用域树、autoRegister、瞬时捕获、 HMAC、isTrusted 证明、i18n 目录 (<code data-nac-role="code-inline">t</code>/<code data-nac-role="code-inline">locale</code>), 以及整个 <code data-nac-role="code-inline">registerDataTable</code> / <code data-nac-role="code-inline">dt_*</code> 数据表家族 (5.3 节)。发布为 <code data-nac-role="code-inline">@nac3/runtime/extensions</code> (<code data-nac-role="code-inline">dist/nac-v2-extensions.mjs</code>)。核心 运行时<strong>不</strong>带 <code data-nac-role="code-inline">dt_*</code> 这一表面; 要得到它就加载这个模块。</li><li data-nac-id="spec.list.271.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">js/nac-chat-client.js</code> -- 一个参考聊天客户端, 它把语音 + LLM + 派发器接在一起。发布为 <code data-nac-role="code-inline">@nac3/runtime/chat-client</code>。</li></ul>
+<p data-nac-id="spec.p.272" data-nac-role="paragraph">该包还以可执行名 <code data-nac-role="code-inline">nac3</code> 和 <code data-nac-role="code-inline">nac</code> 暴露一个命令行 (<code data-nac-role="code-inline">dist/cli.js</code>, 10.2 节)。</p>
+<p data-nac-id="spec.p.273" data-nac-role="paragraph">欢迎其他实现 (原生自动化执行器用 Python、嵌入式代理用 Rust 等)。权威是 规范, 不是这份 JS 代码。</p>
 <hr />
-<p data-nac-id="spec.p.142" data-nac-role="paragraph"><em>本文件为 NAC3 v2.1 规范的权威版本。对本文件的任何修改均构成规范变更，须经 RFC 流程；详见 <code data-nac-role="code-inline">CONTRIBUTING.md</code>。</em></p>
+<h2 data-nac-id="spec.h2.15-canvas-api-v25" data-nac-role="heading" data-nac-level="2" id="15-canvas-api-v25">15. 插件扩展契约 -- canvas 与 API 表面 (v2.5)</h2>
+<p data-nac-id="spec.p.276" data-nac-role="paragraph">第 1-14 节假定与代理有关的表面就是 <strong>DOM</strong>。每个可寻址的元素都有一个 <code data-nac-role="code-inline">data-nac-id</code> 属性, 每个动词都通过 <code data-nac-role="code-inline">el.click()</code> 触发, 每次状态读取都来自 <code data-nac-role="code-inline">el.getAttribute(...)</code>。对于外壳和内容都活在 DOM 节点里的应用, 这是 成立的。</p>
+<p data-nac-id="spec.p.277" data-nac-role="paragraph">对于表面的一部分是 <strong>canvas</strong> 的应用, 它不成立 (LibreOffice / Collabora Online、Figma、Excalidraw、Miro, 以及任何自制的 WebGL 编辑器)。外壳也许仍然是 DOM (工具栏、对话框), 但命令往往需要流经应用 自己的公开 API (postMessage、插件 SDK、脚本桥), 而状态也许根本无法从 DOM 读到。</p>
+<p data-nac-id="spec.p.278" data-nac-role="paragraph">v2.5 增加了一小组原语, 让一个 NAC3 插件能够声明它自己通往这类表面的 路由契约。运行时对任何具体应用都保持无知 -- 它学会与某个应用对话的 唯一途径, 就是读那个插件的清单。</p>
+<h3 data-nac-id="spec.h3.151" data-nac-role="heading" data-nac-level="3" id="151">15.1 为什么需要一组新的原语</h3>
+<p data-nac-id="spec.p.280" data-nac-role="paragraph">只认识 DOM 的 <code data-nac-role="code-inline">NAC.click(id)</code> 做不到:</p>
+<ul data-nac-id="spec.list.281" data-nac-role="list"><li data-nac-id="spec.list.281.item.1" data-nac-role="list-item">向一个被沙箱化的 Collabora iframe 发送 <code data-nac-role="code-inline">Send_UNO_Command</code> 的 postMessage。</li><li data-nac-id="spec.list.281.item.2" data-nac-role="list-item">在 Figma 的插件沙箱里调用 <code data-nac-role="code-inline">figma.currentPage.selection = [...]</code>。</li><li data-nac-id="spec.list.281.item.3" data-nac-role="list-item">对一个 React 的 ref 调用 <code data-nac-role="code-inline">excalidrawAPI.setElements(...)</code>。</li><li data-nac-id="spec.list.281.item.4" data-nac-role="list-item">读出当前 Collabora 的选区上粗体是否处于启用状态 (工具栏会反映它; canvas 把它藏起来)。</li></ul>
+<p data-nac-id="spec.p.282" data-nac-role="paragraph">解决办法<strong>不是</strong>给 <code data-nac-role="code-inline">NAC.click</code> 加上探测 backend 的启发式规则。解决办法 是增加一个显式的、与具体应用无关的动词, 它接受一个插件 slug 和一个 动词路径, 并让插件的清单去声明那个动词如何被路由。</p>
+<h3 data-nac-id="spec.h3.152" data-nac-role="heading" data-nac-level="3" id="152">15.2 三个原语</h3>
+<pre data-nac-id="spec.code.284" data-nac-role="code" data-nac-lang="ts"><code>NAC.registerPlugin(slug: string, manifest: PluginManifest): void
+NAC.call(plugin: string, verb_path: string, args?: object): Promise&lt;any&gt;
+NAC.read(plugin: string, state_path: string): Promise&lt;any&gt;
+NAC.subscribe(plugin: string, event_path: string,
+              cb: (data: any) =&gt; void): SubscriptionHandle
+NAC.unsubscribe(handle: SubscriptionHandle): void</code></pre>
+<ul data-nac-id="spec.list.285" data-nac-role="list"><li data-nac-id="spec.list.285.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">registerPlugin(slug, manifest)</code> 注册一个 v2.5 的插件。同一个 <code data-nac-role="code-inline">slug</code> 可以同时出现在 DOM 的清单注册表 (第 5 节) 和 v2.5 的扩展 注册表里; 两者并存。v2.5 的调用只通过 v2.5 的注册表解析。</li><li data-nac-id="spec.list.285.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">call</code> 调用一个已声明的动词。路由由清单选择, 不由代理选择。它以 backend 返回的东西来解决 (常常是 <code data-nac-role="code-inline">undefined</code> / <code data-nac-role="code-inline">{ok: true}</code>); 若动词未知、backend 失败, 或响应的形状无效, 它以 <code data-nac-role="code-inline">NacError</code> 拒绝。</li><li data-nac-id="spec.list.285.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">read</code> 返回一个已声明的状态值。运行时按声明的顺序走这个状态的兜底 链, 返回第一个解析成功的来源; 只有当链上每个来源都失败时才拒绝。</li><li data-nac-id="spec.list.285.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">subscribe</code> 把一个监听器挂到一个已声明的事件上。它返回一个句柄, 调用方把它传给 <code data-nac-role="code-inline">unsubscribe</code> 来清理。事件可以由上游真实的事件源 支撑, 也可以通过轮询 / MutationObserver 合成出来 -- 由清单声明是 哪一种。</li></ul>
+<p data-nac-id="spec.p.286" data-nac-role="paragraph">这四个函数都是异步的 (返回 Promise), 只有 <code data-nac-role="code-inline">unsubscribe</code> 例外, 它是 同步且幂等的。</p>
+<h3 data-nac-id="spec.h3.153" data-nac-role="heading" data-nac-level="3" id="153">15.3 插件清单的形状</h3>
+<pre data-nac-id="spec.code.288" data-nac-role="code" data-nac-lang="ts"><code>interface PluginManifest {
+  slug: string;
+  verbs:  { [verb_path: string]: VerbBinding };
+  state:  { [state_path: string]: StateBinding[] };
+  events: { [event_path: string]: EventBinding };
+}
+
+interface VerbBinding {
+  backend:       BackendKind;
+  /* backend-specific fields (see 15.4) */
+  [k: string]: any;
+}
+
+interface StateBinding {
+  backend:       BackendKind;
+  /* backend-specific fields (see 15.4) */
+  extract?:      string;   /* extractor DSL string (see 15.5) */
+  [k: string]: any;
+}
+
+interface EventBinding {
+  backend:       BackendKind;
+  /* backend-specific fields */
+  [k: string]: any;
+}
+
+type BackendKind =
+  | &#x27;postmessage&#x27;
+  | &#x27;postmessage-listen&#x27;
+  | &#x27;sdk-call&#x27;
+  | &#x27;script-bridge&#x27;
+  | &#x27;dom-mirror&#x27;
+  | &#x27;same-origin-window&#x27;
+  | &#x27;synthetic-mutation&#x27;
+  | &#x27;synthetic-poll&#x27;;</code></pre>
+<p data-nac-id="spec.p.289" data-nac-role="paragraph">清单是纯 JSON (没有 JS 回调)。Forge、Sumi 以及将来任何工具都把它们 作为数据生成; 运行时从一个固定的词汇表里解释 backend 的名字。</p>
+<p data-nac-id="spec.p.290" data-nac-role="paragraph">动词和事件各有<strong>恰好一个</strong>绑定。状态有一个绑定的<strong>有序数组</strong>: 运行时 按顺序走这条链, 返回第一个成功解析的来源。</p>
+<h3 data-nac-id="spec.h3.154-backend" data-nac-role="heading" data-nac-level="3" id="154-backend">15.4 backend 的词汇表</h3>
+<table data-nac-id="spec.table.292" data-nac-role="data-table"><thead><tr><th>种类</th><th>用于</th><th>必填字段</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">postmessage</code></td><td>动词: 通过 <code data-nac-role="code-inline">postMessage</code> 向一个 iframe 投递消息。</td><td><code data-nac-role="code-inline">target</code> (要发送到的 iframe 的 CSS 选择器)、<code data-nac-role="code-inline">message</code> (MessageId 字符串)、<code data-nac-role="code-inline">values</code> (用参数插值的对象字面量)、<code data-nac-role="code-inline">values_from_args</code> (可选, 原样转发的参数键的数组)</td></tr><tr><td><code data-nac-role="code-inline">postmessage-listen</code></td><td>事件: 在 <code data-nac-role="code-inline">window.message</code> 上监听某个特定的到达 <code data-nac-role="code-inline">MessageId</code>。</td><td><code data-nac-role="code-inline">source</code> (用于过滤来源的 iframe 的 CSS 选择器; 省略则接受任何来源)、<code data-nac-role="code-inline">message</code> (要匹配的 MessageId)、<code data-nac-role="code-inline">extract</code> (作用于消息数据的抽取 DSL)</td></tr><tr><td><code data-nac-role="code-inline">sdk-call</code></td><td>动词: 调用一个全局暴露的 JS 函数 (例如 Figma 插件、Excalidraw 的 API)。</td><td><code data-nac-role="code-inline">path</code> (<code data-nac-role="code-inline">window</code> 里的点号路径, 例如 <code data-nac-role="code-inline">figma.currentPage.selection</code>)、<code data-nac-role="code-inline">mode</code> (<code data-nac-role="code-inline">assign</code> 表示把参数的值赋给该路径, <code data-nac-role="code-inline">invoke</code> 表示把它当函数调用并传入参数对象)</td></tr><tr><td><code data-nac-role="code-inline">script-bridge</code></td><td>动词或状态: 调用某个应用的脚本桥 (Collabora 的 <code data-nac-role="code-inline">CallPythonScript</code>、LibreOffice 的 UNO 桥、Google Apps Script)。</td><td><code data-nac-role="code-inline">bridge</code> (backend 专属的标识符, 如 <code data-nac-role="code-inline">collabora.python</code>)、<code data-nac-role="code-inline">script</code> (脚本的标识符)、<code data-nac-role="code-inline">function</code> (要运行的函数名)、<code data-nac-role="code-inline">args</code> (用调用参数插值的对象字面量)、<code data-nac-role="code-inline">response_match</code> (用于状态: 要等待的响应 MessageId)、<code data-nac-role="code-inline">timeout_ms</code> (可选, 默认 5000)</td></tr><tr><td><code data-nac-role="code-inline">dom-mirror</code></td><td>状态: 从一个 DOM 元素读取, 它的属性 / 类名 / 文本镜像了 canvas 内部的某个状态 (例如当某种格式在当前选区上启用时被高亮的工具栏按钮)。</td><td><code data-nac-role="code-inline">selector</code> (要查询的 CSS 选择器)、<code data-nac-role="code-inline">extract</code> (抽取 DSL, 见 15.5)</td></tr><tr><td><code data-nac-role="code-inline">same-origin-window</code></td><td>状态: 当 iframe 同源时, 从 <code data-nac-role="code-inline">iframe.contentWindow.&lt;path&gt;</code> 读取。运行时会察觉跨源并落到下一个兜底。</td><td><code data-nac-role="code-inline">target</code> (iframe 的 CSS 选择器)、<code data-nac-role="code-inline">path</code> (<code data-nac-role="code-inline">contentWindow</code> 里的点号路径)</td></tr><tr><td><code data-nac-role="code-inline">synthetic-mutation</code></td><td>事件: 通过观察一个或多个状态来源上的 DOM 变动, 在被观察的值发生变化时重新发出, 以此合成一个事件。</td><td><code data-nac-role="code-inline">observe</code> (要盯住的状态路径的数组; 运行时对每一个调用 <code data-nac-role="code-inline">read</code>, 并在变动之间比对)、<code data-nac-role="code-inline">throttle_ms</code> (可选, 默认 100)</td></tr><tr><td><code data-nac-role="code-inline">synthetic-poll</code></td><td>事件: 通过轮询状态来源来合成一个事件。</td><td><code data-nac-role="code-inline">observe</code> (状态路径的数组)、<code data-nac-role="code-inline">interval_ms</code> (默认 250)</td></tr></tbody></table>
+<p data-nac-id="spec.p.293" data-nac-role="paragraph">每个 backend 都必须由运行时实现为一个自成一体的派发器 (<code data-nac-role="code-inline">dispatch(binding, args, context) -&gt; Promise&lt;value&gt;</code>)。向本规范添加 一种新的 backend 需要跃进规范的版本; 忽略未知 backend 的运行时必须 拒绝声明了它们的清单 (不得默默跳过)。</p>
+<h3 data-nac-id="spec.h3.155-dsl" data-nac-role="heading" data-nac-level="3" id="155-dsl">15.5 抽取用的迷你 DSL</h3>
+<p data-nac-id="spec.p.295" data-nac-role="paragraph">状态的 backend 以及 <code data-nac-role="code-inline">postmessage-listen</code> 这个事件 backend, 常常需要从 一个更大的对象里摘出一个字段。运行时自带一个极小的声明式 DSL, 好让 清单保持纯 JSON:</p>
+<table data-nac-id="spec.table.296" data-nac-role="data-table"><thead><tr><th>写法</th><th>含义</th><th>输入示例 -&gt; 输出</th></tr></thead><tbody><tr><td><code data-nac-role="code-inline">field.path.to.value</code></td><td>沿点号路径遍历。</td><td><code data-nac-role="code-inline">{a:{b:1}}</code> 配 <code data-nac-role="code-inline">a.b</code> -&gt; <code data-nac-role="code-inline">1</code></td></tr><tr><td><code data-nac-role="code-inline">attribute:NAME</code></td><td>仅 DOM: 读 <code data-nac-role="code-inline">el.getAttribute(NAME)</code>。</td><td><code data-nac-role="code-inline">&lt;i data-x=&quot;hi&quot;&gt;</code> 配 <code data-nac-role="code-inline">attribute:data-x</code> -&gt; <code data-nac-role="code-inline">&#x27;hi&#x27;</code></td></tr><tr><td><code data-nac-role="code-inline">text</code></td><td>仅 DOM: 读 <code data-nac-role="code-inline">el.textContent</code>。</td><td><code data-nac-role="code-inline">&lt;span&gt;hi&lt;/span&gt;</code> 配 <code data-nac-role="code-inline">text</code> -&gt; <code data-nac-role="code-inline">&#x27;hi&#x27;</code></td></tr><tr><td><code data-nac-role="code-inline">classList.contains:CLASS</code></td><td>仅 DOM: <code data-nac-role="code-inline">el.classList.contains(CLASS)</code> -&gt; 布尔。</td><td><code data-nac-role="code-inline">&lt;button class=&quot;active&quot;&gt;</code> 配 <code data-nac-role="code-inline">classList.contains:active</code> -&gt; <code data-nac-role="code-inline">true</code></td></tr><tr><td><code data-nac-role="code-inline">value</code></td><td>仅 DOM: 读 <code data-nac-role="code-inline">el.value</code>。</td><td><code data-nac-role="code-inline">&lt;input value=&quot;x&quot;&gt;</code> 配 <code data-nac-role="code-inline">value</code> -&gt; <code data-nac-role="code-inline">&#x27;x&#x27;</code></td></tr><tr><td><code data-nac-role="code-inline">present</code></td><td>仅 DOM: 若选择器解析到了一个元素则返回 <code data-nac-role="code-inline">true</code>, 否则 <code data-nac-role="code-inline">false</code>。</td><td>选择器匹配到了 -&gt; <code data-nac-role="code-inline">true</code></td></tr></tbody></table>
+<p data-nac-id="spec.p.297" data-nac-role="paragraph">v2.5 不支持组合; 一个抽取器就恰好是上面的某一行。需要复杂变换的清单, 请改为声明一个 <code data-nac-role="code-inline">script-bridge</code>。</p>
+<h3 data-nac-id="spec.h3.156-state" data-nac-role="heading" data-nac-level="3" id="156-state">15.6 <code data-nac-role="code-inline">state</code> 兜底链的语义</h3>
+<p data-nac-id="spec.p.299" data-nac-role="paragraph"><code data-nac-role="code-inline">state[path]</code> 是一个绑定的数组。<code data-nac-role="code-inline">NAC.read(plugin, path)</code> 按顺序走这个 数组。对每个绑定:</p>
+<ol data-nac-id="spec.list.300" data-nac-role="list"><li data-nac-id="spec.list.300.item.1" data-nac-role="list-item">运行时调用该 backend 的派发器。</li><li data-nac-id="spec.list.300.item.2" data-nac-role="list-item">若派发器以一个值解决 (包括 <code data-nac-role="code-inline">false</code>、<code data-nac-role="code-inline">0</code>、空字符串, 但<strong>不包括</strong> <code data-nac-role="code-inline">undefined</code>), <code data-nac-role="code-inline">read</code> 返回那个值。</li><li data-nac-id="spec.list.300.item.3" data-nac-role="list-item">若派发器拒绝, 或以 <code data-nac-role="code-inline">undefined</code> 解决, 运行时前进到数组里的下一个 绑定。</li><li data-nac-id="spec.list.300.item.4" data-nac-role="list-item">若没有任何绑定产出值, <code data-nac-role="code-inline">read</code> 以 <code data-nac-role="code-inline">NacError(&#x27;state_unreadable&#x27;, ...)</code> 拒绝, 它的 <code data-nac-role="code-inline">err.attempts: [...]</code> 为每个尝试过的 backend 带一条记录, 内容是 <code data-nac-role="code-inline">{backend, reason}</code>。</li></ol>
+<p data-nac-id="spec.p.301" data-nac-role="paragraph">理由: 这条链编码的是写清单的人的偏好顺序。最快、最便宜、最新鲜的来源 被声明在最前面; 兜底则优雅地逐级退化。运行时绝不会默默先挑一个更差的 来源。</p>
+<h3 data-nac-id="spec.h3.157" data-nac-role="heading" data-nac-level="3" id="157">15.7 合成动作的来源</h3>
+<p data-nac-id="spec.p.303" data-nac-role="paragraph">每一次 <code data-nac-role="code-inline">NAC.call</code> 的派发, 都会在 backend 返回之后向 <code data-nac-role="code-inline">document</code> 发出一个 <code data-nac-role="code-inline">nac:plugin:invoked</code> 事件。detail 的载荷:</p>
+<pre data-nac-id="spec.code.304" data-nac-role="code" data-nac-lang="js"><code>{
+  plugin:    &#x27;collabora.writer&#x27;,
+  verb_path: &#x27;uno.Bold&#x27;,
+  backend:   &#x27;postmessage&#x27;,
+  request_id: &#x27;pi_&lt;random hex&gt;&#x27;,
+  source:    &#x27;agent&#x27;,     // see sec 7
+  trusted:   false,
+  duration_ms: 12,
+  ok:        true,
+  error:     null,
+}</code></pre>
+<p data-nac-id="spec.p.305" data-nac-role="paragraph"><code data-nac-role="code-inline">nac:plugin:read</code> (在一次 <code data-nac-role="code-inline">read</code> 之后) 与 <code data-nac-role="code-inline">nac:plugin:event</code> (合成事件 的重新发出) 用同样的形状。<code data-nac-role="code-inline">source</code> 默认是 <code data-nac-role="code-inline">&#x27;agent&#x27;</code>; 把运行时包进 面向用户界面的宿主, 可以通过已有的 <code data-nac-role="code-inline">NAC.set_source(...)</code> 机制覆盖它 (第 7 节)。</p>
+<h3 data-nac-id="spec.h3.158-collabora-writer" data-nac-role="heading" data-nac-level="3" id="158-collabora-writer">15.8 完整走通的例子 -- Collabora Writer</h3>
+<pre data-nac-id="spec.code.307" data-nac-role="code" data-nac-lang="json"><code>{
+  &quot;slug&quot;: &quot;collabora.writer&quot;,
+  &quot;verbs&quot;: {
+    &quot;uno.Bold&quot;: {
+      &quot;backend&quot;: &quot;postmessage&quot;,
+      &quot;target&quot;:  &quot;iframe[data-collabora-frame]&quot;,
+      &quot;message&quot;: &quot;Send_UNO_Command&quot;,
+      &quot;values&quot;:  { &quot;Command&quot;: &quot;.uno:Bold&quot; }
+    },
+    &quot;doc.save&quot;: {
+      &quot;backend&quot;: &quot;postmessage&quot;,
+      &quot;target&quot;:  &quot;iframe[data-collabora-frame]&quot;,
+      &quot;message&quot;: &quot;Action_Save&quot;,
+      &quot;values_from_args&quot;: [&quot;DontTerminateEdit&quot;, &quot;Notify&quot;]
+    }
+  },
+  &quot;state&quot;: {
+    &quot;selection.isBold&quot;: [
+      { &quot;backend&quot;: &quot;dom-mirror&quot;,
+        &quot;selector&quot;: &quot;[data-nac-id=&#x27;toolbar.bold&#x27;]&quot;,
+        &quot;extract&quot;:  &quot;classList.contains:selected&quot; },
+      { &quot;backend&quot;: &quot;script-bridge&quot;,
+        &quot;bridge&quot;:   &quot;collabora.python&quot;,
+        &quot;script&quot;:   &quot;yujin_state.py&quot;,
+        &quot;function&quot;: &quot;GetSelectionState&quot;,
+        &quot;response_match&quot;: &quot;CallPythonScript-Result&quot;,
+        &quot;extract&quot;:  &quot;Values.is_bold&quot; }
+    ],
+    &quot;doc.modified&quot;: [
+      { &quot;backend&quot;: &quot;same-origin-window&quot;,
+        &quot;target&quot;:  &quot;iframe[data-collabora-frame]&quot;,
+        &quot;path&quot;:    &quot;app.file.modified&quot; }
+    ]
+  },
+  &quot;events&quot;: {
+    &quot;doc.modified&quot;: {
+      &quot;backend&quot;: &quot;postmessage-listen&quot;,
+      &quot;source&quot;:  &quot;iframe[data-collabora-frame]&quot;,
+      &quot;message&quot;: &quot;Doc_ModifiedStatus&quot;,
+      &quot;extract&quot;: &quot;Values.Modified&quot;
+    },
+    &quot;selection.changed&quot;: {
+      &quot;backend&quot;:     &quot;synthetic-mutation&quot;,
+      &quot;observe&quot;:     [&quot;selection.isBold&quot;, &quot;selection.isItalic&quot;],
+      &quot;throttle_ms&quot;: 100
+    }
+  }
+}</code></pre>
+<p data-nac-id="spec.p.308" data-nac-role="paragraph">代理调用 <code data-nac-role="code-inline">NAC.call(&#x27;collabora.writer&#x27;, &#x27;uno.Bold&#x27;)</code>; 运行时经由 <code data-nac-role="code-inline">postmessage</code> 这个 backend 路由, 向该 iframe 投递 <code data-nac-role="code-inline">Send_UNO_Command</code>。为了确认这个效果确实发生了 (见第 17 节), 代理调用 <code data-nac-role="code-inline">await NAC.read(&#x27;collabora.writer&#x27;, &#x27;selection.isBold&#x27;)</code>; 运行时先试 工具栏的镜像 (快且免费), 若镜像不可用就落到 Python 的脚本桥。代理 从不知道、也从不关心是哪个来源回答的。</p>
+<h3 data-nac-id="spec.h3.159" data-nac-role="heading" data-nac-level="3" id="159">15.9 错误</h3>
+<p data-nac-id="spec.p.310" data-nac-role="paragraph"><code data-nac-role="code-inline">NAC.call</code> / <code data-nac-role="code-inline">read</code> / <code data-nac-role="code-inline">subscribe</code> 会以一个 <code data-nac-role="code-inline">NacError</code> 拒绝, 其 <code data-nac-role="code-inline">code</code> 是下列之一:</p>
+<ul data-nac-id="spec.list.311" data-nac-role="list"><li data-nac-id="spec.list.311.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">plugin_not_registered</code> -- 该 slug 没有 v2.5 的清单。</li><li data-nac-id="spec.list.311.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">verb_not_declared</code> -- 该动词路径不在清单里。</li><li data-nac-id="spec.list.311.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">state_not_declared</code> -- 该状态路径不在清单里。</li><li data-nac-id="spec.list.311.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">event_not_declared</code> -- 该事件路径不在清单里。</li><li data-nac-id="spec.list.311.item.5" data-nac-role="list-item"><code data-nac-role="code-inline">backend_unknown</code> -- 清单声明了一个运行时并未实现的 backend。清单 必须在注册时就被拒绝; 这个错误只有在某个运行时接受了一种将来的清单 格式、随后又无法派发它时才会浮现。</li><li data-nac-id="spec.list.311.item.6" data-nac-role="list-item"><code data-nac-role="code-inline">backend_target_missing</code> -- 该 backend 的目标 (iframe、JS 路径、DOM 选择器) 找不到。</li><li data-nac-id="spec.list.311.item.7" data-nac-role="list-item"><code data-nac-role="code-inline">cross_origin_blocked</code> -- 对一个跨源的 iframe 尝试了 <code data-nac-role="code-inline">same-origin-window</code>。</li><li data-nac-id="spec.list.311.item.8" data-nac-role="list-item"><code data-nac-role="code-inline">state_unreadable</code> -- 一条状态链上的每个绑定都失败了; 见 15.6。</li><li data-nac-id="spec.list.311.item.9" data-nac-role="list-item"><code data-nac-role="code-inline">timeout</code> -- 某个 backend 没有在它所声明的 <code data-nac-role="code-inline">timeout_ms</code> 内回应 (动词默认 5000, 状态读取默认 1000)。</li><li data-nac-id="spec.list.311.item.10" data-nac-role="list-item"><code data-nac-role="code-inline">invalid</code> -- 参数的形状不对 (slug 无效、注册时清单格式错乱等)。</li></ul>
 <hr />
-<p data-nac-id="spec.p.144" data-nac-role="paragraph"><em>This is a machine translation of the canonical English version at <code data-nac-role="code-inline">/nac-spec/SPEC.md</code>. Report translation issues at the project's GitHub. Native-speaker reviewed: no (machine_v1).</em></p>
+<h2 data-nac-id="spec.h2.16-v25-250alpha5-rfc-v2502" data-nac-role="heading" data-nac-level="2" id="16-v25-250alpha5-rfc-v2502">16. 树状导航 (v2.5 -- 已在 2.5.0-alpha.5 发布 / RFC V25-02)</h2>
+<p data-nac-id="spec.p.314" data-nac-role="paragraph">面向辅助流程与语音执行器的分层命令导航原语, 它们需要描述从当前焦点 出发能做什么。</p>
+<p data-nac-id="spec.p.315" data-nac-role="paragraph"><strong>API 表面:</strong></p>
+<ul data-nac-id="spec.list.316" data-nac-role="list"><li data-nac-id="spec.list.316.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.context(plugin) -&gt; { breadcrumb: [{nac_id, label}, ...] }</code> 从 <code data-nac-role="code-inline">document.activeElement</code> 出发, 沿带有 <code data-nac-role="code-inline">data-nac-id</code> 的祖先元素 向上走, 在插件的根处停下。若插件内部没有任何东西获得焦点, 返回一条 空的面包屑。每一级的 <code data-nac-role="code-inline">label</code> 来自 <code data-nac-role="code-inline">narrate</code> (第 17 节)。</li></ul>
+<ul data-nac-id="spec.list.317" data-nac-role="list"><li data-nac-id="spec.list.317.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.tree(plugin, rootId?) -&gt; [{nac_id, label, opens?, leaf?}, ...]</code> 列举 <code data-nac-role="code-inline">rootId</code> (省略则为插件的根) 的<strong>直接</strong>可寻址子元素。&quot;直接&quot; 意思是起点与该子元素之间没有另一个带 <code data-nac-role="code-inline">data-nac-id</code> 的元素。对每一 项:</li><li data-nac-id="spec.list.317.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">label</code> 通过 <code data-nac-role="code-inline">narrate</code> 解析</li><li data-nac-id="spec.list.317.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">opens</code> 在 <code data-nac-role="code-inline">data-nac-opens</code> 属性存在时镜像它</li><li data-nac-id="spec.list.317.item.4" data-nac-role="list-item"><code data-nac-role="code-inline">leaf</code> 在 <code data-nac-role="code-inline">data-nac-leaf</code> 存在时为 <code data-nac-role="code-inline">true</code></li></ul>
+<p data-nac-id="spec.p.318" data-nac-role="paragraph"><strong>给编写者的属性:</strong></p>
+<ul data-nac-id="spec.list.319" data-nac-role="list"><li data-nac-id="spec.list.319.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-opens=&quot;&lt;target-nac-id&gt;&quot;</code>: 声明这个节点会打开 / 下钻到由 目标 id 指明的那个元素。它让代理可以顺着导航链走下去, 而不必猜 名字。</li><li data-nac-id="spec.list.319.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">data-nac-leaf</code>: 明确的终端标记; 下游的代理由此知道不可能再下钻。</li></ul>
+<p data-nac-id="spec.p.320" data-nac-role="paragraph"><strong>错误:</strong> 对未知的 rootId, <code data-nac-role="code-inline">tree</code> 返回 <code data-nac-role="code-inline">[]</code> (静默为空, 不是错误)。 对未知的插件, <code data-nac-role="code-inline">context</code> 始终返回 <code data-nac-role="code-inline">{ breadcrumb: [] }</code>。</p>
+<hr />
+<h2 data-nac-id="spec.h2.17-v25-250alpha5-rfc-v2503" data-nac-role="heading" data-nac-level="2" id="17-v25-250alpha5-rfc-v2503">17. 辅助标签 (v2.5 -- 已在 2.5.0-alpha.5 发布 / RFC V25-03)</h2>
+<p data-nac-id="spec.p.323" data-nac-role="paragraph">人类可读标签的规范解析。一个函数, 服务于屏幕阅读器、语音合成、语音 流程、审计日志, 以及移动端的辅助表面。</p>
+<p data-nac-id="spec.p.324" data-nac-role="paragraph"><strong>API 表面:</strong></p>
+<ul data-nac-id="spec.list.325" data-nac-role="list"><li data-nac-id="spec.list.325.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.narrate(plugin, nac_id) -&gt; string | null</code> 若找不到该插件或该 nac_id, 返回 <code data-nac-role="code-inline">null</code>。否则返回按下面这个严格优先 顺序得到的标签:</li></ul>
+<ol data-nac-id="spec.list.326" data-nac-role="list"><li data-nac-id="spec.list.326.item.1" data-nac-role="list-item"><strong><code data-nac-role="code-inline">aria-label</code></strong> -- 无障碍优先; 除非它只有空白, 否则一律尊重。</li><li data-nac-id="spec.list.326.item.2" data-nac-role="list-item"><strong>可见文本</strong> -- 该元素的 <code data-nac-role="code-inline">textContent</code>, 但排除任何嵌套的带 <code data-nac-role="code-inline">data-nac-id</code> 的子树 (那些有自己的 narrate 解析; 把它们排除掉, 口头输出才会限定在本范围内)。</li><li data-nac-id="spec.list.326.item.3" data-nac-role="list-item"><strong><code data-nac-role="code-inline">data-nac-label</code></strong> -- 编写者明确的覆盖; 当可见文本里含有图标 字形或 i18n 键时很有用。</li><li data-nac-id="spec.list.326.item.4" data-nac-role="list-item"><strong>退回到 <code data-nac-role="code-inline">nac_id</code></strong> -- 最坏的情况; 它示意&quot;没有人写过标签&quot;。</li></ol>
+<p data-nac-id="spec.p.327" data-nac-role="paragraph">  任何一层上只含空白的值, 都会落到下一层。</p>
+<p data-nac-id="spec.p.328" data-nac-role="paragraph"><strong>校验:</strong> 对于形如序号的 nac_id (<code data-nac-role="code-inline">btn-1</code>、<code data-nac-role="code-inline">btn-2</code>、...) 而缺少上述 任一较高层标签的情况, <code data-nac-role="code-inline">validate_global()</code> 可能在 <code data-nac-role="code-inline">plugin_instance_violations</code> 这个分组里发出警告。</p>
+<hr />
+<h2 data-nac-id="spec.h2.18-v25-250alpha5-rfc-v2504" data-nac-role="heading" data-nac-level="2" id="18-v25-250alpha5-rfc-v2504">18. 效果检测 (v2.5 -- 已在 2.5.0-alpha.5 发布 / RFC V25-04)</h2>
+<p data-nac-id="spec.p.331" data-nac-role="paragraph">它补上&quot;静默损害&quot;这个缺口: 代理确认的是一个动作的效果, 而不仅是命令 已被发出。两个原语都与 <code data-nac-role="code-inline">NAC.read()</code> 组合, 所以 V25-01 的任何 backend 都能用 (postmessage、sdk-call、dom-mirror、...)。</p>
+<p data-nac-id="spec.p.332" data-nac-role="paragraph"><strong>API 表面:</strong></p>
+<ul data-nac-id="spec.list.333" data-nac-role="list"><li data-nac-id="spec.list.333.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.expect(plugin, statePath, value, opts?) -&gt; Promise&lt;value&gt;</code> 它轮询 <code data-nac-role="code-inline">NAC.read(plugin, statePath)</code>, 直到比较器返回真值, 或者期限 到达。它以解析出的值解决; 到期则以 <code data-nac-role="code-inline">NacError(&#x27;timeout&#x27;, ...)</code> 拒绝。</li></ul>
+<p data-nac-id="spec.p.334" data-nac-role="paragraph">  轮询过程中的读取失败会一直重试到期限 (被当作&quot;还看不到&quot;, 而不是硬   错误)。</p>
+<p data-nac-id="spec.p.335" data-nac-role="paragraph">  可选项:</p>
+<ul data-nac-id="spec.list.336" data-nac-role="list"><li data-nac-id="spec.list.336.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">timeout_ms</code> (默认 <code data-nac-role="code-inline">5000</code>)</li><li data-nac-id="spec.list.336.item.2" data-nac-role="list-item"><code data-nac-role="code-inline">poll_ms</code> (默认 <code data-nac-role="code-inline">100</code>)</li><li data-nac-id="spec.list.336.item.3" data-nac-role="list-item"><code data-nac-role="code-inline">comparator</code> (默认 <code data-nac-role="code-inline">(cur, want) =&gt; cur === want</code>) 它接收 <code data-nac-role="code-inline">(current, expected)</code>, 返回布尔值。</li></ul>
+<ul data-nac-id="spec.list.337" data-nac-role="list"><li data-nac-id="spec.list.337.item.1" data-nac-role="list-item"><code data-nac-role="code-inline">NAC.diff(plugin, statePath, actionFn) -&gt; Promise&lt;{before, after, changed}&gt;</code> 它读状态, 等待 <code data-nac-role="code-inline">actionFn()</code>, 再读一次状态。返回两份快照, 以及一个 用 JSON-stringify 比较算出的布尔值 <code data-nac-role="code-inline">changed</code> (所以 <code data-nac-role="code-inline">undefined</code> 对比 一个值也会被标记为已改变)。读取失败会折叠为 <code data-nac-role="code-inline">undefined</code>。</li></ul>
+<p data-nac-id="spec.p.338" data-nac-role="paragraph"><strong>关于组合的说明:</strong> <code data-nac-role="code-inline">diff</code> 只捕捉起点和终点这两份快照; 它<strong>不</strong>观察 动作内部的中间状态。如果你关心的是&quot;状态在某个时刻经过某个特定的值&quot;, 请用 <code data-nac-role="code-inline">expect</code>。</p>
+<hr />
+<p data-nac-id="spec.p.340" data-nac-role="paragraph"><em>本文档是 NAC3 v2.5 的规范性规范。第 0-14 节与 v2.4 稳定版相比没有 变化。第 15-18 节在 v2.5 发布。对本文件的编辑构成规范的变更, 需要一个 RFC; 见 <code data-nac-role="code-inline">CONTRIBUTING.md</code>。</em></p>
 </main>
 
-<script src="/nac-spec/js/nac.js?v=v22"></script>
-<script src="/nac-spec/js/nac-v2-extensions.js?v=v22"></script>
+<script src="/nac-spec/js/nac.js?v=v25"></script>
+<script src="/nac-spec/js/nac-v2-extensions.js?v=v25"></script>
 <script>
 (function () {
   if (!window.NAC || !window.NAC.register) return;
   var manifest = {
     plugin_slug: "spec",
     version: "1.0.0",
-    nac_version: "2.2",
+    nac_version: "2.5.1",
     elements: [
       { id: "spec.translation_notice", role: "region",
          label_i18n: { es: "Aviso de traducci\u00F3n", en: "Translation notice", pt: "Aviso de tradu\u00E7\u00E3o", fr: "Avis de traduction", it: "Avviso di traduzione", de: "\u00DCbersetzungshinweis", ja: "\u7FFB\u8A33\u306E\u6CE8\u8A18", zh: "\u7FFB\u8BD1\u8BF4\u660E", hi: "\u0905\u0928\u0941\u0935\u093E\u0926 \u0938\u0942\u091A\u0928\u093E", ar: "\u0625\u0634\u0639\u0627\u0631 \u0627\u0644\u062A\u0631\u062C\u0645\u0629" } },

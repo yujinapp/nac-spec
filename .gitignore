@@ -26,3 +26,9 @@ Thumbs.db
 *.pem
 *.key
 .nac3-keys/
+
+# Translation work orders: generated from SPEC.md by
+# scripts/build-spec-translations.mjs --parts, merged back with --merge.
+# The authored artifact is i18n/<locale>/SPEC.units.md, which IS tracked.
+.translation-parts/
+.tmp-probe/

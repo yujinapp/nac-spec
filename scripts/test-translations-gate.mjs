@@ -41,6 +41,17 @@ function sandbox() {
   cpSync(join(ROOT, 'i18n'), join(dir, 'i18n'), { recursive: true });
   cpSync(join(ROOT, 'scripts', 'build-translation-banners.mjs'),
     join(dir, 'scripts', 'build-translation-banners.mjs'), { recursive: true });
+  /* The banner producer gained an import (scripts/lib/spec-units.mjs)
+     when D-05 gave the translation BODY its own producer, and this
+     scratch tree stopped being a runnable copy: every case here
+     crashed with ERR_MODULE_NOT_FOUND instead of failing, and a crash
+     hides the cases behind it. The store is copied too, because the
+     coverage the banner states is now measured from it. */
+  cpSync(join(ROOT, 'scripts', 'lib'), join(dir, 'scripts', 'lib'), { recursive: true });
+  for (const loc of ['es', 'pt', 'fr', 'it', 'de', 'ja', 'zh', 'hi', 'ar']) {
+    const store = join(ROOT, 'i18n', loc, 'SPEC.units.md');
+    if (existsSync(store)) cpSync(store, join(dir, 'i18n', loc, 'SPEC.units.md'));
+  }
   return dir;
 }
 
@@ -107,9 +118,24 @@ testCase('a banner that moved to a different file is not counted for this one', 
   'de');
 
 /* ---- the numbers ---- */
+/* This case used to patch the literal string 'translation_sections: 34'
+   -- the May number. When D-05 took the nine to 83 of 83 the patch
+   stopped matching, so it provoked nothing and the case passed for the
+   wrong reason: a red case that cannot go red is worse than no case.
+   It is anchored on the KEY now, never on the value. */
 testCase('a count that overstates what the translation covers is refused', 'red',
-  (d) => patch(d, 'i18n/fr/SPEC.md', (s) => s.replace('translation_sections: 34', 'translation_sections: 80')),
-  'translation_sections declares 80');
+  (d) => patch(d, 'i18n/fr/SPEC.md',
+    (s) => s.replace(/translation_sections: \d+/, 'translation_sections: 999')),
+  'translation_sections declares 999');
+
+/* The same lie from the other side: the page keeps claiming full
+   coverage while the STORE it is measured against lost a unit. Since
+   D-05 the coverage is measured from the store, so this is the shape
+   the lie takes now. */
+testCase('a page that claims coverage its store no longer supports is refused', 'red',
+  (d) => patch(d, 'i18n/fr/SPEC.units.md',
+    (s) => s.replace(/^<!-- u [0-9a-f]{12} \|/m, '<!-- u ffffffffffff |')),
+  'translation_units declares');
 
 testCase('a stale canonical total is refused', 'red',
   (d) => patch(d, 'i18n/zh/SPEC.md',

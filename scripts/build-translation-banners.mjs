@@ -5,16 +5,24 @@
    themselves (decision D-03, option C, 2026-10-26).
 
    WHY THIS EXISTS. The specification is published in ten languages.
-   Nine of those are machine translations of the English text as it was
-   on 2026-05-11 (NAC3 v2.2); the English text has grown by 49 sections
-   since. Measured, not guessed: each translation carries 34 of the 83
-   headings the canonical SPEC.md has today -- all nine the same 34,
-   because all nine translate the same older document. Until this
-   script existed, nothing on those pages said so above the fold, the
-   nine .html files declared <html lang="en"> over translated prose,
-   and -- the root cause -- NO script in this repository produced them.
-   They were orphan artifacts from May with no producer and no lock, so
-   every statement on them rotted silently. This is the producer.
+   Nine of those are machine translations, and until this script
+   existed nothing on those pages said so above the fold, the nine
+   .html files declared <html lang="en"> over translated prose, and --
+   the root cause -- NO script in this repository produced them. They
+   were orphan artifacts from a May 2026 pass with no producer and no
+   lock, which is how they could sit at 34 of the 83 sections for five
+   months without a word about it. This is the producer of what they
+   say about themselves.
+
+   WHAT CHANGED ON 2026-10-27 (decision D-05, option B). The nine are
+   no longer a frozen artifact: scripts/build-spec-translations.mjs
+   produces their BODY from a per-locale store and they are
+   regenerated per release. So the two things this file used to type --
+   the source version and the source date -- are now MEASURED per
+   locale from that store, and so is the coverage. The division of
+   labour is strict: that script owns the body, this one owns the
+   frontmatter, the banner, the badge and the manifest entry. No byte
+   has two owners.
 
    WHAT IT OWNS, and therefore what it overwrites with --write:
      - the machine-readable translation_* keys in the frontmatter of
@@ -41,6 +49,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as U from './lib/spec-units.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -49,12 +58,16 @@ const WRITE = process.argv.includes('--write');
 /* The nine locales published as translations. 'en' is not here on
    purpose: English is not a translation of itself, it is the
    normative text (SPEC.md section 4.3.2). */
-const LOCALES = ['es', 'pt', 'fr', 'it', 'de', 'ja', 'zh', 'hi', 'ar'];
+const LOCALES = U.LOCALES;
 
-/* What the nine translations are a translation OF. Declared once here
-   and written into all nine, so the answer lives in one place. */
-const SOURCE_VERSION = '2.2';
-const SOURCE_DATE = '2026-05-11';
+/* What each translation is a translation OF used to be typed here as
+   two constants ('2.2' and '2026-05-11'), which was right while the
+   nine were a frozen May artifact. D-05 made them complete and
+   regenerated per release, so the answer is now PER LOCALE and
+   MEASURED: the version and the date come from that locale's store
+   header, the coverage from the store against today's English. A
+   typed version here would have been the 24th slot that goes stale on
+   a bump, which is audit N-17's root cause. */
 const CANONICAL_URL = '/nac-spec/SPEC.html';
 
 /* The sentence every agent and every screen reader gets regardless of
@@ -75,47 +88,47 @@ const T = {
   es: {
     word: 'traducción',
     link: 'Leer el texto normativo en inglés',
-    text: ({ n, total }) => `**Traducción automática, no normativa.** Traduce la versión en inglés tal como estaba el ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION}) y cubre ${n} de las ${total} secciones del original de hoy. El texto normativo es el inglés: si esta traducción y el inglés no coinciden, manda el inglés.`,
+    text: ({ n, total, d, v }) => `**Traducción automática, no normativa.** Traduce la versión en inglés tal como estaba el ${d} (NAC3 v${v}) y cubre ${n} de las ${total} secciones del original de hoy. El texto normativo es el inglés: si esta traducción y el inglés no coinciden, manda el inglés.`,
   },
   pt: {
     word: 'tradução',
     link: 'Ler o texto normativo em inglês',
-    text: ({ n, total }) => `**Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION}) e cobre ${n} das ${total} seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.`,
+    text: ({ n, total, d, v }) => `**Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em ${d} (NAC3 v${v}) e cobre ${n} das ${total} seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.`,
   },
   fr: {
     word: 'traduction',
     link: 'Lire le texte normatif en anglais',
-    text: ({ n, total }) => `**Traduction automatique, non normative.** Elle traduit la version anglaise telle qu'elle était le ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION}) et couvre ${n} des ${total} sections de l'original actuel. Le texte normatif est l'anglais : en cas de divergence entre cette traduction et l'anglais, l'anglais prévaut.`,
+    text: ({ n, total, d, v }) => `**Traduction automatique, non normative.** Elle traduit la version anglaise telle qu'elle était le ${d} (NAC3 v${v}) et couvre ${n} des ${total} sections de l'original actuel. Le texte normatif est l'anglais : en cas de divergence entre cette traduction et l'anglais, l'anglais prévaut.`,
   },
   it: {
     word: 'traduzione',
     link: 'Leggere il testo normativo in inglese',
-    text: ({ n, total }) => `**Traduzione automatica, non normativa.** Traduce la versione inglese come era il ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION}) e copre ${n} delle ${total} sezioni dell'originale di oggi. Il testo normativo è l'inglese: in caso di divergenza tra questa traduzione e l'inglese, prevale l'inglese.`,
+    text: ({ n, total, d, v }) => `**Traduzione automatica, non normativa.** Traduce la versione inglese come era il ${d} (NAC3 v${v}) e copre ${n} delle ${total} sezioni dell'originale di oggi. Il testo normativo è l'inglese: in caso di divergenza tra questa traduzione e l'inglese, prevale l'inglese.`,
   },
   de: {
     word: 'Übersetzung',
     link: 'Den normativen englischen Text lesen',
-    text: ({ n, total }) => `**Maschinelle Übersetzung, nicht normativ.** Sie übersetzt die englische Fassung vom ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION}) und deckt ${n} von ${total} Abschnitten des heutigen Originals ab. Der normative Text ist der englische: bei Abweichungen gilt der englische Text.`,
+    text: ({ n, total, d, v }) => `**Maschinelle Übersetzung, nicht normativ.** Sie übersetzt die englische Fassung vom ${d} (NAC3 v${v}) und deckt ${n} von ${total} Abschnitten des heutigen Originals ab. Der normative Text ist der englische: bei Abweichungen gilt der englische Text.`,
   },
   ja: {
     word: '翻訳',
     link: '規範となる英語版を読む',
-    text: ({ n, total }) => `**機械翻訳であり、規範ではありません。** ${SOURCE_DATE} 時点の英語版 (NAC3 v${SOURCE_VERSION}) を翻訳したもので、現在の原文の ${n} / ${total} 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。`,
+    text: ({ n, total, d, v }) => `**機械翻訳であり、規範ではありません。** ${d} 時点の英語版 (NAC3 v${v}) を翻訳したもので、現在の原文の ${n} / ${total} 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。`,
   },
   zh: {
     word: '翻译',
     link: '阅读规范性的英文版本',
-    text: ({ n, total }) => `**机器翻译，非规范性文本。** 本文翻译的是 ${SOURCE_DATE} 的英文版 (NAC3 v${SOURCE_VERSION})，覆盖当前原文的 ${n} / ${total} 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。`,
+    text: ({ n, total, d, v }) => `**机器翻译，非规范性文本。** 本文翻译的是 ${d} 的英文版 (NAC3 v${v})，覆盖当前原文的 ${n} / ${total} 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。`,
   },
   hi: {
     word: 'अनुवाद',
     link: 'अंग्रेज़ी मानक पाठ पढ़ें',
-    text: ({ n, total }) => `**मशीनी अनुवाद, गैर-मानक।** यह ${SOURCE_DATE} के अंग्रेज़ी संस्करण (NAC3 v${SOURCE_VERSION}) का अनुवाद है और आज के मूल दस्तावेज़ के ${total} में से ${n} अनुब्हागों को शामिल करता है। मानक पाठ अंग्रेज़ी है: बेमेल होने पर अंग्रेज़ी पाठ मान्य होगा।`,
+    text: ({ n, total, d, v }) => `**मशीनी अनुवाद, गैर-मानक।** यह ${d} के अंग्रेज़ी संस्करण (NAC3 v${v}) का अनुवाद है और आज के मूल दस्तावेज़ के ${total} में से ${n} अनुभागों को शामिल करता है। मानक पाठ अंग्रेज़ी है: बेमेल होने पर अंग्रेज़ी पाठ मान्य होगा।`,
   },
   ar: {
     word: 'ترجمة',
     link: 'اقرأ النص المعياري بالإنجليزية',
-    text: ({ n, total }) => `**ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في ${SOURCE_DATE} (NAC3 v${SOURCE_VERSION})، وتغطي ${n} من ${total} قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.`,
+    text: ({ n, total, d, v }) => `**ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في ${d} (NAC3 v${v})، وتغطي ${n} من ${total} قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.`,
   },
 };
 
@@ -123,48 +136,78 @@ const T = {
 /* measurement                                                         */
 /* ------------------------------------------------------------------ */
 
-const MD_MARK_OPEN = '<!-- translation-banner: produced by scripts/build-translation-banners.mjs -->';
-const MD_MARK_CLOSE = '<!-- /translation-banner -->';
+/* These five used to be defined here. They moved to
+   scripts/lib/spec-units.mjs when D-05 gave the BODY of a translation
+   its own producer: two producers reading the same file must agree
+   byte for byte on where the frontmatter ends and where the banner
+   ends, and two copies of that answer is the asymmetry this repository
+   keeps paying for. */
+const { MD_MARK_OPEN, MD_MARK_CLOSE, rx, stripFrontmatter, withoutBanner } = U;
+const headings = U.headingsOf;
 
-function rx(lit) {
-  return lit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+/* ------------------------------------------------------------------ */
+/* what each locale is a translation OF, measured per locale           */
+/* ------------------------------------------------------------------ */
 
-function stripFrontmatter(src) {
-  if (!src.startsWith('---\n')) return { fm: null, body: src };
-  const end = src.indexOf('\n---', 3);
-  if (end === -1) return { fm: null, body: src };
-  return { fm: src.slice(4, end + 1), body: src.slice(end + 4).replace(/^\n/, '') };
-}
-
-/* A section is a markdown heading, not a byte. Bytes were the wrong
-   instrument: measured in bytes the nine translations look like they
-   cover anywhere from 30% to 44%, and that spread is UTF-8 encoding
-   noise (a CJK character costs three bytes, an ASCII one costs one),
-   not coverage. Counted in headings, all nine carry the same 34. */
-function headings(body) {
-  return (body.match(/^#{1,4} .*/gm) || []).length;
-}
-
-function withoutBanner(body) {
-  return body.replace(new RegExp(rx(MD_MARK_OPEN) + '[\\s\\S]*?' + rx(MD_MARK_CLOSE) + '\\n*'), '');
-}
+const ENGLISH = fs.readFileSync(path.join(ROOT, 'SPEC.md'), 'utf8');
+const BLOCKS = U.splitBlocks(ENGLISH);
 
 function canonicalHeadings() {
-  const { body } = stripFrontmatter(fs.readFileSync(path.join(ROOT, 'SPEC.md'), 'utf8'));
-  return headings(body);
+  return headings(stripFrontmatter(ENGLISH).body);
+}
+
+/* The numbers the banner states, and where each one comes from:
+
+     n, total   sections FULLY translated / sections. Measured from the
+                store against today's English, NOT by counting headings
+                on the produced page -- the producer splices the
+                English for a unit nobody translated yet, so a heading
+                count would have said 83 of 83 over a page with
+                English paragraphs in it. That is the exact shape of
+                lie D-03 was created to stop, one level deeper.
+     d, v       the date of the last translation work and the spec
+                version the store was last refreshed against, from
+                that locale's store header.
+     status     complete only when every unit is translated.
+
+   A locale with no store gets null and the caller names it: a page
+   whose coverage cannot be measured must not get a banner that
+   states one. */
+function meta(loc) {
+  const p = path.join(ROOT, 'i18n', loc, 'SPEC.units.md');
+  if (!fs.existsSync(p)) return null;
+  const store = U.parseStore(fs.readFileSync(p, 'utf8'));
+  const cov = U.coverage(BLOCKS, U.translated(store.entries));
+  return {
+    n: cov.sections,
+    total: canonicalHeadings(),
+    units: cov.units,
+    unitsTotal: cov.unitsTotal,
+    d: store.header.pass_date || '(unknown)',
+    v: store.header.source_version || '(unknown)',
+    /* The provenance keys the May generator wrote used to be KEPT
+       verbatim ("this script adds what was missing, it does not erase
+       provenance"). That was right while the body was still the May
+       text. Now the body is produced from a store, so inheriting them
+       made the page declare the sha of an English revision it no
+       longer translates and a date five months before the work: false
+       provenance is worse than none. They are derived here. */
+    hash: U.sourceHash(ENGLISH),
+    engine: store.header.engine || '(unknown)',
+    status: cov.units === cov.unitsTotal ? 'complete' : 'partial',
+  };
 }
 
 /* ------------------------------------------------------------------ */
 /* rendering -- the single source of every banner on disk              */
 /* ------------------------------------------------------------------ */
 
-function renderMdBanner(locale, n, total) {
+function renderMdBanner(locale, M) {
   const t = T[locale];
   return [
     MD_MARK_OPEN,
     '',
-    '> ' + t.text({ n, total }),
+    '> ' + t.text(M),
     '>',
     '> *' + EN_LINE + '*',
     '>',
@@ -180,9 +223,9 @@ function esc(s) {
 
 /* The emphasis of the first clause becomes a <strong>; the rest is
    escaped text. An agent gets the same claim a reader gets. */
-function renderHtmlBanner(locale, n, total) {
+function renderHtmlBanner(locale, M) {
   const t = T[locale];
-  const body = t.text({ n, total });
+  const body = t.text(M);
   const m = body.match(/^\*\*([\s\S]+?)\*\*\s*([\s\S]*)$/);
   const lead = m ? m[1] : body;
   const rest = m ? m[2] : '';
@@ -210,23 +253,36 @@ const MANIFEST_ENTRIES = [
 
 const MANIFEST_RE = / {6}\{ id: "spec\.translation_notice", role: "region",[\s\S]*?id: "spec\.translation_notice\.canonical"[\s\S]*?\} \},\n/;
 
-function renderBadge(locale) {
-  return '<span class="badge">NAC3 v' + SOURCE_VERSION + ' &middot; ' + T[locale].word + '</span>';
+function renderBadge(locale, M) {
+  return '<span class="badge">NAC3 v' + M.v + ' &middot; ' + T[locale].word + '</span>';
 }
 
 /* ------------------------------------------------------------------ */
 /* the contract each translation has to satisfy                        */
 /* ------------------------------------------------------------------ */
 
-const REQUIRED_FM = (loc, n, total) => ({
+const REQUIRED_FM = (loc, M) => ({
+  translation_source_hash: M.hash,
+  translation_quality: 'machine_v1',
+  translation_date: M.d,
+  translation_engine: M.engine,
   translation_normative: 'false',
-  translation_status: 'partial',
+  /* Derived, not declared: 'partial' was typed here while all nine
+     were partial, which meant a complete translation would still have
+     announced itself as partial to every machine reading this block. */
+  translation_status: M.status,
   translation_lang: loc,
   translation_source: 'SPEC.md',
-  translation_source_version: SOURCE_VERSION,
-  translation_source_date: SOURCE_DATE,
-  translation_sections: String(n),
-  translation_sections_canonical: String(total),
+  translation_source_version: M.v,
+  translation_source_date: M.d,
+  translation_sections: String(M.n),
+  translation_sections_canonical: String(M.total),
+  /* The unit figures are the fine-grained truth behind the section
+     count: a section counts as translated only when every one of its
+     units is, so these two are what a machine should read to know how
+     much English is still spliced into the page. */
+  translation_units: String(M.units),
+  translation_units_canonical: String(M.unitsTotal),
   translation_canonical_url: CANONICAL_URL,
 });
 
@@ -246,12 +302,11 @@ const total = canonicalHeadings();
 /* write mode                                                          */
 /* ------------------------------------------------------------------ */
 
-function writeMd(loc) {
+function writeMd(loc, M) {
   const p = path.join(ROOT, 'i18n', loc, 'SPEC.md');
   const { fm, body } = stripFrontmatter(fs.readFileSync(p, 'utf8'));
   const clean = withoutBanner(body).replace(/^\n+/, '');
-  const n = headings(clean);
-  const want = REQUIRED_FM(loc, n, total);
+  const want = REQUIRED_FM(loc, M);
 
   /* Every key the May generator wrote (source hash, quality, date) is
      kept: this script adds what was missing, it does not erase
@@ -261,11 +316,11 @@ function writeMd(loc) {
     .filter((l) => l.trim() && !Object.keys(want).some((k) => l.startsWith(k + ':')));
   const fmOut = keep.concat(Object.entries(want).map(([k, v]) => k + ': ' + v)).join('\n');
 
-  fs.writeFileSync(p, '---\n' + fmOut + '\n---\n\n' + renderMdBanner(loc, n, total) + '\n\n' + clean, 'utf8');
-  return n;
+  fs.writeFileSync(p, '---\n' + fmOut + '\n---\n\n' + renderMdBanner(loc, M) + '\n\n' + clean, 'utf8');
+  return M.n;
 }
 
-function writeHtml(loc, n) {
+function writeHtml(loc, M) {
   const p = path.join(ROOT, 'i18n', loc, 'SPEC.html');
   if (!fs.existsSync(p)) return false;
   let s = fs.readFileSync(p, 'utf8');
@@ -277,12 +332,12 @@ function writeHtml(loc, n) {
   /* 2. the badge says what the page is: a translation of an older spec.
         It used to read "NAC3 v2.2" alone, which is a claim about NAC3
         rather than about the page. */
-  s = s.replace(/<span class="badge">NAC3 v[^<]*<\/span>/, renderBadge(loc));
+  s = s.replace(/<span class="badge">NAC3 v[^<]*<\/span>/, renderBadge(loc, M));
 
   /* 3. the banner replaces the leaked frontmatter paragraph: the May
         generator rendered the YAML block as prose, so the first thing
         a reader saw was translation_source_hash. */
-  const banner = renderHtmlBanner(loc, n, total);
+  const banner = renderHtmlBanner(loc, M);
   const leaked = /<hr \/>\n<p data-nac-id="spec\.p\.1" data-nac-role="paragraph">translation_source:[\s\S]*?<\/p>\n<hr \/>/;
   const already = /<aside data-nac-id="spec\.translation_notice"[\s\S]*?<\/aside>/;
   if (already.test(s)) s = s.replace(already, banner);
@@ -304,8 +359,13 @@ function writeHtml(loc, n) {
 if (WRITE) {
   console.log('canonical SPEC.md: ' + total + ' headings');
   for (const loc of LOCALES) {
-    const n = writeMd(loc);
-    const html = writeHtml(loc, n);
+    const M = meta(loc);
+    if (!M) {
+      console.log('  SKIP   i18n/' + loc + '   no translation store, so there is no coverage to state');
+      continue;
+    }
+    const n = writeMd(loc, M);
+    const html = writeHtml(loc, M);
     console.log('  WROTE  i18n/' + loc + '/SPEC.md' + (html ? ' + SPEC.html' : '  (no .html)')
       + '   ' + n + '/' + total + ' sections');
   }
@@ -335,10 +395,17 @@ for (const loc of LOCALES) {
       'node scripts/build-translation-banners.mjs --write');
     continue;
   }
-  const n = headings(withoutBanner(body));
+  const M = meta(loc);
+  if (!M) {
+    drift('i18n/' + loc + '/SPEC.units.md',
+      'no translation store, so the coverage this page states cannot be measured',
+      'node scripts/build-spec-translations.mjs --template ' + loc);
+    continue;
+  }
+  const n = M.n;
 
   /* the machine-readable half */
-  for (const [k, v] of Object.entries(REQUIRED_FM(loc, n, total))) {
+  for (const [k, v] of Object.entries(REQUIRED_FM(loc, M))) {
     const got = fmGet(fm, k);
     if (got === null) {
       drift('i18n/' + loc + '/SPEC.md', 'frontmatter declares no ' + k,
@@ -350,7 +417,7 @@ for (const loc of LOCALES) {
   }
 
   /* the half a human reads: re-rendered and compared, never grepped */
-  if (!body.includes(renderMdBanner(loc, n, total))) {
+  if (!body.includes(renderMdBanner(loc, M))) {
     drift('i18n/' + loc + '/SPEC.md',
       body.includes(MD_MARK_OPEN)
         ? 'the visible banner drifted from what this script produces'
@@ -376,7 +443,7 @@ for (const loc of LOCALES) {
       drift('i18n/ar/SPEC.html', 'right-to-left prose with no dir="rtl"',
         'node scripts/build-translation-banners.mjs --write');
     }
-    if (!h.includes(renderHtmlBanner(loc, n, total))) {
+    if (!h.includes(renderHtmlBanner(loc, M))) {
       drift('i18n/' + loc + '/SPEC.html',
         h.includes('spec.translation_notice')
           ? 'the banner element drifted from what this script produces'
@@ -395,9 +462,9 @@ for (const loc of LOCALES) {
           : 'the banner is painted but not declared in the manifest, so an agent cannot see it',
         'node scripts/build-translation-banners.mjs --write');
     }
-    if (!h.includes(renderBadge(loc))) {
+    if (!h.includes(renderBadge(loc, M))) {
       drift('i18n/' + loc + '/SPEC.html',
-        'the toolbar badge does not say the page is a translation of v' + SOURCE_VERSION,
+        'the toolbar badge does not say the page is a translation of v' + M.v,
         'node scripts/build-translation-banners.mjs --write');
     }
   }

@@ -97,6 +97,15 @@ Hecho **despues** de publicar la 2.5.2, y no toca la version: el contrato pinnea
 - **Lo que el candado NO prueba:** lee bytes y resuelve rutas en disco, no descarga
   nada. Un stylesheet remoto no se verifica, y un host que no sirva un archivo que
   SI existe lo cazan los checks en vivo, no este.
+- **Publicado y medido contra PRODUCCION, no contra el repositorio.** Commit
+  `913d135`, deploy run **40570333555** verde con cero anotaciones propias. Las
+  **262 paginas pedidas al servidor una por una**: 262 respuestas 200 y **cero**
+  referencias al stylesheet muerto. El archivo sigue dando 404 -- nunca existio y
+  no se escribio -- pero ya no lo pide nadie, que es la opcion B tal cual se
+  decidio. Recibos: RCP-099 (red_proof contra `f889d7e`: 262 referencias muertas,
+  el caso "the committed tree passes" cae), RCP-100 (12/12 la suite del candado),
+  RCP-101 (`check:release` completo, salida 0), RCP-102 (navegador local sin
+  tolerancia) y RCP-103 (**el mismo gate contra el sitio publicado**, en verde).
 
 ## Lo que sigue esperando al dueno (nada traba nada)
 

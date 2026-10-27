@@ -196,9 +196,16 @@ testCase('a translation that legitimately covers more sections stays legal', 'gr
   });
 
 console.log('');
+/* The tally goes out on BOTH paths, like every other gate suite here.
+   It used to print only on green, and a red run said just how many cases
+   misbehaved -- so the run that matters most (the suite against the tree
+   before the change) was the only one that did not report how it went.
+   Measured consequence, not hypothetical: an evidence receipt of that red
+   run parsed no counts and was recorded as weak. */
+console.log(passed + ' passed, ' + failures.length + ' failed');
 if (failures.length) {
+  console.log('');
   console.log('RED -- ' + failures.length + ' case(s) did not behave:');
   for (const f of failures) console.log('  ' + f);
   process.exit(1);
 }
-console.log(passed + ' passed, 0 failed');

@@ -158,6 +158,27 @@ jobs:
         # existed to catch.
         run: node scripts/test-translations-gate.mjs
 
+      - name: Live-landing smoke check goes red when it should
+        # The post-deploy smoke check below is DERIVED from this tree
+        # instead of hand-typed in YAML, which is the whole point -- the
+        # previous version asserted the literal markup
+        # <h2>What NAC3 does not cover</h2>, the landing rewrite reworded
+        # that heading, and the deploy would have uploaded the tree and
+        # then gone red on a release that was otherwise correct.
+        #
+        # A derived check brings its own way of lying: derive nothing,
+        # assert nothing, pass. This stands up a local host serving a
+        # tampered copy for each regression the check claims to guard --
+        # a dropped limits section, a single dropped limit, a stale
+        # version badge, a rewritten SRI hash, a missing immutable path,
+        # a dropped license, a dropped link back to the method, and a
+        # tree that declares no ids at all -- and asserts the refusal.
+        # Writing it found one defect in the check itself: it matched the
+        # ids as bare substrings, and every one of them is also named in
+        # the page's own manifest block, so a host that stripped the
+        # markup and kept the script satisfied it.
+        run: node scripts/smoke-live-landing.mjs --selftest
+
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         run: |
@@ -202,59 +223,28 @@ jobs:
             "${{ secrets.GODADDY_USER }}@${{ secrets.GODADDY_HOST }}:/home/${{ secrets.GODADDY_USER }}/public_html/yujin.app/nac-spec/" \
             2>&1 | tail -40
 
-      - name: Smoke check the live site
-        run: |
-          for i in 1 2 3; do
-            BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/ || true)"
-            if echo "$BODY" | grep -q "Native Agent Contract"; then
-              echo "Live site responding with expected content."
-              # Bonus: confirm the Now-in-alpha section landed too.
-              if echo "$BODY" | grep -q "Now in alpha"; then
-                echo "Updated Forge commercial section is live."
-              else
-                echo "::warning::Live site responding but 'Now in alpha' section not yet visible (may be CDN cache)."
-              fi
-              exit 0
-            fi
-            echo "Attempt $i did not see expected content, retrying..."
-            sleep 5
-          done
-          echo "::error::Smoke check failed -- yujin.app/nac-spec/ did not return expected content within 3 tries"
-          exit 1
-
-      - name: Smoke check integrity is live
-        # The audit measures these from outside; so does this.
+      - name: Smoke check the live site is serving this tree
+        # Everything asserted here is READ from the tree being deployed:
+        # the title, the version badge, each SRI src/hash pair, the
+        # immutable runtime path (and that it is actually served), the
+        # thirteen ids the limits section declares, the two licenses it
+        # names, and the link back to Urazuke. Audits N-02/N-03 (a stale
+        # SRI ships a page that silently refuses to run), N-09/N-15/N-16
+        # and items 3 and 4 of the owner verification block, measured
+        # where that block measures them: on the server.
         #
-        # The versioned path is READ from js/integrity.json, not typed
-        # here. It used to be hard-coded twice, which meant the next
-        # version bump would have failed this step on a deploy that was
-        # otherwise perfectly correct -- the workflow would have been
-        # asserting the presence of the PREVIOUS release. Audit N-17.
-        run: |
-          IMMUTABLE="$(node -e "process.stdout.write(require('./js/integrity.json').immutable_path)")"
-          echo "Immutable path under test: $IMMUTABLE"
-          BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/)"
-          grep -q 'integrity="sha384-' <<< "$BODY" || { echo "::error::Landing page went live without an SRI hash"; exit 1; }
-          grep -qF "$IMMUTABLE" <<< "$BODY" || { echo "::error::Landing page does not offer the immutable versioned path ($IMMUTABLE)"; exit 1; }
-          curl -fsSL --max-time 20 -o /dev/null -w '%{http_code}\n' "https://yujin.app/nac-spec/$IMMUTABLE" | grep -qx 200 || { echo "::error::Immutable runtime path is not being served ($IMMUTABLE)"; exit 1; }
-          echo "Integrity is live."
-
-      - name: Smoke check the declared limits are live
-        # Audit N-09 / N-15 / N-16, and items 3 and 4 of the owner
-        # verification block, measured where the block measures them:
-        # on the server. The owner's own criterion is a grep, and a grep
+        # The owner's own criterion for the limits is a grep, and a grep
         # can be satisfied by an HTML comment -- so this asserts the
-        # HEADING and the link target, not the loose phrase. The browser
-        # half of the same check (visible text + the 13 ids declared in
-        # the manifest) is e2e/landing-limits-check.mjs, which runs
-        # against this URL with N0_BASE and is not in CI because it
-        # needs a browser download.
-        run: |
-          BODY="$(curl -fsSL --max-time 20 https://yujin.app/nac-spec/)"
-          grep -qF '<h2>What NAC3 does not cover</h2>' <<< "$BODY" || { echo "::error::The published landing page declares no limits section (audit N-09)"; exit 1; }
-          grep -qF 'https://yujin.app/urazuke/' <<< "$BODY" || { echo "::error::The published landing page has no link back to Urazuke (audit N-15)"; exit 1; }
-          grep -qF 'Creative Commons BY-SA 4.0' <<< "$BODY" || { echo "::error::The published landing page does not declare the Urazuke license next to its own (audit N-16)"; exit 1; }
-          echo "Declared limits, the Urazuke link and both licenses are live."
+        # data-nac-id ATTRIBUTES the owner approved as data, which also
+        # read the same in all ten locales. The browser half of the same
+        # check (visible text, zero console errors) is
+        # e2e/landing-limits-check.mjs, which takes the same --base and
+        # stays out of CI because it needs a browser download.
+        #
+        # Three attempts, because a freshly rsynced tree can take a
+        # moment to come out of the host cache. Only the last attempt
+        # annotates.
+        run: node scripts/smoke-live-landing.mjs --base https://yujin.app/nac-spec/ --retries 3
 
       - name: Verify the published contract API from outside
         # The producer checked itself before the upload; this checks the

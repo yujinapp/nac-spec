@@ -14,7 +14,7 @@
     "verify:contract": "node scripts/verify-contract-api.mjs --expect-head-from-repo",
     "keygen:contract": "node scripts/sign-contract-api.mjs --keygen",
     "sign:contract": "node scripts/sign-contract-api.mjs --sign",
-    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs && node scripts/build-contract-api.mjs && node scripts/test-version-gate.mjs && node scripts/build-translation-banners.mjs && node scripts/test-landing-i18n.mjs",
+    "check:release": "node scripts/build-integrity.mjs && node scripts/check-version-coherence.mjs && node scripts/build-contract-api.mjs && node scripts/test-version-gate.mjs && node scripts/build-translation-banners.mjs && node scripts/test-landing-i18n.mjs && node scripts/smoke-live-landing.mjs --selftest",
     "test:integrity": "node scripts/test-integrity-load.mjs",
     "test:integrity-gate": "node scripts/test-integrity-gate.mjs",
     "test:version-gate": "node scripts/test-version-gate.mjs",
@@ -29,7 +29,9 @@
     "build:translations": "node scripts/build-translation-banners.mjs --write",
     "test:translations-gate": "node scripts/test-translations-gate.mjs",
     "test:translations": "node e2e/translations-check.mjs",
-    "test:landing-i18n": "node scripts/test-landing-i18n.mjs"
+    "test:landing-i18n": "node scripts/test-landing-i18n.mjs",
+    "test:smoke-live": "node scripts/smoke-live-landing.mjs --selftest",
+    "smoke:live": "node scripts/smoke-live-landing.mjs --base https://yujin.app/nac-spec/ --retries 3"
   },
   "devDependencies": {
     "playwright": "^1.60.0"

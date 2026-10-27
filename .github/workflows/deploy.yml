@@ -158,6 +158,32 @@ jobs:
         # existed to catch.
         run: node scripts/test-translations-gate.mjs
 
+      - name: Stylesheet link gate
+        # Audit N-46 / PND-053. From 2026-06-28 the docs renderer wrote
+        # <link rel="stylesheet" href="/nac-spec/css/yujin-tokens.css"> into
+        # every page it generated and the file was never written: 262
+        # published pages -- SPEC.html, the page of the normative document,
+        # among them -- asked the server for it and got a 404 on every load.
+        # Nothing looked broken, because every custom property is used with
+        # an inline fallback, so it failed SILENTLY in the project whose
+        # argument is that it does not. Four months; the browser gate for
+        # the nine translations found it by LOADING a page, not by reading.
+        #
+        # The defect was never the missing file: it was that a page could
+        # claim a resource nobody checked existed. This refuses any page
+        # whose local stylesheet -- <link> or @import -- does not resolve in
+        # the tree being deployed.
+        run: node scripts/check-stylesheet-links.mjs
+
+      - name: Stylesheet link gate goes red when it should
+        # A gate nobody proved red is a decoration. Twelve cases, each
+        # planting one dead reference in a throwaway tree; the first is the
+        # verbatim <link> line the 262 pages really shipped, and the last
+        # refuses a scan that finds no page at all, because a gate that
+        # measures nothing and prints OK is the failure mode this repository
+        # keeps finding in its own locks.
+        run: node scripts/test-stylesheet-links.mjs
+
       - name: Live-landing smoke check goes red when it should
         # The post-deploy smoke check below is DERIVED from this tree
         # instead of hand-typed in YAML, which is the whole point -- the

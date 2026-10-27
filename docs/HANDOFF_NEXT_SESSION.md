@@ -1,4 +1,4 @@
-# Handoff -- estado al 2026-10-27, 22:4x UTC (la 2.5.2 ESTA PUBLICADA en los dos lugares)
+# Handoff -- estado al 2026-10-27, 19:4x UTC (la 2.5.2 ESTA PUBLICADA en los dos lugares; PND-053 cerrado)
 
 **Lo que cambio respecto de todo lo que sigue abajo: ya no falta la firma, no hay
 nada sin empujar, y la 2.5.2 esta afuera.** El dueno firmo en su maquina
@@ -62,11 +62,46 @@ de lo que las nueve dicen de si mismas:
   completo en verde, salida 0) y RCP-094 (la suite del candado, 27 casos, 0
   fallos).
 
+## PND-053 cerrado: el stylesheet muerto salio de las 262 paginas (decision del dueno)
+
+Decision textual del dueno, 2026-10-27: **"Sacalo y listo. Avancemos."** -> opcion B.
+Hecho **despues** de publicar la 2.5.2, y no toca la version: el contrato pinnea
+`SPEC.md`, no `SPEC.html`, asi que no necesito firma ni salto (verificado en
+`api/v/2.5.2/contract.json`).
+
+- **Salio de las 262 paginas y del generador.** Una sola linea borrada por pagina,
+  forma identica en las 262 (verificado antes de escribir: una unica variante en
+  todo el arbol). `scripts/build-spec-html.mjs` ya no la emite, con el motivo
+  escrito en el codigo. Las 251 paginas de `docs/` y `guides/` **no tienen
+  productor vivo**: son artefactos huerfanos de junio, el mismo patron que las
+  traducciones de mayo.
+- **El candado que faltaba, que es lo que importa.** El defecto nunca fue el
+  archivo ausente: fue que una pagina podia afirmar un recurso que nadie verifico
+  que exista. `scripts/check-stylesheet-links.mjs` rechaza cualquier pagina cuyo
+  stylesheet local (`<link>` o `@import`) no resuelva en el arbol desplegado, y se
+  niega ante un escaneo que no encuentra ninguna pagina. En `check:release` y en
+  `deploy.yml`, con sus dos pasos (gate + red).
+- **Sus 12 casos en rojo** (`scripts/test-stylesheet-links.mjs`): el primero es la
+  linea verbatim que las 262 paginas llevaron cuatro meses; tambien orden de
+  atributos y comillas simples, `rel="alternate stylesheet"`, `<link>` sin `href`,
+  `@import` muerto y el escaneo vacio. Dos verdes marcan el limite (un stylesheet
+  remoto no se exige que resuelva en disco; un `?query` no rompe uno que si).
+- **Salio la tolerancia** de `e2e/translations-check.mjs:104` -- era parte del
+  criterio de aceptacion de PND-053. El gate que encontro el hallazgo vuelve a
+  exigir **cero** errores de consola sin excepciones y pasa en verde sobre las
+  nueve: esa es la prueba de que el 404 murio, medida cargando paginas.
+- **Consumidores corregidos en el mismo commit** (SQ 14): `IMPLEMENTATION_GUIDE.md`
+  decia que el estilo se ve mal bajo `file://` por esa hoja -- era falso y mandaba
+  a buscar un problema de estilo inexistente; `PERFORMANCE_TEST_PLAN.md` instruia a
+  una pagina futura a **reusar** el archivo muerto, o sea reproducir el defecto.
+- **Lo que el candado NO prueba:** lee bytes y resuelve rutas en disco, no descarga
+  nada. Un stylesheet remoto no se verifica, y un host que no sirva un archivo que
+  SI existe lo cazan los checks en vivo, no este.
+
 ## Lo que sigue esperando al dueno (nada traba nada)
 
 | Que | Pendiente |
 |---|---|
-| La hoja de estilos `css/yujin-tokens.css` que da 404 en 262 paginas publicadas -- publicar el archivo o sacarle el enlace al generador | PND-053 |
 | La clave de firma sin passphrase en una maquina donde corren varias sesiones de agente. Ponerle passphrase NO rota la clave | PND-056 |
 | Las cuatro decisiones sobre el texto de los niveles de conformidad; tres de ellas son lo que `validate-global` reporta en rojo sobre la propia portada | PND-044, PND-045, PND-046, PND-047 |
 | El candado en el repo `rpaforce` para que la regeneracion del sitemap de la raiz no borre las 7 urls del protocolo | PND-060 |

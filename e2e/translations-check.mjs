@@ -92,26 +92,22 @@ function check(name, ok, detail) {
   if (!ok) failures.push(name + (detail ? ': ' + detail : ''));
 }
 
-/* ONE tolerated 404, by URL, and it is printed on every run so nobody
-   mistakes it for green. PND-053 / audit N-46: 262 published pages --
-   SPEC.html among them -- link /nac-spec/css/yujin-tokens.css, which
-   was never published and answers 404 on the site too. It is an owner
-   decision (publish the file, or drop the link from the generator), so
-   this gate names it instead of either failing on it forever or going
-   blind to console errors. Any OTHER console error, and any other 404,
-   is still red. When PND-053 closes, this tolerance comes out: that is
-   part of its acceptance criterion. */
-const TOLERATED_404 = /\/css\/yujin-tokens\.css(\?|$)/;
-let toleratedSeen = 0;
+/* NO 404 is tolerated any more. Until 2026-10-27 this gate carried one
+   tolerance by URL: 262 published pages linked /nac-spec/css/yujin-tokens.css,
+   a stylesheet that was never written, and this check named it as an owner
+   decision (PND-053 / audit N-46) instead of failing on it forever or going
+   blind to console errors. The owner decided to drop the link; the link is
+   gone from the generator and from the 262 pages, and so the tolerance is
+   gone too -- removing it was part of that item's acceptance criterion.
+   scripts/check-stylesheet-links.mjs is what keeps a dead stylesheet from
+   coming back without anyone loading a page. */
 
 /* A 404 is reported to the console as a generic sentence with no URL in
    it, so the URL comes from the response stream and the console line is
    only matched as the shape it is. */
 function partition(errs, notFound) {
-  const unexpected404 = notFound.filter((u) => !TOLERATED_404.test(u));
-  toleratedSeen += notFound.length - unexpected404.length;
   const real = errs.filter((e) => !/Failed to load resource/.test(e));
-  return { unexpected404, real };
+  return { unexpected404: notFound.slice(), real };
 }
 
 const browser = await chromium.launch();
@@ -251,12 +247,6 @@ await browser.close();
 if (server) server.close();
 
 console.log('');
-if (toleratedSeen) {
-  console.log('WARN  ' + toleratedSeen + ' tolerated 404 response(s) for '
-    + '/nac-spec/css/yujin-tokens.css -- audit N-46 / PND-053, an owner decision.');
-  console.log('      This gate does not fail on it and does not call it fixed.');
-  console.log('');
-}
 if (failures.length) {
   console.log('RED -- ' + failures.length + ' failing check(s)');
   for (const f of failures) console.log('  ' + f);

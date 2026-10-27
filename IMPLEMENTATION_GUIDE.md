@@ -56,9 +56,13 @@ file:///C:/nac-spec-yujinapp/peer-reviews.html
 For Markdown: render via your editor's preview OR use a quick HTML
 render `npx markdown-cli your-file.md > /tmp/preview.html` if needed.
 
-The CSS imports `/nac-spec/css/yujin-tokens.css` which won't resolve
-under file:// — the layout will look slightly off. To preview with
-correct styling, run a static server in the repo:
+These pages carry all their styling inline, so `file://` renders them
+exactly as the server does. (Until 2026-10-27 they also linked
+`/nac-spec/css/yujin-tokens.css`, a file that was never written: it 404'd
+over http too, so this paragraph used to blame `file://` for a stylesheet
+that did not exist anywhere. PND-053 / audit N-46.) A static server is
+still the right way to preview, because the runtime, the locale catalogues
+and the manifests are fetched and `file://` blocks that:
 
 ```bash
 cd C:/nac-spec-yujinapp

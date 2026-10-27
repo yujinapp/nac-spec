@@ -362,8 +362,13 @@ numbers, then per-section detail. Sample structure:
 ### 4.3 Public report — `nac-spec/performance.html`
 
 A Yujin-styled HTML page mirroring the structure of `peer-reviews.html`.
-Reuses `css/yujin-tokens.css`. Renders the summary markdown as HTML with
-charts (use Chart.js via CDN or inline SVG -- whatever's simpler).
+Styles inline, like every other published page here -- do NOT link
+`css/yujin-tokens.css`: that file was never written, 404'd on 262 published
+pages for four months, and the link is gone as of 2026-10-27 (PND-053 /
+audit N-46). `scripts/check-stylesheet-links.mjs` refuses any page that
+links a stylesheet which does not resolve, so a page built from this plan
+with that link in it will not deploy. Renders the summary markdown as HTML
+with charts (use Chart.js via CDN or inline SVG -- whatever is simpler).
 
 Sections:
 

@@ -2264,11 +2264,57 @@ las nueve paginas.
 (la documentacion adopta los tokens del sistema visual) o sacarle el enlace al generador (se
 queda con el estilo que ya tiene). Por eso es decision del dueno y no un arreglo mecanico.
 
-**Lo que ya esta hecho para que no se vuelva ruido:** el gate lo tolera **por URL**, lo imprime
-como WARN nombrando el pendiente, y se pone rojo ante cualquier otro error de consola. No se
-puso ciego.
+**Lo que se hizo mientras la decision estaba abierta, para que no se volviera ruido:** el gate
+lo toleraba **por URL**, lo imprimia como WARN nombrando el pendiente, y se ponia rojo ante
+cualquier otro error de consola. No se puso ciego.
 
-**Severidad:** avisa. **Quien decide:** el dueno. **Estado:** abierto (`PND-053`).
+**DECISION DEL DUENO (2026-10-27), textual: "Sacalo y listo. Avancemos."** -> opcion B. Lo que
+peso en la recomendacion, y se midio antes de preguntar: los ocho nombres que esas paginas
+esperan (`--color-text`, `--color-text-muted`, `--color-accent`, `--color-bg-subtle`,
+`--color-bg-surface`, `--color-border-subtle`, `--font-display`, `--font-sans`) **no existen
+con esos nombres en ninguna fuente** -- la portada usa nombres cortos propios y el
+`yujin-design-tokens.css` de RPAForce es un set de CRM que cubre 6 de 8 y le faltan justo los
+dos colores de texto. Publicar el archivo no era copiar uno que existiera: era redisenar 262
+paginas con revision en los diez idiomas. Y la paleta de reserva **es** el aspecto que esas
+paginas tuvieron siempre, asi que quitar el enlace no cambia un pixel.
+
+**Lo que se hizo (2026-10-27):**
+
+1. El `<link>` salio de `scripts/build-spec-html.mjs` (el productor de `SPEC.html`,
+   `README_DEMOS.html` y las nueve traducidas) con el motivo escrito en el codigo.
+2. Salio de las **262 paginas**: una sola linea borrada en cada una, forma identica en las 262
+   (verificado antes de escribir: una sola variante de la linea en todo el arbol). Las 251 de
+   `docs/` y `guides/` **no tienen productor vivo en el repositorio** -- son artefactos
+   huerfanos de junio, el mismo patron que las traducciones de mayo.
+3. **El candado que faltaba.** El defecto nunca fue el archivo ausente: fue que una pagina
+   podia **afirmar un recurso que nadie verifico que exista**, la misma forma que todos los
+   hallazgos de este documento. `scripts/check-stylesheet-links.mjs` rechaza cualquier pagina
+   cuyo stylesheet local (`<link>` o `@import`) no resuelva en el arbol que se despliega, y se
+   niega tambien ante un escaneo que no encuentra ninguna pagina (un escaneo vacio no es un
+   pase). Entra en `check:release` y en el workflow de deploy.
+4. **Sus casos en rojo**, `scripts/test-stylesheet-links.mjs`: 12 casos, y el primero no es
+   hipotetico -- es la linea verbatim que las 262 paginas llevaron cuatro meses. Tambien:
+   orden de atributos y comillas simples (un reformateo no debe esconder un enlace muerto),
+   `rel="alternate stylesheet"`, un `<link>` sin `href`, un `@import` muerto, y el escaneo
+   vacio. Dos casos verdes marcan el limite: un stylesheet remoto no se exige que resuelva en
+   disco, y un `?query` no rompe un enlace que si resuelve.
+5. **Salio la tolerancia** de `e2e/translations-check.mjs` (era parte del criterio de
+   aceptacion). El gate que descubrio el hallazgo vuelve a exigir **cero** errores de consola
+   sin excepciones, y pasa en verde sobre las nueve paginas: eso es la prueba de que el 404
+   murio, medida cargando las paginas y no leyendo el arbol.
+
+**Lo que este candado NO prueba, dicho aca para que nadie lo lea como mas de lo que es:** lee
+bytes y resuelve rutas en disco, no descarga nada. Un stylesheet remoto (las fuentes de Google)
+no se verifica, y un host que no sirva un archivo que SI existe en el arbol lo cazan los checks
+en vivo (`scripts/smoke-live-landing.mjs`, `e2e/translations-check.mjs`), no este.
+
+**Lo que queda escrito como trabajo, no como deuda escondida:** si alguna vez la documentacion
+publicada va a adoptar el sistema visual, es una decision de diseno con su propia revision en
+los diez idiomas (arabe RTL incluido), no una linea agregada al generador. Escribir el enlace
+antes que el archivo es exactamente lo que causo este hallazgo.
+
+**Severidad:** avisa. **Quien decide:** el dueno (decidido). **Estado: CERRADO** el 2026-10-27
+(`PND-053`).
 
 ---
 

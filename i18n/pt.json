@@ -120,7 +120,7 @@
  "hero.t2": "· Neutro quanto ao framework",
  "hero.t3": "· Dez idiomas",
  "hero.t4": "· Caminho imutável do runtime, verificado por impressão",
- "hero.version": "v2.5.1 · estável",
+ "hero.version": "v2.5.2 · estável",
  "limits.eyebrow": "O que não cobre",
  "limits.gov.link": "Leia em Governança, abaixo →",
  "limits.h2": "O NAC3 nomeia o que vive no DOM. Tudo o que segue fica fora dessa linha.",
@@ -264,5 +264,5 @@
  "what.h2": "Um botão que você já publicou, com mais três atributos.",
  "what.lede": "Esse é todo o custo de adoção de um elemento. Nenhum framework a adotar, nenhum passo de compilação a acrescentar, nenhum runtime à volta do qual reescrever a sua aplicação.",
  "what.runtime.h": "Acrescente o runtime uma vez, e fixe-o",
- "what.runtime.p": "Em produção fixa-se o caminho imutável e deixa-se o navegador verificar os bytes. <code>js/2.5.1/nac.js</code> nunca muda; <code>js/nac.js</code> é um alias móvel para experimentar, nunca para fixar."
+ "what.runtime.p": "Em produção fixa-se o caminho imutável e deixa-se o navegador verificar os bytes. <code>js/2.5.2/nac.js</code> nunca muda; <code>js/nac.js</code> é um alias móvel para experimentar, nunca para fixar."
 }

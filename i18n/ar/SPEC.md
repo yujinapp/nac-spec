@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: ar
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في 2026-10-27 (NAC3 v2.5.1)، وتغطي 83 من 83 قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.
+> **ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في 2026-10-27 (NAC3 v2.5.2)، وتغطي 83 من 83 قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**الإصدار:** 2.5.1 (مستقر -- سطح v2.5 الكامل: narrate و context+tree و expect+diff)
+**الإصدار:** 2.5.2 (مستقر -- سطح v2.5 الكامل: narrate و context+tree و expect+diff)
 **الحالة:** إصدار مستقر. وسم التوزيع `latest` في npm يشير إلى هنا؛ والقسم 9.1 يبين ما يضمنه ذلك وما لا تضمنه نسخة ما قبل الإصدار. هذا المستند يذكر إصداره في موضع واحد بالضبط، في السطر أعلاه. أما وثائق RFC المنشورة وأدلتها في الطبقة 2 + الطبقة 3 فهي مسرودة في `README.md` و `runtime/CHANGELOG.md`.
 **الترخيص:** Apache-2.0
 **المحرر:** Yujin (yujin.app)
@@ -213,11 +213,18 @@ es, en, pt, fr, ja, zh, hi, ar, de, it
 `https://yujin.app/nac-spec/SPEC.html`.
 
 تُنشر المواصفة كذلك على هيئة ترجمات آلية تحت
-`i18n/<locale>/SPEC.md`. وتلك الترجمات **غير معيارية**. كل واحدة منها
-جزئية، وكل واحدة مجمدة على مراجعة المصدر التي يعلنها إشعارها الخاص؛
-والإشعار إلزامي، وأي ترجمة منشورة بلا إشعار فهي عيب في النشر لا في
-الترجمة. وحيث تختلف الترجمة عن النص الإنجليزي فالنص الإنجليزي هو
-الحاكم، وأي دعوى مطابقة هي دعوى في مواجهة النص الإنجليزي.
+`i18n/<locale>/SPEC.md`. وتلك الترجمات **غير معيارية**. وكل واحدة منها
+تعلن، في إشعار يراه القارئ وفي ترويسة مقروءة آليا، أي مراجعة إنجليزية
+تترجم وأي قدر منها تغطي؛ والإشعار إلزامي، وأي ترجمة منشورة بلا إشعار فهي
+عيب في النشر لا في الترجمة. وحيث تختلف الترجمة عن النص الإنجليزي فالنص
+الإنجليزي هو الحاكم، وأي دعوى مطابقة هي دعوى في مواجهة النص الإنجليزي.
+
+والترجمة المتأخرة عن الإنجليزية **لا تمنع نشر الإنجليزية أبدا**. فالنص
+المعياري يصدر حين يكون جاهزا؛ والترجمة القديمة يُبلغ عنها وحدة وحدة،
+ويمضي الإصدار. وتسع مصنوعات آلية لا تملك حق النقض على المستند الذي
+تترجمه. وحتى 2.5.1 كانت التسع تغطي 34 من 83 قسما ولم يكن شيء يقول ذلك؛
+وهي تُنتج الآن من مخزن لكل لغة، والإجراء في
+`docs/TRANSLATION_PASS.md`.
 
 ---
 

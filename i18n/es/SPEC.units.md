@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: es
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**Versión:** 2.5.1 (estable -- la superficie v2.5 completa: narrate, context+tree, expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**Versión:** 2.5.2 (estable -- la superficie v2.5 completa: narrate, context+tree, expect+diff)
 **Estado:** Versión estable. La etiqueta de distribución `latest` de npm apunta aquí; la sección 9.1 dice qué garantiza eso y qué no garantiza una preversión. Este documento declara su versión en exactamente un lugar, la línea de arriba. Los RFC publicados y su evidencia de Capa 2 + Capa 3 están listados en `README.md` y `runtime/CHANGELOG.md`.
 **Licencia:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -201,15 +201,24 @@ El texto normativo de NAC3 es el **inglés**: el `SPEC.md` que está en la
 raíz del repositorio de la especificación, renderizado en
 `https://yujin.app/nac-spec/SPEC.html`.
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 La especificación también se publica como traducciones automáticas bajo
 `i18n/<locale>/SPEC.md`. Esas traducciones son **no normativas**. Cada
-una es parcial y cada una queda congelada en la revisión de origen que
-declara su propio cartel; el cartel es obligatorio, y una traducción
-publicada que no lleve cartel es un defecto de la publicación, no de la
-traducción. Cuando una traducción y el texto en inglés no coinciden,
-manda el texto en inglés, y una afirmación de conformidad es una
-afirmación contra el texto en inglés.
+una declara, en un cartel que un lector ve y en un encabezado legible
+por máquina, qué revisión del inglés traduce y cuánto de ella cubre; el
+cartel es obligatorio, y una traducción publicada que no lleve cartel es
+un defecto de la publicación, no de la traducción. Cuando una traducción
+y el texto en inglés no coinciden, manda el texto en inglés, y una
+afirmación de conformidad es una afirmación contra el texto en inglés.
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+Una traducción que está atrasada respecto del inglés **nunca bloquea la
+publicación del inglés**. El texto normativo sale cuando está listo; una
+traducción vieja se reporta, unidad por unidad, y la versión se publica.
+Nueve artefactos automáticos no tienen veto sobre el documento que
+traducen. Hasta la 2.5.1 las nueve cubrían 34 de las 83 secciones y nada
+lo decía; ahora se producen desde un almacén por idioma, y el
+procedimiento es `docs/TRANSLATION_PASS.md`.
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. API pública

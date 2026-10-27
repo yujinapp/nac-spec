@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: pt
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em 2026-10-27 (NAC3 v2.5.1) e cobre 83 das 83 seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.
+> **Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em 2026-10-27 (NAC3 v2.5.2) e cobre 83 das 83 seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**Versão:** 2.5.1 (estável -- a superfície v2.5 completa: narrate, context+tree, expect+diff)
+**Versão:** 2.5.2 (estável -- a superfície v2.5 completa: narrate, context+tree, expect+diff)
 **Status:** Versão estável. A dist-tag `latest` do npm aponta para cá; a seção 9.1 diz o que isso garante e o que uma pré-versão não garante. Este documento declara sua versão em exatamente um lugar, a linha acima. Os RFCs publicados e suas evidências de Camada 2 + Camada 3 estão listados em `README.md` e `runtime/CHANGELOG.md`.
 **Licença:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -222,11 +222,20 @@ repositório da especificação, renderizado em
 
 A especificação também é publicada como traduções automáticas em
 `i18n/<locale>/SPEC.md`. Essas traduções são **não normativas**. Cada
-uma é parcial e cada uma fica congelada na revisão de origem que o seu
-próprio banner declara; o banner é obrigatório, e uma tradução publicada
-sem banner é um defeito da publicação, não da tradução. Quando uma
-tradução e o texto em inglês divergem, vale o texto em inglês, e uma
-afirmação de conformidade é uma afirmação contra o texto em inglês.
+uma declara, num banner que o leitor vê e num frontmatter legível por
+máquina, qual revisão do inglês ela traduz e quanto dela cobre; o banner
+é obrigatório, e uma tradução publicada sem banner é um defeito da
+publicação, não da tradução. Quando uma tradução e o texto em inglês
+divergem, vale o texto em inglês, e uma afirmação de conformidade é uma
+afirmação contra o texto em inglês.
+
+Uma tradução atrasada em relação ao inglês **nunca bloqueia a
+publicação do inglês**. O texto normativo sai quando está pronto; uma
+tradução velha é reportada, unidade por unidade, e a versão vai ao ar.
+Nove artefatos automáticos não têm veto sobre o documento que traduzem.
+Até a 2.5.1 as nove cobriam 34 das 83 seções e nada dizia isso;
+agora elas são produzidas a partir de um repositório por idioma, e o
+procedimento é `docs/TRANSLATION_PASS.md`.
 
 ---
 

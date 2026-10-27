@@ -125,7 +125,7 @@
  "hero.t2": "· Rahmenneutral",
  "hero.t3": "· Zehn Sprachen",
  "hero.t4": "· Unveränderlicher Laufzeitpfad, per Prüfsumme belegt",
- "hero.version": "v2.5.1 · stable",
+ "hero.version": "v2.5.2 · stable",
  "limits.eyebrow": "Was es nicht abdeckt",
  "limits.gov.link": "Nachzulesen unter Governance, weiter unten →",
  "limits.h2": "NAC3 benennt, was im DOM lebt. Alles Folgende liegt jenseits dieser Linie.",
@@ -269,5 +269,5 @@
  "what.h2": "Eine Schaltfläche, die Sie längst ausgeliefert haben, mit drei Attributen mehr.",
  "what.lede": "Das ist der gesamte Einführungsaufwand für ein Element. Kein Rahmen zu übernehmen, kein Bauschritt hinzuzufügen, keine Laufzeit, um die herum Sie Ihre Anwendung neu schreiben müssten.",
  "what.runtime.h": "Binden Sie die Laufzeit einmal ein — und nageln Sie sie fest",
- "what.runtime.p": "Im Produktivbetrieb nagelt man den unveränderlichen Pfad fest und lässt den Browser die Bytes prüfen. <code>js/2.5.1/nac.js</code> ändert sich nie; <code>js/nac.js</code> ist ein beweglicher Verweis zum Ausprobieren, nie zum Festnageln."
+ "what.runtime.p": "Im Produktivbetrieb nagelt man den unveränderlichen Pfad fest und lässt den Browser die Bytes prüfen. <code>js/2.5.2/nac.js</code> ändert sich nie; <code>js/nac.js</code> ist ein beweglicher Verweis zum Ausprobieren, nie zum Festnageln."
 }

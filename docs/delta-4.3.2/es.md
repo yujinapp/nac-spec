@@ -8,11 +8,11 @@ un defecto de la publicación, no de la traducción. Cuando una traducción
 y el texto en inglés no coinciden, manda el texto en inglés, y una
 afirmación de conformidad es una afirmación contra el texto en inglés.
 
-<!-- u a21a8a7a16bc | delta 4.3.2 | prose -->
+<!-- u 22e3daff7a29 | delta 4.3.2 | prose -->
 Una traducción que está atrasada respecto del inglés **nunca bloquea la
 publicación del inglés**. El texto normativo sale cuando está listo; una
 traducción vieja se reporta, unidad por unidad, y la versión se publica.
 Nueve artefactos automáticos no tienen veto sobre el documento que
-traducen. Antes de 2.5.1 las nueve cubrían 34 de las 83 secciones y nada
+traducen. Hasta la 2.5.1 las nueve cubrían 34 de las 83 secciones y nada
 lo decía; ahora se producen desde un almacén por idioma, y el
 procedimiento es `docs/TRANSLATION_PASS.md`.

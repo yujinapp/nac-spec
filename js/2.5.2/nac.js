@@ -1,0 +1,8220 @@
+/* =====================================================================
+   NAC3 (Native Agent Contract v3) -- reference JavaScript runtime.
+   Spec: SPEC.md (repo root). Public docs: yujin.app/nac-spec/.
+   Apache-2.0 License -- Pablo Adrian Kuschniroff + Sumi, 2026.
+   =====================================================================
+
+   AUTHORITATIVE VERSION CONSTANT: see the global.NAC export at the
+   bottom of this file. `version: '2.5.2', spec_version: '2.5'`
+   is the normative declaration. The dated changelog sections below are
+   historical notes; if they ever drift from the export, the export
+   wins.
+
+   v1.9.0 (2026-05-08) -- MINOR release. The v2.0 patch round closing
+   every gap the five-AI panel of v1.8 (Microsoft Copilot, DeepSeek,
+   Mistral Le Chat, Grok, ChatGPT) flagged as `should land before
+   2.0` plus broader patch surface. New APIs:
+     confirm_action, set_confirm_handler            (sec 6.2.32)
+     action_undoable, action_undo_window_ms         (sec 6.2.33)
+     sign_provenance, verify_provenance             (sec 6.2.1)
+     recommended_remediation                        (sec 6.2.30)
+     assert_event_fired, assert_event_count,
+     perf_probe, replay_pending                     (sec 13.10/13.11)
+     sort_hints_by_priority, set_hint_priority      (sec 3.1)
+     set_a11y_hint_localizer                        (sec 3.1)
+   New attributes (host-side):
+     data-nac-skip-reason (REQUIRED with skip)      (sec 3.1)
+     data-nac-braille-label                         (sec 3.1)
+     data-nac-confirmation-message                  (sec 3.1)
+   New manifest field: action.undoable / undo_window_ms,
+                       manifest.attention_profile (5 presets).
+   Runtime install also mounts the ARIA bridge for a11y_hint and
+   replays any window.__NAC_PENDING__ buffer. Strict superset of
+   v1.8.0 -- every v1.8 plugin remains valid.
+
+   v1.8.0 (2026-05-07) -- MINOR release. Lands every action item
+   from the four-AI peer review of v1.7 (Copilot, DeepSeek, Mistral,
+   Grok). Adds ProvenanceBlock on every event (source: type|id|tool),
+   data-nac-validate / a11y-hint / drag-type/drag-accept attributes,
+   nac:command:rejected and :failed event family with reason
+   taxonomy, attention signals (sec 7.6), migration codemod under
+   tools/migrate-legacy-events.js. Strict superset of v1.7.0 -- every
+   v1.7 plugin remains valid.
+
+   v1.7.0 (2026-05-07) -- MINOR release. Spec sec 6.2 declares the
+   canonical TypeScript shape for every nac:* event detail. Each
+   widget family gets its own entity-specific id field (action_id,
+   field_id, tab_id, section_id, column_id, source_id, etc) so
+   consumers can pattern-match on a stable contract instead of
+   piling defensive regexes against ambiguous nac_id usage. The
+   peer review v1.6 round identified this as the #1 abandonment
+   cause. Strict superset of v1.6.6 -- the runtime matcher accepts
+   both canonical and legacy field names; legacy emits a
+   `legacy_event_field` warning in validate(). v2.0 (the public
+   announce release) drops the legacy fallbacks entirely.
+
+   Reference runtime: drag_drop, plugin:reset and other internal
+   emitters now emit BOTH canonical and legacy fields during the
+   transition. Hosts SHOULD do the same.
+
+   v1.6.6 (2026-05-07) -- patch release. Adds two roles to the
+   click-event-family map:
+     'sort-control'   -> nac:table:sort_changed
+     'filter-control' -> nac:table:filter_changed
+   Pre-v1.6.6 NAC.click on a sortable column header timed out
+   because the runtime listened only for nac:action:succeeded
+   while the host emitted nac:table:sort_changed. Plus the
+   matcher's nac_id-field equality check now accepts
+   column_nac_id and filter_nac_id (the canonical detail
+   fields for these table events).
+   Strict superset of v1.6.5; every v1.6.5 plugin remains valid.
+
+   v1.6.5 (2026-05-07) -- patch release closing two regressions
+   user found while voice-testing v1.6.4:
+   1. cities.option.3 still timed out because the host's click
+      handler detaches the LI from the DOM (cityList.innerHTML='')
+      BEFORE emitting nac:field:changed. v1.6.4's matcher walked
+      el.closest() on the detached element, got null, and
+      rejected the match. v1.6.5 caches the plugin slug, option
+      value and option textContent at click() time and threads a
+      cachedCtx into _eventMatchesElement so the matcher works
+      regardless of detachment.
+   2. NAC.go_to_section() called scrollIntoView() but on a wide
+      desktop where every section was already in viewport, the
+      tour produced zero visible feedback. v1.6.5 also sets
+      [data-nac-section-visited="1"] on the section for 1500ms
+      so the host CSS can highlight the section even when scroll
+      is a no-op.
+   Strict superset of v1.6.4; every v1.6.4 plugin remains valid.
+
+   v1.6.4 (2026-05-07) -- patch release. NAC.click resolves two
+   real-world matcher gaps that v1.6.3 left open. Both surfaced
+   in Pablo's voice-mode testing where the action executed
+   correctly but the runtime threw timeout because no event
+   matched the listener. Both are fixed in the runtime; no
+   host-side change required.
+
+   1. Combobox-option click. data-nac-role="option" + click():
+      the host's option click handler emits nac:field:changed on
+      the PARENT FIELD's nac_id (e.g. cities.search), but the
+      clicked element has the option's nac_id (e.g.
+      cities.option.3). Pre-v1.6.4 the matcher rejected the event
+      as "another field's signal" because closest() and
+      fieldHost.contains() both miss when the option lives in a
+      sibling <ul> outside the field. _eventMatchesElement now
+      accepts the match when (a) clicked role is "option",
+      (b) option and field belong to the same data-nac-plugin
+      scope, and (c) option's data-nac-value (or textContent)
+      equals event.detail.new_value.
+
+   2. Toggle-class field click. data-nac-role="field" with
+      data-nac-field-type in {checkbox, radio, toggle, switch}:
+      clicking flips the state but the host typically wires only
+      a native change handler (no NAC event emit). NAC.click now
+      synthesises nac:field:changed itself after el.click() with
+      the new boolean value AND a brief listen-window first to
+      avoid double-emit on well-behaved hosts that DO fire it.
+      Plus 'field' is added to _CLICK_EVENT_FAMILY so the matcher
+      listens for nac:field:changed natively.
+
+   Strict superset of v1.6.3; every v1.6.3 plugin remains valid.
+
+   v1.6.3 (2026-05-07) -- patch release. NAC.click is now role-aware
+   on the success-event side: it picks the right success / failure
+   event family based on the target's data-nac-role, instead of
+   listening only for nac:action:succeeded / nac:action:failed.
+   Pre-v1.6.3, click() on a combobox option (data-nac-role="option")
+   timed out at 5s even though the option was selected and the
+   widget emitted nac:field:changed -- the runtime simply was not
+   listening for that event. v1.6.3 maps:
+     role="action"          -> nac:action:succeeded / :failed
+     role="option"          -> nac:field:changed
+     role="tab"             -> nac:tab:activated
+     role="breadcrumb-item" -> nac:breadcrumb:navigated
+     role="accordion-toggle"-> nac:accordion:expanded / :collapsed
+     role="step"            -> nac:step:advanced
+     role="pagination-item" -> nac:table:page_changed
+     role="confirm-button"  -> nac:confirm:resolved / :cancelled
+   Unknown / missing role keeps the action default for back-compat.
+   For non-action roles the runtime ALSO listens for the action-
+   contract events as a safety net so a host that emits both
+   contracts on the same element still works. Strict superset of
+   v1.6.2; every v1.6.2 plugin remains valid.
+
+   v1.6.2 (2026-05-07) -- patch release. Implements NAC.drag_drop
+   (spec sec 13.4), which had been declared in the spec since v1.1
+   but never landed in the runtime. Discovered by user-testing the
+   v1.6.1 demo: an agent asked to "drag Alpha to the right list"
+   timed out because the runtime had no way to invoke a cross-list
+   drag programmatically. The signature matches what the spec
+   already declared:
+     NAC.drag_drop(source_nac_id, target_nac_id, opts?)
+   Source MUST be data-nac-role="draggable", target MUST be
+   data-nac-role="drop-target". Emits the canonical drag event
+   sequence (started -> over -> dropped) with v1.6.1's default-on
+   per-plugin bus + plugin_instance_id payload. Optional opts
+   accept to_index (for ordered drop-targets) and value (passed
+   through to nac:drag:dropped).
+   Strict superset of v1.6.1; every v1.6.1 plugin remains valid
+   (the new method is additive). Demo backend yjNacDemo gains a
+   drag_drop action kind in its allowedKinds + system prompt;
+   demo frontend dispatchAgenticAction routes drag_drop actions
+   through the new runtime method.
+
+   v1.6.1 (2026-05-07) -- patch release responding to AI peer review of
+   v1.6.0 (ChatGPT, Mistral Le Chat, Microsoft Copilot, Claude 4.7 Deep
+   Thinking, DeepSeek, HuggingChat, Grok). Strict superset of v1.6.0;
+   every v1.6.0 plugin remains valid.
+
+   - NAC.is_blocked() canonical "is the UI accepting input?" probe.
+     Replaces the v1.6 antipattern of inferring blocking state from
+     feedback[].severity. Returns {blocked, reasons[]} so callers can
+     branch on confirm-dialog / modal / busy-action.
+     Driven by ChatGPT, DeepSeek, Mistral peer reviews.
+   - NAC.set_validation_tolerance() / get_validation_tolerance().
+     Hosts retiring historic findings incrementally can register a
+     tolerated_violations payload that demotes specific
+     (kind, nac_id) pairs out of the .ok / .has_errors gate while
+     keeping them visible in .tolerated[] for audit. Driven by
+     Mistral, Claude 4.7: "register-time console.warn is ignored;
+     50+ plugin first run sea of red".
+   - validate_global() now also exposes .has_errors as an explicit CI
+     boolean so build scripts do not need to introspect .duplicates
+     length.
+   - Spec sec 7.3.2 (new): aria/nac drift findings are hard-errors at
+     NAC-3 by default; opt-in demote via set_validation_tolerance
+     drift_findings='warn'. Driven by 5 of 7 v1.6 reviewers.
+   - Spec sec 7.4 (tightened): per-plugin event buses are default-on,
+     not opt-in; both root-level and document-level dispatch are
+     mandatory in v1.6.1+. Driven by Claude 4.7's "data-nac-plugin-bus
+     should arguably be the default" plus Mistral / Copilot /
+     HuggingChat raising the same finding under different wording.
+   - Spec sec 7.4 (clarified): closed shadow roots are explicitly out
+     of scope; the only canonical pattern is bridge-via-public-method
+     + manifest "shadow_root":"closed" so validators skip the
+     unreachable DOM checks. Every reviewer raised this.
+   - Docs: README pitch rewritten to "1 day per screen + 1 day for
+     the design-system layer", removing the stale "1 hour" claim that
+     three reviewers (Copilot, Claude 4.7, HuggingChat) flagged as
+     no longer matching the surface size. New MANUAL.md chapters
+     "Design-system layer pattern" and "Event emission patterns" hit
+     the two #1 abandonment causes head-on.
+
+   v1.6.0 (2026-05-06) -- MINOR release. Adds NAC.reset(slug?)
+   plugin reset primitive (spec section 9.3) + companion
+   NAC.set_reset_provider(slug, fn) so plugins can declare
+   their custom reset semantics. Without a registered provider
+   the runtime falls back to a generic reset that walks the
+   plugin root, clears every [data-nac-role="field"] (honouring
+   data-nac-default-value), applies data-nac-default-state and
+   data-nac-default-hidden, and emits nac:plugin:reset on
+   completion. Strict superset of v1.5.4; every v1.0..v1.5.4
+   plugin remains valid (the new primitive is opt-in).
+
+   v1.5.4 (2026-05-06) -- demo-only patch. Ships exhaustive
+   10-locale i18n on every visible string of the reference demo
+   at yujin.app/nac-spec/example.php. The runtime contract here
+   is byte-identical to v1.5.1 -- only the version constant
+   bumped for traceability.
+
+   v1.5.1 (2026-05-06) -- patch release. Two additions on top of
+   v1.5.0:
+   - register() now logs a console.warn when a new manifest
+     declares a nac_id that already exists in another registered
+     plugin. Best-practice nudge at dev-time; runtime never throws.
+   - NAC.validate_global() new function returns structured cross-
+     plugin findings: duplicates, DOM orphans (data-nac-id present
+     but not in any manifest), unmounted manifest entries, and
+     convention violations (nac_id missing the plugin-slug prefix).
+     CI gates that want NAC-3 drift to be a hard fail call this
+     after the per-plugin validate(slug) loop. Spec section P7.1.
+   Plus the demo got 10-locale label_i18n maps and UI chrome
+   translations in the same release; the runtime contract there is
+   unchanged.
+
+   v1.5.0 (2026-05-06) -- MINOR release. Adds the canonical NAC + LLM
+   agentic loop pattern as informative spec sections 9.1 and 9.2.
+   The reference public demo at yujin.app/nac-spec/example.php now
+   ships an agentic chat backed by Claude Sonnet (primary) +
+   DeepSeek free (fallback) via the new public endpoint
+   /api/v1/yujin/nac-demo. API keys live server-side and never
+   reach the browser. The runtime contract in this file is unchanged
+   from v1.4.2; v1.5.0 is a SPEC + DEMO release.
+
+   v1.4.2 (2026-05-06) -- patch release responding to Microsoft
+   Copilot's review of v1.4.1. Strict superset of v1.4.1; every
+   v1.4.1 plugin remains valid. Changes from v1.4.1:
+   - 3.5-A: P5 return shapes formalised normatively in spec
+            section P5.0 (NacElement, NacSnapshot, NacKpiReadout,
+            NacFeedback, NacEvent, NacResult, NacStateSnapshot).
+            Runtime already conformed; spec catches up.
+   - 3.5-B: click_by_verb tie-break rule (first manifest match
+            wins). Validator emits warn 'duplicate_verb'.
+   - 3.5-C: tab_by_label matching: case-insensitive trim across
+            every declared locale; first match wins. Validator
+            emits warn 'duplicate_tab_label'.
+   - 3.5-D: confirm-dialog promoted from API_REFERENCE narrative
+            to normative spec section 7.5 with full DOM shape,
+            lifecycle event family (nac:confirm:requested |
+            resolved | cancelled), validator findings.
+   - 3.5-E: NAC-3 MUST/MAY split per event family in spec sec
+            6.1. Events required only for widget families the
+            plugin actually uses.
+   - 3.5-G: NAC-drives, ARIA-mirrors single direction made
+            normative in spec sec 7.3.1. Validator emits error
+            'aria_first_state' when reverse mirroring detected.
+   - 3.5-H: data-nac-plugin-id promoted from SHOULD to MUST when
+            multiple instances of the same plugin slug coexist.
+            Validator error 'duplicate_plugin_no_instance_id'.
+   - v1.4.1 focus-follow on every write entry point (click,
+     fill, select, tab, breadcrumb): scrollIntoView + focus +
+     visual pulse + nac:focus:moved event. Opt out via
+     NAC.config.focus_on_action = false. (Originally v1.4.1
+     scope but landed in v1.4.2.)
+
+   v1.4.1 (2026-05-06) -- previous patch release responding to
+   AI peer review of 2026-05-06 (DeepSeek + Claude + Grok Fast).
+   See CHANGELOG.md for the v1.4.1 surface. Highlights:
+   - 3.4-A: click() no longer phantom-resolves after 200 ms.
+   - 3.4-B: validate() now reports structured errors[].
+   - 3.4-C: click_by_verb / tab_by_label added.
+   - 3.2-E: events emit composed: true + plugin_instance_id.
+   - 14.3.5: system_map_layers() synchronous declaration.
+   - register() accepts (manifest) and (slug, manifest).
+
+   This file installs `window.NAC` -- the operator API defined by
+   spec/NAC-v1.0.md sections 5 and 7. It is plugin-host agnostic:
+   any UI that follows the data-attribute conventions will be
+   navigable through it.
+
+   No build step. No dependencies. ASCII-pure. Works in any modern
+   browser (Chrome 90+, Firefox 88+, Safari 14+).
+
+   Usage:
+     <script src="nac.js"></script>
+     // Then anywhere:
+     await NAC.click('apply_all');
+     const snap = NAC.describe();
+
+   Plugin authors register their manifest at boot:
+     NAC.register({
+       plugin_slug: 'my_plugin',
+       version: '1.0.0',
+       i18n_namespace: 'cc.my_plugin',
+       fields: [...], actions: [...], tabs: [...], kpis: [...],
+     });
+
+   ASCII-pure throughout (no accented chars, no emojis).
+   ===================================================================== */
+
+(function (global) {
+  'use strict';
+
+  if (global.NAC && global.NAC.__nac_v1_installed) return;
+
+  /* ---------- Errors ---------------------------------------------- */
+
+  function NacError(code, message, extra) {
+    const e = new Error(message || code);
+    e.name = 'NacError';
+    e.code = code;
+    Object.assign(e, extra || {});
+    return e;
+  }
+
+  /* ================================================================
+     v2.5 / RFC V24-01: Plugin slug uniqueness gate (spec sec 7.4)
+     ================================================================
+
+     When a plugin slug appears on more than one DOM root
+     simultaneously, every root MUST carry a unique
+     data-nac-plugin-id attribute. The runtime enforces via three
+     mechanisms:
+
+       NAC.register      -> synchronous throw on the registered slug
+       boot-time pass    -> nac:fatal + visible red banner at first
+                            cross-slug violation, then refuse further
+                            dispatches
+       validate_global   -> structured finding for CI (non-fatal)
+
+     Gated by NAC.HARD_DEDUP (default true; set false for migration). */
+
+  /* _scanPluginInstances() walks the live DOM and groups every
+     [data-nac-plugin] root by its slug. For each group of >1 root,
+     it requires every root to carry a non-empty data-nac-plugin-id
+     AND for those ids to be pairwise unique. Returns a structured
+     findings array; never throws. */
+  function _scanPluginInstances() {
+    if (typeof document === 'undefined') return [];
+    const findings = [];
+    const bySlug = {};
+    const all = document.querySelectorAll('[data-nac-plugin]');
+    for (let i = 0; i < all.length; i++) {
+      const el = all[i];
+      const slug = el.getAttribute('data-nac-plugin') || '';
+      if (!slug) continue;
+      (bySlug[slug] = bySlug[slug] || []).push(el);
+    }
+    for (const slug in bySlug) {
+      if (!Object.prototype.hasOwnProperty.call(bySlug, slug)) continue;
+      const roots = bySlug[slug];
+      if (roots.length < 2) continue;
+      const ids = [];
+      const missing = [];
+      for (let r = 0; r < roots.length; r++) {
+        const id = roots[r].getAttribute('data-nac-plugin-id') || '';
+        if (!id) missing.push(roots[r]); else ids.push(id);
+      }
+      const dupIds = [];
+      const seen = {};
+      for (let j = 0; j < ids.length; j++) {
+        if (seen[ids[j]]) dupIds.push(ids[j]);
+        else seen[ids[j]] = 1;
+      }
+      if (missing.length > 0 || dupIds.length > 0) {
+        findings.push({
+          code: 'duplicate_plugin_no_instance_id',
+          severity: 'error',
+          slug: slug,
+          instance_count: roots.length,
+          missing_instance_id_count: missing.length,
+          duplicate_instance_ids: dupIds,
+          message: roots.length + ' DOM roots carry data-nac-plugin="'
+            + slug + '" but '
+            + (missing.length
+                ? missing.length + ' lack data-nac-plugin-id'
+                : 'two share data-nac-plugin-id "' + dupIds[0] + '"')
+            + '. Per SPEC sec 7.4, every root sharing a slug MUST '
+            + 'carry a unique data-nac-plugin-id.',
+        });
+      }
+    }
+    return findings;
+  }
+
+  /* _checkPluginSlugUniqueOrThrow(slug) is the synchronous gate used
+     by NAC.register(). Throws the first finding for the registered
+     slug; other-slug findings are ignored here -- the DOM-ready pass
+     below catches them globally. */
+  function _checkPluginSlugUniqueOrThrow(slug) {
+    const all = _scanPluginInstances();
+    for (let i = 0; i < all.length; i++) {
+      if (all[i].slug !== slug) continue;
+      throw NacError('duplicate_plugin_no_instance_id', all[i].message, {
+        slug: slug,
+        instance_count: all[i].instance_count,
+        missing_instance_id_count: all[i].missing_instance_id_count,
+        duplicate_instance_ids: all[i].duplicate_instance_ids,
+      });
+    }
+  }
+
+  /* _installPluginDedupBootGate() runs once at DOMContentLoaded and
+     enforces the same contract across every slug. On first violation
+     it dispatches nac:fatal, paints a red banner, and re-throws
+     asynchronously so test harnesses + browsers catch the error
+     instead of silently swallowing. */
+  let _bootDedupFatal = null;
+  function _installPluginDedupBootGate() {
+    if (typeof document === 'undefined') return;
+    const run = function () {
+      if (typeof global !== 'undefined' && global.NAC &&
+          global.NAC.HARD_DEDUP === false) return;
+      if (typeof window !== 'undefined' && window.NAC &&
+          window.NAC.HARD_DEDUP === false) return;
+      const findings = _scanPluginInstances();
+      if (findings.length === 0) return;
+      const f = findings[0];
+      const err = NacError('duplicate_plugin_no_instance_id', f.message, {
+        slug: f.slug,
+        instance_count: f.instance_count,
+        missing_instance_id_count: f.missing_instance_id_count,
+        duplicate_instance_ids: f.duplicate_instance_ids,
+        all_findings: findings,
+      });
+      _bootDedupFatal = err;
+      try {
+        document.dispatchEvent(new CustomEvent('nac:fatal', {
+          detail: { code: 'duplicate_plugin_no_instance_id',
+                    slug: f.slug, message: f.message,
+                    findings: findings },
+        }));
+      } catch (_) {}
+      try { _paintFatalBanner(err); } catch (_) {}
+      setTimeout(function () { throw err; }, 0);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  }
+
+  function _paintFatalBanner(err) {
+    if (typeof document === 'undefined' || !document.body) return;
+    if (document.getElementById('__nac_fatal_banner__')) return;
+    const div = document.createElement('div');
+    div.id = '__nac_fatal_banner__';
+    div.setAttribute('role', 'alert');
+    div.style = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;'
+      + 'background:#DC2626;color:#fff;font:600 14px/1.4 system-ui,sans-serif;'
+      + 'padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+    div.textContent = '[NAC3 FATAL] ' + err.code + ': ' + err.message;
+    if (document.body.firstChild) {
+      document.body.insertBefore(div, document.body.firstChild);
+    } else {
+      document.body.appendChild(div);
+    }
+  }
+  /* /end V24-01 */
+
+  /* ==================================================================
+     v2.4 / RFC V24-04: Snapshot versioning + optimistic concurrency
+     ==================================================================
+
+     Promotes NAC3 from a decoration-and-verb contract to a real
+     agentic concurrency protocol. See docs/RFC_V24-04.md for the
+     full design + Appendix C for agent best practices. Three
+     primitives, in order an agent should typically use them:
+
+       plugin_version       primary; per-plugin monotonic; ignores noise
+                            outside the targeted plugin.
+       element_state_hash   content-aware; 128-bit SHA-256 truncated.
+       tree_version         escape hatch; global monotonic.
+
+     All three are returned by describe(); all three are honored as
+     expected_* parameters on every mutating API; mismatches reject
+     with NacError('snapshot_stale', { reason, ... }) and the side
+     effect does not occur.
+  */
+
+  /* ---- Internal state ---- */
+
+  let _tree_version = 0;
+  const _plugin_versions = new Map();   /* key: `${slug}|${instance_id||''}` */
+  const _version_history = [];           /* circular buffer, max 500 */
+  const _plugin_scope_cache = (typeof WeakMap !== 'undefined')
+    ? new WeakMap()                      /* Element -> { slug, instance_id } */
+    : null;
+  let _hydration_complete = false;
+  let _hydration_fallback_timer = null;
+  let _mutation_observer = null;
+
+  /* STRICT_VERSIONING + eager_hashing + HARD_DEDUP are exposed via
+     the NAC export (bottom of the module) so hosts can flip them
+     before / after install. Internal mirrors keep hot-path checks
+     property-access-free in the most common cases. */
+  function _strictVersioningOn() {
+    return (typeof window !== 'undefined' && window.NAC &&
+            window.NAC.STRICT_VERSIONING === true);
+  }
+  function _eagerHashingOn() {
+    return (typeof window !== 'undefined' && window.NAC &&
+            window.NAC.eager_hashing === true);
+  }
+
+  /* ---- Plugin scope resolver (RFC sec 5.1.1) ----
+
+     "Plugin scope is logical, not physical." An element belongs to
+     the plugin declared by its nearest [data-nac-plugin] ancestor.
+     Portals/teleports that carry the attribute on their portaled
+     root inherit the right scope regardless of DOM hierarchy.
+
+     Cached per element via WeakMap to avoid O(depth) walks on every
+     mutation in high-rate paths (drag-drop, autocomplete filtering).
+     Cache entries invalidate naturally when the element is GC'd; we
+     also clear them on attribute mutations of data-nac-plugin* in
+     the observer below. */
+  function _resolvePluginScope(el) {
+    if (!el || el.nodeType !== 1) return null;
+    if (_plugin_scope_cache && _plugin_scope_cache.has(el)) {
+      return _plugin_scope_cache.get(el);
+    }
+    let cur = el;
+    while (cur && cur.nodeType === 1) {
+      if (cur.hasAttribute && cur.hasAttribute('data-nac-plugin')) {
+        const scope = {
+          slug: cur.getAttribute('data-nac-plugin') || '',
+          instance_id: cur.getAttribute('data-nac-plugin-id') || null,
+        };
+        if (_plugin_scope_cache) _plugin_scope_cache.set(el, scope);
+        return scope;
+      }
+      cur = cur.parentElement;
+    }
+    if (_plugin_scope_cache) _plugin_scope_cache.set(el, null);
+    return null;
+  }
+
+  function _pluginKey(slug, instance_id) {
+    return slug + '|' + (instance_id || '');
+  }
+  function _pluginVersionFor(slug, instance_id) {
+    return 'v_' + (_plugin_versions.get(_pluginKey(slug, instance_id)) || 0);
+  }
+  function _treeVersionStr() { return 'v_' + _tree_version; }
+
+  /* ---- Bump functions (RFC sec 8.1) ---- */
+
+  function _bumpTreeVersion(trigger, affected_plugins) {
+    _tree_version += 1;
+    _version_history.push({
+      at: Date.now(),
+      tree_version: _treeVersionStr(),
+      trigger: trigger,
+      affected_plugins: affected_plugins || [],
+    });
+    while (_version_history.length > 500) _version_history.shift();
+    if (typeof document !== 'undefined') {
+      document.dispatchEvent(new CustomEvent('nac:tree:invalidated', {
+        detail: {
+          from_version: 'v_' + (_tree_version - 1),
+          to_version: _treeVersionStr(),
+          trigger: trigger,
+          affected_plugins: affected_plugins || [],
+        },
+      }));
+    }
+  }
+
+  function _bumpPluginVersion(slug, instance_id, trigger) {
+    if (!slug) return;
+    const key = _pluginKey(slug, instance_id);
+    const prev = _plugin_versions.get(key) || 0;
+    const next = prev + 1;
+    _plugin_versions.set(key, next);
+    /* Tree version bumps along with every plugin version bump. */
+    _bumpTreeVersion(trigger, [{ slug: slug, instance_id: instance_id || null }]);
+    if (typeof document !== 'undefined') {
+      document.dispatchEvent(new CustomEvent('nac:plugin:invalidated', {
+        detail: {
+          plugin_slug: slug,
+          plugin_instance_id: instance_id || null,
+          from_version: 'v_' + prev,
+          to_version: 'v_' + next,
+          trigger: trigger,
+        },
+      }));
+    }
+  }
+
+  /* Helper invoked from data-table primitives + syncPlugin to bump
+     versions without needing a mutation observer round-trip. */
+  function _markStructuralChange(slug, instance_id, trigger) {
+    _bumpPluginVersion(slug, instance_id, trigger || 'syncPlugin');
+  }
+
+  /* ---- Mutation observer (RFC sec 8.2) ----
+
+     Single observer rooted at document.body, filters mutations to
+     elements inside any [data-nac-plugin] subtree, coalesces all
+     mutations in a single microtask into one bump per affected
+     plugin. Structural changes (add/remove [data-nac-*] elements,
+     attribute changes to data-nac-id/role/action/plugin*, visibility
+     transitions) bump; pure state changes (value/textContent/focus)
+     do not. */
+  const _NAC_ATTRS_STRUCTURAL = new Set([
+    'data-nac-id', 'data-nac-role', 'data-nac-action',
+    'data-nac-plugin', 'data-nac-plugin-id', 'data-nac-verb',
+    'aria-hidden', 'hidden', 'style',
+  ]);
+
+  function _scopeOfMutation(mutation) {
+    /* attributes: target is the element itself.
+       childList: walk added/removed nodes; each contributes a scope. */
+    const scopes = [];
+    if (mutation.type === 'attributes' && mutation.target) {
+      const s = _resolvePluginScope(mutation.target);
+      if (s) scopes.push(s);
+    } else if (mutation.type === 'childList') {
+      const collect = function (nl) {
+        for (let i = 0; i < nl.length; i++) {
+          const n = nl[i];
+          if (n.nodeType !== 1) continue;
+          /* Only nodes that themselves carry a data-nac-* attribute,
+             or that contain one, are agent-relevant. */
+          let relevant = false;
+          if (n.hasAttribute && (n.hasAttribute('data-nac-id') ||
+              n.hasAttribute('data-nac-role') ||
+              n.hasAttribute('data-nac-plugin'))) {
+            relevant = true;
+          }
+          if (!relevant && n.querySelector) {
+            relevant = !!n.querySelector('[data-nac-id],[data-nac-role],[data-nac-plugin]');
+          }
+          if (relevant) {
+            /* Resolve scope from the mutation parent (where the node
+               was inserted/removed), since the removed node may no
+               longer be in the tree. */
+            const s = _resolvePluginScope(mutation.target);
+            if (s) scopes.push(s);
+          }
+        }
+      };
+      collect(mutation.addedNodes);
+      collect(mutation.removedNodes);
+    }
+    return scopes;
+  }
+
+  function _isStructuralAttrChange(mutation) {
+    if (mutation.type !== 'attributes') return false;
+    return _NAC_ATTRS_STRUCTURAL.has(mutation.attributeName || '');
+  }
+
+  function _handleMutationRecords(records) {
+    /* Coalesce: collect every affected (slug, instance_id) and emit
+       exactly one bump per pair per microtask flush. */
+    const affected = new Map();
+    for (let i = 0; i < records.length; i++) {
+      const r = records[i];
+      let structural = false;
+      if (r.type === 'childList') structural = true;
+      else if (r.type === 'attributes' && _isStructuralAttrChange(r)) structural = true;
+      else if (r.type === 'attributes' &&
+               (r.attributeName === 'data-nac-plugin' ||
+                r.attributeName === 'data-nac-plugin-id') &&
+               _plugin_scope_cache && r.target) {
+        /* Plugin scope changed -- invalidate cache for this element. */
+        try { _plugin_scope_cache.delete(r.target); } catch (_) {}
+      }
+      if (!structural) continue;
+      const scopes = _scopeOfMutation(r);
+      for (let j = 0; j < scopes.length; j++) {
+        const k = _pluginKey(scopes[j].slug, scopes[j].instance_id);
+        if (!affected.has(k)) {
+          affected.set(k, { slug: scopes[j].slug, instance_id: scopes[j].instance_id });
+        }
+      }
+    }
+    if (affected.size === 0) return;
+    affected.forEach(function (scope) {
+      _bumpPluginVersion(scope.slug, scope.instance_id, 'mutation');
+    });
+  }
+
+  function _installMutationObserver() {
+    if (_mutation_observer || typeof MutationObserver === 'undefined' ||
+        typeof document === 'undefined' || !document.body) return;
+    _mutation_observer = new MutationObserver(_handleMutationRecords);
+    _mutation_observer.observe(document.body, {
+      childList: true,
+      subtree:   true,
+      attributes: true,
+      attributeFilter: ['data-nac-id', 'data-nac-role', 'data-nac-action',
+                        'data-nac-plugin', 'data-nac-plugin-id', 'data-nac-verb',
+                        'data-nac-state', 'aria-hidden', 'hidden', 'disabled',
+                        'style'],
+    });
+  }
+
+  /* ---- element_state_hash (RFC sec 5.2) ----
+
+     The hash covers exactly 5 keys (visible, disabled, value, text,
+     custom) per the canonical mini-spec. Truncation at 256 chars on
+     value+text is normative. Serializer emits keys alphabetically,
+     non-ASCII escaped as \uXXXX lowercase, no whitespace. SHA-256
+     over the canonical bytes, truncated to the leading 128 bits
+     (16 bytes), encoded as 32 lowercase hex chars. */
+
+  function _hashIsEffectivelyVisible(el) {
+    /* Cheap visibility check: offsetParent + style.display +
+       style.visibility + aria-hidden. */
+    if (!el || el.nodeType !== 1) return false;
+    if (el.getAttribute && el.getAttribute('aria-hidden') === 'true') return false;
+    if (typeof el.offsetParent === 'object' && el.offsetParent === null) {
+      /* position:fixed escapes offsetParent=null. Use rect fallback. */
+      if (typeof el.getBoundingClientRect === 'function') {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) return false;
+      } else {
+        return false;
+      }
+    }
+    if (typeof window !== 'undefined' && window.getComputedStyle) {
+      const cs = window.getComputedStyle(el);
+      if (cs && (cs.display === 'none' || cs.visibility === 'hidden')) return false;
+    }
+    return true;
+  }
+
+  function _hashReadValue(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const tag = (el.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') {
+      const t = (el.type || '').toLowerCase();
+      if (t === 'checkbox' || t === 'radio') return el.checked ? 'true' : 'false';
+      return el.value == null ? null : String(el.value).slice(0, 256);
+    }
+    if (tag === 'select') {
+      return el.value == null ? null : String(el.value).slice(0, 256);
+    }
+    /* role=option fallback: aria-selected. */
+    if (el.getAttribute && el.getAttribute('aria-selected') === 'true') return 'selected';
+    return null;
+  }
+
+  function _jsonStringCanonical(s) {
+    /* RFC 8259 string encoding + the V24-04 normative rule: non-ASCII
+       escaped as \uXXXX lowercase. Eliminates engine divergence. */
+    let out = '"';
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      if (c === 0x22) out += '\\"';
+      else if (c === 0x5C) out += '\\\\';
+      else if (c === 0x08) out += '\\b';
+      else if (c === 0x0C) out += '\\f';
+      else if (c === 0x0A) out += '\\n';
+      else if (c === 0x0D) out += '\\r';
+      else if (c === 0x09) out += '\\t';
+      else if (c < 0x20 || c > 0x7E) {
+        let hex = c.toString(16);
+        while (hex.length < 4) hex = '0' + hex;
+        out += '\\u' + hex.toLowerCase();
+      } else {
+        out += s.charAt(i);
+      }
+    }
+    out += '"';
+    return out;
+  }
+
+  function _canonicalSerializeState(obj) {
+    /* Keys in alphabetical order: custom, disabled, text, value, visible. */
+    return '{'
+      + '"custom":'   + (obj.custom   === null ? 'null' : _jsonStringCanonical(obj.custom))   + ','
+      + '"disabled":' + (obj.disabled ? 'true' : 'false') + ','
+      + '"text":'     + (obj.text     === null ? 'null' : _jsonStringCanonical(obj.text))     + ','
+      + '"value":'    + (obj.value    === null ? 'null' : _jsonStringCanonical(obj.value))    + ','
+      + '"visible":'  + (obj.visible  ? 'true' : 'false')
+      + '}';
+  }
+
+  function _bytesToHexLower(bytes) {
+    let out = '';
+    for (let i = 0; i < bytes.length; i++) {
+      const v = bytes[i];
+      out += (v < 16 ? '0' : '') + v.toString(16);
+    }
+    return out;
+  }
+
+  /* Synchronous SHA-256 fallback. Used in non-secure contexts where
+     crypto.subtle is unavailable (HTTP iframes, legacy embeds).
+     Reference implementation (~80 LOC). Produces byte-identical
+     digests to crypto.subtle.digest('SHA-256', ...). */
+  function _sha256Sync(bytes) {
+    const K = [
+      0x428a2f98|0,0x71374491|0,0xb5c0fbcf|0,0xe9b5dba5|0,0x3956c25b|0,0x59f111f1|0,0x923f82a4|0,0xab1c5ed5|0,
+      0xd807aa98|0,0x12835b01|0,0x243185be|0,0x550c7dc3|0,0x72be5d74|0,0x80deb1fe|0,0x9bdc06a7|0,0xc19bf174|0,
+      0xe49b69c1|0,0xefbe4786|0,0x0fc19dc6|0,0x240ca1cc|0,0x2de92c6f|0,0x4a7484aa|0,0x5cb0a9dc|0,0x76f988da|0,
+      0x983e5152|0,0xa831c66d|0,0xb00327c8|0,0xbf597fc7|0,0xc6e00bf3|0,0xd5a79147|0,0x06ca6351|0,0x14292967|0,
+      0x27b70a85|0,0x2e1b2138|0,0x4d2c6dfc|0,0x53380d13|0,0x650a7354|0,0x766a0abb|0,0x81c2c92e|0,0x92722c85|0,
+      0xa2bfe8a1|0,0xa81a664b|0,0xc24b8b70|0,0xc76c51a3|0,0xd192e819|0,0xd6990624|0,0xf40e3585|0,0x106aa070|0,
+      0x19a4c116|0,0x1e376c08|0,0x2748774c|0,0x34b0bcb5|0,0x391c0cb3|0,0x4ed8aa4a|0,0x5b9cca4f|0,0x682e6ff3|0,
+      0x748f82ee|0,0x78a5636f|0,0x84c87814|0,0x8cc70208|0,0x90befffa|0,0xa4506ceb|0,0xbef9a3f7|0,0xc67178f2|0,
+    ];
+    let H = [0x6a09e667|0,0xbb67ae85|0,0x3c6ef372|0,0xa54ff53a|0,0x510e527f|0,0x9b05688c|0,0x1f83d9ab|0,0x5be0cd19|0];
+    /* Padding */
+    const ml = bytes.length;
+    const bits = ml * 8;
+    const padlen = (((ml + 9 + 63) >> 6) << 6) - ml;
+    const buf = new Uint8Array(ml + padlen);
+    buf.set(bytes, 0);
+    buf[ml] = 0x80;
+    /* big-endian 64-bit length, low 32 bits in the last 4 bytes */
+    buf[buf.length - 4] = (bits >>> 24) & 0xff;
+    buf[buf.length - 3] = (bits >>> 16) & 0xff;
+    buf[buf.length - 2] = (bits >>>  8) & 0xff;
+    buf[buf.length - 1] =  bits         & 0xff;
+    const W = new Int32Array(64);
+    function ROTR(x, n) { return (x >>> n) | (x << (32 - n)); }
+    for (let chunk = 0; chunk < buf.length; chunk += 64) {
+      for (let i = 0; i < 16; i++) {
+        W[i] = (buf[chunk + i*4    ] << 24) |
+               (buf[chunk + i*4 + 1] << 16) |
+               (buf[chunk + i*4 + 2] <<  8) |
+               (buf[chunk + i*4 + 3]);
+      }
+      for (let i = 16; i < 64; i++) {
+        const s0 = ROTR(W[i-15], 7) ^ ROTR(W[i-15], 18) ^ (W[i-15] >>> 3);
+        const s1 = ROTR(W[i-2], 17) ^ ROTR(W[i-2], 19) ^ (W[i-2] >>> 10);
+        W[i] = (W[i-16] + s0 + W[i-7] + s1) | 0;
+      }
+      let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+      for (let i = 0; i < 64; i++) {
+        const S1 = ROTR(e,6) ^ ROTR(e,11) ^ ROTR(e,25);
+        const ch = (e & f) ^ ((~e) & g);
+        const t1 = (h + S1 + ch + K[i] + W[i]) | 0;
+        const S0 = ROTR(a,2) ^ ROTR(a,13) ^ ROTR(a,22);
+        const mj = (a & b) ^ (a & c) ^ (b & c);
+        const t2 = (S0 + mj) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0;
+        d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      H[0]=(H[0]+a)|0; H[1]=(H[1]+b)|0; H[2]=(H[2]+c)|0; H[3]=(H[3]+d)|0;
+      H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+h)|0;
+    }
+    const out = new Uint8Array(32);
+    for (let i = 0; i < 8; i++) {
+      out[i*4    ] = (H[i] >>> 24) & 0xff;
+      out[i*4 + 1] = (H[i] >>> 16) & 0xff;
+      out[i*4 + 2] = (H[i] >>>  8) & 0xff;
+      out[i*4 + 3] =  H[i]         & 0xff;
+    }
+    return out;
+  }
+
+  async function _sha256(bytes) {
+    if (typeof crypto !== 'undefined' && crypto.subtle && crypto.subtle.digest) {
+      const buf = await crypto.subtle.digest('SHA-256', bytes);
+      return new Uint8Array(buf);
+    }
+    return _sha256Sync(bytes);
+  }
+
+  function _buildHashState(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const role = (el.getAttribute && (el.getAttribute('data-nac-role') || '')) || '';
+    let text = null;
+    if (role === 'action' || role === 'tab') {
+      const t = (el.textContent || '').trim();
+      text = t.slice(0, 256);
+    }
+    let value = null;
+    if (role === 'field' || role === 'option') {
+      value = _hashReadValue(el);
+    }
+    return {
+      custom: (el.getAttribute && el.getAttribute('data-nac-state')) || null,
+      disabled: el.disabled === true ||
+                (el.getAttribute && el.getAttribute('aria-disabled') === 'true'),
+      text: text,
+      value: value,
+      visible: _hashIsEffectivelyVisible(el),
+    };
+  }
+
+  function _encodeCanonical(canonical) {
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(canonical);
+    const b = new Uint8Array(canonical.length);
+    for (let i = 0; i < canonical.length; i++) b[i] = canonical.charCodeAt(i) & 0xff;
+    return b;
+  }
+
+  /* Async variant -- uses WebCrypto when available (faster on long
+     strings); falls back to the sync implementation in non-secure
+     contexts. Awaited by _resolveVersionExpectations on the hash
+     check path. */
+  async function _stateHashOf(el) {
+    const state = _buildHashState(el);
+    if (!state) return null;
+    const enc = _encodeCanonical(_canonicalSerializeState(state));
+    const digest = await _sha256(enc);
+    return _bytesToHexLower(digest.slice(0, 16));
+  }
+
+  /* Sync variant -- always uses _sha256Sync. Used by describe() so
+     the public read API stays synchronous. ~0.5-1ms per element on
+     modern V8; acceptable up to a few hundred elements per describe.
+     Hosts with thousands of elements should pre-cache via the
+     eager_hashing flag (future optimization). */
+  function _stateHashOfSync(el) {
+    const state = _buildHashState(el);
+    if (!state) return null;
+    const enc = _encodeCanonical(_canonicalSerializeState(state));
+    const digest = _sha256Sync(enc);
+    return _bytesToHexLower(digest.slice(0, 16));
+  }
+
+  /* ---- markHydrationComplete + 100ms fallback (RFC sec 5.10) ---- */
+
+  function _completeHydration(triggered_by) {
+    if (_hydration_complete) return;
+    _hydration_complete = true;
+    if (_hydration_fallback_timer) {
+      clearTimeout(_hydration_fallback_timer);
+      _hydration_fallback_timer = null;
+    }
+    /* Enumerate every registered plugin instance and emit per-plugin
+       events with from_version=null, plus a global tree event. */
+    const affected = [];
+    _plugin_versions.forEach(function (_n, key) {
+      const i = key.indexOf('|');
+      const slug = key.slice(0, i);
+      const inst = key.slice(i + 1) || null;
+      affected.push({ slug: slug, instance_id: inst });
+    });
+    /* Tree bump tagged as hydration_complete. */
+    _bumpTreeVersion('hydration_complete', affected.slice());
+    if (typeof document !== 'undefined') {
+      for (let i = 0; i < affected.length; i++) {
+        const a = affected[i];
+        const key = _pluginKey(a.slug, a.instance_id);
+        const curN = _plugin_versions.get(key) || 0;
+        document.dispatchEvent(new CustomEvent('nac:plugin:invalidated', {
+          detail: {
+            plugin_slug: a.slug,
+            plugin_instance_id: a.instance_id,
+            from_version: null,
+            to_version: 'v_' + curN,
+            trigger: 'hydration_complete',
+          },
+        }));
+      }
+    }
+  }
+
+  function markHydrationComplete() {
+    if (_hydration_complete) return;
+    _completeHydration('explicit');
+  }
+
+  function _armHydrationFallback() {
+    if (typeof document === 'undefined') return;
+    const start = function () {
+      _hydration_fallback_timer = setTimeout(function () {
+        if (!_hydration_complete) _completeHydration('fallback_100ms');
+      }, 100);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start, { once: true });
+    } else {
+      start();
+    }
+  }
+
+  /* ---- versionHistory devtools surface (RFC sec 5.9) ---- */
+
+  function versionHistory(limit) {
+    const n = (typeof limit === 'number' && limit > 0)
+      ? Math.min(limit, _version_history.length)
+      : Math.min(50, _version_history.length);
+    return _version_history.slice(-n).reverse();
+  }
+
+  /* ---- Resolver helper for expected_* checks (RFC sec 5.4 + 8.3) ----
+
+     Returns Promise<void>. Throws NacError on mismatch / tier reject /
+     STRICT-without-expectation. Cheap-to-expensive order:
+       1. STRICT gate
+       2. NAC-3 (non-versioned) tier rejects ANY expected_*
+       3. expected_plugin_version (integer compare)
+       4. expected_tree_version (integer compare)
+       5. expected_element_state_hash (SHA-256, awaited last)
+  */
+  async function _resolveVersionExpectations(opts, el) {
+    const o = opts || {};
+    const hasAny = ('expected_plugin_version' in o) ||
+                   ('expected_tree_version'   in o) ||
+                   ('expected_element_state_hash' in o);
+    if (_strictVersioningOn() && !hasAny) {
+      throw NacError('version_required',
+        'STRICT_VERSIONING is on; at least one expected_* required.',
+        { method: (o && o.method) || undefined });
+    }
+    /* Tier reject -- conformance_tier is exposed on the NAC export,
+       and a runtime that declares NAC-3 must NOT silently honor any
+       expected_*. */
+    const tier = (typeof window !== 'undefined' && window.NAC &&
+                  window.NAC.conformance_tier) || 'NAC-3-versioned';
+    if (tier === 'NAC-3' && hasAny) {
+      throw NacError('feature_not_supported',
+        'Runtime tier is NAC-3 (non-versioned); expected_* parameters are not honored.',
+        { tier: 'NAC-3', requested_feature: 'versioning' });
+    }
+    /* Plugin version */
+    if ('expected_plugin_version' in o) {
+      const scope = _resolvePluginScope(el);
+      if (scope) {
+        const cur = _pluginVersionFor(scope.slug, scope.instance_id);
+        if (o.expected_plugin_version !== cur) {
+          /* RFC V24-04 sec 5.5: extras nested under .detail.
+             NacError() flattens by default; mirror under detail
+             for the new versioning error class so agents reading
+             the RFC can use err.detail.reason directly. */
+          const detail = {
+            reason: 'plugin_changed',
+            plugin_slug: scope.slug,
+            plugin_instance_id: scope.instance_id,
+            expected_plugin_version: o.expected_plugin_version,
+            current_plugin_version: cur,
+          };
+          throw NacError('snapshot_stale',
+            'expected_plugin_version=' + o.expected_plugin_version +
+            ' current_plugin_version=' + cur,
+            Object.assign({ detail: detail }, detail));
+        }
+      }
+    }
+    /* Tree version */
+    if ('expected_tree_version' in o) {
+      const cur = _treeVersionStr();
+      if (o.expected_tree_version !== cur) {
+        const detail = {
+          reason: 'tree_changed',
+          expected_tree_version: o.expected_tree_version,
+          current_tree_version: cur,
+        };
+        throw NacError('snapshot_stale',
+          'expected_tree_version=' + o.expected_tree_version +
+          ' current_tree_version=' + cur,
+          Object.assign({ detail: detail }, detail));
+      }
+    }
+    /* Element state hash (awaited last) */
+    if ('expected_element_state_hash' in o) {
+      const cur = await _stateHashOf(el);
+      if (o.expected_element_state_hash !== cur) {
+        const detail = {
+          reason: 'element_changed',
+          expected_element_state_hash: o.expected_element_state_hash,
+          current_element_state_hash: cur,
+        };
+        throw NacError('snapshot_stale',
+          'expected_element_state_hash=' + o.expected_element_state_hash +
+          ' current_element_state_hash=' + cur,
+          Object.assign({ detail: detail }, detail));
+      }
+    }
+  }
+
+  /* Read back the post-dispatch versions. Used by every mutating API
+     after the side effect lands. Pair with _flushObserverQueue() to
+     guarantee MutationObserver records have been integrated. */
+  function _atVersionsFor(el) {
+    const scope = _resolvePluginScope(el);
+    return {
+      at_plugin_version: scope ? _pluginVersionFor(scope.slug, scope.instance_id) : null,
+      at_tree_version:   _treeVersionStr(),
+    };
+  }
+
+  /* Flush pending MutationObserver records into version bumps before
+     resolving the promise (RFC sec 5.8). queueMicrotask is enough --
+     the observer fires once per microtask flush. */
+  function _flushObserverQueue() {
+    return new Promise(function (resolve) {
+      if (typeof queueMicrotask === 'function') {
+        queueMicrotask(resolve);
+      } else {
+        Promise.resolve().then(resolve);
+      }
+    });
+  }
+
+  /* ==================================================================
+     End of v2.4 / RFC V24-04 foundation block.
+     ================================================================== */
+
+  /* H1.v7 (2026-05-21): structured disambiguation contract.
+     When the runtime cannot resolve an id/verb/qualifier/label
+     unambiguously, it MUST emit `nac:disambiguation_requested` with
+     a structured candidate list so reactive hosts (chat UI, voice
+     agent, assistive software) can present the choices to the user.
+     The error thrown alongside carries the same candidates on
+     err.candidates so synchronous catchers can also recover.
+
+     Detail shape:
+       method:   'click_by_verb' | 'tab' | 'tab_by_label' | ...
+       plugin:   string | null
+       query:    { verb, qualifier, label, id, ... }   (whatever applies)
+       candidates: [{ nac_id: '...', label: '...' }, ...]
+
+     Hosts SHOULD listen on document and reply by re-dispatching
+     with a more specific qualifier/id. Voice agents SHOULD speak
+     "Did you mean A or B?" using the labels. */
+  function _emitDisambiguationRequested(detail) {
+    if (typeof document === 'undefined' || !document.dispatchEvent) return;
+    try {
+      document.dispatchEvent(new CustomEvent('nac:disambiguation_requested', {
+        detail: detail,
+      }));
+    } catch (e) { /* tolerated -- runtime should still throw */ }
+  }
+
+  function _candidateLabel(el) {
+    /* Best-effort human label for a DOM element. Used in
+       candidates[].label so voice/assistive can re-prompt. */
+    if (!el) return '';
+    const al = el.getAttribute && el.getAttribute('aria-label');
+    if (al) return String(al).trim();
+    const tx = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (tx) return tx.slice(0, 120);
+    return el.getAttribute && el.getAttribute('data-nac-id') || '';
+  }
+
+  /* ---------- v1.8.0: skip-validate, command-events, dedup ------- */
+
+  /* Spec sec 5: data-nac-validate="skip" marks a subtree (typically
+     a third-party widget) as out of scope for NAC-3 validation. The
+     validator must NOT raise hard errors on elements inside such
+     subtrees. The runtime walks ancestors looking for the marker.
+     If the skipped subtree contains [data-nac-id] elements, validate()
+     surfaces a structured warning (severity: 'warn', code:
+     'skip_subtree_contains_interactives') so authors notice that
+     they are excluding interactive surface. */
+  function _validateSkipAncestor(el) {
+    if (!el || typeof el.closest !== 'function') return null;
+    return el.closest('[data-nac-validate="skip"]');
+  }
+
+  /* Spec sec 6.2.28 nac:command:rejected and nac:command:failed.
+     Emitted by NAC.click/fill/expand/drag_drop/sort/etc when:
+       rejected = preflight check failed (target disabled, hidden,
+                  not_found, ambiguous, drag-type-mismatch).
+       failed   = unexpected throw during execution (host handler
+                  raised, network error during fetch, etc).
+     These close the silent-failure gap reviewers flagged in v1.7
+     for users delegating multi-step UI work to AI assistants. */
+  function _emitCommandRejected(detail) {
+    detail = detail || {};
+    /* command_method = 'click' | 'fill' | 'drag_drop' | ... */
+    /* command_target = nac_id string (or null if unresolvable) */
+    /* reason = 'disabled' | 'hidden' | 'not_found' | 'ambiguous' |
+                'drag_type_mismatch' | 'invalid' */
+    /* message = optional human-readable string */
+    /* v1.9.0 (sec 6.2.30): pre-populate recommended_remediation
+       so consumers see the canonical next-step without each one
+       implementing the table. */
+    if (!detail.recommended_remediation && detail.reason) {
+      detail.recommended_remediation = _remediationByReasonLookup(detail.reason);
+    }
+    _emit('nac:command:rejected', _withDefaultSource(detail, 'script'));
+  }
+  function _emitCommandFailed(detail) {
+    detail = detail || {};
+    /* Same shape as rejected, plus error_message + optional
+       error_stack snippet. */
+    if (!detail.recommended_remediation && detail.reason) {
+      detail.recommended_remediation = _remediationByReasonLookup(detail.reason);
+    }
+    _emit('nac:command:failed', _withDefaultSource(detail, 'script'));
+  }
+  /* Forward-declared lookup; populated when _REMEDIATION_BY_REASON
+     loads later in the file. Keeping the helper inline so emit
+     sites do not need to know the table. */
+  function _remediationByReasonLookup(reason) {
+    if (typeof _REMEDIATION_BY_REASON === 'undefined') {
+      return 'escalate_to_human';
+    }
+    return _REMEDIATION_BY_REASON[reason] || 'escalate_to_human';
+  }
+
+  /* Spec sec 6.2 ProvenanceBlock: every emitted event MAY carry
+     source: { type: 'user' | 'agent' | 'script', id?, tool? }.
+     The runtime defaults to {type:'script'} for events emitted
+     from NAC.click/fill/etc; callers can override by passing
+     opts.source. User-initiated events (real DOM clicks via the
+     mouse, real keyboard input) carry {type:'user'}. */
+  function _withDefaultSource(detail, defaultType) {
+    detail = detail || {};
+    if (!detail.source) {
+      detail.source = { type: defaultType || 'script' };
+    } else if (typeof detail.source === 'string') {
+      detail.source = { type: detail.source };
+    }
+    return detail;
+  }
+
+  /* Spec sec 6.2 legacy_event_field warning deduplication.
+     v1.7 emits a console.warn whenever a consumer reads a legacy
+     alias (e.g. detail.nac_id when the canonical is detail.field_id).
+     Without dedup, a chatty page can flood the console with 100s
+     of identical warnings per session. Key by (event_type, field).
+     Reset by calling NAC.__resetLegacyWarnDedup() (test-only). */
+  const _legacyWarnSeen = Object.create(null);
+  function _legacyWarn(eventType, field, canonical) {
+    const key = eventType + '::' + field;
+    if (_legacyWarnSeen[key]) return;
+    _legacyWarnSeen[key] = true;
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn('[NAC] legacy_event_field: ' + eventType +
+        ' detail.' + field + ' is a legacy alias. Use detail.' +
+        canonical + ' instead. Will be removed in v2.0.');
+    }
+  }
+
+  /* Spec sec 13.4.1 v1.9.0: drag-type registry. Recognised
+     canonical types per the spec; matchers are pattern-based
+     (e.g. 'image/*' matches 'image/png'). Custom types outside
+     the registry are accepted but validate() emits a
+     drag_type_unknown warning so authors notice ad-hoc types
+     that hurt cross-app interop. */
+  const _DRAG_TYPE_REGISTRY = [
+    /^text\/(plain|markdown|html|csv|uri-list)$/,
+    /^image\/(.+)$/,
+    /^audio\/(.+)$/,
+    /^video\/(.+)$/,
+    /^application\/(json|pdf|json\+card|json\+row|json\+task)$/,
+    /^card\/[a-z][a-z0-9_]*$/,
+    /^row\/[a-z][a-z0-9_]*$/,
+    /^file\/[a-z0-9]+$/,
+    /^(tag|note|event|chart-series|tree-node|\*)$/,
+  ];
+  function _isRegisteredDragType(t) {
+    if (!t || typeof t !== 'string') return false;
+    const norm = t.trim().toLowerCase();
+    if (!norm) return false;
+    for (let i = 0; i < _DRAG_TYPE_REGISTRY.length; i++) {
+      if (_DRAG_TYPE_REGISTRY[i].test(norm)) return true;
+    }
+    return false;
+  }
+
+  /* Spec sec 13.4 v1.8.0: drag_drop type validation.
+     Source declares data-nac-drag-type (e.g. "card", "row").
+     Target declares data-nac-drag-accept (CSV: "card,row,*"
+     or "*" for any). Mismatch -> nac:command:rejected with
+     reason: 'drag_type_mismatch'. Used by drag_drop() below.
+     v1.9: case-insensitive + whitespace-trimmed matching. */
+  function _dragTypesCompatible(source_el, target_el) {
+    if (!source_el || !target_el) return false;
+    const stype = (source_el.getAttribute('data-nac-drag-type') || '').trim().toLowerCase();
+    const accept = (target_el.getAttribute('data-nac-drag-accept') || '*').trim().toLowerCase();
+    if (!stype) return true; /* untyped source: assume compatible */
+    if (accept === '*' || accept === '') return true;
+    const types = accept.split(',').map(function (s) { return s.trim(); });
+    return types.indexOf(stype) >= 0 || types.indexOf('*') >= 0;
+  }
+
+  /* ---------- v1.9.0: ARIA preflight + ARIA bridge ---------------- */
+
+  /* Spec sec 7.3.3: before invoking the host handler on NAC.click /
+     fill / drag_drop, the runtime walks the target's ancestors for
+     inert + aria-disabled (which inherit) and checks the target
+     itself for aria-busy / aria-hidden / aria-readonly. Returns
+     null if the element is operable, or a {reason, message} struct
+     if a preflight check rejects.
+     The drift tolerance window (sec 7.3.2) does NOT apply here --
+     this is a preflight gate, not a state-mismatch detector. */
+  function _ariaPreflight(el, kind) {
+    if (!el) return null;
+    /* aria-disabled and inert inherit from ancestors. */
+    var anc = el;
+    while (anc && anc !== document.body) {
+      if (anc.hasAttribute && anc.hasAttribute('inert')) {
+        return { reason: 'inert',
+          message: 'Element ancestor is inert' };
+      }
+      if (anc.getAttribute && anc.getAttribute('aria-disabled') === 'true') {
+        return { reason: 'disabled',
+          message: 'Element or ancestor has aria-disabled=true' };
+      }
+      anc = anc.parentElement;
+    }
+    /* aria-busy / aria-hidden / aria-readonly check the target only. */
+    if (el.getAttribute && el.getAttribute('aria-busy') === 'true') {
+      return { reason: 'aria_busy',
+        message: 'Element has aria-busy=true' };
+    }
+    /* readonly only blocks fill (clicks on a readonly button are fine). */
+    if (kind === 'fill' &&
+        (el.hasAttribute('readonly') ||
+         el.getAttribute('aria-readonly') === 'true')) {
+      return { reason: 'readonly',
+        message: 'Field is readonly' };
+    }
+    return null;
+  }
+
+  /* Spec sec 3.1 v1.9.0: ARIA bridge for data-nac-a11y-hint.
+     Screen readers do not read data-nac-* attributes. To make
+     a11y_hint consumable today, the runtime mounts a hidden
+     live region per page and appends per-element hint text via
+     aria-describedby. */
+  const _A11Y_HINT_DEFAULTS = {
+    'irreversible':         'This action cannot be undone.',
+    'requires_confirmation':'Confirmation will be required.',
+    'dangerous':            'Dangerous action.',
+    'long_running':         'May take a while.',
+    'costly':               'Triggers a billable side effect.',
+    'external_side_effect': 'Affects external systems.',
+    'data_loss':            'Replaces data without preservation.',
+    /* v1.9.0 vocabulary additions (sec 3.1, DeepSeek v1.8 finding). */
+    'session_boundary':     'This action ends the session.',
+    'audit_required':       'Action subject to compliance audit.',
+  };
+
+  /* Spec sec 3.1 v1.9.0: hint priority ordering normative.
+     Highest priority first. Custom hints sort to the bottom
+     unless a host registers a custom priority via
+     NAC.set_hint_priority(). */
+  const _DEFAULT_HINT_PRIORITY = [
+    'audit_required', 'session_boundary',
+    'irreversible', 'data_loss', 'dangerous',
+    'external_side_effect', 'costly',
+    'requires_confirmation', 'long_running',
+  ];
+  let _hint_priority = _DEFAULT_HINT_PRIORITY.slice();
+  function set_hint_priority(arr) {
+    if (Array.isArray(arr) && arr.length > 0) _hint_priority = arr.slice();
+  }
+  function sort_hints_by_priority(hints) {
+    if (!Array.isArray(hints)) return [];
+    const known = []; const custom = [];
+    for (let i = 0; i < hints.length; i++) {
+      if (_hint_priority.indexOf(hints[i]) >= 0) known.push(hints[i]);
+      else custom.push(hints[i]);
+    }
+    known.sort(function (a, b) {
+      return _hint_priority.indexOf(a) - _hint_priority.indexOf(b);
+    });
+    return known.concat(custom);
+  }
+  let _a11y_hint_localizer = null;
+  function set_a11y_hint_localizer(fn) {
+    _a11y_hint_localizer = (typeof fn === 'function') ? fn : null;
+    /* Re-render any existing bridges so the new locale takes effect. */
+    _bridgeAllA11yHints();
+  }
+  function _localizeHintTag(tag, locale) {
+    if (_a11y_hint_localizer) {
+      try {
+        var v = _a11y_hint_localizer(tag, locale);
+        if (typeof v === 'string' && v) return v;
+      } catch (e) { /* fall through */ }
+    }
+    return _A11Y_HINT_DEFAULTS[tag] || tag;
+  }
+  function _ensureHintRegion() {
+    var r = document.getElementById('nac-a11y-hint-region');
+    if (r) return r;
+    r = document.createElement('div');
+    r.id = 'nac-a11y-hint-region';
+    r.setAttribute('role', 'status');
+    r.setAttribute('aria-live', 'polite');
+    /* Visually hidden but readable by AT. Inline so hosts don't
+       have to ship our CSS. */
+    r.style.cssText =
+      'position:absolute;width:1px;height:1px;padding:0;margin:-1px;'
+    + 'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;'
+    + 'border:0;';
+    document.body.appendChild(r);
+    return r;
+  }
+  function _bridgeOneA11yHint(el) {
+    if (!el || !el.getAttribute) return;
+    var hintRaw = el.getAttribute('data-nac-a11y-hint');
+    if (!hintRaw) return;
+    var tags = hintRaw.split('|').map(function (s) { return s.trim(); })
+                                 .filter(function (s) { return s.length > 0; });
+    if (!tags.length) return;
+    var locale = (document.documentElement.lang || 'en').split('-')[0];
+    var text = tags.map(function (t) { return _localizeHintTag(t, locale); })
+                   .join(' ');
+    /* Find or create a per-element span carrying the hint text. */
+    var spanId = el.getAttribute('data-nac-a11y-hint-span-id');
+    if (!spanId) {
+      spanId = 'nac-hint-' + Math.random().toString(36).slice(2, 10);
+      el.setAttribute('data-nac-a11y-hint-span-id', spanId);
+    }
+    var region = _ensureHintRegion();
+    var span = document.getElementById(spanId);
+    if (!span) {
+      span = document.createElement('span');
+      span.id = spanId;
+      region.appendChild(span);
+    }
+    span.textContent = text;
+    /* Append to existing aria-describedby (preserve any host value). */
+    var describedBy = el.getAttribute('aria-describedby') || '';
+    var ids = describedBy.split(/\s+/).filter(function (s) { return s.length > 0; });
+    if (ids.indexOf(spanId) < 0) {
+      ids.push(spanId);
+      el.setAttribute('aria-describedby', ids.join(' '));
+    }
+  }
+  function _bridgeAllA11yHints() {
+    var els = document.querySelectorAll('[data-nac-a11y-hint]');
+    Array.prototype.forEach.call(els, _bridgeOneA11yHint);
+  }
+  /* Run the bridge once at install + observe future mutations. */
+  function _installA11yHintBridge() {
+    if (typeof MutationObserver === 'undefined') {
+      _bridgeAllA11yHints();
+      return;
+    }
+    var run = function () { _bridgeAllA11yHints(); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      run();
+    }
+    var mo = new MutationObserver(function (mutations) {
+      var dirty = false;
+      mutations.forEach(function (m) {
+        if (m.type === 'attributes' &&
+            m.attributeName === 'data-nac-a11y-hint') {
+          dirty = true;
+        } else if (m.type === 'childList' && m.addedNodes.length) {
+          for (var i = 0; i < m.addedNodes.length; i++) {
+            var n = m.addedNodes[i];
+            if (n.nodeType === 1 &&
+                (n.hasAttribute && n.hasAttribute('data-nac-a11y-hint') ||
+                 n.querySelector && n.querySelector('[data-nac-a11y-hint]'))) {
+              dirty = true; break;
+            }
+          }
+        }
+      });
+      if (dirty) _bridgeAllA11yHints();
+    });
+    mo.observe(document.body || document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-nac-a11y-hint'],
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  /* ---------- Registry -------------------------------------------- */
+
+  const _manifests = Object.create(null);
+  const _instances = Object.create(null);
+
+  /* v2.3 (F7) -- auth-aware capabilities. Hosts call
+     NAC.setCapabilities([...]) when the user logs in / role changes.
+     Manifest entries opt in by declaring `requires_capability` on the
+     element or on a specific verb. Public verbs (NAC.click /
+     NAC.invoke) gate before dispatch and reject with
+     code='capability_required' if the cap is absent. */
+  let _userCapabilities = new Set();
+
+  function _resolveCapability(nac_id, verb) {
+    /* Walk every registered manifest, find a matching element id, and
+       return:
+         - the verb-specific requires_capability if verb is given and
+           the matching verb entry has one set,
+         - else the element-level requires_capability,
+         - else null. */
+    for (const slug in _manifests) {
+      const m = _manifests[slug];
+      if (!m) continue;
+      const all = (m.elements || []).concat(m.tabs || []);
+      for (let i = 0; i < all.length; i++) {
+        const e = all[i];
+        if (!e || e.id !== nac_id) continue;
+        /* verb-level. */
+        if (verb && Array.isArray(e.actions)) {
+          for (let j = 0; j < e.actions.length; j++) {
+            const a = e.actions[j];
+            if (a && a.verb === verb && a.requires_capability) {
+              return a.requires_capability;
+            }
+          }
+        }
+        /* element-level fallback. */
+        if (e.requires_capability) return e.requires_capability;
+        return null;
+      }
+    }
+    return null;
+  }
+
+  function _hasCapability(cap) {
+    if (!cap) return true;
+    if (Array.isArray(cap)) {
+      /* Array semantics: user must have AT LEAST ONE of the listed
+         capabilities (OR). Use repeated array entries OR a higher-
+         level guard for AND semantics. */
+      for (let i = 0; i < cap.length; i++) {
+        if (_userCapabilities.has(cap[i])) return true;
+      }
+      return false;
+    }
+    return _userCapabilities.has(cap);
+  }
+
+  function setCapabilities(arr) {
+    /* Accepts an array, a single string, or null (clears).
+       Replaces the entire set; for incremental updates use
+       grantCapability / revokeCapability. */
+    if (arr == null) { _userCapabilities = new Set(); return; }
+    if (typeof arr === 'string') arr = [arr];
+    if (!Array.isArray(arr)) {
+      throw NacError('invalid', 'setCapabilities: array of strings required');
+    }
+    _userCapabilities = new Set(arr.map(String));
+  }
+  function grantCapability(cap)  { _userCapabilities.add(String(cap)); }
+  function revokeCapability(cap) { _userCapabilities.delete(String(cap)); }
+  function userCapabilities()    { return Array.from(_userCapabilities); }
+
+  /* register(manifest)            -- canonical, plugin_slug inside manifest
+     register(slug, manifest)      -- v1.4.1: accepted for back-compat with
+                                      integrators that match the typical
+                                      "id-then-payload" RPC shape. If both
+                                      slug and manifest.plugin_slug are
+                                      present, manifest.plugin_slug wins so
+                                      the manifest stays canonical. If only
+                                      the slug arg is present, it is copied
+                                      into manifest.plugin_slug. */
+  /* v2.2.0 (V22-01) -- canonical role set + strict validator.
+     Maintained alongside _CLICK_EVENT_FAMILY (line 1160). When you
+     add a role here, also add it to that family map (or document
+     why it has no completion event). */
+  const _KNOWN_ROLES_V22 = new Set([
+    'plugin', 'section', 'region',
+    'action', 'field', 'option',
+    'tab', 'breadcrumb-item', 'accordion-toggle',
+    'step', 'pagination-item', 'confirm-button',
+    'sort-control', 'filter-control', 'data-table',
+    'navigation', 'confirm-dialog',
+    /* Drag-and-drop primitives (v1.6.2). */
+    'draggable', 'drop-target',
+    /* Tolerated for legacy buttons that just need to be clickable
+       without contract. Falls back to action behaviour at runtime. */
+    'button'
+  ]);
+
+  function _v22Emit(severity, code, nac_id, message, detail) {
+    const fn = severity === 'error'
+      ? (typeof console !== 'undefined' && console.error  ? console.error.bind(console) : null)
+      : (typeof console !== 'undefined' && console.warn   ? console.warn.bind(console)  : null);
+    if (fn) fn('[NAC v2.2 ' + severity + '][' + code + '] ' + message,
+      detail ? detail : '');
+    /* In strict mode, the caller (_v22StrictValidate) throws after
+       collecting findings. */
+  }
+
+  function _v22StrictValidate(manifest) {
+    const slug = manifest.plugin_slug;
+    const findings = [];
+    const elements = Array.isArray(manifest.elements) ? manifest.elements : [];
+    const tabsArr  = Array.isArray(manifest.tabs)     ? manifest.tabs     : [];
+
+    function check(el, source) {
+      if (!el || typeof el !== 'object') return;
+      const id   = String(el.id || el.nac_id || '');
+      const role = String(el.role || '');
+      if (!id) return; /* spec-level error caught elsewhere */
+
+      /* Check 1: role enumeration. */
+      if (role && !_KNOWN_ROLES_V22.has(role)) {
+        findings.push({
+          code: 'manifest_role_unknown',
+          nac_id: id,
+          message: 'plugin "' + slug + '" id="' + id + '" has unknown role="' + role +
+                   '". Known roles: ' + Array.from(_KNOWN_ROLES_V22).join(', '),
+          detail: { plugin: slug, source: source, role: role }
+        });
+      }
+
+      /* Check 2: tab-id naming convention -- id like "tab.X" MUST
+         have role 'tab'. Catches the role drift class that broke
+         example-v21-data-table.php on 2026-05-09. */
+      if (/^tab\./.test(id) && role !== 'tab') {
+        findings.push({
+          code: 'tab_id_manifest_role_drift',
+          nac_id: id,
+          message: 'plugin "' + slug + '" id="' + id + '" looks like a tab but role="' +
+                   (role || 'unset') + '". NAC.tab() and NAC.tab_by_label() will not find it.',
+          detail: { plugin: slug, source: source, role: role }
+        });
+      }
+
+      /* Check 3: DOM coherence -- if the element is mounted, its
+         data-nac-role MUST match. Skip when DOM is not yet ready
+         (a deferred check runs on DOMContentLoaded). */
+      if (typeof document !== 'undefined' && document.body) {
+        const domEl = document.querySelector('[data-nac-id="' + id + '"]');
+        if (domEl) {
+          const domRole = domEl.getAttribute('data-nac-role');
+          if (domRole && role && domRole !== role) {
+            findings.push({
+              code: 'manifest_dom_role_mismatch',
+              nac_id: id,
+              message: 'plugin "' + slug + '" id="' + id +
+                       '": manifest says role="' + role +
+                       '" but DOM says role="' + domRole + '"',
+              detail: { plugin: slug, source: source, manifest_role: role, dom_role: domRole }
+            });
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < elements.length; i++) check(elements[i], 'elements');
+    for (let i = 0; i < tabsArr.length;  i++) check(tabsArr[i],  'tabs');
+
+    /* Emit each finding. */
+    for (const f of findings) _v22Emit('error', f.code, f.nac_id, f.message, f.detail);
+
+    if (findings.length && NAC.STRICT_VALIDATION) {
+      const e = new Error('NAC strict validation failed (' + findings.length + ' findings)');
+      e.code = 'strict_validation';
+      e.findings = findings;
+      throw e;
+    }
+  }
+
+  /* v2.2.0 (V22-02) -- bindAction helper.
+
+     Spec sec 6.2 requires every role='action' click handler to
+     emit nac:action:succeeded after its synchronous side effect.
+     Brownfield panels routinely forget this, producing a 5s
+     timeout from NAC.click() even when the side effect already
+     ran (cf. example-v20-full.php v20_panel buttons fixed by
+     wrapping bind() locally on 2026-05-09).
+
+     This helper bakes the contract into the runtime. Adopters who
+     want their handlers to stay conformant just call:
+
+       NAC.bindAction(buttonEl, function (ev) { ... }, {
+         plugin: 'invoice', action_id: 'invoice.save'
+       });
+
+     The helper:
+       1. Calls the user's handler synchronously.
+       2. If the handler throws, emits nac:action:failed with the
+          error.
+       3. Otherwise emits nac:action:succeeded with {plugin,
+          action_id, is_trusted: ev.isTrusted}.
+       4. If the handler returns a Promise, waits for resolve/reject
+          and emits the appropriate event after.
+
+     For role='action' panels you can use this as a drop-in for
+     addEventListener('click', ...). Other roles use their own
+     event family (sec 6); a 'tab' uses nac:tab:activated, etc.
+     This helper is action-only by design; we ship a sibling
+     helper for tabs in v2.3. */
+  function bindAction(el, handler, ctx) {
+    if (!el)                       throw NacError('invalid', 'bindAction: element required');
+    if (typeof handler !== 'function') throw NacError('invalid', 'bindAction: handler must be a function');
+    if (!ctx || !ctx.plugin || !ctx.action_id) {
+      throw NacError('invalid', 'bindAction: ctx.plugin and ctx.action_id required');
+    }
+    const plugin = String(ctx.plugin);
+    const action_id = String(ctx.action_id);
+
+    function emitSuccess(ev) {
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail: {
+          plugin: plugin,
+          action_id: action_id,
+          is_trusted: ev ? !!ev.isTrusted : false
+        }
+      }));
+    }
+    function emitFailure(ev, err) {
+      document.dispatchEvent(new CustomEvent('nac:action:failed', {
+        detail: {
+          plugin: plugin,
+          action_id: action_id,
+          is_trusted: ev ? !!ev.isTrusted : false,
+          error: (err && err.message) || String(err)
+        }
+      }));
+    }
+
+    function listener(ev) {
+      let result;
+      try {
+        result = handler.call(el, ev);
+      } catch (err) {
+        emitFailure(ev, err);
+        throw err; /* preserve normal click-handler error semantics */
+      }
+      if (result && typeof result.then === 'function') {
+        result.then(
+          function () { emitSuccess(ev); },
+          function (err) { emitFailure(ev, err); }
+        );
+      } else {
+        emitSuccess(ev);
+      }
+    }
+
+    el.addEventListener('click', listener);
+    /* Return an unbinder so callers can clean up if needed. */
+    return function unbind() {
+      el.removeEventListener('click', listener);
+    };
+  }
+
+  /* v2.3 (F2): bindTab -- the tab companion to bindAction. Bakes the
+     `nac:tab:activated` contract event into the runtime so tab handlers
+     don't have to remember to emit it. Same shape, different event
+     family. ctx must carry { plugin, tab_id }.
+
+     Activation event fires nac:tab:activated on document. On handler
+     throw or rejected promise, emits nac:tab:activation_failed with
+     the same detail shape plus the error message.
+
+     Like bindAction, listens on 'click' (the canonical user activation).
+     Hosts that activate tabs via keyboard or programmatic state must
+     dispatch their own click on the element, OR call bindTab with a
+     custom activate event (opts.activate_event). */
+  function bindTab(el, handler, ctx, opts) {
+    if (!el)                           throw NacError('invalid', 'bindTab: element required');
+    if (typeof handler !== 'function') throw NacError('invalid', 'bindTab: handler must be a function');
+    if (!ctx || !ctx.plugin || !ctx.tab_id) {
+      throw NacError('invalid', 'bindTab: ctx.plugin and ctx.tab_id required');
+    }
+    const plugin     = String(ctx.plugin);
+    const tab_id     = String(ctx.tab_id);
+    const activateEv = (opts && opts.activate_event) || 'click';
+
+    function emitActivated(ev) {
+      document.dispatchEvent(new CustomEvent('nac:tab:activated', {
+        detail: {
+          plugin:     plugin,
+          tab_id:     tab_id,
+          is_trusted: ev ? !!ev.isTrusted : false
+        }
+      }));
+    }
+    function emitFailure(ev, err) {
+      document.dispatchEvent(new CustomEvent('nac:tab:activation_failed', {
+        detail: {
+          plugin:     plugin,
+          tab_id:     tab_id,
+          is_trusted: ev ? !!ev.isTrusted : false,
+          error:      (err && err.message) || String(err)
+        }
+      }));
+    }
+
+    function listener(ev) {
+      let result;
+      try {
+        result = handler.call(el, ev);
+      } catch (err) {
+        emitFailure(ev, err);
+        throw err;
+      }
+      if (result && typeof result.then === 'function') {
+        result.then(
+          function () { emitActivated(ev); },
+          function (err) { emitFailure(ev, err); }
+        );
+      } else {
+        emitActivated(ev);
+      }
+    }
+
+    el.addEventListener(activateEv, listener);
+    return function unbind() {
+      el.removeEventListener(activateEv, listener);
+    };
+  }
+
+  /* ===================================================================
+     v2.3 PREVIEW (V23-01) -- Field editor primitive.
+
+     A user (or an agent on their behalf) can ask "edit X" on any
+     field. The runtime opens a modal with selection + replace +
+     delete + AI syntax-correct verbs, all NAC-3 callable. The
+     spec sec 13 will formalise the contract in v2.3; we ship the
+     reference impl now so adopters can wire it.
+
+     Usage from agent or user:
+       NAC.click_by_verb('myplugin', 'edit_field', { nac_id: 'invoice.client_name' })
+       NAC.edit_field('invoice.client_name')
+
+     Modal verbs (registered under plugin_slug='nac_editor'):
+       select_word        -- select the word at the caret
+       select_sentence    -- select the sentence at the caret
+       select_all         -- ctrl-A
+       replace            -- replace selection with given text
+       delete_selection   -- delete current selection
+       ai_correct_syntax  -- POST current value to chat backend
+                             with system prompt "fix grammar +
+                             spelling, return only fixed text",
+                             replace value with response
+       save               -- write back to source field, close
+       cancel             -- discard, close
+  ================================================================== */
+
+  let _editorState = null;  /* { sourceEl, modal, textarea, originalValue } */
+
+  function _ensureEditorStyles() {
+    if (document.getElementById('nac-editor-styles')) return;
+    const css = `
+      .nac-editor-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 2147482999;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .nac-editor-modal {
+        background: #fff; border-radius: 10px;
+        width: min(720px, 90vw); max-height: 80vh;
+        display: flex; flex-direction: column;
+        box-shadow: 0 24px 64px rgba(0,0,0,.25);
+        overflow: hidden;
+        font-family: 'DM Sans', system-ui, sans-serif;
+      }
+      .nac-editor-head {
+        padding: 12px 16px;
+        background: #1a1a1a; color: #f5f5f5;
+        border-bottom: 2px solid #c8a04d;
+        display: flex; align-items: center; gap: 12px;
+      }
+      .nac-editor-head .title { font-weight: 600; flex: 1; }
+      .nac-editor-toolbar {
+        padding: 10px 12px;
+        background: #f4f3f0;
+        border-bottom: 1px solid #e5e5e5;
+        display: flex; gap: 6px; flex-wrap: wrap;
+      }
+      .nac-editor-toolbar button {
+        background: #fff; color: #1a1a1a;
+        border: 1px solid #e5e5e5; border-radius: 4px;
+        padding: 5px 10px; font-size: 12px;
+        cursor: pointer; font-family: inherit;
+      }
+      .nac-editor-toolbar button:hover { background: #f4f3f0; border-color: #c8a04d; }
+      .nac-editor-textarea {
+        flex: 1;
+        padding: 16px;
+        border: none; outline: none;
+        font-family: 'Fira Code', 'SF Mono', monospace;
+        font-size: 14px; line-height: 1.55;
+        resize: vertical; min-height: 200px;
+        color: #1a1a1a;
+      }
+      .nac-editor-foot {
+        padding: 10px 16px;
+        background: #fff;
+        border-top: 1px solid #e5e5e5;
+        display: flex; gap: 8px; justify-content: flex-end;
+      }
+      .nac-editor-foot button {
+        padding: 8px 18px; border-radius: 6px;
+        font-size: 14px; font-weight: 600;
+        cursor: pointer; font-family: inherit;
+      }
+      .nac-editor-foot .save {
+        background: #1a1a1a; color: #f5f5f5; border: none;
+      }
+      .nac-editor-foot .cancel {
+        background: transparent; color: #1a1a1a;
+        border: 1px solid #e5e5e5;
+      }
+      .nac-editor-status {
+        padding: 6px 16px; font-size: 12px; color: #888;
+        background: #fafafa; border-top: 1px solid #e5e5e5;
+      }
+    `;
+    const style = document.createElement('style');
+    style.id = 'nac-editor-styles';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  function _editorRegisterManifest() {
+    /* Idempotent registration of the editor's own plugin so its
+       buttons appear in NAC.describe() and any external agent
+       can call them by id. */
+    if (_manifests['nac_editor']) return;
+    register({
+      plugin_slug: 'nac_editor',
+      version: '2.3.0',
+      nac_version: '2.3',  /* primitive promoted from preview to GA in v2.3 stable (F4) */
+      elements: [
+        { id: 'nac_editor.modal', role: 'region',
+          label_i18n: { es:'Editor de campo',en:'Field editor',pt:'Editor',fr:'Editeur',
+                        it:'Editore',de:'Editor',ja:'エディタ',zh:'编辑器',hi:'editor',ar:'محرر' } },
+        { id: 'nac_editor.textarea', role: 'field',
+          label_i18n: { es:'Texto',en:'Text',pt:'Texto',fr:'Texte',it:'Testo',
+                        de:'Text',ja:'テキスト',zh:'文本',hi:'text',ar:'نص' } },
+        { id: 'nac_editor.select_word', role: 'action',
+          actions: [{ verb: 'select_word',
+            label_i18n: { es:'Seleccionar palabra',en:'Select word',pt:'Selecionar palavra',
+                          fr:'Selectionner mot',it:'Seleziona parola',de:'Wort markieren',
+                          ja:'単語選択',zh:'选词',hi:'shabd chuno',ar:'حدد كلمة' } }],
+          label_i18n: { es:'Palabra',en:'Word',pt:'Palavra',fr:'Mot',it:'Parola',
+                        de:'Wort',ja:'単語',zh:'词',hi:'shabd',ar:'كلمة' } },
+        { id: 'nac_editor.select_sentence', role: 'action',
+          actions: [{ verb: 'select_sentence',
+            label_i18n: { es:'Seleccionar frase',en:'Select sentence',pt:'Selecionar frase',
+                          fr:'Selectionner phrase',it:'Seleziona frase',de:'Satz markieren',
+                          ja:'文選択',zh:'选句',hi:'vakya chuno',ar:'حدد جملة' } }],
+          label_i18n: { es:'Frase',en:'Sentence',pt:'Frase',fr:'Phrase',it:'Frase',
+                        de:'Satz',ja:'文',zh:'句子',hi:'vakya',ar:'جملة' } },
+        { id: 'nac_editor.select_all', role: 'action',
+          actions: [{ verb: 'select_all',
+            label_i18n: { es:'Seleccionar todo',en:'Select all',pt:'Selecionar tudo',
+                          fr:'Tout selectionner',it:'Seleziona tutto',de:'Alles markieren',
+                          ja:'全選択',zh:'全选',hi:'sab chuno',ar:'حدد الكل' } }],
+          label_i18n: { es:'Todo',en:'All',pt:'Tudo',fr:'Tout',it:'Tutto',
+                        de:'Alles',ja:'全',zh:'全',hi:'sab',ar:'الكل' } },
+        { id: 'nac_editor.replace', role: 'action',
+          actions: [{ verb: 'replace',
+            label_i18n: { es:'Reemplazar',en:'Replace',pt:'Substituir',fr:'Remplacer',
+                          it:'Sostituisci',de:'Ersetzen',ja:'置換',zh:'替换',hi:'badle',ar:'استبدل' } }],
+          label_i18n: { es:'Reemplazar',en:'Replace',pt:'Substituir',fr:'Remplacer',
+                        it:'Sostituisci',de:'Ersetzen',ja:'置換',zh:'替换',hi:'badle',ar:'استبدل' } },
+        { id: 'nac_editor.delete_selection', role: 'action',
+          actions: [{ verb: 'delete_selection',
+            label_i18n: { es:'Borrar seleccion',en:'Delete selection',pt:'Apagar selecao',
+                          fr:'Supprimer selection',it:'Elimina selezione',de:'Auswahl loeschen',
+                          ja:'選択範囲を削除',zh:'删除所选',hi:'chuna hua hatao',ar:'حذف التحديد' } }],
+          label_i18n: { es:'Borrar',en:'Delete',pt:'Apagar',fr:'Supprimer',it:'Elimina',
+                        de:'Loeschen',ja:'削除',zh:'删除',hi:'hatao',ar:'حذف' } },
+        { id: 'nac_editor.ai_correct_syntax', role: 'action',
+          actions: [{ verb: 'ai_correct_syntax',
+            label_i18n: { es:'Corregir con IA',en:'AI correct',pt:'Corrigir com IA',
+                          fr:'Corriger avec IA',it:'Correggi con IA',de:'KI korrigieren',
+                          ja:'AI校正',zh:'AI校正',hi:'AI se sudhar',ar:'تصحيح بالذكاء الاصطناعي' } }],
+          label_i18n: { es:'IA',en:'AI',pt:'IA',fr:'IA',it:'IA',
+                        de:'KI',ja:'AI',zh:'AI',hi:'AI',ar:'ذكاء' } },
+        { id: 'nac_editor.save', role: 'action',
+          actions: [{ verb: 'save',
+            label_i18n: { es:'Guardar','en':'Save',pt:'Salvar',fr:'Sauver',it:'Salva',
+                          de:'Speichern',ja:'保存',zh:'保存',hi:'sahejna',ar:'حفظ' } }],
+          label_i18n: { es:'Guardar','en':'Save',pt:'Salvar',fr:'Sauver',it:'Salva',
+                        de:'Speichern',ja:'保存',zh:'保存',hi:'sahejna',ar:'حفظ' } },
+        { id: 'nac_editor.cancel', role: 'action',
+          actions: [{ verb: 'cancel',
+            label_i18n: { es:'Cancelar','en':'Cancel',pt:'Cancelar',fr:'Annuler',it:'Annulla',
+                          de:'Abbrechen',ja:'キャンセル',zh:'取消',hi:'cancel',ar:'إلغاء' } }],
+          label_i18n: { es:'Cancelar','en':'Cancel',pt:'Cancelar',fr:'Annuler',it:'Annulla',
+                        de:'Abbrechen',ja:'キャンセル',zh:'取消',hi:'cancel',ar:'إلغاء' } }
+      ]
+    });
+  }
+
+  function edit_field(field_nac_id) {
+    if (!field_nac_id) throw NacError('invalid', 'edit_field requires a nac_id');
+    const sourceEl = document.querySelector('[data-nac-id="' + field_nac_id + '"]');
+    if (!sourceEl) throw NacError('not_found', 'edit_field: ' + field_nac_id + ' not in DOM');
+    if (sourceEl.tagName !== 'INPUT' && sourceEl.tagName !== 'TEXTAREA' && !sourceEl.isContentEditable) {
+      throw NacError('invalid', 'edit_field: ' + field_nac_id + ' is not an editable widget');
+    }
+    if (_editorState) _closeEditor(false);
+    _ensureEditorStyles();
+    _editorRegisterManifest();
+
+    const original = sourceEl.isContentEditable ? sourceEl.textContent : sourceEl.value;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'nac-editor-overlay';
+    overlay.setAttribute('data-nac-role', 'confirm-dialog');
+
+    const modal = document.createElement('div');
+    modal.className = 'nac-editor-modal';
+    modal.setAttribute('data-nac-id', 'nac_editor.modal');
+    modal.setAttribute('data-nac-role', 'region');
+    modal.setAttribute('data-nac-plugin', 'nac_editor');
+    overlay.appendChild(modal);
+
+    const head = document.createElement('div');
+    head.className = 'nac-editor-head';
+    head.innerHTML = '<span class="title">Editing ' + field_nac_id + '</span>';
+    modal.appendChild(head);
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'nac-editor-toolbar';
+    const TBN = [
+      { id: 'nac_editor.select_word',      label: 'word',     verb: 'select_word' },
+      { id: 'nac_editor.select_sentence',  label: 'sentence', verb: 'select_sentence' },
+      { id: 'nac_editor.select_all',       label: 'all',      verb: 'select_all' },
+      { id: 'nac_editor.replace',          label: 'replace',  verb: 'replace' },
+      { id: 'nac_editor.delete_selection', label: 'delete',   verb: 'delete_selection' },
+      { id: 'nac_editor.ai_correct_syntax',label: 'AI fix',   verb: 'ai_correct_syntax' }
+    ];
+    TBN.forEach(function (b) {
+      const btn = document.createElement('button');
+      btn.textContent = b.label;
+      btn.setAttribute('data-nac-id', b.id);
+      btn.setAttribute('data-nac-role', 'action');
+      btn.setAttribute('data-nac-action', b.verb);
+      toolbar.appendChild(btn);
+    });
+    modal.appendChild(toolbar);
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'nac-editor-textarea';
+    textarea.setAttribute('data-nac-id', 'nac_editor.textarea');
+    textarea.setAttribute('data-nac-role', 'field');
+    textarea.value = original || '';
+    modal.appendChild(textarea);
+
+    const status = document.createElement('div');
+    status.className = 'nac-editor-status';
+    status.textContent = 'press Esc to cancel  |  Ctrl+Enter to save';
+    modal.appendChild(status);
+
+    const foot = document.createElement('div');
+    foot.className = 'nac-editor-foot';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cancel';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.setAttribute('data-nac-id', 'nac_editor.cancel');
+    cancelBtn.setAttribute('data-nac-role', 'action');
+    cancelBtn.setAttribute('data-nac-action', 'cancel');
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save';
+    saveBtn.textContent = 'Save';
+    saveBtn.setAttribute('data-nac-id', 'nac_editor.save');
+    saveBtn.setAttribute('data-nac-role', 'action');
+    saveBtn.setAttribute('data-nac-action', 'save');
+    foot.appendChild(cancelBtn);
+    foot.appendChild(saveBtn);
+    modal.appendChild(foot);
+
+    document.body.appendChild(overlay);
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+    _editorState = { sourceEl: sourceEl, overlay: overlay, modal: modal, textarea: textarea, originalValue: original, status: status };
+
+    /* === Toolbar verb handlers === */
+    function selectWord() {
+      const v = textarea.value;
+      const start = textarea.selectionStart;
+      let lo = start, hi = start;
+      while (lo > 0 && /\w/.test(v[lo - 1])) lo--;
+      while (hi < v.length && /\w/.test(v[hi])) hi++;
+      textarea.setSelectionRange(lo, hi);
+      textarea.focus();
+      _emitAck('nac_editor.select_word');
+    }
+    function selectSentence() {
+      const v = textarea.value;
+      const start = textarea.selectionStart;
+      let lo = start, hi = start;
+      while (lo > 0 && !'.!?\n'.includes(v[lo - 1])) lo--;
+      while (hi < v.length && !'.!?\n'.includes(v[hi])) hi++;
+      while (lo < v.length && /\s/.test(v[lo])) lo++;
+      if (hi < v.length) hi++; /* include the punctuation */
+      textarea.setSelectionRange(lo, hi);
+      textarea.focus();
+      _emitAck('nac_editor.select_sentence');
+    }
+    function selectAll() {
+      textarea.setSelectionRange(0, textarea.value.length);
+      textarea.focus();
+      _emitAck('nac_editor.select_all');
+    }
+    function replaceSelection(text) {
+      const start = textarea.selectionStart;
+      const end   = textarea.selectionEnd;
+      const v = textarea.value;
+      const replacement = text == null ? (window.prompt('Replace selection with:', '') || '') : String(text);
+      textarea.value = v.slice(0, start) + replacement + v.slice(end);
+      textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+      textarea.focus();
+      _emitAck('nac_editor.replace');
+    }
+    function deleteSelection() {
+      const start = textarea.selectionStart;
+      const end   = textarea.selectionEnd;
+      if (start === end) return;
+      const v = textarea.value;
+      textarea.value = v.slice(0, start) + v.slice(end);
+      textarea.setSelectionRange(start, start);
+      textarea.focus();
+      _emitAck('nac_editor.delete_selection');
+    }
+    async function aiCorrectSyntax() {
+      status.textContent = 'asking AI...';
+      const original = textarea.value;
+      try {
+        const endpoint = (window.NacChat && window.NacChat._endpoint) || '/crm/api/v1/yujin/nac-demo';
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: 'editor_' + Date.now(),
+            prompt: 'Fix grammar and spelling in the following text. Return ONLY the corrected text, no commentary, no quotes:\n\n' + original,
+            lang: (window.NacChat && window.NacChat._lang) || 'en',
+            history: [],
+            nac_tree: { active: 'nac_editor', plugins: [] }
+          })
+        });
+        const json = await resp.json();
+        const fixed = (json && (json.message || json.reply)) || '';
+        if (fixed && fixed !== original) {
+          textarea.value = fixed.trim();
+          status.textContent = 'AI corrected. Review + Save, or Cancel to revert.';
+        } else {
+          status.textContent = 'AI returned no changes.';
+        }
+      } catch (e) {
+        status.textContent = 'AI request failed: ' + (e && e.message);
+      }
+      _emitAck('nac_editor.ai_correct_syntax');
+    }
+
+    function _emitAck(action_id) {
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail: { plugin: 'nac_editor', action_id: action_id }
+      }));
+    }
+
+    /* === Wire toolbar buttons + footer + keyboard === */
+    toolbar.children[0].addEventListener('click', selectWord);
+    toolbar.children[1].addEventListener('click', selectSentence);
+    toolbar.children[2].addEventListener('click', selectAll);
+    toolbar.children[3].addEventListener('click', function () { replaceSelection(null); });
+    toolbar.children[4].addEventListener('click', deleteSelection);
+    toolbar.children[5].addEventListener('click', aiCorrectSyntax);
+    cancelBtn.addEventListener('click', function () { _closeEditor(false); });
+    saveBtn.addEventListener('click',   function () { _closeEditor(true); });
+
+    function onKey(e) {
+      if (e.key === 'Escape') { _closeEditor(false); }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { _closeEditor(true); }
+    }
+    overlay.addEventListener('keydown', onKey);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) _closeEditor(false);
+    });
+
+    document.dispatchEvent(new CustomEvent('nac:editor:opened', {
+      detail: { source_id: field_nac_id, plugin: 'nac_editor' }
+    }));
+
+    return Promise.resolve({ ok: true });
+  }
+
+  function _closeEditor(commit) {
+    if (!_editorState) return;
+    const s = _editorState;
+    if (commit) {
+      const newVal = s.textarea.value;
+      if (s.sourceEl.isContentEditable) {
+        s.sourceEl.textContent = newVal;
+        s.sourceEl.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        s.sourceEl.value = newVal;
+        s.sourceEl.dispatchEvent(new Event('input',  { bubbles: true }));
+        s.sourceEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail: { plugin: 'nac_editor', action_id: 'nac_editor.save' }
+      }));
+    } else {
+      document.dispatchEvent(new CustomEvent('nac:action:succeeded', {
+        detail: { plugin: 'nac_editor', action_id: 'nac_editor.cancel' }
+      }));
+    }
+    if (s.overlay && s.overlay.parentNode) s.overlay.parentNode.removeChild(s.overlay);
+    _editorState = null;
+    document.dispatchEvent(new CustomEvent('nac:editor:closed', {
+      detail: { plugin: 'nac_editor', commit: !!commit }
+    }));
+  }
+
+  function register(arg1, arg2) {
+    let manifest;
+    if (typeof arg1 === 'string' && arg2 && typeof arg2 === 'object') {
+      manifest = arg2;
+      if (!manifest.plugin_slug) manifest.plugin_slug = arg1;
+    } else {
+      manifest = arg1;
+    }
+    if (!manifest || typeof manifest !== 'object') {
+      throw NacError('invalid', 'manifest object required');
+    }
+    const slug = String(manifest.plugin_slug || '').trim();
+    if (!slug) throw NacError('invalid', 'manifest.plugin_slug required');
+    if (!manifest.version) manifest.version = '1.0.0';
+    if (!manifest.nac_version) manifest.nac_version = '1.0';
+
+    /* v2.5 / RFC V24-01 -- synchronous slug uniqueness gate.
+       Throws NacError('duplicate_plugin_no_instance_id', ...) when
+       the DOM already contains multiple roots for this slug and any
+       of them omit or duplicate data-nac-plugin-id. Gated by
+       NAC.HARD_DEDUP (default true; settable false for migration). */
+    const _hardDedup = (typeof global !== 'undefined' && global.NAC
+        ? global.NAC.HARD_DEDUP !== false
+        : (typeof window !== 'undefined' && window.NAC
+            ? window.NAC.HARD_DEDUP !== false
+            : true));
+    if (_hardDedup) {
+      _checkPluginSlugUniqueOrThrow(slug);
+    }
+
+    /* v1.5.1 cross-plugin duplicate-id detection.
+       Spec section P7 expects nac_ids to be plugin-namespaced
+       ('plugin.element' convention). When two manifests register
+       the same nac_id, find()/click() resolution becomes
+       order-dependent and brittle. We log a console.warn at
+       register-time so authors notice during dev. The runtime
+       does NOT throw -- this is a best-practice nudge, not a
+       hard rule. validate_global() formalises the same check as
+       a structured finding consumable by CI. */
+    try {
+      const newIds = _collectManifestIds(manifest);
+      for (const otherSlug in _manifests) {
+        if (otherSlug === slug) continue;
+        const otherIds = _collectManifestIds(_manifests[otherSlug]);
+        const dupes = newIds.filter(function (id) {
+          return otherIds.indexOf(id) >= 0;
+        });
+        if (dupes.length) {
+          /* Use console.warn (not error -- a duplicate is bad
+             practice but not a fatal). Authors who want to fail
+             CI on this gate it via validate_global(). */
+          (typeof console !== 'undefined' && console.warn) &&
+          console.warn('[NAC] duplicate nac_ids between plugin "'
+            + slug + '" and "' + otherSlug + '":', dupes);
+        }
+      }
+    } catch (e) { /* never block register() on the lint */ }
+
+    /* v2.2.0 (V22-01): strict validation -- console.error in v2.2,
+       throw in v2.3 once adopters have migrated. Three checks:
+         1. manifest_role_unknown -- role outside the canonical set.
+         2. tab_id_manifest_role_drift -- id matches /^tab\./ but
+            role is not 'tab'. NAC.tab() and NAC.tab_by_label() both
+            query canonical role only; a drift here makes the tab
+            invisible to those resolvers.
+         3. manifest_dom_role_mismatch -- if the corresponding DOM
+            element is mounted, its data-nac-role MUST match the
+            manifest entry's role. Catches the case where an HTML
+            author and a JS author drift apart on what role to use.
+       NAC.STRICT_VALIDATION (default false in v2.2) toggles whether
+       findings throw or only console.error. v2.3 default flips to
+       true and the option is removed in v3.0. */
+    try { _v22StrictValidate(manifest); }
+    catch (e) {
+      if (NAC.STRICT_VALIDATION) throw e;
+      /* Otherwise the inner _v22StrictValidate already
+         console.error-ed each finding; we just swallow the
+         throw-trampoline. */
+    }
+
+    _manifests[slug] = manifest;
+    /* v1.9.0 (sec 13.5): apply manifest.attention_profile preset.
+       Sets the matching CSS custom properties on the plugin root
+       so the focus pulse + section-visited highlight cascade only
+       to that plugin's surface. */
+    _applyAttentionProfile(slug, manifest.attention_profile);
+    document.dispatchEvent(new CustomEvent('nac:registered', {
+      detail: { plugin: slug, version: manifest.version },
+    }));
+    return true;
+  }
+
+  /* Spec sec 13.5 v1.9.0: attention profile presets. */
+  const _ATTENTION_PROFILES = {
+    'default': {
+      '--nac-focus-pulse-thickness': '3px',
+      '--nac-focus-pulse-duration':  '700ms',
+      '--nac-focus-pulse-color':     '#DC2626',
+      '--nac-focus-pulse-glow-radius': '18px',
+    },
+    'high_contrast': {
+      '--nac-focus-pulse-thickness': '5px',
+      '--nac-focus-pulse-duration':  '700ms',
+      '--nac-focus-pulse-color':     '#000000',
+      '--nac-focus-pulse-glow-radius': '26px',
+    },
+    'reduced_motion': {
+      '--nac-focus-pulse-thickness': '3px',
+      '--nac-focus-pulse-duration':  '0ms',
+      '--nac-focus-pulse-color':     '#DC2626',
+      '--nac-focus-pulse-glow-radius': '0',
+    },
+    'extended_pulse': {
+      '--nac-focus-pulse-thickness': '4px',
+      '--nac-focus-pulse-duration':  '1500ms',
+      '--nac-focus-pulse-color':     '#DC2626',
+      '--nac-focus-pulse-glow-radius': '24px',
+    },
+    'maximum_salience': {
+      '--nac-focus-pulse-thickness': '5px',
+      '--nac-focus-pulse-duration':  '1500ms',
+      '--nac-focus-pulse-color':     '#000000',
+      '--nac-focus-pulse-glow-radius': '32px',
+    },
+  };
+  function _applyAttentionProfile(slug, profile) {
+    if (!profile || profile === 'default') return;
+    const map = _ATTENTION_PROFILES[profile];
+    if (!map) {
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('[NAC] attention_profile_unknown: ' + profile +
+          ' is not a recognised preset. Expected one of: default, ' +
+          'high_contrast, reduced_motion, extended_pulse, maximum_salience.');
+      }
+      return;
+    }
+    /* Wait for the plugin root to mount, then apply.
+       Some plugins register before their DOM is mounted. */
+    function apply() {
+      const root = document.querySelector('[data-nac-plugin="' + slug + '"]');
+      if (!root) {
+        /* Try once after DOMContentLoaded if root is not yet in DOM. */
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', apply, { once: true });
+        }
+        return;
+      }
+      for (const k in map) {
+        if (Object.prototype.hasOwnProperty.call(map, k)) {
+          root.style.setProperty(k, map[k]);
+        }
+      }
+    }
+    apply();
+  }
+
+  /* Helper for the duplicate-id lint and validate_global().
+     Collects every nac_id declared in the manifest's actions[],
+     fields[], tabs[], kpis[], rows.cells[], breadcrumbs[], etc. */
+  function _collectManifestIds(m) {
+    const out = [];
+    /* v2.5 fix (audit N-33): the CANONICAL manifest shape is
+       `elements: [{ id, role, ... }]` -- that is what section 4
+       documents, what every demo ships and what the rest of this
+       runtime reads (see _capabilityFor, which walks
+       m.elements.concat(m.tabs) by `.id`). This collector used to
+       read ONLY the legacy groups below, keyed by `nac_id`, so for
+       a manifest written the documented way it returned an empty
+       list. Everything built on top went quietly wrong in the same
+       direction: validate_global() reported total_ids = 0, called
+       every declared element an orphan, could never report a
+       duplicate, an unmounted id or a convention violation, and
+       still answered ok = true. A validator that cannot see the
+       manifest is not a lenient validator, it is a green light
+       with nothing behind it. Both shapes are read now; the legacy
+       groups stay because manifests in the wild still use them. */
+    const elems = (m && m.elements) || [];
+    elems.forEach(function (e) {
+      if (e && e.id) out.push(String(e.id));
+    });
+    const groups = ['actions', 'fields', 'tabs', 'kpis', 'charts'];
+    groups.forEach(function (g) {
+      const arr = (m && m[g]) || [];
+      arr.forEach(function (x) {
+        /* tabs are declared with `.id` in the canonical shape and
+           with `.nac_id` in the legacy one; take whichever is there
+           instead of choosing a winner. */
+        if (x && x.nac_id) out.push(String(x.nac_id));
+        else if (x && x.id) out.push(String(x.id));
+      });
+    });
+    if (m && m.rows && Array.isArray(m.rows.cells)) {
+      m.rows.cells.forEach(function (c) {
+        if (c && c.nac_id) out.push(String(c.nac_id));
+      });
+    }
+    if (m && Array.isArray(m.breadcrumbs)) {
+      m.breadcrumbs.forEach(function (b) {
+        if (b && Array.isArray(b.items)) {
+          b.items.forEach(function (i) {
+            if (i && i.nac_id) out.push(String(i.nac_id));
+          });
+        }
+      });
+    }
+    /* Unique: an id declared in two shapes of the SAME manifest is one
+       id, not a cross-plugin duplicate. */
+    const seen = Object.create(null);
+    return out.filter(function (id) {
+      if (seen[id]) return false;
+      seen[id] = true;
+      return true;
+    });
+  }
+
+  function unregister(slug) {
+    delete _manifests[slug];
+    delete _instances[slug];
+  }
+
+  function manifest(slug) {
+    if (slug == null) {
+      return Object.keys(_manifests).map(function (k) { return _manifests[k]; });
+    }
+    return _manifests[slug] || null;
+  }
+
+  /* ================================================================
+     v2.5 V24-02 -- syncPlugin: idempotent registration
+     ================================================================
+
+     SPA hosts that re-render a component call register() again on
+     remount; the legacy register() appends a new manifest entry,
+     accumulating stale state. syncPlugin REPLACES the manifest for a
+     given slug instead of appending. Calling N times with the same
+     manifest leaves the registry in the same state as calling once.
+
+     Validation is identical to register() (manifest_role_unknown,
+     tab_id_manifest_role_drift, etc honour STRICT_VALIDATION).
+     Versioning: each call mints a new plugin_version (V24-04 OCC)
+     and -- only on REPLACE, not first-add -- emits
+     nac:plugin:invalidated so subscribers can refresh derived state. */
+
+  /* syncPlugin uses the V24-04 versioning machinery: every replace
+     calls _bumpPluginVersion(slug, null, 'syncPlugin') which bumps
+     _plugin_versions + _tree_version + dispatches nac:plugin:invalidated
+     in one atomic step. Single source of truth for OCC. */
+  function syncPlugin(arg1, arg2) {
+    let m;
+    if (typeof arg1 === 'string' && arg2 && typeof arg2 === 'object') {
+      /* (slug, manifest) form -- match register's calling convention. */
+      m = Object.assign({}, arg2);
+      if (!m.plugin_slug) m.plugin_slug = arg1;
+    } else if (arg1 && typeof arg1 === 'object') {
+      m = arg1;
+    } else {
+      throw NacError('invalid',
+        'syncPlugin: requires (manifest) or (slug, manifest)');
+    }
+    const slug = m.plugin_slug;
+    if (!slug || typeof slug !== 'string') {
+      throw NacError('invalid',
+        'syncPlugin: manifest.plugin_slug required (non-empty string)');
+    }
+    const wasPresent = !!_manifests[slug];
+    /* Replace path: drop the prior entry so register() does not
+       append-by-side-effect when callers used the array-of-elements
+       merge pattern. */
+    if (wasPresent) {
+      delete _manifests[slug];
+      if (typeof _instances !== 'undefined') delete _instances[slug];
+    }
+    /* Delegate to register() so validation + storage code-path stays
+       exactly one place. If register throws (strict validation), the
+       prior entry is GONE -- caller's responsibility to handle. */
+    register(m);
+    /* Bump V24-04 OCC version on REPLACE only. First-add is a normal
+       register: the boot tree_version already reflects the new plugin
+       and subscribers do not need to refresh anything that did not
+       exist a moment ago. _bumpPluginVersion fires nac:plugin:invalidated
+       as part of its work, so we don't dispatch again here. */
+    if (wasPresent) {
+      _bumpPluginVersion(slug, null, 'syncPlugin');
+    }
+    return {
+      replaced: wasPresent,
+      slug:     slug,
+      version:  _pluginVersionFor(slug, null),
+    };
+  }
+
+  /* ================================================================
+     v2.5 V24-05 -- Agent authority + sudo elevation
+     ================================================================
+
+     Three primitives for a host to interpose a confirmation UI
+     between an agent dispatch and the action's side effect, with a
+     SUDO-style elevation that bypasses confirmations for a granted
+     scope until its TTL expires.
+
+       NAC.set_confirm_handler(fn)
+         fn is async (req) => boolean. The host renders its UI
+         (modal, voice, Discord button, etc) and resolves true on
+         approve, false on reject. A handler that throws is treated
+         as "reject" (never as a silent approval).
+
+       NAC.confirm_action(action_id, message, opts?)
+         opts = { scope?: 'low'|'medium'|'high', metadata?: {...} }
+         Returns Promise<boolean>. If currently elevated for an
+         equal-or-stricter scope, resolves true synchronously
+         WITHOUT invoking the handler.
+
+       NAC.request_authority(scope, ttl_ms, opts?)
+         Asks the host for sudo elevation. On grant, subsequent
+         confirm_action calls in that scope (or lower) resolve
+         immediately for ttl_ms. After TTL the elevation
+         auto-revokes; manual revoke is NAC.revoke_authority(scope).
+
+       NAC.has_authority(scope) -> boolean
+       NAC.revoke_authority(scope) -> void (idempotent)
+
+     Scope rank: high > medium > low. Granted high authority
+     satisfies medium + low; granted low does NOT satisfy higher.
+
+     Provenance on document:
+       nac:authority:requested / :granted / :denied / :revoked / :expired
+       nac:action:confirmed / :rejected */
+
+  const _V25_SCOPE_RANK = { low: 1, medium: 2, high: 3 };
+  const _v25_authority_grants = new Map();
+  let _v25_authReqSeq = 0;
+  let _v25_confirm_handler = null;
+
+  function _v25_emitAuth(kind, detail) {
+    if (typeof document === 'undefined') return;
+    try {
+      document.dispatchEvent(new CustomEvent('nac:authority:' + kind,
+        { detail: detail, bubbles: true }));
+    } catch (_) { /* SSR or no document */ }
+  }
+  function _v25_emitAction(kind, detail) {
+    if (typeof document === 'undefined') return;
+    try {
+      document.dispatchEvent(new CustomEvent('nac:action:' + kind,
+        { detail: detail, bubbles: true }));
+    } catch (_) { /* SSR or no document */ }
+  }
+
+  function set_confirm_handler(fn) {
+    if (typeof fn !== 'function') {
+      throw NacError('invalid',
+        'NAC.set_confirm_handler: fn must be a function');
+    }
+    _v25_confirm_handler = fn;
+  }
+
+  function has_authority(scope) {
+    if (!_V25_SCOPE_RANK[scope]) return false;
+    const want = _V25_SCOPE_RANK[scope];
+    const now = Date.now();
+    /* Iterate live grants. Higher rank satisfies lower-rank check.
+       Auto-purge expired entries inline so the map stays clean. */
+    let satisfied = false;
+    _v25_authority_grants.forEach(function (info, grantedScope) {
+      if (info.expires_at <= now) return; /* timer will purge */
+      if (_V25_SCOPE_RANK[grantedScope] >= want) satisfied = true;
+    });
+    return satisfied;
+  }
+
+  function revoke_authority(scope) {
+    const info = _v25_authority_grants.get(scope);
+    if (!info) return; /* idempotent */
+    if (info.timer) { try { clearTimeout(info.timer); } catch (_) {} }
+    _v25_authority_grants.delete(scope);
+    _v25_emitAuth('revoked', { scope: scope, reason: 'manual' });
+  }
+
+  function request_authority(scope, ttl_ms, opts) {
+    return new Promise(function (resolve, reject) {
+      if (!_V25_SCOPE_RANK[scope]) {
+        reject(NacError('invalid',
+          'request_authority: scope must be one of low|medium|high'));
+        return;
+      }
+      if (typeof ttl_ms !== 'number' || ttl_ms < 0 || !isFinite(ttl_ms)) {
+        reject(NacError('invalid',
+          'request_authority: ttl_ms must be a non-negative finite number'));
+        return;
+      }
+      if (!_v25_confirm_handler) {
+        reject(NacError('no_confirm_handler',
+          'request_authority: NAC.set_confirm_handler must be called first'));
+        return;
+      }
+      const reqId = 'auth_' + Date.now().toString(36) + '_' + (++_v25_authReqSeq).toString(36);
+      const req = {
+        kind:     'request_authority',
+        request_id: reqId,
+        scope:    scope,
+        ttl_ms:   ttl_ms,
+        metadata: (opts && opts.metadata) || {},
+      };
+      _v25_emitAuth('requested', req);
+      let p;
+      try { p = Promise.resolve(_v25_confirm_handler(req)); }
+      catch (e) { p = Promise.resolve(false); }
+      p.then(function (granted) { return !!granted; },
+             function () { return false; })
+       .then(function (granted) {
+        if (!granted) {
+          _v25_emitAuth('denied',
+            { scope: scope, ttl_ms: ttl_ms, request_id: reqId });
+          resolve({ granted: false, scope: scope, expires_at: null });
+          return;
+        }
+        const now = Date.now();
+        const expires_at = now + ttl_ms;
+        /* Replace any prior grant for the same scope. */
+        const prior = _v25_authority_grants.get(scope);
+        if (prior && prior.timer) { try { clearTimeout(prior.timer); } catch (_) {} }
+        const timer = setTimeout(function () {
+          _v25_authority_grants.delete(scope);
+          _v25_emitAuth('expired', { scope: scope, reason: 'ttl' });
+        }, ttl_ms);
+        _v25_authority_grants.set(scope, { expires_at: expires_at, timer: timer });
+        _v25_emitAuth('granted',
+          { scope: scope, expires_at: expires_at, request_id: reqId });
+        resolve({ granted: true, scope: scope, expires_at: expires_at });
+      });
+    });
+  }
+
+  function confirm_action(action_id, message, opts) {
+    return new Promise(function (resolve, reject) {
+      if (typeof action_id !== 'string' || !action_id) {
+        reject(NacError('invalid',
+          'confirm_action: action_id must be a non-empty string'));
+        return;
+      }
+      const scope = (opts && opts.scope) || 'medium';
+      const metadata = (opts && opts.metadata) || {};
+      /* Sudo bypass -- if we already have authority for this scope
+         (or higher), short-circuit without calling the handler. */
+      if (has_authority(scope)) {
+        _v25_emitAction('confirmed',
+          { action_id: action_id, scope: scope, sudo: true });
+        resolve(true);
+        return;
+      }
+      if (!_v25_confirm_handler) {
+        reject(NacError('no_confirm_handler',
+          'confirm_action: NAC.set_confirm_handler must be called first'));
+        return;
+      }
+      const req = {
+        kind:      'confirm_action',
+        action_id: action_id,
+        message:   message,
+        scope:     scope,
+        metadata:  metadata,
+      };
+      let p;
+      try { p = Promise.resolve(_v25_confirm_handler(req)); }
+      catch (e) { p = Promise.resolve(false); }
+      p.then(function (approved) { return !!approved; },
+             function () { return false; })
+       .then(function (approved) {
+        _v25_emitAction(approved ? 'confirmed' : 'rejected',
+          { action_id: action_id, scope: scope, sudo: false });
+        resolve(approved);
+      });
+    });
+  }
+
+  /* ---------- Element discovery ----------------------------------- */
+
+  /* ---------- v2.3 shadow DOM resolution (F1 + F6) ----------
+     Walks open shadow roots recursively (cap depth=10) and delegates
+     to el.nac3.query/queryAll on closed shadow hosts that opted in.
+     Errors are emitted as nac:shadow_blocked / nac:shadow_protocol_violation
+     events, each at most once per host (tracked via WeakSet). Existing
+     light-DOM callsites are unaffected; the helpers are strict supersets
+     of the previous document.querySelectorAll('[data-nac-id]') call. */
+  const _SHADOW_DEPTH_CAP = 10;
+  const _shadowBlockedEmitted    = new WeakSet();
+  const _shadowProtocolViolated  = new WeakSet();
+
+  function _emitShadowBlocked(host, reason) {
+    if (!host || _shadowBlockedEmitted.has(host)) return;
+    _shadowBlockedEmitted.add(host);
+    try {
+      const ev = new CustomEvent('nac:shadow_blocked', {
+        bubbles:  true,
+        composed: true,
+        detail:   { host: host, reason: reason, ts: Date.now() }
+      });
+      (host.dispatchEvent ? host : document).dispatchEvent(ev);
+    } catch (_) {}
+  }
+  function _emitShadowProtocolViolation(host, message, value) {
+    if (!host || _shadowProtocolViolated.has(host)) return;
+    _shadowProtocolViolated.add(host);
+    try {
+      const ev = new CustomEvent('nac:shadow_protocol_violation', {
+        bubbles:  true,
+        composed: true,
+        detail:   { host: host, message: message,
+                    value_snapshot: (function () {
+                      try { return typeof value === 'object' ? '[object]' : String(value).slice(0, 80); }
+                      catch (_) { return '[unprintable]'; } })(), ts: Date.now() }
+      });
+      (host.dispatchEvent ? host : document).dispatchEvent(ev);
+    } catch (_) {}
+  }
+
+  function _deepQueryAll(selector, root, depth) {
+    root  = root  || document;
+    depth = depth || 0;
+    let out = [];
+    /* Direct match on this root. */
+    try {
+      if (root.querySelectorAll) {
+        out = Array.prototype.slice.call(root.querySelectorAll(selector));
+      }
+    } catch (_) {}
+    if (depth >= _SHADOW_DEPTH_CAP) return out;
+    /* Walk every element under root looking for shadow boundaries. */
+    let walk;
+    try {
+      walk = root.querySelectorAll ? root.querySelectorAll('*') : [];
+    } catch (_) { walk = []; }
+    for (let i = 0; i < walk.length; i++) {
+      const el = walk[i];
+      /* Open shadow root: recurse. */
+      if (el.shadowRoot) {
+        const inner = _deepQueryAll(selector, el.shadowRoot, depth + 1);
+        if (inner.length) out = out.concat(inner);
+        continue;
+      }
+      /* Closed shadow root with voluntary exposure API. */
+      const nac3 = el.nac3;
+      if (nac3 && typeof nac3 === 'object') {
+        try {
+          if (typeof nac3.queryAll === 'function') {
+            const raw = nac3.queryAll(selector);
+            if (Array.isArray(raw)) {
+              const valid = [];
+              for (let k = 0; k < raw.length; k++) {
+                const n = raw[k];
+                if (n && n.nodeType === 1) valid.push(n);
+                else _emitShadowProtocolViolation(el,
+                       'nac3.queryAll returned non-Element item', n);
+              }
+              if (valid.length) out = out.concat(valid);
+            } else if (raw != null) {
+              _emitShadowProtocolViolation(el,
+                'nac3.queryAll did not return an array', raw);
+            }
+          } else if (typeof nac3.query === 'function') {
+            const one = nac3.query(selector);
+            if (one && one.nodeType === 1) out.push(one);
+            else if (one != null) {
+              _emitShadowProtocolViolation(el,
+                'nac3.query returned non-Element value', one);
+            }
+          }
+        } catch (e) {
+          _emitShadowBlocked(el, 'exposure_threw');
+        }
+      } else if (el.hasAttribute && el.hasAttribute('data-nac-shadow')
+                 && el.getAttribute('data-nac-shadow') === 'closed') {
+        /* Element explicitly declared as closed-shadow with no exposure
+           API. Per spec sec 5.1.6, this is a deliberate opt-out;
+           emit shadow_blocked once so debugging tooling sees it. */
+        _emitShadowBlocked(el, 'not_exposed');
+      }
+    }
+    return out;
+  }
+  function _deepQuery(selector, root) {
+    const all = _deepQueryAll(selector, root, 0);
+    return all.length ? all[0] : null;
+  }
+
+  function _allElements() {
+    return _deepQueryAll('[data-nac-id]', document, 0);
+  }
+
+  function _activePlugin() {
+    /* Most recently mounted plugin with state=ready wins. Falls back
+       to topmost plugin root in the DOM order. */
+    const plugins = Array.prototype.slice.call(
+      document.querySelectorAll('[data-nac-plugin]')
+    );
+    if (!plugins.length) return null;
+    const ready = plugins.filter(function (p) {
+      return p.getAttribute('data-nac-plugin-state') === 'ready';
+    });
+    return (ready.length ? ready[ready.length - 1] : plugins[plugins.length - 1])
+      .getAttribute('data-nac-plugin');
+  }
+
+  function _findElement(nac_id, opts) {
+    opts = opts || {};
+    const targetPlugin = opts.plugin || _activePlugin();
+    let candidates = _allElements().filter(function (el) {
+      return el.getAttribute('data-nac-id') === nac_id;
+    });
+    if (targetPlugin) {
+      const scoped = candidates.filter(function (el) {
+        const root = el.closest('[data-nac-plugin]');
+        return root && root.getAttribute('data-nac-plugin') === targetPlugin;
+      });
+      if (scoped.length) candidates = scoped;
+    }
+    return candidates[0] || null;
+  }
+
+  function _serializeElement(el) {
+    if (!el) return null;
+    const root = el.closest('[data-nac-plugin]');
+    return {
+      nac_id:     el.getAttribute('data-nac-id'),
+      plugin:     root ? root.getAttribute('data-nac-plugin') : null,
+      role:       el.getAttribute('data-nac-role') || null,
+      state:      el.getAttribute('data-nac-state') || 'idle',
+      field_type: el.getAttribute('data-nac-field-type') || null,
+      action:     el.getAttribute('data-nac-action') || null,
+      error:      el.getAttribute('data-nac-error') || null,
+      label:      el.getAttribute('aria-label')
+                || (el.id && document.querySelector('label[for="' + el.id + '"]')
+                       ? document.querySelector('label[for="' + el.id + '"]').textContent.trim()
+                       : null)
+                /* Fallback for KPI/feedback/static elements: look for an
+                   inner labeled child by convention. Resolves the case
+                   where the visible label is rendered as a child node
+                   (e.g. <div class="yj-kpi-label">Applied</div>) without
+                   aria-label on the wrapper. NAC v1.0 P6 still requires
+                   aria-label for inputs and actions; this fallback only
+                   helps observability (NAC.list / describe). */
+                || (function () {
+                       const inner = el.querySelector('[data-nac-role="label"], .yj-kpi-label, .yj-tab-label');
+                       if (inner && inner.textContent) return inner.textContent.trim();
+                       /* Last resort: trim el's own textContent capped at 80 chars. */
+                       const t = (el.textContent || '').trim();
+                       return t ? t.slice(0, 80) : null;
+                   })(),
+      value:      _readElementValue(el),
+      visible:    _isVisible(el),
+      disabled:   el.disabled === true || el.getAttribute('aria-disabled') === 'true',
+      /* v1.8.0: surface data-nac-a11y-hint as a structured array.
+         Hints are pipe-separated semantic tags (e.g.
+         "irreversible|requires_confirmation|long_running") that let
+         voice tools, screen readers and AI agents warn users about
+         dangerous actions BEFORE invoking them. Sec 5 attributes
+         table; sec 6.2 ProvenanceBlock context. */
+      a11y_hint:  (function () {
+        const raw = el.getAttribute('data-nac-a11y-hint');
+        if (!raw) return null;
+        return raw.split('|').map(function (s) { return s.trim(); })
+                  .filter(function (s) { return s.length > 0; });
+      })(),
+      /* v1.9.0: braille_label for refreshable braille displays.
+         Voice tools / AT producing braille output prefer this over
+         aria-label (~40 char width on typical Bristol Braille
+         Canute / NVDA braille mode). Falls back to null when the
+         element does not declare data-nac-braille-label; consumers
+         should fall back to aria-label / label. */
+      braille_label: el.getAttribute('data-nac-braille-label') || null,
+      /* v1.9.0: surface manifest's undoable flag (sec 6.2.33) on
+         describe()/find() output so AI agents can decide
+         interposition pressure based on whether the action is
+         recoverable. Reads from the registered manifest. */
+      undoable: (function () {
+        const id = el.getAttribute('data-nac-id');
+        if (!id) return false;
+        const a = _findActionInManifests(id);
+        return !!(a && a.undoable === true);
+      })(),
+    };
+  }
+
+  function _readElementValue(el) {
+    if (el.tagName === 'INPUT') {
+      if (el.type === 'checkbox' || el.type === 'radio') return !!el.checked;
+      return el.value;
+    }
+    if (el.tagName === 'SELECT') {
+      if (el.multiple) {
+        return Array.prototype.slice.call(el.selectedOptions)
+          .map(function (o) { return o.value; });
+      }
+      return el.value;
+    }
+    if (el.tagName === 'TEXTAREA') return el.value;
+    if (el.hasAttribute('contenteditable')) return el.textContent;
+    return null;
+  }
+
+  function _isVisible(el) {
+    if (!el || !el.getBoundingClientRect) return false;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) return false;
+    const cs = el.ownerDocument.defaultView.getComputedStyle(el);
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+  }
+
+  /* ---------- Public read API ------------------------------------- */
+
+  function describe() {
+    const plugins = Array.prototype.slice.call(
+      document.querySelectorAll('[data-nac-plugin]')
+    ).map(function (root) {
+      const slug = root.getAttribute('data-nac-plugin');
+      const instance_id = root.getAttribute('data-nac-plugin-id') || null;
+      return {
+        plugin:              slug,
+        plugin_instance_id:  instance_id,
+        plugin_state:        root.getAttribute('data-nac-plugin-state') || 'idle',
+        /* v2.5 / RFC V24-04 (sec 5.1): per-plugin monotonic version
+           token. Primary tool for agents -- ignore noise outside the
+           targeted plugin by passing expected_plugin_version on
+           dispatch. */
+        plugin_version:      _pluginVersionFor(slug, instance_id),
+        elements:            Array.prototype.slice.call(
+          root.querySelectorAll('[data-nac-id]')
+        ).map(_serializeElementWithHash),
+      };
+    });
+    return {
+      nac_version: '1.0',
+      timestamp:   Date.now(),
+      url:         location.href,
+      active:      _activePlugin(),
+      plugins:     plugins,
+      /* v2.5 / RFC V24-04 (sec 5.3): global monotonic version token.
+         Escape hatch for cross-plugin orchestration; prefer
+         plugin_version for single-plugin plans. */
+      tree_version: _treeVersionStr(),
+    };
+  }
+
+  /* v2.5 / RFC V24-04 (sec 5.2): serialize + attach element_state_hash.
+     Sync compute; ~0.5-1ms per element. NULL when the element does
+     not carry a role that contributes to the hash. */
+  function _serializeElementWithHash(el) {
+    const base = _serializeElement(el);
+    if (!base) return base;
+    try { base.element_state_hash = _stateHashOfSync(el); }
+    catch (_) { base.element_state_hash = null; }
+    return base;
+  }
+
+  function list(role) {
+    const all = _allElements().map(_serializeElement);
+    if (!role) return all;
+    return all.filter(function (e) { return e.role === role; });
+  }
+
+  function find(nac_id, opts) {
+    return _serializeElement(_findElement(nac_id, opts));
+  }
+
+  function read_feedback() {
+    return _allElements()
+      .filter(function (el) {
+        return el.getAttribute('data-nac-role') === 'feedback';
+      })
+      .map(function (el) {
+        return {
+          nac_id:  el.getAttribute('data-nac-id'),
+          state:   el.getAttribute('data-nac-state') || 'idle',
+          message: el.textContent.trim(),
+          error:   el.getAttribute('data-nac-error') || null,
+        };
+      });
+  }
+
+  function snapshot_state() {
+    const errs = _allElements()
+      .filter(function (el) {
+        return el.getAttribute('data-nac-state') === 'invalid'
+            || el.getAttribute('data-nac-state') === 'error';
+      })
+      .map(_serializeElement);
+    return {
+      timestamp: Date.now(),
+      active:    _activePlugin(),
+      errors:    errs,
+      feedback:  read_feedback(),
+    };
+  }
+
+  /* ---------- Event awaiter --------------------------------------- */
+
+  function wait_for(eventName, timeout_ms) {
+    timeout_ms = timeout_ms || 5000;
+    return new Promise(function (resolve, reject) {
+      let done = false;
+      function onEvt(e) {
+        if (done) return;
+        done = true;
+        document.removeEventListener(eventName, onEvt);
+        clearTimeout(t);
+        resolve({ event: eventName, detail: e.detail || null });
+      }
+      const t = setTimeout(function () {
+        if (done) return;
+        done = true;
+        document.removeEventListener(eventName, onEvt);
+        reject(NacError('timeout',
+          'Event ' + eventName + ' did not fire within ' + timeout_ms + 'ms'));
+      }, timeout_ms);
+      document.addEventListener(eventName, onEvt);
+    });
+  }
+
+  /* ---------- v1.4.1: focus-follow on programmatic operations ----- */
+  /* When NAC drives an element (click / fill / select / tab) the
+     human reviewer wants to SEE what the agent did. Without this
+     helper, programmatic clicks happen invisibly off-screen and
+     the page stays static -- bad for demos and accessibility.
+
+     Behaviour, applied uniformly to every write entry point:
+     1. scrollIntoView({ behavior:'smooth', block:'center' }) so
+        the element is on screen.
+     2. el.focus({ preventScroll: true }) when focusable. If the
+        element is not natively focusable (a div with role=action),
+        we set tabindex=-1 temporarily and remove it on blur so
+        the focus ring fires anyway. preventScroll is honoured
+        because we already scrolled above with smooth behaviour.
+     3. Add a brief class data-nac-focus-pulse for ~600ms so a
+        CSS rule (host-defined or fallback inline) shows a visual
+        pulse. Custom hosts MAY style
+        [data-nac-focus-pulse] { outline: ... }; the runtime injects
+        a minimal stylesheet once on install if no rule exists yet.
+     4. Emit nac:focus:moved on document so other listeners
+        (test runners, screen-recorder, autopilot) can sync. */
+  function _focusElement(el) {
+    if (!el) return;
+    /* Honour opt-out per call: someone passed { focus: false }. */
+    if (el.__nac_skip_focus) { delete el.__nac_skip_focus; return; }
+    /* Honour global opt-out via NAC.config.focus_on_action = false. */
+    if (global.NAC && global.NAC.config
+        && global.NAC.config.focus_on_action === false) return;
+    /* v1.5.5: back to block: 'center'. The previous 'nearest'
+       avoided rapid jumping but lost context -- elements landed
+       at the bottom of the viewport, where the human eye loses
+       the surrounding cards. Centering keeps the focused
+       element vertically middle on screen so the agent's
+       progress is always trackable, no matter how far apart the
+       targets are. The 1800ms autopilot tick (also v1.5.4-fix)
+       gives smooth-scroll enough time to settle between steps. */
+    try {
+      if (typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center',
+                            inline: 'nearest' });
+      }
+    } catch (e) { /* older browsers ignore options */ }
+    /* Make non-focusable elements focusable transiently. */
+    let addedTabindex = false;
+    if (!el.matches('a[href], button, input, select, textarea, '
+                    + '[tabindex], [contenteditable]')) {
+      el.setAttribute('tabindex', '-1');
+      addedTabindex = true;
+    }
+    try { el.focus({ preventScroll: true }); }
+    catch (e) { try { el.focus(); } catch (e2) { /* swallow */ } }
+    if (addedTabindex) {
+      const cleanup = function () {
+        el.removeAttribute('tabindex');
+        el.removeEventListener('blur', cleanup);
+      };
+      el.addEventListener('blur', cleanup);
+    }
+    /* Visual pulse. Add attribute, remove after 600ms. */
+    el.setAttribute('data-nac-focus-pulse', '1');
+    setTimeout(function () {
+      el.removeAttribute('data-nac-focus-pulse');
+    }, 600);
+    /* Emit observer event. */
+    const root = el.closest('[data-nac-plugin]');
+    document.dispatchEvent(new CustomEvent('nac:focus:moved', {
+      detail: {
+        plugin: root ? root.getAttribute('data-nac-plugin') : null,
+        plugin_instance_id: root
+          ? (root.getAttribute('data-nac-plugin-id') || null)
+          : null,
+        nac_id: el.getAttribute('data-nac-id') || null,
+        timestamp: Date.now(),
+      },
+      bubbles: true,
+      composed: true,
+    }));
+  }
+  /* Inject a minimal pulse stylesheet once at install time. Hosts
+     can override by defining a higher-specificity rule. */
+  function _ensureFocusStyle() {
+    if (document.getElementById('nac-focus-pulse-style')) return;
+    if (!document.head) return;
+    const s = document.createElement('style');
+    s.id = 'nac-focus-pulse-style';
+    s.textContent =
+      '[data-nac-focus-pulse]{'
+      + 'outline:2px solid #4f46e5;'
+      + 'outline-offset:2px;'
+      + 'box-shadow:0 0 0 4px rgba(79,70,229,.25);'
+      + 'transition:outline-color .15s ease, box-shadow .15s ease;'
+      + '}';
+    document.head.appendChild(s);
+  }
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _ensureFocusStyle);
+    } else {
+      _ensureFocusStyle();
+    }
+  }
+
+  /* ---------- Public write API ------------------------------------ */
+
+  /* v1.6.3: success-event family per role. NAC.click is the
+     canonical "fire the user's primary intent on this element"
+     verb, but different widget families emit different success
+     events:
+       role="action"          -> nac:action:succeeded / :failed
+       role="option"          -> nac:field:changed (combobox/select)
+       role="tab"             -> nac:tab:activated
+       role="breadcrumb-item" -> nac:breadcrumb:navigated
+       role="accordion-toggle"-> nac:accordion:expanded / :collapsed
+       role="step"            -> nac:step:advanced
+       role="pagination-item" -> nac:table:page_changed
+       role="confirm-button"  -> nac:confirm:resolved / :cancelled
+     Pre-v1.6.3 the runtime only listened for nac:action:succeeded,
+     so click() on any non-action role timed out at 5s even when the
+     widget reacted correctly. v1.6.3 picks the right event family
+     based on data-nac-role on the target. Unknown / missing role
+     keeps the action default for back-compat. */
+  const _CLICK_EVENT_FAMILY = {
+    'action':           ['nac:action:succeeded', 'nac:action:failed'],
+    'option':           ['nac:field:changed'],
+    'tab':              ['nac:tab:activated'],
+    'breadcrumb-item':  ['nac:breadcrumb:navigated'],
+    'accordion-toggle': ['nac:accordion:expanded', 'nac:accordion:collapsed'],
+    'step':             ['nac:step:advanced'],
+    'pagination-item':  ['nac:table:page_changed'],
+    'confirm-button':   ['nac:confirm:resolved', 'nac:confirm:cancelled'],
+    /* v1.6.4: field role for clickable fields (checkbox / radio /
+       toggle). Pre-v1.6.4, NAC.click on a checkbox timed out
+       because the click toggled the state but no event fired
+       and the action-contract listener never resolved. The
+       runtime now also synthesises nac:field:changed after
+       el.click() for these field types (see click() body). */
+    'field':            ['nac:field:changed'],
+    /* v1.6.6: table sort + filter controls. Pre-v1.6.6
+       NAC.click('table.demo.sort.city') timed out because the
+       column header has data-nac-role="sort-control" and emits
+       nac:table:sort_changed (not nac:action:succeeded). The
+       matcher is extended below to accept event detail fields
+       column_nac_id and filter_nac_id as nac_id matches. */
+    'sort-control':     ['nac:table:sort_changed'],
+    'filter-control':   ['nac:table:filter_changed'],
+  };
+
+  /* v1.6.4: field types whose click() act on a value (toggle).
+     For these, the runtime synthesises nac:field:changed after
+     el.click() so an automation runner sees a deterministic
+     completion signal even when the host's own change-handler
+     does not emit one. Other field types (text, number, date)
+     are left alone -- click() on them just focuses; there is no
+     value change to signal. */
+  const _CLICK_TOGGLE_FIELD_TYPES = ['checkbox', 'radio', 'toggle', 'switch'];
+
+  async function click(nac_id, opts) {
+    /* v1.4.1: removed the 200ms phantom-success leg. Now click()
+       races real lifecycle events against a configurable timeout
+       and rejects with NacError('timeout', ...) if none fire.
+       Default timeout 5000ms; override via opts.timeout.
+       v1.6.3: success-event family is role-aware (see _CLICK_EVENT_FAMILY). */
+    const el = _findElement(nac_id, opts);
+    if (!el) {
+      /* v1.8.0: emit nac:command:rejected so an AI agent or audit
+         pipeline can hear about every silent miss instead of just
+         catching the throw. */
+      _emitCommandRejected({
+        command_method: 'click',
+        command_target: nac_id,
+        reason: 'not_found',
+        message: 'No element with nac_id=' + nac_id,
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('not_found', 'No element with nac_id=' + nac_id);
+    }
+    if (el.disabled || el.getAttribute('aria-disabled') === 'true') {
+      _emitCommandRejected({
+        command_method: 'click',
+        command_target: nac_id,
+        reason: 'disabled',
+        message: 'Element ' + nac_id + ' is disabled',
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('disabled', 'Element ' + nac_id + ' is disabled');
+    }
+    /* v2.3 (F7): capability gate. If the action declares
+       requires_capability and the current user set does not satisfy
+       it, reject before dispatch with code='capability_required'. */
+    {
+      const reqCap = _resolveCapability(nac_id, null);
+      if (reqCap && !_hasCapability(reqCap)) {
+        _emitCommandRejected({
+          command_method: 'click',
+          command_target: nac_id,
+          reason: 'capability_required',
+          message: 'Element ' + nac_id + ' requires capability ' +
+                   (Array.isArray(reqCap) ? '[' + reqCap.join(',') + ']' : reqCap),
+          source: (opts && opts.source) || undefined,
+        });
+        throw NacError('capability_required',
+          'Element ' + nac_id + ' requires capability ' +
+          (Array.isArray(reqCap) ? '[' + reqCap.join(',') + ']' : reqCap));
+      }
+    }
+    /* v1.8.0: hidden-target rejection. A button inside display:none
+       or aria-hidden="true" is not a click target a user could reach;
+       sec 6.2.28 requires us to surface this rather than fire silently.
+       We use rect dimensions + aria-hidden so position:fixed elements
+       (legitimate offsetParent=null) are NOT misclassified. */
+    var hiddenByAria = el.getAttribute('aria-hidden') === 'true';
+    var hiddenByLayout = false;
+    if (typeof el.getBoundingClientRect === 'function') {
+      var rect = el.getBoundingClientRect();
+      hiddenByLayout = (rect.width === 0 && rect.height === 0);
+    }
+    if (hiddenByAria || hiddenByLayout) {
+      _emitCommandRejected({
+        command_method: 'click',
+        command_target: nac_id,
+        reason: 'hidden',
+        message: 'Element ' + nac_id + ' is not visible',
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('hidden', 'Element ' + nac_id + ' is not visible');
+    }
+    /* v1.9.0 ARIA preflight (sec 7.3.3): inert ancestor + aria-busy
+       block click before the host handler runs. Disabled is already
+       handled above; readonly only applies to fill (skipped here). */
+    var ariaPF = _ariaPreflight(el, 'click');
+    if (ariaPF) {
+      _emitCommandRejected({
+        command_method: 'click',
+        command_target: nac_id,
+        reason: ariaPF.reason,
+        message: ariaPF.message,
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError(ariaPF.reason, ariaPF.message);
+    }
+    /* v2.5 / RFC V24-04 OCC gate. Only await when opts actually
+       carries expected_* OR STRICT_VERSIONING demands it; otherwise
+       skip to avoid introducing a microtask boundary that would
+       reorder side-effect-then-immediate-check call patterns. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
+    const role = el.getAttribute('data-nac-role') || 'action';
+    const family = _CLICK_EVENT_FAMILY[role] || _CLICK_EVENT_FAMILY['action'];
+    /* The first event in each family is the "success" signal; if a
+       second entry exists it is the "failure" signal. Some families
+       (option, tab, breadcrumb, step, pagination) have no failure
+       counterpart -- the widget either succeeds or stays silent
+       (and the timeout catches the silent case). Always also listen
+       for nac:action:succeeded/failed as a fallback so hosts that
+       emit both contracts (e.g. a tab that is also an action) work. */
+    const successEvents = [family[0]];
+    const failureEvents = family.length > 1 ? [family[1]] : [];
+    if (role !== 'action') {
+      successEvents.push('nac:action:succeeded');
+      failureEvents.push('nac:action:failed');
+    }
+    /* v1.6.5: cache plugin slug + option value/text BEFORE el.click()
+       fires. The host's click handler may DETACH el from the DOM
+       (e.g. combobox option click does cityList.innerHTML='') BEFORE
+       emitting nac:field:changed. After detachment el.closest()
+       returns null, so the v1.6.4 matcher rejected legitimate match
+       attempts. Cache here, pass to _eventMatchesElement so it never
+       walks the DOM for a detached element. */
+    var pluginRoot = el.closest('[data-nac-plugin]');
+    const cachedCtx = {
+      plugin:   pluginRoot ? pluginRoot.getAttribute('data-nac-plugin') : null,
+      opt_value: el.getAttribute('data-nac-value'),
+      opt_text:  (el.textContent || '').trim(),
+      role:     role,
+    };
+    const timeout_ms = (opts && opts.timeout) || 5000;
+    const result = new Promise(function (resolve, reject) {
+      let settled = false;
+      function onSucceeded(e) {
+        if (settled) return;
+        /* Filter: the event must mention this element via either
+           event.target or detail.nac_id matching. Without this, a
+           background nac:field:changed from another field would
+           resolve our click prematurely. */
+        if (!_eventMatchesElement(e, el, nac_id, cachedCtx)) return;
+        settled = true;
+        cleanup();
+        resolve({ ok: true, event: { event: e.type, detail: e.detail || null } });
+      }
+      function onFailed(e) {
+        if (settled) return;
+        if (!_eventMatchesElement(e, el, nac_id, cachedCtx)) return;
+        settled = true;
+        cleanup();
+        resolve({ ok: false, event: { event: e.type, detail: e.detail || null } });
+      }
+      function cleanup() {
+        successEvents.forEach(function (n) { document.removeEventListener(n, onSucceeded); });
+        failureEvents.forEach(function (n) { document.removeEventListener(n, onFailed); });
+        clearTimeout(t);
+      }
+      const t = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(NacError('timeout',
+          'click(' + nac_id + ', role=' + role + ') did not emit any of [' +
+          successEvents.concat(failureEvents).join(', ') + '] within ' +
+          timeout_ms + 'ms'));
+      }, timeout_ms);
+      successEvents.forEach(function (n) { document.addEventListener(n, onSucceeded); });
+      failureEvents.forEach(function (n) { document.addEventListener(n, onFailed); });
+    });
+    _focusElement(el);
+    el.click();
+
+    /* v1.6.4: synthesize nac:field:changed after click() on a
+       toggle-class field (checkbox / radio / toggle / switch).
+       Pre-v1.6.4 a host that wired only a native change handler
+       (no NAC event emit) caused click() to time out at 5s even
+       though the field state did flip. The synthesised event
+       carries the new value so the matcher resolves immediately
+       and downstream listeners see the same shape they would
+       from NAC.fill. Only fires when the host itself did NOT
+       emit nac:field:changed within a microtask (we listen
+       briefly to avoid double-emit on well-behaved hosts). */
+    if (role === 'field') {
+      var ftype = (el.getAttribute('data-nac-field-type') || '').toLowerCase();
+      if (_CLICK_TOGGLE_FIELD_TYPES.indexOf(ftype) >= 0) {
+        var hostEmitted = false;
+        var hostListener = function (ev) {
+          if (_eventMatchesElement(ev, el, nac_id)) hostEmitted = true;
+        };
+        document.addEventListener('nac:field:changed', hostListener, true);
+        setTimeout(function () {
+          document.removeEventListener('nac:field:changed', hostListener, true);
+          if (hostEmitted) return;
+          var newVal = (ftype === 'checkbox' || ftype === 'switch' || ftype === 'toggle')
+            ? !!el.checked
+            : (ftype === 'radio' ? !!el.checked : el.value);
+          var pluginRoot = el.closest('[data-nac-plugin]');
+          _emit('nac:field:changed', {
+            nac_id:    nac_id,
+            new_value: newVal,
+            plugin:    pluginRoot ? pluginRoot.getAttribute('data-nac-plugin') : null,
+            synthesised: true,
+          });
+        }, 32);
+      }
+    }
+    return result;
+  }
+
+  /* v1.6.3 helper: an event "matches" the clicked element when its
+     detail names the same nac_id, OR when its target IS the element
+     (or a descendant), OR when no nac_id appears in detail (defensive
+     -- we take the event as a match rather than miss it on a sloppy
+     emitter and time out). */
+  function _eventMatchesElement(e, el, nac_id, cached) {
+    var d = e && e.detail;
+    if (d && (
+              /* v1.7.0 canonical fields (sec 6.2). */
+              d.action_id === nac_id || d.field_id === nac_id ||
+              d.tab_id === nac_id || d.section_id === nac_id ||
+              d.column_id === nac_id || d.filter_id === nac_id ||
+              d.source_id === nac_id || d.target_id === nac_id ||
+              d.list_id === nac_id || d.item_id === nac_id ||
+              d.tree_id === nac_id || d.node_id === nac_id ||
+              d.breadcrumb_id === nac_id || d.confirm_id === nac_id ||
+              d.toast_id === nac_id || d.drawer_id === nac_id ||
+              d.calendar_id === nac_id || d.event_id === nac_id ||
+              d.chart_id === nac_id || d.series_id === nac_id ||
+              d.map_id === nac_id || d.marker_id === nac_id ||
+              d.richtext_id === nac_id || d.dropzone_id === nac_id ||
+              d.stepper_id === nac_id || d.carousel_id === nac_id ||
+              d.timeline_id === nac_id || d.option_id === nac_id ||
+              d.table_id === nac_id ||
+              /* v1.6.x legacy aliases (deprecated, removed in v2.0). */
+              d.nac_id === nac_id || d.from_nac_id === nac_id ||
+              d.target_nac_id === nac_id || d.id === nac_id ||
+              d.column_nac_id === nac_id || d.filter_nac_id === nac_id ||
+              d.step_id === nac_id || d.over_nac_id === nac_id)) {
+      return true;
+    }
+    if (e.target && (e.target === el || (el.contains && el.contains(e.target)))) {
+      return true;
+    }
+    /* Field-change events fire on the parent field when an option
+       is clicked; resolve those too. */
+    if (e.type === 'nac:field:changed' && d && d.nac_id) {
+      var parentField = el.closest('[data-nac-id="' + d.nac_id + '"]');
+      if (parentField) return true;
+      /* Or: the element is a descendant of an element whose nac_id
+         matches the field that fired. */
+      var fieldHost = document.querySelector(
+        '[data-nac-role="field"][data-nac-id="' + d.nac_id + '"], ' +
+        '[data-nac-role="combobox"][data-nac-id="' + d.nac_id + '"]');
+      if (fieldHost && fieldHost.contains(el)) return true;
+      /* v1.6.4-v1.6.5: combobox option click. The host's option
+         click handler emits nac:field:changed on the parent field
+         (e.g. cities.search) with new_value matching the option's
+         data-nac-value. The clicked option (e.g. cities.option.3)
+         lives in a separate <ul>; el.closest() and
+         fieldHost.contains() both miss because the option was
+         DETACHED from the DOM by cityList.innerHTML='' before the
+         event fired. v1.6.5 caches the plugin/optValue/optText at
+         click() time and uses them here -- the matcher works for
+         detached elements. */
+      var role = (cached && cached.role) || el.getAttribute('data-nac-role') || '';
+      if (role === 'option' &&
+          d.new_value !== undefined && d.new_value !== null) {
+        var optPluginSlug;
+        if (cached && cached.plugin) {
+          optPluginSlug = cached.plugin;
+        } else {
+          var optPluginNode = el.closest('[data-nac-plugin]');
+          optPluginSlug = optPluginNode
+            ? optPluginNode.getAttribute('data-nac-plugin') : null;
+        }
+        var fieldElForPlugin = document.querySelector(
+          '[data-nac-id="' + d.nac_id + '"]');
+        var fieldPluginNode = fieldElForPlugin
+          ? fieldElForPlugin.closest('[data-nac-plugin]') : null;
+        var fieldPluginSlug = fieldPluginNode
+          ? fieldPluginNode.getAttribute('data-nac-plugin') : null;
+        if (optPluginSlug && fieldPluginSlug &&
+            optPluginSlug === fieldPluginSlug) {
+          var optVal = (cached && cached.opt_value !== undefined)
+            ? cached.opt_value : el.getAttribute('data-nac-value');
+          if (optVal !== null && String(d.new_value) === String(optVal)) {
+            return true;
+          }
+          var optText = (cached && cached.opt_text)
+            ? cached.opt_text
+            : (el.textContent || '').trim();
+          if (optText && optText === String(d.new_value)) {
+            return true;
+          }
+        }
+      }
+    }
+    return !d; /* defensive: emitter sloppy, no detail at all -> match */
+  }
+
+  async function fill(nac_id, value, opts) {
+    const el = _findElement(nac_id, opts);
+    if (!el) {
+      _emitCommandRejected({
+        command_method: 'fill',
+        command_target: nac_id,
+        reason: 'not_found',
+        message: 'No field with nac_id=' + nac_id,
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('not_found', 'No field with nac_id=' + nac_id);
+    }
+    if (el.disabled) {
+      _emitCommandRejected({
+        command_method: 'fill',
+        command_target: nac_id,
+        reason: 'disabled',
+        message: 'Field ' + nac_id + ' is disabled',
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('disabled', 'Field ' + nac_id + ' is disabled');
+    }
+    /* v1.9.0 ARIA preflight (sec 7.3.3): inert / aria-busy /
+       readonly all reject before the host handler. */
+    var fillPF = _ariaPreflight(el, 'fill');
+    if (fillPF) {
+      _emitCommandRejected({
+        command_method: 'fill',
+        command_target: nac_id,
+        reason: fillPF.reason,
+        message: fillPF.message,
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError(fillPF.reason, fillPF.message);
+    }
+    /* v2.5 / RFC V24-04 OCC gate. Same conditional pattern as click. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
+    _focusElement(el);
+    const ft = el.getAttribute('data-nac-field-type');
+
+    /* The native property setter, or null when this host has no such
+       constructor (audit N-44).
+
+       Every call site below already had a fallback -- `el.value = v`
+       when the descriptor has no setter -- and the fallback was
+       UNREACHABLE in the only environment it was written for. The guard
+       tested the descriptor and the expression reached through
+       `window.HTMLInputElement.prototype` to produce it, so on a host
+       with a partial DOM (a test shim, an SSR or headless context --
+       the paths this runtime claims to support) fill() threw
+       `Cannot read properties of undefined (reading 'prototype')`
+       before any fallback could run. Worse than the crash: the thrown
+       value is a raw TypeError with no `code`, so a caller relying on
+       the error contract gets nothing it can branch on.
+
+       A real browser is unaffected: the constructors always exist,
+       the descriptor is found, and the native setter is used exactly
+       as before -- which is what keeps React's controlled inputs
+       working. */
+    const _nativeSetter = function (ctorName, prop) {
+      var ctor = (typeof window !== 'undefined') ? window[ctorName] : undefined;
+      if (!ctor || !ctor.prototype) return null;
+      var d = Object.getOwnPropertyDescriptor(ctor.prototype, prop);
+      return (d && d.set) ? d.set : null;
+    };
+
+    if (ft === 'checkbox' || ft === 'radio') {
+      /* React tracks `checked` similarly to `value`; use the native
+         setter so controlled checkboxes/radios update state. */
+      var nativeCheckedSetter = _nativeSetter('HTMLInputElement', 'checked');
+      if (nativeCheckedSetter) {
+        nativeCheckedSetter.call(el, !!value);
+      } else {
+        el.checked = !!value;
+      }
+    } else if (el.tagName === 'SELECT') {
+      var nativeSelectSetter = _nativeSetter('HTMLSelectElement', 'value');
+      if (nativeSelectSetter) {
+        nativeSelectSetter.call(el, String(value));
+      } else {
+        el.value = String(value);
+      }
+    } else if (el.hasAttribute('contenteditable')) {
+      el.textContent = String(value == null ? '' : value);
+    } else {
+      /* React + controlled inputs: setting el.value directly is silently
+         reverted on the next render because React's synthetic event system
+         tracks the original property setter on HTMLInputElement.prototype.
+         Use the native setter so React's onChange receives the new value
+         and updates its state. Works on plain DOM inputs unchanged. */
+      var nativeValueSetter = _nativeSetter(
+        (el.tagName === 'TEXTAREA') ? 'HTMLTextAreaElement' : 'HTMLInputElement',
+        'value'
+      );
+      var newVal = String(value == null ? '' : value);
+      if (nativeValueSetter) {
+        nativeValueSetter.call(el, newVal);
+      } else {
+        el.value = newVal;
+      }
+    }
+
+    el.dispatchEvent(new Event('input',  { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    document.dispatchEvent(new CustomEvent('nac:field:changed', {
+      detail: {
+        plugin:    (el.closest('[data-nac-plugin]') || {}).getAttribute
+                     && el.closest('[data-nac-plugin]').getAttribute('data-nac-plugin'),
+        nac_id:    nac_id,
+        value:     value,
+        timestamp: Date.now(),
+      },
+    }));
+    return { ok: true };
+  }
+
+  async function select(nac_id, option, opts) {
+    const el = _findElement(nac_id, opts);
+    if (!el) throw NacError('not_found', 'No select with nac_id=' + nac_id);
+    /* v2.5 / RFC V24-04 OCC gate. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
+    _focusElement(el);
+    if (el.tagName === 'SELECT') {
+      if (el.multiple && Array.isArray(option)) {
+        Array.prototype.forEach.call(el.options, function (o) {
+          o.selected = option.indexOf(o.value) >= 0;
+        });
+      } else {
+        el.value = String(option);
+      }
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      return { ok: true };
+    }
+    /* Non-native select widget: try clicking the option element. */
+    const root = el.closest('[data-nac-plugin]') || document;
+    const opt = root.querySelector('[data-nac-id="' + nac_id + '.' + option + '"]')
+             || root.querySelector('[data-nac-id="' + option + '"]');
+    if (opt) { _focusElement(opt); opt.click(); return { ok: true }; }
+    throw NacError('not_found', 'option ' + option + ' not present in ' + nac_id);
+  }
+
+  async function tab(plugin, tab_key, opts) {
+    /* v2.5.0-alpha.4: opts third arg accepts V24-04 expected_*
+       parameters (expected_plugin_version / expected_tree_version /
+       expected_element_state_hash). When opts has any expected_* OR
+       STRICT_VERSIONING is on, the OCC gate runs before the tab
+       click. Pre-alpha.4 the signature was (plugin, tab_key); the
+       single-arg ergonomic form keeps working because opts on the
+       single-arg path is the SECOND argument (tab_key); we detect
+       that case and re-bind. */
+    /* Re-binding: single-arg ergonomic form may have been called as
+       tab(bareId) OR tab(bareId, opts). Differentiate by typeof. */
+    if (tab_key !== undefined && typeof tab_key === 'object' && tab_key !== null
+        && typeof plugin === 'string' && plugin.indexOf('.') >= 0) {
+      opts = tab_key;
+      tab_key = undefined;
+    }
+    /* H1.v5 (2026-05-20): single-arg ergonomic form. When the caller
+       passes only a full nac_id (e.g. "conduit.tab.feed__your_feed"),
+       resolve it directly against the DOM without requiring the
+       caller to split plugin + tab_key. The two-arg form remains
+       the canonical contract; this is a back-compat ergonomic. */
+    if (tab_key === undefined && typeof plugin === 'string' && plugin.indexOf('.') >= 0) {
+      const bareId = plugin;
+      let tabEl = document.querySelector(
+        '[data-nac-role="tab"][data-nac-id="' + bareId + '"]'
+      );
+      /* H1.v7 (2026-05-21): strict resolution. If the bare id is not
+         in DOM, try the qualified-instance fallback ONLY when the
+         match is unambiguous: exactly one element whose id starts
+         with bareId + "__". Zero matches throws no_matching_instance;
+         multiple matches throws ambiguous_tab. No silent resolution
+         to "the first one that looks similar" -- assistive users
+         landing on the wrong tab from a near-match is the exact
+         failure mode the protocol forbids. */
+      if (!tabEl) {
+        const cands = document.querySelectorAll('[data-nac-role="tab"][data-nac-id]');
+        const exact = [];
+        for (let i = 0; i < cands.length; i++) {
+          const id = cands[i].getAttribute('data-nac-id') || '';
+          if (id.indexOf(bareId + '__') === 0) exact.push(cands[i]);
+        }
+        if (exact.length === 1) {
+          tabEl = exact[0];
+        } else if (exact.length > 1) {
+          const candidates = [];
+          for (let i = 0; i < exact.length; i++) {
+            candidates.push({
+              nac_id: exact[i].getAttribute('data-nac-id'),
+              label:  _candidateLabel(exact[i]),
+            });
+          }
+          _emitDisambiguationRequested({
+            method: 'tab', plugin: null,
+            query: { id: bareId },
+            reason: 'ambiguous_tab',
+            candidates: candidates,
+          });
+          throw NacError('ambiguous_tab',
+            'tab id="' + bareId + '" is not in DOM and ' + exact.length +
+            ' qualified instances match the "' + bareId + '__" prefix: ' +
+            candidates.map(function (c) { return c.nac_id; }).join(', ') +
+            ' -- pass the full qualified id',
+            { candidates: candidates });
+        }
+      }
+      if (!tabEl) {
+        /* No exact, no qualified instance. Build the list of all tabs
+           in DOM so the agent / voice / assistive can re-ask. */
+        const all = document.querySelectorAll('[data-nac-role="tab"][data-nac-id]');
+        const available = [];
+        for (let i = 0; i < all.length; i++) {
+          available.push({
+            nac_id: all[i].getAttribute('data-nac-id'),
+            label:  _candidateLabel(all[i]),
+          });
+        }
+        _emitDisambiguationRequested({
+          method: 'tab', plugin: null,
+          query: { id: bareId },
+          reason: 'no_matching_instance',
+          candidates: available,
+        });
+        throw NacError('no_matching_instance', 'tab id="' + bareId +
+          '" not in DOM (no exact match, no "' + bareId + '__" qualified instance)',
+          { candidates: available });
+      }
+      /* v2.5 V24-04 OCC gate, same conditional pattern as click. */
+      {
+        const _o = opts || {};
+        const _hasExp = ('expected_plugin_version' in _o)
+                     || ('expected_tree_version' in _o)
+                     || ('expected_element_state_hash' in _o);
+        if (_hasExp || _strictVersioningOn()) {
+          await _resolveVersionExpectations(opts, tabEl);
+        }
+      }
+      _focusElement(tabEl);
+      tabEl.click();
+      try { await wait_for('nac:tab:changed', 1500); } catch (e) { /* tolerated */ }
+      return { ok: true };
+    }
+    const root = document.querySelector('[data-nac-plugin="' + plugin + '"]');
+    if (!root) throw NacError('not_found', 'plugin ' + plugin + ' not mounted');
+    const tabEl = root.querySelector(
+      '[data-nac-role="tab"][data-nac-id="' + tab_key + '"]'
+    );
+    if (!tabEl) throw NacError('not_found', 'tab ' + tab_key + ' missing');
+    /* v2.5 V24-04 OCC gate (two-arg path). */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, tabEl);
+      }
+    }
+    _focusElement(tabEl);
+    tabEl.click();
+    try {
+      await wait_for('nac:tab:changed', 1500);
+    } catch (e) { /* tolerated */ }
+    return { ok: true };
+  }
+
+  /* ---------- v1.4.1: voice/agent ergonomic helpers --------------- */
+  /* Both helpers added 2026-05-06 in response to AI peer review
+     action item 3.4-C. A voice agent that hears "apply all" or
+     "switch to the failed tab" should not need to call manifest()
+     first to map the spoken phrase to a nac_id. These helpers do
+     the lookup automatically. They are convenience wrappers over
+     click() and tab(); the underlying contracts (awaitable-write,
+     timeouts, throws) are unchanged. */
+
+  async function click_by_verb(plugin, verb, opts) {
+    if (!verb) throw NacError('invalid', 'click_by_verb requires a verb');
+    /* Resolve plugin: explicit arg, or active plugin if null. */
+    const targetPlugin = plugin || _activePlugin();
+    /* H2 (2026-05-20): qualifier / qualifier_ordinal disambiguate
+       among multiple DOM nodes that share a verb. Forge --ai-apply
+       can decorate a reusable React component (e.g. <NavItem>) with
+       a base nac_id and let the bake-time JSX add the qualifier
+       suffix (e.g. "conduit.navigation.nav_item__sign_in"). The
+       resolver below prefers an exact suffix match for opts.qualifier,
+       falls back to a contains match, and supports
+       opts.qualifier_ordinal as positional selection across all
+       elements sharing the verb in DOM order. Back-compat: with no
+       qualifier / qualifier_ordinal, behavior matches pre-H2. */
+    const qualifier        = opts && opts.qualifier;
+    const qualifierOrdinal = opts && (typeof opts.qualifier_ordinal === 'number')
+                             ? opts.qualifier_ordinal : null;
+
+    /* Search the manifest first for an action with matching verb. */
+    let matched = null;
+    if (targetPlugin && _manifests[targetPlugin]) {
+      const actions = _manifests[targetPlugin].actions || [];
+      for (let i = 0; i < actions.length; i++) {
+        if (actions[i] && actions[i].verb === verb) {
+          matched = actions[i];
+          break;
+        }
+      }
+    }
+    /* When a qualifier is provided we always fall through to the DOM
+       scan -- the manifest's flat top-level actions[] entries don't
+       carry per-instance suffixes; only the DOM does. */
+    if (qualifier || qualifierOrdinal !== null) matched = null;
+
+    /* H1.v5 (2026-05-20): if the manifest matched but the matched.nac_id
+       has no live DOM element, the manifest entry is a per-instance
+       template (e.g. data-nac-id={`conduit.action.delete_article__${slug}`}).
+       Fall through to the DOM scan so we pick whichever qualified
+       instance is actually mounted. */
+    if (matched && matched.nac_id) {
+      const probe = document.querySelector('[data-nac-id="' + matched.nac_id + '"]');
+      if (!probe) matched = null;
+    }
+
+    if (!matched) {
+      /* Fallback: scan DOM within plugin scope for [data-nac-action]. */
+      const root = targetPlugin
+        ? document.querySelector('[data-nac-plugin="' + targetPlugin + '"]')
+        : document;
+      if (root) {
+        if (qualifier) {
+          /* H1.v7 (2026-05-21): strict resolution. The previous
+             implementation had a second-pass `indexOf(qualifier)`
+             fallback that resolved silently to any element whose
+             id CONTAINED the qualifier as a substring. That
+             violated NAC's 0-silent-damage invariant: an invalid
+             qualifier (e.g. "article") would match an unrelated
+             element (e.g. "...nav_item__new_article") and report
+             the dispatch as success. Now: only EXACT id match or
+             SUFFIX after the "__" separator counts. Zero matches
+             throws no_matching_instance; multiple matches throw
+             ambiguous_qualifier. No silent resolution. */
+          const cands = root.querySelectorAll('[data-nac-action="' + verb + '"]');
+          const exact = [];
+          for (let i = 0; i < cands.length; i++) {
+            const id = cands[i].getAttribute('data-nac-id') || '';
+            if (id === qualifier || id.endsWith('__' + qualifier)) exact.push(cands[i]);
+          }
+          if (exact.length === 0) {
+            /* Build the list of AVAILABLE qualifiers for this verb so
+               the agent / voice / assistive can re-ask with one that
+               exists. This is the "no_matching" companion to
+               ambiguous: in both cases we surface the option set. */
+            const available = [];
+            for (let i = 0; i < cands.length; i++) {
+              available.push({
+                nac_id: cands[i].getAttribute('data-nac-id'),
+                label:  _candidateLabel(cands[i]),
+              });
+            }
+            _emitDisambiguationRequested({
+              method: 'click_by_verb', plugin: targetPlugin || null,
+              query: { verb: verb, qualifier: qualifier },
+              reason: 'no_matching_instance',
+              candidates: available,
+            });
+            throw NacError('no_matching_instance',
+              'No element with data-nac-action="' + verb +
+              '" matches qualifier="' + qualifier + '" by exact id or __suffix' +
+              ' in plugin "' + (targetPlugin || '<active>') + '"',
+              { candidates: available });
+          }
+          if (exact.length > 1) {
+            const candidates = [];
+            for (let i = 0; i < exact.length; i++) {
+              candidates.push({
+                nac_id: exact[i].getAttribute('data-nac-id'),
+                label:  _candidateLabel(exact[i]),
+              });
+            }
+            _emitDisambiguationRequested({
+              method: 'click_by_verb', plugin: targetPlugin || null,
+              query: { verb: verb, qualifier: qualifier },
+              reason: 'ambiguous_qualifier',
+              candidates: candidates,
+            });
+            throw NacError('ambiguous_qualifier',
+              'qualifier="' + qualifier + '" matches ' + exact.length +
+              ' elements with verb="' + verb + '": ' +
+              candidates.map(function (c) { return c.nac_id; }).join(', ') +
+              ' -- supply a more specific qualifier or use opts.qualifier_ordinal',
+              { candidates: candidates });
+          }
+          matched = { nac_id: exact[0].getAttribute('data-nac-id'), verb: verb };
+        } else if (qualifierOrdinal !== null) {
+          const cands = root.querySelectorAll('[data-nac-action="' + verb + '"]');
+          const el = cands[qualifierOrdinal];
+          if (el && el.getAttribute('data-nac-id')) {
+            matched = { nac_id: el.getAttribute('data-nac-id'), verb: verb };
+          }
+        } else {
+          /* Default: first match in DOM order. */
+          const el = root.querySelector('[data-nac-action="' + verb + '"]');
+          if (el && el.getAttribute('data-nac-id')) {
+            matched = { nac_id: el.getAttribute('data-nac-id'), verb: verb };
+          }
+        }
+      }
+    }
+    if (!matched || !matched.nac_id) {
+      const qInfo = qualifier ? ' (qualifier="' + qualifier + '")'
+                  : qualifierOrdinal !== null ? ' (qualifier_ordinal=' + qualifierOrdinal + ')'
+                  : '';
+      throw NacError('not_found',
+        'No action with verb="' + verb + '"' + qInfo + ' found in plugin "'
+        + (targetPlugin || '<active>') + '"');
+    }
+    return await click(matched.nac_id,
+      Object.assign({}, opts || {},
+        targetPlugin ? { plugin: targetPlugin } : {}));
+  }
+
+  /* ============================================================
+     v2.3.0 -- NAC.invoke / NAC.utter (action payload contract)
+     ============================================================
+     NAC v2.2 actions are click-and-go: NAC.click(id) /
+     NAC.click_by_verb(plugin, verb) trigger a click; the host
+     handles it; the runtime polls for nac:action:succeeded.
+
+     This works for verb-and-state actions (save, cancel, delete)
+     but collapses when the action needs DATA from the agent:
+     utter(text), search(query), send_message(body), upload(file),
+     schedule(date), translate(text, target_lang). The host has
+     no way to receive the agent's payload via a synthetic click.
+
+     v2.3 closes this gap. NAC.invoke(action_id, payload) dispatches
+     a 'nac:action:requested' CustomEvent on the host element with
+     the payload + a correlation request_id. The host listens,
+     processes, and emits 'nac:action:succeeded' (or :failed) with
+     the matching request_id. The runtime resolves the Promise.
+
+     Click-style verbs continue to work unchanged via click() /
+     click_by_verb(). invoke is purely additive.
+
+     Atlas Pro is the reference adopter: its 'utter' verb on
+     'atlas_pro_ad.mic' accepts {text, lang} and routes into the
+     existing /parse + /tts conversational loop. */
+
+  async function invoke(action_id, payload, opts) {
+    if (!action_id || typeof action_id !== 'string') {
+      throw NacError('invalid', 'invoke requires an action_id');
+    }
+    if (payload == null || typeof payload !== 'object') {
+      throw NacError('invalid', 'invoke requires a payload object');
+    }
+    const el = _findElement(action_id, opts);
+    if (!el) {
+      _emitCommandRejected({
+        command_method: 'invoke',
+        command_target: action_id,
+        reason: 'not_found',
+        message: 'No element with nac_id=' + action_id,
+        source: (opts && opts.source) || undefined,
+      });
+      throw NacError('not_found', 'No element with nac_id=' + action_id);
+    }
+    /* invoke deliberately does NOT enforce visibility OR disabled --
+       the canonical use case is a mic / search / upload widget
+       that may live outside the visible viewport or be visually
+       disabled while a previous request is processing, but is
+       still a valid NAC target (the agent's request is a logical
+       message, not a synthetic click). Hosts that need to refuse
+       an invoke based on UI state should do it in their
+       nac:action:requested listener and emit nac:action:failed
+       with a meaningful error code. */
+    /* v2.5 / RFC V24-04 OCC gate. */
+    {
+      const _o = opts || {};
+      const _hasExp = ('expected_plugin_version' in _o)
+                   || ('expected_tree_version' in _o)
+                   || ('expected_element_state_hash' in _o);
+      if (_hasExp || _strictVersioningOn()) {
+        await _resolveVersionExpectations(opts, el);
+      }
+    }
+    const verb = (payload && payload.verb)
+              || el.getAttribute('data-nac-action')
+              || '';
+    /* v2.3 (F7): capability gate. Unlike disabled, capabilities ARE
+       enforced on invoke -- a missing permission is not a UI state
+       issue, it is a logical authorization failure that should
+       short-circuit BEFORE the host's listener even hears about it. */
+    {
+      const reqCap = _resolveCapability(action_id, verb);
+      if (reqCap && !_hasCapability(reqCap)) {
+        _emitCommandRejected({
+          command_method: 'invoke',
+          command_target: action_id,
+          reason: 'capability_required',
+          message: 'Action ' + action_id + ' (verb=' + verb + ') requires capability ' +
+                   (Array.isArray(reqCap) ? '[' + reqCap.join(',') + ']' : reqCap),
+          source: (opts && opts.source) || undefined,
+        });
+        throw NacError('capability_required',
+          'Action ' + action_id + ' (verb=' + verb + ') requires capability ' +
+          (Array.isArray(reqCap) ? '[' + reqCap.join(',') + ']' : reqCap));
+      }
+    }
+    const pluginRoot = el.closest('[data-nac-plugin]');
+    const plugin = pluginRoot
+      ? pluginRoot.getAttribute('data-nac-plugin')
+      : null;
+    const request_id = 'nac_inv_'
+      + Math.random().toString(36).slice(2, 12)
+      + '_' + Date.now();
+    const timeout_ms = (opts && opts.timeout) || 30000;
+
+    const result = new Promise(function (resolve, reject) {
+      let settled = false;
+      function matchesReq(e) {
+        return e && e.detail && e.detail.request_id === request_id;
+      }
+      function onSucceeded(e) {
+        if (settled) return;
+        if (!matchesReq(e)) return;
+        settled = true;
+        cleanup();
+        resolve({
+          ok: true,
+          request_id: request_id,
+          ack: e.detail || null,
+        });
+      }
+      function onFailed(e) {
+        if (settled) return;
+        if (!matchesReq(e)) return;
+        settled = true;
+        cleanup();
+        const code = (e.detail && e.detail.error) || 'failed';
+        reject(NacError(code,
+          'invoke failed for ' + action_id
+            + ((e.detail && e.detail.message) ? ': ' + e.detail.message : '')));
+      }
+      const timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(NacError('timeout',
+          'invoke timeout after ' + timeout_ms + 'ms for ' + action_id));
+      }, timeout_ms);
+      function cleanup() {
+        document.removeEventListener('nac:action:succeeded', onSucceeded);
+        document.removeEventListener('nac:action:failed',    onFailed);
+        clearTimeout(timer);
+      }
+      document.addEventListener('nac:action:succeeded', onSucceeded);
+      document.addEventListener('nac:action:failed',    onFailed);
+    });
+
+    /* Dispatch the request event. Bubbles so the host can listen
+       on document if it prefers a single handler for all actions
+       (matches how the existing :succeeded / :failed contracts
+       work today). detail.payload is opaque to the runtime; only
+       the host knows what shape to expect for its own verb. */
+    el.dispatchEvent(new CustomEvent('nac:action:requested', {
+      bubbles: true,
+      detail: {
+        action_id:  action_id,
+        verb:       verb,
+        payload:    payload,
+        plugin:     plugin,
+        request_id: request_id,
+        ts:         Date.now(),
+      },
+    }));
+
+    return result;
+  }
+
+  /* Ergonomic shortcut for the most common payload-bearing verb.
+     Equivalent to invoke(id, {verb:'utter', text, lang, voice}). */
+  async function utter(action_id, opts) {
+    if (!opts || typeof opts !== 'object') {
+      throw NacError('invalid', 'utter requires an opts object with at least "text"');
+    }
+    if (!opts.text || typeof opts.text !== 'string') {
+      throw NacError('invalid', 'utter requires opts.text (string)');
+    }
+    return await invoke(action_id, {
+      verb:     'utter',
+      text:     opts.text,
+      lang:     opts.lang     || null,
+      voice:    opts.voice    || null,
+      metadata: opts.metadata || null,
+    }, opts);
+  }
+
+  async function tab_by_label(plugin, label, opts) {
+    if (!label) throw NacError('invalid', 'tab_by_label requires a label');
+    const targetPlugin = plugin || _activePlugin();
+    if (!targetPlugin) throw NacError('not_found',
+      'tab_by_label requires a plugin (no active plugin)');
+    /* Tolerant normalization: strip parenthetical suffixes
+       ("Lines (collection)" -> "lines") so labels generated by an
+       LLM that quotes the visible textContent still match canonical
+       names. Pablo report 2026-05-09. */
+    function _norm(s) {
+      return String(s == null ? '' : s)
+        .toLowerCase()
+        .replace(/\s*\([^)]*\)\s*/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    const lc = _norm(label);
+    /* Tab candidates come from the canonical m.tabs[] (sec 6.2) AND
+       from m.elements[role==='tab']. Both shapes are spec-conformant:
+       a manifest may put tabs in either container as long as the
+       role is 'tab'. We do NOT accept role='navigation' here -- HTML
+       semantics aside, that role is reserved by the spec for nav
+       landmarks (whole-region scroll targets), not switchable panels.
+       Fixing the data is the right answer; the runtime stays strict. */
+    const m = _manifests[targetPlugin];
+    const tabSources = [];
+    if (m) {
+      if (Array.isArray(m.tabs)) {
+        for (let i = 0; i < m.tabs.length; i++) {
+          if (m.tabs[i]) tabSources.push(m.tabs[i]);
+        }
+      }
+      if (Array.isArray(m.elements)) {
+        for (let i = 0; i < m.elements.length; i++) {
+          const e = m.elements[i];
+          if (e && e.role === 'tab') tabSources.push(e);
+        }
+      }
+    }
+    /* H1.v7 (2026-05-21): two-tier strict resolution. The voice /
+       assistive use case requires fuzzy substring matching (a user
+       saying "feed" should reach "Global Feed") -- but it must NEVER
+       resolve silently to the first lucky match when multiple tabs
+       satisfy the same fuzzy query. For a disabled user a wrong-tab
+       activation without signal is exactly the failure mode the
+       protocol forbids.
+
+       Tier 1: exact-normalized equality. If exactly 1 source has
+         _norm(candidate) === _norm(query) -> resolve. If 0, try tier 2.
+         If >1 -> ambiguous_label (multiple tabs share the same name).
+       Tier 2: substring containment in either direction. Collect ALL
+         tabs that match by substring. If exactly 1 -> resolve. If 0,
+         try DOM fallback. If >1 -> ambiguous_label (the agent must
+         re-ask with a more specific phrase). */
+    function _candidatesFor(t) {
+      const out = [];
+      if (t.label) out.push(t.label);
+      if (t.label_i18n && typeof t.label_i18n === 'object') {
+        for (const k in t.label_i18n) {
+          if (typeof t.label_i18n[k] === 'string') out.push(t.label_i18n[k]);
+        }
+      }
+      if (t.nac_id) out.push(t.nac_id);
+      if (t.id)     out.push(t.id);
+      return out;
+    }
+    const exactMatches = [];
+    const fuzzyMatches = [];
+    for (let i = 0; i < tabSources.length; i++) {
+      const t = tabSources[i];
+      const candidates = _candidatesFor(t);
+      let isExact = false, isFuzzy = false;
+      for (let j = 0; j < candidates.length; j++) {
+        const cand = _norm(candidates[j]);
+        if (!cand) continue;
+        if (cand === lc) { isExact = true; break; }
+        if ((lc.length >= 3 && cand.indexOf(lc) >= 0) ||
+            (cand.length >= 3 && lc.indexOf(cand) >= 0)) isFuzzy = true;
+      }
+      const id = t.nac_id || t.id;
+      if (isExact && id) exactMatches.push({ id: id, label: t.label || id });
+      else if (isFuzzy && id) fuzzyMatches.push({ id: id, label: t.label || id });
+    }
+    let matched = null;
+    if (exactMatches.length === 1) {
+      matched = { nac_id: exactMatches[0].id };
+    } else if (exactMatches.length > 1) {
+      _emitDisambiguationRequested({
+        method: 'tab_by_label', plugin: targetPlugin,
+        query: { label: label },
+        reason: 'ambiguous_label_exact',
+        candidates: exactMatches.map(function (m) {
+          return { nac_id: m.id, label: m.label };
+        }),
+      });
+      throw NacError('ambiguous_label',
+        'tab_by_label: ' + exactMatches.length + ' tabs share the exact label "' + label + '": ' +
+        exactMatches.map(function (m) { return m.id; }).join(', ') +
+        ' -- the manifest has duplicate labels; deduplicate or pass the nac_id directly',
+        { candidates: exactMatches.map(function (m) { return { nac_id: m.id, label: m.label }; }) });
+    } else if (fuzzyMatches.length === 1) {
+      matched = { nac_id: fuzzyMatches[0].id };
+    } else if (fuzzyMatches.length > 1) {
+      const candidates = fuzzyMatches.map(function (m) {
+        return { nac_id: m.id, label: m.label };
+      });
+      _emitDisambiguationRequested({
+        method: 'tab_by_label', plugin: targetPlugin,
+        query: { label: label },
+        reason: 'ambiguous_label_fuzzy',
+        candidates: candidates,
+      });
+      throw NacError('ambiguous_label',
+        'tab_by_label: query "' + label + '" matches ' + fuzzyMatches.length +
+        ' tabs by substring: ' + fuzzyMatches.map(function (m) {
+          return m.id + ' (' + m.label + ')';
+        }).join(', ') + ' -- supply a more specific phrase or the nac_id',
+        { candidates: candidates });
+    }
+    /* DOM fallback uses the canonical role only. Match against
+       aria-label and textContent with parens stripped (the parens
+       normalisation is legitimate -- LLMs quoting visible button
+       text often include the parenthetical context "(collection)"
+       that humans wouldn't say aloud). Same two-tier strict logic. */
+    if (!matched) {
+      const root = document.querySelector(
+        '[data-nac-plugin="' + targetPlugin + '"]');
+      if (root) {
+        const tabs = Array.prototype.slice.call(
+          root.querySelectorAll('[data-nac-role="tab"]'));
+        const domExact = [];
+        const domFuzzy = [];
+        for (let i = 0; i < tabs.length; i++) {
+          const txt = _norm(tabs[i].getAttribute('aria-label') || tabs[i].textContent || '');
+          const id = tabs[i].getAttribute('data-nac-id');
+          if (!txt || !id) continue;
+          if (txt === lc) domExact.push({ id: id, label: txt });
+          else if ((lc.length >= 3 && txt.indexOf(lc) >= 0) ||
+                   (txt.length >= 3 && lc.indexOf(txt) >= 0)) domFuzzy.push({ id: id, label: txt });
+        }
+        if (domExact.length === 1) {
+          matched = { nac_id: domExact[0].id };
+        } else if (domExact.length > 1) {
+          const cand = domExact.map(function (m) { return { nac_id: m.id, label: m.label }; });
+          _emitDisambiguationRequested({
+            method: 'tab_by_label', plugin: targetPlugin,
+            query: { label: label },
+            reason: 'ambiguous_label_exact_dom',
+            candidates: cand,
+          });
+          throw NacError('ambiguous_label',
+            'tab_by_label DOM: ' + domExact.length + ' visible tabs share the exact label "' +
+            label + '" -- pass the nac_id directly',
+            { candidates: cand });
+        } else if (domFuzzy.length === 1) {
+          matched = { nac_id: domFuzzy[0].id };
+        } else if (domFuzzy.length > 1) {
+          const cand = domFuzzy.map(function (m) { return { nac_id: m.id, label: m.label }; });
+          _emitDisambiguationRequested({
+            method: 'tab_by_label', plugin: targetPlugin,
+            query: { label: label },
+            reason: 'ambiguous_label_fuzzy_dom',
+            candidates: cand,
+          });
+          throw NacError('ambiguous_label',
+            'tab_by_label DOM: query "' + label + '" matches ' + domFuzzy.length +
+            ' visible tabs by substring: ' + domFuzzy.map(function (m) {
+              return m.id + ' (' + m.label + ')';
+            }).join(', ') + ' -- supply a more specific phrase or the nac_id',
+            { candidates: cand });
+        }
+      }
+    }
+    if (!matched || !matched.nac_id) {
+      /* No exact, no fuzzy, no DOM match: surface ALL visible tabs as
+         options so voice / assistive can re-prompt. */
+      const all = document.querySelectorAll('[data-nac-role="tab"][data-nac-id]');
+      const available = [];
+      for (let i = 0; i < all.length; i++) {
+        const id = all[i].getAttribute('data-nac-id');
+        available.push({ nac_id: id, label: _candidateLabel(all[i]) });
+      }
+      _emitDisambiguationRequested({
+        method: 'tab_by_label', plugin: targetPlugin,
+        query: { label: label },
+        reason: 'no_matching_label',
+        candidates: available,
+      });
+      throw NacError('not_found',
+        'No tab matching label="' + label + '" in plugin "'
+        + targetPlugin + '"',
+        { candidates: available });
+    }
+    /* v2.5 alpha.4: propagate opts (V24-04 expected_*) down to tab(). */
+    return await tab(targetPlugin, matched.nac_id, opts);
+  }
+
+  /* ---------- Visualization mode ---------------------------------- */
+
+  function set_mode(mode) {
+    const valid = ['modal', 'maximized', 'new_tab', 'new_window'];
+    if (valid.indexOf(mode) < 0) {
+      throw NacError('invalid', 'mode must be one of ' + valid.join(','));
+    }
+    document.dispatchEvent(new CustomEvent('nac:mode:requested', {
+      detail: { mode: mode, timestamp: Date.now() },
+    }));
+  }
+
+  /* ---------- Screenshot (best-effort) ---------------------------- */
+
+  async function screenshot() {
+    /* Best-effort: serialize the active plugin DOM to data URL.
+       For real screenshots, the runner uses Playwright's screenshot
+       primitive; this is a fallback for in-page operators. */
+    const root = document.querySelector('[data-nac-plugin="' + _activePlugin() + '"]')
+              || document.body;
+    const xml = new XMLSerializer().serializeToString(root);
+    return 'data:image/svg+xml;base64,' +
+      btoa(unescape(encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800">'
+        + '<foreignObject width="100%" height="100%">'
+        + '<div xmlns="http://www.w3.org/1999/xhtml">' + xml + '</div>'
+        + '</foreignObject></svg>'
+      )));
+  }
+
+  /* ---------- Manifest -> DOM validator --------------------------- */
+
+  /* v1.4.1 (added 2026-05-06):
+     Strengthened in response to AI peer review action item 3.4-B.
+     Pre-v1.4.1 the validator only checked ID presence, which made
+     P7's "drift is a CI blocker" promise vacuous. v1.4.1 adds
+     checks for: field type alignment (manifest.type vs
+     data-nac-field-type), options resolver presence, depends_on
+     graph integrity, table column declarations, breadcrumb path
+     consistency, ARIA-NAC state mirroring (per spec 7.3 mapping
+     table). All findings are returned as a structured errors
+     array with severity. The legacy `missing` array is preserved
+     for back-compat so existing CI scripts keep working. */
+  function validate(plugin_slug) {
+    const m = _manifests[plugin_slug];
+    if (!m) return { ok: false, code: 'no_manifest' };
+    const root = document.querySelector('[data-nac-plugin="' + plugin_slug + '"]');
+    if (!root) return { ok: false, code: 'plugin_not_mounted' };
+    const found = {};
+    const elemByNacId = {};
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-id]'),
+      function (el) {
+        /* v1.8.0: skip elements inside a data-nac-validate="skip"
+           subtree. The marker exists for third-party widgets the
+           host cannot annotate. We do NOT register them as found
+           and we do NOT raise findings against them. We DO emit
+           a separate warning if such a subtree contains
+           interactives, so authors notice they are excluding
+           operable surface. */
+        if (_validateSkipAncestor(el)) return;
+        const id = el.getAttribute('data-nac-id');
+        found[id] = true;
+        elemByNacId[id] = el;
+      }
+    );
+    const missing = [];
+    const errors = [];
+    function pushErr(severity, code, nac_id, msg, extra) {
+      const e = { severity: severity, code: code, nac_id: nac_id || null, message: msg };
+      if (extra) for (const k in extra) e[k] = extra[k];
+      errors.push(e);
+    }
+    /* v1.9.0 (sec 13.4.1): warn on data-nac-drag-type or
+       data-nac-drag-accept values that fall outside the registry.
+       Custom types still work (the runtime accepts them) but the
+       warning surfaces ad-hoc types that hurt cross-app interop. */
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-drag-type], [data-nac-drag-accept]'),
+      function (el) {
+        const stype = el.getAttribute('data-nac-drag-type');
+        if (stype && !_isRegisteredDragType(stype)) {
+          pushErr('warn', 'drag_type_unknown',
+            el.getAttribute('data-nac-id'),
+            'data-nac-drag-type=' + JSON.stringify(stype) +
+            ' is not in the v1.9 registry (sec 13.4.1). Custom types ' +
+            'work but hurt cross-app interop. Consider proposing the ' +
+            'type as a registry addition.',
+            { type: stype, attr: 'data-nac-drag-type' });
+        }
+        const accept = el.getAttribute('data-nac-drag-accept');
+        if (accept) {
+          const types = accept.split(',').map(function (s) { return s.trim(); });
+          for (let i = 0; i < types.length; i++) {
+            if (types[i] && !_isRegisteredDragType(types[i])) {
+              pushErr('warn', 'drag_type_unknown',
+                el.getAttribute('data-nac-id'),
+                'data-nac-drag-accept entry ' + JSON.stringify(types[i]) +
+                ' is not in the v1.9 registry (sec 13.4.1).',
+                { type: types[i], attr: 'data-nac-drag-accept' });
+            }
+          }
+        }
+      }
+    );
+
+    /* v1.8.0: surface skip-validate regions that contain interactive
+       elements as a structured warning (not an error). Authors who
+       legitimately wrap a third-party widget can ignore it; authors
+       who accidentally hid live UI behind the marker get a nudge.
+       v1.9.0: also enforce data-nac-skip-reason (sec 3.1). A skip
+       without a reason is severity 'error' at NAC-3, 'warn' below. */
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-validate="skip"]'),
+      function (skipEl) {
+        const interactives = skipEl.querySelectorAll(
+          '[data-nac-id], [data-nac-role="action"], ' +
+          '[data-nac-role="field"], [data-nac-role="tab"], ' +
+          '[data-nac-role="draggable"], button:not([disabled]), ' +
+          'input:not([disabled]), select:not([disabled])');
+        if (interactives.length > 0) {
+          pushErr('warn', 'skip_subtree_contains_interactives',
+            skipEl.getAttribute('data-nac-id'),
+            'data-nac-validate="skip" region contains ' +
+            interactives.length + ' interactive descendant(s); ' +
+            'these will not be operable by NAC drivers',
+            { interactive_count: interactives.length });
+        }
+        const reason = skipEl.getAttribute('data-nac-skip-reason');
+        if (!reason || !reason.trim()) {
+          pushErr('error', 'skip_without_reason',
+            skipEl.getAttribute('data-nac-id'),
+            'data-nac-validate="skip" requires a data-nac-skip-reason ' +
+            'attribute (sec 3.1, v1.9). Format: ' +
+            '"<category>[;remediate-by=YYYY-MM-DD][;tracker=<id>]"');
+        } else {
+          /* v1.9.0: enforce remediate-by presence (warn). */
+          var dateMatch = /remediate-by=(\d{4}-\d{2}-\d{2})/.exec(reason);
+          if (!dateMatch) {
+            pushErr('warn', 'skip_no_remediate_date',
+              skipEl.getAttribute('data-nac-id'),
+              'data-nac-skip-reason has a category but no ' +
+              'remediate-by=YYYY-MM-DD. Without a target date the ' +
+              'skip drifts to "permanent escape hatch". Add a ' +
+              'remediate-by token or remove the skip.');
+          } else {
+            var dueDate = dateMatch[1];
+            var todayISO = new Date().toISOString().slice(0, 10);
+            if (dueDate < todayISO) {
+              pushErr('warn', 'skip_remediation_overdue',
+                skipEl.getAttribute('data-nac-id'),
+                'data-nac-validate="skip" remediate-by=' + dueDate +
+                ' is past (today ' + todayISO + ')',
+                { remediate_by: dueDate });
+            }
+          }
+        }
+      }
+    );
+    /* 1. Presence (legacy check). */
+    function checkPresence(arr, kind) {
+      (arr || []).forEach(function (e) {
+        if (!e || !e.nac_id) return;
+        if (!found[e.nac_id]) {
+          missing.push(e.nac_id);
+          pushErr('error', 'missing_in_dom', e.nac_id,
+            kind + ' "' + e.nac_id + '" declared in manifest but not present in DOM');
+        }
+      });
+    }
+    checkPresence(m.fields,  'field');
+    checkPresence(m.actions, 'action');
+    checkPresence(m.tabs,    'tab');
+    checkPresence(m.kpis,    'kpi');
+    checkPresence(m.charts,  'chart');
+
+    /* 2. Field type alignment: manifest.type must match
+       data-nac-field-type on the DOM element (when present). */
+    (m.fields || []).forEach(function (f) {
+      if (!f || !f.nac_id || !found[f.nac_id]) return;
+      const el = elemByNacId[f.nac_id];
+      if (!f.type) {
+        pushErr('warn', 'field_type_undeclared', f.nac_id,
+          'field has no manifest.type; use one of text/number/date/select/...');
+        return;
+      }
+      const domType = el.getAttribute('data-nac-field-type');
+      if (domType && domType !== f.type) {
+        pushErr('error', 'field_type_mismatch', f.nac_id,
+          'manifest declares type=' + f.type
+          + ' but DOM has data-nac-field-type=' + domType,
+          { manifest_type: f.type, dom_type: domType });
+      }
+    });
+
+    /* 3. Options resolver presence: if a field has type=select or
+       multi and the manifest does not embed static options, a
+       resolver MUST be registered via set_options_resolver. */
+    (m.fields || []).forEach(function (f) {
+      if (!f || !f.nac_id) return;
+      if (f.type !== 'select' && f.type !== 'multi') return;
+      const hasStatic = Array.isArray(f.options) && f.options.length > 0;
+      const hasResolver = !!_optionResolvers[
+        _resolverKey(plugin_slug, f.nac_id)];
+      const hasSource = !!f.options_source;
+      if (!hasStatic && !hasResolver && !hasSource) {
+        pushErr('error', 'options_unresolved', f.nac_id,
+          'select/multi field has no static options, no resolver, no options_source');
+      }
+    });
+
+    /* 4. depends_on graph integrity: every dependency target must
+       exist in the same manifest (or be globally addressable). */
+    (m.fields || []).forEach(function (f) {
+      if (!f || !Array.isArray(f.depends_on)) return;
+      f.depends_on.forEach(function (dep) {
+        const depId = (typeof dep === 'string') ? dep : (dep && dep.field);
+        if (!depId) return;
+        const sameManifest = (m.fields || []).some(function (x) {
+          return x && x.nac_id === depId;
+        });
+        if (!sameManifest) {
+          pushErr('warn', 'depends_on_orphan', f.nac_id,
+            'depends_on references "' + depId + '" which is not in this manifest');
+        }
+      });
+    });
+
+    /* 5. Table column declarations (v1.1 rows.cells): if rows
+       exist in DOM, every declared cell column must be findable
+       in at least one row. */
+    if (m.rows && Array.isArray(m.rows.cells) && m.rows.cells.length) {
+      const sampleRow = root.querySelector('[data-nac-role="row"]');
+      if (sampleRow) {
+        m.rows.cells.forEach(function (col) {
+          if (!col || !col.nac_id) return;
+          const cell = sampleRow.querySelector(
+            '[data-nac-id$="' + col.nac_id + '"], '
+            + '[data-nac-cell="' + col.nac_id + '"]');
+          if (!cell) {
+            pushErr('error', 'row_cell_missing', col.nac_id,
+              'manifest declares row cell "' + col.nac_id
+              + '" but no row element has it');
+          }
+        });
+      }
+    }
+
+    /* 6. Breadcrumb path consistency (v1.4): every declared
+       breadcrumb step must have a matching breadcrumb-item in DOM. */
+    (m.breadcrumbs || []).forEach(function (b) {
+      if (!b || !Array.isArray(b.items)) return;
+      b.items.forEach(function (item) {
+        if (!item || !item.nac_id) return;
+        const el = root.querySelector(
+          '[data-nac-role="breadcrumb-item"][data-nac-id="' + item.nac_id + '"]');
+        if (!el) {
+          pushErr('error', 'breadcrumb_item_missing', item.nac_id,
+            'breadcrumb item "' + item.nac_id
+            + '" declared in manifest but not present in DOM');
+        }
+      });
+    });
+
+    /* 7. ARIA-NAC state mirroring (spec section 7.3 mapping table).
+       Reports a warning per element where data-nac-state maps to an
+       ARIA attribute and the two disagree. */
+    const _ariaMap = {
+      loading:   { aria: 'aria-busy',     value: 'true'  },
+      idle:      { aria: 'aria-busy',     value: 'false' },
+      ready:     { aria: 'aria-busy',     value: 'false' },
+      invalid:   { aria: 'aria-invalid',  value: 'true'  },
+      error:     { aria: 'aria-invalid',  value: 'true'  },
+      valid:     { aria: 'aria-invalid',  value: 'false' },
+      expanded:  { aria: 'aria-expanded', value: 'true'  },
+      collapsed: { aria: 'aria-expanded', value: 'false' },
+      disabled:  { aria: 'aria-disabled', value: 'true'  },
+      selected:  { aria: 'aria-selected', value: 'true'  },
+      checked:   { aria: 'aria-checked',  value: 'true'  },
+      pressed:   { aria: 'aria-pressed',  value: 'true'  },
+    };
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-state]'),
+      function (el) {
+        const st = el.getAttribute('data-nac-state');
+        const mapping = _ariaMap[st];
+        if (!mapping) return;
+        const ariaVal = el.getAttribute(mapping.aria);
+        if (ariaVal !== null && ariaVal !== mapping.value) {
+          const id = el.getAttribute('data-nac-id') || null;
+          pushErr('warn', 'aria_nac_state_mismatch', id,
+            'data-nac-state="' + st + '" expects '
+            + mapping.aria + '="' + mapping.value
+            + '" but element has ' + mapping.aria + '="' + ariaVal + '"',
+            { state: st, aria_attr: mapping.aria,
+              expected: mapping.value, actual: ariaVal });
+        }
+      });
+
+    /* 8. Duplicate verb LINT (spec section P5 click_by_verb tie-break,
+          v1.4.2). Plugin authors that declare two actions with the
+          same verb force first-match-wins behaviour, which is
+          deterministic but easy to misroute. */
+    const _verbSeen = {};
+    (m.actions || []).forEach(function (a) {
+      if (!a || !a.verb) return;
+      if (_verbSeen[a.verb]) {
+        pushErr('warn', 'duplicate_verb', a.nac_id || null,
+          'verb "' + a.verb + '" appears on multiple actions in this '
+          + 'plugin; click_by_verb will pick the first in array order. '
+          + 'Earlier nac_id: "' + _verbSeen[a.verb] + '"',
+          { verb: a.verb, conflict_with: _verbSeen[a.verb] });
+      } else {
+        _verbSeen[a.verb] = a.nac_id || '<no-id>';
+      }
+    });
+
+    /* 8.5 Duplicate plugin-mount-without-instance-id LINT
+          (spec sec 7.4 plugin slug uniqueness, v1.4.2). Multi-mount
+          of the same plugin slug without per-instance IDs makes
+          driver calls non-deterministic. */
+    {
+      const sameSlug = Array.prototype.slice.call(
+        document.querySelectorAll(
+          '[data-nac-plugin="' + plugin_slug + '"]'));
+      if (sameSlug.length > 1) {
+        const ids = sameSlug.map(function (r) {
+          return r.getAttribute('data-nac-plugin-id') || '';
+        });
+        const missing = sameSlug.filter(function (r) {
+          return !r.getAttribute('data-nac-plugin-id');
+        });
+        const seen = {};
+        const dupIds = [];
+        ids.forEach(function (i) {
+          if (!i) return;
+          if (seen[i]) dupIds.push(i);
+          else seen[i] = true;
+        });
+        if (missing.length || dupIds.length) {
+          pushErr('error', 'duplicate_plugin_no_instance_id', null,
+            sameSlug.length + ' instances of plugin "' + plugin_slug
+            + '" simultaneously in DOM but '
+            + (missing.length
+                ? missing.length + ' lack data-nac-plugin-id'
+                : 'two share data-nac-plugin-id "' + dupIds[0] + '"')
+            + '. Each instance MUST carry a unique '
+            + 'data-nac-plugin-id (spec 7.4).',
+            { instance_count: sameSlug.length,
+              missing_ids:    missing.length,
+              duplicate_ids:  dupIds });
+        }
+      }
+    }
+
+    /* 9. Duplicate tab label LINT (spec section tab_by_label, v1.4.2).
+          Tab labels are matched case-insensitive trim across every
+          declared locale; duplicates after normalisation force
+          first-match-wins. */
+    const _labelSeen = {};
+    (m.tabs || []).forEach(function (t) {
+      if (!t) return;
+      const collect = [];
+      if (t.label) collect.push(t.label);
+      if (t.label_i18n && typeof t.label_i18n === 'object') {
+        for (const k in t.label_i18n) {
+          if (typeof t.label_i18n[k] === 'string') {
+            collect.push(t.label_i18n[k]);
+          }
+        }
+      }
+      collect.forEach(function (lab) {
+        const norm = String(lab).toLowerCase().trim();
+        if (!norm) return;
+        if (_labelSeen[norm]) {
+          pushErr('warn', 'duplicate_tab_label', t.nac_id || null,
+            'tab label "' + lab + '" matches another tab after '
+            + 'case-insensitive trim; tab_by_label will pick the '
+            + 'first in array order. Earlier nac_id: "'
+            + _labelSeen[norm] + '"',
+            { label: lab, normalised: norm,
+              conflict_with: _labelSeen[norm] });
+        } else {
+          _labelSeen[norm] = t.nac_id || '<no-id>';
+        }
+      });
+    });
+
+    const errCount = errors.filter(function (e) {
+      return e.severity === 'error';
+    }).length;
+    return {
+      ok:        errCount === 0,
+      missing:   missing,        /* legacy back-compat */
+      errors:    errors,         /* v1.4.1 structured findings */
+      manifest:  m,
+      timestamp: Date.now(),
+    };
+  }
+
+  /* ---------- v1.5.1: cross-plugin validator --------------------- */
+  /* validate_global() answers "are there duplicate nac_ids across
+     ALL registered plugins, and are there orphan elements in the
+     DOM that belong to no manifest?" The per-plugin validate(slug)
+     cannot see across boundaries; this one can.
+
+     Returns an OBJECT OF NAMED BUCKETS -- not a flat array of
+     findings. Every item of every bucket carries `code` and
+     `severity` since 2.5.0 (audit N-14), so a CI integration can
+     gate on a code without parsing a message:
+       {
+         ok:         boolean,
+         has_errors: boolean,
+         duplicates: [{code nac_id_duplicate_across_plugins,
+                       severity error, nac_id, plugins:[...]}],
+         orphans:    [{code nac_id_orphan_in_dom, severity warn,
+                       nac_id, in_dom:true, in_manifest:false,
+                       plugin_root:?}],
+         unmounted:  [{code nac_id_declared_not_mounted,
+                       severity warn, nac_id, in_manifest:true,
+                       in_dom:false, plugin}],
+         convention_violations:
+                     [{code nac_id_missing_plugin_prefix,
+                       severity warn, nac_id, plugin, hint}],
+         plugin_instance_violations:
+                     [{code duplicate_plugin_no_instance_id,
+                       severity error, slug, ...}],
+         tolerated:  [{kind, nac_id, until, original}],
+         plugin_count, total_ids,
+         timestamp
+       }
+     The five codes are published, with their severity and what to do
+     about each, in api/latest/findings.json. (The code names above are
+     written unquoted on purpose: the catalogue generator greps the
+     emission shape out of this file, and a comment is not an
+     emission.)
+
+     A NAC-3 codebase that wants drift to be a CI blocker should run
+     this in addition to the per-plugin validate(slug) loop. */
+  function validate_global() {
+    const out = {
+      ok: true,
+      duplicates: [],
+      orphans:    [],
+      unmounted:  [],
+      convention_violations: [],
+      /* v2.5 / RFC V24-01: plugin slug uniqueness findings live in
+         their own bucket so CI integrations can gate on them
+         independently of nac_id duplicates. */
+      plugin_instance_violations: _scanPluginInstances(),
+      plugin_count: 0,
+      total_ids:    0,
+      timestamp:    Date.now(),
+    };
+
+    /* Build a manifest-side index { nac_id -> [plugins] }. */
+    const idIndex = Object.create(null);
+    const slugList = Object.keys(_manifests);
+    out.plugin_count = slugList.length;
+    slugList.forEach(function (slug) {
+      const m = _manifests[slug];
+      const ids = _collectManifestIds(m);
+      ids.forEach(function (id) {
+        if (!idIndex[id]) idIndex[id] = [];
+        if (idIndex[id].indexOf(slug) < 0) idIndex[id].push(slug);
+      });
+      /* Convention check: nac_id SHOULD start with the plugin slug
+         followed by a dot. The spec calls this 'plugin-namespaced'
+         in P1. Authors who ship 'apply_all' instead of
+         'patch_manager.apply_all' silently lose the namespacing
+         guard. */
+      ids.forEach(function (id) {
+        if (id.indexOf(slug + '.') !== 0 && id !== slug) {
+          out.convention_violations.push({
+            /* v2.5 / audit N-14: every finding of this validator carries
+               a code from the published catalogue, so section 12 promise
+               4 ("the validate_global finding codes will not be reused")
+               covers a real set instead of an empty one. The code is the
+               stable identity; the message is not. */
+            code:     'nac_id_missing_plugin_prefix',
+            severity: 'warn',
+            nac_id: id, plugin: slug,
+            hint:   'expected prefix "' + slug + '."',
+          });
+        }
+      });
+    });
+    out.total_ids = Object.keys(idIndex).length;
+
+    /* Duplicates: any id that appears in 2+ manifests. */
+    for (const id in idIndex) {
+      if (idIndex[id].length >= 2) {
+        out.duplicates.push({
+          code:     'nac_id_duplicate_across_plugins',
+          severity: 'error',
+          nac_id: id, plugins: idIndex[id].slice(),
+        });
+      }
+    }
+
+    /* Walk the DOM once. For every [data-nac-id]:
+       - if not in idIndex, it is an orphan.
+       - track DOM-side seen ids to compute unmounted = manifest \ DOM. */
+    const inDom = Object.create(null);
+    if (typeof document !== 'undefined') {
+      const all = document.querySelectorAll('[data-nac-id]');
+      Array.prototype.forEach.call(all, function (el) {
+        const id = el.getAttribute('data-nac-id');
+        if (!id) return;
+        inDom[id] = true;
+        if (!idIndex[id]) {
+          /* Orphan in DOM but not in any manifest. Note: tabs
+             frequently are declared in DOM-only because the host
+             may add tabs dynamically; we report but at warn
+             severity for the caller to decide. */
+          const root = el.closest('[data-nac-plugin]');
+          out.orphans.push({
+            code:     'nac_id_orphan_in_dom',
+            severity: 'warn',
+            nac_id: id,
+            in_dom: true,
+            in_manifest: false,
+            plugin_root: root ? root.getAttribute('data-nac-plugin') : null,
+          });
+        }
+      });
+    }
+
+    /* Unmounted: declared in some manifest but not present in DOM. */
+    for (const id in idIndex) {
+      if (!inDom[id]) {
+        out.unmounted.push({
+          code:     'nac_id_declared_not_mounted',
+          severity: 'warn',
+          nac_id: id, in_manifest: true, in_dom: false,
+          plugin: idIndex[id][0],
+        });
+      }
+    }
+
+    /* v1.6.1: tolerated_violations support. Hosts retiring historic
+       findings incrementally can register a tolerated set via
+       NAC.set_validation_tolerance({tolerated:[...]}); each finding
+       still appears in the report under .tolerated[] but is excluded
+       from the .ok / .has_errors gate so CI does not block on
+       known-tracked debt. Flagged by Mistral, Claude 4.7 v1.6
+       review: "register-time console.warn is ignored; 50+ plugin
+       first run sea of red; teams need a tolerated-violations
+       file". */
+    out.tolerated = [];
+    const tol = _validationTolerance || { tolerated: [] };
+    if (Array.isArray(tol.tolerated) && tol.tolerated.length > 0) {
+      const tolSet = Object.create(null);
+      tol.tolerated.forEach(function (t) {
+        const k = String(t.kind || '') + '::' + String(t.nac_id || '');
+        tolSet[k] = t.until || true;
+      });
+      ['duplicates', 'orphans', 'unmounted', 'convention_violations'].forEach(function (kind) {
+        const kept = [];
+        out[kind].forEach(function (item) {
+          const k = kind + '::' + item.nac_id;
+          if (tolSet[k]) {
+            out.tolerated.push({
+              kind: kind, nac_id: item.nac_id, until: tolSet[k],
+              original: item
+            });
+          } else {
+            kept.push(item);
+          }
+        });
+        out[kind] = kept;
+      });
+    }
+
+    out.ok = !out.duplicates.length;
+    /* v1.6.1: explicit has_errors flag for CI integration. Drift
+       findings (duplicates) are hard-errors per spec sec 7.3.2;
+       orphans + unmounted + convention_violations stay informative
+       unless the host explicitly opts in via tolerance config. */
+    out.has_errors = out.duplicates.length > 0;
+    return out;
+  }
+
+  /* v1.6.1: tolerance config storage + setter. The shape:
+       {
+         tolerated: [
+           { kind: 'duplicates'|'orphans'|'unmounted'
+                  |'convention_violations',
+             nac_id: 'plugin.slug',
+             until: '2026-12-31'   // optional informative
+           }, ...
+         ],
+         drift_findings: 'warn' | 'error'   // for sec 7.3.2 demote
+       }
+     Hosts typically load this from a tolerated_violations.json
+     committed alongside the codebase, so what gets silenced is
+     auditable in version control. */
+  let _validationTolerance = null;
+  function set_validation_tolerance(cfg) {
+    _validationTolerance = cfg && typeof cfg === 'object' ? cfg : null;
+  }
+  function get_validation_tolerance() {
+    return _validationTolerance;
+  }
+
+  /* ---------- v1.2: dynamic options ------------------------------- */
+
+  /* Per-field option resolver. Plugin authors call
+     NAC.set_options_resolver(plugin, field_id, fn) once at boot;
+     fn(query, limit) -> Promise<Option[]>. Static manifest options
+     are wrapped automatically when no resolver is set. */
+  const _optionResolvers = Object.create(null);
+
+  function _resolverKey(plugin, field_id) {
+    return String(plugin || '') + '::' + String(field_id || '');
+  }
+
+  function set_options_resolver(plugin, field_id, fn) {
+    if (typeof fn !== 'function') {
+      throw NacError('invalid', 'resolver fn required');
+    }
+    _optionResolvers[_resolverKey(plugin, field_id)] = fn;
+  }
+
+  function _findFieldDef(field_id) {
+    /* Walk every registered manifest, return the first matching
+       fields[] entry with its plugin slug. */
+    for (const slug in _manifests) {
+      const m = _manifests[slug];
+      const arr = (m && m.fields) || [];
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] && arr[i].id === field_id) {
+          return { plugin: slug, field: arr[i] };
+        }
+      }
+    }
+    return null;
+  }
+
+  function _emitOptionsEvent(name, detail) {
+    document.dispatchEvent(new CustomEvent('nac:options:' + name, {
+      detail: detail, bubbles: true,
+    }));
+  }
+
+  async function options(field_id) {
+    const found = _findFieldDef(field_id);
+    if (!found) {
+      throw NacError('field_not_found', 'no field with id ' + field_id);
+    }
+    const f = found.field;
+    const src = f.options_source || 'static';
+    if (src === 'remote') {
+      throw NacError('RemoteSourceRequiresSearch',
+        'field ' + field_id + ' is remote; use NAC.search_options');
+    }
+    _emitOptionsEvent('loading', { field_id: field_id, source: src });
+    let result;
+    try {
+      const resolver = _optionResolvers[_resolverKey(found.plugin, field_id)];
+      if (resolver) {
+        result = await resolver('', null);
+      } else if (Array.isArray(f.options)) {
+        result = f.options.slice();
+      } else {
+        result = [];
+      }
+    } catch (err) {
+      _emitOptionsEvent('error', { field_id: field_id, source: src, message: String(err && err.message || err) });
+      throw NacError('OptionsUnavailable', 'options fetch failed: ' + (err && err.message || err));
+    }
+    _emitOptionsEvent('loaded', { field_id: field_id, source: src, count: result.length });
+    return result;
+  }
+
+  async function search_options(field_id, query, limit) {
+    const found = _findFieldDef(field_id);
+    if (!found) {
+      throw NacError('field_not_found', 'no field with id ' + field_id);
+    }
+    const f = found.field;
+    const src = f.options_source || 'static';
+    const lim = Number(limit || 10);
+    const q = String(query == null ? '' : query);
+    _emitOptionsEvent('loading', { field_id: field_id, source: src, query: q });
+    let result;
+    try {
+      const resolver = _optionResolvers[_resolverKey(found.plugin, field_id)];
+      if (resolver) {
+        result = await resolver(q, lim);
+      } else if (Array.isArray(f.options)) {
+        const ql = q.toLowerCase();
+        result = f.options.filter(function (o) {
+          if (!ql) return true;
+          const lab = String(o.label || o.value || '').toLowerCase();
+          return lab.indexOf(ql) !== -1;
+        }).slice(0, lim);
+      } else {
+        result = [];
+      }
+    } catch (err) {
+      _emitOptionsEvent('error', { field_id: field_id, source: src, query: q, message: String(err && err.message || err) });
+      throw NacError('OptionsUnavailable', 'search failed: ' + (err && err.message || err));
+    }
+    _emitOptionsEvent('loaded', { field_id: field_id, source: src, query: q, count: result.length });
+    return result;
+  }
+
+  function invalidate_options(field_id, reason, trigger_field_id) {
+    _emitOptionsEvent('invalidated', {
+      field_id: field_id,
+      reason: reason || 'manual',
+      trigger_field_id: trigger_field_id || null,
+    });
+  }
+
+  /* ---------- v1.2: window chrome (min/max/restore) --------------- */
+
+  function _findPluginRoot(plugin) {
+    return document.querySelector('[data-nac-plugin="' + plugin + '"]')
+        || document.querySelector('[data-nac-id="' + plugin + '"]');
+  }
+
+  function _setPluginState(plugin, newState) {
+    const root = _findPluginRoot(plugin);
+    if (!root) {
+      throw NacError('plugin_not_found', 'no DOM root for plugin ' + plugin);
+    }
+    const prior = root.getAttribute('data-nac-state') || 'normal';
+    root.setAttribute('data-nac-state', newState);
+    return { prior: prior, root: root };
+  }
+
+  function _emitPluginGeometry(name, plugin, prior_state, extra) {
+    const detail = Object.assign({ plugin: plugin, prior_state: prior_state }, extra || {});
+    document.dispatchEvent(new CustomEvent('nac:plugin:' + name, {
+      detail: detail, bubbles: true,
+    }));
+  }
+
+  async function minimize(plugin) {
+    const r = _setPluginState(plugin, 'minimized');
+    _emitPluginGeometry('minimized', plugin, r.prior);
+    return 'minimized';
+  }
+
+  async function maximize(plugin) {
+    const r = _setPluginState(plugin, 'maximized');
+    _emitPluginGeometry('maximized', plugin, r.prior);
+    return 'maximized';
+  }
+
+  async function restore(plugin) {
+    const r = _setPluginState(plugin, 'normal');
+    _emitPluginGeometry('restored', plugin, r.prior);
+    return 'normal';
+  }
+
+  async function fullscreen(plugin, on) {
+    const root = _findPluginRoot(plugin);
+    if (!root) {
+      throw NacError('plugin_not_found', 'no DOM root for plugin ' + plugin);
+    }
+    const currentlyFs = !!document.fullscreenElement;
+    const target = (typeof on === 'boolean') ? on : !currentlyFs;
+    try {
+      if (target && root.requestFullscreen) {
+        await root.requestFullscreen();
+      } else if (!target && document.exitFullscreen && currentlyFs) {
+        await document.exitFullscreen();
+      }
+    } catch (err) {
+      /* permission denied or not supported -- fall back to state-only */
+    }
+    const newState = target ? 'fullscreen' : 'normal';
+    const prior = root.getAttribute('data-nac-state') || 'normal';
+    root.setAttribute('data-nac-state', newState);
+    _emitPluginGeometry('fullscreen_changed', plugin, prior, { fullscreen: target });
+    return newState;
+  }
+
+  /* ---------- v1.2: discovery (system map / capabilities) -------- */
+
+  let _systemMapProvider = null;
+  let _capabilitiesProvider = null;
+
+  function set_system_map_provider(fn) {
+    if (typeof fn !== 'function') {
+      throw NacError('invalid', 'provider fn required');
+    }
+    _systemMapProvider = fn;
+  }
+
+  function set_capabilities_provider(fn) {
+    if (typeof fn !== 'function') {
+      throw NacError('invalid', 'provider fn required');
+    }
+    _capabilitiesProvider = fn;
+  }
+
+  async function system_map() {
+    if (!_systemMapProvider) {
+      throw NacError('SystemMapNotProvided', 'no system_map provider registered');
+    }
+    return await _systemMapProvider();
+  }
+
+  async function capabilities() {
+    if (_capabilitiesProvider) {
+      return await _capabilitiesProvider();
+    }
+    /* Fallback: synthesise a minimal CapabilityInventory from known
+       manifests. This is what the spec calls "Layer C from Layer B". */
+    const slugs = Object.keys(_manifests);
+    const actions = [];
+    for (let i = 0; i < slugs.length; i++) {
+      const m = _manifests[slugs[i]];
+      const acts = (m && m.actions) || [];
+      for (let j = 0; j < acts.length; j++) {
+        if (acts[j] && acts[j].id) {
+          actions.push({ id: acts[j].id, label: acts[j].label || acts[j].id, verbs: [acts[j].verb || 'click'] });
+        }
+      }
+    }
+    return {
+      entities: [],
+      actions: actions,
+      reports: [],
+      dashboards: [],
+      integrations: [],
+      languages: [],
+      _synthesised: true,
+    };
+  }
+
+  /* ---------- v1.6.0: plugin reset primitive ----------------------
+     Spec section 9.4 (informative). Lets a plugin declare how to
+     return to its initial state -- clearing fields, closing
+     modals, restoring minimised cards, resetting tabs / sort /
+     filter, etc. Without a registered provider, the runtime
+     falls back to a generic walk that clears every
+     [data-nac-role="field"] and resets every
+     [data-nac-default-state] within the plugin scope.
+     Use case: agentic operators that want to "start fresh"
+     before a new sequence (the canonical example: NAC.reset()
+     called at the top of the autopilot demo so each run begins
+     from a known state). */
+  const _resetProviders = Object.create(null);
+
+  function set_reset_provider(plugin_slug, fn) {
+    if (typeof fn !== 'function') {
+      throw NacError('invalid', 'reset provider fn required');
+    }
+    if (!plugin_slug) {
+      throw NacError('invalid', 'plugin_slug required');
+    }
+    _resetProviders[String(plugin_slug)] = fn;
+  }
+
+  async function reset(plugin_slug) {
+    /* Specific plugin + custom provider -> run it. */
+    if (plugin_slug && _resetProviders[plugin_slug]) {
+      try {
+        await _resetProviders[plugin_slug]();
+      } catch (e) {
+        return { ok: false, plugin: plugin_slug, error: String(e) };
+      }
+      _emitResetEvent(plugin_slug);
+      return { ok: true, plugin: plugin_slug, source: 'custom' };
+    }
+    /* No specific plugin -> run every registered provider in
+       parallel + a global generic reset for the page. */
+    if (!plugin_slug) {
+      const slugs = Object.keys(_resetProviders);
+      const results = {};
+      for (let i = 0; i < slugs.length; i++) {
+        try {
+          await _resetProviders[slugs[i]]();
+          results[slugs[i]] = { ok: true, source: 'custom' };
+          _emitResetEvent(slugs[i]);
+        } catch (e) {
+          results[slugs[i]] = { ok: false, error: String(e) };
+        }
+      }
+      _genericReset(null);
+      _emitResetEvent('*');
+      return { ok: true, plugin: '*', plugins: results,
+        source: 'custom+generic' };
+    }
+    /* Specific plugin without registered provider -> generic
+       fallback scoped to the plugin root. */
+    const ok = _genericReset(plugin_slug);
+    _emitResetEvent(plugin_slug);
+    return { ok: ok, plugin: plugin_slug, source: 'generic' };
+  }
+
+  function _genericReset(plugin_slug) {
+    const root = plugin_slug
+      ? document.querySelector('[data-nac-plugin="' + plugin_slug + '"]')
+      : document;
+    if (!root) return false;
+    /* Clear every NAC-instrumented field. Honours
+       data-nac-default-value when declared. */
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-role="field"]'),
+      function (el) {
+        const def = el.getAttribute('data-nac-default-value');
+        try {
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            if (el.type === 'checkbox' || el.type === 'radio') {
+              el.checked = (def === 'true' || def === '1');
+            } else {
+              el.value = def !== null ? def : '';
+            }
+          } else if (el.tagName === 'SELECT') {
+            el.value = def !== null ? def : '';
+          } else if (el.hasAttribute('contenteditable')) {
+            el.textContent = def !== null ? def : '';
+          }
+          el.setAttribute('data-nac-state', 'pristine');
+          el.dispatchEvent(new Event('input',  { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        } catch (e) { /* swallow per-field */ }
+      });
+    /* Reset elements with a declared default state. */
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-default-state]'),
+      function (el) {
+        el.setAttribute('data-nac-state',
+          el.getAttribute('data-nac-default-state'));
+      });
+    /* Hide every region that defaults hidden. Convention:
+       data-nac-default-hidden="1" on a region the host wants
+       reset to hidden. */
+    Array.prototype.forEach.call(
+      root.querySelectorAll('[data-nac-default-hidden]'),
+      function (el) { el.hidden = true; });
+    return true;
+  }
+
+  function _emitResetEvent(plugin) {
+    document.dispatchEvent(new CustomEvent('nac:plugin:reset', {
+      detail: { plugin: plugin || '*', timestamp: Date.now() },
+      bubbles: true, composed: true,
+    }));
+  }
+
+  /* v1.4.1 (added 2026-05-06, spec section 14.3.5):
+     synchronous declaration of which discovery layers the host
+     supports, so agents do not need to probe by exception. */
+  function system_map_layers() {
+    let hasB = false;
+    const slugs = Object.keys(_manifests);
+    for (let i = 0; i < slugs.length; i++) {
+      const m = _manifests[slugs[i]];
+      if (m && Array.isArray(m.transitions) && m.transitions.length) {
+        hasB = true;
+        break;
+      }
+    }
+    const a = !!_systemMapProvider;
+    const c = !!_capabilitiesProvider || slugs.length > 0;
+    let preferred = null;
+    if (a)      preferred = 'a';
+    else if (hasB) preferred = 'b';
+    else if (c)    preferred = 'c';
+    return {
+      a: a,
+      b: hasB,
+      c: c,
+      preferred: preferred,
+    };
+  }
+
+  /* ---------- v1.2: section navigation --------------------------- */
+
+  function _findSection(sectionId) {
+    return document.querySelector(
+      '[data-nac-role="section"][data-nac-id="' + sectionId + '"]');
+  }
+
+  function list_sections() {
+    const out = [];
+    document.querySelectorAll('[data-nac-role="section"][data-nac-id]')
+      .forEach(function (el) {
+        out.push({
+          id:    el.getAttribute('data-nac-id'),
+          label: el.getAttribute('data-nac-label')
+                 || (el.querySelector('h1,h2,h3,h4') || {}).textContent
+                 || '',
+          visible: el.getAttribute('data-nac-state') !== 'hidden',
+        });
+      });
+    return out;
+  }
+
+  async function go_to_section(sectionId) {
+    const sec = _findSection(sectionId);
+    if (!sec) {
+      throw NacError('section_not_found', 'no section with id ' + sectionId);
+    }
+    /* If the section sits inside a collapsed accordion or non-active
+       tab, the v1.2 reference impl SHOULD lift those constraints
+       before scrolling. We probe two well-known patterns and rely on
+       the page's own NAC handlers; if neither matches, we just scroll. */
+    const collapsedAcc = sec.closest('[data-nac-role="accordion-section"][data-nac-state="collapsed"]');
+    if (collapsedAcc && typeof global.NAC.expand === 'function') {
+      try { await global.NAC.expand(collapsedAcc.getAttribute('data-nac-id')); }
+      catch (e) { /* not fatal */ }
+    }
+    const tabPanel = sec.closest('[data-nac-role="tabpanel"]');
+    if (tabPanel && typeof global.NAC.tab === 'function') {
+      const plugin = tabPanel.getAttribute('data-nac-plugin');
+      const tabSlug = tabPanel.getAttribute('data-nac-tab');
+      if (plugin && tabSlug) {
+        try { await global.NAC.tab(plugin, tabSlug); }
+        catch (e) { /* not fatal */ }
+      }
+    }
+    sec.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    /* v1.6.5: visible highlight on the section even when scroll
+       is a no-op (section already in viewport on a wide screen).
+       Pre-v1.6.5 the agent tour was invisible on desktop because
+       all 5 sections fit at once -- speak() called but nothing
+       moved on screen. Pair with CSS rule
+       [data-nac-section-visited="1"] for the red border + glow. */
+    sec.setAttribute('data-nac-section-visited', '1');
+    setTimeout(function () { sec.removeAttribute('data-nac-section-visited'); }, 1500);
+    await new Promise(function (r) { setTimeout(r, 350); });
+    document.dispatchEvent(new CustomEvent('nac:section:reached', {
+      detail: {
+        section_id: sectionId,
+        label: sec.getAttribute('data-nac-label')
+               || (sec.querySelector('h1,h2,h3,h4') || {}).textContent
+               || '',
+      },
+      bubbles: true,
+    }));
+    return { ok: true, section_id: sectionId };
+  }
+
+  /* Auto-instrument visibility on sections via IntersectionObserver. */
+  if (typeof IntersectionObserver !== 'undefined') {
+    function _wireSectionObserver() {
+      const els = document.querySelectorAll('[data-nac-role="section"][data-nac-id]');
+      if (!els.length) return;
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          const newState = en.isIntersecting ? 'visible' : 'hidden';
+          const prior = en.target.getAttribute('data-nac-state') || 'hidden';
+          if (prior !== newState) {
+            en.target.setAttribute('data-nac-state', newState);
+            document.dispatchEvent(new CustomEvent('nac:state:changed', {
+              detail: {
+                nac_id: en.target.getAttribute('data-nac-id'),
+                role: 'section',
+                old_state: prior,
+                new_state: newState,
+              },
+              bubbles: true,
+            }));
+          }
+        });
+      }, { threshold: 0.2 });
+      els.forEach(function (el) { io.observe(el); });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _wireSectionObserver);
+    } else {
+      _wireSectionObserver();
+    }
+  }
+
+  /* ---------- v1.3: helpers shared across primitives ------------- */
+
+  /* v1.4.1 (added 2026-05-06):
+     - composed: true so events cross shadow DOM closed boundaries
+       (spec section 7.4).
+     - alias plugin_slug -> plugin if a caller set the legacy field
+       (spec section 7.4 deprecation rule).
+     - attach plugin_instance_id from data-nac-plugin-id if a
+       producer opted into the multi-instance pattern. */
+  function _normalizeDetail(detail) {
+    detail = detail || {};
+    if (detail.plugin_slug && !detail.plugin) {
+      detail.plugin = detail.plugin_slug;
+    }
+    if (detail.plugin && detail.plugin_instance_id === undefined) {
+      const root = document.querySelector(
+        '[data-nac-plugin="' + detail.plugin + '"]');
+      detail.plugin_instance_id = root
+        ? (root.getAttribute('data-nac-plugin-id') || null)
+        : null;
+    }
+    return detail;
+  }
+  function _emit(name, detail) {
+    detail = _normalizeDetail(detail);
+    /* v1.8.0: apply default source provenance when caller did not
+       set one. Lifecycle events (nac:plugin:opened, etc.) emitted at
+       boot before any user action default to {type:'script'} so a
+       downstream auditor never sees an event without provenance. */
+    if (!detail.source) {
+      detail.source = { type: 'script' };
+    } else if (typeof detail.source === 'string') {
+      detail.source = { type: detail.source };
+    }
+    document.dispatchEvent(new CustomEvent(name, {
+      detail: detail, bubbles: true, composed: true,
+    }));
+    /* Per-plugin bus dispatch (optional, spec sec 7.4): if a plugin
+       root opted in via data-nac-plugin-bus="enabled", also fire on
+       the root so per-instance subscribers see the event without
+       payload filtering. */
+    if (detail.plugin) {
+      const root = document.querySelector(
+        '[data-nac-plugin="' + detail.plugin + '"]'
+        + (detail.plugin_instance_id
+            ? '[data-nac-plugin-id="' + detail.plugin_instance_id + '"]'
+            : ''));
+      if (root && root.getAttribute('data-nac-plugin-bus') === 'enabled') {
+        root.dispatchEvent(new CustomEvent(name, {
+          detail: detail, bubbles: false, composed: true,
+        }));
+      }
+    }
+    /* v1.9.0 (DeepSeek v1.8 finding): if this event is a legacy
+       alias whose canonical pair did NOT fire in the same task
+       tick, emit a console.warn so authors notice incomplete
+       migrations. Deduped per (legacy_name, canonical_name) per
+       session. */
+    _checkLegacyOnlyEmit(name);
+  }
+
+  /* Map of legacy event name -> canonical event name. When a
+     legacy fires, we wait one microtask and check if the canonical
+     fired too. */
+  const _LEGACY_TO_CANONICAL = {
+    'nac:section:expanded':  'nac:accordion:expanded',
+    'nac:section:collapsed': 'nac:accordion:collapsed',
+  };
+  const _legacy_pending = Object.create(null);
+  const _legacy_warned = Object.create(null);
+  function _checkLegacyOnlyEmit(name) {
+    const canonical = _LEGACY_TO_CANONICAL[name];
+    if (canonical) {
+      /* Schedule a check at the end of the current macrotask. If
+         the canonical fired before this check runs, the pair was
+         dual-emit; nothing to warn. If not, the legacy fired alone. */
+      const key = name + '::' + canonical;
+      _legacy_pending[name] = (_legacy_pending[name] || 0) + 1;
+      setTimeout(function () {
+        const pending = _legacy_pending[name] || 0;
+        const canonicalSeen = _legacy_pending['_seen_' + canonical] || 0;
+        _legacy_pending[name] = 0;
+        _legacy_pending['_seen_' + canonical] = 0;
+        if (pending > canonicalSeen && !_legacy_warned[key]) {
+          _legacy_warned[key] = true;
+          if (typeof console !== 'undefined' && console.warn) {
+            console.warn('[NAC] legacy_event_without_canonical: ' +
+              name + ' fired without ' + canonical + ' in the same tick. ' +
+              'Use NAC.emit_dual(canonical, legacy, detail) so both fire ' +
+              'and v2.0-ready consumers see the canonical name. Will be ' +
+              'enforced as a hard error in v2.0.');
+          }
+        }
+      }, 0);
+    }
+    /* Track canonical sightings so the legacy check above can dedupe. */
+    for (const legacyName in _LEGACY_TO_CANONICAL) {
+      if (_LEGACY_TO_CANONICAL[legacyName] === name) {
+        _legacy_pending['_seen_' + name] = (_legacy_pending['_seen_' + name] || 0) + 1;
+        break;
+      }
+    }
+  }
+  function _byId(id) {
+    /* v2.3: deep-aware. Walks open shadow roots + closed-shadow
+       exposure API. Falls back to document.querySelector when
+       the deep helper is unavailable (defensive). */
+    if (typeof _deepQuery === 'function') {
+      return _deepQuery('[data-nac-id="' + id + '"]', document);
+    }
+    return document.querySelector('[data-nac-id="' + id + '"]');
+  }
+
+  /* ---------- v1.3: toast / banner / confirm --------------------- */
+
+  let _toastSeq = 0;
+  function toast(text, opts) {
+    const o = opts || {};
+    const id = o.id || ('nac.toast.' + (++_toastSeq));
+    const ttl = Number(o.ttl_ms || 4000);
+    const sev = o.severity || 'info';
+    const wrap = (function () {
+      let r = document.querySelector('[data-nac-role="toast-region"]');
+      if (!r) {
+        r = document.createElement('div');
+        r.setAttribute('data-nac-role', 'toast-region');
+        r.setAttribute('aria-live', 'polite');
+        r.style.cssText = 'position:fixed;top:16px;right:16px;z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;';
+        document.body.appendChild(r);
+      }
+      return r;
+    })();
+    const el = document.createElement('div');
+    el.setAttribute('data-nac-id', id);
+    el.setAttribute('data-nac-role', 'toast');
+    el.setAttribute('data-nac-state', 'visible');
+    el.setAttribute('data-nac-severity', sev);
+    el.style.cssText = 'background:#2b2118;color:#fffaf0;padding:10px 14px;border-radius:6px;font-family:system-ui,sans-serif;font-size:13px;max-width:340px;box-shadow:0 4px 12px rgba(0,0,0,0.18);pointer-events:auto;';
+    el.textContent = text;
+    wrap.appendChild(el);
+    _emit('nac:toast:fired', { id: id, severity: sev, text: text, ttl_ms: ttl });
+    if (ttl > 0) {
+      setTimeout(function () {
+        if (el.parentNode) {
+          el.setAttribute('data-nac-state', 'dismissed');
+          el.parentNode.removeChild(el);
+          _emit('nac:toast:dismissed', { id: id, dismissed_by: 'timeout' });
+        }
+      }, ttl);
+    }
+    return id;
+  }
+  function list_toasts() {
+    const out = [];
+    document.querySelectorAll('[data-nac-role="toast"][data-nac-state="visible"]')
+      .forEach(function (el) {
+        out.push({
+          id: el.getAttribute('data-nac-id'),
+          text: el.textContent,
+          severity: el.getAttribute('data-nac-severity') || 'info',
+        });
+      });
+    return out;
+  }
+  function dismiss_toast(id) {
+    const el = _byId(id);
+    if (el && el.parentNode) {
+      el.setAttribute('data-nac-state', 'dismissed');
+      el.parentNode.removeChild(el);
+      _emit('nac:toast:dismissed', { id: id, dismissed_by: 'programmatic' });
+    }
+  }
+
+  function list_banners() {
+    const out = [];
+    document.querySelectorAll('[data-nac-role="banner"][data-nac-state="visible"]')
+      .forEach(function (el) {
+        out.push({
+          id: el.getAttribute('data-nac-id'),
+          text: (el.textContent || '').trim(),
+          severity: el.getAttribute('data-nac-severity') || 'info',
+        });
+      });
+    return out;
+  }
+  function dismiss_banner(id) {
+    const el = _byId(id);
+    if (!el) return;
+    el.setAttribute('data-nac-state', 'dismissed');
+    el.style.display = 'none';
+    _emit('nac:banner:dismissed', { id: id });
+  }
+
+  /* ---------- v1.3: confirm dialog ------------------------------- */
+
+  function confirm_dialog(prompt, opts) {
+    const o = opts || {};
+    const id = 'nac.confirm.' + Date.now();
+    const danger = !!o.danger;
+    return new Promise(function (resolve) {
+      const overlay = document.createElement('div');
+      overlay.setAttribute('data-nac-id', id);
+      overlay.setAttribute('data-nac-role', 'confirm-dialog');
+      overlay.setAttribute('data-nac-state', 'pending');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border-radius:8px;padding:20px;max-width:440px;font-family:system-ui,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,0.3);';
+      card.innerHTML =
+        '<div style="font-size:14px;color:#2b2118;margin-bottom:16px;line-height:1.5;">' +
+          String(prompt).replace(/[<>&]/g, function (c) {
+            return ({ '<':'&lt;','>':'&gt;','&':'&amp;' })[c];
+          }) +
+        '</div>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+          '<button data-nac-id="' + id + '.cancel"  data-nac-role="action" data-nac-action="cancel" ' +
+                  'style="padding:6px 14px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font:inherit;">' +
+                  (o.cancel_label || 'Cancel') + '</button>' +
+          '<button data-nac-id="' + id + '.confirm" data-nac-role="action" data-nac-action="confirm" ' +
+                  'style="padding:6px 14px;border:0;border-radius:4px;background:' + (danger ? '#b91c1c' : '#ec407a') + ';color:#fff;cursor:pointer;font:inherit;">' +
+                  (o.confirm_label || 'Confirm') + '</button>' +
+        '</div>';
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      _emit('nac:confirm:requested', { id: id, prompt: prompt, danger: danger });
+
+      function done(answer) {
+        overlay.setAttribute('data-nac-state', answer ? 'confirmed' : 'cancelled');
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        _emit(answer ? 'nac:confirm:confirmed' : 'nac:confirm:cancelled', { id: id });
+        resolve(!!answer);
+      }
+      card.querySelector('[data-nac-id="' + id + '.confirm"]').addEventListener('click', function () { done(true); });
+      card.querySelector('[data-nac-id="' + id + '.cancel"]').addEventListener('click', function () { done(false); });
+    });
+  }
+  function list_pending_confirms() {
+    const out = [];
+    document.querySelectorAll('[data-nac-role="confirm-dialog"][data-nac-state="pending"]')
+      .forEach(function (el) {
+        out.push({ id: el.getAttribute('data-nac-id') });
+      });
+    return out;
+  }
+
+  /* v1.6.1: NAC.is_blocked() -- canonical "is the UI accepting
+     operator input right now?" probe. Replaces the v1.6 antipattern
+     of inferring blocking state from feedback[].severity (flagged
+     by ChatGPT, DeepSeek, Mistral peer reviews of v1.6.0).
+
+     Returns:
+       { blocked: boolean,
+         reasons: [
+           { kind: 'confirm-dialog' | 'modal' | 'busy-action',
+             nac_id: string,
+             severity: 'block' | 'soft' }
+         ] }
+
+     blocked === true when ANY reason is severity 'block'. Soft-
+     reasons (transient busy states under 1s) are surfaced for
+     telemetry but do not flip the boolean. Operators that just
+     want the boolean read .blocked; operators that need to react
+     differently per kind iterate .reasons. */
+  function is_blocked() {
+    const reasons = [];
+    /* Pending confirm dialogs are always blocking. */
+    list_pending_confirms().forEach(function (c) {
+      reasons.push({
+        kind: 'confirm-dialog',
+        nac_id: c.id,
+        severity: 'block'
+      });
+    });
+    /* Open modals (data-nac-role="modal" with state open|opening)
+       gate the surface beneath. data-nac-soft="true" opts out for
+       non-blocking sheets / popovers. */
+    document.querySelectorAll('[data-nac-role="modal"]')
+      .forEach(function (el) {
+        const state = el.getAttribute('data-nac-state') || '';
+        if (state !== 'open' && state !== 'opening') return;
+        const soft = el.getAttribute('data-nac-soft') === 'true';
+        reasons.push({
+          kind: 'modal',
+          nac_id: el.getAttribute('data-nac-id') || '',
+          severity: soft ? 'soft' : 'block'
+        });
+      });
+    /* Actions in flight (data-nac-state="busy" or "loading") are
+       surfaced as soft reasons so callers can choose to wait. */
+    document.querySelectorAll('[data-nac-role="action"][data-nac-state="busy"], ' +
+                              '[data-nac-role="action"][data-nac-state="loading"]')
+      .forEach(function (el) {
+        reasons.push({
+          kind: 'busy-action',
+          nac_id: el.getAttribute('data-nac-id') || '',
+          severity: 'soft'
+        });
+      });
+    const blocked = reasons.some(function (r) { return r.severity === 'block'; });
+    return { blocked: blocked, reasons: reasons };
+  }
+
+  /* ---------- v1.3: stepper -------------------------------------- */
+
+  function _stepperRoot(stepper_id) {
+    return document.querySelector(
+      '[data-nac-role="stepper"][data-nac-id="' + stepper_id + '"]');
+  }
+  function _stepperSteps(stepper_id) {
+    const root = _stepperRoot(stepper_id);
+    if (!root) return [];
+    return Array.prototype.slice.call(
+      root.querySelectorAll('[data-nac-role="step"]'));
+  }
+  function step_state(stepper_id) {
+    const steps = _stepperSteps(stepper_id);
+    let current = -1;
+    for (let i = 0; i < steps.length; i++) {
+      if (steps[i].getAttribute('data-nac-state') === 'current') { current = i; break; }
+    }
+    if (current < 0) {
+      for (let i = 0; i < steps.length; i++) {
+        if (steps[i].getAttribute('data-nac-state') !== 'done') { current = i; break; }
+      }
+    }
+    if (current < 0) current = steps.length - 1;
+    return { current: current, total: steps.length };
+  }
+  function step_to(stepper_id, n) {
+    const steps = _stepperSteps(stepper_id);
+    if (!steps.length) throw NacError('stepper_not_found', stepper_id);
+    n = Math.max(0, Math.min(steps.length - 1, Number(n)));
+    const prior = step_state(stepper_id).current;
+    steps.forEach(function (s, i) {
+      if (i < n)      s.setAttribute('data-nac-state', 'done');
+      else if (i === n) s.setAttribute('data-nac-state', 'current');
+      else            s.setAttribute('data-nac-state', 'pending');
+    });
+    if (n > prior) _emit('nac:step:advanced', { stepper_id: stepper_id, from: prior, to: n, total: steps.length });
+    else if (n < prior) _emit('nac:step:back', { stepper_id: stepper_id, from: prior, to: n });
+    if (n === steps.length - 1) {
+      _emit('nac:step:completed', { stepper_id: stepper_id, total: steps.length });
+    }
+    return { current: n, total: steps.length };
+  }
+  function step_next(stepper_id) {
+    const s = step_state(stepper_id);
+    return step_to(stepper_id, Math.min(s.total - 1, s.current + 1));
+  }
+  function step_back(stepper_id) {
+    const s = step_state(stepper_id);
+    return step_to(stepper_id, Math.max(0, s.current - 1));
+  }
+
+  /* ---------- v1.3: tree ----------------------------------------- */
+
+  function _treeNode(node_id) {
+    return document.querySelector(
+      '[data-nac-role="treenode"][data-nac-id="' + node_id + '"]');
+  }
+  function tree_expand(node_id) {
+    const n = _treeNode(node_id);
+    if (!n) throw NacError('treenode_not_found', node_id);
+    if (n.getAttribute('data-nac-state') === 'leaf') return;
+    n.setAttribute('data-nac-state', 'expanded');
+    Array.prototype.slice.call(n.children).forEach(function (c) {
+      if (c.getAttribute && c.getAttribute('data-nac-role') === 'tree-children') {
+        c.removeAttribute('hidden');
+      }
+    });
+    const level = parseInt(n.getAttribute('data-nac-level') || '0', 10);
+    _emit('nac:tree:expanded', { node_id: node_id, level: level });
+  }
+  function tree_collapse(node_id) {
+    const n = _treeNode(node_id);
+    if (!n) throw NacError('treenode_not_found', node_id);
+    if (n.getAttribute('data-nac-state') === 'leaf') return;
+    n.setAttribute('data-nac-state', 'collapsed');
+    Array.prototype.slice.call(n.children).forEach(function (c) {
+      if (c.getAttribute && c.getAttribute('data-nac-role') === 'tree-children') {
+        c.setAttribute('hidden', 'hidden');
+      }
+    });
+    const level = parseInt(n.getAttribute('data-nac-level') || '0', 10);
+    _emit('nac:tree:collapsed', { node_id: node_id, level: level });
+  }
+  function tree_select(node_id) {
+    const n = _treeNode(node_id);
+    if (!n) throw NacError('treenode_not_found', node_id);
+    const tree = n.closest('[data-nac-role="tree"]');
+    if (tree) {
+      tree.querySelectorAll('[data-nac-role="treenode"][data-nac-state="selected"]').forEach(function (other) {
+        if (other !== n) other.setAttribute('data-nac-state', other.hasAttribute('data-nac-was-expanded') ? 'expanded' : 'collapsed');
+      });
+    }
+    n.setAttribute('data-nac-state', 'selected');
+    _emit('nac:tree:selected', { node_id: node_id, path: tree_path(node_id) });
+  }
+  function tree_path(node_id) {
+    const n = _treeNode(node_id);
+    if (!n) return [];
+    const out = [];
+    let cur = n;
+    while (cur) {
+      if (cur.getAttribute && cur.getAttribute('data-nac-role') === 'treenode') {
+        out.unshift(cur.getAttribute('data-nac-id'));
+      }
+      if (cur.getAttribute && cur.getAttribute('data-nac-role') === 'tree') break;
+      cur = cur.parentElement;
+    }
+    return out;
+  }
+
+  /* ---------- v1.3: tag-input ------------------------------------ */
+
+  function _tagFieldRoot(field_id) {
+    const el = document.querySelector(
+      '[data-nac-role="field"][data-nac-field-type="tag-input"][data-nac-id="' + field_id + '"]');
+    return el;
+  }
+  function add_tag(field_id, value) {
+    const root = _tagFieldRoot(field_id);
+    if (!root) throw NacError('field_not_found', field_id);
+    const cur = list_tags(field_id);
+    if (cur.indexOf(value) >= 0) return;
+    cur.push(value);
+    root.setAttribute('data-nac-value', cur.join('|'));
+    _emit('nac:tags:added', { field_id: field_id, value: value, source: 'programmatic' });
+  }
+  function remove_tag(field_id, value) {
+    const root = _tagFieldRoot(field_id);
+    if (!root) throw NacError('field_not_found', field_id);
+    const cur = list_tags(field_id).filter(function (v) { return v !== value; });
+    root.setAttribute('data-nac-value', cur.join('|'));
+    _emit('nac:tags:removed', { field_id: field_id, value: value });
+  }
+  function list_tags(field_id) {
+    const root = _tagFieldRoot(field_id);
+    if (!root) return [];
+    const v = root.getAttribute('data-nac-value') || '';
+    return v ? v.split('|') : [];
+  }
+
+  /* ---------- v1.3: drawer / bottom-sheet ------------------------ */
+
+  function _drawer(id) {
+    return document.querySelector(
+      '[data-nac-role="drawer"][data-nac-id="' + id + '"], ' +
+      '[data-nac-role="bottom-sheet"][data-nac-id="' + id + '"]');
+  }
+  function open_drawer(id, position) {
+    const d = _drawer(id);
+    if (!d) throw NacError('drawer_not_found', id);
+    if (position) d.setAttribute('data-nac-position', position);
+    d.setAttribute('data-nac-state', 'open');
+    _emit('nac:drawer:opened', { id: id, position: d.getAttribute('data-nac-position') || 'right' });
+  }
+  function close_drawer(id) {
+    const d = _drawer(id);
+    if (!d) throw NacError('drawer_not_found', id);
+    d.setAttribute('data-nac-state', 'closed');
+    _emit('nac:drawer:closed', { id: id, dismissed_by: 'programmatic' });
+  }
+  function peek_drawer(id, height_pct) {
+    const d = _drawer(id);
+    if (!d) throw NacError('drawer_not_found', id);
+    d.setAttribute('data-nac-state', 'peek');
+    d.setAttribute('data-nac-peek-pct', String(height_pct || 25));
+    _emit('nac:drawer:peek', { id: id, height_pct: Number(height_pct || 25) });
+  }
+
+  /* ---------- v1.3: calendar ------------------------------------- */
+
+  function calendar_view(cal_id, view) {
+    const c = document.querySelector(
+      '[data-nac-role="calendar"][data-nac-id="' + cal_id + '"]');
+    if (!c) throw NacError('calendar_not_found', cal_id);
+    c.setAttribute('data-nac-view', view);
+    _emit('nac:calendar:view_changed', { calendar_id: cal_id, view: view });
+  }
+  function calendar_go_to(cal_id, date) {
+    const c = document.querySelector(
+      '[data-nac-role="calendar"][data-nac-id="' + cal_id + '"]');
+    if (!c) throw NacError('calendar_not_found', cal_id);
+    c.setAttribute('data-nac-date', date);
+    _emit('nac:calendar:date_selected', { calendar_id: cal_id, date: date });
+  }
+  function calendar_select_event(event_id) {
+    const ev = _byId(event_id);
+    if (!ev) throw NacError('calendar_event_not_found', event_id);
+    ev.setAttribute('data-nac-state', 'selected');
+    _emit('nac:calendar:event_clicked', {
+      event_id: event_id,
+      start: ev.getAttribute('data-nac-start') || null,
+      end:   ev.getAttribute('data-nac-end')   || null,
+    });
+  }
+  function calendar_list_events(cal_id /*, from, to */) {
+    const c = document.querySelector(
+      '[data-nac-role="calendar"][data-nac-id="' + cal_id + '"]');
+    if (!c) return [];
+    const out = [];
+    c.querySelectorAll('[data-nac-role="calendar-event"]').forEach(function (e) {
+      out.push({
+        id: e.getAttribute('data-nac-id'),
+        start: e.getAttribute('data-nac-start') || null,
+        end:   e.getAttribute('data-nac-end')   || null,
+        label: (e.getAttribute('data-nac-label') || e.textContent || '').trim(),
+        state: e.getAttribute('data-nac-state') || 'confirmed',
+      });
+    });
+    return out;
+  }
+
+  /* ---------- v1.3: chart ---------------------------------------- */
+
+  function chart_data(chart_id) {
+    const c = document.querySelector(
+      '[data-nac-role="chart"][data-nac-id="' + chart_id + '"]');
+    if (!c) throw NacError('chart_not_found', chart_id);
+    const series = [];
+    c.querySelectorAll('[data-nac-role="chart-series"]').forEach(function (s) {
+      const points = [];
+      s.querySelectorAll('[data-nac-role="chart-point"]').forEach(function (p) {
+        points.push({
+          x: p.getAttribute('data-nac-x'),
+          y: Number(p.getAttribute('data-nac-y')),
+          label: p.getAttribute('data-nac-label') || '',
+          id: p.getAttribute('data-nac-id'),
+        });
+      });
+      series.push({
+        id: s.getAttribute('data-nac-id'),
+        label: s.getAttribute('data-nac-label') || '',
+        visible: s.getAttribute('data-nac-state') !== 'hidden',
+        points: points,
+      });
+    });
+    return { chart_id: chart_id, series: series };
+  }
+  function chart_toggle_series(chart_id, series_id, on) {
+    const s = document.querySelector(
+      '[data-nac-role="chart-series"][data-nac-id="' + series_id + '"]');
+    if (!s) throw NacError('chart_series_not_found', series_id);
+    const target = (typeof on === 'boolean') ? on : (s.getAttribute('data-nac-state') === 'hidden');
+    s.setAttribute('data-nac-state', target ? 'visible' : 'hidden');
+    _emit('nac:chart:series_toggled', { chart_id: chart_id, series: series_id, visible: target });
+  }
+  function chart_filter(chart_id, criteria) {
+    _emit('nac:chart:filtered', { chart_id: chart_id, criteria: criteria });
+  }
+
+  /* ---------- v1.3: map ------------------------------------------ */
+
+  function map_focus(map_id, lat, lng, zoom) {
+    const m = document.querySelector(
+      '[data-nac-role="map"][data-nac-id="' + map_id + '"]');
+    if (!m) throw NacError('map_not_found', map_id);
+    m.setAttribute('data-nac-lat',  String(lat));
+    m.setAttribute('data-nac-lng',  String(lng));
+    if (zoom != null) m.setAttribute('data-nac-zoom', String(zoom));
+    _emit('nac:map:moved', { map_id: map_id, lat: Number(lat), lng: Number(lng) });
+    if (zoom != null) {
+      _emit('nac:map:zoom_changed', { map_id: map_id, zoom: Number(zoom) });
+    }
+  }
+  function map_select_marker(marker_id) {
+    const mk = document.querySelector(
+      '[data-nac-role="map-marker"][data-nac-id="' + marker_id + '"]');
+    if (!mk) throw NacError('map_marker_not_found', marker_id);
+    mk.setAttribute('data-nac-state', 'selected');
+    const map_id = (mk.closest('[data-nac-role="map"]') || {}).getAttribute
+      ? mk.closest('[data-nac-role="map"]').getAttribute('data-nac-id')
+      : null;
+    _emit('nac:map:marker_clicked', {
+      map_id: map_id,
+      marker_id: marker_id,
+      lat: Number(mk.getAttribute('data-nac-lat') || 0),
+      lng: Number(mk.getAttribute('data-nac-lng') || 0),
+      label: mk.getAttribute('data-nac-label') || '',
+    });
+  }
+  function map_toggle_layer(map_id, layer_id, on) {
+    const ly = document.querySelector(
+      '[data-nac-role="map-layer"][data-nac-id="' + layer_id + '"]');
+    if (!ly) throw NacError('map_layer_not_found', layer_id);
+    const target = (typeof on === 'boolean') ? on : (ly.getAttribute('data-nac-state') === 'hidden');
+    ly.setAttribute('data-nac-state', target ? 'visible' : 'hidden');
+    _emit('nac:map:layer_toggled', { map_id: map_id, layer_id: layer_id, visible: target });
+  }
+  function list_markers(map_id) {
+    const m = document.querySelector(
+      '[data-nac-role="map"][data-nac-id="' + map_id + '"]');
+    if (!m) return [];
+    const out = [];
+    m.querySelectorAll('[data-nac-role="map-marker"]').forEach(function (mk) {
+      out.push({
+        id: mk.getAttribute('data-nac-id'),
+        lat: Number(mk.getAttribute('data-nac-lat') || 0),
+        lng: Number(mk.getAttribute('data-nac-lng') || 0),
+        label: mk.getAttribute('data-nac-label') || '',
+        state: mk.getAttribute('data-nac-state') || 'idle',
+      });
+    });
+    return out;
+  }
+
+  /* ---------- v1.3: richtext ------------------------------------- */
+
+  function richtext_format(field_id, format, value) {
+    _emit('nac:richtext:format_applied',
+      { field_id: field_id, format: format, value: value || null });
+  }
+  function richtext_insert_link(field_id, text, url) {
+    _emit('nac:richtext:link_inserted',
+      { field_id: field_id, text: text, url: url });
+  }
+  function richtext_insert_mention(field_id, user_id, label) {
+    _emit('nac:richtext:mention_picked',
+      { field_id: field_id, user_id: user_id, label: label });
+  }
+
+  /* ---------- v1.4: breadcrumb ----------------------------------- */
+
+  function _breadcrumbContainer(crumb_id) {
+    return document.querySelector(
+      '[data-nac-role="breadcrumb"][data-nac-id="' + crumb_id + '"]');
+  }
+  function _breadcrumbItems(rootEl) {
+    if (!rootEl) return [];
+    return Array.prototype.slice.call(
+      rootEl.querySelectorAll('[data-nac-role="breadcrumb-item"]'));
+  }
+  function list_breadcrumbs() {
+    var roots = document.querySelectorAll('[data-nac-role="breadcrumb"]');
+    var out = [];
+    Array.prototype.forEach.call(roots, function (root) {
+      var items = _breadcrumbItems(root).map(function (el, idx) {
+        var st = el.getAttribute('data-nac-state') || 'navigable';
+        return {
+          id:        el.getAttribute('data-nac-id'),
+          label:     el.getAttribute('aria-label')
+                       || el.textContent.trim(),
+          depth:     idx,
+          navigable: st === 'navigable',
+          current:   st === 'current',
+        };
+      });
+      out.push({
+        id:    root.getAttribute('data-nac-id'),
+        items: items,
+      });
+    });
+    return out;
+  }
+  function navigate_breadcrumb(item_id) {
+    var el = document.querySelector(
+      '[data-nac-role="breadcrumb-item"][data-nac-id="'
+        + item_id + '"]');
+    if (!el) {
+      // fallback: any anchor whose label matches
+      el = document.querySelector('a[data-nac-id="' + item_id + '"]');
+    }
+    if (!el) {
+      return Promise.reject(new NacError('not_found',
+        'breadcrumb item not found: ' + item_id));
+    }
+    var root = el.closest('[data-nac-role="breadcrumb"]');
+    var items = _breadcrumbItems(root);
+    var depth = items.indexOf(el);
+    var path = items.slice(0, depth + 1)
+      .map(function (i) { return i.getAttribute('data-nac-id'); });
+    _emit('nac:breadcrumb:navigated', {
+      id:           root ? root.getAttribute('data-nac-id') : null,
+      depth:        items.length - 1,
+      path:         path,
+      target_depth: depth,
+    });
+    _focusElement(el);
+    el.click();
+    return Promise.resolve({ ok: true });
+  }
+
+  /* ---------- v1.4: carousel ------------------------------------- */
+
+  function _carousel(carousel_id) {
+    return document.querySelector(
+      '[data-nac-role="carousel"][data-nac-id="' + carousel_id + '"]');
+  }
+  function _carouselSlides(rootEl) {
+    if (!rootEl) return [];
+    return Array.prototype.slice.call(
+      rootEl.querySelectorAll('[data-nac-role="carousel-slide"]'));
+  }
+  function _carouselCurrentIdx(rootEl) {
+    var slides = _carouselSlides(rootEl);
+    for (var i = 0; i < slides.length; i++) {
+      if (slides[i].getAttribute('data-nac-state') === 'active') return i;
+    }
+    return 0;
+  }
+  function list_carousels() {
+    var roots = document.querySelectorAll('[data-nac-role="carousel"]');
+    var out = [];
+    Array.prototype.forEach.call(roots, function (root) {
+      out.push({
+        id:       root.getAttribute('data-nac-id'),
+        total:    _carouselSlides(root).length,
+        current_idx: _carouselCurrentIdx(root),
+        autoplay: root.getAttribute('data-nac-state') === 'playing',
+      });
+    });
+    return out;
+  }
+  function carousel_state(carousel_id) {
+    var root = _carousel(carousel_id);
+    if (!root) {
+      throw new NacError('not_found',
+        'carousel not found: ' + carousel_id);
+    }
+    var slides = _carouselSlides(root);
+    return {
+      current_idx: _carouselCurrentIdx(root),
+      total:       slides.length,
+      autoplay:    root.getAttribute('data-nac-state') === 'playing',
+      slide_ids:   slides.map(function (s) {
+        return s.getAttribute('data-nac-id');
+      }),
+    };
+  }
+  function _carousel_change(carousel_id, to_idx, trigger) {
+    var root = _carousel(carousel_id);
+    if (!root) {
+      return Promise.reject(new NacError('not_found',
+        'carousel not found: ' + carousel_id));
+    }
+    var slides = _carouselSlides(root);
+    var total = slides.length;
+    if (total === 0) {
+      return Promise.reject(new NacError('invalid',
+        'carousel has no slides'));
+    }
+    var from_idx = _carouselCurrentIdx(root);
+    var bounded = ((to_idx % total) + total) % total;
+    slides.forEach(function (s, i) {
+      s.setAttribute('data-nac-state', i === bounded ? 'active' : 'inactive');
+    });
+    _emit('nac:carousel:slide_changed', {
+      carousel_id: carousel_id,
+      from_idx:    from_idx,
+      to_idx:      bounded,
+      total:       total,
+      trigger:     trigger || 'programmatic',
+    });
+    return Promise.resolve({ ok: true });
+  }
+  function carousel_advance(carousel_id, delta) {
+    var root = _carousel(carousel_id);
+    if (!root) {
+      return Promise.reject(new NacError('not_found',
+        'carousel not found: ' + carousel_id));
+    }
+    var current = _carouselCurrentIdx(root);
+    var d = (typeof delta === 'number') ? delta : 1;
+    var trigger = d > 0 ? 'next' : 'prev';
+    return _carousel_change(carousel_id, current + d, trigger);
+  }
+  function carousel_to(carousel_id, slide_idx) {
+    return _carousel_change(carousel_id, slide_idx, 'dot');
+  }
+  function carousel_autoplay(carousel_id, on) {
+    var root = _carousel(carousel_id);
+    if (!root) {
+      return Promise.reject(new NacError('not_found',
+        'carousel not found: ' + carousel_id));
+    }
+    root.setAttribute('data-nac-state', on ? 'playing' : 'paused');
+    _emit(on ? 'nac:carousel:autoplay_resumed'
+             : 'nac:carousel:autoplay_paused',
+      on ? { carousel_id: carousel_id }
+         : { carousel_id: carousel_id, dismissed_by: 'programmatic' });
+    return Promise.resolve({ ok: true });
+  }
+
+  /* ---------- v1.4: timeline ------------------------------------- */
+
+  function _timeline(timeline_id) {
+    return document.querySelector(
+      '[data-nac-role="timeline"][data-nac-id="' + timeline_id + '"]');
+  }
+  function _timelineItems(rootEl) {
+    if (!rootEl) return [];
+    return Array.prototype.slice.call(
+      rootEl.querySelectorAll('[data-nac-role="timeline-item"]'));
+  }
+  function list_timelines() {
+    var roots = document.querySelectorAll('[data-nac-role="timeline"]');
+    var out = [];
+    Array.prototype.forEach.call(roots, function (root) {
+      var items = _timelineItems(root);
+      out.push({
+        id:         root.getAttribute('data-nac-id'),
+        is_live:    root.getAttribute('data-nac-state') === 'live',
+        ordering:   root.getAttribute('data-nac-ordering') || 'newest_first',
+        item_count: items.length,
+      });
+    });
+    return out;
+  }
+  function timeline_state(timeline_id) {
+    var root = _timeline(timeline_id);
+    if (!root) {
+      throw new NacError('not_found',
+        'timeline not found: ' + timeline_id);
+    }
+    var items = _timelineItems(root);
+    var times = items.map(function (it) {
+      return it.getAttribute('data-nac-ts');
+    }).filter(Boolean).sort();
+    return {
+      is_live:    root.getAttribute('data-nac-state') === 'live',
+      ordering:   root.getAttribute('data-nac-ordering') || 'newest_first',
+      oldest_ts:  times[0] || null,
+      newest_ts:  times[times.length - 1] || null,
+      item_count: items.length,
+    };
+  }
+  function _timeline_load(timeline_id, direction, limit) {
+    var root = _timeline(timeline_id);
+    if (!root) {
+      return Promise.reject(new NacError('not_found',
+        'timeline not found: ' + timeline_id));
+    }
+    var resolver = root.__nac_timeline_resolver;
+    var p;
+    if (typeof resolver === 'function') {
+      p = Promise.resolve(resolver(direction, limit || 20));
+    } else {
+      p = Promise.resolve([]);
+    }
+    return p.then(function (items) {
+      var arr = items || [];
+      _emit('nac:timeline:loaded_more', {
+        timeline_id: timeline_id,
+        direction:   direction,
+        count:       arr.length,
+      });
+      return arr;
+    });
+  }
+  function timeline_load_older(timeline_id, limit) {
+    return _timeline_load(timeline_id, 'older', limit);
+  }
+  function timeline_load_newer(timeline_id, limit) {
+    return _timeline_load(timeline_id, 'newer', limit);
+  }
+
+  /* ---------- v1.4: reorder (extends v1.1 drag-and-drop) --------- */
+
+  function reorder(list_id, item_id, to_index) {
+    var list = _byId(list_id);
+    if (!list) {
+      return Promise.reject(new NacError('not_found',
+        'list not found: ' + list_id));
+    }
+    var item = list.querySelector(
+      '[data-nac-role="draggable"][data-nac-id="' + item_id + '"]')
+      || _byId(item_id);
+    if (!item) {
+      return Promise.reject(new NacError('not_found',
+        'draggable item not found: ' + item_id));
+    }
+    var siblings = Array.prototype.slice.call(list.querySelectorAll(
+      '[data-nac-role="draggable"]'));
+    var from_index = siblings.indexOf(item);
+    var bounded = Math.max(0, Math.min(to_index, siblings.length - 1));
+    if (from_index === -1) {
+      return Promise.reject(new NacError('invalid',
+        'item is not a draggable child of list'));
+    }
+    if (from_index !== bounded) {
+      var ref = siblings[bounded];
+      if (bounded > from_index && ref && ref.nextSibling) {
+        list.insertBefore(item, ref.nextSibling);
+      } else if (ref) {
+        list.insertBefore(item, ref);
+      }
+    }
+    _emit('nac:list:reordered', {
+      list_id:    list_id,
+      item_id:    item_id,
+      from_index: from_index,
+      to_index:   bounded,
+    });
+    return Promise.resolve({ ok: true });
+  }
+
+  /* ---------- v1.6.2: drag_drop (implements spec sec 13.4) -------- */
+
+  /* NAC.drag_drop(source_nac_id, target_nac_id, opts?)
+     Programmatic drag-and-drop. Spec sec 13.4 declared this signature
+     since v1.1 but the runtime never implemented it -- a user testing
+     the v1.6.1 demo discovered the gap when the agent tried to invoke
+     it via NAC.click on a draggable (which timed out). v1.6.2 closes
+     the loop.
+
+     Contract:
+     - source MUST have data-nac-role="draggable".
+     - target MUST have data-nac-role="drop-target".
+     - Emits nac:drag:started immediately, nac:drag:over after the
+       focus barrier, nac:drag:dropped after the DOM move settles.
+       Each event carries plugin + plugin_instance_id per sec 7.4.
+     - Honors v1.6.1 default-on per-plugin bus: events fire on both
+       the plugin root and document.
+     - Resolves on success { ok: true, source, target } or rejects
+       with NacError('not_found' | 'invalid' | 'role_mismatch'). */
+  function drag_drop(source_nac_id, target_nac_id, opts) {
+    opts = opts || {};
+    var source = _byId(source_nac_id);
+    if (!source) {
+      _emitCommandRejected({
+        command_method: 'drag_drop',
+        command_target: source_nac_id,
+        reason: 'not_found',
+        message: 'draggable not found: ' + source_nac_id,
+        source: opts.source,
+      });
+      return Promise.reject(new NacError('not_found',
+        'draggable not found: ' + source_nac_id));
+    }
+    var target = _byId(target_nac_id);
+    if (!target) {
+      _emitCommandRejected({
+        command_method: 'drag_drop',
+        command_target: target_nac_id,
+        reason: 'not_found',
+        message: 'drop-target not found: ' + target_nac_id,
+        source: opts.source,
+      });
+      return Promise.reject(new NacError('not_found',
+        'drop-target not found: ' + target_nac_id));
+    }
+    if (source.getAttribute('data-nac-role') !== 'draggable') {
+      _emitCommandRejected({
+        command_method: 'drag_drop',
+        command_target: source_nac_id,
+        reason: 'role_mismatch',
+        message: 'source must have data-nac-role="draggable"',
+        source: opts.source,
+      });
+      return Promise.reject(new NacError('role_mismatch',
+        'source must have data-nac-role="draggable", got: ' +
+        (source.getAttribute('data-nac-role') || 'null')));
+    }
+    if (target.getAttribute('data-nac-role') !== 'drop-target') {
+      _emitCommandRejected({
+        command_method: 'drag_drop',
+        command_target: target_nac_id,
+        reason: 'role_mismatch',
+        message: 'target must have data-nac-role="drop-target"',
+        source: opts.source,
+      });
+      return Promise.reject(new NacError('role_mismatch',
+        'target must have data-nac-role="drop-target", got: ' +
+        (target.getAttribute('data-nac-role') || 'null')));
+    }
+    /* v1.8.0: drag-type validation (spec sec 13.4 v1.8 addition).
+       Source declares its own kind via data-nac-drag-type; target
+       declares an accept list via data-nac-drag-accept (CSV or "*").
+       Mismatch -> nac:command:rejected with reason=drag_type_mismatch
+       so an automated agent that picked the wrong target hears about
+       it instead of silently mutating the DOM. */
+    if (!_dragTypesCompatible(source, target)) {
+      var stype = source.getAttribute('data-nac-drag-type') || '';
+      var accept = target.getAttribute('data-nac-drag-accept') || '*';
+      _emitCommandRejected({
+        command_method: 'drag_drop',
+        command_target: target_nac_id,
+        reason: 'drag_type_mismatch',
+        message: 'source type "' + stype + '" not in target accept "' + accept + '"',
+        drag_type: stype,
+        drag_accept: accept,
+        source: opts.source,
+      });
+      return Promise.reject(new NacError('drag_type_mismatch',
+        'source type "' + stype + '" not in target accept "' + accept + '"'));
+    }
+
+    /* v1.4.1 focus barrier: scroll source into view + visual pulse
+       so a human reviewer sees what the agent is doing. */
+    _focusElement(source);
+
+    source.setAttribute('data-nac-state', 'dragging');
+    /* v1.7.0: emit canonical source_id + legacy from_nac_id alias.
+       Plugin scope from the source's data-nac-plugin ancestor so
+       sec 6.2.1 universal base (plugin + plugin_instance_id) is
+       satisfied. v1.7 round 3 conformance FAILed without these. */
+    var dragPluginRoot = source.closest('[data-nac-plugin]');
+    var dragPluginCtx = {
+      plugin: dragPluginRoot ? dragPluginRoot.getAttribute('data-nac-plugin') : null,
+      plugin_instance_id: dragPluginRoot
+        ? (dragPluginRoot.getAttribute('data-nac-plugin-id') || null)
+        : null,
+    };
+    _emit('nac:drag:started', Object.assign({}, dragPluginCtx, {
+      source_id:   source_nac_id,
+      from_nac_id: source_nac_id, /* legacy, removed v2.0 */
+    }));
+
+    /* Tiny delay so the focus pulse is observable before the DOM
+       move settles. Mirrors the demo's existing UX. */
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        try {
+          target.setAttribute('data-nac-state', 'drop-target-over');
+          _emit('nac:drag:over', Object.assign({}, dragPluginCtx, {
+            source_id:   source_nac_id,           /* v1.7.0 canonical */
+            target_id:   target_nac_id,           /* v1.7.0 canonical */
+            from_nac_id: source_nac_id,           /* legacy, drop v2.0 */
+            over_nac_id: target_nac_id,           /* legacy, drop v2.0 */
+          }));
+          /* Remove any "drop here" placeholder the demo stages. */
+          var empty = target.querySelector('.ne-drag-empty');
+          if (empty) empty.parentNode.removeChild(empty);
+          /* Optional to_index for ordered drop-targets; otherwise
+             append at end. */
+          if (typeof opts.to_index === 'number') {
+            var siblings = Array.prototype.slice.call(
+              target.querySelectorAll('[data-nac-role="draggable"]'));
+            var bounded = Math.max(0, Math.min(opts.to_index, siblings.length));
+            var ref = siblings[bounded] || null;
+            if (ref) target.insertBefore(source, ref);
+            else target.appendChild(source);
+          } else {
+            target.appendChild(source);
+          }
+          source.setAttribute('data-nac-state', 'idle');
+          target.setAttribute('data-nac-state', 'idle');
+          _emit('nac:drag:dropped', Object.assign({}, dragPluginCtx, {
+            source_id:     source_nac_id,         /* v1.7.0 canonical */
+            target_id:     target_nac_id,         /* v1.7.0 canonical */
+            from_nac_id:   source_nac_id,         /* legacy, drop v2.0 */
+            target_nac_id: target_nac_id,         /* legacy, drop v2.0 */
+            value:         opts.value !== undefined ? opts.value : null,
+          }));
+          resolve({ ok: true, source: source_nac_id, target: target_nac_id });
+        } catch (err) {
+          source.setAttribute('data-nac-state', 'idle');
+          target.setAttribute('data-nac-state', 'idle');
+          _emit('nac:drag:cancelled', Object.assign({}, dragPluginCtx, {
+            source_id:   source_nac_id,           /* v1.7.0 canonical */
+            from_nac_id: source_nac_id,           /* legacy, drop v2.0 */
+            reason:      'aborted',
+            error:       err && err.message ? err.message : String(err),
+          }));
+          /* v1.8.0: emit nac:command:failed so an audit pipeline
+             sees unexpected throws as separate from preflight
+             rejections (which are nac:command:rejected). */
+          _emitCommandFailed({
+            command_method: 'drag_drop',
+            command_target: target_nac_id,
+            reason: 'exception',
+            message: err && err.message ? err.message : String(err),
+            error_message: err && err.message ? err.message : String(err),
+            source: opts.source,
+          });
+          reject(err instanceof Error ? err :
+            new NacError('invalid', String(err)));
+        }
+      }, 80);
+    });
+  }
+
+  /* ---------- v1.8.0: public emit_dual + canonical shape check
+                + runtime validate_event_conformance --------------- */
+
+  /* NAC.emit_dual(canonical, legacy, detail)
+     Fires both the canonical and legacy event names with the same
+     normalized detail so plugins migrating to v1.7+ shapes do not
+     have to maintain two emit-sites. The runtime guarantees the
+     canonical fires synchronously BEFORE the legacy alias, same
+     macrotask, so subscribers that listen only to the canonical
+     name see it first (sec 6.2 emission order). */
+  function emit_dual(canonical_name, legacy_name, detail) {
+    detail = detail || {};
+    _emit(canonical_name, detail);
+    if (legacy_name && legacy_name !== canonical_name) {
+      _emit(legacy_name, detail);
+    }
+  }
+
+  /* NAC.command_rejected(detail) / NAC.command_failed(detail)
+     Public wrappers around the internal helpers so plugin authors
+     can surface their own preflight rejections + execution failures
+     using the same wire shape the runtime uses for click/fill/etc.
+     Detail keys: command_method (string), command_target (nac_id |
+     null), reason (enum), message (string), source (ProvenanceBlock). */
+  function command_rejected(detail) { _emitCommandRejected(detail); }
+  function command_failed(detail) { _emitCommandFailed(detail); }
+
+  /* Canonical shape registry for each nac:* event family per sec 6.2.
+     Required fields the runtime guarantees in v1.8+. Used by
+     NAC.check_canonical_shape() and validate_event_conformance(). */
+  const _CANONICAL_SHAPES = {
+    'nac:plugin:opened':         { required: ['plugin'] },
+    'nac:plugin:closed':         { required: ['plugin'] },
+    'nac:plugin:minimized':      { required: ['plugin'] },
+    'nac:plugin:maximized':      { required: ['plugin'] },
+    'nac:plugin:restored':       { required: ['plugin'] },
+    'nac:plugin:reset':          { required: ['plugin'] },
+    'nac:action:dispatching':    { required: ['plugin', 'action_id'] },
+    'nac:action:succeeded':      { required: ['plugin', 'action_id'] },
+    'nac:action:failed':         { required: ['plugin', 'action_id'] },
+    'nac:field:changed':         { required: ['plugin', 'field_id'] },
+    'nac:tab:changed':           { required: ['plugin', 'tab_id'] },
+    'nac:section:expanded':      { required: ['plugin', 'section_id'] },
+    'nac:section:collapsed':     { required: ['plugin', 'section_id'] },
+    'nac:accordion:expanded':    { required: ['plugin', 'section_id'] },
+    'nac:accordion:collapsed':   { required: ['plugin', 'section_id'] },
+    'nac:slider:value_changed':  { required: ['plugin', 'field_id', 'value'] },
+    'nac:table:sort_changed':    { required: ['plugin', 'column_id'] },
+    'nac:table:filter_changed':  { required: ['plugin', 'filter_id'] },
+    'nac:list:reordered':        { required: ['list_id', 'item_id'] },
+    'nac:drag:started':          { required: ['plugin', 'source_id'] },
+    'nac:drag:over':             { required: ['plugin', 'source_id', 'target_id'] },
+    'nac:drag:dropped':          { required: ['plugin', 'source_id', 'target_id'] },
+    'nac:drag:cancelled':        { required: ['plugin', 'source_id'] },
+    'nac:state:changed':         { required: [] },
+    'nac:step:advanced':         { required: ['plugin', 'stepper_id'] },
+    'nac:step:back':             { required: ['plugin', 'stepper_id'] },
+    'nac:tree:expanded':         { required: ['plugin', 'tree_id', 'node_id'] },
+    'nac:tree:collapsed':        { required: ['plugin', 'tree_id', 'node_id'] },
+    'nac:tree:selected':         { required: ['plugin', 'tree_id', 'node_id'] },
+    'nac:toast:shown':           { required: ['plugin', 'toast_id'] },
+    'nac:toast:dismissed':       { required: ['plugin', 'toast_id'] },
+    'nac:drawer:opened':         { required: ['plugin', 'drawer_id'] },
+    'nac:drawer:closed':         { required: ['plugin', 'drawer_id'] },
+    'nac:calendar:view_changed': { required: ['plugin', 'calendar_id'] },
+    'nac:calendar:event_selected': { required: ['plugin', 'calendar_id', 'event_id'] },
+    'nac:chart:data_loaded':     { required: ['plugin', 'chart_id'] },
+    'nac:chart:series_toggled':  { required: ['plugin', 'chart_id', 'series_id'] },
+    'nac:map:focused':           { required: ['plugin', 'map_id'] },
+    'nac:map:marker_selected':   { required: ['plugin', 'map_id', 'marker_id'] },
+    'nac:richtext:formatted':    { required: ['plugin', 'richtext_id'] },
+    'nac:richtext:link_inserted':{ required: ['plugin', 'richtext_id'] },
+    'nac:breadcrumb:navigated':  { required: ['plugin', 'breadcrumb_id'] },
+    'nac:carousel:advanced':     { required: ['plugin', 'carousel_id'] },
+    'nac:timeline:loaded':       { required: ['plugin', 'timeline_id'] },
+    'nac:command:rejected':      { required: ['command_method', 'reason'] },
+    'nac:command:failed':        { required: ['command_method'] },
+    /* v1.9.0 (sec 6.2.32): action confirmation event family. */
+    'nac:action:confirm:requested': { required: ['action_id', 'verb', 'confirm_id'] },
+    'nac:action:confirm:granted':   { required: ['action_id', 'confirm_id'] },
+    'nac:action:confirm:denied':    { required: ['action_id', 'confirm_id'] },
+  };
+
+  /* NAC.check_canonical_shape(eventType, detail) -> { ok, missing }
+     Pure utility. Returns { ok: true, missing: [] } if the detail
+     carries every required field for that event family. Otherwise
+     ok=false and missing=[...] lists the absent canonical fields.
+     Plugin authors can call this in their own tests; CI gates can
+     fail builds when ok=false. */
+  function check_canonical_shape(eventType, detail) {
+    const shape = _CANONICAL_SHAPES[eventType];
+    if (!shape) {
+      return { ok: false, missing: [], unknown_event: true };
+    }
+    const missing = [];
+    detail = detail || {};
+    for (let i = 0; i < shape.required.length; i++) {
+      const f = shape.required[i];
+      if (detail[f] === undefined || detail[f] === null) {
+        missing.push(f);
+      }
+    }
+    /* v1.9.0 (sec 6.2.27): ProvenanceBlock is REQUIRED at NAC-3.
+       Conformance fails if source is absent or its type is not in
+       the allowed enum. Reviewer action item (Mistral, Copilot). */
+    var srcOk = detail.source && typeof detail.source === 'object' &&
+                ['user', 'agent', 'script'].indexOf(detail.source.type) >= 0;
+    if (!srcOk) missing.push('source');
+    return { ok: missing.length === 0, missing: missing };
+  }
+
+  /* NAC.validate_event_conformance(driver, opts)
+     Runtime equivalent of the demo's "v1.7 event conformance"
+     self-test (Mistral review action item: the self-test should
+     live in the runtime, not in demo source). Subscribes to every
+     event family in _CANONICAL_SHAPES, optionally invokes a driver
+     to drive the page, then validates each captured event against
+     its canonical shape. Returns:
+       {
+         pass: number,         // events that satisfied canonical shape
+         fail: number,         // events that violated canonical shape
+         miss: number,         // event families never observed
+         total_captured: number,
+         details: [
+           { event, ok|fail|miss, missing?, sample_detail? },
+           ...
+         ]
+       }
+     opts.timeout_ms (default 4000) caps how long we listen. */
+  async function validate_event_conformance(driver, opts) {
+    opts = opts || {};
+    const timeout_ms = opts.timeout_ms || 4000;
+    const expected = Object.keys(_CANONICAL_SHAPES);
+    const captured = Object.create(null); /* event -> [details] */
+    const handlers = Object.create(null);
+    expected.forEach(function (ev) {
+      captured[ev] = [];
+      handlers[ev] = function (e) { captured[ev].push(e.detail || {}); };
+      document.addEventListener(ev, handlers[ev]);
+    });
+    function cleanup() {
+      expected.forEach(function (ev) {
+        document.removeEventListener(ev, handlers[ev]);
+      });
+    }
+    try {
+      if (typeof driver === 'function') {
+        await driver();
+      }
+      /* Give async emits a tick to settle. */
+      await new Promise(function (r) { setTimeout(r, Math.min(timeout_ms, 500)); });
+    } finally {
+      cleanup();
+    }
+    let pass = 0, fail = 0, miss = 0, total = 0;
+    const details = [];
+    expected.forEach(function (ev) {
+      const seen = captured[ev];
+      if (!seen.length) {
+        miss++;
+        details.push({ event: ev, status: 'miss' });
+        return;
+      }
+      total += seen.length;
+      const probe = seen[0];
+      const r = check_canonical_shape(ev, probe);
+      if (r.ok) {
+        pass++;
+        details.push({ event: ev, status: 'pass', count: seen.length });
+      } else {
+        fail++;
+        details.push({
+          event: ev, status: 'fail',
+          missing: r.missing, sample_detail: probe, count: seen.length,
+        });
+      }
+    });
+    return {
+      pass: pass, fail: fail, miss: miss,
+      total_captured: total, details: details,
+    };
+  }
+
+  /* ---------- v1.9.0: test harness utilities (sec 13.10) --------- */
+
+  /* NAC.assert_event_fired(eventType, opts)
+     Resolves with the matched event detail when an event of the
+     given type fires AND every predicate in opts.match passes.
+     Rejects with NacError('timeout', ...) after opts.timeout_ms
+     (default 5000). The match object pins specific detail fields
+     so a test can assert on a precise variant of the event. */
+  function assert_event_fired(eventType, opts) {
+    opts = opts || {};
+    const timeout_ms = opts.timeout_ms || 5000;
+    const match = opts.match || {};
+    const since = (typeof opts.since_ms === 'number')
+      ? Date.now() - opts.since_ms : 0;
+    return new Promise(function (resolve, reject) {
+      let settled = false;
+      function onEvt(e) {
+        if (settled) return;
+        const d = e.detail || {};
+        /* Match every predicate. */
+        for (const k in match) {
+          if (Object.prototype.hasOwnProperty.call(match, k) &&
+              d[k] !== match[k]) return;
+        }
+        settled = true;
+        document.removeEventListener(eventType, onEvt);
+        clearTimeout(t);
+        resolve({ event: eventType, detail: d, t: Date.now() });
+      }
+      const t = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        document.removeEventListener(eventType, onEvt);
+        reject(NacError('timeout',
+          'assert_event_fired(' + eventType + ') did not match within '
+          + timeout_ms + 'ms'));
+      }, timeout_ms);
+      document.addEventListener(eventType, onEvt);
+      /* since_ms unsupported in this minimal impl: events fired
+         BEFORE addEventListener cannot be replayed. The opt is
+         accepted for API stability and ignored at runtime;
+         consumers that need pre-call replay use replay_pending
+         (sec 13.11) instead. */
+      void since;
+    });
+  }
+
+  /* NAC.assert_event_count(eventType, n, opts)
+     Captures events for opts.window_ms (default 250) AFTER the
+     call. Resolves with { count, samples } when count === n,
+     rejects otherwise. The window MUST capture for the full
+     duration even after n fires (so it can detect n+1). */
+  function assert_event_count(eventType, n, opts) {
+    opts = opts || {};
+    const window_ms = opts.window_ms || 250;
+    const match = opts.match || {};
+    return new Promise(function (resolve, reject) {
+      const samples = [];
+      function onEvt(e) {
+        const d = e.detail || {};
+        for (const k in match) {
+          if (Object.prototype.hasOwnProperty.call(match, k) &&
+              d[k] !== match[k]) return;
+        }
+        samples.push(d);
+      }
+      document.addEventListener(eventType, onEvt);
+      setTimeout(function () {
+        document.removeEventListener(eventType, onEvt);
+        if (samples.length === n) {
+          resolve({ count: samples.length, samples: samples });
+        } else {
+          reject(NacError('count_mismatch',
+            'assert_event_count(' + eventType + ', ' + n + ') saw '
+            + samples.length + ' events in ' + window_ms + 'ms',
+            { count: samples.length, samples: samples }));
+        }
+      }, window_ms);
+    });
+  }
+
+  /* NAC.perf_probe(opts)
+     Synthetic 1000-element fixture that exercises describe(),
+     validate(), validate_event_conformance() once each and
+     returns a structured timing report against the sec 6.2.27
+     performance budget. */
+  async function perf_probe(opts) {
+    opts = opts || {};
+    const N = opts.element_count || 1000;
+    const BUDGETS = {
+      describe_ms: 30,
+      validate_ms: 50,
+      conformance_ms: 10,
+      emit_ms_avg: 0.5,
+    };
+    /* Build the fixture: a single hidden plugin root with N
+       data-nac-id elements distributed across role types. */
+    const root = document.createElement('div');
+    root.setAttribute('data-nac-plugin', '__nac_perf_probe__');
+    root.setAttribute('data-nac-plugin-state', 'ready');
+    root.style.cssText = 'position:absolute;width:1px;height:1px;'
+      + 'overflow:hidden;clip:rect(0,0,0,0);';
+    const roles = ['action', 'field', 'tab', 'region', 'option'];
+    let html = '';
+    for (let i = 0; i < N; i++) {
+      const r = roles[i % roles.length];
+      html += '<button data-nac-id="probe.' + r + '.' + i +
+              '" data-nac-role="' + r + '"' +
+              (r === 'action' ? ' data-nac-action="apply"' : '') +
+              ' aria-label="probe ' + i + '"></button>';
+    }
+    root.innerHTML = html;
+    document.body.appendChild(root);
+    /* Register a synthetic manifest so validate() has work to do. */
+    const actions = [];
+    const fields = [];
+    for (let i = 0; i < N; i++) {
+      const r = roles[i % roles.length];
+      const id = 'probe.' + r + '.' + i;
+      const lbl = { es: 'p' + i, en: 'p' + i, pt: 'p' + i, fr: 'p' + i,
+                    it: 'p' + i, de: 'p' + i, ja: 'p' + i, zh: 'p' + i,
+                    hi: 'p' + i, ar: 'p' + i };
+      if (r === 'action') {
+        actions.push({ nac_id: id, verb: 'apply', label_i18n: lbl });
+      } else if (r === 'field') {
+        fields.push({ nac_id: id, type: 'text', label_i18n: lbl });
+      }
+    }
+    register({
+      plugin_slug: '__nac_perf_probe__',
+      version: '1.0.0', nac_version: '1.9',
+      actions: actions, fields: fields, kpis: [],
+    });
+    function _now() { return performance && performance.now ? performance.now() : Date.now(); }
+    /* describe() */
+    const t1 = _now(); describe(); const describe_ms = _now() - t1;
+    /* validate() */
+    const t2 = _now(); validate('__nac_perf_probe__'); const validate_ms = _now() - t2;
+    /* validate_event_conformance: zero driver -- measures
+       runtime overhead only (subscribe + capture-zero + iterate
+       captured + check shapes + cleanup). The 1ms timeout means
+       we wait ~1ms instead of 100ms; what we measure is the
+       overhead, not the capture window. */
+    const t3 = _now(); await validate_event_conformance(undefined,
+      { timeout_ms: 1 }); const conformance_ms = _now() - t3;
+    /* _emit avg: 100 emits, then divide. */
+    const t4 = _now();
+    for (let i = 0; i < 100; i++) {
+      _emit('nac:state:changed', {
+        plugin: '__nac_perf_probe__', plugin_instance_id: null,
+        nac_id: 'probe.action.' + (i % N), state: 'idle',
+      });
+    }
+    const emit_ms_avg = (_now() - t4) / 100;
+    /* Tear down. */
+    unregister('__nac_perf_probe__');
+    document.body.removeChild(root);
+    /* Build report. */
+    const breakdown = [
+      { op: 'describe', ms: describe_ms, budget_ms: BUDGETS.describe_ms },
+      { op: 'validate', ms: validate_ms, budget_ms: BUDGETS.validate_ms },
+      { op: 'validate_event_conformance', ms: conformance_ms,
+        budget_ms: BUDGETS.conformance_ms },
+      { op: 'emit_ms_avg', ms: emit_ms_avg, budget_ms: BUDGETS.emit_ms_avg },
+    ];
+    const within_budget = breakdown.every(function (b) { return b.ms <= b.budget_ms; });
+    return {
+      element_count: N,
+      describe_ms: describe_ms,
+      validate_ms: validate_ms,
+      conformance_ms: conformance_ms,
+      emit_ms_avg: emit_ms_avg,
+      within_budget: within_budget,
+      breakdown: breakdown,
+    };
+  }
+
+  /* ---------- v1.9.0: action undoable flag (sec 6.2.33) --------- */
+
+  function _findActionInManifests(action_id) {
+    for (const slug in _manifests) {
+      const m = _manifests[slug];
+      if (!m || !m.actions) continue;
+      for (let i = 0; i < m.actions.length; i++) {
+        if (m.actions[i].nac_id === action_id) {
+          return m.actions[i];
+        }
+      }
+    }
+    return null;
+  }
+  function action_undoable(action_id) {
+    const a = _findActionInManifests(action_id);
+    return !!(a && a.undoable === true);
+  }
+  function action_undo_window_ms(action_id) {
+    const a = _findActionInManifests(action_id);
+    if (!a || a.undoable !== true) return null;
+    return typeof a.undo_window_ms === 'number' ? a.undo_window_ms : null;
+  }
+
+  /* ---------- v1.9.0: provenance authenticity (sec 6.2.1) ------- */
+
+  /* NAC.sign_provenance(detail, secret) -> Promise<detail>
+     Returns a clone of detail with detail.source.signature set to
+     hex-encoded HMAC-SHA256 over the canonical provenance fields
+     (type, id, tool, ts). The secret is per-tenant; key
+     management is the host's responsibility (the spec MAY define
+     rotation/storage in a future revision). Optional in v1.9
+     (advisory); MAY become required at v2.x for high-trust
+     tenants. Microsoft Copilot v1.8 finding. */
+  async function sign_provenance(detail, secret) {
+    if (!detail || !detail.source) return detail;
+    const sig = await _hmacHex(secret, _provenanceCanonicalString(detail.source));
+    detail = Object.assign({}, detail);
+    detail.source = Object.assign({}, detail.source, { signature: sig });
+    return detail;
+  }
+
+  /* NAC.verify_provenance(detail, secret) -> Promise<boolean>
+     Returns true if detail.source.signature matches the HMAC of
+     the canonical provenance fields. */
+  async function verify_provenance(detail, secret) {
+    if (!detail || !detail.source || !detail.source.signature) return false;
+    const provided = detail.source.signature;
+    const expected = await _hmacHex(secret, _provenanceCanonicalString(detail.source));
+    /* Constant-time compare. */
+    if (provided.length !== expected.length) return false;
+    let diff = 0;
+    for (let i = 0; i < provided.length; i++) {
+      diff |= provided.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    return diff === 0;
+  }
+
+  /* Canonical string serialization for HMAC input. Sorted keys
+     so {type,tool,id} and {tool,id,type} produce the same input. */
+  function _provenanceCanonicalString(source) {
+    const ordered = {};
+    ['type', 'id', 'tool', 'ts'].forEach(function (k) {
+      if (source[k] !== undefined && source[k] !== null) ordered[k] = source[k];
+    });
+    return JSON.stringify(ordered);
+  }
+
+  /* HMAC-SHA256 helper using SubtleCrypto. Returns hex string. */
+  async function _hmacHex(secret, message) {
+    if (typeof crypto === 'undefined' || !crypto.subtle) {
+      throw NacError('crypto_unavailable',
+        'SubtleCrypto API not available; cannot sign provenance');
+    }
+    const enc = new TextEncoder();
+    const keyData = enc.encode(secret);
+    const msgData = enc.encode(message);
+    const key = await crypto.subtle.importKey(
+      'raw', keyData, { name: 'HMAC', hash: 'SHA-256' },
+      false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', key, msgData);
+    const arr = new Uint8Array(sig);
+    let hex = '';
+    for (let i = 0; i < arr.length; i++) {
+      const b = arr[i].toString(16);
+      hex += b.length === 1 ? '0' + b : b;
+    }
+    return hex;
+  }
+
+  /* ---------- v1.9.0: recommended_remediation (sec 6.2.30) ----- */
+
+  const _REMEDIATION_BY_REASON = {
+    'not_found':            'requery_collection',
+    'disabled':             'inform_user_unavailable',
+    'hidden':               'inform_user_unavailable',
+    'ambiguous':            'disambiguate',
+    'role_mismatch':        'report_bug',
+    'drag_type_mismatch':   'pick_compatible_target',
+    'aria_busy':            'retry_after:1000ms',
+    'inert':                'inform_user_unavailable',
+    'readonly':             'inform_user_readonly',
+    'user_cancelled':       'accept_decision',
+    'timeout':              'retry_with_backoff',
+    'policy_blocked':       'escalate_to_human',
+    'exception':            'retry_with_backoff',
+  };
+  function recommended_remediation(reason) {
+    if (!reason || typeof reason !== 'string') return 'escalate_to_human';
+    return _REMEDIATION_BY_REASON[reason] || 'escalate_to_human';
+  }
+
+  /* ---------- v1.9.0: event replay buffer (sec 13.11) ----------- */
+
+  /* NAC.replay_pending(buffer)
+     Re-emits each entry of the buffer through the event bus.
+     Used by hosts that capture user actions before the runtime
+     loads. Each replayed event is tagged with detail._replayed
+     = true so audit consumers can distinguish from live emits. */
+  function replay_pending(buffer) {
+    if (!buffer || !Array.isArray(buffer) || buffer.length === 0) return 0;
+    let count = 0;
+    for (let i = 0; i < buffer.length; i++) {
+      const entry = buffer[i];
+      if (!entry || typeof entry.event !== 'string') continue;
+      const detail = Object.assign({}, entry.detail || {}, { _replayed: true });
+      _emit(entry.event, detail);
+      count++;
+    }
+    return count;
+  }
+
+  /* ================================================================
+     v2.5 Block A -- plugin extension contract (SPEC.md sec 15)
+     ================================================================
+
+     Adds an agnostic routing layer so a plugin can declare verbs /
+     state / events that flow through backends other than direct DOM:
+     postMessage to iframes, plugin SDK calls, script bridges, DOM
+     mirrors, same-origin window reads, synthetic events. The runtime
+     stays ignorant of any specific app -- it only knows the fixed
+     vocabulary of backend kinds and the extractor DSL.
+
+     IMPORTANT: NO fallback to v2.4 register() semantics. v2.5 plugins
+     live in their own registry. NAC.call / read / subscribe ONLY
+     consult this registry; they never silently degrade to NAC.click()
+     against a same-named DOM element. */
+
+  const _v25_plugins = Object.create(null);
+
+  /* The 8 backend names from SPEC.md sec 15.4. Any other name in a
+     manifest is a hard reject at register time. */
+  const _V25_VALID_BACKENDS = {
+    'postmessage':         true,
+    'postmessage-listen':  true,
+    'sdk-call':            true,
+    'script-bridge':       true,
+    'dom-mirror':          true,
+    'same-origin-window':  true,
+    'synthetic-mutation':  true,
+    'synthetic-poll':      true,
+  };
+
+  /* Counter for the request_id baked into every provenance event. */
+  let _v25_req_counter = 0;
+  function _v25_nextRequestId(prefix) {
+    _v25_req_counter += 1;
+    /* Hex-ish but non-cryptographic; the contract only requires
+       uniqueness within a session for correlation. */
+    return prefix + '_' + Date.now().toString(36) + '_' + _v25_req_counter.toString(36);
+  }
+
+  /* ---------- 15.5 extractor DSL ---------- */
+
+  /* Apply an extractor DSL string to a raw value (or DOM element).
+     Returns the extracted value. Throws if the DSL is malformed.
+     The runtime swallows extractor errors at dispatch time (treats
+     them as "this binding failed"); throwing here lets the test
+     surface bad manifests during register / first call. */
+  function _v25_extract(rawValue, dsl, isDom) {
+    if (dsl == null || dsl === '') return rawValue;
+    /* DOM-only forms first */
+    if (dsl === 'text') {
+      if (!isDom) throw new Error('extractor "text" requires a DOM element');
+      return rawValue.textContent;
+    }
+    if (dsl === 'value') {
+      if (!isDom) throw new Error('extractor "value" requires a DOM element');
+      return rawValue.value;
+    }
+    if (dsl === 'present') {
+      /* For DOM backends, rawValue is the element OR null. */
+      return rawValue != null;
+    }
+    if (dsl.indexOf('attribute:') === 0) {
+      if (!isDom) throw new Error('extractor "attribute:" requires a DOM element');
+      const attr = dsl.slice('attribute:'.length);
+      return rawValue.getAttribute(attr);
+    }
+    if (dsl.indexOf('classList.contains:') === 0) {
+      if (!isDom) throw new Error('extractor "classList.contains:" requires a DOM element');
+      const cls = dsl.slice('classList.contains:'.length);
+      return rawValue.classList.contains(cls);
+    }
+    /* Otherwise treat as a dotted field path against rawValue. */
+    if (/^[A-Za-z_][\w.]*$/.test(dsl)) {
+      const parts = dsl.split('.');
+      let cur = rawValue;
+      for (let i = 0; i < parts.length; i++) {
+        if (cur == null) return undefined;
+        cur = cur[parts[i]];
+      }
+      return cur;
+    }
+    throw new Error('unknown extractor DSL: ' + dsl);
+  }
+
+  /* ---------- 15.4 backend dispatchers ----------
+     Each backend dispatcher returns a Promise.
+     - For verbs: resolves with the backend's return value (often {ok}).
+     - For state: resolves with the raw value (extractor applied by caller).
+     - Rejects with a plain Error whose .message goes into provenance /
+       err.attempts. */
+
+  function _v25_resolvePath(root, path) {
+    /* Walk a dotted path. Returns { parent, key, value } where
+       parent[key] === value. Used by sdk-call assign / read. */
+    if (!path) return { parent: null, key: null, value: undefined };
+    const parts = path.split('.');
+    let parent = null;
+    let cur = root;
+    let key = null;
+    for (let i = 0; i < parts.length; i++) {
+      if (cur == null) return { parent: null, key: parts[i], value: undefined };
+      parent = cur;
+      key = parts[i];
+      cur = cur[key];
+    }
+    return { parent: parent, key: key, value: cur };
+  }
+
+  function _v25_backend_sdk_call(binding, args) {
+    const mode = binding.mode || 'invoke';
+    const path = binding.path;
+    if (!path || typeof path !== 'string') {
+      return Promise.reject(new Error('sdk-call requires `path` string'));
+    }
+    const resolved = _v25_resolvePath(global, path);
+    if (mode === 'read') {
+      if (resolved.parent == null) {
+        return Promise.reject(new Error('sdk-call read: path not resolvable: ' + path));
+      }
+      if (resolved.value === undefined) {
+        return Promise.reject(new Error('sdk-call read: path resolves to undefined: ' + path));
+      }
+      return Promise.resolve(resolved.value);
+    }
+    if (mode === 'assign') {
+      if (resolved.parent == null) {
+        return Promise.reject(new Error('sdk-call assign: path parent not resolvable: ' + path));
+      }
+      resolved.parent[resolved.key] = args;
+      return Promise.resolve({ ok: true });
+    }
+    if (mode === 'invoke') {
+      if (resolved.parent == null || typeof resolved.value !== 'function') {
+        return Promise.reject(new Error('sdk-call invoke: path is not a function: ' + path));
+      }
+      try {
+        const ret = resolved.value.call(resolved.parent, args);
+        return Promise.resolve(ret);
+      } catch (e) {
+        return Promise.reject(e);
+      }
+    }
+    return Promise.reject(new Error('sdk-call: unknown mode ' + mode));
+  }
+
+  function _v25_backend_dom_mirror(binding /*, args*/) {
+    const sel = binding.selector;
+    if (!sel) return Promise.reject(new Error('dom-mirror requires `selector` string'));
+    const el = document.querySelector(sel);
+    if (binding.extract === 'present') {
+      /* present extractor is well-defined even for null element. */
+      return Promise.resolve(el != null);
+    }
+    if (el == null) {
+      return Promise.reject(new Error('dom-mirror: selector matched no element: ' + sel));
+    }
+    try {
+      const value = _v25_extract(el, binding.extract, true);
+      if (value === undefined) {
+        return Promise.reject(new Error('dom-mirror: extractor returned undefined for ' + sel));
+      }
+      return Promise.resolve(value);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  /* postmessage (verb): post a structured message to the iframe.contentWindow
+     of the target. `values` literal + `values_from_args` forward keys. */
+  function _v25_backend_postmessage(binding, args) {
+    const sel = binding.target;
+    if (!sel) return Promise.reject(new Error('postmessage requires `target` selector'));
+    const iframe = document.querySelector(sel);
+    if (!iframe) {
+      const e = new Error('postmessage: target iframe not found: ' + sel);
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    if (!iframe.contentWindow || typeof iframe.contentWindow.postMessage !== 'function') {
+      const e = new Error('postmessage: target has no contentWindow.postMessage');
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    const msg = {
+      MessageId: binding.message,
+      SendTime:  Date.now(),
+      Values:    Object.assign({}, binding.values || {}),
+    };
+    if (Array.isArray(binding.values_from_args) && args && typeof args === 'object') {
+      for (let i = 0; i < binding.values_from_args.length; i++) {
+        const k = binding.values_from_args[i];
+        if (Object.prototype.hasOwnProperty.call(args, k)) msg.Values[k] = args[k];
+      }
+    }
+    try {
+      iframe.contentWindow.postMessage(msg, binding.target_origin || '*');
+      return Promise.resolve({ ok: true });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  /* same-origin-window (state): read iframe.contentWindow.<path>. Throws
+     a cross-origin sentinel if accessing the contentWindow fails the
+     same-origin check. In the reference shim we honor an `_sameOrigin`
+     flag the test sets explicitly; in real browsers the property access
+     throws a DOMException SecurityError which we map the same way. */
+  function _v25_backend_same_origin_window(binding /*, args*/) {
+    const sel = binding.target;
+    if (!sel) return Promise.reject(new Error('same-origin-window requires `target`'));
+    const iframe = document.querySelector(sel);
+    if (!iframe) {
+      const e = new Error('same-origin-window: iframe not found: ' + sel);
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    if (iframe._sameOrigin === false) {
+      const e = new Error('cross_origin_blocked: iframe is cross-origin');
+      e._code = 'cross_origin_blocked'; return Promise.reject(e);
+    }
+    let cw;
+    try { cw = iframe.contentWindow; }
+    catch (e) {
+      const ex = new Error('cross_origin_blocked: contentWindow access threw');
+      ex._code = 'cross_origin_blocked'; return Promise.reject(ex);
+    }
+    if (!cw) {
+      const e = new Error('same-origin-window: contentWindow is null');
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    /* Walk the path. */
+    if (!binding.path) return Promise.reject(new Error('same-origin-window requires `path`'));
+    const parts = binding.path.split('.');
+    let cur = cw;
+    for (let i = 0; i < parts.length; i++) {
+      if (cur == null) return Promise.reject(new Error('same-origin-window: path segment ' + parts[i] + ' is null'));
+      try { cur = cur[parts[i]]; }
+      catch (e) {
+        const ex = new Error('cross_origin_blocked: read into contentWindow threw');
+        ex._code = 'cross_origin_blocked'; return Promise.reject(ex);
+      }
+    }
+    if (cur === undefined) {
+      return Promise.reject(new Error('same-origin-window: path resolves to undefined'));
+    }
+    return Promise.resolve(cur);
+  }
+
+  /* script-bridge (state/verb): postmessage with a request, await a
+     correlated response, extract the value. Used by Collabora's
+     CallPythonScript pattern; generalises to any app that exposes a
+     RPC channel over postMessage. */
+  function _v25_backend_script_bridge(binding, args) {
+    const sel = binding.target;
+    if (!sel) return Promise.reject(new Error('script-bridge requires `target`'));
+    const iframe = document.querySelector(sel);
+    if (!iframe) {
+      const e = new Error('script-bridge: iframe not found: ' + sel);
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    if (!iframe.contentWindow || typeof iframe.contentWindow.postMessage !== 'function') {
+      const e = new Error('script-bridge: target has no contentWindow.postMessage');
+      e._code = 'backend_target_missing'; return Promise.reject(e);
+    }
+    const responseMsgId = binding.response_match;
+    if (!responseMsgId) return Promise.reject(new Error('script-bridge requires `response_match`'));
+    const timeoutMs = binding.timeout_ms || 5000;
+    const wantValues = Object.assign({}, binding.values || {});
+    if (args && typeof args === 'object') {
+      for (const k in args) wantValues[k] = args[k];
+    }
+    return new Promise(function (resolve, reject) {
+      let settled = false;
+      function onMessage(ev) {
+        if (settled) return;
+        if (!ev || !ev.data) return;
+        if (ev.source !== iframe.contentWindow) return;
+        if (ev.data.MessageId !== responseMsgId) return;
+        settled = true;
+        global.removeEventListener('message', onMessage);
+        clearTimeout(t);
+        /* Resolve with the raw response object. The caller (read or call)
+           applies binding.extract once -- the dispatcher does not, so the
+           extractor is never run twice. */
+        resolve(ev.data);
+      }
+      const t = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        global.removeEventListener('message', onMessage);
+        reject(new Error('script-bridge: timeout after ' + timeoutMs + 'ms'));
+      }, timeoutMs);
+      global.addEventListener('message', onMessage);
+      /* Fire the request. */
+      iframe.contentWindow.postMessage({
+        MessageId: binding.message,
+        SendTime:  Date.now(),
+        Values:    wantValues,
+      }, binding.target_origin || '*');
+    });
+  }
+
+  /* synthetic-poll (event): observe declared state paths on a fixed
+     setInterval cadence. On each tick, re-read every observed path,
+     compare to the cached snapshot, and fire the cb with the new
+     snapshot when ANY value differs. Requires only setInterval; no
+     MutationObserver dependency. Teardown clears the interval. */
+  function _v25_subscribe_synthetic_poll(plugin, event_path, binding, cb) {
+    if (!Array.isArray(binding.observe) || binding.observe.length === 0) {
+      throw new Error('synthetic-poll requires `observe: [state_path, ...]`');
+    }
+    const interval = binding.interval_ms || 250;
+    const paths = binding.observe.slice();
+    let cached = null;   /* null until first successful snapshot */
+    function snapshot() {
+      const out = {};
+      let allOk = true;
+      const promises = paths.map(function (p) {
+        return read(plugin, p).then(function (v) { out[p] = v; },
+                                     function () { allOk = false; });
+      });
+      return Promise.all(promises).then(function () {
+        return allOk ? out : null;
+      });
+    }
+    function diffsFromCached(snap) {
+      if (cached == null) return false;
+      for (let i = 0; i < paths.length; i++) {
+        const k = paths[i];
+        /* Strict JSON-shape compare for primitives + objects. */
+        const a = cached[k]; const b = snap[k];
+        if (a !== b) {
+          if (typeof a !== 'object' || typeof b !== 'object') return true;
+          if (JSON.stringify(a) !== JSON.stringify(b)) return true;
+        }
+      }
+      return false;
+    }
+    /* Prime the cache from the first snapshot so the first real change
+       fires (and not the initial baseline). */
+    snapshot().then(function (first) { if (first != null) cached = first; });
+    const handle = setInterval(function () {
+      snapshot().then(function (snap) {
+        if (snap == null) return;
+        if (cached == null) { cached = snap; return; }
+        if (diffsFromCached(snap)) {
+          cached = snap;
+          try { cb(snap); }
+          finally {
+            _v25_emitProvenance('event', plugin, event_path, 'synthetic-poll',
+              _v25_nextRequestId('pe'), true, null, 0);
+          }
+        }
+      });
+    }, interval);
+    return function teardown() { clearInterval(handle); };
+  }
+
+  /* synthetic-mutation (event): observe declared state paths via
+     MutationObserver on the underlying dom-mirror elements. On
+     mutation (with throttle), re-read every observed path and fire
+     the user cb when ANY value changed vs the cached snapshot.
+
+     Requires that every observed path's FIRST state binding be
+     dom-mirror -- only DOM-rooted state is observable via mutations.
+     Mixed manifests (dom-mirror + sdk-call in the same observe list)
+     reject at subscribe time with `invalid`. The manifest author can
+     fall back to synthetic-poll for those cases (declared, not
+     implicit). */
+  function _v25_subscribe_synthetic_mutation(plugin, event_path, binding, cb) {
+    if (typeof MutationObserver === 'undefined') {
+      throw new Error('synthetic-mutation requires MutationObserver in scope');
+    }
+    if (!Array.isArray(binding.observe) || binding.observe.length === 0) {
+      throw new Error('synthetic-mutation requires `observe: [state_path, ...]`');
+    }
+    const throttle = binding.throttle_ms != null ? binding.throttle_ms : 100;
+    const paths = binding.observe.slice();
+    /* Resolve each observed path to a dom-mirror element. Reject the
+       whole subscription if any observed path's primary binding is
+       not dom-mirror -- spec contract, no silent degradation. */
+    const elements = [];
+    const manifest = _v25_plugins[plugin];
+    for (let i = 0; i < paths.length; i++) {
+      const stateChain = manifest.state[paths[i]];
+      if (!stateChain || !stateChain.length) {
+        const e = new Error('synthetic-mutation: observed state "' + paths[i] + '" not declared');
+        e._code = 'invalid'; throw e;
+      }
+      const first = stateChain[0];
+      if (first.backend !== 'dom-mirror') {
+        const e = new Error('synthetic-mutation: observed state "' + paths[i] +
+          '" primary backend must be dom-mirror, got ' + first.backend);
+        e._code = 'invalid'; throw e;
+      }
+      const el = document.querySelector(first.selector);
+      if (el) elements.push(el);
+    }
+    let cached = null;
+    let pending = null;
+    function snapshot() {
+      const out = {};
+      let allOk = true;
+      const promises = paths.map(function (p) {
+        return read(plugin, p).then(function (v) { out[p] = v; },
+                                     function () { allOk = false; });
+      });
+      return Promise.all(promises).then(function () {
+        return allOk ? out : null;
+      });
+    }
+    function diffsFromCached(snap) {
+      if (cached == null) return false;
+      for (let i = 0; i < paths.length; i++) {
+        const k = paths[i];
+        const a = cached[k]; const b = snap[k];
+        if (a !== b) {
+          if (typeof a !== 'object' || typeof b !== 'object') return true;
+          if (JSON.stringify(a) !== JSON.stringify(b)) return true;
+        }
+      }
+      return false;
+    }
+    function tick() {
+      pending = null;
+      snapshot().then(function (snap) {
+        if (snap == null) return;
+        if (cached == null) { cached = snap; return; }
+        if (diffsFromCached(snap)) {
+          cached = snap;
+          try { cb(snap); }
+          finally {
+            _v25_emitProvenance('event', plugin, event_path, 'synthetic-mutation',
+              _v25_nextRequestId('pe'), true, null, 0);
+          }
+        }
+      });
+    }
+    /* Prime cache from first snapshot. */
+    snapshot().then(function (first) { if (first != null) cached = first; });
+    const observer = new MutationObserver(function () {
+      if (pending != null) return; /* already throttled */
+      pending = setTimeout(tick, throttle);
+    });
+    for (let i = 0; i < elements.length; i++) {
+      observer.observe(elements[i], {
+        attributes: true, childList: true, characterData: true, subtree: true,
+      });
+    }
+    return function teardown() {
+      observer.disconnect();
+      if (pending != null) { clearTimeout(pending); pending = null; }
+    };
+  }
+
+  /* postmessage-listen (event): subscribe to incoming `message` events
+     on the host window, filter by source iframe + MessageId, run the
+     extractor, fire the user callback. Returns a teardown closure. */
+  function _v25_subscribe_postmessage_listen(plugin, event_path, binding, cb) {
+    const sel = binding.source;
+    const wantMsgId = binding.message;
+    if (!wantMsgId) throw new Error('postmessage-listen requires `message`');
+    /* Source filtering: if a selector is given, resolve the iframe NOW.
+       If the iframe is later replaced, the subscription stops matching;
+       that is intentional -- callers can re-subscribe on remount. */
+    const iframe = sel ? document.querySelector(sel) : null;
+    function onMessage(ev) {
+      if (!ev || !ev.data) return;
+      if (ev.data.MessageId !== wantMsgId) return;
+      if (iframe && ev.source !== iframe.contentWindow) return;
+      let value;
+      try {
+        value = binding.extract ? _v25_extract(ev.data, binding.extract, false) : ev.data;
+      } catch (e) {
+        _v25_emitProvenance('event', plugin, event_path, 'postmessage-listen',
+          _v25_nextRequestId('pe'), false, e.message, 0);
+        return;
+      }
+      try { cb(value); }
+      finally {
+        _v25_emitProvenance('event', plugin, event_path, 'postmessage-listen',
+          _v25_nextRequestId('pe'), true, null, 0);
+      }
+    }
+    global.addEventListener('message', onMessage);
+    return function teardown() { global.removeEventListener('message', onMessage); };
+  }
+
+  /* Registry of dispatchers keyed by backend name. */
+  const _V25_VERB_DISPATCHERS = {
+    'sdk-call':            _v25_backend_sdk_call,
+    'postmessage':         _v25_backend_postmessage,
+    'script-bridge':       _v25_backend_script_bridge,
+    /* same-origin-window and dom-mirror are state-only; the synthetic
+       backends are event-only. */
+  };
+  const _V25_STATE_DISPATCHERS = {
+    'sdk-call':            _v25_backend_sdk_call,
+    'dom-mirror':          _v25_backend_dom_mirror,
+    'same-origin-window':  _v25_backend_same_origin_window,
+    'script-bridge':       _v25_backend_script_bridge,
+  };
+  const _V25_EVENT_SUBSCRIBERS = {
+    'postmessage-listen':  _v25_subscribe_postmessage_listen,
+    'synthetic-poll':      _v25_subscribe_synthetic_poll,
+    'synthetic-mutation':  _v25_subscribe_synthetic_mutation,
+  };
+
+  /* ---------- 15.2 / 15.3 public surface ---------- */
+
+  function _v25_validateManifest(slug, manifest) {
+    if (typeof slug !== 'string' || !slug) {
+      const e = new Error('registerPlugin: slug must be non-empty string');
+      e.code = 'invalid'; throw e;
+    }
+    if (manifest == null || typeof manifest !== 'object') {
+      const e = new Error('registerPlugin: manifest object required');
+      e.code = 'invalid'; throw e;
+    }
+    const verbs  = manifest.verbs  || {};
+    const states = manifest.state  || {};
+    const events = manifest.events || {};
+    /* Verbs: single binding each, backend in vocabulary. */
+    for (const vp in verbs) {
+      const b = verbs[vp];
+      if (!b || typeof b !== 'object' || !b.backend) {
+        const e = new Error('verb "' + vp + '" missing backend');
+        e.code = 'invalid'; throw e;
+      }
+      if (!_V25_VALID_BACKENDS[b.backend]) {
+        const e = new Error('verb "' + vp + '" declares unknown backend: ' + b.backend);
+        e.code = 'backend_unknown'; throw e;
+      }
+    }
+    /* State: array of bindings each. */
+    for (const sp in states) {
+      const arr = states[sp];
+      if (!Array.isArray(arr) || arr.length === 0) {
+        const e = new Error('state "' + sp + '" must be a non-empty array of bindings');
+        e.code = 'invalid'; throw e;
+      }
+      for (let i = 0; i < arr.length; i++) {
+        const b = arr[i];
+        if (!b || typeof b !== 'object' || !b.backend) {
+          const e = new Error('state "' + sp + '" binding[' + i + '] missing backend');
+          e.code = 'invalid'; throw e;
+        }
+        if (!_V25_VALID_BACKENDS[b.backend]) {
+          const e = new Error('state "' + sp + '" binding[' + i + '] unknown backend: ' + b.backend);
+          e.code = 'backend_unknown'; throw e;
+        }
+      }
+    }
+    /* Events: single binding each. */
+    for (const ep in events) {
+      const b = events[ep];
+      if (!b || typeof b !== 'object' || !b.backend) {
+        const e = new Error('event "' + ep + '" missing backend');
+        e.code = 'invalid'; throw e;
+      }
+      if (!_V25_VALID_BACKENDS[b.backend]) {
+        const e = new Error('event "' + ep + '" unknown backend: ' + b.backend);
+        e.code = 'backend_unknown'; throw e;
+      }
+    }
+  }
+
+  function registerPlugin(slug, manifest) {
+    _v25_validateManifest(slug, manifest);
+    /* Re-register replaces -- idempotent for live-reload scenarios. */
+    _v25_plugins[slug] = {
+      slug:     slug,
+      verbs:    manifest.verbs  || {},
+      state:    manifest.state  || {},
+      events:   manifest.events || {},
+    };
+  }
+
+  /* Provenance emit helper -- the kind is one of 'invoked', 'read',
+     'event'. Detail shape per SPEC.md sec 15.7. */
+  function _v25_emitProvenance(kind, plugin, path, backend, request_id, ok, error, duration_ms, extra) {
+    const detail = {
+      plugin:      plugin,
+      backend:     backend || null,
+      request_id:  request_id,
+      source:      'agent',
+      trusted:     false,
+      duration_ms: duration_ms,
+      ok:          !!ok,
+      error:       error || null,
+    };
+    if (kind === 'invoked') detail.verb_path = path;
+    else if (kind === 'read') detail.state_path = path;
+    else if (kind === 'event') detail.event_path = path;
+    if (extra) {
+      for (const k in extra) detail[k] = extra[k];
+    }
+    try {
+      document.dispatchEvent(new CustomEvent('nac:plugin:' + kind, { detail: detail, bubbles: true }));
+    } catch (_) { /* if document lacks dispatch, swallow */ }
+  }
+
+  function _v25_buildNacError(code, message, extra) {
+    const e = new Error(message);
+    e.code = code;
+    if (extra) for (const k in extra) e[k] = extra[k];
+    return e;
+  }
+
+  function call(plugin, verb_path, args) {
+    const request_id = _v25_nextRequestId('pi');
+    const t0 = Date.now();
+    /* Errors that surface BEFORE any backend dispatch still get a
+       provenance row -- the agent's request happened, it just failed
+       at routing. backend stays null in that case. */
+    if (!_v25_plugins[plugin]) {
+      const err = _v25_buildNacError('plugin_not_registered',
+        'NAC.call: plugin "' + plugin + '" not registered');
+      _v25_emitProvenance('invoked', plugin, verb_path, null, request_id, false, err.message, Date.now() - t0);
+      return Promise.reject(err);
+    }
+    const binding = _v25_plugins[plugin].verbs[verb_path];
+    if (!binding) {
+      const err = _v25_buildNacError('verb_not_declared',
+        'NAC.call: plugin "' + plugin + '" has no verb "' + verb_path + '"');
+      _v25_emitProvenance('invoked', plugin, verb_path, null, request_id, false, err.message, Date.now() - t0);
+      return Promise.reject(err);
+    }
+    const dispatcher = _V25_VERB_DISPATCHERS[binding.backend];
+    if (!dispatcher) {
+      const err = _v25_buildNacError('backend_unknown',
+        'NAC.call: backend "' + binding.backend + '" not implemented for verbs');
+      _v25_emitProvenance('invoked', plugin, verb_path, binding.backend, request_id, false, err.message, Date.now() - t0);
+      return Promise.reject(err);
+    }
+    return dispatcher(binding, args).then(function (value) {
+      _v25_emitProvenance('invoked', plugin, verb_path, binding.backend, request_id, true, null, Date.now() - t0);
+      return value;
+    }, function (err) {
+      /* If the dispatcher tagged the error with a NacError code via
+         `_code`, lift it onto a proper NacError so callers see e.g.
+         backend_target_missing or cross_origin_blocked instead of the
+         raw Error. Provenance always records the human message. */
+      const msg = (err && err.message) || String(err);
+      _v25_emitProvenance('invoked', plugin, verb_path, binding.backend, request_id, false, msg, Date.now() - t0);
+      if (err && err._code) {
+        throw _v25_buildNacError(err._code, msg);
+      }
+      throw err;
+    });
+  }
+
+  function read(plugin, state_path) {
+    const request_id = _v25_nextRequestId('pr');
+    const t0 = Date.now();
+    if (!_v25_plugins[plugin]) {
+      const err = _v25_buildNacError('plugin_not_registered',
+        'NAC.read: plugin "' + plugin + '" not registered');
+      _v25_emitProvenance('read', plugin, state_path, null, request_id, false, err.message, Date.now() - t0);
+      return Promise.reject(err);
+    }
+    const chain = _v25_plugins[plugin].state[state_path];
+    if (!chain) {
+      const err = _v25_buildNacError('state_not_declared',
+        'NAC.read: plugin "' + plugin + '" has no state "' + state_path + '"');
+      _v25_emitProvenance('read', plugin, state_path, null, request_id, false, err.message, Date.now() - t0);
+      return Promise.reject(err);
+    }
+    /* Walk the chain in declared order. First binding to resolve with
+       a non-undefined value wins. Every failure is recorded for the
+       state_unreadable error if none succeed. */
+    const attempts = [];
+    function tryAt(i) {
+      if (i >= chain.length) {
+        const err = _v25_buildNacError('state_unreadable',
+          'NAC.read: every binding in chain for "' + state_path + '" failed',
+          { attempts: attempts });
+        _v25_emitProvenance('read', plugin, state_path, null, request_id, false, err.message, Date.now() - t0, { attempts: attempts });
+        return Promise.reject(err);
+      }
+      const binding = chain[i];
+      const dispatcher = _V25_STATE_DISPATCHERS[binding.backend];
+      if (!dispatcher) {
+        attempts.push({ backend: binding.backend, reason: 'dispatcher not implemented for state' });
+        return tryAt(i + 1);
+      }
+      return dispatcher(binding).then(function (raw) {
+        /* For dom-mirror with extract, the dispatcher already applied
+           the extractor and returned the extracted value. For sdk-call
+           with mode:read, the raw value is the path's value -- no
+           extractor needed unless the manifest declared one. */
+        let value;
+        if (binding.backend === 'dom-mirror') {
+          value = raw; /* already extracted */
+        } else if (binding.extract) {
+          try { value = _v25_extract(raw, binding.extract, false); }
+          catch (e) {
+            attempts.push({ backend: binding.backend, reason: e.message });
+            return tryAt(i + 1);
+          }
+        } else {
+          value = raw;
+        }
+        if (value === undefined) {
+          attempts.push({ backend: binding.backend, reason: 'resolved value was undefined' });
+          return tryAt(i + 1);
+        }
+        _v25_emitProvenance('read', plugin, state_path, binding.backend, request_id, true, null, Date.now() - t0);
+        return value;
+      }, function (err) {
+        attempts.push({ backend: binding.backend, reason: err.message || String(err) });
+        return tryAt(i + 1);
+      });
+    }
+    return tryAt(0);
+  }
+
+  /* Active subscription handles -> teardown closures. Allows
+     idempotent unsubscribe by handle reference. */
+  const _v25_subscriptions = new WeakMap();
+  let _v25_sub_counter = 0;
+
+  function subscribe(plugin, event_path, cb) {
+    if (typeof cb !== 'function') {
+      throw _v25_buildNacError('invalid', 'NAC.subscribe: cb must be a function');
+    }
+    if (!_v25_plugins[plugin]) {
+      throw _v25_buildNacError('plugin_not_registered',
+        'NAC.subscribe: plugin "' + plugin + '" not registered');
+    }
+    const binding = _v25_plugins[plugin].events[event_path];
+    if (!binding) {
+      throw _v25_buildNacError('event_not_declared',
+        'NAC.subscribe: plugin "' + plugin + '" has no event "' + event_path + '"');
+    }
+    const subscriber = _V25_EVENT_SUBSCRIBERS[binding.backend];
+    if (!subscriber) {
+      throw _v25_buildNacError('backend_unknown',
+        'NAC.subscribe: backend "' + binding.backend + '" not implemented for events');
+    }
+    let teardown;
+    try { teardown = subscriber(plugin, event_path, binding, cb); }
+    catch (e) {
+      if (e && e._code) throw _v25_buildNacError(e._code, e.message);
+      throw e;
+    }
+    _v25_sub_counter += 1;
+    const handle = {
+      __v25_sub:    true,
+      id:           _v25_sub_counter,
+      plugin:       plugin,
+      event_path:   event_path,
+      backend:      binding.backend,
+    };
+    _v25_subscriptions.set(handle, teardown);
+    return handle;
+  }
+
+  function unsubscribe(handle) {
+    if (!handle || !handle.__v25_sub) return;
+    const teardown = _v25_subscriptions.get(handle);
+    if (teardown) {
+      try { teardown(); } catch (_) { /* idempotent */ }
+      _v25_subscriptions.delete(handle);
+    }
+  }
+
+  /* ================================================================
+     v2.5 Block C -- RFC V25-03: assistive labels (narrate)
+     ================================================================
+
+     NAC.narrate(plugin, nac_id) -> string
+       Canonical human-readable label for any nac_id in the plugin's
+       DOM. Priority order:
+         1. aria-label              (a11y-first)
+         2. visible text            (the human reading the chrome)
+         3. data-nac-label          (author override)
+         4. nac_id                  (worst case)
+
+     For elements where the visible text leaks child-interactive
+     content (eg a button containing an icon and a label), narrate
+     prefers the FIRST text node directly under the element so the
+     spoken output stays focused.
+
+     Returns null only if the element cannot be found (unknown
+     nac_id or unknown plugin). Empty/whitespace labels collapse to
+     the next priority tier. */
+
+  function _v25c_visibleText(el) {
+    if (!el) return '';
+    /* Collect text directly under el, excluding nested elements that
+       are themselves nac-addressable (those have their own narrate
+       resolution). */
+    let out = '';
+    for (let n = el.firstChild; n; n = n.nextSibling) {
+      if (n.nodeType === 3 /* TEXT_NODE */) {
+        out += n.nodeValue || '';
+      } else if (n.nodeType === 1 /* ELEMENT_NODE */) {
+        /* Skip nested nac-addressable subtrees -- they have their
+           own label. */
+        if (n.getAttribute && n.getAttribute('data-nac-id')) continue;
+        /* Recurse into non-addressable children (typical: icon
+           <span> + text). */
+        out += _v25c_visibleText(n);
+      }
+    }
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function narrate(plugin, nac_id) {
+    if (typeof nac_id !== 'string' || !nac_id) return null;
+    /* Scope by plugin if provided -- look only inside [data-nac-plugin=plugin]
+       subtree. If plugin is omitted, fall back to global search. */
+    let root = document;
+    if (plugin) {
+      const pluginRoot = document.querySelector('[data-nac-plugin="' + plugin + '"]');
+      if (!pluginRoot) return null;
+      root = pluginRoot;
+    }
+    /* Use attribute selector with CSS-safe escape via JSON.stringify
+       to avoid injection when nac_id contains weird chars. */
+    const safeId = '"' + String(nac_id).replace(/["\\]/g, '\\$&') + '"';
+    const el = root.querySelector('[data-nac-id=' + safeId + ']');
+    if (!el) return null;
+    /* 1. aria-label */
+    const aria = el.getAttribute('aria-label');
+    if (aria && aria.trim()) return aria.trim();
+    /* 2. visible text (direct + nested non-addressable) */
+    const vis = _v25c_visibleText(el);
+    if (vis) return vis;
+    /* 3. data-nac-label */
+    const explicit = el.getAttribute('data-nac-label');
+    if (explicit && explicit.trim()) return explicit.trim();
+    /* 4. nac_id fallback */
+    return nac_id;
+  }
+
+  /* ================================================================
+     v2.5 Block B -- RFC V25-02: tree navigation
+     ================================================================
+
+     NAC.context(plugin) -> { breadcrumb: [{nac_id, label}, ...] }
+       Walks up from document.activeElement through ancestor nac-id
+       elements within the plugin subtree. Empty array when nothing
+       focused inside the plugin.
+
+     NAC.tree(plugin, rootId?) -> [{nac_id, label, opens?, leaf?}, ...]
+       Enumerates the IMMEDIATE addressable children of rootId (or the
+       plugin root when rootId is omitted). "Immediate" means: there
+       are no other nac-id elements between them and the start. Each
+       entry reports the data-nac-opens target slug (if any) and a
+       boolean leaf flag (data-nac-leaf attribute present).
+
+     Both functions delegate label resolution to narrate(). */
+
+  function _v25b_pluginRoot(plugin) {
+    if (!plugin) return null;
+    return document.querySelector('[data-nac-plugin="' + plugin + '"]');
+  }
+
+  function context(plugin) {
+    const out = { breadcrumb: [] };
+    const root = _v25b_pluginRoot(plugin);
+    if (!root) return out;
+    const active = document.activeElement;
+    if (!active || !root.contains(active)) return out;
+    /* Walk up; collect each ancestor that owns a data-nac-id. Stop
+       at the plugin root inclusive (root itself may not carry a
+       nac-id -- in that case we just stop there). */
+    let cur = active;
+    while (cur && cur !== root.parentElement) {
+      const id = cur.getAttribute && cur.getAttribute('data-nac-id');
+      if (id) {
+        out.breadcrumb.unshift({ nac_id: id, label: narrate(plugin, id) });
+      }
+      if (cur === root) break;
+      cur = cur.parentElement;
+    }
+    return out;
+  }
+
+  function _v25b_isImmediate(start, node) {
+    /* True if `node` has no OTHER nac-id ancestor between itself and
+       `start`. Excludes node === start and ancestors above start. */
+    let p = node.parentElement;
+    while (p && p !== start) {
+      if (p.getAttribute && p.getAttribute('data-nac-id')) return false;
+      p = p.parentElement;
+    }
+    return true;
+  }
+
+  /* ================================================================
+     v2.5 Block D -- RFC V25-04: effect detection (expect + diff)
+     ================================================================
+
+     NAC.expect(plugin, statePath, value, opts?) -> Promise
+       Polls NAC.read(plugin, statePath) until the returned value
+       satisfies the comparator (default ===) or the timeout fires.
+       Resolves with the resolved value on match.
+       Rejects with NacError('timeout', ...) on deadline.
+       Read failures are retried until the deadline (treated as
+       "the state is not yet observable").
+
+       opts:
+         timeout_ms   default 5000
+         poll_ms      default 100
+         comparator   default (cur, want) => cur === want
+                      receives (current, expected) and returns boolean
+
+     NAC.diff(plugin, statePath, actionFn) -> Promise<{before, after, changed}>
+       Reads state, awaits actionFn(), reads state again, returns
+       both snapshots + a `changed` boolean (JSON-stringify compare).
+       Read failures collapse to undefined and changed is computed
+       on the stringified pair (so undefined vs value still flags).
+
+     Both delegate to NAC.read() so they inherit V25-01's full
+     fallback-chain semantics for free. */
+
+  function expect(plugin, statePath, value, opts) {
+    opts = opts || {};
+    const timeout = (typeof opts.timeout_ms === 'number') ? opts.timeout_ms : 5000;
+    const pollMs  = (typeof opts.poll_ms === 'number')    ? opts.poll_ms    : 100;
+    const cmp = (typeof opts.comparator === 'function')
+      ? opts.comparator
+      : function (cur, want) { return cur === want; };
+    const deadline = Date.now() + timeout;
+    return new Promise(function (resolve, reject) {
+      function tick() {
+        read(plugin, statePath).then(function (cur) {
+          let matches = false;
+          try { matches = !!cmp(cur, value); }
+          catch (_) { matches = false; }
+          if (matches) { resolve(cur); return; }
+          if (Date.now() >= deadline) {
+            reject(_v25_buildNacError('timeout',
+              'NAC.expect: state "' + statePath + '" did not match within ' +
+              timeout + 'ms (last value: ' + JSON.stringify(cur) + ')'));
+            return;
+          }
+          setTimeout(tick, pollMs);
+        }, function (_err) {
+          if (Date.now() >= deadline) {
+            reject(_v25_buildNacError('timeout',
+              'NAC.expect: state "' + statePath + '" unreadable + timeout'));
+            return;
+          }
+          setTimeout(tick, pollMs);
+        });
+      }
+      tick();
+    });
+  }
+
+  function diff(plugin, statePath, actionFn) {
+    function safeRead() {
+      return read(plugin, statePath).then(
+        function (v) { return v; },
+        function ()  { return undefined; }
+      );
+    }
+    return safeRead().then(function (before) {
+      const act = (typeof actionFn === 'function')
+        ? Promise.resolve(actionFn())
+        : Promise.resolve();
+      return act.then(function () {
+        return safeRead().then(function (after) {
+          let changed;
+          try {
+            changed = JSON.stringify(before) !== JSON.stringify(after);
+          } catch (_) {
+            changed = before !== after;
+          }
+          return { before: before, after: after, changed: changed };
+        });
+      });
+    });
+  }
+
+  function tree(plugin, rootId) {
+    const pluginRoot = _v25b_pluginRoot(plugin);
+    if (!pluginRoot) return [];
+    let start = pluginRoot;
+    if (rootId) {
+      const safeId = '"' + String(rootId).replace(/["\\]/g, '\\$&') + '"';
+      const found = pluginRoot.querySelector('[data-nac-id=' + safeId + ']');
+      if (!found) return [];
+      start = found;
+    }
+    const candidates = start.querySelectorAll('[data-nac-id]');
+    const out = [];
+    for (let i = 0; i < candidates.length; i++) {
+      const k = candidates[i];
+      if (!_v25b_isImmediate(start, k)) continue;
+      const id = k.getAttribute('data-nac-id');
+      const entry = {
+        nac_id: id,
+        label:  narrate(plugin, id),
+      };
+      const opens = k.getAttribute('data-nac-opens');
+      if (opens) entry.opens = opens;
+      if (k.hasAttribute('data-nac-leaf')) entry.leaf = true;
+      out.push(entry);
+    }
+    return out;
+  }
+
+  /* ---------- Install -------------------------------------------- */
+
+  global.NAC = {
+    __nac_v1_installed: true,
+    version:      '2.5.2',
+    spec_version: '2.5',
+    /* v2.2.0 (V22-01) -- strict validation toggle. When true,
+       NAC.register throws on findings (manifest_role_unknown,
+       tab_id_manifest_role_drift, manifest_dom_role_mismatch).
+       Default false in v2.2 (warning-only) for the migration
+       window; v2.3 stable flips default to true (F3); v3.0 removes
+       the flag. Opt-out: set NAC.STRICT_VALIDATION = false in your
+       bootstrap before any register() call. See
+       guides/MIGRATION_v2.2_to_v2.3.md. */
+    STRICT_VALIDATION: true,
+    /* v2.5 / RFC V24-01 -- when true (default), NAC.register throws
+       on the first slug uniqueness violation; the boot-time pass
+       paints a red banner + dispatches nac:fatal. Set false BEFORE
+       any register() call to opt out for a single migration window.
+       The flag is removed in v2.6 (enforcement becomes unconditional). */
+    HARD_DEDUP: true,
+    /* registry */
+    register:        register,
+    unregister:      unregister,
+    manifest:        manifest,
+    /* v2.5 V24-02 -- idempotent registration. Use this in SPA hosts
+       where a component remount may call into NAC twice; syncPlugin
+       replaces the manifest instead of appending. */
+    syncPlugin:      syncPlugin,
+    /* v2.5 V24-05 -- Agent authority + sudo elevation. The host
+       interposes a confirmation UI between agent dispatch and the
+       action's side effect; request_authority + has_authority let
+       the user grant a time-bounded "sudo" elevation that bypasses
+       confirmations for a scope until TTL expires. */
+    set_confirm_handler: set_confirm_handler,
+    confirm_action:      confirm_action,
+    request_authority:   request_authority,
+    has_authority:       has_authority,
+    revoke_authority:    revoke_authority,
+    /* v2.5 V24-04 -- Snapshot versioning + optimistic concurrency.
+       plugin_version + element_state_hash + tree_version appear in
+       describe() output (RFC sec 5.2/5.3). expected_plugin_version
+       / expected_tree_version / expected_element_state_hash on every
+       mutating API reject with NacError('snapshot_stale', ...) when
+       the snapshot is stale. As of v2.5.0-alpha.4 every mutating
+       verb (click/fill/select/invoke/tab/tab_by_label) honours the
+       gate, so STRICT_VERSIONING default flips to true: callers
+       MUST pass at least one expected_* or set STRICT_VERSIONING
+       =false explicitly. Removed in v2.6 (becomes unconditional). */
+    STRICT_VERSIONING:   true,
+    eager_hashing:       false,
+    conformance_tier:    'NAC-3-versioned',
+    markHydrationComplete: markHydrationComplete,
+    versionHistory:      versionHistory,
+    /* v2.3 preview (V23-02): introspection helper that returns the
+       list of plugin slugs currently registered (regardless of DOM
+       mount state). Used by the interop layer's export_tree to
+       iterate the registry; also useful for hosts that need to
+       audit what manifests are loaded after autoRegister.watch
+       has done its work. Pure read of the internal map; safe to
+       call from anywhere. */
+    list_registered_plugins: function () {
+      return Object.keys(_manifests);
+    },
+    /* v2.2.0 (V22-02) -- bindAction helper that auto-emits
+       nac:action:succeeded / :failed after a click handler runs.
+       Removes the brownfield foot-gun where panels forget to emit
+       the contract event and NAC.click() times out spuriously. */
+    bindAction:      bindAction,
+    bindTab:         bindTab,
+    /* v2.3 (F7): auth-aware capabilities. setCapabilities replaces
+       the user's full set; grant/revoke for incremental updates;
+       userCapabilities returns a snapshot array. NAC.click and
+       NAC.invoke gate against this set when the manifest entry
+       declares requires_capability. */
+    setCapabilities:    setCapabilities,
+    grantCapability:    grantCapability,
+    revokeCapability:   revokeCapability,
+    userCapabilities:   userCapabilities,
+    /* v2.3.0 PREVIEW (V23-01) -- field editor primitive. Opens a
+       Word-style modal on any field, with select/replace/delete/
+       AI-syntax-correct verbs all NAC-3 callable. The modal
+       registers under plugin_slug='nac_editor' with full 10-locale
+       labels; agents can drive it like any other NAC plugin. */
+    edit_field:      edit_field,
+    /* read */
+    describe:        describe,
+    list:            list,
+    find:            find,
+    read_feedback:   read_feedback,
+    snapshot_state:  snapshot_state,
+    /* write */
+    click:           click,
+    fill:            fill,
+    select:          select,
+    tab:             tab,
+    set_mode:        set_mode,
+    /* v1.4.1 -- voice/agent ergonomic helpers */
+    click_by_verb:   click_by_verb,
+    tab_by_label:    tab_by_label,
+    /* v2.3.0 -- payload-bearing actions. invoke() is the generic
+       primitive: dispatches nac:action:requested with the agent's
+       payload and resolves on nac:action:succeeded/:failed matching
+       the request_id. utter() is the ergonomic shortcut for the
+       conversational verb pattern (the first concrete adopter is
+       Atlas Pro's mic). Both are additive on top of click()/click_by_verb()
+       and do not change existing demo behaviour. */
+    invoke:          invoke,
+    utter:           utter,
+    /* utility */
+    wait_for:        wait_for,
+    screenshot:      screenshot,
+    validate:        validate,
+    /* v1.5.1 -- cross-plugin validator */
+    validate_global: validate_global,
+    /* v1.6.1 -- tolerance config for retiring historic findings */
+    set_validation_tolerance: set_validation_tolerance,
+    get_validation_tolerance: get_validation_tolerance,
+    /* v1.6.1 -- canonical "is the UI blocked?" probe */
+    is_blocked:      is_blocked,
+    /* v1.2 -- dynamic options */
+    options:                 options,
+    search_options:          search_options,
+    invalidate_options:      invalidate_options,
+    set_options_resolver:    set_options_resolver,
+    /* v1.2 -- window chrome */
+    minimize:        minimize,
+    maximize:        maximize,
+    restore:         restore,
+    fullscreen:      fullscreen,
+    /* v1.2 -- discovery */
+    system_map:                  system_map,
+    capabilities:                capabilities,
+    set_system_map_provider:     set_system_map_provider,
+    set_capabilities_provider:   set_capabilities_provider,
+    /* v1.4.1 -- discovery layer declaration */
+    system_map_layers:           system_map_layers,
+    /* v1.6.0 -- plugin reset primitive */
+    reset:                       reset,
+    set_reset_provider:          set_reset_provider,
+    /* v1.2 -- section landmarks */
+    list_sections:               list_sections,
+    go_to_section:               go_to_section,
+    /* v1.3 -- toast / banner / confirm */
+    toast:                       toast,
+    list_toasts:                 list_toasts,
+    dismiss_toast:               dismiss_toast,
+    list_banners:                list_banners,
+    dismiss_banner:              dismiss_banner,
+    confirm:                     confirm_dialog,
+    list_pending_confirms:       list_pending_confirms,
+    /* v1.3 -- stepper */
+    step_next:                   step_next,
+    step_back:                   step_back,
+    step_to:                     step_to,
+    step_state:                  step_state,
+    /* v1.3 -- tree */
+    tree_expand:                 tree_expand,
+    tree_collapse:               tree_collapse,
+    tree_select:                 tree_select,
+    tree_path:                   tree_path,
+    /* v1.3 -- tag-input */
+    add_tag:                     add_tag,
+    remove_tag:                  remove_tag,
+    list_tags:                   list_tags,
+    /* v1.3 -- drawer / bottom-sheet */
+    open_drawer:                 open_drawer,
+    close_drawer:                close_drawer,
+    peek_drawer:                 peek_drawer,
+    /* v1.3 -- calendar */
+    calendar_view:               calendar_view,
+    calendar_go_to:              calendar_go_to,
+    calendar_select_event:       calendar_select_event,
+    calendar_list_events:        calendar_list_events,
+    /* v1.3 -- chart */
+    chart_data:                  chart_data,
+    chart_toggle_series:         chart_toggle_series,
+    chart_filter:                chart_filter,
+    /* v1.3 -- map */
+    map_focus:                   map_focus,
+    map_select_marker:           map_select_marker,
+    map_toggle_layer:            map_toggle_layer,
+    list_markers:                list_markers,
+    /* v1.3 -- richtext */
+    richtext_format:             richtext_format,
+    richtext_insert_link:        richtext_insert_link,
+    richtext_insert_mention:     richtext_insert_mention,
+    /* v1.4 -- breadcrumb */
+    list_breadcrumbs:            list_breadcrumbs,
+    navigate_breadcrumb:         navigate_breadcrumb,
+    /* v1.4 -- carousel */
+    list_carousels:              list_carousels,
+    carousel_state:              carousel_state,
+    carousel_advance:            carousel_advance,
+    carousel_to:                 carousel_to,
+    carousel_autoplay:           carousel_autoplay,
+    /* v1.4 -- timeline */
+    list_timelines:              list_timelines,
+    timeline_state:              timeline_state,
+    timeline_load_older:         timeline_load_older,
+    timeline_load_newer:         timeline_load_newer,
+    /* v1.4 -- reorder (in-list) */
+    reorder:                     reorder,
+    /* v1.6.2 -- drag_drop (cross-list, implements spec sec 13.4) */
+    drag_drop:                   drag_drop,
+    /* v1.8.0 -- emit helpers + canonical shape utilities */
+    emit_dual:                   emit_dual,
+    command_rejected:            command_rejected,
+    command_failed:              command_failed,
+    check_canonical_shape:       check_canonical_shape,
+    validate_event_conformance:  validate_event_conformance,
+    /* v1.9.0 -- a11y_hint localizer override */
+    set_a11y_hint_localizer:     set_a11y_hint_localizer,
+    /* v1.9.0 -- hint priority ordering (sec 3.1) */
+    sort_hints_by_priority:      sort_hints_by_priority,
+    set_hint_priority:           set_hint_priority,
+    /* v1.9.0 -- test harness (sec 13.10) + event replay (sec 13.11) */
+    assert_event_fired:          assert_event_fired,
+    assert_event_count:          assert_event_count,
+    perf_probe:                  perf_probe,
+    replay_pending:              replay_pending,
+    /* v1.9.0 -- action confirmation -- superseded by v2.5 V24-05
+       (set_confirm_handler / confirm_action / request_authority /
+       has_authority / revoke_authority exposed earlier in this
+       object). The v1.9 single-handler model is a strict subset. */
+    /* v1.9.0 -- action undoable flag (sec 6.2.33) */
+    action_undoable:             action_undoable,
+    action_undo_window_ms:       action_undo_window_ms,
+    /* v1.9.0 -- provenance authenticity (sec 6.2.1) */
+    sign_provenance:             sign_provenance,
+    verify_provenance:           verify_provenance,
+    /* v1.9.0 -- recommended remediation (sec 6.2.30) */
+    recommended_remediation:     recommended_remediation,
+    /* v1.2 -- error codes */
+    errors: {
+      RemoteSourceRequiresSearch: 'RemoteSourceRequiresSearch',
+      OptionsUnavailable:         'OptionsUnavailable',
+      SystemMapNotProvided:       'SystemMapNotProvided',
+      CapabilitiesNotProvided:    'CapabilitiesNotProvided',
+    },
+    /* config */
+    config: {
+      default_timeout_ms: 5000,
+    },
+    /* errors */
+    NacError:        NacError,
+    /* v2.5 Block A -- plugin extension contract (SPEC.md sec 15).
+       Agnostic routing for canvas + API surfaces (Collabora, Figma,
+       Miro, Excalidraw, etc). Lives in its own registry; never falls
+       back to v2.4 register() semantics. */
+    registerPlugin:  registerPlugin,
+    call:            call,
+    read:            read,
+    subscribe:       subscribe,
+    unsubscribe:     unsubscribe,
+    /* v2.5 Block C -- assistive labels (SPEC.md sec 17 / RFC V25-03).
+       Canonical human-readable label resolution for screen readers,
+       TTS, voice flows, audit logs. Priority order: aria-label >
+       visible text > data-nac-label > nac_id fallback. */
+    narrate:         narrate,
+    /* v2.5 Block B -- tree navigation (SPEC.md sec 16 / RFC V25-02).
+       context(plugin) returns the focused node's breadcrumb;
+       tree(plugin, rootId?) enumerates navigable children.
+       data-nac-opens declares parent->child relationships; data-nac-leaf
+       marks terminals. Companion to narrate for chrome-driven walks. */
+    context:         context,
+    tree:            tree,
+    /* v2.5 Block D -- effect detection (SPEC.md sec 18 / RFC V25-04).
+       Closes the "silent damage" gap for assistive callers: the agent
+       confirms the EFFECT of an action, not just that the command was
+       emitted. expect() polls until a state matches; diff() snapshots
+       around an action. Both compose with NAC.read() / V25-01 surface. */
+    expect:          expect,
+    diff:            diff,
+  };
+
+  /* v2.2.1: guard browser-only init so this module is importable in
+     Node / SSR / test contexts without crashing. */
+  if (typeof document !== 'undefined') {
+    document.dispatchEvent(new CustomEvent('nac:installed', {
+      detail: { version: global.NAC.version, spec: global.NAC.spec_version },
+    }));
+
+    /* v1.9.0: install the ARIA bridge for data-nac-a11y-hint so
+       screen readers actually consume the hints today (sec 3.1).
+       Runs after install so existing host-level aria-describedby
+       values are preserved (we append, not overwrite). */
+    _installA11yHintBridge();
+  }
+
+  /* v1.9.0: auto-replay any window.__NAC_PENDING__ buffer the
+     host staged before the runtime loaded (sec 13.11). The host
+     pushes {event, detail} entries during boot; we replay them
+     once the runtime is ready, then clear so hot reloads do not
+     double-replay. */
+  if (global && Array.isArray(global.__NAC_PENDING__)) {
+    try {
+      replay_pending(global.__NAC_PENDING__);
+      global.__NAC_PENDING__ = [];
+    } catch (e) { /* swallow; hosts can call replay_pending() themselves */ }
+  }
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

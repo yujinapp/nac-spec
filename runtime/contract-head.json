@@ -1,12 +1,12 @@
 {
   "api_schema": 1,
-  "chain_head": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
-  "entry_count": 3,
+  "chain_head": "sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk",
+  "entry_count": 4,
   "generated_by": "scripts/build-contract-api.mjs",
   "note": "The third of three independent witnesses of the contract chain head (audit N-24). This copy is immutable once published: npm does not allow a version to be republished, so a host that rewrites the chain cannot reach back and change it. If this head disagrees with the one the host serves for this version, do not trust the host. Present from 2.5.0 onward; earlier releases were published before this API existed.",
   "protocol": "NAC3",
-  "published_at": "2026-10-26",
-  "runtime_version": "2.5.1",
+  "published_at": "2026-10-27",
+  "runtime_version": "2.5.2",
   "surface": "contract-head-witness",
   "witnesses": {
     "host": "api/index.json served by the web host (chain_head)",

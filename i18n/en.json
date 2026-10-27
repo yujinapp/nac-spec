@@ -121,7 +121,7 @@
  "hero.t2": "· Framework-neutral",
  "hero.t3": "· Ten locales",
  "hero.t4": "· Immutable runtime path, verified by hash",
- "hero.version": "v2.5.1 · stable",
+ "hero.version": "v2.5.2 · stable",
  "limits.eyebrow": "What it does not cover",
  "limits.gov.link": "Read it in Governance, below →",
  "limits.h2": "NAC3 names what lives in the DOM. Everything here is outside that line.",
@@ -265,5 +265,5 @@
  "what.h2": "A button you already shipped, with three extra attributes.",
  "what.lede": "That is the whole adoption cost of one element. No framework to adopt, no build step to add, no runtime to rewrite your app around.",
  "what.runtime.h": "Add the runtime once — and pin it",
- "what.runtime.p": "Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.1/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning."
+ "what.runtime.p": "Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.2/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning."
 }

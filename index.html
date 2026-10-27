@@ -197,7 +197,7 @@ body[data-chat-open="1"] .chat{transform:translateX(0)}
   <div class="kanji-big">楽</div>
   <p class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Native Agent Contract</span></p>
   <h1 data-i18n-html="hero.h1">Stable names for the things an <em>agent</em> wants to act on.</h1>
-  <p class="vbadge"><span data-i18n="hero.version">v2.5.1 &middot; stable</span></p>
+  <p class="vbadge"><span data-i18n="hero.version">v2.5.2 &middot; stable</span></p>
   <p class="lede" data-i18n="hero.lede">NAC3 is a small, free contract that lets a web UI you already shipped be driven by AI assistants, voice runners, RPA bots, accessibility tools and test runners — by name, not by brittle selectors. You add a few HTML attributes. Agents resolve names, click buttons, fill fields and switch tabs the way a person would, and the contract itself is published as data, with a hash you recompute.</p>
   <div class="cta-row">
     <a class="btn btn-p" href="SPEC.md" data-nac-id="nac_landing.cta.spec" data-nac-role="action" data-nac-action="open_spec" data-i18n="hero.cta1">Read the spec →</a>
@@ -231,12 +231,12 @@ body[data-chat-open="1"] .chat{transform:translateX(0)}
 await NAC.click(<span class="string">'invoice.save'</span>);              <span class="comment">// by id</span>
 await NAC.click_by_verb(<span class="string">'invoice'</span>, <span class="string">'save'</span>);  <span class="comment">// by verb</span></code></pre>
   <h3 style="font-size:1rem;margin:1.6rem 0 .5rem" data-i18n="what.runtime.h">Add the runtime once — and pin it</h3>
-  <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.1/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
+  <p class="lede" style="font-size:.93rem" data-i18n-html="what.runtime.p">Production pins the immutable path and lets the browser verify the bytes. <code>js/2.5.2/nac.js</code> never changes; <code>js/nac.js</code> is a moving alias for trying things, never for pinning.</p>
 <pre><code>npm install @nac3/runtime
 
 <span class="comment">// or via CDN, pinned and verified:</span>
-&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.1/nac.js"</span>
-        integrity=<span class="string">"sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS"</span>
+&lt;script src=<span class="string">"https://yujin.app/nac-spec/js/2.5.2/nac.js"</span>
+        integrity=<span class="string">"sha384-p/YMdtVCHBybg8MB5eTPL8LWaVQWLXARVsZtNp8eJ5Jeute2zIrmItiIDKfed/CE"</span>
         crossorigin=<span class="string">"anonymous"</span>&gt;&lt;/script&gt;
 
 <span class="comment"># do not take that hash on faith — recompute it. One line, no dependencies:</span>
@@ -323,8 +323,8 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   <div class="grid g4">
     <div class="card"><span class="tag teal" data-i18n="api.c1.t">directory</span><h4><code>api/index.json</code></h4><p data-i18n="api.c1.p">What exists, with the append-only hash record.</p></div>
     <div class="card"><span class="tag teal" data-i18n="api.c2.t">pointers</span><h4><code>api/latest.json</code></h4><p data-i18n="api.c2.p">Which version is stable and which is preview.</p></div>
-    <div class="card"><span class="tag teal" data-i18n="api.c3.t">contract</span><h4><code>api/v/2.5.1/contract.json</code></h4><p data-i18n="api.c3.p">Roles, attributes, verbs, events.</p></div>
-    <div class="card"><span class="tag teal" data-i18n="api.c4.t">levels</span><h4><code>api/v/2.5.1/levels.json</code></h4><p data-i18n="api.c4.p">Conformance levels and what each one requires. The finding catalogue sits next to it.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c3.t">contract</span><h4><code>api/v/2.5.2/contract.json</code></h4><p data-i18n="api.c3.p">Roles, attributes, verbs, events.</p></div>
+    <div class="card"><span class="tag teal" data-i18n="api.c4.t">levels</span><h4><code>api/v/2.5.2/levels.json</code></h4><p data-i18n="api.c4.p">Conformance levels and what each one requires. The finding catalogue sits next to it.</p></div>
   </div>
 </div></section>
 
@@ -630,7 +630,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
   </div>
 </aside>
 
-<script src="js/2.5.1/nac.js" integrity="sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS" crossorigin="anonymous"></script>
+<script src="js/2.5.2/nac.js" integrity="sha384-p/YMdtVCHBybg8MB5eTPL8LWaVQWLXARVsZtNp8eJ5Jeute2zIrmItiIDKfed/CE" crossorigin="anonymous"></script>
 <script src="js/nac-v2-extensions.js" integrity="sha384-Hjb/hqiIlC2AGwxRnZTaqAzoaaw9icM2TuJJgB+ozEQIcirMxk+d1QPmIAhdyfUK" crossorigin="anonymous"></script>
 <script src="js/nac-chat-client.js" integrity="sha384-HVIEwtZGJj4lWZuBaYPkm83+TW0sn24RG/vqIC/GKKiJht79BGabWvlWT8+s0fkR" crossorigin="anonymous"></script>
 <script src="i18n.js" defer></script>
@@ -665,7 +665,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
 
     NAC.register({
       plugin_slug: 'nac_landing',
-      version: '2.5.1',
+      version: '2.5.2',
       nac_version: '2.5',
       elements: [
         { id: 'nac_landing.topbar', role: 'region',
@@ -771,7 +771,7 @@ node -e "const c=require('crypto'),f=require('fs');console.log('sha384-'+c.creat
        not declared is invisible to an agent that does what the protocol says. */
     NAC.register({
       plugin_slug: 'chat',
-      version: '2.5.1',
+      version: '2.5.2',
       nac_version: '2.5',
       elements: [
         { id: 'chat.lang', role: 'field',

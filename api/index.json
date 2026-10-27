@@ -1,6 +1,6 @@
 {
   "api_schema": 1,
-  "chain_head": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
+  "chain_head": "sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk",
   "entries": [
     {
       "channel": "prerelease",
@@ -79,9 +79,35 @@
       "published_at": "2026-10-26",
       "runtime_sha384": "sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS",
       "version": "2.5.1"
+    },
+    {
+      "channel": "stable",
+      "entry_sha384": "sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk",
+      "files": [
+        {
+          "bytes": 20595,
+          "path": "api/v/2.5.2/contract.json",
+          "sha384": "sha384-FA2JSkZzcgIHZtDZyfUfiSvIXVVzNz2X31Qj9E0T5iVZXEKhjbLy/mKG1e1g8yBV"
+        },
+        {
+          "bytes": 15055,
+          "path": "api/v/2.5.2/findings.json",
+          "sha384": "sha384-nrtgvPPD2xpmehXt1ni4uZlDs7fHH8XTA5z2W/B5niBLJK1cZZrPQXQuEi72NxRa"
+        },
+        {
+          "bytes": 10397,
+          "path": "api/v/2.5.2/levels.json",
+          "sha384": "sha384-AL5yEQs4w1mXrnp+tgRSC5LCJln+Gl/nDM7zlBvlg2MZgY4uk3MFJohETnwsFJlO"
+        }
+      ],
+      "generated_at_commit": "44e23c6b6df4eeca1454e9f630e41c6ffad57fde",
+      "prev_entry_sha384": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
+      "published_at": "2026-10-27",
+      "runtime_sha384": "sha384-p/YMdtVCHBybg8MB5eTPL8LWaVQWLXARVsZtNp8eJ5Jeute2zIrmItiIDKfed/CE",
+      "version": "2.5.2"
     }
   ],
-  "entry_count": 3,
+  "entry_count": 4,
   "generated_by": "scripts/build-contract-api.mjs",
   "policy": {
     "append_only": true,

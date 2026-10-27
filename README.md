@@ -4,13 +4,16 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-2.5.1_stable-green)](https://yujin.app/nac-spec/)
+[![Status: stable](https://img.shields.io/badge/status-2.5.2_stable-green)](https://yujin.app/nac-spec/)
 [![Spec: v2.5](https://img.shields.io/badge/spec-v2.5-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 [![Tests: passing](https://img.shields.io/badge/tests-386_passing-success)](runtime/test/)
 
+> **2.5.2 shipped** (2026-10-27) -- a patch release with no runtime behaviour change. The nine translations of the specification are **complete**: 83 of 83 sections, up from 34, produced from a per-locale unit store instead of being hand-kept files from May. They stay **non-normative** -- the English text governs -- and section 4.3.2 was rewritten to say so without calling them "partial", which the completion made false, and to state the rule the decision required: a translation that is behind the English never blocks the publication of the English. The 2.5.1 note below is the release before this one.
+>
 > **2.5.1 shipped** (2026-10-26) -- a patch release with two surface fixes and no runtime behaviour change. The SPEC header stopped contradicting itself: its Status line restated a prerelease as the promoted version, which the promotion to stable falsified, and a new slot in the version lock keeps that line from ever naming a version again. And the specification now declares, in section 4.3.2, that the English text is normative and the nine published translations are not -- each of them says so at the top, in its own language, with the revision it translates and how much of the current text it carries. The 2.5.0 entry below is the release that completed the v2.5 line.
+>
 > Unifies the two parallel dev lines that diverged during May 2026 and
 > establishes `yujinapp/nac-spec` as the SOLE source of truth for NAC3
 > from this commit forward. Adds **V25-01** plugin extension contract
@@ -84,6 +87,19 @@ The voice ad is the visceral case. The same five attributes also drive meeting s
 | Your app | [Bounty program](https://yujin.app/bounty) -- $200-500 per OSS PR | -- |
 
 ## Status
+
+- **2.5.2** -- shipped 2026-10-27, **stable**. Patch release, no
+  runtime behaviour change. The nine SPEC translations went from 34 of
+  83 sections to 83 of 83 (decision D-05, option B), produced from a
+  per-locale unit store keyed by the sha256 of each English unit, so a
+  later English edit moves only the units it touches -- measured on the
+  real document: 281 of 283 units untouched when one paragraph changes.
+  Section 4.3.2 stopped calling them partial, which the completion made
+  false, and now states the no-veto rule: a stale translation never
+  blocks the publication of the English. The lock is
+  `scripts/test-spec-translations.mjs`, which compares every identifier,
+  link, URL, number, table row, list item and section number against the
+  English without reading the prose.
 
 - **2.5.1** -- shipped 2026-10-26, **stable**. Patch release, no
   runtime behaviour change. Two published surfaces that contradicted

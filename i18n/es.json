@@ -120,7 +120,7 @@
  "hero.t2": "· Neutral respecto del marco de trabajo",
  "hero.t3": "· Diez idiomas",
  "hero.t4": "· Ruta inmutable del runtime, verificada por huella",
- "hero.version": "v2.5.1 · estable",
+ "hero.version": "v2.5.2 · estable",
  "limits.eyebrow": "Lo que no cubre",
  "limits.gov.link": "Leerlo en Gobernanza, más abajo →",
  "limits.h2": "NAC3 nombra lo que vive en el DOM. Todo lo que sigue queda afuera de esa línea.",
@@ -264,5 +264,5 @@
  "what.h2": "Un botón que ya publicaste, con tres atributos más.",
  "what.lede": "Ese es todo el costo de adopción de un elemento. Ningún marco de trabajo que adoptar, ningún paso de compilación que agregar, ningún runtime alrededor del cual reescribir tu aplicación.",
  "what.runtime.h": "Agregá el runtime una vez, y fijalo",
- "what.runtime.p": "En producción se fija la ruta inmutable y se deja que el navegador verifique los bytes. <code>js/2.5.1/nac.js</code> nunca cambia; <code>js/nac.js</code> es un alias móvil para probar cosas, nunca para fijar."
+ "what.runtime.p": "En producción se fija la ruta inmutable y se deja que el navegador verifique los bytes. <code>js/2.5.2/nac.js</code> nunca cambia; <code>js/nac.js</code> es un alias móvil para probar cosas, nunca para fijar."
 }

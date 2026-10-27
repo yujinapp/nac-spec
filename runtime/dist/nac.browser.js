@@ -6,7 +6,7 @@
    =====================================================================
 
    AUTHORITATIVE VERSION CONSTANT: see the global.NAC export at the
-   bottom of this file. `version: '2.5.1', spec_version: '2.5'`
+   bottom of this file. `version: '2.5.2', spec_version: '2.5'`
    is the normative declaration. The dated changelog sections below are
    historical notes; if they ever drift from the export, the export
    wins.
@@ -7921,7 +7921,7 @@
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.1',
+    version:      '2.5.2',
     spec_version: '2.5',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,

@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: pt
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**Versão:** 2.5.1 (estável -- a superfície v2.5 completa: narrate, context+tree, expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**Versão:** 2.5.2 (estável -- a superfície v2.5 completa: narrate, context+tree, expect+diff)
 **Status:** Versão estável. A dist-tag `latest` do npm aponta para cá; a seção 9.1 diz o que isso garante e o que uma pré-versão não garante. Este documento declara sua versão em exatamente um lugar, a linha acima. Os RFCs publicados e suas evidências de Camada 2 + Camada 3 estão listados em `README.md` e `runtime/CHANGELOG.md`.
 **Licença:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -196,14 +196,24 @@ O texto normativo do NAC3 é o **inglês**: o `SPEC.md` na raiz do
 repositório da especificação, renderizado em
 `https://yujin.app/nac-spec/SPEC.html`.
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 A especificação também é publicada como traduções automáticas em
 `i18n/<locale>/SPEC.md`. Essas traduções são **não normativas**. Cada
-uma é parcial e cada uma fica congelada na revisão de origem que o seu
-próprio banner declara; o banner é obrigatório, e uma tradução publicada
-sem banner é um defeito da publicação, não da tradução. Quando uma
-tradução e o texto em inglês divergem, vale o texto em inglês, e uma
-afirmação de conformidade é uma afirmação contra o texto em inglês.
+uma declara, num banner que o leitor vê e num frontmatter legível por
+máquina, qual revisão do inglês ela traduz e quanto dela cobre; o banner
+é obrigatório, e uma tradução publicada sem banner é um defeito da
+publicação, não da tradução. Quando uma tradução e o texto em inglês
+divergem, vale o texto em inglês, e uma afirmação de conformidade é uma
+afirmação contra o texto em inglês.
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+Uma tradução atrasada em relação ao inglês **nunca bloqueia a
+publicação do inglês**. O texto normativo sai quando está pronto; uma
+tradução velha é reportada, unidade por unidade, e a versão vai ao ar.
+Nove artefatos automáticos não têm veto sobre o documento que traduzem.
+Até a 2.5.1 as nove cobriam 34 das 83 seções e nada dizia isso;
+agora elas são produzidas a partir de um repositório por idioma, e o
+procedimento é `docs/TRANSLATION_PASS.md`.
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. API pública

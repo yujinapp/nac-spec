@@ -1,12 +1,12 @@
 {
   "api_schema": 1,
-  "chain_head": "sha384-IEi9Sxq1e04WqL4ho3+BiKq6qXWJhYEkCKHfspmO9EUnPV9TiOD1dOTurNGc2pn9",
+  "chain_head": "sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk",
   "generated_by": "scripts/build-contract-api.mjs",
   "mirrored_channel": "stable",
-  "mirrored_in_api_latest": "2.5.1",
-  "note": "api/latest/ mirrors 2.5.1 (stable). Every mirrored artefact declares its own channel, so a consumer that requires a stable contract can refuse a prerelease without reading this file. Old versions are never purged: pin api/v/<version>/ for a byte-stable contract.",
+  "mirrored_in_api_latest": "2.5.2",
+  "note": "api/latest/ mirrors 2.5.2 (stable). Every mirrored artefact declares its own channel, so a consumer that requires a stable contract can refuse a prerelease without reading this file. Old versions are never purged: pin api/v/<version>/ for a byte-stable contract.",
   "prerelease": "2.5.0-alpha.5",
   "protocol": "NAC3",
-  "stable": "2.5.1",
+  "stable": "2.5.2",
   "surface": "latest"
 }

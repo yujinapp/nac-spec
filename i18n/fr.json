@@ -125,7 +125,7 @@
  "hero.t2": "· Neutre vis-à-vis du cadre",
  "hero.t3": "· Dix langues",
  "hero.t4": "· Chemin immuable du runtime, vérifié par empreinte",
- "hero.version": "v2.5.1 · stable",
+ "hero.version": "v2.5.2 · stable",
  "limits.eyebrow": "Ce qu'il ne couvre pas",
  "limits.gov.link": "À lire dans Gouvernance, plus bas →",
  "limits.h2": "NAC3 nomme ce qui vit dans le DOM. Tout ce qui suit est en dehors de cette ligne.",
@@ -269,5 +269,5 @@
  "what.h2": "Un bouton que vous avez déjà livré, avec trois attributs de plus.",
  "what.lede": "C'est tout le coût d'adoption d'un élément. Aucun cadre à adopter, aucune étape de compilation à ajouter, aucun runtime autour duquel réécrire votre application.",
  "what.runtime.h": "Ajoutez le runtime une fois, et figez-le",
- "what.runtime.p": "En production on fige le chemin immuable et on laisse le navigateur vérifier les octets. <code>js/2.5.1/nac.js</code> ne change jamais ; <code>js/nac.js</code> est un alias mobile pour essayer, jamais pour figer."
+ "what.runtime.p": "En production on fige le chemin immuable et on laisse le navigateur vérifier les octets. <code>js/2.5.2/nac.js</code> ne change jamais ; <code>js/nac.js</code> est un alias mobile pour essayer, jamais pour figer."
 }

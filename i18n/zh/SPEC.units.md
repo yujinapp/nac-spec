@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: zh
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**版本:** 2.5.1 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**版本:** 2.5.2 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff)
 **状态:** 稳定发布。npm 的 dist-tag `latest` 指向这里; 9.1 节说明它保证什么、预发布版不保证什么。本文档只在一个地方写明自己的版本, 就是上面那一行。已发布的 RFC 及其第 2 层 + 第 3 层证据列在 `README.md` 和 `runtime/CHANGELOG.md` 中。
 **许可:** Apache-2.0
 **编者:** Yujin (yujin.app)
@@ -177,12 +177,19 @@ NAC3 中没有任何内容强制一个实现用十种语言发布自己的文档
 NAC3 的规范性文本是**英文**的那一份: 规范仓库根目录下的 `SPEC.md`,
 渲染在 `https://yujin.app/nac-spec/SPEC.html`。
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 本规范也以机器翻译的形式发布在 `i18n/<locale>/SPEC.md` 下。那些译文
-**不具规范性**。每一份都是部分的, 每一份都冻结在它自己的提示横幅所
-声明的源修订上; 横幅是必须的, 而一份没有横幅的已发布译文是发布的缺陷,
-不是翻译的缺陷。当译文与英文文本不一致时, 以英文文本为准, 而一项合规
-声明是针对英文文本的声明。
+**不具规范性**。每一份都在读者看得见的横幅里, 以及在机器可读的前置数据
+里, 声明它翻译的是英文的哪一个修订, 以及覆盖了其中多少; 横幅是必须的,
+而一份没有横幅的已发布译文是发布的缺陷, 不是翻译的缺陷。当译文与英文
+文本不一致时, 以英文文本为准, 而一项合规声明是针对英文文本的声明。
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+落后于英文的译文**绝不阻挡英文的发布**。规范性文本准备好了就发布; 过时的
+译文会被逐条报告, 而版本照常发出。九个机器产物对它们所翻译的文档没有
+否决权。直到 2.5.1 为止, 这九份覆盖 83 节中的 34 节, 而没有任何地方说明
+这一点; 现在它们由每种语言各自的存储生成, 流程见
+`docs/TRANSLATION_PASS.md`。
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. 公开 API

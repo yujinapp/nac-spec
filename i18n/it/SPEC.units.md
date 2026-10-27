@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: it
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**Versione:** 2.5.1 (stabile -- la superficie v2.5 completa: narrate, context+tree, expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**Versione:** 2.5.2 (stabile -- la superficie v2.5 completa: narrate, context+tree, expect+diff)
 **Stato:** Versione stabile. Il dist-tag npm `latest` punta qui; la sezione 9.1 dice che cosa garantisce e che cosa non garantisce una prerelease. Questo documento dichiara la propria versione in esattamente un posto, la riga qui sopra. Gli RFC pubblicati e le loro prove di Livello 2 + Livello 3 sono elencati in `README.md` e `runtime/CHANGELOG.md`.
 **Licenza:** Apache-2.0
 **Curatore:** Yujin (yujin.app)
@@ -204,15 +204,25 @@ Il testo normativo di NAC3 è quello **inglese**: il `SPEC.md` nella
 radice del repository della specifica, reso in
 `https://yujin.app/nac-spec/SPEC.html`.
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 La specifica è pubblicata anche come traduzioni automatiche sotto
-`i18n/<locale>/SPEC.md`. Quelle traduzioni sono **non normative**.
-Ognuna è parziale e ognuna è congelata alla revisione di origine che il
-suo stesso cartello dichiara; il cartello è obbligatorio, e una
-traduzione pubblicata che non porta il cartello è un difetto della
-pubblicazione, non della traduzione. Quando una traduzione e il testo
-inglese non concordano, vale il testo inglese, e una dichiarazione di
-conformità è una dichiarazione rispetto al testo inglese.
+`i18n/<locale>/SPEC.md`. Quelle traduzioni sono **non normative**. Ognuna
+dichiara, in un cartello che il lettore vede e in un frontmatter
+leggibile da una macchina, quale revisione inglese traduce e quanta ne
+copre; il cartello è obbligatorio, e una traduzione pubblicata senza
+cartello è un difetto della pubblicazione, non della traduzione. Quando
+una traduzione e il testo inglese non concordano, vale il testo inglese,
+e una dichiarazione di conformità è una dichiarazione rispetto al testo
+inglese.
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+Una traduzione in ritardo rispetto all'inglese **non blocca mai la
+pubblicazione dell'inglese**. Il testo normativo esce quando è pronto;
+una traduzione vecchia viene segnalata, unità per unità, e la versione
+parte. Nove artefatti automatici non hanno potere di veto sul documento
+che traducono. Fino alla 2.5.1 le nove coprivano 34 delle 83 sezioni e
+niente lo diceva; ora vengono prodotte da un archivio per lingua, e la
+procedura è `docs/TRANSLATION_PASS.md`.
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. API pubblica

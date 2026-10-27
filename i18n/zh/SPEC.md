@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: zh
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **机器翻译，非规范性文本。** 本文翻译的是 2026-10-27 的英文版 (NAC3 v2.5.1)，覆盖当前原文的 83 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。
+> **机器翻译，非规范性文本。** 本文翻译的是 2026-10-27 的英文版 (NAC3 v2.5.2)，覆盖当前原文的 83 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**版本:** 2.5.1 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff)
+**版本:** 2.5.2 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff)
 **状态:** 稳定发布。npm 的 dist-tag `latest` 指向这里; 9.1 节说明它保证什么、预发布版不保证什么。本文档只在一个地方写明自己的版本, 就是上面那一行。已发布的 RFC 及其第 2 层 + 第 3 层证据列在 `README.md` 和 `runtime/CHANGELOG.md` 中。
 **许可:** Apache-2.0
 **编者:** Yujin (yujin.app)
@@ -202,10 +202,16 @@ NAC3 的规范性文本是**英文**的那一份: 规范仓库根目录下的 `S
 渲染在 `https://yujin.app/nac-spec/SPEC.html`。
 
 本规范也以机器翻译的形式发布在 `i18n/<locale>/SPEC.md` 下。那些译文
-**不具规范性**。每一份都是部分的, 每一份都冻结在它自己的提示横幅所
-声明的源修订上; 横幅是必须的, 而一份没有横幅的已发布译文是发布的缺陷,
-不是翻译的缺陷。当译文与英文文本不一致时, 以英文文本为准, 而一项合规
-声明是针对英文文本的声明。
+**不具规范性**。每一份都在读者看得见的横幅里, 以及在机器可读的前置数据
+里, 声明它翻译的是英文的哪一个修订, 以及覆盖了其中多少; 横幅是必须的,
+而一份没有横幅的已发布译文是发布的缺陷, 不是翻译的缺陷。当译文与英文
+文本不一致时, 以英文文本为准, 而一项合规声明是针对英文文本的声明。
+
+落后于英文的译文**绝不阻挡英文的发布**。规范性文本准备好了就发布; 过时的
+译文会被逐条报告, 而版本照常发出。九个机器产物对它们所翻译的文档没有
+否决权。直到 2.5.1 为止, 这九份覆盖 83 节中的 34 节, 而没有任何地方说明
+这一点; 现在它们由每种语言各自的存储生成, 流程见
+`docs/TRANSLATION_PASS.md`。
 
 ---
 

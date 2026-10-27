@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: fr
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **Traduction automatique, non normative.** Elle traduit la version anglaise telle qu'elle était le 2026-10-27 (NAC3 v2.5.1) et couvre 83 des 83 sections de l'original actuel. Le texte normatif est l'anglais : en cas de divergence entre cette traduction et l'anglais, l'anglais prévaut.
+> **Traduction automatique, non normative.** Elle traduit la version anglaise telle qu'elle était le 2026-10-27 (NAC3 v2.5.2) et couvre 83 des 83 sections de l'original actuel. Le texte normatif est l'anglais : en cas de divergence entre cette traduction et l'anglais, l'anglais prévaut.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**Version :** 2.5.1 (stable -- la surface v2.5 complète : narrate, context+tree, expect+diff)
+**Version :** 2.5.2 (stable -- la surface v2.5 complète : narrate, context+tree, expect+diff)
 **Statut :** Version stable. Le dist-tag npm `latest` pointe ici ; la section 9.1 énonce ce que cela garantit et ce qu'une préversion ne garantit pas. Ce document énonce sa version en exactement un endroit, la ligne ci-dessus. Les RFC publiés et leurs preuves de Couche 2 + Couche 3 sont listés dans `README.md` et `runtime/CHANGELOG.md`.
 **Licence :** Apache-2.0
 **Éditeur :** Yujin (yujin.app)
@@ -229,12 +229,22 @@ du dépôt de la spécification, rendu à
 
 La spécification est aussi publiée sous forme de traductions
 automatiques dans `i18n/<locale>/SPEC.md`. Ces traductions sont **non
-normatives**. Chacune est partielle et chacune est figée à la révision
-source que sa propre bannière déclare ; la bannière est obligatoire, et
+normatives**. Chacune déclare, dans une bannière que le lecteur voit et
+dans un frontmatter lisible par machine, quelle révision anglaise elle
+traduit et quelle part elle en couvre ; la bannière est obligatoire, et
 une traduction publiée sans bannière est un défaut de la publication,
 pas de la traduction. Lorsqu'une traduction et le texte anglais
 divergent, c'est le texte anglais qui fait foi, et une revendication de
 conformité est une revendication face au texte anglais.
+
+Une traduction en retard sur l'anglais **ne bloque jamais la
+publication de l'anglais**. Le texte normatif sort quand il est prêt ;
+une traduction périmée est signalée, unité par unité, et la version
+part. Neuf artefacts automatiques n'ont pas de droit de veto sur le
+document qu'ils traduisent. Jusqu'à la 2.5.1 les neuf couvraient 34 des
+83 sections et rien ne le disait ; elles sont désormais produites depuis
+un magasin par locale, et la procédure est
+`docs/TRANSLATION_PASS.md`.
 
 ---
 

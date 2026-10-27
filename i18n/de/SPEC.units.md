@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: de
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**Version:** 2.5.1 (stabil -- die vollständige v2.5-Oberfläche: narrate, context+tree, expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**Version:** 2.5.2 (stabil -- die vollständige v2.5-Oberfläche: narrate, context+tree, expect+diff)
 **Status:** Stabile Veröffentlichung. Der npm-dist-tag `latest` zeigt hierher; Abschnitt 9.1 sagt, was das garantiert und was eine Vorabversion nicht garantiert. Dieses Dokument nennt seine Version an genau einer Stelle, in der Zeile darüber. Die veröffentlichten RFCs und ihre Nachweise auf Schicht 2 + Schicht 3 sind in `README.md` und `runtime/CHANGELOG.md` aufgeführt.
 **Lizenz:** Apache-2.0
 **Herausgeber:** Yujin (yujin.app)
@@ -208,16 +208,26 @@ Der normative Text von NAC3 ist der **englische**: die `SPEC.md` im
 Wurzelverzeichnis des Spezifikations-Repositoriums, gerendert unter
 `https://yujin.app/nac-spec/SPEC.html`.
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 Die Spezifikation wird außerdem als maschinelle Übersetzung unter
 `i18n/<locale>/SPEC.md` veröffentlicht. Diese Übersetzungen sind
-**nicht normativ**. Jede ist unvollständig, und jede ist auf dem
-Quellstand eingefroren, den ihr eigener Hinweisbanner angibt; der
-Banner ist Pflicht, und eine veröffentlichte Übersetzung ohne Banner
-ist ein Mangel der Veröffentlichung, nicht der Übersetzung. Wo eine
-Übersetzung und der englische Text voneinander abweichen, gilt der
-englische Text, und eine Konformitätsaussage ist eine Aussage gegenüber
-dem englischen Text.
+**nicht normativ**. Jede gibt in einem Banner, das ein Leser sieht, und
+in maschinenlesbarem Frontmatter an, welche englische Fassung sie
+übersetzt und wie viel davon sie abdeckt; der Banner ist Pflicht, und
+eine veröffentlichte Übersetzung ohne Banner ist ein Mangel der
+Veröffentlichung, nicht der Übersetzung. Wo eine Übersetzung und der
+englische Text voneinander abweichen, gilt der englische Text, und eine
+Konformitätsaussage ist eine Aussage gegenüber dem englischen Text.
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+Eine Übersetzung, die hinter dem Englischen liegt, **blockiert niemals
+die Veröffentlichung des Englischen**. Der normative Text erscheint,
+wenn er fertig ist; eine veraltete Übersetzung wird je Einheit gemeldet,
+und die Veröffentlichung geht hinaus. Neun maschinelle Artefakte haben
+kein Vetorecht über das Dokument, das sie übersetzen. Bis einschließlich 2.5.1 deckten
+die neun 34 von 83 Abschnitten ab, und nichts sagte das; sie werden
+jetzt aus einem Speicher pro Locale erzeugt, und das Verfahren steht in
+`docs/TRANSLATION_PASS.md`.
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. Öffentliche API

@@ -775,9 +775,9 @@
   "generated_from": {
     "runtime_bytes": 349103,
     "runtime_path": "js/nac.js",
-    "runtime_sha384": "sha384-KLkfuJYyjnQ6lnjRKvaHKd8X2LydR7U/cCmL0uiTzID4Pz5dn8wkOhIOwHrgqZcS",
+    "runtime_sha384": "sha384-p/YMdtVCHBybg8MB5eTPL8LWaVQWLXARVsZtNp8eJ5Jeute2zIrmItiIDKfed/CE",
     "spec_path": "SPEC.md",
-    "spec_sha384": "sha384-3zJDEyJIWnCLrquXuecWlIlCZAdR//xc5fniR9WDDSC53cvlVWxGtQlqbIOMENNF"
+    "spec_sha384": "sha384-5LzdfeVBmtV1qEisjJakagOauZamTSw0LsCzJ1r31nYPaSeCRWUOQJEcNzv9DKQD"
   },
   "locales": {
     "note": "Every label_i18n MUST cover all 10 locales (SPEC.md section 4.3). This is a requirement on the adopter manifest, not on the language of the specification.",
@@ -924,5 +924,5 @@
   ],
   "spec_version": "2.5",
   "surface": "contract",
-  "version": "2.5.1"
+  "version": "2.5.2"
 }

@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: ja
 source: SPEC.md
-source_version: 2.5.1
+source_version: 2.5.2
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 5e88280f4232 | 1 NAC3 -- Native Agent Contract | prose -->
-**バージョン:** 2.5.1 (安定版 -- v2.5 の全面: narrate、context+tree、expect+diff)
+<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
+**バージョン:** 2.5.2 (安定版 -- v2.5 の全面: narrate、context+tree、expect+diff)
 **状態:** 安定リリース。npm の dist-tag `latest` はここを指します。それが何を保証し、プレリリースが何を保証しないかは 9.1 節に書いてあります。この文書は自身のバージョンをちょうど一箇所、すぐ上の行だけに書きます。公開済みの RFC とその第 2 層 + 第 3 層の証跡は `README.md` と `runtime/CHANGELOG.md` に一覧があります。
 **ライセンス:** Apache-2.0
 **編集者:** Yujin (yujin.app)
@@ -196,13 +196,21 @@ NAC-permissive なランタイムは、後方互換のために未知の役割�
 NAC3 の規範となる本文は**英語**です。仕様リポジトリの直下にある
 `SPEC.md` で、`https://yujin.app/nac-spec/SPEC.html` に描画されます。
 
-<!-- u 82cce4eb7161 | 11 4.3.2 Normative language of this specification | prose -->
+<!-- u 5ac523ec3a00 | 11 4.3.2 Normative language of this specification | prose -->
 仕様は `i18n/<locale>/SPEC.md` の下に機械翻訳としても公開されます。
-それらの翻訳は**規範ではありません**。どれも部分的で、どれも自分の
-掲示が宣言する原文の版に凍結されています。掲示は必須であり、掲示を
-持たない公開済みの翻訳は、翻訳の欠陥ではなく公開の欠陥です。翻訳と
-英語の本文が食い違う場合は英語の本文が優先し、適合の主張は英語の
-本文に対する主張です。
+それらの翻訳は**規範ではありません**。どれも、読者が見る掲示と、機械が
+読める前付けの両方で、英語のどの版を訳したのか、そのどれだけを覆って
+いるのかを宣言します。掲示は必須であり、掲示を持たない公開済みの翻訳は、
+翻訳の欠陥ではなく公開の欠陥です。翻訳と英語の本文が食い違う場合は英語の
+本文が優先し、適合の主張は英語の本文に対する主張です。
+
+<!-- u 22e3daff7a29 | 11 4.3.2 Normative language of this specification | prose -->
+英語に遅れている翻訳が、**英語の公開を止めることは決してありません**。
+規範となる本文は用意ができたときに出ます。古い翻訳は単位ごとに報告され、
+そのうえで公開は進みます。九つの機械的な産物が、自分の訳す文書に対して
+拒否権を持つことはありません。2.5.1 まで、九つは 83 節のうち 34 節を
+覆っていて、そのことを何も言っていませんでした。今は言語ごとの蓄えから
+作られ、その手順は `docs/TRANSLATION_PASS.md` にあります。
 
 <!-- u a168e1e445ba | 12 5. Public API | heading -->
 ## 5. 公開 API

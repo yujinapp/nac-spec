@@ -1,6 +1,6 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.1 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
+**Version:** 2.5.2 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
 **Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states what that guarantees and what a prerelease does not. This document states its version in exactly one place, the line above. The shipped RFCs and their Layer 2 + Layer 3 evidence are listed in `README.md` and `runtime/CHANGELOG.md`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -194,11 +194,20 @@ of the specification repository, rendered at
 
 The specification is also published as machine translations under
 `i18n/<locale>/SPEC.md`. Those translations are **non-normative**. Each
-one is partial and each is frozen at the source revision its own banner
-declares; the banner is required, and a published translation that
+one declares, in a banner a reader sees and in machine-readable
+frontmatter, which English revision it translates and how much of it it
+covers; the banner is required, and a published translation that
 carries no banner is a defect of the publication, not a translation.
 Where a translation and the English text disagree, the English text
 governs, and a conformance claim is a claim against the English text.
+
+A translation that is behind the English **never blocks the publication
+of the English**. The normative text ships when it is ready; a stale
+translation is reported, per unit, and the release goes out. Nine
+machine artefacts do not hold a veto over the document they translate.
+Through 2.5.1 the nine covered 34 of the 83 sections and nothing said
+so; they are produced from a per-locale store now, and the procedure is
+`docs/TRANSLATION_PASS.md`.
 
 ---
 

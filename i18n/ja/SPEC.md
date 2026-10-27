@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: ja
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **機械翻訳であり、規範ではありません。** 2026-10-27 時点の英語版 (NAC3 v2.5.1) を翻訳したもので、現在の原文の 83 / 83 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。
+> **機械翻訳であり、規範ではありません。** 2026-10-27 時点の英語版 (NAC3 v2.5.2) を翻訳したもので、現在の原文の 83 / 83 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**バージョン:** 2.5.1 (安定版 -- v2.5 の全面: narrate、context+tree、expect+diff)
+**バージョン:** 2.5.2 (安定版 -- v2.5 の全面: narrate、context+tree、expect+diff)
 **状態:** 安定リリース。npm の dist-tag `latest` はここを指します。それが何を保証し、プレリリースが何を保証しないかは 9.1 節に書いてあります。この文書は自身のバージョンをちょうど一箇所、すぐ上の行だけに書きます。公開済みの RFC とその第 2 層 + 第 3 層の証跡は `README.md` と `runtime/CHANGELOG.md` に一覧があります。
 **ライセンス:** Apache-2.0
 **編集者:** Yujin (yujin.app)
@@ -221,11 +221,18 @@ NAC3 の規範となる本文は**英語**です。仕様リポジトリの直�
 `SPEC.md` で、`https://yujin.app/nac-spec/SPEC.html` に描画されます。
 
 仕様は `i18n/<locale>/SPEC.md` の下に機械翻訳としても公開されます。
-それらの翻訳は**規範ではありません**。どれも部分的で、どれも自分の
-掲示が宣言する原文の版に凍結されています。掲示は必須であり、掲示を
-持たない公開済みの翻訳は、翻訳の欠陥ではなく公開の欠陥です。翻訳と
-英語の本文が食い違う場合は英語の本文が優先し、適合の主張は英語の
-本文に対する主張です。
+それらの翻訳は**規範ではありません**。どれも、読者が見る掲示と、機械が
+読める前付けの両方で、英語のどの版を訳したのか、そのどれだけを覆って
+いるのかを宣言します。掲示は必須であり、掲示を持たない公開済みの翻訳は、
+翻訳の欠陥ではなく公開の欠陥です。翻訳と英語の本文が食い違う場合は英語の
+本文が優先し、適合の主張は英語の本文に対する主張です。
+
+英語に遅れている翻訳が、**英語の公開を止めることは決してありません**。
+規範となる本文は用意ができたときに出ます。古い翻訳は単位ごとに報告され、
+そのうえで公開は進みます。九つの機械的な産物が、自分の訳す文書に対して
+拒否権を持つことはありません。2.5.1 まで、九つは 83 節のうち 34 節を
+覆っていて、そのことを何も言っていませんでした。今は言語ごとの蓄えから
+作られ、その手順は `docs/TRANSLATION_PASS.md` にあります。
 
 ---
 

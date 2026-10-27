@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.5.2 -- 2026-10-27
+
+A patch release with no runtime behaviour change. Like 2.5.1 it exists
+because a PUBLISHED surface contradicted itself and could not be fixed
+without a version: the contract API publishes `spec_sha384`, the hash of
+SPEC.md's bytes, so editing the normative document moves the contract of
+a version already in the signed chain.
+
+### Changed
+
+- **Section 4.3.2 stopped calling the nine translations partial, and
+  states the no-veto rule** (decision D-05, option B). The 2.5.1 text
+  said each translation "is partial and each is frozen at the source
+  revision its own banner declares". The first half became false the
+  moment the nine were completed: they carry 283 of 283 translatable
+  units and 83 of 83 sections. The paragraph now says what is true and
+  checkable -- each declares, in a banner a reader sees and in
+  machine-readable frontmatter, which English revision it translates and
+  how much of it it covers -- and a second paragraph states the rule the
+  decision required: **a translation that is behind the English never
+  blocks the publication of the English**. Nine machine artefacts do not
+  hold a veto over the document they translate. The sentence naming the
+  historical coverage says "Through 2.5.1", not "before": the nine
+  shipped partial IN 2.5.1 and are complete from this release on.
+
+- **The nine translations of SPEC.md are complete** (D-05, option B).
+  They went from 34 of 83 sections -- the May document translated in
+  full, against an English text that has grown 49 sections since -- to
+  83 of 83, produced from a per-locale unit store whose keys are the
+  sha256 of the English unit, so a future English edit moves only the
+  units it touches. Measured on the real document: editing one English
+  paragraph leaves 281 of 283 units untouched per locale. They remain
+  **non-normative**, and `scripts/test-spec-translations.mjs` compares
+  every identifier, link, URL, number, table row, list item and section
+  number against the English without reading the prose. The procedure is
+  `docs/TRANSLATION_PASS.md`.
+
+No runtime surface changes: the API, the attributes, the events, the
+conformance levels and the finding catalogue are byte-identical to 2.5.1.
+
 ## 2.5.1 -- 2026-10-26
 
 A patch release with no runtime behaviour change. It exists because two

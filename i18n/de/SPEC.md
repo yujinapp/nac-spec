@@ -1,5 +1,5 @@
 ---
-translation_source_hash: 13f2725d22ba29c84ddfdf58bac800d547f968b0f393d5cd9285cf1e2d4d0a0a
+translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: de
 translation_source: SPEC.md
-translation_source_version: 2.5.1
+translation_source_version: 2.5.2
 translation_source_date: 2026-10-27
 translation_sections: 83
 translation_sections_canonical: 83
-translation_units: 282
-translation_units_canonical: 282
+translation_units: 283
+translation_units_canonical: 283
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **Maschinelle Übersetzung, nicht normativ.** Sie übersetzt die englische Fassung vom 2026-10-27 (NAC3 v2.5.1) und deckt 83 von 83 Abschnitten des heutigen Originals ab. Der normative Text ist der englische: bei Abweichungen gilt der englische Text.
+> **Maschinelle Übersetzung, nicht normativ.** Sie übersetzt die englische Fassung vom 2026-10-27 (NAC3 v2.5.2) und deckt 83 von 83 Abschnitten des heutigen Originals ab. Der normative Text ist der englische: bei Abweichungen gilt der englische Text.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.1 (stabil -- die vollständige v2.5-Oberfläche: narrate, context+tree, expect+diff)
+**Version:** 2.5.2 (stabil -- die vollständige v2.5-Oberfläche: narrate, context+tree, expect+diff)
 **Status:** Stabile Veröffentlichung. Der npm-dist-tag `latest` zeigt hierher; Abschnitt 9.1 sagt, was das garantiert und was eine Vorabversion nicht garantiert. Dieses Dokument nennt seine Version an genau einer Stelle, in der Zeile darüber. Die veröffentlichten RFCs und ihre Nachweise auf Schicht 2 + Schicht 3 sind in `README.md` und `runtime/CHANGELOG.md` aufgeführt.
 **Lizenz:** Apache-2.0
 **Herausgeber:** Yujin (yujin.app)
@@ -234,13 +234,22 @@ Wurzelverzeichnis des Spezifikations-Repositoriums, gerendert unter
 
 Die Spezifikation wird außerdem als maschinelle Übersetzung unter
 `i18n/<locale>/SPEC.md` veröffentlicht. Diese Übersetzungen sind
-**nicht normativ**. Jede ist unvollständig, und jede ist auf dem
-Quellstand eingefroren, den ihr eigener Hinweisbanner angibt; der
-Banner ist Pflicht, und eine veröffentlichte Übersetzung ohne Banner
-ist ein Mangel der Veröffentlichung, nicht der Übersetzung. Wo eine
-Übersetzung und der englische Text voneinander abweichen, gilt der
-englische Text, und eine Konformitätsaussage ist eine Aussage gegenüber
-dem englischen Text.
+**nicht normativ**. Jede gibt in einem Banner, das ein Leser sieht, und
+in maschinenlesbarem Frontmatter an, welche englische Fassung sie
+übersetzt und wie viel davon sie abdeckt; der Banner ist Pflicht, und
+eine veröffentlichte Übersetzung ohne Banner ist ein Mangel der
+Veröffentlichung, nicht der Übersetzung. Wo eine Übersetzung und der
+englische Text voneinander abweichen, gilt der englische Text, und eine
+Konformitätsaussage ist eine Aussage gegenüber dem englischen Text.
+
+Eine Übersetzung, die hinter dem Englischen liegt, **blockiert niemals
+die Veröffentlichung des Englischen**. Der normative Text erscheint,
+wenn er fertig ist; eine veraltete Übersetzung wird je Einheit gemeldet,
+und die Veröffentlichung geht hinaus. Neun maschinelle Artefakte haben
+kein Vetorecht über das Dokument, das sie übersetzen. Bis einschließlich 2.5.1 deckten
+die neun 34 von 83 Abschnitten ab, und nichts sagte das; sie werden
+jetzt aus einem Speicher pro Locale erzeugt, und das Verfahren steht in
+`docs/TRANSLATION_PASS.md`.
 
 ---
 

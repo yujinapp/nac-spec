@@ -9,11 +9,11 @@ una traduzione e il testo inglese non concordano, vale il testo inglese,
 e una dichiarazione di conformità è una dichiarazione rispetto al testo
 inglese.
 
-<!-- u a21a8a7a16bc | delta 4.3.2 | prose -->
+<!-- u 22e3daff7a29 | delta 4.3.2 | prose -->
 Una traduzione in ritardo rispetto all'inglese **non blocca mai la
 pubblicazione dell'inglese**. Il testo normativo esce quando è pronto;
 una traduzione vecchia viene segnalata, unità per unità, e la versione
 parte. Nove artefatti automatici non hanno potere di veto sul documento
-che traducono. Prima della 2.5.1 le nove coprivano 34 delle 83 sezioni e
+che traducono. Fino alla 2.5.1 le nove coprivano 34 delle 83 sezioni e
 niente lo diceva; ora vengono prodotte da un archivio per lingua, e la
 procedura è `docs/TRANSLATION_PASS.md`.

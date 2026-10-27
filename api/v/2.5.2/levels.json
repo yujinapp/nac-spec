@@ -1,0 +1,177 @@
+{
+  "api_schema": 1,
+  "channel": "stable",
+  "generated_by": "scripts/build-contract-api.mjs",
+  "levels": [
+    {
+      "cumulative": false,
+      "display_name": "NAC3 Conformance Level 1",
+      "id": "nac3-conformance-level-1",
+      "legacy_display_name": "NAC-1",
+      "level": 1,
+      "requirements": [
+        {
+          "check": "human",
+          "decider": null,
+          "falsified_by": [],
+          "id": "L1-dd0bd4a0",
+          "machine_checkable": false,
+          "note": "A tool cannot decide which widgets an agent SHOULD be able to operate. It can report unannotated interactive elements as candidates; whether each one belongs in the contract is the author's call. Any validator that reports this requirement as passed is overreaching.",
+          "requires_drive": false,
+          "text": "Every clickable widget that an agent should be able to operate carries `data-nac-id` and `data-nac-role`.",
+          "text_sha384": "sha384-j3EccnTJffrFyTGTBhktgDu5jcTnAu1msfFNT2wFDLyUsNksotJjbCzerlDLPTf8"
+        },
+        {
+          "check": "behavioural",
+          "decider": "action_completion_events",
+          "falsified_by": [],
+          "id": "L1-fc278d09",
+          "machine_checkable": true,
+          "note": "Decidable only by clicking every advertised action and waiting for its completion event. No finding code covers it: a validator must drive the page and report the ids that never completed.",
+          "requires_drive": true,
+          "text": "Every `data-nac-role=\"action\"` element fires `nac:action:succeeded` after its side effect.",
+          "text_sha384": "sha384-6IyP2dxizNAvAGFY8nPrMQ6+0eKeerkXDFGJEF/aaFAVUtVSMFzxjuefOJpoviVy"
+        },
+        {
+          "check": "static",
+          "decider": "manifest_registered",
+          "falsified_by": [
+            "no_manifest"
+          ],
+          "id": "L1-bb23d963",
+          "machine_checkable": true,
+          "note": "Decidable by asking the runtime for its registered manifests after the page settles.",
+          "requires_drive": false,
+          "text": "The page registers at least one plugin manifest via `NAC.register()`.",
+          "text_sha384": "sha384-h4xO/CCA+qJNBu7Xp2vJEylobWm0k2De7YIdEQI1EjeLJ78yk85ROMDQZEc4odIx"
+        },
+        {
+          "check": "behavioural",
+          "decider": "click_resolves_and_lands",
+          "falsified_by": [
+            "missing_in_dom",
+            "plugin_not_mounted"
+          ],
+          "id": "L1-1f78457d",
+          "machine_checkable": true,
+          "note": "Resolution can be checked statically; that the click actually lands needs the page driven.",
+          "requires_drive": true,
+          "text": "`NAC.click(id)` works for every advertised id.",
+          "text_sha384": "sha384-ndiKxR+qIPGNkI4eZwE158BPjbtXD+s1vZs1oZqSGl0mAaq/V/HpPHfC8Wb6d6SY"
+        }
+      ]
+    },
+    {
+      "cumulative": true,
+      "display_name": "NAC3 Conformance Level 2",
+      "id": "nac3-conformance-level-2",
+      "legacy_display_name": "NAC-2",
+      "level": 2,
+      "requirements": [
+        {
+          "check": "static",
+          "decider": "manifest_declares_groups",
+          "falsified_by": [],
+          "id": "L2-f6a7aa72",
+          "machine_checkable": true,
+          "note": "Decidable by reading the registered manifest: the three arrays are present and non-empty, rather than inferred from the DOM. No finding code reports their absence today. Read LITERALLY, as the validator must: the sentence names tabs[] / fields[] / actions[], which is the LEGACY manifest shape. Section 4 documents `elements: [{id, role}]` as the canonical one, and audit N-33 is the record of what reading only the legacy groups cost. A page written the documented way therefore fails this requirement as worded. The validator does not reinterpret the sentence -- that is what the hash-keyed review is for. Tracked as audit N-37.",
+          "requires_drive": false,
+          "text": "Registers `tabs[]`, `fields[]`, `actions[]` arrays explicitly in its manifest (not inferred from DOM).",
+          "text_sha384": "sha384-qfF53+n/AsHuAeu0Lfbo/3PoKFd+rlJL/xf88CO4qLLQban9Hdk1yEU4NlmbA2NS"
+        },
+        {
+          "check": "static",
+          "decider": "label_i18n_covers_locales",
+          "falsified_by": [],
+          "id": "L2-610ad4be",
+          "machine_checkable": true,
+          "note": "Decidable by comparing every label_i18n against the 10 required locales published in contract.json. Gap worth naming: no finding code reports incomplete locale coverage, so a page can miss this and no validator currently says so.",
+          "requires_drive": false,
+          "text": "Provides `label_i18n` covering all 10 NAC3 locales for every user-facing label.",
+          "text_sha384": "sha384-/SmujOyfyfbhHD/JB/DmJfkBS0w5F2RsJJZJ7uIH9d2ckfccP1kuFayhb/Ea/8te"
+        },
+        {
+          "check": "human",
+          "decider": null,
+          "falsified_by": [],
+          "id": "L2-cf01fc03",
+          "machine_checkable": false,
+          "note": "A tool cannot distinguish a page that does not need the brownfield primitives from one that needed them and skipped them. Observing that they were called proves use, not conformance.",
+          "requires_drive": false,
+          "text": "Implements the v2.0 brownfield primitives: scope tree, ephemeral capture, autoRegister.watch.",
+          "text_sha384": "sha384-aUm/oI5UhZdQCNrxIO1olGuEaU46HASMg1Aga2tWVV27PrGIc9/g2PmCd3ht2mOG"
+        },
+        {
+          "check": "static",
+          "decider": "validate_global_no_errors",
+          "falsified_by": [],
+          "id": "L2-984aa1a1",
+          "machine_checkable": true,
+          "note": "Decided today by the counts in the error-severity buckets of validate_global, because those findings carry no codes yet. When the buckets get codes this becomes falsified_by a code list.",
+          "requires_drive": false,
+          "text": "Passes `NAC.validate_global({probe: false})` with zero `error`-severity findings.",
+          "text_sha384": "sha384-34d0xK6T07qc7Z5B6CTrQCBBTKqSa1mR4kLsJVHhoiGWOSPLlzuqUYahKUnQS6d9"
+        }
+      ]
+    },
+    {
+      "cumulative": true,
+      "display_name": "NAC3 Conformance Level 3",
+      "id": "nac3-conformance-level-3",
+      "legacy_display_name": "NAC-3",
+      "level": 3,
+      "requirements": [
+        {
+          "check": "static",
+          "decider": "manifest_hmac_block_present",
+          "falsified_by": [],
+          "id": "L3-cc540e31",
+          "machine_checkable": true,
+          "note": "Decidable only in the NEGATIVE, and that is the whole of it. A manifest that carries no provenance block definitively does not satisfy this, so the validator can FAIL it. Whether a block that IS present is authentic cannot be decided: the validator has no tenant secret, and -- measured while building the validator for audit N-18 -- the runtime exposes no manifest verification at all. NAC.sign_provenance / NAC.verify_provenance operate on an event's detail.source, never on a manifest, so there is nothing on the page that can say 'I verified this'. Tracked as audit N-36. Until that exists, this requirement reports fail or unverified and never pass, which is why no tool can assert level 3 today.",
+          "requires_drive": false,
+          "text": "Carries HMAC-signed manifests.",
+          "text_sha384": "sha384-SCzRE3480NmJW1pwZDYGdd4BND5eO/hWImjUMV3YijdWwMNaYeFVX9/0af9SSHAF"
+        },
+        {
+          "check": "human",
+          "decider": null,
+          "falsified_by": [],
+          "id": "L3-788469c4",
+          "machine_checkable": false,
+          "note": "Which verbs are security-sensitive is a product decision. A tool can report which actions refuse untrusted clicks; it cannot know which ones should.",
+          "requires_drive": false,
+          "text": "Distinguishes `isTrusted` for security-sensitive verbs.",
+          "text_sha384": "sha384-yb/vat4c8XyXR9Y5SaMjmKW+TniJJnyahGXkGkvkP/6Bobff090sDLbKTxbV4q+D"
+        },
+        {
+          "check": "static",
+          "decider": "validate_global_no_findings",
+          "falsified_by": [],
+          "id": "L3-4bdc1b16",
+          "machine_checkable": true,
+          "note": "Same call as the level 2 requirement above with a stricter threshold: zero findings of ANY severity. Gap measured while building the validator for audit N-18: validate_global() takes NO arguments and never reads `probe`, although SPEC.md section 10.1 publishes the signature as validate_global(opts?: {probe?: boolean}). So passing {probe: true} is accepted and ignored, and this check is exactly the level 2 one with a stricter threshold rather than the deeper probing the sentence implies. Tracked as audit N-35.",
+          "requires_drive": false,
+          "text": "Passes `NAC.validate_global({probe: true})` with zero findings.",
+          "text_sha384": "sha384-LsrEiYGyTKFsR2QbpYaAkZLnHunuHKScq0LLlRHPIRSw/7mAkVCKAtE1Mp5vAzQz"
+        }
+      ]
+    }
+  ],
+  "naming": {
+    "display_name_pattern": "NAC3 Conformance Level <1|2|3>",
+    "id_pattern": "nac3-conformance-level-<1|2|3>",
+    "legacy_display_name_pattern": "NAC-<1|2|3>",
+    "note": "Audit N-06, resolved in 2.5.0 (owner decision: option A). The pre-2.5.0 display names NAC-1 / NAC-2 / NAC-3 collided with the protocol name NAC3; they are published as `legacy_display_name` so a document that predates the rename can still be mapped. Machines MUST key on `id`, never on any display name.",
+    "spec_section": "8 (names), 8.1 (historical names)"
+  },
+  "protocol": "NAC3",
+  "reporting": {
+    "coverage_note": "A report that cites a level MUST also state how many requirements of that level were decided and how many were not, and MUST NOT present the level as a certification. The reference CLI prints \"asserted on N of M requirements\" beside every level it reports, and names each undecided requirement by its published id.",
+    "must_report_coverage": true,
+    "note": "A validator MAY report a level only when every machine_checkable requirement of that level and of every lower level passes. Requirements with machine_checkable=false cannot be decided by a tool and MUST be reported as unverified rather than assumed.",
+    "reference_validator": "npx nac3 validate <url>  (add --drive to decide the behavioural requirements)"
+  },
+  "spec_version": "2.5",
+  "surface": "levels",
+  "version": "2.5.2"
+}

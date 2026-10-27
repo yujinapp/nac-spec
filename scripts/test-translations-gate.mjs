@@ -210,12 +210,72 @@ testCase('a missing landing page is refused, not treated as zero locales', 'red'
   (d) => rmSync(join(d, 'index.html')),
   'landing page is missing');
 
+/* ---- what the NORMATIVE text claims about the nine (PND-061) ----
+       SPEC 4.3.2 is prose, so nothing measured it: on 2026-10-27 the
+       section called the nine "partial" hours after a pass had taken
+       them to 83 of 83, and the producer printed a no-veto clause
+       citing a section that did not yet contain it. Each case below
+       plants one of those two shapes back.
+       Every edit here ALSO invalidates the source hash in the nine
+       frontmatters, so the gate would refuse the tree anyway -- which
+       is why each case asserts the refusal in the terms of THIS check.
+       A red case that would still pass with the check deleted proves
+       nothing, and this suite has already shipped two of those. */
+const H432 = '#### 4.3.2 Normative language of this specification';
+
+/* Real line breaks, never an escape: the only thing these blocks do is
+   plant text, and a mangled escape is how a mutation stops provoking. */
+const PARTIAL_PARA = `
+
+Each one is partial and frozen at the revision its banner declares.
+`;
+
+const EXTRA_SECTION = `
+
+## 15. A section the nine do not have
+
+Body.
+`;
+
+testCase('a normative text that calls the nine partial while all nine are whole is refused', 'red',
+  (d) => patch(d, 'SPEC.md', (s) => s.replace(H432, H432 + PARTIAL_PARA)),
+  'describes the nine as covering less than the English');
+
+testCase('a normative text that dropped the no-veto rule the producer cites is refused', 'red',
+  (d) => patch(d, 'SPEC.md',
+    (s) => s.split('never blocks the publication').join('may delay the publication')),
+  'no-veto rule is missing');
+
+testCase('a specification that lost section 4.3.2 entirely is refused, not passed over', 'red',
+  (d) => patch(d, 'SPEC.md', (s) => s.replace(H432, '#### 4.3.2b Something else')),
+  'is gone');
+
+/* The mirror: it refuses in BOTH directions, or it is a lock that only
+   closes one way. The English grows a section the nine do not have, so
+   they are genuinely short, and 4.3.2 stays silent about it. */
+testCase('a normative text silent about coverage while the nine are short is refused', 'red',
+  (d) => patch(d, 'SPEC.md', (s) => s + EXTRA_SECTION),
+  'says nothing about it');
+
 /* ---- and the one shape that must STAY legal ---- */
 testCase('a translation that legitimately covers more sections stays legal', 'green',
   (d) => {
     /* The gate measures; it does not pin the number at 34. A locale
        that gains sections has to pass once its banner is regenerated. */
     patch(d, 'i18n/es/SPEC.md', (s) => s + '\n## 15. Una seccion traducida de mas\n\nCuerpo.\n');
+    const r = spawnSync(process.execPath,
+      [join(d, 'scripts', 'build-translation-banners.mjs'), '--write'], { encoding: 'utf8' });
+    if (r.status !== 0) throw new Error('--write failed: ' + r.stdout + r.stderr);
+  });
+
+testCase('a reworded 4.3.2 that keeps the rule and claims no coverage stays legal', 'green',
+  (d) => {
+    /* The check is not pinned to today's sentence. Reword the prose
+       around the rule, regenerate what the banners own, and the tree
+       has to pass -- otherwise this is a lock on an editor, not on a
+       claim. */
+    patch(d, 'SPEC.md', (s) => s.split('The normative text of NAC3 is the **English** one')
+      .join('The text that governs NAC3 is the **English** one'));
     const r = spawnSync(process.execPath,
       [join(d, 'scripts', 'build-translation-banners.mjs'), '--write'], { encoding: 'utf8' });
     if (r.status !== 0) throw new Error('--write failed: ' + r.stdout + r.stderr);

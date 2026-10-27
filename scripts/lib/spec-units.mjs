@@ -418,3 +418,44 @@ export function coverage(blocks, store) {
 export function sourceHash(md) {
   return crypto.createHash('sha256').update(md, 'utf8').digest('hex');
 }
+
+/* ------------------------------------------------------------------ */
+/* What the NORMATIVE text claims about the nine translations.         */
+/* ------------------------------------------------------------------ */
+
+/* WHY THIS LIVES HERE. SPEC 4.3.2 makes two claims about the nine
+   translations, and on 2026-10-27 one of them went false by itself:
+   the section said "each one IS PARTIAL" and the D-05 pass had taken
+   all nine to 83 of 83 sections. Nothing in the repository could
+   notice, because no instrument read that prose -- the publication of
+   the thing is what made the claim about the thing false, which is the
+   shape of defect this project keeps finding.
+   The other half was the mirror of it: build-spec-translations.mjs
+   PRINTED "a stale translation never blocks the publication of the
+   normative English (SPEC 4.3.2)" while 4.3.2 was mute on the subject.
+   For a day the tooling cited a clause that did not exist.
+   So the claim and its citation are ONE constant, read by the producer
+   that cites it and by the gate that verifies the specification really
+   says it. Reword it here and both move; reword 4.3.2 alone and the
+   gate goes red with the section named. */
+
+export const TRANSLATION_SECTION = '4.3.2';
+
+/* The load-bearing fragment of the no-veto rule. Deliberately the
+   predicate and not the whole sentence: it has to survive an editor
+   rewriting the subject of the sentence, and still fail if the rule
+   itself is dropped. */
+export const NO_VETO_CLAIM = 'never blocks the publication';
+
+/* Prose that describes the nine as covering less than the English.
+   This is the claim that goes stale the moment a pass completes them,
+   so the gate refuses it while every locale is whole -- and refuses
+   its ABSENCE while a locale is missing sections. Both directions, or
+   it is a lock that only closes one way. */
+export const PARTIAL_COVERAGE_PROSE = [
+  /\b(is|are|was|were|remains?|stays?)\s+partial\b/i,
+  /\bpartial\s+(translation|coverage|version)/i,
+  /\beach\s+(one|of\s+them)\s+is\s+partial\b/i,
+  /\b(is|are)\s+incomplete\b/i,
+  /\bcovers?\s+only\b/i,
+];

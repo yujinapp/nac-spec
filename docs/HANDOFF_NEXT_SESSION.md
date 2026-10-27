@@ -1,3 +1,81 @@
+# Handoff -- estado al 2026-10-27, 22:4x UTC (la 2.5.2 ESTA PUBLICADA en los dos lugares)
+
+**Lo que cambio respecto de todo lo que sigue abajo: ya no falta la firma, no hay
+nada sin empujar, y la 2.5.2 esta afuera.** El dueno firmo en su maquina
+(`signed at 2026-10-27T15:29:54Z`, cadena de cuatro entradas, cabeza
+`sha384-mzie2uMo7z01...`) y autorizo el movimiento completo ("Si. Empuja y
+despliega y en el mismo move cortamos 2.5.2").
+
+## Lo que esta publicado, medido contra produccion y contra el registro
+
+- **npm**: `@nac3/runtime@2.5.2`, `latest`. Instalado en carpeta limpia desde el
+  registro: el CLI se anuncia `@nac3/runtime CLI 2.5.2 (Native Agent Contract
+  v2.5)`, el `contract-head.json` empaquetado lleva la cabeza de cadena
+  `mzie2uMo7z01` con `entry_count 4`, y el `SPEC.md` empaquetado lleva la regla
+  de no-veto y ya no llama "partial" a las nueve traducciones. Las cinco
+  preversiones siguen bajo el tag `alpha`.
+- **El sitio**: `https://yujin.app/nac-spec/` sirve la 2.5.2. `smoke-live-landing`
+  contra produccion en verde (sello de version, las tres huellas SRI, la ruta
+  inmutable servida con 200, los 13 ids de la seccion de limites, las dos
+  licencias y el enlace al metodo). Recibo RCP-089.
+- **El contrato, auditable de afuera**: `verify-contract-api --base
+  https://yujin.app/nac-spec --expect-head-from-repo` en verde: la cadena
+  recomputa sobre los bytes que el servidor entrega, 12 artefactos coinciden,
+  `latest` apunta a 2.5.2, la firma verifica contra la clave del testigo
+  independiente y la cabeza coincide con los **tres** testigos. Recibo RCP-088.
+- **Las nueve traducciones**: servidas, `translation_status: complete`,
+  `translation_sections: 83`, `translation_source_version: 2.5.2` en las nueve.
+  `SPEC.html` en vivo declara 2.5.2 y lleva la regla de no-veto.
+- **Deploy**: run 40532471025, verde, **cero anotaciones propias** (las dos que
+  aparecen son avisos de plataforma de GitHub sobre Node 20 y ubuntu-latest).
+- **`origin/main` y `origin/portada-look-urazuke` estan en el mismo commit.**
+
+## El candado que PND-061 exigia en su criterio 4 (hecho despues de publicar)
+
+El criterio 4 de PND-061 pedia "un candado que rechace la vuelta de la palabra
+'partial' en 4.3.2 sobre nueve traducciones completas". Al cortar la 2.5.2 se
+dijo explicitamente que la version **no traia candado nuevo**; ahora existe, en
+`scripts/build-translation-banners.mjs`, que ya era el productor y la compuerta
+de lo que las nueve dicen de si mismas:
+
+- **Refuta en las dos direcciones.** Si las nueve cubren el documento entero y
+  4.3.2 las describe como parciales, es rechazo con la seccion nombrada. Si una
+  pagina publicada carga menos secciones que el canonico y 4.3.2 calla, tambien.
+  Un candado que cierra para un solo lado no cierra.
+- **La regla de no-veto y su cita son UNA constante compartida**
+  (`U.NO_VETO_CLAIM` en `scripts/lib/spec-units.mjs`). El productor la imprime
+  citando 4.3.2 y la compuerta verifica que 4.3.2 realmente la diga. Esto cierra
+  una asimetria real: el 2026-10-27 el productor imprimia esa frase citando
+  4.3.2 cuando 4.3.2 no la tenia -- durante un dia la herramienta cito una
+  clausula inexistente.
+- **Mide ESTRUCTURA, no frescura**, y eso lo encontraron los propios casos en
+  rojo. La primera version media la cobertura del store, donde una seccion queda
+  "stale" en cuanto un parrafo del ingles se mueve: asi el candado habria exigido
+  reescribir el normativo en cada edicion del ingles, que es lo contrario de la
+  regla de no-veto. Dos casos lo delataron (uno en rojo que no provocaba el
+  mensaje esperado, uno en verde que el candado rechazaba). Corregido a contar
+  encabezados de la pagina publicada.
+- **Recibos**: RCP-092 (red_proof contra 857c136 con el test llevado al worktree
+  base: 4 de 27 casos en BROKEN, cada uno por la **ausencia del mensaje de este
+  candado**, no por la huella del SPEC -- el arbol base rechaza igual, y eso es
+  justo lo que hace que los cuatro casos discriminen), RCP-093 (`check:release`
+  completo en verde, salida 0) y RCP-094 (la suite del candado, 27 casos, 0
+  fallos).
+
+## Lo que sigue esperando al dueno (nada traba nada)
+
+| Que | Pendiente |
+|---|---|
+| La hoja de estilos `css/yujin-tokens.css` que da 404 en 262 paginas publicadas -- publicar el archivo o sacarle el enlace al generador | PND-053 |
+| La clave de firma sin passphrase en una maquina donde corren varias sesiones de agente. Ponerle passphrase NO rota la clave | PND-056 |
+| Las cuatro decisiones sobre el texto de los niveles de conformidad; tres de ellas son lo que `validate-global` reporta en rojo sobre la propia portada | PND-044, PND-045, PND-046, PND-047 |
+| El candado en el repo `rpaforce` para que la regeneracion del sitemap de la raiz no borre las 7 urls del protocolo | PND-060 |
+| Re-medir el benchmark de 600 corridas (cifras declaradas historicas por decision del dueno) | PND-040 |
+| La portada declara 64 de los 128 ids que pinta | PND-038 |
+| Seis acciones declaradas que no confirman nunca | PND-048 |
+
+---
+
 # Handoff -- estado al 2026-10-27, 20:10 UTC (D-05 EJECUTADA: las nueve traducciones estan completas)
 
 **Lo que cambio respecto de todo lo que sigue abajo.** El dueno revirtio el

@@ -515,6 +515,85 @@ if (!fs.existsSync(landing)) {
   }
 }
 
+/* ---- the NORMATIVE half: what SPEC 4.3.2 claims about the nine.
+       The banner on each page is measured, so it cannot go stale. The
+       prose in the specification is not, and on 2026-10-27 it went
+       false by itself: 4.3.2 said the nine "are partial" while the
+       D-05 pass had just taken all of them to the whole document.
+       Nothing could notice, because no instrument read that prose. The
+       mirror defect shipped the same day: the producer PRINTED the
+       no-veto rule citing 4.3.2 while 4.3.2 was mute about it, so for
+       a day the tooling cited a clause that did not exist.
+       This refuses both, in both directions.
+
+       WHAT IT MEASURES, and why that one. STRUCTURE: how many of the
+       canonical headings the published page actually carries. Not the
+       store coverage -- a section counts as stale there the moment one
+       of its paragraphs moves in the English, so a gate built on it
+       would demand a rewrite of the normative text on every English
+       edit, which is the exact opposite of the no-veto rule. Unit
+       level freshness is the banner's job, per page, per unit. The
+       claim 4.3.2 makes is structural, so this is measured
+       structurally. Found by this gate's own red cases, which fired on
+       a reworded paragraph. ---- */
+const structure = LOCALES.map((loc) => {
+  const f = path.join(ROOT, 'i18n', loc, 'SPEC.md');
+  if (!fs.existsSync(f)) return null;
+  const body = withoutBanner(stripFrontmatter(fs.readFileSync(f, 'utf8')).body);
+  return { loc, n: headings(body) };
+}).filter(Boolean);
+
+/* The section label a block carries is "<ordinal> <number> <title>",
+   so the number is a whole token. Matched as a token and not as a
+   substring on purpose: "4.3.2" is a substring of "4.3.20". */
+const sectionBlocks = BLOCKS.filter(
+  (b) => String(b.section).split(' ').includes(U.TRANSLATION_SECTION));
+
+const shortLocales = structure.filter((x) => x.n < total).map((x) => x.loc);
+
+if (!structure.length) {
+  drift('SPEC.md ' + U.TRANSLATION_SECTION,
+    'not one published translation could be read, so the claim the section makes cannot be checked',
+    'restore i18n/<locale>/SPEC.md');
+} else if (!sectionBlocks.length) {
+  drift('SPEC.md', 'section ' + U.TRANSLATION_SECTION
+    + ' is gone, and scripts/build-spec-translations.mjs still cites it to a reader as the rule it obeys',
+    'restore the section, or stop citing it from the producer');
+} else {
+  const prose = sectionBlocks.map((b) => b.text).join(' ');
+  const claims = U.PARTIAL_COVERAGE_PROSE.filter((re) => re.test(prose));
+  const before432 = findings.length;
+
+  if (!shortLocales.length && claims.length) {
+    drift('SPEC.md ' + U.TRANSLATION_SECTION,
+      'the normative text still describes the nine as covering less than the English'
+        + ' (' + claims.map(String).join(', ') + '), and all ' + structure.length
+        + ' carry ' + total + ' of ' + total + ' sections',
+      'reword ' + U.TRANSLATION_SECTION
+        + ' to point at the per-page banner instead of stating a coverage');
+  }
+  if (shortLocales.length && !claims.length) {
+    drift('SPEC.md ' + U.TRANSLATION_SECTION,
+      shortLocales.join(', ') + ' carry fewer than the ' + total
+        + ' canonical sections and the normative text says nothing about it',
+      'npm run build:translations so the pages carry the whole document, or say in '
+        + U.TRANSLATION_SECTION + ' that a translation may cover less, and where a reader sees how much');
+  }
+  if (!prose.includes(U.NO_VETO_CLAIM)) {
+    drift('SPEC.md ' + U.TRANSLATION_SECTION,
+      'the no-veto rule is missing from the normative text, and'
+        + ' scripts/build-spec-translations.mjs cites this section to a reader as the rule'
+        + ' it obeys ("' + U.NO_VETO_CLAIM + '")',
+      'write the rule in ' + U.TRANSLATION_SECTION + ', or stop citing it from the producer');
+  }
+  if (findings.length === before432) {
+    console.log('OK    SPEC.md ' + U.TRANSLATION_SECTION
+      + '   says of the nine what the structure measures ('
+      + (shortLocales.length ? shortLocales.length + ' locale(s) short' : 'all ' + total + ' sections')
+      + '), and carries the no-veto rule the tooling cites');
+  }
+}
+
 console.log('');
 if (findings.length) {
   for (const f of findings) console.log('DRIFT ' + f.what + ': ' + f.detail + '\n      fix: ' + f.fix);

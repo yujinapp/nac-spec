@@ -469,7 +469,8 @@ if (fatal.length) {
 }
 if (soft.length) {
   console.log(soft.length + ' translation(s) behind the English. Reported, NOT fatal:'
-    + ' a stale translation never blocks the publication of the normative English (SPEC 4.3.2).');
+    + ' a stale translation ' + U.NO_VETO_CLAIM
+    + ' of the normative English (SPEC ' + U.TRANSLATION_SECTION + ').');
 }
 console.log('Spec translations are coherent: ' + U.LOCALES.length
   + ' locales produced from their store, identities intact.');

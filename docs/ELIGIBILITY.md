@@ -1,10 +1,10 @@
 # ELIGIBILITY -- nac-spec / NAC3
 
-**Sheet version:** 3 (P8 re-measured against the published 2.5.2)
-**Date:** 2026-10-28 (v1 2026-10-24, v2 2026-10-24)
+**Sheet version:** 4 (the owner's decision: **GO**, option 1)
+**Date:** 2026-10-28 (v1 2026-10-24, v2 2026-10-24, v3 2026-10-28)
 **Method:** Urazuke, station N0 (normalisation of the legacy)
 **Executor:** Forge (agent)
-**Decider:** the project owner -- **decision pending confirmation** (see section 4)
+**Decider:** the project owner (Pablo Kuschnirof) -- **decision taken 2026-10-28**, see section 4
 **Criteria used:** `docs/ELIGIBILITY_CRITERIA.md`
 **Intake facts:** `docs/INITIAL_SURVEY.md`
 **Receipts v1:** `docs/EVIDENCE_N0.md`
@@ -17,6 +17,11 @@ and three releases after v2. Both channels are now in sync with the repository;
 the divergence v2 found is gone. P8 **stays red on its other half**: the npm
 channel still has no gate. PRE-3 narrowed accordingly. Section 8 added with the
 new measurements; section 7 kept as the historical record of what was wrong.
+v3 -> v4. The decision line filled: the owner decided **option 1, GO**, on
+2026-10-28, with P8 worked as the first task of the takeover and not as a
+precondition. PRE-3 therefore stops being blocking, here in section 3 and in
+`docs/PENDING.md`, and keeps its acceptance criterion untouched. Nothing was
+re-measured for v4: the colours are the ones measured in v3, the same day.
 
 ---
 
@@ -62,7 +67,7 @@ broke it.
 
 | id | Blocking? | Prerequisite project | Acceptance criterion |
 |---|---|---|---|
-| PRE-3 | **YES**, if P8 stays red | **Publication contract, gated** (narrowed 2026-10-28: the republication half is done -- 2.5.2 is out and matches the tree on both channels). What remains: make the npm channel verifiable from outside like the CDN one already is -- a check that fetches the published tarball from the registry and refuses it when it differs from the repository at that version, with its red case exercised, running in the chain rather than from memory. Stale `runtime/PUBLISH_INSTRUCTIONS.md` (it still names `packages/nac/` and version 2.2.0) belongs to the same job. | P8 verified green: a fresh `npm install @nac3/runtime` and a fresh fetch of the CDN URL both yield content identical to the repository at the same version -- that part is **measured green today** -- **and** a deliberately introduced divergence in the npm channel makes the gate fail, observed at least once. |
+| PRE-3 | **no** -- owner decision 2026-10-28 (option 1): worked as the first task of the takeover | **Publication contract, gated** (narrowed 2026-10-28: the republication half is done -- 2.5.2 is out and matches the tree on both channels). What remains: make the npm channel verifiable from outside like the CDN one already is -- a check that fetches the published tarball from the registry and refuses it when it differs from the repository at that version, with its red case exercised, running in the chain rather than from memory. Stale `runtime/PUBLISH_INSTRUCTIONS.md` (it still names `packages/nac/` and version 2.2.0) belongs to the same job. | P8 verified green: a fresh `npm install @nac3/runtime` and a fresh fetch of the CDN URL both yield content identical to the repository at the same version -- that part is **measured green today** -- **and** a deliberately introduced divergence in the npm channel makes the gate fail, observed at least once. |
 | PRE-1 | no | **Data and backup proof for the CRM example**: document every data class the example generates, state the owner, execute one restore into a test environment, write the anonymisation rule per personal field. | The CRM example, if it is ever taken into scope, has an owner, a copy path and a proven restore. |
 | PRE-2 | retired | Edge stub for the chat intermediary. | Not needed: the endpoint is already an injectable option (Q4 answer, P7). |
 
@@ -76,10 +81,29 @@ Options, as defined in `docs/ELIGIBILITY_CRITERIA.md` section 3:
    item and the takeover waits for it.
 3. **No-go** -- do not apply the method to this system.
 
-**Decision: pending confirmation.** The owner has stated the scope (evolutive,
-protocol plus web presentation) and has answered all open questions, and the
-working instruction on record is to proceed in Urazuke. Section 5 records the
-answers; the decision line needs the owner's word, the date and the decider.
+**Decision: GO -- option 1.** Taken by the project owner on **2026-10-28**, on
+sheet v3 as measured that same day. The owner chose option 1 explicitly, and
+ordered one piece of work before the takeover began: a review of the pending
+items that do not belong to the Urazuke implementation, delivered as registry
+item `PND-066` and closed with the owner's written rationale, *"documento de
+revision aprobado"* (commit 7bfa4f5,
+`docs/revision-de-pendientes-ajenos-a-urazuke-2026-10-28.md`).
+
+What the decision means, in consequence:
+
+* The system is **taken over** under the method. The ladder continues from
+  station N1.
+* **P8 is not a precondition.** It is the first task of the takeover, so PRE-3
+  stops being blocking -- in section 3 here and in `docs/PENDING.md`. Its
+  acceptance criterion does not move an inch: P8 turns green only when a
+  deliberately introduced divergence on the npm channel makes a gate fail, and
+  that failure has been observed at least once.
+* The remaining red is therefore **inside** the takeover rather than in front of
+  it: work with an owner, a criterion and a place in the queue -- not an open
+  question.
+* **PRE-1 stays out of scope** while the object of the method is the protocol
+  and its web presentation (answers Q1 and Q2). It becomes blocking only if the
+  scope ever absorbs the CRM example, and P6 returns to red with it.
 
 ## 5. Questions asked and answers given
 

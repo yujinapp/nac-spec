@@ -6,11 +6,16 @@ promise: an item closes when its criterion is measured green.
 
 ---
 
-## PRE-3 -- Publication contract, gated  [BLOCKING for P8]
+## PRE-3 -- Publication contract, gated  [FIRST TASK OF THE TAKEOVER -- not blocking]
 
 **Origin:** station N0, prerequisite P8 (`docs/ELIGIBILITY.md`).
 **Owner of the decision:** the project owner.
-**Status:** open, **narrowed on 2026-10-28**. Blocking, while P8 stays red.
+**Registry id:** `PND-067`.
+**Status:** open, **narrowed on 2026-10-28**. **No longer blocking:** the owner
+decided GO (option 1) on 2026-10-28, which puts this item inside the takeover as
+its first task instead of in front of it (`docs/ELIGIBILITY.md` section 4). The
+acceptance criterion below is unchanged -- what moved is the queue position, not
+the bar.
 
 **Re-measured 2026-10-28 against the published 2.5.2 (what is now DONE):**
 

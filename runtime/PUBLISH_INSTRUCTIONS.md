@@ -50,10 +50,15 @@ refuses rather than warns.
    serve a version it has just accepted. If what landed is not this
    tree, you find out immediately, from the same command.
 
-3. **On every push** -- CI runs the same program in `--mode release`.
-   A version in the tree that is not published yet passes with a notice;
-   a version that IS published and no longer matches this tree fails the
-   build. So a divergence cannot sit unnoticed between releases.
+3. **On every push** -- CI runs the same program in
+   `--mode release --witness-release`. A version in the tree that is not
+   published yet passes with a notice; a version that IS published and
+   no longer matches **what the repository declared when it released
+   that version** fails the build. The witness is the `release(<version>)`
+   commit, not today's tip, because between releases the tree moves on
+   and that is not a divergence. If the witness cannot be resolved the
+   gate stops rather than guessing. So a divergence cannot sit unnoticed
+   between releases, and ordinary work does not turn CI red.
 
 Both modes of the gate, and the eight ways it must refuse, are proven in
 `scripts/test-npm-publication-gate.mjs` -- which also runs in CI,

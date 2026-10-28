@@ -58,6 +58,14 @@
      node scripts/verify-npm-publication.mjs --version 2.5.2
      node scripts/verify-npm-publication.mjs --registry http://127.0.0.1:8080
      node scripts/verify-npm-publication.mjs --allow-offline
+     node scripts/verify-npm-publication.mjs --witness-release
+     node scripts/verify-npm-publication.mjs --witness-ref ed399d2
+
+   The witness matters as much as the mode: the contract is about what
+   the repository declared AT the published version, which after the
+   release is a git ref and not the working tree. See the witness block
+   further down -- the first CI run of this gate went red against its
+   own commit for exactly this reason.
 
    A registry that cannot be reached is reported as its own failure,
    never as a divergence, and never as a pass: --allow-offline is there
@@ -69,6 +77,7 @@
 
 import { createHash } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -104,39 +113,129 @@ const ok = (m) => console.log('OK    ' + m);
 const note = (m) => console.log('      ' + m);
 
 /* ---------------------------------------------------------------- *
- * the witness: the tree
+ * the witness
+ *
+ * The contract is "an adopter installing version X receives what the
+ * repository declared AT version X". The working tree answers that
+ * only at the moment of the publish; a minute later the tree moves on,
+ * and comparing a published 2.5.2 against a tree that is already
+ * working towards the next version reports a divergence that is not
+ * one. That false red was observed on the first run of this gate in
+ * CI, against its own commit, and is why --witness-ref exists.
+ *
+ *   (no flag)         the working tree. Right for --mode post-publish,
+ *                     which runs inside the publish command.
+ *   --witness-ref R   read the package from git ref R instead. Right
+ *                     for any check that runs later.
+ *   --witness-release resolve R automatically: the newest commit whose
+ *                     subject is "release(<version>)...", this repo's
+ *                     convention for a release cut. Right for CI.
+ *
+ * Whichever is used, the program prints which witness it compared
+ * against. A verifier that does not say what it compared is a verifier
+ * nobody can check.
  * ---------------------------------------------------------------- */
 
-const manifestPath = join(PKG_DIR, 'package.json');
-if (!existsSync(manifestPath)) {
-  console.error('FAIL  there is no runtime/package.json: nothing to compare the registry against');
-  process.exit(1);
+function git(args) {
+  return execFileSync('git', args, { cwd: ROOT, maxBuffer: 1 << 28 });
 }
-const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-const NAME = manifest.name;
-const VERSION = arg('--version', manifest.version);
 
-/* The files the repository DECLARES it publishes. npm resolves the
-   `files` array plus a handful it always includes; we resolve the same
-   set from the same declaration, so "not shipped" and "not declared"
-   are both answerable from the tree alone. */
+let WITNESS_REF = arg('--witness-ref', null);
+let witnessWhy = 'the working tree';
+
+if (!WITNESS_REF && process.argv.includes('--witness-release')) {
+  const wanted = arg('--version', null);
+  const treeVersion = JSON.parse(readFileSync(join(PKG_DIR, 'package.json'), 'utf8')).version;
+  const target = wanted || treeVersion;
+  let log = '';
+  try { log = git(['log', '--format=%H%x09%s', '-400']).toString('utf8'); } catch (e) { log = ''; }
+  for (const line of log.split('\n')) {
+    const tab = line.indexOf('\t');
+    if (tab < 0) continue;
+    const subject = line.slice(tab + 1);
+    if (subject.indexOf('release(' + target + ')') === 0) {
+      WITNESS_REF = line.slice(0, tab);
+      witnessWhy = 'the release commit for ' + target + ' (' + WITNESS_REF.slice(0, 7) + ' "' + subject + '")';
+      break;
+    }
+  }
+  if (!WITNESS_REF) {
+    /* Fail closed. The alternative -- quietly comparing against the
+       working tree instead -- is how this check would report a
+       divergence that is only the tree moving on, and the two causes
+       below look identical from the output of a gate that guesses. */
+    const depth = log.split('\n').filter(Boolean).length;
+    console.error('FAIL  --witness-release could not find a "release(' + target + ')" commit, so the'
+      + ' comparison has no witness and was NOT made');
+    if (depth <= 1) {
+      console.error('        the git history here is ' + depth + ' commit deep: this is a shallow clone.');
+      console.error('        in CI, check out with `fetch-depth: 0`.');
+    } else {
+      console.error('        ' + depth + ' commits were searched and none is a release cut for ' + target + '.');
+      console.error('        pass --witness-ref <ref> with the commit that version was published from.');
+    }
+    process.exit(1);
+  }
+} else if (WITNESS_REF) {
+  witnessWhy = 'git ref ' + WITNESS_REF;
+}
+
+/* The declared file set and every file's content come from the SAME
+   witness. Mixing them -- a file list from the tree and contents from
+   a ref, or the other way round -- produces findings about files that
+   never coexisted. */
 const ALWAYS = ['package.json', 'README.md', 'LICENSE'];
 
-function walk(rel) {
+function walkTree(rel) {
   const abs = join(PKG_DIR, rel);
   if (!existsSync(abs)) return [];
   if (!statSync(abs).isDirectory()) return [rel];
   const out = [];
   for (const name of readdirSync(abs).sort()) {
-    out.push(...walk(posix.join(rel, name)));
+    out.push(...walkTree(posix.join(rel, name)));
   }
   return out;
 }
 
+let listAll;
+let witnessRead;
+
+if (WITNESS_REF) {
+  let names;
+  try {
+    names = git(['ls-tree', '-r', '--name-only', WITNESS_REF, '--', 'runtime/'])
+      .toString('utf8').split('\n').filter(Boolean)
+      .map((p) => p.replace(/^runtime\//, ''));
+  } catch (e) {
+    console.error('FAIL  cannot read runtime/ at ' + WITNESS_REF + ': ' + e.message);
+    process.exit(1);
+  }
+  listAll = () => names;
+  witnessRead = (rel) => git(['show', WITNESS_REF + ':runtime/' + rel]);
+} else {
+  listAll = null;
+  witnessRead = (rel) => readFileSync(join(PKG_DIR, rel));
+}
+
+const manifestPath = join(PKG_DIR, 'package.json');
+if (!WITNESS_REF && !existsSync(manifestPath)) {
+  console.error('FAIL  there is no runtime/package.json: nothing to compare the registry against');
+  process.exit(1);
+}
+const manifest = JSON.parse(witnessRead('package.json').toString('utf8'));
+const NAME = manifest.name;
+const VERSION = arg('--version', manifest.version);
+
 const declared = new Set();
 for (const pattern of [...(manifest.files || []), ...ALWAYS]) {
   const rel = pattern.replace(/\/+$/, '');
-  for (const f of walk(rel)) declared.add(f);
+  if (listAll) {
+    for (const f of listAll()) {
+      if (f === rel || f.indexOf(rel + '/') === 0) declared.add(f);
+    }
+  } else {
+    for (const f of walkTree(rel)) declared.add(f);
+  }
 }
 
 /* ---------------------------------------------------------------- *
@@ -221,7 +320,8 @@ async function main() {
   console.log('package           ' + NAME + '@' + VERSION);
   console.log('registry          ' + REGISTRY);
   console.log('mode              ' + MODE);
-  console.log('witness           runtime/package.json + its files[] declaration (' + declared.size + ' files)');
+  console.log('witness           ' + witnessWhy);
+  console.log('                  runtime/ + its files[] declaration (' + declared.size + ' files)');
   console.log('');
 
   const packumentUrl = REGISTRY + '/' + NAME.replace('/', '%2f');
@@ -342,7 +442,7 @@ async function main() {
       fail('the published package ships "' + rel + '", which the repository does not declare in runtime/package.json files[]');
       continue;
     }
-    const repoBytes = readFileSync(join(PKG_DIR, rel));
+    const repoBytes = witnessRead(rel);
     const diff = difference(rel, f.data, repoBytes);
     if (!diff) {
       identical += 1;

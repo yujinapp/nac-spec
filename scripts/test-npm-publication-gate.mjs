@@ -296,6 +296,42 @@ async function main() {
   assert(allowed.out.indexOf('was NOT verified') >= 0,
     'and says out loud that the npm channel was not verified', allowed.out);
 
+  /* ---- 11. the witness is the tree AT the published version ----
+     The first CI run of this gate went red against its own commit:
+     the published 2.5.2 was compared with a working tree that had
+     already moved on, and the gate called that a divergence. It is
+     not one -- the contract is about what the repository declared AT
+     version X. --witness-release exists for that, and these two
+     checks are what keep it from degrading into a silent fallback:
+     the program must SAY which witness it used, and the content must
+     really come from the ref. */
+  console.log('\n11. WITNESS -- what the repository declared at the published version');
+  state.tarball = pack(baseline());
+  state.integrity = null;
+  state.version = VERSION;
+
+  const resolved = await runGate(['--witness-release']);
+  assert(resolved.out.indexOf('the release commit for ' + VERSION) >= 0,
+    '--witness-release names the release commit it resolved, instead of falling back in silence',
+    resolved.out);
+
+  /* HEAD~1 is this gate's own parent: runtime/package.json there has no
+     postpublish hook, and the tarball above is built from the current
+     tree, which does. So a gate that honours the ref MUST report that
+     file -- and one that quietly reads the working tree cannot. */
+  const atParent = await runGate(['--witness-ref', 'HEAD~1']);
+  assert(atParent.code !== 0 && atParent.out.indexOf('package.json differs') >= 0,
+    '--witness-ref compares against the ref, not the working tree',
+    'exit code ' + atParent.code + '\n' + atParent.out);
+
+  /* A witness that cannot be resolved must stop the program, not
+     degrade into a comparison against whatever happens to be on disk.
+     The shallow-clone case in CI is exactly this one. */
+  const noWitness = await runGate(['--witness-release', '--version', '9.9.9']);
+  assert(noWitness.code !== 0 && noWitness.out.indexOf('comparison has no witness and was NOT made') >= 0,
+    'an unresolvable witness fails closed instead of comparing against the working tree',
+    'exit code ' + noWitness.code + '\n' + noWitness.out);
+
   /* ---- done ---- */
   server.close();
   console.log('');

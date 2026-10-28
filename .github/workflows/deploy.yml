@@ -39,7 +39,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # Full history on purpose: the published-package gate below
+          # compares the npm release against what the repository
+          # declared AT that version, which it finds by looking for the
+          # "release(<version>)" commit. In a shallow clone there is no
+          # such commit to find and the gate fails closed rather than
+          # comparing against the wrong tree.
+          fetch-depth: 0
 
       - name: Integrity gate
         # Audit N-02/N-03. A stale Subresource Integrity hash in index.html
@@ -136,7 +142,13 @@ jobs:
         # tree that is not published yet passes with a notice (that is
         # the window between a bump and a publication); a version that
         # IS published and no longer matches fails.
-        run: node scripts/verify-npm-publication.mjs --mode release
+        #
+        # --witness-release is load-bearing: the contract is about what
+        # the repository declared AT the published version, so the
+        # witness is the release commit for it, not today's tip. Without
+        # that flag this step goes red on every push that touches
+        # runtime/ between releases -- observed on its own first run.
+        run: node scripts/verify-npm-publication.mjs --mode release --witness-release
 
       - name: Published package gate goes red when it should
         # Same rule as every gate here: it has to be seen refusing. A

@@ -10,9 +10,34 @@ promise: an item closes when its criterion is measured green.
 
 **Origin:** station N0, prerequisite P8 (`docs/ELIGIBILITY.md`).
 **Owner of the decision:** the project owner.
-**Status:** open. Blocking, while P8 stays red.
+**Status:** open, **narrowed on 2026-10-28**. Blocking, while P8 stays red.
 
-**What is wrong, measured (2026-10-24):**
+**Re-measured 2026-10-28 against the published 2.5.2 (what is now DONE):**
+
+* The divergence is gone. `npm pack @nac3/runtime@2.5.2`, unpacked and compared
+  file by file against `runtime/`: **22 of 22 identical, 0 differing lines**,
+  normalised for line endings. The shipped `SPEC.md` declares 2.5.2 and the
+  shipped dist headers declare Apache-2.0.
+* The CDN channel is identical to the repository copy: HTTP 200, 349 103 bytes,
+  **0 differing lines**.
+* The CDN channel now has its gate: the deploy workflow smoke-checks the served
+  tree and then runs `verify-contract-api --expect-head-from-repo` against the
+  host, with its red cases exercised in the same run.
+* `check-version-coherence.mjs` closes the cause of the alpha.5 incident -- the
+  version is declared once and every consumer must agree -- in CI and in
+  `prepublishOnly`.
+
+**What is still missing (this is what keeps P8 red):**
+
+* **Nothing reads the registry back.** No script fetches the published tarball
+  and compares it with the repository; the workflow never mentions npm. The two
+  channels are in sync today because the last publication was done carefully,
+  not because a divergent one would be refused.
+* The package is published **by hand** from the owner machine, and
+  `runtime/PUBLISH_INSTRUCTIONS.md` is stale: it still names `packages/nac/`
+  and version 2.2.0.
+
+**What was wrong, measured (2026-10-24) -- historical, now fixed:**
 
 * The npm channel ships the previous version's specification: `SPEC.md` inside
   `nac3-runtime-2.5.0-alpha.5.tgz` has 1 443 lines and declares
@@ -32,16 +57,21 @@ promise: an item closes when its criterion is measured green.
 
 **Acceptance criterion (P8 green):**
 
-1. One build produces both channels from the same tree, and neither channel is
-   published by hand.
-2. A fresh `npm install @nac3/runtime` at version X and a fresh fetch of
+1. **NOT MET.** One build produces both channels from the same tree, and
+   neither channel is published by hand. *(The CDN channel is published by the
+   workflow; npm is published by hand.)*
+2. **MET, measured 2026-10-28 at 2.5.2 (22/22 files identical; CDN 0 differing
+   lines).** A fresh `npm install @nac3/runtime` at version X and a fresh fetch of
    `https://yujin.app/nac-spec/js/nac.js` at version X both yield content
    identical to the repository at that version -- spec text, licence header and
    code -- with the comparison normalised for line endings only.
-3. A deliberately introduced divergence in either channel makes the gate fail,
-   and that failure was observed at least once.
-4. The check runs after every change, per the owner's delivery contract
-   (`docs/ELIGIBILITY.md` section 5, Q5b).
+3. **HALF MET.** A deliberately introduced divergence in either channel makes
+   the gate fail, and that failure was observed at least once. *(Observed for
+   the CDN/contract channel, whose red cases run in CI. Not for npm: there is
+   no gate to turn red.)*
+4. **HALF MET.** The check runs after every change, per the owner's delivery
+   contract (`docs/ELIGIBILITY.md` section 5, Q5b). *(Every push verifies the
+   CDN channel. No publication verifies the npm one.)*
 
 ---
 

@@ -1,7 +1,7 @@
 # ELIGIBILITY -- nac-spec / NAC3
 
-**Sheet version:** 2 (owner's answers incorporated; one new red)
-**Date:** 2026-10-24
+**Sheet version:** 3 (P8 re-measured against the published 2.5.2)
+**Date:** 2026-10-28 (v1 2026-10-24, v2 2026-10-24)
 **Method:** Urazuke, station N0 (normalisation of the legacy)
 **Executor:** Forge (agent)
 **Decider:** the project owner -- **decision pending confirmation** (see section 4)
@@ -12,6 +12,11 @@
 **Change log:** v1 -> v2. Section 5 filled with the owner's answers. P6 and P7
 re-coloured on those answers. A claim in P5 was withdrawn and moved to a new
 row, P8, which is RED. Sections 6 and 7 added.
+v2 -> v3. P8 re-measured on 2026-10-28 against the published 2.5.2, four days
+and three releases after v2. Both channels are now in sync with the repository;
+the divergence v2 found is gone. P8 **stays red on its other half**: the npm
+channel still has no gate. PRE-3 narrowed accordingly. Section 8 added with the
+new measurements; section 7 kept as the historical record of what was wrong.
 
 ---
 
@@ -26,11 +31,12 @@ row, P8, which is RED. Sections 6 and 7 added.
 | **P5** | The system builds and runs with today's tools, every unresolved dependency named | **GREEN** | On Node 22 / npm 11 / PHP 8.3: `npm test` green (14 suites, **386 assertions, 0 failures**), `npm run build` green, **zero runtime dependencies**, production site live (HTTP 200), CI green. **Unresolved dependencies: none** -- the only unresolved dependency is a service, not a package. Caveat F-4: five legacy stage scripts exist and pass individually but are **not** part of the test gate, so the enforced coverage is narrower than the available coverage. *Corrected in v2: v1 also claimed that the npm artefact matches the repository. That claim was measured and is false; it is now row P8.* |
 | **P6** | Production data can be copied and anonymised into a test environment, and a backup exists and has been restored | **GREEN (scoped)** | Re-coloured on the owner's answers Q1 and Q2 (section 5). **This system owns no data.** It is a protocol plus its web presentation: no database, no accounts, no server-side persistence; demo data is hard-coded in the pages. The only personal data it can emit -- tester reports, waitlist e-mails -- is posted to a CRM that the owner classified as a **consumer example**, not part of the object of the method. There is therefore no production dataset of this system to copy or anonymise, and none to restore: the artefact's backup is the git history, and its restore is a checkout plus a redeploy, which P1 already exercised. **Residual, non-blocking:** nobody has proven a restore of the CRM example's own data (PRE-1). That belongs to the example, not to the protocol. **If the takeover scope ever absorbs the CRM demo, this row returns to RED and PRE-1 becomes blocking.** |
 | **P7** | Every external integration has a test mode or can be isolated at the edge | **GREEN** | The protocol itself has **zero** external integrations: it is a browser-side library with no runtime dependencies and no required network call. The only calls sit inside example pages, and each is replaceable at the edge without touching the system: the chat client accepts `opts.endpoint` (js/nac-chat-client.js, line 671), so a local stand-in needs no change to the artefact; the tester reporter degrades to a local draft and then to e-mail; the waitlist falls back to e-mail. Probing confirmed the demo endpoint is alive and validating (GET 405, empty POST 422). The owner's answer Q4 reclassified that backend as an example, so the v1 condition ("the owner must explicitly accept the consequence") is satisfied by scope, not by exception. PRE-2 is retired. |
-| **P8** | The artefact is actually served the way the product is contracted to be served, and that is verified after every change | **RED** | The owner defined the delivery contract in answer Q5b: two channels, `npm install @nac3/runtime` and `<script src="https://yujin.app/nac-spec/js/nac.js">`, both to be checked after every change. **Measured, channel by channel:** (a) CDN channel **GREEN** -- the served `js/nac.js` is 344 665 bytes against 352 798 in the repository, and the two are identical line for line; the 8 133-byte gap is exactly the CRLF-to-LF conversion performed by the server. (b) npm channel **RED** -- tarball `nac3-runtime-2.5.0-alpha.5.tgz` ships a `SPEC.md` of **1 443 lines describing 2.5.0-alpha.4**, against 1 621 lines and alpha.5 in the repository: **835 differing lines**, the protocol spec one version behind the version number on the tin. Its three dist files differ from the repository build on 4 lines each, and one of those lines declares **"MIT License"** where the repository and the tarball's own `LICENSE` file both say **Apache-2.0**. The tarball's header also still points at `packages/nac/SPEC.md`, a path that no longer exists. (c) **Nothing verifies either channel after a change:** `.github/workflows/deploy.yml` smoke-checks the live home page only; it does not publish to npm, does not compare the published artefact with the repository, and would not have caught any of the above. Measurements in section 7. **Prerequisite project PRE-3.** |
+| **P8** | The artefact is actually served the way the product is contracted to be served, and that is verified after every change | **RED (narrowed)** | The owner defined the delivery contract in answer Q5b: two channels, `npm install @nac3/runtime` and `<script src="https://yujin.app/nac-spec/js/nac.js">`, both to be checked after every change. **Re-measured 2026-10-28 against the published 2.5.2** (section 8): (a) **the divergence is gone.** All **22 published files** of `@nac3/runtime@2.5.2` are identical to `runtime/` line for line, normalised for line endings -- including the `SPEC.md`, which now declares 2.5.2, and the dist headers, which now declare **Apache-2.0**. The CDN `js/nac.js` is identical to the repository copy, 0 differing lines. Both channels agree with the tree and with each other. (b) **What is still missing is the gate, and only on the npm side.** The CDN channel is held by CI: the deploy workflow smoke-checks the served tree and then re-verifies the published contract chain from outside, with its red cases exercised in the same run. The npm channel has **nothing**: `.github/workflows/deploy.yml` never mentions npm, no script fetches the published tarball back, and the package is published by hand from the owner machine. `check-version-coherence.mjs` -- the lock written after the alpha.5 incident -- closes the cause inside the tree, but it reads the tree, never the registry. So today the two channels are in sync **because the last publication was done carefully**, not because anything would refuse a divergent one. **Prerequisite project PRE-3, narrowed to the gate.** |
 
-**Result: 7 green, 1 red.** The remaining red is not about the code: it is that
-the two channels the product is contracted to be served through are not held in
-sync, and no gate checks that they are.
+**Result: 7 green, 1 red.** The remaining red is no longer a divergence -- as of
+2026-10-28 both channels match the repository at 2.5.2. It is that the npm
+channel is held in sync by hand, and nothing would refuse a publication that
+broke it.
 
 ## 2. What the sheet means in plain words
 
@@ -56,7 +62,7 @@ sync, and no gate checks that they are.
 
 | id | Blocking? | Prerequisite project | Acceptance criterion |
 |---|---|---|---|
-| PRE-3 | **YES**, if P8 stays red | **Publication contract, gated**: make one build produce both channels from the same tree, republish the package so that the shipped spec and licence match the repository, and add a gate that fails when either channel diverges from the repository (published `js/nac.js` versus source; published tarball content versus source). | P8 verified green: a fresh `npm install @nac3/runtime` and a fresh fetch of the CDN URL both yield content identical to the repository at the same version, and a deliberately introduced divergence makes the gate fail. |
+| PRE-3 | **YES**, if P8 stays red | **Publication contract, gated** (narrowed 2026-10-28: the republication half is done -- 2.5.2 is out and matches the tree on both channels). What remains: make the npm channel verifiable from outside like the CDN one already is -- a check that fetches the published tarball from the registry and refuses it when it differs from the repository at that version, with its red case exercised, running in the chain rather than from memory. Stale `runtime/PUBLISH_INSTRUCTIONS.md` (it still names `packages/nac/` and version 2.2.0) belongs to the same job. | P8 verified green: a fresh `npm install @nac3/runtime` and a fresh fetch of the CDN URL both yield content identical to the repository at the same version -- that part is **measured green today** -- **and** a deliberately introduced divergence in the npm channel makes the gate fail, observed at least once. |
 | PRE-1 | no | **Data and backup proof for the CRM example**: document every data class the example generates, state the owner, execute one restore into a test environment, write the anonymisation rule per personal field. | The CRM example, if it is ever taken into scope, has an owner, a copy path and a proven restore. |
 | PRE-2 | retired | Edge stub for the chat intermediary. | Not needed: the endpoint is already an injectable option (Q4 answer, P7). |
 
@@ -128,3 +134,20 @@ injectable, the protocol does not depend on it.
 | `SPEC.md` | compare against repository `SPEC.md` | **1 443 against 1 621 lines; 835 differing**; the shipped copy declares **2.5.0-alpha.4** where the repository declares 2.5.0-alpha.5 |
 | tarball licence | `package/LICENSE` | Apache License, 202 lines -- contradicts the "MIT License" header inside the shipped dist |
 | CI | `.github/workflows/deploy.yml` | publishes the site over rsync, smoke-checks the live home page only; **no npm publish, no artefact comparison** |
+
+## 8. Re-measurement of P8, 2026-10-28 (reproducible)
+
+Section 7 is the record of what was wrong on 2026-10-24. This is the state four
+days and three releases later, measured the same way.
+
+| Check | Command, in effect | Result |
+|---|---|---|
+| Registry state | `npm view @nac3/runtime version dist-tags` | `latest` -> **2.5.2**; `alpha` -> 2.5.0-alpha.5 (the five preversions stay where they were) |
+| Repository version | `runtime/package.json` | 2.5.2 -- the same version, so the comparison is like for like |
+| Published package vs repository | `npm pack @nac3/runtime@2.5.2`, unpack, compare every file against `runtime/`, normalised for line endings | **22 of 22 files identical, 0 differing lines**, `dist/` included |
+| Shipped `SPEC.md` | read the unpacked copy | declares **2.5.2** (v2: declared alpha.4 while the tin said alpha.5) |
+| Shipped licence header | grep the unpacked `dist/*` | one single line, **Apache-2.0**, agreeing with `LICENSE` (v2: said "MIT License") |
+| CDN `js/nac.js` vs repository | `curl https://yujin.app/nac-spec/js/nac.js`, compare | HTTP 200, 349 103 bytes, **0 differing lines** |
+| Gate on the CDN channel | `.github/workflows/deploy.yml` | **exists**: live-tree smoke check plus `verify-contract-api --expect-head-from-repo` after the upload, with red cases run in the same workflow |
+| Gate on the npm channel | grep the workflow and `scripts/` for the registry | **none**. No `npm publish`, no script fetches a published tarball. `check-version-coherence.mjs` locks the version inside the tree, which is the cause of the alpha.5 incident, but it never reads the registry |
+| Publication path | `runtime/PUBLISH_INSTRUCTIONS.md` | by hand, from the owner machine -- and the document is itself stale: it names `packages/nac/` and version 2.2.0 |

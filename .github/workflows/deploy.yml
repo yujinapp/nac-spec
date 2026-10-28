@@ -122,6 +122,35 @@ jobs:
         # localhost, no network.
         run: node scripts/test-contract-api-http.mjs
 
+      - name: Published package gate
+        # The other half of the delivery contract, and the half that had
+        # nobody watching it: `npm install @nac3/runtime`. Version
+        # coherence above reads the TREE, so it cannot see a package
+        # published from a dirty copy, an older checkout or without a
+        # rebuild -- which is exactly what shipped on 2026-10-24, a
+        # tarball carrying the previous version's SPEC.md and a licence
+        # header contradicting the LICENSE beside it.
+        #
+        # This fetches what an adopter actually receives and compares it
+        # with this tree, file by file. Release mode: a version in the
+        # tree that is not published yet passes with a notice (that is
+        # the window between a bump and a publication); a version that
+        # IS published and no longer matches fails.
+        run: node scripts/verify-npm-publication.mjs --mode release
+
+      - name: Published package gate goes red when it should
+        # Same rule as every gate here: it has to be seen refusing. A
+        # local HTTP registry serves a real tarball built from runtime/
+        # and the suite breaks one thing at a time -- a changed line of
+        # shipped code, the 2026-10-24 stale spec, the MIT/Apache
+        # contradiction, a declared file missing, an undeclared file
+        # shipped, a tin that disagrees with its contents, bytes that
+        # do not match the integrity on record -- asserting each time
+        # that the gate refuses AND names what it refused. The last
+        # cases cover the gate's own honesty: "not published yet" is
+        # not a divergence, and an unreachable registry is never a pass.
+        run: node scripts/test-npm-publication-gate.mjs
+
       - name: Landing i18n guard
         # The landing ships in ten locales and the switcher only serves a
         # catalogue that declares itself complete. This refuses the ways that

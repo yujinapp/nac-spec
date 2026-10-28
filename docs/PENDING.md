@@ -6,7 +6,7 @@ promise: an item closes when its criterion is measured green.
 
 ---
 
-## PRE-3 -- Publication contract, gated  [FIRST TASK OF THE TAKEOVER -- not blocking]
+## PRE-3 -- Publication contract, gated  [IN PROGRESS -- the gate is built; criterion 1 is an owner decision]
 
 **Origin:** station N0, prerequisite P8 (`docs/ELIGIBILITY.md`).
 **Owner of the decision:** the project owner.
@@ -32,15 +32,41 @@ the bar.
   version is declared once and every consumer must agree -- in CI and in
   `prepublishOnly`.
 
-**What is still missing (this is what keeps P8 red):**
+**Built on 2026-10-28, the first task of the takeover (registry `PND-067`):**
 
-* **Nothing reads the registry back.** No script fetches the published tarball
-  and compares it with the repository; the workflow never mentions npm. The two
-  channels are in sync today because the last publication was done carefully,
-  not because a divergent one would be refused.
-* The package is published **by hand** from the owner machine, and
-  `runtime/PUBLISH_INSTRUCTIONS.md` is stale: it still names `packages/nac/`
-  and version 2.2.0.
+* **Something reads the registry back.** `scripts/verify-npm-publication.mjs`
+  fetches the packument, downloads the published tarball, checks its bytes
+  against the integrity hash the registry recorded, unpacks it and compares
+  every file against `runtime/` -- in both directions, so a file shipped that
+  the repository does not declare is as wrong as a declared file not shipped --
+  plus the version inside the tarball's own manifest. Measured against the real
+  published 2.5.2: **22 of 22 files identical, 0 differing lines.**
+* **Two modes, because "not published yet" is not a divergence.** Release mode
+  passes a version the tree declares and the registry does not have yet, and
+  fails a published version that no longer matches. Post-publish mode requires
+  the version to be there. A gate that cannot tell those apart gets switched
+  off; this one is tested on the distinction.
+* **An unreachable registry is its own answer**, never a divergence and never a
+  pass. `--allow-offline` exists for deliberate offline work and is absent from
+  CI.
+* **Wired to run by itself:** release mode in `npm run check:release` and in
+  `.github/workflows/deploy.yml` on every push; post-publish mode in
+  `postpublish` of `runtime/package.json`, so the publish command verifies its
+  own result; the red-case suite in CI next to it.
+* `runtime/PUBLISH_INSTRUCTIONS.md` rewritten: the old one described a first
+  publish from `packages/nac/` at version 2.2.0 into an organisation the package
+  is not published under. None of it was true.
+
+**What is still missing (acceptance criterion 1, and only that):**
+
+* The package is still published **by hand** from the owner machine. Publishing
+  from CI needs an automation token as the `NPM_TOKEN` repository secret, which
+  is the owner's decision to take (secrets are held by one person -- answer Q3).
+* Stated plainly, so the gain is not overclaimed: a divergent publication can no
+  longer go **unnoticed** -- the publish command reports it and every later push
+  reports it -- but it can still **happen**, because nothing prevents a human
+  publishing at the wrong moment. Criterion 1 is what closes that, and it waits
+  on the token decision.
 
 **What was wrong, measured (2026-10-24) -- historical, now fixed:**
 
@@ -70,13 +96,16 @@ the bar.
    `https://yujin.app/nac-spec/js/nac.js` at version X both yield content
    identical to the repository at that version -- spec text, licence header and
    code -- with the comparison normalised for line endings only.
-3. **HALF MET.** A deliberately introduced divergence in either channel makes
-   the gate fail, and that failure was observed at least once. *(Observed for
-   the CDN/contract channel, whose red cases run in CI. Not for npm: there is
-   no gate to turn red.)*
-4. **HALF MET.** The check runs after every change, per the owner's delivery
-   contract (`docs/ELIGIBILITY.md` section 5, Q5b). *(Every push verifies the
-   CDN channel. No publication verifies the npm one.)*
+3. **MET, observed 2026-10-28.** A deliberately introduced divergence in either
+   channel makes the gate fail, and that failure was observed at least once.
+   *(CDN/contract channel: red cases in CI, as before. npm channel:
+   `scripts/test-npm-publication-gate.mjs`, 27 checks, 0 failures -- a local
+   registry serves a real tarball built from `runtime/` and the suite breaks one
+   thing at a time, asserting the gate refuses AND names what it refused.)*
+4. **MET, 2026-10-28.** The check runs after every change, per the owner's
+   delivery contract (`docs/ELIGIBILITY.md` section 5, Q5b). *(CDN: every push.
+   npm: every push in release mode, plus the publish command itself through
+   `postpublish` in `runtime/package.json`.)*
 
 ---
 

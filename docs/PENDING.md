@@ -49,7 +49,7 @@ the bar.
   against that; when it cannot resolve one it **fails closed** and names the
   cause (a shallow clone -- which is why CI now checks out with full history --
   or no release cut for that version) instead of quietly comparing against
-  whatever is on disk. Three checks in the suite keep that from degrading.
+  whatever is on disk. Four checks in the suite keep that from degrading.
 * **Two modes, because "not published yet" is not a divergence.** Release mode
   passes a version the tree declares and the registry does not have yet, and
   fails a published version that no longer matches. Post-publish mode requires
@@ -108,7 +108,7 @@ the bar.
 3. **MET, observed 2026-10-28.** A deliberately introduced divergence in either
    channel makes the gate fail, and that failure was observed at least once.
    *(CDN/contract channel: red cases in CI, as before. npm channel:
-   `scripts/test-npm-publication-gate.mjs`, 30 checks, 0 failures -- a local
+   `scripts/test-npm-publication-gate.mjs`, 31 checks, 0 failures -- a local
    registry serves a real tarball built from `runtime/` and the suite breaks one
    thing at a time, asserting the gate refuses AND names what it refused.)*
 4. **MET, 2026-10-28.** The check runs after every change, per the owner's

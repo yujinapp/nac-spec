@@ -34,7 +34,7 @@
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -315,14 +315,33 @@ async function main() {
     '--witness-release names the release commit it resolved, instead of falling back in silence',
     resolved.out);
 
-  /* HEAD~1 is this gate's own parent: runtime/package.json there has no
-     postpublish hook, and the tarball above is built from the current
-     tree, which does. So a gate that honours the ref MUST report that
-     file -- and one that quietly reads the working tree cannot. */
-  const atParent = await runGate(['--witness-ref', 'HEAD~1']);
-  assert(atParent.code !== 0 && atParent.out.indexOf('package.json differs') >= 0,
-    '--witness-ref compares against the ref, not the working tree',
-    'exit code ' + atParent.code + '\n' + atParent.out);
+  /* To prove the content really comes from the ref we need a ref where
+     a published file is KNOWN to differ from today's tree, and we must
+     not hardcode a commit: the suite would then rot the next time
+     history moves. The parent of the last commit that changed
+     runtime/package.json differs in that file by definition of
+     "changed". The tarball above is built from the working tree, so a
+     gate honouring the ref must report package.json -- and one quietly
+     reading the working tree cannot. */
+  let olderRef = null;
+  try {
+    const last = execFileSync('git', ['log', '-1', '--format=%H', '--', 'runtime/package.json'],
+      { cwd: ROOT, encoding: 'utf8' }).trim();
+    const parent = execFileSync('git', ['rev-parse', last + '^'], { cwd: ROOT, encoding: 'utf8' }).trim();
+    execFileSync('git', ['cat-file', '-e', parent + ':runtime/package.json'], { cwd: ROOT });
+    olderRef = parent;
+  } catch (e) {
+    olderRef = null;
+  }
+  assert(!!olderRef,
+    'a ref whose runtime/package.json differs from the tree can be resolved from history',
+    'without one this case cannot distinguish the ref from the working tree; is this a shallow clone?');
+  if (olderRef) {
+    const atOlder = await runGate(['--witness-ref', olderRef]);
+    assert(atOlder.code !== 0 && atOlder.out.indexOf('package.json differs') >= 0,
+      '--witness-ref compares against the ref (' + olderRef.slice(0, 7) + '), not the working tree',
+      'exit code ' + atOlder.code + '\n' + atOlder.out);
+  }
 
   /* A witness that cannot be resolved must stop the program, not
      degrade into a comparison against whatever happens to be on disk.

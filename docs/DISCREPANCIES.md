@@ -76,9 +76,18 @@ lista es D-08, que sigue sin decidir.
 
 ### D-02 -- El sitio solo existe correctamente bajo `/nac-spec/`
 
+**Corrección de una medición propia (2026-10-30, misma fecha).** La primera
+versión de esta entrada decía "260 páginas" sin distinguir de dónde salía cada
+una, y al re-medirla para traerla al dueño el número no se reprodujo. Se retira
+y se reemplaza por la medición de abajo, que además cambia la forma del problema:
+**no son las páginas, es un generador** (regla propia: una medición que no se
+reproduce se retira, no se redondea).
+
 | Punta | Qué dice | Evidencia |
 |---|---|---|
-| El código | 260 páginas publicadas cargan el runtime por **ruta absoluta**: `/nac-spec/js/nac.js?v=...` y `/nac-spec/js/nac-v2-extensions.js?v=...` | medido hoy, 2026-10-30 |
+| El código, lo generado | **273 páginas** cargan el runtime por **ruta absoluta** (`/nac-spec/js/nac.js?v=...` y `/nac-spec/js/nac-v2-extensions.js?v=...`): 235 bajo `i18n/`, 21 bajo `docs/`, 11 bajo `guides/` y 6 en la raíz | `grep -rl "/nac-spec/js/" --include="*.html" --include="*.php"`, 2026-10-30 |
+| El código, lo escrito a mano | las **14 páginas de entrada** -- `index.html` y los 13 `example-*.php` -- lo cargan por **ruta relativa**, así que esas sí funcionan en cualquier raíz | `grep -rlE "src=[\"'](\.\./)*js/nac(-v2-extensions)?\.js"`, 2026-10-30 |
+| El productor | la ruta absoluta la emite **un solo lugar**: `scripts/build-spec-html.mjs`, líneas 344-345. Las 273 páginas son su salida, no 273 decisiones | leído hoy |
 | El sitio | "All of them open in your browser" (sección de demos de la portada) | `index.html` |
 | El recibo de N0 | servido desde la raíz en una máquina local, esos documentos cargan **sin runtime** (404 en los dos scripts) | `docs/EVIDENCE_N0.md`, 2026-10-24 |
 
@@ -87,18 +96,26 @@ candado (`check-stylesheet-links.mjs`, a raíz de PND-053: una hoja inexistente
 pedida por 262 páginas durante cuatro meses). Lo que queda abierto es la parte
 del runtime, y ningún candado la cubre.
 
+**Por qué la ruta absoluta está ahí, y no es un descuido.** Las páginas generadas
+viven a profundidades distintas (`i18n/ja/docs/x.html`, `guides/y.html`, `z.html`).
+Una ruta relativa correcta no es un literal: es un prefijo que depende de la
+profundidad de cada archivo. La absoluta es la forma de no calcular eso, al
+precio de clavar el sistema a `/nac-spec/`.
+
 **Qué hay que decidir.** O el comportamiento actual **es** la especificación
 —este sistema se sirve bajo `/nac-spec/` y no se soporta en otra raíz, lo cual
-se escribe y se termina la discusión— o las rutas pasan a ser relativas y el
-árbol se puede servir desde cualquier lado.
+se escribe y se termina la discusión— o el generador pasa a emitir un prefijo
+según la profundidad y el árbol se puede servir desde cualquier lado.
 
 **Mi recomendación: declarar que el comportamiento actual es la especificación,
-y agregar el candado que lo verifique.** Cambiar 260 páginas publicadas es
-mucho riesgo para un beneficio que hoy no tiene adoptante: nadie pidió servir
-esto desde otra raíz. Pero conviene que esté escrito, porque hoy se descubre
-levantándolo y fallando.
+y agregar el candado que lo verifique.** Nadie pidió servir esto desde otra raíz,
+y el cambio no es gratis: toca el generador y **regenera 273 páginas publicadas**
+en nueve idiomas, que es superficie publicada moviéndose por un beneficio sin
+adoptante. Lo que sí hace falta es que esté escrito y verificado, porque hoy se
+descubre levantando el árbol en otra raíz y viendo dos 404.
 
-**Estado:** no traída todavía.
+**Estado:** traída al dueño el 2026-10-30, con la medición corregida. Sin
+decisión.
 
 ---
 

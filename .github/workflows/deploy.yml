@@ -249,10 +249,16 @@ jobs:
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         #
-        # The last two are internal process documents, not product: the
+        # The last five are internal process documents, not product: the
         # session bootstrap (CLAUDE.md) and the working agreement it
         # loads, which carries the owner's name, how he works and the
-        # decisions he has taken. Everything else under docs/ IS served
+        # decisions he has taken; plus the three artefacts of the reading
+        # of the system (N2) -- the recovered map, the living state and
+        # the discrepancy sheet. The last one names, with evidence, every
+        # place this system is currently soft; the state file names the
+        # open security findings by id. Publishing either at a guessable
+        # URL hands over a map of the weak points for no benefit to any
+        # reader of the protocol. Everything else under docs/ IS served
         # today at an unlinked but guessable URL (docs/ELIGIBILITY.md
         # answers 200); whether that stays that way is the owner's call
         # and is tracked as a pending item. These two are excluded
@@ -278,6 +284,9 @@ jobs:
             --exclude='PENDING_*.md' \
             --exclude='CLAUDE.md' \
             --exclude='WORKING_AGREEMENT.md' \
+            --exclude='SEMANTIC_TREE.md' \
+            --exclude='STATUS.md' \
+            --exclude='DISCREPANCIES.md' \
             ./ _deploy_stage/
           echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 

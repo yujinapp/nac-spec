@@ -100,7 +100,18 @@ entera **antes** del paso que despliega.
 Documentos de la toma, en orden: `docs/INITIAL_SURVEY.md` (hechos de entrada) ·
 `docs/ELIGIBILITY.md` + `docs/ELIGIBILITY_CRITERIA.md` (si el sistema se podía tomar) ·
 `docs/FUNCTIONALITY_RECOVERED.md` (qué hace hoy) · `docs/EVIDENCE_N0.md` (recibos) ·
-`docs/WORKING_AGREEMENT.md` (el contrato).
+`docs/WORKING_AGREEMENT.md` (el contrato) · **`docs/SEMANTIC_TREE.md` (el mapa
+recuperado del sistema, con la fuente de cada nodo)** · **`docs/STATUS.md` (el
+estado vivo: cada número con el comando que lo produce y su fecha)** ·
+**`docs/DISCREPANCIES.md` (lo que no coincide, con la evidencia de las dos
+puntas, esperando la decisión del dueño)**.
+
+**Los tres últimos son la lectura mínima antes de tocar código.** El mapa evita
+descifrar un módulo de nuevo (regla 8); el estado evita citar un número viejo
+como si fuera de hoy (regla 14); las discrepancias evitan "arreglar" en silencio
+algo que el dueño todavía no decidió (regla 10). Los tres se excluyen del
+despliegue del sitio: son documentos de proceso, y el de discrepancias nombra
+los puntos flojos del sistema.
 
 ## 5. El orden del trabajo sale del registro, no de la impresión
 

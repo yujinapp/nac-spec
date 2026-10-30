@@ -249,22 +249,30 @@ jobs:
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         #
-        # The last five are internal process documents, not product: the
+        # The last six are internal process documents, not product: the
         # session bootstrap (CLAUDE.md) and the working agreement it
         # loads, which carries the owner's name, how he works and the
-        # decisions he has taken; plus the three artefacts of the reading
-        # of the system (N2) -- the recovered map, the living state and
-        # the discrepancy sheet. The last one names, with evidence, every
-        # place this system is currently soft; the state file names the
-        # open security findings by id. Publishing either at a guessable
-        # URL hands over a map of the weak points for no benefit to any
-        # reader of the protocol. Everything else under docs/ IS served
-        # today at an unlinked but guessable URL (docs/ELIGIBILITY.md
-        # answers 200); whether that stays that way is the owner's call
-        # and is tracked as a pending item. These two are excluded
-        # because they were never published, so not publishing them is
-        # still a free and reversible choice -- working agreement rule
-        # 17: what is published is not deleted, it is redirected.
+        # decisions he has taken; the three artefacts of the reading of
+        # the system (N2) -- the recovered map, the living state and the
+        # discrepancy sheet; and the owner's decision log (DECISIONS.md),
+        # which quotes him verbatim. The discrepancy sheet names, with
+        # evidence, every place this system is currently soft; the state
+        # file names the open security findings by id. Publishing any of
+        # them at a guessable URL hands over a map of the weak points, or
+        # the owner's own words, for no benefit to any reader of the
+        # protocol. Everything else under docs/ IS served today at an
+        # unlinked but guessable URL (docs/ELIGIBILITY.md answers 200);
+        # whether that stays that way is the owner's call and is tracked
+        # as a pending item. These six are excluded because they were
+        # never published, so not publishing them is still a free and
+        # reversible choice -- working agreement rule 17: what is
+        # published is not deleted, it is redirected.
+        #
+        # This list is maintained BY HAND and nothing verifies it: a new
+        # internal document under docs/ is published by default unless
+        # someone remembers to add it here (measured 2026-10-30, when
+        # DECISIONS.md needed the sixth manual entry). Tracked in the
+        # pending registry with the rest of the docs/ publication call.
         run: |
           rm -rf _deploy_stage
           mkdir -p _deploy_stage
@@ -287,6 +295,7 @@ jobs:
             --exclude='SEMANTIC_TREE.md' \
             --exclude='STATUS.md' \
             --exclude='DISCREPANCIES.md' \
+            --exclude='DECISIONS.md' \
             ./ _deploy_stage/
           echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 

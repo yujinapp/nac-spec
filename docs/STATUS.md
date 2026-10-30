@@ -2,6 +2,7 @@
 
 **Refreshed: 2026-10-30** by Forge, at station N2 of the Urazuke ladder.
 Map: `docs/SEMANTIC_TREE.md` · Discrepancies: `docs/DISCREPANCIES.md` ·
+Owner's decisions: `docs/DECISIONS.md` ·
 Contract: `docs/WORKING_AGREEMENT.md` · Session bootstrap: `CLAUDE.md`.
 
 This file is the **state**, not the story. Every number below was produced by
@@ -77,9 +78,9 @@ their red proofs, and the Urazuke documents.
 | Ladder | `WFL-001`, Urazuke for an inherited system, 27 tasks |
 | Station N0 (eligibility) | **closed** 2026-10-28 with the owner's GO |
 | Station N1 (working agreement) | **closed** 2026-10-30; contract v1.2 accepted in full |
-| Station N2 (this reading) | **in flight.** The four artefacts exist; it closes when the owner decides the discrepancies |
+| Station N2 (this reading) | **in flight.** The five artefacts exist; **1 of 8 discrepancies decided** (D-01, owner, 2026-10-30, in `docs/DECISIONS.md`); it closes when the owner decides the other seven |
 | Sizing gate (G9) | **missing** -- load-bearing construction is blocked until the owner gives the volumetry, the retention and the hardware envelope |
-| Open pending items | **41**: 25 are the remaining ladder tasks, 16 are work |
+| Open pending items | **45** (`yujin.pending.list`, 2026-10-30): 25 are the remaining ladder tasks, 20 are work |
 | Top three by priority | PND-067 (publish from CI, needs a repository secret), PND-030 (execute the external audit remediation), PND-056 (the contract signing key has no passphrase) |
 
 ---
@@ -89,8 +90,10 @@ their red proofs, and the Urazuke documents.
 1. **The npm channel is published by hand.** The lock now refuses a divergent
    publication from three places, so a divergence cannot pass unnoticed -- but it
    can still happen. Needs an `NPM_TOKEN` repository secret (PND-067, owner).
-2. **Eight discrepancies are waiting for a decision** (`docs/DISCREPANCIES.md`).
-   None of them is being worked until the owner decides it.
+2. **Seven of the eight discrepancies are waiting for a decision**
+   (`docs/DISCREPANCIES.md`). D-01 was decided by the owner on 2026-10-30
+   (`docs/DECISIONS.md`); what it left open is PND-072. None of the other seven
+   is being worked until the owner decides it.
 3. **The landing does not declare half of its own surface**: 116 painted ids
    against 50 declared in its manifest (PND-038), and six declared actions never
    confirm, so an agent calling them eats a five-second timeout (PND-048).

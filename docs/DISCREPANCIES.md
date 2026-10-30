@@ -3,7 +3,8 @@
 Estación: **N2 -- la lectura del sistema** (Urazuke, entrada de un legado).
 Fecha: **2026-10-30**. Autor: Forge (el agente). Dueño: Pablo Kuschnirof.
 Mapa recuperado: `docs/SEMANTIC_TREE.md` · Estado vivo: `docs/STATUS.md` ·
-Contrato: `docs/WORKING_AGREEMENT.md`.
+Decisiones del dueño: `docs/DECISIONS.md` · Contrato:
+`docs/WORKING_AGREEMENT.md`.
 
 **Qué es este documento.** La lista de todo lo que encontré donde el código, la
 configuración, la documentación y lo que el dueño dijo **no coinciden**. Cada
@@ -14,8 +15,12 @@ silencio. Acá no se arregló nada.
 
 **Cómo se traen.** Por decisión del dueño (2026-10-30) las discrepancias se le
 traen **en el momento y de a una**, no en lotes. Este documento es el registro
-completo para que ninguna se pierda; la conversación va de a una. La columna
-*estado* dice cuáles ya se le llevaron.
+completo para que ninguna se pierda; la conversación va de a una. La línea
+*estado* de cada entrada dice cuáles ya se le llevaron y cuáles decidió; las
+decididas quedan con su frase textual en `docs/DECISIONS.md`.
+
+**Decididas hasta hoy (2026-10-30):** 1 de 8 -- D-01. Las otras siete siguen
+esperando su palabra y **ninguna se tocó**.
 
 **Lo que no está acá.** Los hallazgos donde **una sola punta tiene razón** no
 son discrepancias: son hallazgos, y por la regla 9 van al registro de pendientes
@@ -56,7 +61,16 @@ escrito al lado sin destruir nada. Lo que sí hay que hacer es corregir lo viejo
 porque un documento que dice "la cadena todavía no existe" en un proyecto donde
 la cadena es la única puerta a producción desinforma a quien lo lee primero.
 
-**Estado:** traída al dueño el 2026-10-30. Sin decisión.
+**Estado:** **DECIDIDA** por el dueño el 2026-10-30, textual: *"Se queda como
+está"* -- la opción 2. `PROJECT.md` sigue siendo el manual de normas; el mapa es
+`docs/SEMANTIC_TREE.md` y la puerta de entrada de cada sesión es `CLAUDE.md`.
+Escrita en `docs/DECISIONS.md` y como **regla confirmada** al lado del nodo
+(`docs/SEMANTIC_TREE.md` sección 0, `CLAUDE.md` sección 4). **No cierra la parte
+3:** el contenido viejo de `PROJECT.md` (la cadena declarada como objetivo
+futuro, el espejado a este mismo repositorio, la versión `2.5.0-alpha.5`) queda
+registrado como pendiente con su medición y sin tocar (**PND-072**) -- el dueño
+decidió el rol del documento, no si se le corrige el contenido. El punto 4 de esa
+lista es D-08, que sigue sin decidir.
 
 ---
 

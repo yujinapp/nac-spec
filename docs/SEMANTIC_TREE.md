@@ -4,11 +4,20 @@ Station: **N2 -- the reading of the system** (Urazuke, legacy entry).
 Date: **2026-10-30**. Author: Forge (agent). Owner: Pablo Kuschnirof.
 Read together with: `CLAUDE.md` (session bootstrap), `docs/WORKING_AGREEMENT.md`
 (the contract), `docs/STATUS.md` (living state), `docs/DISCREPANCIES.md` (what
-does not agree and is waiting for the owner).
+does not agree and is waiting for the owner), `docs/DECISIONS.md` (what the owner
+has already decided, in his own words).
 
 **This document is not normative.** `SPEC.md` is the normative text. This is a
 map recovered **from the system as it exists today**, written so a session that
 has never seen this repository can find its way without re-deriving it.
+
+**Confirmed rule (owner, 2026-10-30: *"Se queda como está"*).** This file is
+**the** recovered map, and there is only one. `PROJECT.md` stays what it already
+was -- the programming-norms manual -- and is not converted into a map and not
+rewritten; `CLAUDE.md` stays the session entry point and points here. Decision
+in `docs/DECISIONS.md` D-01, discrepancy in `docs/DISCREPANCIES.md` D-01. A
+future request to move this map into `PROJECT.md` contradicts a decision of the
+owner and is brought back to him before it is executed.
 
 ---
 

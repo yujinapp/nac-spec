@@ -96,6 +96,7 @@ entera **antes** del paso que despliega.
 | Pruebas del runtime y de punta a punta | `runtime/test/`, `e2e/` |
 | Portada y demos | `index.html`, `demos/`, `example-*.php` |
 | Documentos de proceso | `docs/` |
+| Normas de programación (RFC, estilo, doctrina de pruebas) | `PROJECT.md` |
 
 Documentos de la toma, en orden: `docs/INITIAL_SURVEY.md` (hechos de entrada) ·
 `docs/ELIGIBILITY.md` + `docs/ELIGIBILITY_CRITERIA.md` (si el sistema se podía tomar) ·
@@ -104,14 +105,26 @@ Documentos de la toma, en orden: `docs/INITIAL_SURVEY.md` (hechos de entrada) ·
 recuperado del sistema, con la fuente de cada nodo)** · **`docs/STATUS.md` (el
 estado vivo: cada número con el comando que lo produce y su fecha)** ·
 **`docs/DISCREPANCIES.md` (lo que no coincide, con la evidencia de las dos
-puntas, esperando la decisión del dueño)**.
+puntas, esperando la decisión del dueño)** · **`docs/DECISIONS.md` (lo que el
+dueño ya decidió, con su frase textual y la fecha)**.
 
-**Los tres últimos son la lectura mínima antes de tocar código.** El mapa evita
+**Regla confirmada por el dueño el 2026-10-30** (*"Se queda como está"*,
+`docs/DECISIONS.md` D-01): el **mapa** del sistema es `docs/SEMANTIC_TREE.md` y
+no hay otro; `PROJECT.md` **no** es el mapa, es el manual de normas, y no se
+convierte ni se reescribe; la puerta de entrada de cada sesión es **este**
+archivo. Un pedido de mudar el mapa a `PROJECT.md` contradice una decisión del
+dueño y se le trae antes de ejecutarlo.
+
+**Los cuatro últimos son la lectura mínima antes de tocar código.** El mapa evita
 descifrar un módulo de nuevo (regla 8); el estado evita citar un número viejo
 como si fuera de hoy (regla 14); las discrepancias evitan "arreglar" en silencio
-algo que el dueño todavía no decidió (regla 10). Los tres se excluyen del
-despliegue del sitio: son documentos de proceso, y el de discrepancias nombra
-los puntos flojos del sistema.
+algo que el dueño todavía no decidió (regla 10), y las decisiones evitan
+reabrir algo que ya decidió. Los cuatro se excluyen del despliegue del sitio:
+son documentos de proceso, el de discrepancias nombra los puntos flojos del
+sistema y el de decisiones cita al dueño textualmente. Esa lista de exclusión
+se mantiene **a mano** y nada la verifica: un documento interno nuevo bajo
+`docs/` se publica por omisión si nadie se acuerda de agregarlo
+(`.github/workflows/deploy.yml`, paso *Stage files for upload*).
 
 ## 5. El orden del trabajo sale del registro, no de la impresión
 

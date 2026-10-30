@@ -68,6 +68,19 @@ Un cambio **no está entregado** hasta que las dos puertas coinciden con el árb
   `smoke-live-landing.mjs` y `verify-contract-api.mjs` verifican **desde afuera** que lo que
   el servidor entrega es este árbol.
 
+**Regla confirmada por el dueño el 2026-10-30** (*"se escribe que este sistema se sirve
+bajo /nac-spec/ y no en otra raíz, y se le pone un candado que lo verifique"*,
+`docs/DECISIONS.md` D-02): **este sistema se sirve bajo `/nac-spec/` y no se soporta en otra
+raíz.** Las 273 páginas generadas cargan el runtime por ruta absoluta porque un solo
+productor (`scripts/build-spec-html.mjs`) emite un prefijo para páginas que viven a seis
+profundidades distintas; las 14 escritas a mano lo cargan relativo y sí abren en cualquier
+raíz. Un árbol levantado en otra dirección **no** es una instalación degradada: es una
+configuración que este proyecto no promete. El candado es `scripts/check-mount-path.mjs`
+(las páginas, la resolución de los `<script>` relativos, y las diez declaraciones del
+literal `/nac-spec/` —incluido el destino del `rsync`— enfrentadas entre sí) con su rojo
+`scripts/test-mount-path.mjs`. Un pedido de hacer el árbol servible desde cualquier raíz
+contradice esta decisión y se le trae al dueño antes de ejecutarlo.
+
 Lo que falta de este lado, y es del dueño: la publicación a npm todavía se hace **a mano**;
 automatizarla necesita un `NPM_TOKEN` como secreto del repo (**PND-067**). Hoy una
 publicación divergente no puede pasar inadvertida, pero todavía puede ocurrir.

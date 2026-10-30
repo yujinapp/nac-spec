@@ -225,6 +225,39 @@ jobs:
         # keeps finding in its own locks.
         run: node scripts/test-stylesheet-links.mjs
 
+      - name: Mount path gate
+        # Owner decision D-02, 2026-10-30: this system is served under
+        # /nac-spec/ and is not supported at another root. Until that
+        # decision the rule existed only as behaviour -- 273 generated
+        # pages load the runtime by root-absolute path because the
+        # generator emits one prefix for pages that sit at six different
+        # depths, and the only way to find out was to stand the tree up
+        # somewhere else and watch two 404s (N0 receipt, 2026-10-24).
+        #
+        # This refuses any page carrying a root-absolute reference
+        # outside the mount, any relative <script> that does not resolve
+        # (the half the landing promises for the hand-written demos),
+        # and any declaration of the mount -- including the rsync target
+        # below -- that stops agreeing with the rest. Nothing was
+        # regenerated and the generator was not touched: the current
+        # behaviour IS the specification, and now it is written down.
+        run: node scripts/check-mount-path.mjs
+
+      - name: Mount path gate goes red when it should
+        # Twenty-one cases, each planting one disagreement in a throwaway
+        # tree: the runtime tag with the mount dropped, an off-mount link,
+        # a prefix that merely looks like the mount, a relative src that
+        # does not resolve, a declaration site that moved alone, and an
+        # exception that outlived its reason.
+        #
+        # Writing them found a defect in the gate: it bounded a <script>
+        # tag at the first `>`, and the demo pages write their
+        # cache-buster with PHP inside the attribute, so `?>` ended the
+        # tag early -- the scan read ZERO scripts on six of them and
+        # printed PASSED. The gate now refuses a page it cannot read
+        # instead of reporting on the part it managed to see.
+        run: node scripts/test-mount-path.mjs
+
       - name: Live-landing smoke check goes red when it should
         # The post-deploy smoke check below is DERIVED from this tree
         # instead of hand-typed in YAML, which is the whole point -- the

@@ -30,11 +30,12 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 
 | Gate | Command | Last result |
 |---|---|---|
-| Full pre-push gate | `npm run check:release` | **green** 2026-10-30, 12 scripts |
+| Full pre-push gate | `npm run check:release` | **green** 2026-10-30, 14 scripts |
 | Runtime suites | `cd runtime && npm test` | **green** 2026-10-30 -- 14 suites, **386 PASS, 0 FAIL** |
 | Published-package lock | `npm run check:npm` | **green** -- and its red proof `npm run test:npm-gate` passes **31 of 31** cases |
 | Spec translations | `npm run stats:translations` | **green** -- canonical 283 units / 83 sections; all nine locales 283/283, 83/83, no orphans |
-| Integrity, stylesheets, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
+| Integrity, stylesheets, mount path, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
+| Mount path lock | `npm run check:mount` | **green** 2026-10-30 -- 321 pages, 812 references under the mount, 57 relative `<script>` srcs resolved, 10 of 10 declaration sites agreeing; its red proof `npm run test:mount-gate` passes **21 of 21** cases |
 | Full deploy chain | push to `main` | **green**, 22 steps, run 41048418059 |
 
 **Not in the chain**, declared so nobody reads "green" as "everything here is
@@ -90,10 +91,11 @@ their red proofs, and the Urazuke documents.
 1. **The npm channel is published by hand.** The lock now refuses a divergent
    publication from three places, so a divergence cannot pass unnoticed -- but it
    can still happen. Needs an `NPM_TOKEN` repository secret (PND-067, owner).
-2. **Seven of the eight discrepancies are waiting for a decision**
-   (`docs/DISCREPANCIES.md`). D-01 was decided by the owner on 2026-10-30
-   (`docs/DECISIONS.md`); what it left open is PND-072. None of the other seven
-   is being worked until the owner decides it.
+2. **Six of the eight discrepancies are waiting for a decision**
+   (`docs/DISCREPANCIES.md`). D-01 and D-02 were decided by the owner on
+   2026-10-30 (`docs/DECISIONS.md`); what they left open is PND-072 (D-01) and
+   PND-074 plus PND-075 (D-02). None of the other six is being worked until the
+   owner decides it.
 3. **The landing does not declare half of its own surface**: 116 painted ids
    against 50 declared in its manifest (PND-038), and six declared actions never
    confirm, so an agent calling them eats a five-second timeout (PND-048).
@@ -113,7 +115,7 @@ their red proofs, and the Urazuke documents.
 Run these, in this order, and write what came back with today's date:
 
 ```
-npm run check:release          # the whole gate, 12 scripts
+npm run check:release          # the whole gate, 14 scripts
 cd runtime && npm test         # 14 suites; count the PASS lines
 npm run stats:translations      # the nine locales, per unit and per section
 npm run check:npm              # the published package against the tree of its version

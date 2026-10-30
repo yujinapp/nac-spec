@@ -19,8 +19,8 @@ completo para que ninguna se pierda; la conversación va de a una. La línea
 *estado* de cada entrada dice cuáles ya se le llevaron y cuáles decidió; las
 decididas quedan con su frase textual en `docs/DECISIONS.md`.
 
-**Decididas hasta hoy (2026-10-30):** 1 de 8 -- D-01. Las otras siete siguen
-esperando su palabra y **ninguna se tocó**.
+**Decididas hasta hoy (2026-10-30):** 2 de 8 -- D-01 y D-02. Las otras seis
+siguen esperando su palabra y **ninguna se tocó**.
 
 **Lo que no está acá.** Los hallazgos donde **una sola punta tiene razón** no
 son discrepancias: son hallazgos, y por la regla 9 van al registro de pendientes
@@ -114,8 +114,22 @@ en nueve idiomas, que es superficie publicada moviéndose por un beneficio sin
 adoptante. Lo que sí hace falta es que esté escrito y verificado, porque hoy se
 descubre levantando el árbol en otra raíz y viendo dos 404.
 
-**Estado:** traída al dueño el 2026-10-30, con la medición corregida. Sin
-decisión.
+**Estado: DECIDIDA** por el dueño el 2026-10-30, opción A, textual en
+`docs/DECISIONS.md` D-02: *"se escribe que este sistema se sirve bajo /nac-spec/
+y no en otra raíz, y se le pone un candado que lo verifique"*. El comportamiento
+actual **es** la especificación; el candado es `scripts/check-mount-path.mjs`
+con su rojo `scripts/test-mount-path.mjs` (21 casos), los dos en
+`npm run check:release` y en la cadena de despliegue. **Cero páginas movidas y
+el generador sin tocar.**
+
+**Una punta de esta entrada se retira.** Al implementar la decisión, *"el sitio
+promete"* no se sostuvo: "All of them open in your browser" titula la sección de
+**demos** de la portada, cuyas tarjetas enlazan los `example-*.php` -- las
+páginas de ruta relativa, que sí abren en cualquier raíz. La promesa nunca cubrió
+las 273 generadas. La discrepancia real era más chica: el requisito de montaje no
+estaba escrito ni verificado. Lo que **no** cerró la decisión quedó registrado y
+sin tocar: **PND-074** (tres referencias raíz-absolutas que no resuelven) y
+**PND-075** (dos páginas que no son producto se publican en cada despliegue).
 
 ---
 

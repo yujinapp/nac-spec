@@ -179,14 +179,25 @@ document wishes they worked.
 ### P8 -- Deploy the site (second delivery gate)
 * **Trigger** `[config]`: any push to `main`, or a manual dispatch. **There is no
   other path to production, and no test environment** `[business]`.
-* **Steps** `[config]` (`.github/workflows/deploy.yml`, 22 steps): integrity,
+* **Steps** `[config]` (`.github/workflows/deploy.yml`, 24 steps): integrity,
   global validator, version coherence, contract API, published package, landing
-  i18n, translation banners and stylesheet links -- **each lock immediately
-  followed by the step that proves it goes red** -- then stage the upload
-  (stripping the process documents), rsync to the host with `--delete-after`,
-  then smoke-check the live site from outside and verify the published contract
-  API from outside.
+  i18n, translation banners, stylesheet links and the mount path -- **each lock
+  immediately followed by the step that proves it goes red** -- then stage the
+  upload (stripping the process documents), rsync to the host with
+  `--delete-after`, then smoke-check the live site from outside and verify the
+  published contract API from outside.
 * **Outcome**: `https://yujin.app/nac-spec/` serves this tree.
+* **Confirmed rule** `[business]` (owner decision D-02, 2026-10-30, textual in
+  `docs/DECISIONS.md`): **this system is served under `/nac-spec/` and is not
+  supported at another root.** 273 generated pages load the runtime by
+  root-absolute path because one producer (`scripts/build-spec-html.mjs`) emits
+  one prefix for pages sitting at six different depths; the 14 hand-written
+  entry pages load it relatively and **do** open from any root. The owner
+  decided the current behaviour IS the specification: nothing was regenerated,
+  the generator was not touched, and the rule is now locked by
+  `scripts/check-mount-path.mjs` (pages, relative `<script>` resolution, and the
+  ten places that declare the mount literal -- the rsync target above included)
+  with its red proof `scripts/test-mount-path.mjs`.
 * **Exceptions** `[config]`: the chain runs **before** the deploy step, so a red
   lock means nothing ships. Two gates that need a browser are not in the chain
   (`test:limits`, `test:cli-levels`) -- a declared gap, registered as a pending.

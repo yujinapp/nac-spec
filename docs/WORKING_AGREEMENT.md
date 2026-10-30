@@ -1,10 +1,10 @@
 # Contrato de convivencia (N1 — Urazuke)
 
-**Versión:** 1.1 | **Fecha:** 2026-10-30 | **Entre:** Pablo Kuschnirof (dueño del
+**Versión:** 1.2 | **Fecha:** 2026-10-30 | **Entre:** Pablo Kuschnirof (dueño del
 proyecto) y el agente (Yujin Forge).
-**Estado:** propuesto por el agente, **esperando la aceptación del dueño**. Hasta que
-Pablo lo acepte, las reglas 1 a 11 rigen igual porque son el método; lo que espera
-aceptación son las propuestas 12 a 17 y la sección "Cómo trabaja el dueño".
+**Estado:** **ACEPTADO POR EL DUEÑO** el 2026-10-30 ("Lo acepto"). Rige completo: las
+once reglas del método, las seis reglas 12 a 17 que este sistema se ganó y la sección
+"Cómo trabaja el dueño". Ya no hay nada en este documento que sea una propuesta.
 **Objeto:** `nac-spec` / NAC3 — un sistema que **ya existe, ya está publicado y ya
 tiene adoptantes**. Esto no es un proyecto nuevo: se toma uno en marcha.
 **Hechos de entrada:** `docs/INITIAL_SURVEY.md` · **Elegibilidad:** `docs/ELIGIBILITY.md`
@@ -135,10 +135,12 @@ hay está probado", y no se dice como si lo fuera.
 
 ---
 
-## 3. Propuestas del agente (12 a 17) — esperando aceptación
+## 3. Las seis reglas que este sistema se ganó (12 a 17)
 
-Estas no estaban en el pedido. Se proponen porque cada una ya se probó necesaria en este
-repositorio: abajo de cada una está el episodio que la produjo.
+**Aceptadas por el dueño el 2026-10-30.** No estaban en el pedido del método: las propuso
+el agente porque cada una ya se había probado necesaria en este repositorio, y abajo de
+cada una está el episodio que la produjo. Desde la aceptación rigen igual que las once
+primeras; no se vuelven a proponer ni a discutir (están en la tabla de la sección 5).
 
 **12. Todo candado viene con su prueba en rojo.**
 Un control que nunca se vio fallar no es un control: es una creencia. Todo candado nuevo
@@ -196,8 +198,8 @@ redirige a lo que lo reemplaza.
 
 ## 4. Cómo trabaja el dueño
 
-Lo que el agente debe dar por sabido. Esto no se infiere: cada punto viene de algo que el
-dueño dijo, con su fecha.
+**Aceptada por el dueño el 2026-10-30.** Lo que el agente debe dar por sabido. Esto no se
+infiere: cada punto viene de algo que el dueño dijo, con su fecha.
 
 * **Rol.** Dueño y decisor. Define alcance, prioridad y negocio. El agente decide el
   detalle técnico de **cómo**, no el **qué**.
@@ -230,18 +232,24 @@ No se vuelven a proponer, discutir ni "mejorar" sin que el dueño las reabra.
 | Las nueve traducciones **se completan al 100% y se regeneran en cada versión**, con un candado que exige identificadores idénticos (opción B). | 2026-10-27 | No se propone retirarlas ni congelarlas. |
 | El sistema **se toma** con el método (GO), y el candado del canal npm se trabaja como primera tarea de la toma, no como requisito previo. | 2026-10-28 | La estación N0 está cerrada; no se vuelve a discutir la elegibilidad. |
 | El contrato **se carga solo** al inicio de cada sesión, desde `CLAUDE.md` en la raíz. | 2026-10-30 | No se propone volver a depender de la memoria de la conversación. Un cambio en este contrato revisa `CLAUDE.md` en el mismo commit (regla 4). |
+| **El contrato está aceptado completo**: las seis reglas 12 a 17 y la sección "Cómo trabaja el dueño" ("Lo acepto"). | 2026-10-30 | Las diecisiete reglas rigen por igual. El agente ya no las declara como propuestas, y no se reabre si una de ellas conviene o no: se aplica. Agregar o cambiar una regla es un cambio de versión de este documento, decidido por el dueño. |
 
 ---
 
 ## 6. Cierre
 
-Las once reglas del método rigen desde esta versión. Las propuestas 12 a 17 y la sección
-4 **esperan la aceptación del dueño**; hasta entonces el agente las aplica y las declara
-como propuestas, no como acordadas.
+**Este contrato no tiene nada abierto.** Las diecisiete reglas rigen, la sección "Cómo
+trabaja el dueño" está confirmada por él, y las dos preguntas que la v1.0 dejó en sus
+manos se cerraron el mismo día:
 
-La pregunta abierta de la v1.0 — cómo se carga este contrato sin depender de la memoria
-de una conversación — **está resuelta**: el dueño decidió crear `CLAUDE.md` (2026-10-30),
-y está en la tabla de arriba.
+* **Cómo se carga sin depender de la memoria de una conversación** — resuelta con
+  `CLAUDE.md` en la raíz (2026-10-30), verificado en producción.
+* **Si las reglas 12 a 17 y la sección 4 se aceptaban** — aceptadas el 2026-10-30.
 
-**Queda una sola cosa en manos del dueño:** aceptar (o no) las propuestas 12 a 17 y la
-sección 4. Mientras no las acepte, el agente las aplica y las declara como propuestas.
+Lo que **sigue siendo creído** (regla 5) es lo mismo que antes y no lo tapa la aceptación:
+el mecanismo **carga** el contrato, no **obliga** a cumplirlo. No existe un candado que
+ponga en rojo a una sesión que lo incumple, y mientras no exista, "la sesión respetó el
+contrato" es una afirmación sin recibo.
+
+Cambiar, agregar o retirar una regla es una versión nueva de este documento, decidida por
+el dueño, y revisa `CLAUDE.md` en el mismo commit (regla 4).

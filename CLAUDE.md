@@ -13,9 +13,11 @@ el código** — y este archivo se corrige en el mismo commit (regla 4).
 
 ## 0. El contrato de convivencia — lectura obligatoria
 
-**`docs/WORKING_AGREEMENT.md`.** Define cómo se trabaja sobre este sistema: las once
-reglas del método, seis propuestas y las decisiones del dueño que no se reabren. **Se lee
-antes de la primera acción de la sesión**, no cuando surge la duda.
+**`docs/WORKING_AGREEMENT.md`.** Define cómo se trabaja sobre este sistema: diecisiete
+reglas —las once del método y las seis que este sistema se ganó— y las decisiones del
+dueño que no se reabren. **Aceptado completo por el dueño el 2026-10-30**: no quedan
+propuestas, rige entero. **Se lee antes de la primera acción de la sesión**, no cuando
+surge la duda.
 
 Las cuatro que más se incumplen, resumidas para que no haya excusa de no haberlas visto —
 el texto que rige es el del contrato, no este resumen:

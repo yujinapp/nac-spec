@@ -24,7 +24,7 @@
    Exit:   0 every case behaved, 1 any case did not
    ===================================================================== */
 
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, cpSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, cpSync, readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -40,8 +40,27 @@ const SHIPPED_TAG = '<script src="/nac-spec/js/nac.js?v=v25"></script>';
    page asks for a path that belongs to somebody else and gets a 404. */
 const OFF_MOUNT_TAG = '<script src="/js/nac.js?v=v25"></script>';
 
+/* How many cases this suite claims to run. Checked at the end: a suite
+   that silently runs fewer behaviours than it advertises is the same
+   defect as a gate that scans nothing and prints OK. */
+const EXPECTED_CASES = 21;
+
 let passed = 0;
 const failures = [];
+
+/* Run with no gate present -- against the tree BEFORE this change, say,
+   which is how the red proof of this work was taken. Every behaviour
+   below is then UNMET, not untested, and this says so with counts a
+   reader (or a receipt) can parse, instead of dying on a stack trace. */
+if (!existsSync(join(ROOT, GATE))) {
+  console.log('mount path gate -- behaviour\n');
+  console.log('FAILED   ' + GATE.split('\\').join('/') + ' does not exist');
+  console.log('         nothing in this tree verifies that the system is served under');
+  console.log('         /nac-spec/, so all ' + EXPECTED_CASES + ' behaviours are unmet.');
+  console.log('');
+  console.log('0 passed, ' + EXPECTED_CASES + ' failed');
+  process.exit(1);
+}
 
 function page(body) {
   return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8" />\n</head>\n<body>\n'
@@ -252,6 +271,11 @@ console.log('');
 if (failures.length) {
   console.log(passed + ' passed, ' + failures.length + ' failed');
   for (const f of failures) console.log('  ' + f);
+  process.exit(1);
+}
+if (passed !== EXPECTED_CASES) {
+  console.log(passed + ' passed, 0 failed -- but this suite claims ' + EXPECTED_CASES
+    + ' cases, so it ran fewer behaviours than it advertises');
   process.exit(1);
 }
 console.log(passed + ' passed, 0 failed');

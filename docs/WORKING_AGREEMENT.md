@@ -1,6 +1,6 @@
 # Contrato de convivencia (N1 — Urazuke)
 
-**Versión:** 1.0 | **Fecha:** 2026-10-30 | **Entre:** Pablo Kuschnirof (dueño del
+**Versión:** 1.1 | **Fecha:** 2026-10-30 | **Entre:** Pablo Kuschnirof (dueño del
 proyecto) y el agente (Yujin Forge).
 **Estado:** propuesto por el agente, **esperando la aceptación del dueño**. Hasta que
 Pablo lo acepte, las reglas 1 a 11 rigen igual porque son el método; lo que espera
@@ -13,11 +13,19 @@ tiene adoptantes**. Esto no es un proyecto nuevo: se toma uno en marcha.
 Ninguna afirmación de "hecho" vale sin evidencia (regla 5): lo que no se pudo
 verificar se declara como **creído**, no como confirmado.
 
-> **Pendiente de carga automática.** En el proyecto hermano este contrato se carga al
-> inicio de cada sesión para que no dependa de la memoria de una conversación. Este
-> repositorio **no tiene todavía ese mecanismo** (no existe `CLAUDE.md`). Está planteado
-> como pregunta al dueño al final de este documento. Mientras no exista, el contrato
-> depende de que el agente lo lea — que es exactamente lo que la regla 5 llama *creído*.
+> **Carga automática: resuelta (v1.1, 2026-10-30).** Por decisión del dueño existe
+> `CLAUDE.md` en la raíz del repositorio, cuya primera sección remite a este documento
+> como lectura obligatoria antes de la primera acción de una sesión. El contrato ya no
+> depende de que el agente se acuerde de leerlo. Lo que **sí** sigue siendo *creído*
+> (regla 5) es que una sesión futura lo respete: el mecanismo lo carga, no lo obliga.
+>
+> **Este documento no se publica en el sitio.** Se excluye del despliegue junto con
+> `CLAUDE.md`: son documentos de proceso, y este lleva el nombre del dueño, cómo trabaja
+> y sus decisiones. El resto de `docs/` **sí** se sirve hoy en una URL no enlazada pero
+> adivinable (medido: `docs/ELIGIBILITY.md` responde 200); si eso queda así es decisión
+> del dueño y está registrado como pendiente. Estos dos se excluyen porque nunca
+> estuvieron publicados, así que no publicarlos todavía es una elección libre y
+> reversible — publicar, por la regla 17, ya no lo es.
 
 ---
 
@@ -221,6 +229,7 @@ No se vuelven a proponer, discutir ni "mejorar" sin que el dueño las reabra.
 | El inglés manda; las nueve traducciones declaran, en su propio idioma, que son automáticas, parciales y no normativas. | 2026-10-26 | No se propone volver a discutir qué se declara. |
 | Las nueve traducciones **se completan al 100% y se regeneran en cada versión**, con un candado que exige identificadores idénticos (opción B). | 2026-10-27 | No se propone retirarlas ni congelarlas. |
 | El sistema **se toma** con el método (GO), y el candado del canal npm se trabaja como primera tarea de la toma, no como requisito previo. | 2026-10-28 | La estación N0 está cerrada; no se vuelve a discutir la elegibilidad. |
+| El contrato **se carga solo** al inicio de cada sesión, desde `CLAUDE.md` en la raíz. | 2026-10-30 | No se propone volver a depender de la memoria de la conversación. Un cambio en este contrato revisa `CLAUDE.md` en el mismo commit (regla 4). |
 
 ---
 
@@ -230,9 +239,9 @@ Las once reglas del método rigen desde esta versión. Las propuestas 12 a 17 y 
 4 **esperan la aceptación del dueño**; hasta entonces el agente las aplica y las declara
 como propuestas, no como acordadas.
 
-**Pregunta abierta al dueño (una sola):** este contrato no tiene todavía forma de cargarse
-solo al inicio de cada sesión. Recomendación del agente: crear un `CLAUDE.md` en la raíz
-cuya sección inicial apunte a este documento, como en el proyecto hermano — es lo que
-convierte el contrato en algo que rige aunque nadie se acuerde de leerlo. No se hizo en
-este paso porque la regla 3 es alcance exacto y esto es un archivo nuevo que el paso no
-pidió.
+La pregunta abierta de la v1.0 — cómo se carga este contrato sin depender de la memoria
+de una conversación — **está resuelta**: el dueño decidió crear `CLAUDE.md` (2026-10-30),
+y está en la tabla de arriba.
+
+**Queda una sola cosa en manos del dueño:** aceptar (o no) las propuestas 12 a 17 y la
+sección 4. Mientras no las acepte, el agente las aplica y las declara como propuestas.

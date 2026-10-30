@@ -248,6 +248,17 @@ jobs:
 
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
+        #
+        # The last two are internal process documents, not product: the
+        # session bootstrap (CLAUDE.md) and the working agreement it
+        # loads, which carries the owner's name, how he works and the
+        # decisions he has taken. Everything else under docs/ IS served
+        # today at an unlinked but guessable URL (docs/ELIGIBILITY.md
+        # answers 200); whether that stays that way is the owner's call
+        # and is tracked as a pending item. These two are excluded
+        # because they were never published, so not publishing them is
+        # still a free and reversible choice -- working agreement rule
+        # 17: what is published is not deleted, it is redirected.
         run: |
           rm -rf _deploy_stage
           mkdir -p _deploy_stage
@@ -265,6 +276,8 @@ jobs:
             --exclude='PROJECT.md' \
             --exclude='PROMO_WEEK_*.md' \
             --exclude='PENDING_*.md' \
+            --exclude='CLAUDE.md' \
+            --exclude='WORKING_AGREEMENT.md' \
             ./ _deploy_stage/
           echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 

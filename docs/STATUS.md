@@ -18,11 +18,11 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 | Authoritative version | **2.5.2** | the `version:` constant of the `NAC` export at the end of `js/nac.js` |
 | Spec version | **2.5** (normative text declares 2.5.2) | `SPEC.md` line 3 |
 | npm package | `@nac3/runtime@2.5.2`, Apache-2.0, channel `latest` | `npm run check:npm` -- 22 of 22 files identical to the tree of that version, 0 differing lines |
-| Site | `https://yujin.app/nac-spec/` serving this tree | post-deploy smoke check inside CI run 41048418059 |
+| Site | `https://yujin.app/nac-spec/` serving this tree, **under the mount `/nac-spec/`, which is now a written rule** (owner decision D-02) | post-deploy smoke check inside CI run 41061305762 |
 | Contract API | `api/latest/` mirrors 2.5.2 (stable); prerelease head 2.5.0-alpha.5 | `api/latest.json`, `npm run verify:contract` |
 | Pinned runtime copies | `js/2.5.0`, `js/2.5.0-alpha.5`, `js/2.5.1`, `js/2.5.2`, each with its SRI hash | `js/integrity.json`, `npm run check:integrity` |
-| Last commit on `main` | `37446d4` (2026-10-30) | `git log` |
-| Last CI run | **41048418059 -- success**, 51 s, on `37446d4` | `gh run list` |
+| Last commit on `main` | `d045a67` (2026-10-30) | `git log` |
+| Last CI run | **41061305762 -- success**, 46 s, on `d045a67` | `gh run list` |
 
 ---
 
@@ -36,7 +36,7 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 | Spec translations | `npm run stats:translations` | **green** -- canonical 283 units / 83 sections; all nine locales 283/283, 83/83, no orphans |
 | Integrity, stylesheets, mount path, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
 | Mount path lock | `npm run check:mount` | **green** 2026-10-30 -- 321 pages, 812 references under the mount, 57 relative `<script>` srcs resolved, 10 of 10 declaration sites agreeing; its red proof `npm run test:mount-gate` passes **21 of 21** cases |
-| Full deploy chain | push to `main` | **green**, 22 steps, run 41048418059 |
+| Full deploy chain | push to `main` | **green**, 24 steps, run 41061305762 |
 
 **Not in the chain**, declared so nobody reads "green" as "everything here is
 tested":

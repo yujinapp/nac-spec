@@ -247,6 +247,49 @@ const isText = (rel) => TEXT.test(rel) || rel === 'LICENSE' || rel.endsWith('/LI
 
 const lf = (buf) => buf.toString('utf8').split('\r\n').join('\n');
 
+/* How many lines actually differ, counted the way a person counts.
+ *
+ * The first version of this compared line i against line i and called
+ * every mismatch a differing line. One line INSERTED in the middle of
+ * a file then shifts everything below it, and the gate reports the
+ * whole tail: on 2026-11-07 it announced "12 line(s)" for a single
+ * added line of runtime/package.json, which sends someone looking for
+ * a divergence that does not exist. Positional comparison answers
+ * "are these aligned", and the question is "what changed".
+ *
+ * So: trim the common prefix and suffix, then take the edit distance D
+ * of what is left with Myers' greedy algorithm (O(N*D) -- fast exactly
+ * when the answer is small, which is the case worth reporting well).
+ * D is additions plus deletions, and the length difference is
+ * additions minus deletions, so both numbers come out exact without
+ * building the edit script:
+ *     added = (D + delta) / 2      removed = (D - delta) / 2
+ *
+ * D is capped. Past the cap the two files are not a divergence to
+ * read line by line any more, and the report says so instead of
+ * pretending to a count it did not finish. */
+const DISTANCE_CAP = 4000;
+
+function editDistance(a, b, cap) {
+  const n = a.length;
+  const m = b.length;
+  const max = Math.min(n + m, cap);
+  const off = max + 1;
+  const v = new Int32Array(2 * max + 3);
+  for (let d = 0; d <= max; d += 1) {
+    for (let k = -d; k <= d; k += 2) {
+      let x;
+      if (k === -d || (k !== d && v[off + k - 1] < v[off + k + 1])) x = v[off + k + 1];
+      else x = v[off + k - 1] + 1;
+      let y = x - k;
+      while (x < n && y < m && a[x] === b[y]) { x += 1; y += 1; }
+      v[off + k] = x;
+      if (x >= n && y >= m) return d;
+    }
+  }
+  return -1;
+}
+
 /* The report has to name the file AND the first line that differs:
    "the package does not match" sends someone diffing 8 000 lines by
    hand, which is how a gate earns a reputation for crying wolf. */
@@ -261,18 +304,42 @@ function difference(rel, published, repo) {
   if (a === b) return null;
   const la = a.split('\n');
   const lb = b.split('\n');
-  let first = -1;
-  let count = 0;
-  for (let i = 0; i < Math.max(la.length, lb.length); i += 1) {
-    if (la[i] !== lb[i]) {
-      if (first < 0) first = i + 1;
-      count += 1;
+
+  let p = 0;
+  while (p < la.length && p < lb.length && la[p] === lb[p]) p += 1;
+  let s = 0;
+  while (s < la.length - p && s < lb.length - p
+    && la[la.length - 1 - s] === lb[lb.length - 1 - s]) s += 1;
+
+  const ma = la.slice(p, la.length - s);
+  const mb = lb.slice(p, lb.length - s);
+
+  let added;
+  let removed;
+  let counted = true;
+  if (ma.length === 0 || mb.length === 0) {
+    added = mb.length;
+    removed = ma.length;
+  } else {
+    const d = editDistance(ma, mb, DISTANCE_CAP);
+    if (d < 0) {
+      counted = false;
+      added = mb.length;
+      removed = ma.length;
+    } else {
+      const delta = mb.length - ma.length;
+      added = (d + delta) / 2;
+      removed = (d - delta) / 2;
     }
   }
+
+  const first = p + 1;
   return {
     kind: 'lines',
     first,
-    count,
+    added,
+    removed,
+    counted,
     publishedLine: la[first - 1],
     repoLine: lb[first - 1],
     publishedLines: la.length,
@@ -452,7 +519,13 @@ async function main() {
       fail(rel + ' differs: ' + diff.published + ' bytes published against ' + diff.repo + ' in the repository');
       continue;
     }
-    fail(rel + ' differs from the repository: ' + diff.count + ' line(s), first at line ' + diff.first
+    const lines = (n) => n + (n === 1 ? ' line' : ' lines');
+    fail(rel + ' differs from the repository: '
+      + (diff.counted
+        ? lines(diff.added) + ' added and ' + diff.removed + ' removed since the publication'
+        : 'at least ' + lines(diff.added) + ' added and ' + diff.removed + ' removed since the'
+          + ' publication (the two are too far apart to count exactly)')
+      + ', first at line ' + diff.first
       + (diff.publishedLines !== diff.repoLines
         ? ' (' + diff.publishedLines + ' lines published against ' + diff.repoLines + ')'
         : ''));
@@ -492,11 +565,35 @@ async function main() {
 
   console.log('');
   if (failed) {
-    console.log('The published npm package is NOT this tree. An adopter running');
-    console.log('`npm install ' + NAME + '@' + VERSION + '` does not receive what this repository says they do.');
+    /* Which witness this ran against decides what the red MEANS, so
+       the red has to say it. Against a git ref the finding is the
+       delivery contract broken: an adopter receives something the
+       repository did not declare at that version. Against the working
+       tree it may be nothing but the tree moving on since the release
+       -- which is the normal state between two versions, and is what
+       `npm run verify:npm` (--mode post-publish, no witness flag) does
+       when it is run outside the publish step it belongs to. A red
+       that does not distinguish the two teaches people to ignore it. */
+    if (WITNESS_REF) {
+      console.log('The published npm package is NOT what this repository declared at');
+      console.log(witnessWhy + '. An adopter running');
+      console.log('`npm install ' + NAME + '@' + VERSION + '` does not receive what this repository says they do.');
+    } else {
+      console.log('The published npm package is NOT this WORKING TREE, which is the witness');
+      console.log('this run compared against -- the right one only immediately after `npm');
+      console.log('publish`. Any line runtime/ has gained since ' + VERSION + ' was cut appears');
+      console.log('here as a divergence and is not one.');
+      console.log('');
+      console.log('For the delivery contract -- "is the published package the tree it was cut');
+      console.log('from?" -- run `npm run check:npm`, which witnesses the release commit. If');
+      console.log('that one is green, the channel is intact and the lines above are the tree');
+      console.log('having moved on. If it is red too, the publication really diverged.');
+    }
     process.exit(1);
   }
-  console.log('The published npm package is this tree.');
+  console.log(WITNESS_REF
+    ? 'The published npm package is what this repository declared at ' + witnessWhy + '.'
+    : 'The published npm package is this tree.');
 }
 
 main().catch((e) => {

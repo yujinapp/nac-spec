@@ -32,7 +32,7 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 |---|---|---|
 | Full pre-push gate | `npm run check:release` | **green** 2026-10-30, 14 scripts |
 | Runtime suites | `cd runtime && npm test` | **green** 2026-10-30 -- 14 suites, **386 PASS, 0 FAIL** |
-| Published-package lock | `npm run check:npm` | **green** -- and its red proof `npm run test:npm-gate` passes **31 of 31** cases |
+| Published-package lock | `npm run check:npm` | **green** 2026-11-07 -- 22 of 22 files identical, and its red proof `npm run test:npm-gate` passes **42 of 42** checks (13 cases; 12 and 13 were added 2026-11-07 with the fix to how the red counts lines and names its witness) |
 | Spec translations | `npm run stats:translations` | **green** -- canonical 283 units / 83 sections; all nine locales 283/283, 83/83, no orphans |
 | Integrity, stylesheets, mount path, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
 | Mount path lock | `npm run check:mount` | **green** 2026-10-30 -- 321 pages, 812 references under the mount, 57 relative `<script>` srcs resolved, 10 of 10 declaration sites agreeing; its red proof `npm run test:mount-gate` passes **21 of 21** cases |

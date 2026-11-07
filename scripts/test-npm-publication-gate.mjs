@@ -351,6 +351,84 @@ async function main() {
     'an unresolvable witness fails closed instead of comparing against the working tree',
     'exit code ' + noWitness.code + '\n' + noWitness.out);
 
+  /* ---- 12. the count the human reads ----
+     The 2026-11-07 red: one line added to runtime/package.json after
+     the release was reported as "12 line(s)", because the comparison
+     was positional and an inserted line shifts everything below it.
+     Twelve sends someone hunting a divergence that does not exist.
+     Here the published copy is missing ONE line of the tree, and the
+     gate has to say one. The old code cannot pass this case: its
+     count was the length of the tail. */
+  const pkgLines = readFileSync(join(PKG_DIR, 'package.json'), 'utf8')
+    .split('\r\n').join('\n').split('\n');
+  const positionalCount = pkgLines.length - 5;
+  await expectRed(
+    '12. RED -- one line missing from the published copy is ONE line, not the tail that follows it',
+    (e) => patch(e, 'package.json', (s) => {
+      const lines = s.split('\n');
+      lines.splice(5, 1);
+      return lines.join('\n');
+    }),
+    [
+      'package.json differs from the repository: 1 line added and 0 removed since the publication',
+      'first at line 6',
+      '(' + (pkgLines.length - 1) + ' lines published against ' + pkgLines.length + ')',
+    ],
+  );
+  /* And the number the old behaviour would have printed must be gone.
+     Asserted separately so the red proof does not depend on reading
+     the message above by eye. */
+  {
+    const entries = patch(baseline(), 'package.json', (s) => {
+      const lines = s.split('\n');
+      lines.splice(5, 1);
+      return lines.join('\n');
+    });
+    state.integrity = null;
+    state.version = VERSION;
+    state.tarball = pack(entries);
+    const counted = await runGate();
+    assert(counted.out.indexOf(positionalCount + ' lines added') < 0
+      && counted.out.indexOf(positionalCount + ' line(s)') < 0,
+      'and the positional count (' + positionalCount + ') is not reported as the difference',
+      counted.out);
+  }
+
+  /* ---- 13. a red declares which witness it compared against ----
+     `npm run verify:npm` is --mode post-publish with no witness flag,
+     so its witness is the working tree: between two releases it goes
+     red for any line runtime/ has gained, which is not a divergence.
+     It used to announce "The published npm package is NOT this tree"
+     for that state -- indistinguishable from a real divergence. The
+     red must name its witness and send the reader to the check that
+     asks the contract question. */
+  console.log('\n13. WITNESS -- the red says what it compared against');
+  state.tarball = pack(patch(baseline(), 'package.json', (s) => {
+    const lines = s.split('\n');
+    lines.splice(5, 1);
+    return lines.join('\n');
+  }));
+  state.integrity = null;
+  state.version = VERSION;
+
+  const againstTree = await runGate();
+  assert(againstTree.code !== 0, 'the gate still refuses', 'exit code ' + againstTree.code);
+  assert(againstTree.out.indexOf('NOT this WORKING TREE') >= 0,
+    'a red against the working tree says the witness was the working tree', againstTree.out);
+  assert(againstTree.out.indexOf('npm run check:npm') >= 0,
+    'and names the check that witnesses the release commit instead', againstTree.out);
+
+  if (olderRef) {
+    const againstRef = await runGate(['--witness-ref', olderRef]);
+    assert(againstRef.code !== 0, 'a red against a ref is still a red', 'exit code ' + againstRef.code);
+    assert(againstRef.out.indexOf('NOT what this repository declared at') >= 0
+      && againstRef.out.indexOf('git ref ' + olderRef) >= 0,
+      'a red against a ref names the ref, and claims the contract broken', againstRef.out);
+    assert(againstRef.out.indexOf('npm run check:npm') < 0,
+      'and does NOT send the reader to check:npm: its witness already answers the contract',
+      againstRef.out);
+  }
+
   /* ---- done ---- */
   server.close();
   console.log('');

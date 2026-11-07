@@ -48,6 +48,17 @@ publicado, ya tiene adoptantes, y cada cambio sale a producción.
 * **El inglés manda.** `SPEC.md` es el texto normativo. Las nueve traducciones viven en
   `i18n/<lang>/` y se regeneran en cada versión; los **identificadores no se traducen**
   (nombres de atributos, verbos, números y direcciones son idénticos letra por letra).
+* **El nombre público es `nac-spec`; el protocolo se llama NAC3** (decisión del dueño,
+  2026-11-07, `docs/DECISIONS.md` D-07, textual: *"nac-spec como nombre público. Paquete
+  sigue nac3"*). La vidriera --- descripción del repositorio, etiquetas, `keywords` de npm,
+  prosa de presentación --- dice `nac-spec`, que es por donde la gente lo busca; el texto
+  normativo sigue diciendo NAC3. **El paquete (`@nac3/*`) y los identificadores
+  (`data-nac-*`) no se renombran**: npm no renombra --- se publica otro nombre y se deprecia
+  el viejo, y los dos quedan para siempre --- y los identificadores son 631 archivos que el
+  `SPEC.md` declara idénticos letra por letra en las nueve traducciones. Un pedido de
+  renombrar el paquete o los identificadores contradice una decisión del dueño y se le trae
+  antes de ejecutarlo. Dato que conviene no perder: los atributos se llaman `nac`, **no**
+  `nac3`, así que la colisión del nombre NAC3 con el compilador de ARTIQ/M-Labs no los toca.
 * **Lo que NO es parte del sistema** (decisión del dueño, 2026-10-24): el CRM y el
   intermediario de chat son **ejemplos de consumidor**, no el producto. No se los toma, no
   se los audita como parte de esto.

@@ -359,6 +359,87 @@ disciplina del registro ni el contrato de convivencia.
 
 ---
 
+## D-07 -- El nombre: `nac-spec` es el nombre público, el paquete sigue siendo `@nac3/*`
+
+**Traída al dueño:** 2026-11-07, desde el registro de pendientes (**PND-084**),
+donde el pedido quedó registrado con su medición y sin ejecutar nada. El pedido
+original había sido *"considera ir reemplazando nac3 por nac-spec"*, y lo que se
+le trajo fue que **no es una cosa, son tres**, con costos que se separan en dos
+órdenes de magnitud: la vidriera (gratis y reversible), el ámbito de npm (rompe
+adoptantes) y los identificadores del protocolo (rompe a todo adoptante).
+
+**Decisión del dueño, 2026-11-07, textual:**
+
+> 2) nac-spec como nombre público. Paquete sigue nac3.
+
+**Qué eligió:** **la capa 1 sola.** `nac-spec` es el nombre con el que el
+proyecto se presenta y por el que se lo busca; `NAC3` sigue siendo el nombre del
+protocolo en el texto normativo; el paquete y los identificadores no se tocan.
+
+**De dónde salió el reencuadre, para que no se reabra.** La medición del
+2026-11-07 encontró dos cosas que apuntan en direcciones distintas. Buscar
+*"nac3"* **no** devuelve este proyecto: el nombre ya pertenece al compilador NAC3
+de ARTIQ/M-Labs y a una sigla de materia universitaria brasileña. Y `nac-spec`,
+`nacspec` y `@nac-spec` están **libres** en npm (`npm view` → 404 los tres,
+2026-11-07), así que quien busque ese término encuentra sólo a este proyecto. Pero
+la misma medición mostró que **los que llegan no llegan por el nombre**: llegan
+por lo que el sistema hace. Entonces el problema nunca fue cómo se llama el
+protocolo, era que el *nombre* estuviera cargando con el trabajo de que lo
+encuentren, y eso se resuelve en la vidriera y no en el contrato.
+
+**Consecuencia -- lo que queda aplicado.**
+
+* **Las etiquetas de GitHub** (`yujinapp/nac-spec`): `nac-spec` entró entre las
+  veinte que GitHub permite, y salió `javascript`, que era la más genérica.
+  Verificado releyendo `gh repo view yujinapp/nac-spec --json repositoryTopics`.
+* **La descripción del repositorio** abre con `nac-spec` y nombra al protocolo
+  enseguida: el nombre público primero, el nombre del protocolo después. Es
+  metadata y se revierte con una llamada.
+* **Los dos lugares donde el proyecto ya se publicaba así** quedan como estaban,
+  porque ya eran correctos: el repositorio se llama `nac-spec` y el sitio vive en
+  `/nac-spec/` (**D-02**).
+
+**Pendiente -- lo que la decisión habilita y todavía no puede viajar.** Las
+`keywords` y la `description` de npm **viajan adentro del paquete**: no se editan
+desde la web, sólo publicando. Y `runtime/package.json` está bajo el candado que
+compara el paquete publicado contra el árbol de **esa** versión, así que editarlo
+con la 2.5.2 ya publicada pone en rojo cada empujón --- con razón. La mejora
+queda medida y lista para viajar en el próximo cambio de versión (**PND-088**).
+No se sube una versión sólo para esto: la versión se declara una sola vez y
+arrastra los generadores, las 273 páginas, las nueve traducciones y la firma del
+contrato.
+
+**Lo que esta decisión NO hace, dicho por su nombre.**
+
+* **No renombra el paquete.** `@nac3/runtime` sigue siendo el nombre publicado.
+  npm no renombra: se publica un nombre nuevo y se deprecia el viejo, y los dos
+  quedan para siempre. Y las **dos puertas de entrega** de este proyecto
+  (sección 2 de `CLAUDE.md`) --- traer el tarball de vuelta y compararlo byte por
+  byte, verificar el sitio desde afuera --- pasarían a ser tres o cuatro.
+* **No toca los identificadores del protocolo.** `data-nac-id`, `data-nac-role` y
+  los demás quedan congelados: 631 archivos del árbol los llevan, el `SPEC.md`
+  declara que no se traducen --- idénticos letra por letra en las nueve
+  traducciones --- y cambiarlos rompe a cualquier adoptante, que es lo que la
+  **regla 10** del contrato de convivencia prohíbe hacer en silencio. Dato que
+  conviene no perder: los atributos se llaman `nac`, **no** `nac3`, así que la
+  colisión de nombre no los toca.
+* **No cambia el texto normativo.** `SPEC.md` sigue llamando al protocolo NAC3.
+
+**La medición que corrigió el precio, y que quedó registrada aparte.** Lo que se
+le había dicho al dueño el 2026-11-06 --- que el paquete tenía 620 descargas en
+un mes y el repositorio 492 clonados de unos 140 orígenes "que no son tu propia
+cadena de despliegue" --- **era falso en su segunda mitad**. Medido día por día:
+473 de las 620 descargas cayeron en dos días, los dos en que se trabajó el
+candado que **baja el paquete publicado** para compararlo contra el árbol, y los
+picos de clonados caen en los días de 14 y 7 corridas de la cadena. O sea que el
+proyecto se fabrica sus propias descargas y no hay un solo adoptante externo
+demostrable. Eso **abarata** renombrar, no lo encarece, y el dueño eligió igual
+no renombrar: lo que sigue siendo caro --- dos nombres para siempre, dos puertas
+que se vuelven cuatro --- es independiente del tráfico. La medición está en
+**PND-076** y en `docs/internal/`.
+
+---
+
 ---
 
 *Producido en la estación N2 de la escalera Urazuke. Una entrada de este archivo

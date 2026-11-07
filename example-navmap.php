@@ -31,7 +31,7 @@ $assetVersion = 'v1';
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NAC v1.2 -- system map demo</title>
 <meta name="description" content="NAC v1.2 first-contact discovery: an agent walks an unknown system using NAC.system_map() and acts without scraping.">
-<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/nac-spec/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">

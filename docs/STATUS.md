@@ -36,6 +36,7 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 | Spec translations | `npm run stats:translations` | **green** -- canonical 283 units / 83 sections; all nine locales 283/283, 83/83, no orphans |
 | Integrity, stylesheets, mount path, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
 | Mount path lock | `npm run check:mount` | **green** 2026-10-30 -- 321 pages, 812 references under the mount, 57 relative `<script>` srcs resolved, 10 of 10 declaration sites agreeing; its red proof `npm run test:mount-gate` passes **21 of 21** cases |
+| In-tree link lock | `npm run check:tree-links` | **57 references across 21 missing targets** 2026-11-07 -- all in the May-era translated companion docs and guides (27 of one shape: `i18n/<loc>/{CONTRIBUTING,README_DEMOS,SECURITY}.html` linking `../SPEC.md`, which from two levels down names `i18n/SPEC.md`). **Deliberately NOT in `check:release`** until it is green, because several missing targets are documents whose existence is an owner decision; its red proof `npm run test:tree-links` passes **10 of 10** assertions, rebuilding the two defects it was written for |
 | Full deploy chain | push to `main` | **green**, 24 steps, run 41061305762 |
 
 **Not in the chain**, declared so nobody reads "green" as "everything here is

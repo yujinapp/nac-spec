@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Yujin">
+  <title>Yujin</title>
+  <!--
+    Rama de sakura. Adaptado de branch-sakura.svg del Yujin Design System
+    (yujin-forge/yujin-design-system/icons/sumie/), con la paleta de
+    yujin.app: papel #F7F4EC, tinta #7D2C09, bermellon #B7410E.
+
+    Tres cosas que este dibujo aprendio a los golpes:
+
+    1. El icono original vive dentro de una hoja de estilos (currentColor,
+       stroke-width 1.5). Un favicon se sirve suelto, sin CSS: aca todo va
+       explicito, y mas grueso, porque a 16px un trazo de 1.5 desaparece.
+
+    2. Las flores van AL COSTADO del trazo y alternando de lado, cada una
+       con su ramita. Centradas sobre la linea se lee una brocheta: tres
+       bolas ensartadas en un palo.
+
+    3. La rama va en dos tramos de distinto grosor (2.6 en la base, 1.5 en
+       la punta) con remates redondos que los empalman. Un trazo de grosor
+       parejo se lee como palito de brocheta; el afinamiento es lo que lo
+       vuelve una rama.
+
+    Las flores son rosetas de cinco petalos, no circulos macizos. A 16px la
+    roseta se funde en un punto ; que es justo la degradacion que se busca:
+    legible de lejos, flor de cerca.
+  -->
+  <rect width="32" height="32" rx="7" fill="#F7F4EC"/>
+
+  <defs>
+    <g id="flor">
+      <circle cx="0"     cy="-1.75" r="1.32"/>
+      <circle cx="1.66"  cy="-0.54" r="1.32"/>
+      <circle cx="1.03"  cy="1.42"  r="1.32"/>
+      <circle cx="-1.03" cy="1.42"  r="1.32"/>
+      <circle cx="-1.66" cy="-0.54" r="1.32"/>
+      <circle cx="0"     cy="0"     r="0.78" fill="#F7F4EC"/>
+    </g>
+  </defs>
+
+  <!-- rama: base gruesa + punta fina, empalmadas por los remates redondos -->
+  <g fill="none" stroke="#7D2C09" stroke-linecap="round">
+    <path d="M4.6 27.4 Q9 23.4 13.6 18.9" stroke-width="2.6"/>
+    <path d="M13.6 18.9 Q19.2 13.2 26.1 6.6" stroke-width="1.5"/>
+    <!-- ramitas hacia cada flor -->
+    <g stroke-width="1.15">
+      <path d="M9.7 22.7 L7.9 20.6"/>
+      <path d="M16.3 16.2 L18.5 17.8"/>
+      <path d="M21.8 10.6 L20.4 8.6"/>
+    </g>
+  </g>
+
+  <!-- flores -->
+  <g fill="#B7410E">
+    <use href="#flor" x="6.5"  y="19.1"/>
+    <use href="#flor" x="20.0" y="19.3"/>
+    <use href="#flor" x="19.2" y="7.2"/>
+    <!-- pimpollo en la punta -->
+    <circle cx="26.1" cy="6.6" r="1.45"/>
+  </g>
+</svg>

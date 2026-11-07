@@ -29,7 +29,7 @@ $assetVersion = 'v69';
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NAC v1.8 -- live demo</title>
 <meta name="description" content="Live demo of NAC v1.8 -- a public spec for making web UIs drivable by AI assistants, voice runners, and accessibility tools. Drive this page with your voice or with a chat agent.">
-<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/nac-spec/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">

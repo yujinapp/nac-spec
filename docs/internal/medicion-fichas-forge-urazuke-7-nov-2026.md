@@ -52,6 +52,14 @@ Es el que corre CI. Diferencia exacta, medida desempaquetando el tarball publica
 >     "postpublish": "node ../scripts/verify-npm-publication.mjs --mode post-publish ..."
 ```
 
+**Precision agregada el mismo dia, al arreglarlo (PND-083, commit `a2875df`).** Arriba
+dice "UNA linea agregada" y la cuenta exacta de un diff de lineas es **dos agregadas y
+una removida**: el `83c83,84` que esta transcripto ahi mismo significa "la linea 83 pasa a
+ser las 83-84", o sea que la version sin coma se fue y entraron la version con coma mas el
+hook. Un solo cambio logico, tres lineas de diff. Lo que estaba mal era "12", no la
+diferencia entre una y tres: el candado arreglado informa "2 lines added and 1 removed
+since the publication".
+
 Dos imprecisiones del propio candado, registradas sin tocarlas (regla 3): informa
 "12 line(s)" cuando difiere **una** (compara por posicion, y una linea insertada
 corre las doce siguientes), y el nombre `verify:npm` no dice que su testigo es otro.

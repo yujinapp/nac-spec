@@ -243,6 +243,122 @@ el criterio equivocado. Y los documentos de `docs/` que **ya** se sirven ---
 treinta y pico de URLs adivinables --- siguen sirviéndose: regla 17, lo publicado
 no se borra, se redirige, y eso todavía no se decidió.
 
+## D-05 -- El posicionamiento se extiende a Forge y a Urazuke
+
+**Continuación de D-03**, traída desde el registro de pendientes (**PND-081**
+para Forge y **PND-082** para Urazuke), los dos abiertos y bloqueados esperando
+exactamente esta palabra.
+
+**Traída al dueño:** 2026-11-07, con la medición de las dos fichas
+(`docs/internal/medicion-fichas-forge-urazuke-7-nov-2026.md`): el paquete de
+Forge con 11.202 descargas en un mes y sus dos enlaces principales apuntando a
+un repositorio privado que contesta 404 a quien no tiene acceso; la ficha de
+Urazuke diciéndole al visitante *"nombre provisorio; en elaboración"* mientras su
+README, su sitio y su etimología dicen lo contrario, sin sitio declarado, sin
+etiquetas y sin licencia que GitHub reconozca.
+
+**Decisión del dueño, 2026-11-07, textual:**
+
+> Arregla todos los issues sobre Nac3, Forge y Urazuke
+
+**Qué eligió:** ejecutar. Lo que en PND-081 y PND-082 estaba escrito como
+*decisión previa del dueño* queda decidido en la dirección afirmativa, con una
+sola excepción que el propio dueño separó en el mismo mensaje y sigue abierta
+(el repositorio viejo, abajo).
+
+**Consecuencia -- lo que se hizo el mismo día.**
+
+* **Forge** (`yujinapp/yujin-forge`, commit `b76ab2b`): `homepage` pasa a
+  `https://yujin.app/yujin-forge/` (verificado 200); `bugs` a la misma página
+  más `contact@yujin.app`, que `docs/SECURITY.md` y `docs/PRIVACY_POLICY.md` ya
+  publican; y el campo `repository` **se quitó** --- decisión del agente, escrita
+  acá para que se pueda revisar: el código vive en privado, un campo ausente no
+  afirma nada y uno que apunta a un 404 afirma algo falso. En
+  `packages/nac3-rn`, `homepage` pasa de `https://yujin.app/forge` (404) a
+  `/yujin-forge/`. El README publicado, que abría con *"Status: v1.0.51
+  (2026-06-28)"*, declara la versión que es --- 1.28.0, publicada el 2026-11-04
+  según el registro --- y las notas de abajo quedan **fechadas en la versión que
+  las midió**, para no re-afirmar como actuales afirmaciones que nadie re-midió.
+  **Nada de esto llega a npm hasta la próxima publicación:** el registro sirve el
+  `package.json` del tarball, no el del repositorio.
+* **Urazuke** (`pkuschnirof/urazuke`, por API): descripción sin el *"nombre
+  provisorio; en elaboración"*; `homepage` a `https://yujin.app/urazuke/`
+  (verificado 200, y su único canal real: cinco de las seis llegadas de catorce
+  días vienen de ahí); **veinte etiquetas** donde había cero; y la wiki vacía
+  deshabilitada. La **licencia** va por PR (`pull/37`, rama
+  `ficha/licencia-detectable`, compuertas en verde) y no por API, porque es
+  contenido del repositorio, porque su README dice textual que *"nadie más
+  escribe en `main`"* y porque un push a `main` de ese repositorio despliega a
+  producción: `LICENSE` pasa a ser el texto legal canónico de CC BY-SA 4.0 --- el
+  que reconoce el detector de GitHub --- y `LICENCIA.md` conserva intacta la
+  lectura en castellano con sus notas (alcance, marcas no licenciadas, clientes
+  anonimizados). **La licencia no cambia; cambia cómo se declara.**
+* **NAC3** (este árbol, commit `a2875df`): el único defecto de código del
+  pedido, **PND-083**, cerrado. El candado de publicación informaba *"12
+  line(s)"* por una sola línea agregada (comparaba por posición) y su rojo
+  afirmaba *"the published npm package is NOT this tree"* sin decir que el
+  testigo elegido no era el del contrato. Las dos cosas arregladas con sus
+  pruebas en rojo (casos 12 y 13, probados rojos contra el código anterior).
+
+**Cerrado de D-03:** la imagen de vista previa social, que D-03 dejó abierta por
+no tener API, **la subió el dueño el 2026-11-07** en los dos repositorios.
+Verificado: `usesCustomOpenGraphImage = true` en `yujinapp/nac-spec` y en
+`pkuschnirof/urazuke`, las dos sirviendo PNG de 1280 x 640 (136 KB y 119 KB).
+
+**Abierto -- lo que esta decisión NO resolvió.**
+
+* **La publicación del paquete de Forge.** Hasta que el dueño publique, la página
+  de npm sigue mostrando los enlaces muertos. Publicar un paquete con 11.202
+  descargas al mes no lo decide el agente (**PND-081** sigue abierto).
+* **La fusión del PR de Urazuke.** La insignia de licencia aparece al fusionar
+  (**PND-082** sigue abierto).
+* **Qué parte de Forge es pública.** Quien busca *"yujin forge"* en GitHub
+  encuentra `pkuschnirof/yujin-forge`, un esqueleto de mayo de 0,12 MB.
+* **El reparto de licencias de Urazuke** entre la prosa del método y los
+  artefactos con forma de código (`build/*.mjs`, `gates/*.json`). El *compartir
+  igual* sobre ejecutables le hace dudar a cualquiera que quiera meter los
+  evaluadores en su propia cadena.
+* **El repositorio viejo** `pkuschnirof/nac-spec` (**PND-080**), que el dueño
+  separó explícitamente en el mismo mensaje como pregunta abierta: *"Cómo hacemos
+  Eliminamos pkuschnirof/nac-spec ó lo ruteamos al nuevo?"*. Sin decidir.
+* **El nombre.** El dueño pidió en la misma sesión *"considera ir reemplazando
+  nac3 por nac-spec"*. Registrado con su análisis y su medición en **PND-084**,
+  sin ejecutar nada: toca el ámbito de npm y los identificadores del protocolo,
+  que es la clase de cambio que rompe adoptantes.
+
+---
+
+## D-06 -- El método Urazuke queda suspendido en este proyecto
+
+**Traída al dueño:** no se trajo. El dueño lo decidió y lo ejecutó él mismo en la
+configuración de Forge, en medio de la sesión del 2026-11-07.
+
+**Decisión del dueño, 2026-11-07, textual:**
+
+> Apaga el método urazuke, no le des bolilla por ahora. Ya lo apagué del config.
+
+**Qué eligió:** suspender --- *"por ahora"*, no derogar. Se escribe acá porque
+tiene dos consecuencias verificables que una sesión futura descubriría a los
+golpes.
+
+**Consecuencia.** Los verbos `yujin.urazuke.*` y **`yujin.evidence.run`**
+contestan *"Urazuke is disabled for this Forge"*. O sea: **el proyecto ya no
+puede producir recibos de evidencia**, y el registro de pendientes exige la terna
+(prueba en rojo + verde + regresión) para cerrar con `shipped`. El cierre de
+PND-083 de hoy tuvo que usar la salida escrita del propio registro
+(`sin_recibos_porque`), con los tres comandos y sus resultados transcriptos para
+que el dueño los pueda correr tal cual. Mientras la suspensión siga, **todo
+cierre de código va a quedar contado como excepción** en `pending stats`. Eso no
+es un efecto secundario molesto: es la medida de la suspensión, y conviene que se
+vea.
+
+**Lo que NO cambia:** las tareas `[WFL-001]` siguen abiertas en el registro
+(PND-004 a PND-028) y el trabajo sigue saliendo del registro, no de la impresión
+(sección 5 de `CLAUDE.md`). Lo que se apagó es la escalera y sus recibos, no la
+disciplina del registro ni el contrato de convivencia.
+
+---
+
 ---
 
 *Producido en la estación N2 de la escalera Urazuke. Una entrada de este archivo

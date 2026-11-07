@@ -168,12 +168,31 @@ lo que parezca urgente en la conversación. Dos reglas que ya costaron tiempo:
 * Lo que aparece de paso —un secreto en el código, un camino muerto, una regla duplicada,
   una consulta sin índice— **se registra con su evidencia**, no se arregla en el momento.
 
-## 6. El método: Urazuke
+## 6. El método: Urazuke -- **suspendido desde el 2026-11-07**
 
-El proyecto corre la escalera Urazuke para un sistema heredado (`WFL-001`): las tareas son
-pendientes `[WFL-001]` y se cierran **en orden**. La estación actual y la consigna del
-peldaño se consultan con `yujin.urazuke.status` / `yujin.urazuke.step`. Un peldaño cierra
-cuando Forge lo evalúa **verde** con recibos, nunca con un resumen del agente.
+**Decisión del dueño, 2026-11-07** (*"Apaga el método urazuke, no le des bolilla por
+ahora. Ya lo apagué del config."*, `docs/DECISIONS.md` D-06): el método está **apagado
+en la configuración de Forge**. Suspendido *"por ahora"*, no derogado. No se lo invoque
+ni se lo cite como vigente: `yujin.urazuke.*` y **`yujin.evidence.run`** contestan
+*"Urazuke is disabled for this Forge"*.
+
+Lo que eso obliga, y hay que saberlo antes de cerrar algo: **el proyecto no puede
+producir recibos de evidencia**, y el registro de pendientes exige la terna (prueba en
+rojo + verde + regresión) para cerrar con `shipped`. Hay que usar la salida escrita del
+propio registro (`sin_recibos_porque`), transcribiendo los comandos y sus resultados para
+que el dueño los pueda correr tal cual --- y cada cierre así queda **contado como
+excepción** en `pending stats`. Eso es la medida de la suspensión y conviene que se vea.
+
+**Lo que NO cambió:** las tareas `[WFL-001]` siguen abiertas en el registro (PND-004 a
+PND-028), el trabajo sigue saliendo del registro y no de la impresión (sección 5), y el
+contrato de convivencia (sección 0) rige entero. Lo que se apagó es la escalera y sus
+recibos.
+
+Cómo era, para cuando se vuelva a encender: el proyecto corría la escalera Urazuke para un
+sistema heredado (`WFL-001`), las tareas eran pendientes `[WFL-001]` que se cerraban **en
+orden**, la estación y la consigna del peldaño se consultaban con `yujin.urazuke.status` /
+`yujin.urazuke.step`, y un peldaño cerraba cuando Forge lo evaluaba **verde** con recibos,
+nunca con un resumen del agente.
 
 **Compuerta de dimensionamiento (G9):** antes de escribir código que soporte carga hay que
 registrar la volumetría, la retención y el envoltorio de hardware (`yujin.sizing.*`). Los

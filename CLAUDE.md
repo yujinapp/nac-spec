@@ -135,9 +135,27 @@ algo que el dueño todavía no decidió (regla 10), y las decisiones evitan
 reabrir algo que ya decidió. Los cuatro se excluyen del despliegue del sitio:
 son documentos de proceso, el de discrepancias nombra los puntos flojos del
 sistema y el de decisiones cita al dueño textualmente. Esa lista de exclusión
-se mantiene **a mano** y nada la verifica: un documento interno nuevo bajo
-`docs/` se publica por omisión si nadie se acuerda de agregarlo
-(`.github/workflows/deploy.yml`, paso *Stage files for upload*).
+se mantiene **a mano** y nada la verifica.
+
+**Dónde nace un documento interno nuevo: `docs/internal/`.** Desde el
+2026-11-07 el despliegue excluye **ese directorio entero** con una sola regla
+anclada (`--exclude='/docs/internal/'`), así que un documento de trabajo que
+nace ahí queda fuera del sitio **por omisión**, sin que nadie se tenga que
+acordar. Ahí viven hoy los tres documentos de la medición de visibilidad y de
+la investigación de aocr.org: llevan lectura comercial y nombran a una
+organización identificable. Verificado el 2026-11-07 corriendo el `rsync` del
+propio workflow en seco, con control positivo y prueba en rojo: con la
+exclusión suben 1313 archivos y ninguno de `docs/internal/`; sin ella suben
+1317 y la diferencia son exactamente esos cuatro; `docs/ELIGIBILITY.md` sube en
+los dos casos, que es lo que prueba que la sonda sí ve `docs/`.
+
+**Lo que esto NO arregla:** un documento interno escrito directo en `docs/` --
+no bajo `docs/internal/` -- **sigue publicándose por omisión**, y los seis
+nombres de la lista siguen a mano sin candado
+(`.github/workflows/deploy.yml`, paso *Stage files for upload*). No se
+construyó candado a propósito: lo que falta decidir es **qué** debe ser
+público (**PND-068**), y un candado hecho antes de esa decisión clavaría el
+criterio equivocado.
 
 ## 5. El orden del trabajo sale del registro, no de la impresión
 

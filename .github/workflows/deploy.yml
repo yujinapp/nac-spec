@@ -282,9 +282,9 @@ jobs:
       - name: Stage files for upload
         # Strip junk that should never land on the live server.
         #
-        # The last six are internal process documents, not product: the
-        # session bootstrap (CLAUDE.md) and the working agreement it
-        # loads, which carries the owner's name, how he works and the
+        # The six named documents below are internal process documents, not
+        # product: the session bootstrap (CLAUDE.md) and the working agreement
+        # it loads, which carries the owner's name, how he works and the
         # decisions he has taken; the three artefacts of the reading of
         # the system (N2) -- the recovered map, the living state and the
         # discrepancy sheet; and the owner's decision log (DECISIONS.md),
@@ -301,11 +301,27 @@ jobs:
         # reversible choice -- working agreement rule 17: what is
         # published is not deleted, it is redirected.
         #
-        # This list is maintained BY HAND and nothing verifies it: a new
-        # internal document under docs/ is published by default unless
-        # someone remembers to add it here (measured 2026-10-30, when
-        # DECISIONS.md needed the sixth manual entry). Tracked in the
-        # pending registry with the rest of the docs/ publication call.
+        # The seventh exclusion is a DIRECTORY, not a name: everything
+        # under docs/internal/ never reaches the server. Added 2026-11-07
+        # for the three loose working documents of the visibility and
+        # aocr.org measurements, which carry commercial reading and name
+        # an identifiable third-party organisation. A directory rule was
+        # chosen over three more exclude-by-name lines so the NEXT internal
+        # document is excluded by DEFAULT rather than by someone
+        # remembering: the convention is that an internal working document
+        # is born under docs/internal/. The pattern is ANCHORED
+        # ('/docs/internal/') so it cannot match a directory of that name
+        # somewhere else in the tree.
+        #
+        # The six names above are still maintained BY HAND and nothing
+        # verifies them (measured 2026-10-30, when DECISIONS.md needed the
+        # sixth manual entry). The directory rule narrows that gap but does
+        # NOT close it: a new internal document written straight into docs/
+        # -- not under docs/internal/ -- is still published by default. No
+        # gate was built here on purpose: the open question is WHAT must be
+        # public (tracked in the pending registry as the docs/ publication
+        # call), and a gate built before that decision would nail down the
+        # wrong criterion.
         run: |
           rm -rf _deploy_stage
           mkdir -p _deploy_stage
@@ -329,6 +345,7 @@ jobs:
             --exclude='STATUS.md' \
             --exclude='DISCREPANCIES.md' \
             --exclude='DECISIONS.md' \
+            --exclude='/docs/internal/' \
             ./ _deploy_stage/
           echo "Staged $(find _deploy_stage -type f | wc -l) files / $(du -sh _deploy_stage | cut -f1)"
 

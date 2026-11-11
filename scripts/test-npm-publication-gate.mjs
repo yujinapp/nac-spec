@@ -35,7 +35,7 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { createServer } from 'node:http';
 import { spawn, execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writeTar } from './lib/tar.mjs';
@@ -349,6 +349,13 @@ async function main() {
   let olderRef = null;
   try {
     const idx = join(ROOT, '.tmp', 'npm-gate-witness-index');
+    /* .tmp/ is gitignored, so it exists on a worked-in checkout and
+       does NOT exist on a fresh clone -- which is every CI run. Without
+       this the plumbing could not create its lock file, the witness
+       could not be built, and the case went red on the runner while
+       passing on the machine that wrote it. Measured 2026-11-11, run
+       43118999733. */
+    mkdirSync(dirname(idx), { recursive: true });
     const env = { ...process.env, GIT_INDEX_FILE: idx };
     const git = (args, opts = {}) =>
       execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', env, ...opts }).trim();

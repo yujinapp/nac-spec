@@ -152,9 +152,13 @@ se mantiene **a mano** y nada la verifica.
 2026-11-07 el despliegue excluye **ese directorio entero** con una sola regla
 anclada (`--exclude='/docs/internal/'`), así que un documento de trabajo que
 nace ahí queda fuera del sitio **por omisión**, sin que nadie se tenga que
-acordar. Ahí viven hoy los tres documentos de la medición de visibilidad y de
-la investigación de aocr.org: llevan lectura comercial y nombran a una
-organización identificable. Verificado el 2026-11-07 corriendo el `rsync` del
+acordar. Ahí viven los documentos de trabajo que llevan lectura comercial,
+nombran a una organización identificable o razonan sobre un acuerdo todavía no
+firmado: la medición de visibilidad, la investigación de aocr.org, el traspaso
+del 11-nov, la lectura del contrato de Alignerr y la medición de los enganches
+que faltan en el contrato de extensión (`CANVAS_HOOKS_AUDIT_2026-11-11.md`).
+La exclusión es por directorio, así que un archivo nuevo ahí **no** cambia nada
+de lo verificado abajo. Verificado el 2026-11-07 corriendo el `rsync` del
 propio workflow en seco, con control positivo y prueba en rojo: con la
 exclusión suben 1313 archivos y ninguno de `docs/internal/`; sin ella suben
 1317 y la diferencia son exactamente esos cuatro; `docs/ELIGIBILITY.md` sube en

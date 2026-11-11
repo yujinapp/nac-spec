@@ -22,6 +22,13 @@ decididas quedan con su frase textual en `docs/DECISIONS.md`.
 **Decididas hasta hoy (2026-10-30):** 2 de 8 -- D-01 y D-02. Las otras seis
 siguen esperando su palabra y **ninguna se tocó**.
 
+**Agregadas el 2026-11-11:** cinco más, **D-09 a D-13**, todas del contrato de
+extensión de la sección 15 (el camino por el que una superficie nueva vive en
+otro repositorio). Aparecieron midiendo los enganches que faltan a pedido del
+dueño; la medición completa está en
+`docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md`. Total hoy: **13 entradas, 2
+decididas**.
+
 **Lo que no está acá.** Los hallazgos donde **una sola punta tiene razón** no
 son discrepancias: son hallazgos, y por la regla 9 van al registro de pendientes
 con su evidencia. Están listados al final, en la sección 2, con su número.
@@ -285,6 +292,115 @@ esta lista se mueve con él.
 
 ---
 
+### D-09 -- La sección 15.7 cita `NAC.set_source(...)` y ese mecanismo no existe
+
+| Punta | Qué dice | Evidencia |
+|---|---|---|
+| El texto normativo | 15.7: la procedencia de una acción de plugin trae `source: 'agent'` por omisión, y *"los anfitriones que envuelven el runtime en una UI de usuario **PUEDEN** sobreescribirlo por el mecanismo existente `NAC.set_source(...)` (sec 7)"* | `SPEC.md` línea 1600 |
+| El código | `NAC.set_source` **no existe**: cero ocurrencias en `js/` y en `runtime/`, salvo esa misma línea del SPEC (y su copia en `runtime/SPEC.md`). `_v25_emitProvenance` escribe `source: 'agent'` y `trusted: false` **fijos**, sin forma de sobreescribirlos | `js/nac.js`, leído el 2026-11-11 |
+
+**Consecuencia medible:** toda llamada de plugin queda sellada como de agente y
+no confiable. Un registro de auditoría no puede distinguir a una persona
+tocando la barra de un lienzo (a través del plugin) de un agente haciendo lo
+mismo.
+
+**Qué hay que decidir.** Se implementa `set_source` (y entonces el texto queda
+cumplido), o se corrige 15.7 para que no prometa un mecanismo que no existe.
+
+**Mi recomendación: corregir el texto ahora y registrar el mecanismo como
+pendiente.** Implementar una API nueva sin adoptante que la pida es construir
+de más; prometerla por escrito ya es deuda.
+
+**Estado:** traída el 2026-11-11, sin decidir.
+
+---
+
+### D-10 -- El modo `read` de `sdk-call` está implementado y no está declarado
+
+| Punta | Qué dice | Evidencia |
+|---|---|---|
+| El texto normativo | 15.4: `sdk-call` tiene `mode` con dos valores -- `assign` (asignar el path al valor de los argumentos) e `invoke` (llamarlo como función) | `SPEC.md` tabla de 15.4 |
+| El código | El repartidor implementa **tres** modos: `assign`, `invoke` y `read`, que devuelve el valor del path sin llamarlo. Y el propio `read()` del runtime trae un comentario que lo nombra: *"para sdk-call con mode:read, el valor crudo es el valor del path"* | `js/nac.js`, leído el 2026-11-11 |
+
+**Por qué importa:** `read` es justamente el modo que hace falta para leer el
+estado de una librería desde un plugin -- el centro de un mapa, la posición de
+un video, la página de un PDF. Está en el código, funciona, y un adoptante que
+lea el texto normativo no sabe que existe.
+
+**Qué hay que decidir.** Se declara el tercer modo en 15.4 (el código ya lo
+hace; sería el texto alcanzando al código, regla 10), o se quita del runtime
+-- que rompería a cualquiera que ya lo use.
+
+**Mi recomendación: declararlo.** Es comportamiento publicado desde la 2.5 y la
+regla 10 dice que el comportamiento actual es la especificación.
+
+**Estado:** traída el 2026-11-11, sin decidir.
+
+---
+
+### D-11 -- El tiempo de espera de una lectura de estado: el texto dice 1000 ms, el código usa 5000
+
+| Punta | Qué dice | Evidencia |
+|---|---|---|
+| El texto normativo | 15.9, código `timeout`: *"un backend no respondió dentro de su `timeout_ms` declarado (por omisión **5000 para verbos, 1000 para lecturas de estado**)"* | `SPEC.md` sección 15.9 |
+| El código | El único backend con tiempo de espera es `script-bridge`, y usa `binding.timeout_ms || 5000` **sin distinguir** si lo llamó un verbo o una lectura de estado. Los otros tres backends de estado no tienen tiempo de espera declarado | `js/nac.js`, leído el 2026-11-11 |
+
+**Consecuencia medible:** una lectura de estado que no contesta cuelga cinco
+segundos y no uno. Con `expect()` reintentando, eso multiplica la espera de una
+confirmación.
+
+**Qué hay que decidir.** El código honra los 1000 ms de las lecturas, o el
+texto pasa a declarar 5000 para las dos cosas.
+
+**Estado:** traída el 2026-11-11, sin decidir.
+
+---
+
+### D-12 -- La lista de códigos de error es cerrada en el texto y abierta en el código
+
+| Punta | Qué dice | Evidencia |
+|---|---|---|
+| El texto normativo | 15.9 presenta **diez** códigos y dice *"`NAC.call` / `read` / `subscribe` rechazan con un `NacError` cuyo `code` **es uno de** los siguientes"* | `SPEC.md` sección 15.9 |
+| El código | `call` levanta a `NacError` **cualquier** código que el backend ponga en `err._code`, sin validarlo contra la lista | `js/nac.js`, leído el 2026-11-11 |
+
+**Por qué importa, y no es un detalle:** esa vía no declarada es hoy el **único**
+mecanismo por el que un plugin puede distinguir *"esa fila no está montada"* de
+*"esa fila no existe"* -- que es literalmente lo que exige la aceptación de
+PND-099 (grillas virtualizadas). Funciona por accidente de implementación, no
+por contrato: un adoptante no sabe que existe y un runtime futuro que respete la
+lista cerrada lo puede clavar sin romper nada escrito.
+
+**Qué hay que decidir.** Se declara el espacio de códigos de plugin (con su
+prefijo, para que no colisione con los diez), o el runtime clava la lista y los
+plugins pierden el error de dominio.
+
+**Mi recomendación: declararlo con prefijo.** Es barato y desbloquea la
+superficie más común de las siete.
+
+**Estado:** traída el 2026-11-11, sin decidir.
+
+---
+
+### D-13 -- La motivación de 15.1 nombra un caso que el backend implementado no alcanza
+
+| Punta | Qué dice | Evidencia |
+|---|---|---|
+| El texto normativo | 15.1, entre los cuatro casos que la sección existe para resolver: *"invocar `excalidrawAPI.setElements(...)` sobre una referencia de React"* | `SPEC.md` sección 15.1 |
+| El código | `sdk-call` resuelve su `path` **contra el objeto global** (`window`) y nada más, y en modo `invoke` pasa **exactamente un argumento**. Una referencia de React no vive en `window`, así que ese caso no se puede expresar sin que el adoptante publique a mano una función de pegamento global | `js/nac.js`, leído el 2026-11-11 |
+
+Es la más débil de las cinco: es prosa de motivación contra implementación, no
+una cláusula normativa incumplida. Se registra igual para que no se pierda,
+porque es el mismo hueco que encarece cuatro de las siete superficies nuevas
+(ver E-4 en `docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md`).
+
+**Qué hay que decidir.** Se agrega una vía para alcanzar un handle que no está
+en `window` (y mapeo de argumentos posicionales), o se corrige la motivación
+para que no nombre un caso que el backend no cubre.
+
+**Estado:** traída el 2026-11-11, sin decidir.
+
+---
+
 ## 2. Hallazgos que **no** son discrepancias (una sola punta tiene razón)
 
 Van al registro de pendientes con su evidencia, por la regla 9. No se arreglaron
@@ -298,6 +414,8 @@ de paso.
 | H-4 | La publicación a npm se hace a mano; automatizarla necesita un secreto del repositorio que solo el dueño puede guardar | medido en la toma | PND-067 |
 | H-5 | Todo `docs/` se sirve hoy en direcciones públicas no enlazadas pero adivinables | `docs/ELIGIBILITY.md` responde 200, medido el 2026-10-30 | PND-068 |
 | H-6 | Dos candados que necesitan navegador no corren en la cadena (`test:limits`, `test:cli-levels`) | `deploy.yml`, leído hoy | PND-049 |
+| H-7 | `synthetic-mutation` devuelve una suscripción válida que **nunca dispara** cuando ninguno de sus nodos espejo está en el documento: con cero elementos el `MutationObserver` no observa nada y nadie avisa. Es el caso de una fila virtualizada que no está pintada -- daño silencioso adentro del protocolo | `js/nac.js`, leído el 2026-11-11 | **PND-110** |
+| H-8 | Faltan seis enganches en el núcleo público para que una superficie nueva viva en otro repositorio por el contrato de la sección 15: el registro no se puede enumerar, el manifest no declara argumentos ni etiquetas, y no hay backend para una fuente de eventos real que no sea postMessage | medición de lectura del 2026-11-11, `docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md` | **PND-109** |
 
 Las otras tres ramas (`portada-look-urazuke`, `release/2.5.0`, `release/2.5.1`)
 están **0 commits adelante** de `main`: son marcas de historia, no trabajo

@@ -1,5 +1,5 @@
 ---
-translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
+translation_source_hash: caf3443bf87e4d47dd62a446f575298f876f691d6e52da165cb547b064536267
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: zh
 translation_source: SPEC.md
-translation_source_version: 2.5.2
+translation_source_version: 2.6.0
 translation_source_date: 2026-10-27
-translation_sections: 83
-translation_sections_canonical: 83
-translation_units: 283
-translation_units_canonical: 283
+translation_sections: 85
+translation_sections_canonical: 85
+translation_units: 299
+translation_units_canonical: 299
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **机器翻译，非规范性文本。** 本文翻译的是 2026-10-27 的英文版 (NAC3 v2.5.2)，覆盖当前原文的 83 / 83 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。
+> **机器翻译，非规范性文本。** 本文翻译的是 2026-10-27 的英文版 (NAC3 v2.6.0)，覆盖当前原文的 85 / 85 节。规范性文本为英文版；本译文与英文版不一致时，以英文版为准。
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**版本:** 2.5.2 (稳定版 -- 完整的 v2.5 表面: narrate、context+tree、expect+diff)
+**版本:** 2.6.0 (稳定版 -- v2.5 的全部表面, 加上 v2.6 的插件扩展挂钩: 发现、自我描述、emitter-listen)
 **状态:** 稳定发布。npm 的 dist-tag `latest` 指向这里; 9.1 节说明它保证什么、预发布版不保证什么。本文档只在一个地方写明自己的版本, 就是上面那一行。已发布的 RFC 及其第 2 层 + 第 3 层证据列在 `README.md` 和 `runtime/CHANGELOG.md` 中。
 **许可:** Apache-2.0
 **编者:** Yujin (yujin.app)
@@ -1272,7 +1272,7 @@ RFC 流程, 任何影响公开 API 或传输格式的变更, 都有至少 14 天
 
 ---
 
-## 15. 插件扩展契约 -- canvas 与 API 表面 (v2.5)
+## 15. 插件扩展契约 -- canvas 与 API 表面 (v2.5, 在 v2.6 中扩展)
 
 第 1-14 节假定与代理有关的表面就是 **DOM**。每个可寻址的元素都有一个
 `data-nac-id` 属性, 每个动词都通过 `el.click()` 触发, 每次状态读取都来自
@@ -1288,6 +1288,14 @@ DOM 读到。
 v2.5 增加了一小组原语, 让一个 NAC3 插件能够声明它自己通往这类表面的
 路由契约。运行时对任何具体应用都保持无知 -- 它学会与某个应用对话的
 唯一途径, 就是读那个插件的清单。
+
+v2.6 没有增加任何到达应用的新途径: 15.4 的后端已经覆盖了现存的那些。
+它增加的, 是让一个插件活在自己的仓库里所缺的另一半 -- 一个代理如何
+找到自己没有注册过的插件 (15.10), 以及如何理解它的动词接受什么
+(15.11), 一个不是 postMessage 的真实事件源 (`emitter-listen`, 15.4),
+`sdk-call` 原本缺少的两处触及 (一个不在 `window` 上的 API 对象, 以及
+位置参数), 一条针对无可观察之物的观察者的失败即关闭规则, 还有为插件
+自身的错误声明的代码空间 (15.9)。针对 v2.5 写成的清单不需要任何改动。
 
 ### 15.1 为什么需要一组新的原语
 
@@ -1305,7 +1313,7 @@ v2.5 增加了一小组原语, 让一个 NAC3 插件能够声明它自己通往�
 是增加一个显式的、与具体应用无关的动词, 它接受一个插件 slug 和一个
 动词路径, 并让插件的清单去声明那个动词如何被路由。
 
-### 15.2 三个原语
+### 15.2 原语
 
 ```ts
 NAC.registerPlugin(slug: string, manifest: PluginManifest): void
@@ -1314,6 +1322,15 @@ NAC.read(plugin: string, state_path: string): Promise<any>
 NAC.subscribe(plugin: string, event_path: string,
               cb: (data: any) => void): SubscriptionHandle
 NAC.unsubscribe(handle: SubscriptionHandle): void
+
+/* v2.6 -- discovery (sec 15.10) */
+NAC.plugins(): PluginDescriptor[]
+NAC.describePlugin(slug: string): PluginDescriptor
+
+/* v2.6 -- API handles for objects that never land on `window` (15.4) */
+NAC.registerApiHandle(name: string, obj: object): void
+NAC.unregisterApiHandle(name: string): boolean
+NAC.apiHandles(): string[]
 ```
 
 - `registerPlugin(slug, manifest)` 注册一个 v2.5 的插件。同一个
@@ -1329,14 +1346,23 @@ NAC.unsubscribe(handle: SubscriptionHandle): void
   支撑, 也可以通过轮询 / MutationObserver 合成出来 -- 由清单声明是
   哪一种。
 
-这四个函数都是异步的 (返回 Promise), 只有 `unsubscribe` 例外, 它是
-同步且幂等的。
+- `plugins()` 为每一个已注册的 v2.5 插件返回一个描述符, 按 slug 排序;
+  `describePlugin(slug)` 返回其中一个。两者都是只读的: 描述符是一份
+  副本, 因此调用方无法借由它触及活的注册表 (见 15.10 节)。
+- `registerApiHandle(name, obj)` 以一个名字发布一个 API 对象, 清单可以
+  用 `handle` 来引用它。对象本身从不进入清单 -- 清单始终是纯 JSON。
+
+`call`、`read` 和 `subscribe` 要到达一个表面, 因此是异步的 (返回
+Promise)。`unsubscribe`、`plugins`、`describePlugin` 以及句柄注册表
+只触碰本地状态, 因此是同步的; `unsubscribe` 还是幂等的。
 
 ### 15.3 插件清单的形状
 
 ```ts
 interface PluginManifest {
   slug: string;
+  label?: string;          /* v2.6 -- human name of the surface */
+  hint?:  string;          /* v2.6 -- one line on what it is for */
   verbs:  { [verb_path: string]: VerbBinding };
   state:  { [state_path: string]: StateBinding[] };
   events: { [event_path: string]: EventBinding };
@@ -1344,12 +1370,18 @@ interface PluginManifest {
 
 interface VerbBinding {
   backend:       BackendKind;
+  label?:        string;       /* v2.6 -- see 15.11 */
+  hint?:         string;       /* v2.6 */
+  params?:       ParamDecl[];  /* v2.6 -- what the verb takes */
   /* backend-specific fields (see 15.4) */
   [k: string]: any;
 }
 
 interface StateBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 -- names the state PATH (see 15.11) */
+  hint?:         string;   /* v2.6 */
+  unit?:         string;   /* v2.6 -- 'degrees', 'seconds', 'page' */
   /* backend-specific fields (see 15.4) */
   extract?:      string;   /* extractor DSL string (see 15.5) */
   [k: string]: any;
@@ -1357,8 +1389,22 @@ interface StateBinding {
 
 interface EventBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 */
+  hint?:         string;   /* v2.6 */
   /* backend-specific fields */
   [k: string]: any;
+}
+
+interface ParamDecl {             /* v2.6 -- see 15.11 */
+  name:      string;
+  type:      'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?:     string;
+  min?:      number;
+  max?:      number;
+  enum?:     any[];
+  label?:    string;
+  hint?:     string;
 }
 
 type BackendKind =
@@ -1369,7 +1415,8 @@ type BackendKind =
   | 'dom-mirror'
   | 'same-origin-window'
   | 'synthetic-mutation'
-  | 'synthetic-poll';
+  | 'synthetic-poll'
+  | 'emitter-listen';     /* v2.6 */
 ```
 
 清单是纯 JSON (没有 JS 回调)。Forge、Sumi 以及将来任何工具都把它们
@@ -1378,23 +1425,48 @@ type BackendKind =
 动词和事件各有**恰好一个**绑定。状态有一个绑定的**有序数组**: 运行时
 按顺序走这条链, 返回第一个成功解析的来源。
 
+每一个标注为 `v2.6` 的字段都是可选的: 针对 v2.5 写成的清单无需改动
+仍然有效。不可选的是声明时必须格式正确 -- 一个不是字符串的 `label`,
+或者一个类型不在上述词汇表内的 `params` 条目, 会在注册时以 `invalid`
+被拒绝 (见 15.11 节)。
+
 ### 15.4 backend 的词汇表
 
 | 种类 | 用于 | 必填字段 |
 |------|----------|-----------------|
 | `postmessage` | 动词: 通过 `postMessage` 向一个 iframe 投递消息。 | `target` (要发送到的 iframe 的 CSS 选择器)、`message` (MessageId 字符串)、`values` (用参数插值的对象字面量)、`values_from_args` (可选, 原样转发的参数键的数组) |
 | `postmessage-listen` | 事件: 在 `window.message` 上监听某个特定的到达 `MessageId`。 | `source` (用于过滤来源的 iframe 的 CSS 选择器; 省略则接受任何来源)、`message` (要匹配的 MessageId)、`extract` (作用于消息数据的抽取 DSL) |
-| `sdk-call` | 动词: 调用一个全局暴露的 JS 函数 (例如 Figma 插件、Excalidraw 的 API)。 | `path` (`window` 里的点号路径, 例如 `figma.currentPage.selection`)、`mode` (`assign` 表示把参数的值赋给该路径, `invoke` 表示把它当函数调用并传入参数对象) |
+| `sdk-call` | 动词或状态: 调用或读取暴露在 `window` 上、或暴露在一个已注册 API 句柄上的 JS 函数 / 属性 (Figma 插件、Excalidraw 的 API、一个地图实例)。 | `path` (点分路径, 例如 `figma.currentPage.selection`), `mode` (`assign` 把该路径设为参数的值, `invoke` 把它作为函数调用, `read` 返回该路径上的值), 以及自 v2.6 起: `handle` (可选 -- 用 `NAC.registerApiHandle` 注册的对象的名字; `path` 将针对那个对象而不是全局对象来遍历, 一个从不落在 `window` 上的 API 正是这样被触及的), `args_order` (可选 -- 一个参数名数组, 逐个拼出位置参数列表, 使得像 `map.setView(center, zoom)` 这样的签名可以被表达; 没有它, 参数对象作为单独一个参数传递, 这正是 v2.5 的每一份清单所做的) |
 | `script-bridge` | 动词或状态: 调用某个应用的脚本桥 (Collabora 的 `CallPythonScript`、LibreOffice 的 UNO 桥、Google Apps Script)。 | `bridge` (backend 专属的标识符, 如 `collabora.python`)、`script` (脚本的标识符)、`function` (要运行的函数名)、`args` (用调用参数插值的对象字面量)、`response_match` (用于状态: 要等待的响应 MessageId)、`timeout_ms` (可选, 默认 5000) |
 | `dom-mirror` | 状态: 从一个 DOM 元素读取, 它的属性 / 类名 / 文本镜像了 canvas 内部的某个状态 (例如当某种格式在当前选区上启用时被高亮的工具栏按钮)。 | `selector` (要查询的 CSS 选择器)、`extract` (抽取 DSL, 见 15.5) |
 | `same-origin-window` | 状态: 当 iframe 同源时, 从 `iframe.contentWindow.<path>` 读取。运行时会察觉跨源并落到下一个兜底。 | `target` (iframe 的 CSS 选择器)、`path` (`contentWindow` 里的点号路径) |
-| `synthetic-mutation` | 事件: 通过观察一个或多个状态来源上的 DOM 变动, 在被观察的值发生变化时重新发出, 以此合成一个事件。 | `observe` (要盯住的状态路径的数组; 运行时对每一个调用 `read`, 并在变动之间比对)、`throttle_ms` (可选, 默认 100) |
+| `synthetic-mutation` | 事件: 通过观察一个或多个状态来源上的 DOM 变动来合成事件, 并在被观察的值改变时重新发出。 | `observe` (要监视的状态路径数组; 运行时对每一个调用 `read`, 并在各次变动之间比较差异), `throttle_ms` (可选, 默认 100), `root` (可选, v2.6 -- 一个容器的 CSS 选择器, 用来代替镜像节点本身被观察; 见下面的失败即关闭规则) |
 | `synthetic-poll` | 事件: 通过轮询状态来源来合成一个事件。 | `observe` (状态路径的数组)、`interval_ms` (默认 250) |
+| `emitter-listen` | 事件 (v2.6): 监听一个不是 postMessage 的真实事件源 -- 由某个库暴露的 JS 事件发射器 (`map.on('moveend')`、`video.addEventListener('timeupdate')`、pdf.js 的 `pagechanging`、语音识别的 `onresult`)。 | `event` (必填 -- 库自己的事件名), `handle` (可选 -- 在其上监听的已注册 API 句柄), `path` (可选 -- 通往发射器的点分路径; 声明了句柄时针对句柄解析, 否则针对全局对象解析; 省略则表示句柄本身就是发射器), `method` / `off_method` (可选 -- 订阅 / 退订的方法名; 省略时运行时按 `on`/`off`、`addEventListener`/`removeEventListener`、`addListener`/`removeListener` 的顺序探测), `extract` (对库交给监听者的载荷的可选抽取 DSL), `observe` (可选的状态路径数组: 运行时不交付原始载荷, 而是在事件发生时重新读取这些状态, 回调收到的是那一份快照 -- 这是连续表面上有用的形态, 事件说"它动了", 状态说动到了哪里) |
 
 每个 backend 都必须由运行时实现为一个自成一体的派发器
 (`dispatch(binding, args, context) -> Promise<value>`)。向本规范添加
 一种新的 backend 需要跃进规范的版本; 忽略未知 backend 的运行时必须
 拒绝声明了它们的清单 (不得默默跳过)。
+`emitter-listen` 正是本文档为 2.6 而不是 2.5.3 的原因。
+
+**针对无可观察之物的观察者的失败即关闭规则 (v2.6)。**
+`synthetic-mutation` 会把每一条被观察的状态路径解析到其主
+`dom-mirror` 绑定所选中的 DOM 元素。当一个选择器匹配不到任何元素时,
+`subscribe` 必须以 `backend_target_missing` 拒绝, 并指名那些没有解析
+成功的状态路径与选择器。它不得返回句柄: 一个什么都不观察的订阅会成功
+解析, 然后永远不会触发, 而这恰恰是本协议为之而存在、要予以消除的静默
+损害 -- 并且直到 2.5.2 为止, 参考运行时做的就是这件事。
+
+如果一份清单所观察的节点合理地时有时无 -- 虚拟化表格的一行, 只有在被
+滚动进视野时才存在 -- 那就声明 `root`: 一个比该节点活得更久的容器。
+运行时于是以 `subtree: true` 观察这个容器, 并在每一次变动时重新解析
+选择器, 因此在节点缺席时建立的订阅, 会在节点挂载时触发。出于同样的
+理由, `root` 自身必须能够解析。当一个订阅以无物可读开始, 而被观察的
+状态随后变得可读, 这一转变本身就是一次发出: 从未知到已知的这一步,
+正是调用方在等待的变化。在被观察的状态不可读期间不会发出任何事件,
+因此一份认为缺席本身有意义的清单, 会把缺席声明为数据 -- 一个
+`present` 抽取器, 或者链中的一个后备绑定。
 
 ### 15.5 抽取用的迷你 DSL
 
@@ -1537,6 +1609,139 @@ v2.5 不支持组合; 一个抽取器就恰好是上面的某一行。需要复�
 - `timeout` -- 某个 backend 没有在它所声明的 `timeout_ms` 内回应
   (动词默认 5000, 状态读取默认 1000)。
 - `invalid` -- 参数的形状不对 (slug 无效、注册时清单格式错乱等)。
+
+**插件代码空间 (v2.6)。** 上面那十个代码就是契约的全部词汇, 而且它们
+刻意只谈路由: 它们说的是协议没能到达, 从不说应用为什么拒绝。一个需要
+自己代码的插件 -- 比如把 `row_not_materialized` 作为与"那一行不存在"
+可区分的东西, 一份被锁定的文档, 一次仍在渲染的导出 -- 在保留前缀
+`plugin.` 之下抛出它:
+
+```js
+const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;                       /* inside the backend the manifest routes to */
+```
+
+`NAC.call` 和 `NAC.subscribe` 会把这样的代码原样呈现在 `err.code` 上。
+一个既不属于那十个、也不在 `plugin.` 前缀之下的代码, 会被以 `invalid`
+拒绝, 而被拒绝的字符串保留在 `err.offending_code` 上: 一个未经声明却
+照样通行的代码, 正是一套词汇不再成其为词汇的方式。该前缀是保留的 --
+契约的那十个代码永远不会占用它, 因此一个插件代码永远不可能与未来的
+代码相撞。
+
+### 15.10 注册表的发现 (v2.6)
+
+15.2 到 15.9 各节都要求调用方事先就知道 slug 和路径。直到 2.5.2 为止
+那是唯一的入口: 注册表只被恰好三个函数读取 (`call`、`read`、
+`subscribe`), 因此一个不是自己注册该插件的代理, 无从得知它存在。它读
+DOM 清单 (第 5 节), 找到外壳, 而 canvas 表面是看不见的。对于一个完全
+不声明 DOM 的表面 -- 一个纯语音插件 -- 则根本没有任何东西可以找到。
+
+```ts
+NAC.plugins(): PluginDescriptor[]          /* ordered by slug */
+NAC.describePlugin(slug: string): PluginDescriptor
+
+interface PluginDescriptor {
+  slug:   string;
+  label:  string | null;
+  hint:   string | null;
+  verbs:  { verb_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            params: ParamDecl[] | null; handle?: string }[];
+  state:  { state_path: string; backends: (string | null)[];
+            label: string | null; hint: string | null;
+            unit: string | null }[];
+  events: { event_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            observe: string[] | null; event?: string }[];
+}
+```
+
+规则:
+
+1. 两者都是同步的。它们读取一个本地对象; 没有任何东西被派发到任何
+   表面, 因此没有理由让一个代理为了知道那里有什么而等待一次往返。
+2. 描述符是一份**副本**。调用方不得借由它触及活的注册表, 并改写另一个
+   插件的路由。
+3. 动词、状态路径和事件都按路径排序返回, 因此对同一个注册表的两次读取
+   可以逐字节比较。
+4. 未声明的 `label` / `hint` / `params` 读作 `null`, 而不是读作缺失的
+   键: 读取方不必去分辨"不存在"与"未声明"。
+5. 对一个未注册的 slug 调用 `describePlugin` 会以
+   `plugin_not_registered` 拒绝 (见 15.9 节)。
+
+发现刻意只是读取清单所声明的内容, 而不是对表面的探测。它告诉一个代理
+存在什么, 以及如何称呼它; 表面今天是否回应, 那是 `call` 和 `read`
+的职责。
+
+### 15.11 自我描述 (v2.6)
+
+本协议的 DOM 那一半, 从 v1 起就带着人类可读的名字和一份带类型的字段
+清单 (`data-nac-label`、`data-nac-hint`、带类型的 `fields[]`, 第 6
+节)。插件那一半两者都没有: 一份清单声明了一个动词被路由到哪里, 却
+没有说它叫什么、接受什么。在一个连续表面上, 可操作的东西就是参数本身
+-- 一个坐标与一个缩放级别, 时间轴上的一个瞬间, 一个页码与一个表单
+字段, 三维空间中的一个姿态 -- 而没有任何东西声明它的形状、单位或
+范围。一个语音执行器甚至无法把这个动词念出来。
+
+`label`、`hint`、`params` (动词), 以及 `label` / `hint` / `unit`
+(状态与事件) 补上了这一块。全部可选; 全部可以通过 15.10 读回。
+
+```json
+{
+  "slug":  "acme.map",
+  "label": "Acme map",
+  "verbs": {
+    "view.set": {
+      "backend": "sdk-call",
+      "handle":  "acme.map",
+      "path":    "setView",
+      "mode":    "invoke",
+      "args_order": ["center", "zoom"],
+      "label":   "Move the map",
+      "hint":    "Centres the map on a coordinate at a zoom level",
+      "params": [
+        { "name": "center", "type": "array",  "required": true,
+          "unit": "degrees", "label": "Centre", "hint": "[lat, lng]" },
+        { "name": "zoom",   "type": "number", "required": false,
+          "unit": "zoom level", "min": 0, "max": 22 }
+      ]
+    }
+  },
+  "state": {
+    "view.center": [
+      { "backend": "sdk-call", "handle": "acme.map", "path": "getCenter",
+        "mode": "invoke", "label": "Centre of the view", "unit": "degrees" }
+    ]
+  },
+  "events": {
+    "view.moved": {
+      "backend": "emitter-listen", "handle": "acme.map",
+      "event": "moveend", "observe": ["view.center"],
+      "label": "The map stopped moving"
+    }
+  }
+}
+```
+
+规则:
+
+1. 被声明的 `label`、`hint` 或 `unit` 必须是非空字符串; 否则该清单会
+   在注册时以 `invalid` 被拒绝。
+2. `params` 必须是一个数组。每一个条目必须带有一个 `name` (在该动词内
+   唯一) 和一个取自
+   `string | number | boolean | object | array` 的 `type`。
+   `required`、`unit`、`min`、`max`、`enum`、`label` 和 `hint` 是可选
+   的, 出现时会做类型检查。其他任何东西都是 `invalid`。
+3. 一条状态路径的标签, 是它的链中第一个声明出来的那个。一条状态路径是
+   带着一份有序来源列表的一个值 (见 15.6 节), 因此只被命名一次, 由那
+   个为它命名的来源命名。
+4. `params` 声明的是 `NAC.call` 所收到的 `args` 对象的形状。运行时并不
+   拿它去校验参数: 这个声明的存在, 是为了让一个代理能够组装一次调用、
+   让一个语音执行器能够把它说出来; 需要强制约束参数的表面, 在参数落地
+   的地方去强制它们。
+5. 这里的任何内容都不由运行时翻译。标签是用应用自己的语言写的; 讲另一
+   种语言的宿主在它自己那一层做本地化 (见 4.3 节)。
 
 ---
 

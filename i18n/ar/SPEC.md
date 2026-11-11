@@ -1,5 +1,5 @@
 ---
-translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
+translation_source_hash: caf3443bf87e4d47dd62a446f575298f876f691d6e52da165cb547b064536267
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: ar
 translation_source: SPEC.md
-translation_source_version: 2.5.2
+translation_source_version: 2.6.0
 translation_source_date: 2026-10-27
-translation_sections: 83
-translation_sections_canonical: 83
-translation_units: 283
-translation_units_canonical: 283
+translation_sections: 85
+translation_sections_canonical: 85
+translation_units: 299
+translation_units_canonical: 299
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في 2026-10-27 (NAC3 v2.5.2)، وتغطي 83 من 83 قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.
+> **ترجمة آلية وغير معيارية.** تُترجم النسخة الإنجليزية كما كانت في 2026-10-27 (NAC3 v2.6.0)، وتغطي 85 من 85 قسما في النص الأصلي الحالي. النص المعياري هو الإنجليزي؛ وعند أي اختلاف يُعتمد النص الإنجليزي.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**الإصدار:** 2.5.2 (مستقر -- سطح v2.5 الكامل: narrate و context+tree و expect+diff)
+**الإصدار:** 2.6.0 (مستقر -- سطح v2.5 كاملا مع خطاطيف توسعة الإضافات في v2.6: الاكتشاف، والوصف الذاتي، و emitter-listen)
 **الحالة:** إصدار مستقر. وسم التوزيع `latest` في npm يشير إلى هنا؛ والقسم 9.1 يبين ما يضمنه ذلك وما لا تضمنه نسخة ما قبل الإصدار. هذا المستند يذكر إصداره في موضع واحد بالضبط، في السطر أعلاه. أما وثائق RFC المنشورة وأدلتها في الطبقة 2 + الطبقة 3 فهي مسرودة في `README.md` و `runtime/CHANGELOG.md`.
 **الترخيص:** Apache-2.0
 **المحرر:** Yujin (yujin.app)
@@ -1341,7 +1341,7 @@ Linux Foundation، أو هيئة صناعية مكافئة) متى صار الت
 
 ---
 
-## 15. عقد توسيع الملحق -- أسطح canvas والواجهات البرمجية (v2.5)
+## 15. عقد توسعة الإضافات -- أسطح canvas و API (v2.5، موسع في v2.6)
 
 تفترض الأقسام 1-14 أن السطح الذي يهم الوكيل هو **DOM**. فكل عنصر له
 عنوان يحمل سمة `data-nac-id`، وكل فعل ينطلق عبر `el.click()`، وكل
@@ -1359,6 +1359,15 @@ LibreOffice / Collabora Online، و Figma، و Excalidraw، و Miro، وأي
 الخاص به نحو تلك الأسطح. ويبقى زمن التشغيل محايدا تجاه أي تطبيق بعينه
 -- فهو لا يتعلم الحديث مع تطبيق إلا بقراءة بيان الملحق.
 
+لا تضيف v2.6 أي طريقة جديدة للوصول إلى تطبيق: فخلفيات 15.4 تغطي
+بالفعل ما هو موجود. ما تضيفه هو النصف الذي كان ناقصا كي تعيش إضافة في
+مستودع خاص بها -- كيف يجد وكيل إضافة لم يسجلها هو بنفسه (15.10)، وكيف
+يفهم ما تأخذه أفعالها (15.11)، ومصدر أحداث حقيقي ليس postMessage
+(`emitter-listen`، 15.4)، والمديان اللذان كانا ينقصان `sdk-call` (كائن
+واجهة برمجية خارج `window`، ووسائط موضعية)، وقاعدة الفشل المغلق لمراقب
+لا شيء لديه ليراقبه، ومساحة رموز معلنة لأخطاء الإضافة نفسها (15.9).
+البيان المكتوب على أساس v2.5 لا يحتاج إلى أي تغيير.
+
 ### 15.1 لماذا طاقم بدائيات جديد
 
 الدالة `NAC.click(id)` التي لا تعرف غير DOM لا تستطيع:
@@ -1375,7 +1384,7 @@ LibreOffice / Collabora Online، و Figma، و Excalidraw، و Miro، وأي
 هو إضافة فعل صريح ومحايد يأخذ slug الملحق ومسار الفعل، ويترك لبيان
 الملحق أن يعلن كيف يُوجَّه ذلك الفعل.
 
-### 15.2 البدائيات الثلاث
+### 15.2 العمليات الأولية
 
 ```ts
 NAC.registerPlugin(slug: string, manifest: PluginManifest): void
@@ -1384,6 +1393,15 @@ NAC.read(plugin: string, state_path: string): Promise<any>
 NAC.subscribe(plugin: string, event_path: string,
               cb: (data: any) => void): SubscriptionHandle
 NAC.unsubscribe(handle: SubscriptionHandle): void
+
+/* v2.6 -- discovery (sec 15.10) */
+NAC.plugins(): PluginDescriptor[]
+NAC.describePlugin(slug: string): PluginDescriptor
+
+/* v2.6 -- API handles for objects that never land on `window` (15.4) */
+NAC.registerApiHandle(name: string, obj: object): void
+NAC.unregisterApiHandle(name: string): boolean
+NAC.apiHandles(): string[]
 ```
 
 - الدالة `registerPlugin(slug, manifest)` تسجل ملحق v2.5. ويمكن
@@ -1402,14 +1420,26 @@ NAC.unsubscribe(handle: SubscriptionHandle): void
   أحداث حقيقي في الأعلى، أو أن تكون مصنوعة بالاستفتاء الدوري /
   MutationObserver -- والبيان يعلن أيهما.
 
-الدوال الأربع كلها غير متزامنة (ترجع وعدا) إلا `unsubscribe`، فهي
-متزامنة ولا يتغير أثرها بتكرار النداء.
+- `plugins()` تعيد واصفا لكل إضافة v2.5 مسجلة، مرتبة حسب المعرف
+  النصي؛ و`describePlugin(slug)` تعيد واحدا. كلتاهما للقراءة فقط:
+  الواصف نسخة، فلا يستطيع المستدعي الوصول عبره إلى السجل الحي (القسم
+  15.10).
+- `registerApiHandle(name, obj)` تنشر كائن واجهة برمجية تحت اسم يستطيع
+  البيان أن يشير إليه عبر `handle`. الكائن نفسه لا يدخل البيان أبدا --
+  تبقى البيانات JSON خالصا.
+
+`call` و`read` و`subscribe` تصل إلى سطح، ولذلك فهي غير متزامنة (تعيد
+Promise). أما `unsubscribe` و`plugins` و`describePlugin` وسجل المقابض
+فلا تمس إلا حالة محلية، ولذلك فهي متزامنة؛ و`unsubscribe` فوق ذلك
+عديمة الأثر عند التكرار.
 
 ### 15.3 شكل بيان الملحق
 
 ```ts
 interface PluginManifest {
   slug: string;
+  label?: string;          /* v2.6 -- human name of the surface */
+  hint?:  string;          /* v2.6 -- one line on what it is for */
   verbs:  { [verb_path: string]: VerbBinding };
   state:  { [state_path: string]: StateBinding[] };
   events: { [event_path: string]: EventBinding };
@@ -1417,12 +1447,18 @@ interface PluginManifest {
 
 interface VerbBinding {
   backend:       BackendKind;
+  label?:        string;       /* v2.6 -- see 15.11 */
+  hint?:         string;       /* v2.6 */
+  params?:       ParamDecl[];  /* v2.6 -- what the verb takes */
   /* backend-specific fields (see 15.4) */
   [k: string]: any;
 }
 
 interface StateBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 -- names the state PATH (see 15.11) */
+  hint?:         string;   /* v2.6 */
+  unit?:         string;   /* v2.6 -- 'degrees', 'seconds', 'page' */
   /* backend-specific fields (see 15.4) */
   extract?:      string;   /* extractor DSL string (see 15.5) */
   [k: string]: any;
@@ -1430,8 +1466,22 @@ interface StateBinding {
 
 interface EventBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 */
+  hint?:         string;   /* v2.6 */
   /* backend-specific fields */
   [k: string]: any;
+}
+
+interface ParamDecl {             /* v2.6 -- see 15.11 */
+  name:      string;
+  type:      'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?:     string;
+  min?:      number;
+  max?:      number;
+  enum?:     any[];
+  label?:    string;
+  hint?:     string;
 }
 
 type BackendKind =
@@ -1442,7 +1492,8 @@ type BackendKind =
   | 'dom-mirror'
   | 'same-origin-window'
   | 'synthetic-mutation'
-  | 'synthetic-poll';
+  | 'synthetic-poll'
+  | 'emitter-listen';     /* v2.6 */
 ```
 
 البيانات JSON خالص (بلا دوال رد JS). وتولدها Forge و Sumi وأي أداة
@@ -1452,24 +1503,51 @@ type BackendKind =
 الارتباطات: فيمشي زمن التشغيل على السلسلة بالترتيب، ويرجع أول مصدر
 نجح في الحل.
 
+كل حقل موسوم بـ `v2.6` اختياري: البيان المكتوب على أساس v2.5 يبقى
+صالحا بلا تغيير. وما ليس اختياريا هو أن يكون سليم البنية حين يعلن --
+فـ `label` ليست سلسلة نصية، أو مدخلة `params` من نوع خارج المفردات
+أعلاه، ترفض عند التسجيل بـ `invalid` (القسم 15.11).
+
 ### 15.4 معجم الـ backend
 
 | النوع | يُستخدم لأجل | الحقول المطلوبة |
 |------|----------|-----------------|
 | `postmessage` | فعل: إرسال رسالة إلى iframe عبر `postMessage`. | `target` (منتقي CSS لـ iframe المستقبل)، `message` (نص MessageId)، `values` (كائن حرفي يُعبأ بالوسائط)، `values_from_args` (مصفوفة اختيارية بمفاتيح وسائط تُمرر كما هي) |
 | `postmessage-listen` | حدث: الإنصات إلى `MessageId` وارد محدد على `window.message`. | `source` (منتقي CSS لـ iframe تُصفى به الأصول؛ وإن أُهمل قُبل أي أصل)، `message` (قيمة MessageId المطلوب مطابقتها)، `extract` (معجم الاستخراج على بيانات الرسالة) |
-| `sdk-call` | فعل: نداء دالة JS معروضة عالميا (مثل ملحق Figma، أو واجهة Excalidraw). | `path` (مسار بنقاط داخل `window`، مثل `figma.currentPage.selection`)، `mode` (`assign` لإسناد قيمة الوسائط إلى المسار، و `invoke` لنداء المسار كدالة بكائن الوسائط) |
+| `sdk-call` | فعل أو حالة: استدعاء أو قراءة دالة / خاصية JS معروضة على `window` أو على مقبض واجهة برمجية مسجل (إضافة Figma، واجهة Excalidraw، نسخة خريطة). | `path` (مسار منقوط، مثل `figma.currentPage.selection`)، `mode` (`assign` لضبط المسار على قيمة الوسائط، `invoke` لاستدعائه كدالة، `read` لإعادة القيمة الموجودة عند المسار)، ومن v2.6: `handle` (اختياري -- اسم كائن مسجل بـ `NAC.registerApiHandle`؛ يسار على `path` مقابل ذلك الكائن بدل الكائن العام، وهكذا يوصل إلى واجهة برمجية لا تحط أبدا على `window`)، `args_order` (اختياري -- مصفوفة من أسماء الوسائط تتهجى قائمة الوسائط الموضعية، بحيث يصير توقيع مثل `map.setView(center, zoom)` قابلا للتعبير؛ وبدونه يسافر كائن الوسائط كوسيط واحد، وهو ما يفعله كل بيان من v2.5) |
 | `script-bridge` | فعل أو حالة: نداء جسر السكربتات في تطبيق (مثل `CallPythonScript` في Collabora، أو جسر UNO في LibreOffice، أو Google Apps Script). | `bridge` (معرف خاص بالـ backend، مثل `collabora.python`)، `script` (معرف السكربت)، `function` (اسم الدالة المطلوب تشغيلها)، `args` (كائن حرفي يُعبأ بوسائط النداء)، `response_match` (للحالة: قيمة MessageId للجواب الذي يُنتظر)، `timeout_ms` (اختياري، افتراضيا 5000) |
 | `dom-mirror` | حالة: القراءة من عنصر DOM تعكس سمته / صنفه / نصه حالة داخلية في canvas (مثل زر في شريط الأدوات يُبرز حين يكون تنسيقه مفعلا على المنتقى الحالي). | `selector` (منتقي CSS للاستعلام)، `extract` (معجم الاستخراج، انظر 15.5) |
 | `same-origin-window` | حالة: القراءة من `iframe.contentWindow.<path>` حين يكون iframe من الأصل نفسه. ويكتشف زمن التشغيل اختلاف الأصل فينزل إلى الاحتياط التالي. | `target` (منتقي CSS لـ iframe)، `path` (مسار بنقاط داخل `contentWindow`) |
-| `synthetic-mutation` | حدث: صناعة حدث بمراقبة تغيرات DOM على مصدر حالة أو أكثر، وإعادة الإصدار حين تتغير القيمة المراقبة. | `observe` (مصفوفة بمسارات الحالة المطلوب مراقبتها؛ وينادي زمن التشغيل `read` على كل منها ويقارن بين التغيرات)، `throttle_ms` (اختياري، افتراضيا 100) |
+| `synthetic-mutation` | حدث: تركيب حدث بمراقبة تغيرات DOM على مصدر حالة واحد أو أكثر، وإعادة البث حين تتغير القيمة المراقبة. | `observe` (مصفوفة مسارات حالة للمراقبة؛ يستدعي زمن التشغيل `read` على كل منها ويقارنها عبر التغيرات)، `throttle_ms` (اختياري، 100 افتراضيا)، `root` (اختياري، v2.6 -- محدد CSS لحاوية تراقب بدل عقد المرآة نفسها؛ انظر قاعدة الفشل المغلق أدناه) |
 | `synthetic-poll` | حدث: صناعة حدث باستفتاء مصادر الحالة دوريا. | `observe` (مصفوفة بمسارات الحالة)، `interval_ms` (افتراضيا 250) |
+| `emitter-listen` | حدث (v2.6): الإنصات إلى مصدر أحداث حقيقي ليس postMessage -- باث أحداث JS تعرضه مكتبة (`map.on('moveend')`، `video.addEventListener('timeupdate')`، و`pagechanging` في pdf.js، و`onresult` في مميز الكلام). | `event` (إلزامي -- اسم الحدث في المكتبة)، `handle` (اختياري -- مقبض واجهة برمجية مسجل ينصت عليه)، `path` (اختياري -- مسار منقوط حتى الباث؛ يحل مقابل المقبض إن أعلن واحد، ومقابل الكائن العام إن لم يعلن؛ وحذفه يعني أن المقبض نفسه هو الباث)، `method` / `off_method` (اختياري -- اسما دالتي الاشتراك / إلغاء الاشتراك؛ وعند حذفهما يكتشف زمن التشغيل `on`/`off` أو `addEventListener`/`removeEventListener` أو `addListener`/`removeListener`، بهذا الترتيب)، `extract` (لغة استخلاص اختيارية على الحمولة التي تسلمها المكتبة للمنصت)، `observe` (مصفوفة اختيارية من مسارات الحالة: بدل الحمولة الخام، يعيد زمن التشغيل قراءة تلك الحالات لحظة وقوع الحدث فتصل رد النداء تلك اللقطة -- وهي الصورة المفيدة لسطح متصل، حيث يقول الحدث "لقد تحرك" وتقول الحالة إلى أين) |
 
 يجب أن ينفذ زمن التشغيل كل backend كمرسل مكتف بذاته
 (`dispatch(binding, args, context) -> Promise<value>`). وإضافة نوع
 backend جديد إلى المواصفة تقتضي رفع إصدار المواصفة؛ وأزمنة التشغيل
 التي تتجاهل الـ backend المجهولة يجب أن ترفض البيانات التي تعلنها (لا
 تجاوز صامت).
+`emitter-listen` هو سبب كون هذه الوثيقة 2.6 لا 2.5.3.
+
+**قاعدة الفشل المغلق لمراقب لا شيء لديه ليراقبه (v2.6).**
+تحل `synthetic-mutation` كل مسار حالة مراقب إلى عنصر DOM الذي يختاره
+ارتباطها الأساسي `dom-mirror`. وحين لا يطابق محدد أي عنصر، يجب على
+`subscribe` أن ترفض بـ `backend_target_missing`، مسمية مسارات الحالة
+والمحددات التي لم تحل. ولا يجوز لها أن تعيد مقبضا: فالاشتراك الذي لا
+يراقب شيئا يحل بنجاح ثم لا ينطلق أبدا، وهذا بالضبط هو الضرر الصامت
+الذي وجد هذا البروتوكول لإزالته -- وحتى 2.5.2 كان هذا ما يفعله زمن
+التشغيل المرجعي.
+
+البيان الذي يظهر عقده المراقب ويختفي بوجه مشروع -- صف في شبكة
+افتراضية، لا يوجد إلا ما دام مدفوعا داخل المشهد -- يعلن `root`: حاوية
+تعمر أطول من العقدة. عندئذ يراقب زمن التشغيل تلك الحاوية بـ
+`subtree: true` ويعيد حل المحددات عند كل تغير، فالاشتراك المأخوذ بينما
+كانت العقدة غائبة ينطلق حين تركب العقدة. و`root` نفسه يجب أن يحل،
+للسبب ذاته. وحين يبدأ اشتراك ولا شيء يقرأ، ثم تصير الحالة المراقبة
+قابلة للقراءة، فذلك الانتقال هو في ذاته بث: الخطوة من المجهول إلى
+المعلوم هي التغير الذي ينتظره المستدعي. وما دامت حالة مراقبة غير قابلة
+للقراءة فلا يبث أي حدث، ولذلك فالبيان الذي يكون الغياب فيه ذا معنى
+يعلنه بوصفه بيانات -- مستخلص `present`، أو ارتباط احتياطي في السلسلة.
 
 ### 15.5 معجم الاستخراج المصغر
 
@@ -1615,6 +1693,140 @@ backend جديد إلى المواصفة تقتضي رفع إصدار الموا
   (افتراضيا 5000 للأفعال و 1000 لقراءات الحالة).
 - `invalid` -- شكل الوسيط خاطئ (slug غير صحيح، أو بيان مشوه عند
   التسجيل، وغير ذلك).
+
+**مساحة رموز الإضافة (v2.6).** الرموز العشرة أعلاه هي كل مفردات العقد،
+وهي عن التوجيه عمدا: تقول إن البروتوكول لم يستطع الوصول، ولا تقول أبدا
+لماذا رفض التطبيق. والإضافة التي تحتاج رمزا خاصا بها --
+`row_not_materialized` بوصفه شيئا يميز عن "ذلك الصف غير موجود"، أو
+مستند مقفل، أو تصدير ما زال يرسم -- ترفعه تحت البادئة المحجوزة
+`plugin.`:
+
+```js
+const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;                       /* inside the backend the manifest routes to */
+```
+
+تعرض `NAC.call` و`NAC.subscribe` مثل هذا الرمز كما هو على `err.code`.
+والرمز الذي ليس واحدا من العشرة ولا يقع تحت البادئة `plugin.` يرفض
+بوصفه `invalid`، مع حفظ السلسلة المرفوضة على `err.offending_code`:
+فالرمز غير المعلن الذي يسافر مع ذلك هو تماما الطريقة التي تكف بها
+المفردات عن كونها مفردات. والبادئة محجوزة -- رموز العقد العشرة لن
+تأخذها أبدا، فلا يمكن لرمز إضافة أن يصطدم برمز مستقبلي.
+
+### 15.10 اكتشاف السجل (v2.6)
+
+تشترط الأقسام من 15.2 إلى 15.9 كلها أن يعرف المستدعي سلفا المعرف النصي
+والمسار. وحتى 2.5.2 كان ذلك هو الباب الوحيد: فالسجل كانت تقرؤه ثلاث
+دوال بالضبط (`call` و`read` و`subscribe`)، بحيث إن الوكيل الذي لم يسجل
+الإضافة بنفسه لم يكن له سبيل ليعلم أنها موجودة. كان يقرأ بيان DOM
+(القسم 5)، فيجد الإطار، ويبقى سطح canvas غير مرئي. أما السطح الذي لا
+يعلن DOM البتة -- إضافة صوتية فحسب -- فلم يكن فيه ما يوجد أصلا.
+
+```ts
+NAC.plugins(): PluginDescriptor[]          /* ordered by slug */
+NAC.describePlugin(slug: string): PluginDescriptor
+
+interface PluginDescriptor {
+  slug:   string;
+  label:  string | null;
+  hint:   string | null;
+  verbs:  { verb_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            params: ParamDecl[] | null; handle?: string }[];
+  state:  { state_path: string; backends: (string | null)[];
+            label: string | null; hint: string | null;
+            unit: string | null }[];
+  events: { event_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            observe: string[] | null; event?: string }[];
+}
+```
+
+القواعد:
+
+1. كلتاهما متزامنة. تقرأان كائنا محليا؛ ولا يرسل شيء إلى أي سطح، فلا
+   سبب يدعو وكيلا إلى انتظار ذهاب وإياب كي يعرف ما هو موجود.
+2. الواصف **نسخة**. ولا يجوز أن يستطيع المستدعي الوصول عبره إلى السجل
+   الحي وإعادة كتابة توجيه إضافة أخرى.
+3. تعود الأفعال ومسارات الحالة والأحداث مرتبة حسب المسار، بحيث تصير
+   قراءتان للسجل نفسه قابلتين للمقارنة بايتا ببايت.
+4. ما لم يعلن من `label` / `hint` / `params` يقرأ بوصفه `null`، لا
+   بوصفه مفتاحا ناقصا: فلا يحتاج القارئ أن يميز "غائب" عن "غير معلن".
+5. `describePlugin` على معرف نصي غير مسجل ترفض بـ
+   `plugin_not_registered` (القسم 15.9).
+
+الاكتشاف عمدا قراءة لما يعلنه البيان، لا سبر للسطح. يقول للوكيل ما
+الموجود وكيف يسميه؛ أما هل يجيب السطح اليوم فلذلك وجدت `call` و`read`.
+
+### 15.11 الوصف الذاتي (v2.6)
+
+يحمل نصف هذا البروتوكول الخاص بـ DOM اسما بشريا وقائمة حقول ذات أنواع
+منذ v1 (`data-nac-label` و`data-nac-hint` و`fields[]` بنوع، القسم 6).
+أما نصف الإضافات فلم يحمل شيئا من ذلك: كان البيان يعلن إلى أين يوجه
+الفعل، ولا يقول شيئا عن اسمه ولا عما يأخذه. وعلى سطح متصل يكون القابل
+للتنفيذ هو الوسيط نفسه -- إحداثي ومستوى تقريب، ولحظة على خط زمني،
+وصفحة وحقل نموذج، ووضعية في ثلاثة أبعاد -- ولم يكن شيء يعلن شكله ولا
+وحدته ولا مداه. ولم يكن منفذ صوتي يستطيع حتى أن ينطق اسم الفعل.
+
+`label` و`hint` و`params` (للأفعال)، و`label` / `hint` / `unit`
+(للحالة والأحداث) تسد ذلك. كلها اختيارية؛ وكلها تقرأ ثانية عبر 15.10.
+
+```json
+{
+  "slug":  "acme.map",
+  "label": "Acme map",
+  "verbs": {
+    "view.set": {
+      "backend": "sdk-call",
+      "handle":  "acme.map",
+      "path":    "setView",
+      "mode":    "invoke",
+      "args_order": ["center", "zoom"],
+      "label":   "Move the map",
+      "hint":    "Centres the map on a coordinate at a zoom level",
+      "params": [
+        { "name": "center", "type": "array",  "required": true,
+          "unit": "degrees", "label": "Centre", "hint": "[lat, lng]" },
+        { "name": "zoom",   "type": "number", "required": false,
+          "unit": "zoom level", "min": 0, "max": 22 }
+      ]
+    }
+  },
+  "state": {
+    "view.center": [
+      { "backend": "sdk-call", "handle": "acme.map", "path": "getCenter",
+        "mode": "invoke", "label": "Centre of the view", "unit": "degrees" }
+    ]
+  },
+  "events": {
+    "view.moved": {
+      "backend": "emitter-listen", "handle": "acme.map",
+      "event": "moveend", "observe": ["view.center"],
+      "label": "The map stopped moving"
+    }
+  }
+}
+```
+
+القواعد:
+
+1. `label` أو `hint` أو `unit` المعلن يجب أن يكون سلسلة نصية غير
+   فارغة؛ وإلا رفض البيان عند التسجيل بـ `invalid`.
+2. `params` يجب أن تكون مصفوفة. وكل مدخلة يجب أن تحمل `name` (فريدا
+   داخل الفعل) و`type` من
+   `string | number | boolean | object | array`. أما `required`
+   و`unit` و`min` و`max` و`enum` و`label` و`hint` فاختيارية، ويتحقق من
+   نوعها حين توجد. وأي شيء آخر `invalid`.
+3. تسمية مسار الحالة هي أول تسمية تعلنها سلسلته. فمسار الحالة قيمة
+   واحدة بقائمة مصادر مرتبة (القسم 15.6)، ولذلك يسمى مرة واحدة، من قبل
+   المصدر الذي يسميه.
+4. `params` تعلن شكل كائن `args` الذي تتلقاه `NAC.call`. وزمن التشغيل
+   لا يتحقق من الوسائط مقابلها: فالإعلان موجود كي يستطيع وكيل أن يؤلف
+   استدعاء وكي يستطيع منفذ صوتي أن ينطقه، والسطح الذي يحتاج إلى فرض
+   وسائطه يفرضها حيث تحط.
+5. لا يترجم زمن التشغيل شيئا من هذا. فالتسمية تكتب بلغة التطبيق؛ والمضيف
+   الذي يتكلم لغة أخرى يوطن في طبقته هو (القسم 4.3).
 
 ---
 

@@ -334,7 +334,11 @@ hace; sería el texto alcanzando al código, regla 10), o se quita del runtime
 **Mi recomendación: declararlo.** Es comportamiento publicado desde la 2.5 y la
 regla 10 dice que el comportamiento actual es la especificación.
 
-**Estado:** traída el 2026-11-11, sin decidir.
+**Estado:** CERRADA el 2026-11-11 por la decisión **D-09** del dueño
+(*"Hazlo todo sin frenar..."*, `docs/DECISIONS.md`). No se decidió por separado:
+E-4 obligaba a reescribir la fila de `sdk-call` de la tabla 15.4, y la fila
+reescrita **declara los tres modos**, `read` incluido. El texto alcanzó al
+código, que es lo que esta entrada recomendaba. Publicada en 2.6.0.
 
 ---
 
@@ -377,7 +381,11 @@ plugins pierden el error de dominio.
 **Mi recomendación: declararlo con prefijo.** Es barato y desbloquea la
 superficie más común de las siete.
 
-**Estado:** traída el 2026-11-11, sin decidir.
+**Estado:** CERRADA el 2026-11-11 por la decisión **D-09** del dueño. Se
+declaró con prefijo, que es lo que esta entrada recomendaba: 15.9 publica el
+espacio reservado `plugin.`, el runtime levanta esos códigos tal cual y
+**rechaza** como `invalid` cualquier otro, preservando el refusado en
+`err.offending_code`. Publicada en 2.6.0 (RFC V26-01, enganche E-6).
 
 ---
 
@@ -397,7 +405,12 @@ porque es el mismo hueco que encarece cuatro de las siete superficies nuevas
 en `window` (y mapeo de argumentos posicionales), o se corrige la motivación
 para que no nombre un caso que el backend no cubre.
 
-**Estado:** traída el 2026-11-11, sin decidir.
+**Estado:** CERRADA el 2026-11-11 por la decisión **D-09** del dueño. Se agregó
+la vía: `NAC.registerApiHandle(name, obj)` publica el objeto -- una referencia de
+React, el handle de un visor, una instancia de mapa -- y el binding lo nombra con
+`handle`; `args_order` agrega el orden posicional. El caso que 15.1 nombraba
+desde la 2.5 ahora se puede expresar, y el demo de Leaflet lo ejercita contra un
+objeto que nunca aterriza en `window`. Publicada en 2.6.0 (enganche E-4).
 
 ---
 
@@ -414,8 +427,8 @@ de paso.
 | H-4 | La publicación a npm se hace a mano; automatizarla necesita un secreto del repositorio que solo el dueño puede guardar | medido en la toma | PND-067 |
 | H-5 | Todo `docs/` se sirve hoy en direcciones públicas no enlazadas pero adivinables | `docs/ELIGIBILITY.md` responde 200, medido el 2026-10-30 | PND-068 |
 | H-6 | Dos candados que necesitan navegador no corren en la cadena (`test:limits`, `test:cli-levels`) | `deploy.yml`, leído hoy | PND-049 |
-| H-7 | `synthetic-mutation` devuelve una suscripción válida que **nunca dispara** cuando ninguno de sus nodos espejo está en el documento: con cero elementos el `MutationObserver` no observa nada y nadie avisa. Es el caso de una fila virtualizada que no está pintada -- daño silencioso adentro del protocolo | `js/nac.js`, leído el 2026-11-11 | **PND-110** |
-| H-8 | Faltan seis enganches en el núcleo público para que una superficie nueva viva en otro repositorio por el contrato de la sección 15: el registro no se puede enumerar, el manifest no declara argumentos ni etiquetas, y no hay backend para una fuente de eventos real que no sea postMessage | medición de lectura del 2026-11-11, `docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md` | **PND-109** |
+| H-7 | `synthetic-mutation` devuelve una suscripción válida que **nunca dispara** cuando ninguno de sus nodos espejo está en el documento: con cero elementos el `MutationObserver` no observa nada y nadie avisa. Es el caso de una fila virtualizada que no está pintada -- daño silencioso adentro del protocolo | `js/nac.js`, leído el 2026-11-11 | **PND-110** -- CERRADO en 2.6.0: falla cerrada con `backend_target_missing` + `root` opcional para el nodo que se desmonta (D-09) |
+| H-8 | Faltan seis enganches en el núcleo público para que una superficie nueva viva en otro repositorio por el contrato de la sección 15: el registro no se puede enumerar, el manifest no declara argumentos ni etiquetas, y no hay backend para una fuente de eventos real que no sea postMessage | medición de lectura del 2026-11-11, `docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md` | **PND-109** -- CERRADO en 2.6.0: los seis publicados, RFC V26-01 (D-09) |
 
 Las otras tres ramas (`portada-look-urazuke`, `release/2.5.0`, `release/2.5.1`)
 están **0 commits adelante** de `main`: son marcas de historia, no trabajo
@@ -432,13 +445,16 @@ Vale escribirlo: son los lugares donde alguien ya puso el candado y funciona.
   para que una divergencia futura se vea como dato y no como opinión.
 * La versión se declara **una sola vez** (`js/nac.js`) y todo lo demás la deriva;
   el candado de coherencia rechaza el build si alguien discrepa.
-* El paquete publicado `2.5.2` y el árbol de esa versión son **idénticos**: 22
-  de 22 archivos, cero líneas distintas, con los bytes verificados contra la
-  integridad que declara el registro.
-* Las nueve traducciones del texto normativo están **completas** (283/283
-  unidades, 83/83 secciones) y los identificadores son idénticos letra por letra.
-* Los 14 suites del runtime: **386 verificaciones en verde, cero fallas**,
-  medido hoy.
+* El paquete publicado y el árbol de esa versión son **idénticos**: 22 de 22
+  archivos, cero líneas distintas, con los bytes verificados contra la
+  integridad que declara el registro (medido sobre la `2.5.2`; la `2.6.0` se
+  verifica con el mismo candado en su `postpublish`).
+* Las nueve traducciones del texto normativo están **completas** (299/299
+  unidades, 85/85 secciones, medido el 2026-11-11 sobre la 2.6.0) y los
+  identificadores son idénticos letra por letra.
+* Los 15 suites del runtime: **453 verificaciones en verde, cero fallas**,
+  medido el 2026-11-11 sobre la 2.6.0 (eran 14 suites y 386 verificaciones en la
+  2.5.2; la diferencia es `stage13-plugin-hooks.mjs`).
 
 ---
 

@@ -4,11 +4,13 @@
 > agents, voice runners, RPA bots, and accessibility tools --
 > without per-app glue code.
 
-[![Status: stable](https://img.shields.io/badge/status-2.5.2_stable-green)](https://yujin.app/nac-spec/)
-[![Spec: v2.5](https://img.shields.io/badge/spec-v2.5-blue)](SPEC.md)
+[![Status: stable](https://img.shields.io/badge/status-2.6.0_stable-green)](https://yujin.app/nac-spec/)
+[![Spec: v2.6](https://img.shields.io/badge/spec-v2.6-blue)](SPEC.md)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 [![npm: @nac3/runtime](https://img.shields.io/npm/v/@nac3/runtime?label=npm)](https://www.npmjs.com/package/@nac3/runtime)
 [![Tests: passing](https://img.shields.io/badge/tests-386_passing-success)](runtime/test/)
+
+> **2.6.0 shipped** (2026-11-11) -- a MINOR release that completes the plugin extension contract of section 15 for surfaces that live OUTSIDE this repository. Six hooks (RFC V26-01): an agent can now **discover** a plugin it did not register (`NAC.plugins`, `NAC.describePlugin`) and **understand** what its verbs take (`label`, `hint`, typed `params` with units and ranges); `emitter-listen` is the ninth backend and the first real event source that is not postMessage; `sdk-call` reaches an API object that never lands on `window` (`NAC.registerApiHandle`) and can pass **positional** arguments; a plugin raises its own errors under the reserved `plugin.` code space; and `synthetic-mutation` **fails closed** instead of returning a subscription that never fires. The receipt is a real third-party library, not a mock of ours: `demos/v26-leaflet-plugin/` drives Leaflet 1.9.4. A manifest written against 2.5.2 needs no changes. The 2.5.2 note below is the release before this one.
 
 > **2.5.2 shipped** (2026-10-27) -- a patch release with no runtime behaviour change. The nine translations of the specification are **complete**: 83 of 83 sections, up from 34, produced from a per-locale unit store instead of being hand-kept files from May. They stay **non-normative** -- the English text governs -- and section 4.3.2 was rewritten to say so without calling them "partial", which the completion made false, and to state the rule the decision required: a translation that is behind the English never blocks the publication of the English. The 2.5.1 note below is the release before this one.
 >

@@ -45,6 +45,7 @@ The repo ships two families of runnable demos:
 | `demos/v25-02-tree-nav/` | V25-02 tree navigation (`context` + `tree`). |
 | `demos/v25-03-narrate/` | V25-03 assistive labels (`narrate`). |
 | `demos/v25-04-expect-diff/` | V25-04 effect detection (`expect` + `diff`). |
+| `demos/v26-leaflet-plugin/` | V26-01 the v2.6 plugin hooks against a real Leaflet 1.9.4 (discovery, typed params, `emitter-listen`, API handle, fail-closed observer, plugin error codes). |
 
 Plus the **Atlas Pro voice ad** under `ads-demo/atlas-pro/` -- a
 voice-driven advertisement that closes its own sale via NAC3.

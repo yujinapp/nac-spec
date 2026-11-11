@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V26-01 Leaflet plugin -- NAC3 v2.6 against a real third-party library</title>
+<meta name="description" content="Live demo of NAC3 v2.6 RFC V26-01. A real Leaflet 1.9.4 map is driven through the plugin extension contract: discovery, self-description, emitter-listen, positional sdk-call, fail-closed observers and plugin error codes.">
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H"
+      crossorigin="anonymous">
+<style>
+:root{
+  --cp:#F8F7F4;--cs:#FFFFFF;--cm:#EAE8E2;--cb:#DEDAD2;
+  --ct:#2C2927;--ct2:#615E58;--ct3:#888480;
+  --ci:#2D3A8C;--ca:#9B6A05;--ctl:#0F6E66;--cred:#a14545;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ct);background:var(--cp);line-height:1.5;padding:24px;min-height:100vh;}
+header{max-width:1240px;margin:0 auto 18px;}
+.eyebrow{font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ci);margin-bottom:.4rem;}
+h1{font-size:1.4rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.3rem;}
+.lede{font-size:.92rem;color:var(--ct2);max-width:82ch;}
+.lede code{font-family:ui-monospace,monospace;font-size:.86em;background:var(--cm);padding:1px 4px;border-radius:3px;}
+.layout{display:grid;grid-template-columns:320px 1fr 360px;gap:18px;max-width:1240px;margin:0 auto;align-items:start;}
+.panel{background:var(--cs);border:.5px solid var(--cb);border-radius:8px;padding:14px;}
+.panel h2{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ct2);margin-bottom:10px;border-bottom:.5px solid var(--cm);padding-bottom:6px;}
+.hook{margin-bottom:14px;padding-bottom:12px;border-bottom:.5px dashed var(--cm);}
+.hook:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+.hook-name{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--ca);margin-bottom:6px;font-weight:500;}
+.btn-row{display:flex;gap:4px;flex-wrap:wrap;}
+button{font-family:inherit;font-size:.78rem;padding:6px 10px;border:.5px solid var(--cb);background:var(--cs);color:var(--ct);border-radius:4px;cursor:pointer;transition:all 120ms;}
+button:hover{border-color:var(--ci);color:var(--ci);}
+button.primary{background:var(--ci);color:white;border-color:var(--ci);}
+#map{height:480px;border-radius:8px;border:.5px solid var(--cb);}
+.state-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.78rem;margin-top:10px;}
+.state-grid dt{color:var(--ct3);font-size:.74rem;}
+.state-grid dd{font-family:ui-monospace,monospace;}
+ul.rows{list-style:none;margin-top:8px;min-height:72px;}
+li.marker-row{font-size:.78rem;font-family:ui-monospace,monospace;padding:3px 6px;background:var(--cm);border-radius:3px;margin-bottom:3px;}
+.log{background:#0e0e0e;color:#d6d3c9;font-family:ui-monospace,monospace;font-size:.7rem;padding:10px;border-radius:6px;height:480px;overflow-y:auto;line-height:1.45;}
+.log .entry{padding:3px 0;border-bottom:.5px dashed #2a2a2a;}
+.log .entry.ok{color:#a3c794;}
+.log .entry.err{color:#d68a8a;}
+.log .entry .ts{color:#666;margin-right:6px;}
+.log .entry .kind{color:#7ea3d6;margin-right:6px;}
+.note{font-size:.74rem;color:var(--ct3);margin-top:8px;line-height:1.45;}
+.mirror{font-size:0;}
+footer{max-width:1240px;margin:18px auto 0;font-size:.74rem;color:var(--ct3);line-height:1.6;}
+footer a{color:var(--ci);}
+</style>
+</head>
+<body data-nac-plugin="leaflet-demo">
+
+<header>
+  <div class="eyebrow">NAC3 v2.6 -- RFC V26-01 demo</div>
+  <h1>The plugin contract against a library we do not control</h1>
+  <p class="lede">
+    The map in the centre is a real <strong>Leaflet 1.9.4</strong>, loaded
+    from unpkg with a pinned hash. The plugin that makes it operable
+    lives in its own file, <code>leaflet-nac-plugin.js</code>, and uses
+    nothing but the published runtime surface --
+    <code>registerApiHandle</code> and <code>registerPlugin</code>. That
+    is the whole point: a canvas surface can live in another repository,
+    under another licence, attached to this Apache core without a byte
+    of it changing.
+  </p>
+</header>
+
+<div class="layout">
+
+  <!-- ============ LEFT: the six hooks, one group each ============ -->
+  <div class="panel" data-nac-id="panel.hooks" data-nac-role="panel" data-nac-label="Hook exercises">
+    <h2>The six v2.6 hooks</h2>
+
+    <div class="hook">
+      <div class="hook-name">E-1 / E-2 -- discovery</div>
+      <div class="btn-row">
+        <button class="primary" data-nac-id="hook.discover" data-nac-role="button"
+                data-nac-action="discover_plugins" data-nac-label="Discover plugins"
+                data-nac-hint="Lists what NAC.plugins() reports, without this page telling it anything">Discover</button>
+      </div>
+      <p class="note">An agent that never read the plugin file asks the
+      runtime what is here, and gets the verbs, their labels and the
+      shape of their arguments.</p>
+    </div>
+
+    <div class="hook">
+      <div class="hook-name">E-4 -- sdk-call, positional, off-window</div>
+      <div class="btn-row">
+        <button data-nac-id="hook.setview" data-nac-role="button"
+                data-nac-action="call_view_set" data-nac-label="Move the view"
+                data-nac-hint="Calls map.setView(center, zoom) through the contract">view.set</button>
+        <button data-nac-id="hook.zoomin" data-nac-role="button"
+                data-nac-action="call_zoom_in" data-nac-label="Zoom in">zoom_in</button>
+        <button data-nac-id="hook.city" data-nac-role="button"
+                data-nac-action="call_fit_city" data-nac-label="Go to Montevideo">fit: mvd</button>
+      </div>
+    </div>
+
+    <div class="hook">
+      <div class="hook-name">E-3 -- emitter-listen</div>
+      <div class="btn-row">
+        <button data-nac-id="hook.subscribe" data-nac-role="button"
+                data-nac-action="subscribe_moved" data-nac-label="Subscribe to map movement">subscribe view.moved</button>
+        <button data-nac-id="hook.unsubscribe" data-nac-role="button"
+                data-nac-action="unsubscribe_moved" data-nac-label="Unsubscribe">unsubscribe</button>
+      </div>
+      <p class="note">Leaflet's own <code>moveend</code>, declared in the
+      manifest. Drag the map and watch the log.</p>
+    </div>
+
+    <div class="hook">
+      <div class="hook-name">E-5 -- the observer that observed nothing</div>
+      <div class="btn-row">
+        <button data-nac-id="hook.unrooted" data-nac-role="button"
+                data-nac-action="subscribe_unrooted" data-nac-label="Subscribe without a root">unrooted</button>
+        <button data-nac-id="hook.rooted" data-nac-role="button"
+                data-nac-action="subscribe_rooted" data-nac-label="Subscribe with a root">rooted</button>
+      </div>
+      <p class="note">A city row exists only while the city is in view.
+      Without <code>root</code> the subscription is refused instead of
+      coming back as a handle that never fires.</p>
+    </div>
+
+    <div class="hook">
+      <div class="hook-name">E-6 -- the plugin's own error code</div>
+      <div class="btn-row">
+        <button data-nac-id="hook.overlay" data-nac-role="button"
+                data-nac-action="call_overlay" data-nac-label="Require a missing overlay">overlay.require</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CENTRE: the real library ============ -->
+  <div>
+    <div id="map" data-nac-id="map.surface" data-nac-role="canvas"
+         data-nac-label="Leaflet map surface"
+         data-nac-hint="Not addressable as DOM: driven through the plugin contract"></div>
+    <div class="panel" style="margin-top:14px;">
+      <h2>What the chrome mirrors</h2>
+      <dl class="state-grid">
+        <dt>view.zoom</dt>
+        <dd><span class="mirror" data-mirror="zoom" data-value="4"></span><span data-nac-id="map.state.zoom" data-nac-role="status" id="out-zoom">--</span></dd>
+        <dt>view.center</dt>
+        <dd><span class="mirror" data-mirror="lat" data-value="0"></span><span data-nac-id="map.state.center" data-nac-role="status" id="out-center">--</span></dd>
+        <dt>markers.visible</dt>
+        <dd><span data-nac-id="map.state.visible" data-nac-role="status" id="out-visible">--</span></dd>
+      </dl>
+      <ul class="rows" data-grid="markers" data-nac-id="map.markers"
+          data-nac-role="list" data-nac-label="Tracked cities in view" id="marker-rows"></ul>
+      <p class="note">The rows mount and unmount with the viewport --
+      the same lifecycle a virtualised grid row has. The container is
+      what the rooted subscription observes.</p>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT: provenance ============ -->
+  <div class="panel">
+    <h2>nac:plugin:* provenance</h2>
+    <div class="log" id="log" data-nac-id="panel.log" data-nac-role="log" data-nac-label="Provenance log"></div>
+  </div>
+</div>
+
+<footer>
+  Leaflet is BSD-2-Clause, loaded from unpkg with a pinned SRI hash; no
+  Leaflet byte is vendored here. The plugin file and this page are
+  Apache-2.0, like the runtime. Spec: SPEC.md sections 15.4, 15.9,
+  15.10 and 15.11. Runner:
+  <code>scripts/run-demo-v26-leaflet-plugin.mjs</code>.
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH"
+        crossorigin="anonymous"></script>
+<script src="../../runtime/dist/nac.browser.js"></script>
+<script src="leaflet-nac-plugin.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var logEl = document.getElementById('log');
+  function log(kind, text, ok) {
+    var e = document.createElement('div');
+    e.className = 'entry' + (ok === false ? ' err' : (ok === true ? ' ok' : ''));
+    e.innerHTML = '<span class="ts">' + new Date().toISOString().slice(11, 19) +
+      '</span><span class="kind">' + kind + '</span>' + text;
+    logEl.appendChild(e);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  /* ---- the real library ---- */
+  var map = L.map('map', { zoomControl: true }).setView([-34.75, -57.5], 6);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '(c) OpenStreetMap contributors'
+  }).addTo(map);
+  window.LeafletNacPlugin.cities.forEach(function (c) {
+    L.marker([c.lat, c.lng]).addTo(map).bindTooltip(c.label);
+  });
+
+  /* ---- attach the plugin (the only two calls it makes) ---- */
+  var glue = window.LeafletNacPlugin.install(map, document.getElementById('marker-rows'));
+  log('install', 'leaflet.map registered -- NAC ' + NAC.version + ' / spec ' + NAC.spec_version, true);
+
+  /* ---- the chrome mirrors the map, for the dom-mirror fallbacks ---- */
+  function refreshChrome() {
+    var c = map.getCenter();
+    document.querySelector('[data-mirror="zoom"]').setAttribute('data-value', String(map.getZoom()));
+    document.querySelector('[data-mirror="lat"]').setAttribute('data-value', c.lat.toFixed(4));
+    document.getElementById('out-zoom').textContent = map.getZoom();
+    document.getElementById('out-center').textContent = c.lat.toFixed(4) + ', ' + c.lng.toFixed(4);
+    document.getElementById('out-visible').textContent = glue.visibleCount();
+  }
+  map.on('moveend zoomend', refreshChrome);
+  refreshChrome();
+
+  /* ---- provenance, straight off the document ---- */
+  ['invoked', 'read', 'event'].forEach(function (kind) {
+    document.addEventListener('nac:plugin:' + kind, function (ev) {
+      var d = ev.detail || {};
+      var path = d.verb_path || d.state_path || d.event_path || '';
+      log(kind, path + ' <span class="backend">' + (d.backend || '-') + '</span>' +
+        (d.ok ? '' : ' -- ' + (d.error || 'failed')), !!d.ok);
+    });
+  });
+
+  /* ---- the buttons an agent (or a human) drives ---- */
+  var subs = {};
+  function wire(id, fn) {
+    var el = document.querySelector('[data-nac-id="' + id + '"]');
+    if (el) el.addEventListener('click', function () { Promise.resolve().then(fn).catch(function (e) {
+      log('error', (e && e.code ? e.code + ': ' : '') + (e && e.message), false);
+    }); });
+  }
+
+  wire('hook.discover', function () {
+    var found = NAC.plugins();
+    log('plugins()', found.length + ' plugin(s): ' + found.map(function (p) { return p.slug; }).join(', '), true);
+    found.forEach(function (p) {
+      p.verbs.forEach(function (v) {
+        var args = (v.params || []).map(function (q) {
+          return q.name + ':' + q.type + (q.unit ? ' (' + q.unit + ')' : '');
+        }).join(', ');
+        log('verb', p.slug + ' ' + v.verb_path + ' -- "' + (v.label || '(no label)') + '"' +
+          (args ? ' takes ' + args : ''), true);
+      });
+    });
+  });
+
+  wire('hook.setview', function () {
+    return NAC.call('leaflet.map', 'view.set', { center: [-34.6037, -58.3816], zoom: 12 });
+  });
+  wire('hook.zoomin',  function () { return NAC.call('leaflet.map', 'view.zoom_in'); });
+  wire('hook.city',    function () { return NAC.call('leaflet.map', 'view.fit_all', { city: 'mvd', zoom: 10 }); });
+
+  wire('hook.subscribe', function () {
+    if (subs.moved) return log('subscribe', 'already subscribed to view.moved');
+    subs.moved = NAC.subscribe('leaflet.map', 'view.moved', function (snap) {
+      log('view.moved', JSON.stringify(snap), true);
+    });
+    log('subscribe', 'view.moved -> emitter-listen on Leaflet moveend', true);
+  });
+  wire('hook.unsubscribe', function () {
+    NAC.unsubscribe(subs.moved); subs.moved = null;
+    log('unsubscribe', 'view.moved detached', true);
+  });
+
+  wire('hook.unrooted', function () {
+    var slug = 'scl';   /* Santiago: outside the initial viewport */
+    subs.unrooted = NAC.subscribe('leaflet.map', 'markers.row.' + slug + '.changed_unrooted',
+      function () { log('row', 'unrooted fired'); });
+    log('subscribe', 'unrooted subscription returned a handle -- the row IS painted right now', true);
+  });
+  wire('hook.rooted', function () {
+    var slug = 'scl';
+    subs.rooted = NAC.subscribe('leaflet.map', 'markers.row.' + slug + '.changed',
+      function (snap) { log('row', 'rooted fired: ' + JSON.stringify(snap), true); });
+    log('subscribe', 'rooted subscription on [data-grid="markers"]', true);
+  });
+
+  wire('hook.overlay', function () {
+    return NAC.call('leaflet.map', 'overlay.require', { overlay: 'heatmap' });
+  });
+
+  /* The runner reaches these; a human does not need them. */
+  window.__demo = {
+    map: map, glue: glue, subs: subs, log: log, refreshChrome: refreshChrome
+  };
+  window.__demo_ready = true;
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* =====================================================================
-   NAC CLI v2.5.2 -- the entry point.
+   NAC CLI v2.6.0 -- the entry point.
 
    Two modes, and they do not pretend to be each other:
 
@@ -32,8 +32,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { staticLint } from './cli-lint.mjs';
 
-const VERSION = '2.5.2';
-const SPEC_VERSION = '2.5';
+const VERSION = '2.6.0';
+const SPEC_VERSION = '2.6';
 
 const args = process.argv.slice(2);
 const cmd = args[0];

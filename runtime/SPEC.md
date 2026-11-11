@@ -1,6 +1,6 @@
 # NAC3 -- Native Agent Contract
 
-**Version:** 2.5.2 (stable -- the complete v2.5 surface: narrate, context+tree, expect+diff)
+**Version:** 2.6.0 (stable -- the v2.5 surface plus the v2.6 plugin extension hooks: discovery, self-description, emitter-listen)
 **Status:** Stable release. The npm dist-tag `latest` points here; section 9.1 states what that guarantees and what a prerelease does not. This document states its version in exactly one place, the line above. The shipped RFCs and their Layer 2 + Layer 3 evidence are listed in `README.md` and `runtime/CHANGELOG.md`.
 **License:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -1400,7 +1400,7 @@ code, is the authority.
 
 ---
 
-## 15. Plugin extension contract -- canvas + API surfaces (v2.5)
+## 15. Plugin extension contract -- canvas + API surfaces (v2.5, extended in v2.6)
 
 Sections 1-14 assume the agent-relevant surface is **DOM**. Every
 addressable element has a `data-nac-id` attribute, every verb fires
@@ -1420,6 +1420,17 @@ its own routing contract to such surfaces. The runtime stays
 agnostic of any specific app -- it learns how to talk to one only
 by reading the plugin's manifest.
 
+v2.6 adds no new way to REACH an app: the backends of 15.4 already
+cover the ones that exist. What it adds is the half that was missing
+for a plugin to live in a repository of its own -- how an agent FINDS
+a plugin it did not register (15.10) and UNDERSTANDS what its verbs
+take (15.11), one real event source that is not postMessage
+(`emitter-listen`, 15.4), the two reaches `sdk-call` lacked (an API
+object outside `window`, and positional arguments), a fail-closed rule
+for an observer with nothing to observe, and a declared code space for
+a plugin's own errors (15.9). A manifest written against v2.5 needs no
+changes.
+
 ### 15.1 Why a new primitive set
 
 DOM-only `NAC.click(id)` cannot:
@@ -1437,7 +1448,7 @@ heuristics. The fix is to add an explicit, agnostic verb that
 takes a plugin slug and a verb path, and lets the plugin's
 manifest declare how that verb is routed.
 
-### 15.2 The three primitives
+### 15.2 The primitives
 
 ```ts
 NAC.registerPlugin(slug: string, manifest: PluginManifest): void
@@ -1446,6 +1457,15 @@ NAC.read(plugin: string, state_path: string): Promise<any>
 NAC.subscribe(plugin: string, event_path: string,
               cb: (data: any) => void): SubscriptionHandle
 NAC.unsubscribe(handle: SubscriptionHandle): void
+
+/* v2.6 -- discovery (sec 15.10) */
+NAC.plugins(): PluginDescriptor[]
+NAC.describePlugin(slug: string): PluginDescriptor
+
+/* v2.6 -- API handles for objects that never land on `window` (15.4) */
+NAC.registerApiHandle(name: string, obj: object): void
+NAC.unregisterApiHandle(name: string): boolean
+NAC.apiHandles(): string[]
 ```
 
 - `registerPlugin(slug, manifest)` registers a v2.5 plugin. A given
@@ -1467,14 +1487,26 @@ NAC.unsubscribe(handle: SubscriptionHandle): void
   synthesised via polling / MutationObserver -- the manifest
   declares which.
 
-All four functions are async (Promise-returning) except
-`unsubscribe`, which is synchronous and idempotent.
+- `plugins()` returns a descriptor for every registered v2.5 plugin,
+  ordered by slug; `describePlugin(slug)` returns one. Both are
+  read-only: the descriptor is a COPY, so a caller cannot reach the
+  live registry through it (sec 15.10).
+- `registerApiHandle(name, obj)` publishes an API object under a name
+  a manifest can reference with `handle`. The object itself never
+  enters the manifest -- manifests stay pure JSON.
+
+`call`, `read` and `subscribe` reach a surface and are therefore async
+(Promise-returning). `unsubscribe`, `plugins`, `describePlugin` and the
+handle registry only touch local state and are synchronous;
+`unsubscribe` is also idempotent.
 
 ### 15.3 Plugin manifest shape
 
 ```ts
 interface PluginManifest {
   slug: string;
+  label?: string;          /* v2.6 -- human name of the surface */
+  hint?:  string;          /* v2.6 -- one line on what it is for */
   verbs:  { [verb_path: string]: VerbBinding };
   state:  { [state_path: string]: StateBinding[] };
   events: { [event_path: string]: EventBinding };
@@ -1482,12 +1514,18 @@ interface PluginManifest {
 
 interface VerbBinding {
   backend:       BackendKind;
+  label?:        string;       /* v2.6 -- see 15.11 */
+  hint?:         string;       /* v2.6 */
+  params?:       ParamDecl[];  /* v2.6 -- what the verb takes */
   /* backend-specific fields (see 15.4) */
   [k: string]: any;
 }
 
 interface StateBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 -- names the state PATH (see 15.11) */
+  hint?:         string;   /* v2.6 */
+  unit?:         string;   /* v2.6 -- 'degrees', 'seconds', 'page' */
   /* backend-specific fields (see 15.4) */
   extract?:      string;   /* extractor DSL string (see 15.5) */
   [k: string]: any;
@@ -1495,8 +1533,22 @@ interface StateBinding {
 
 interface EventBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 */
+  hint?:         string;   /* v2.6 */
   /* backend-specific fields */
   [k: string]: any;
+}
+
+interface ParamDecl {             /* v2.6 -- see 15.11 */
+  name:      string;
+  type:      'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?:     string;
+  min?:      number;
+  max?:      number;
+  enum?:     any[];
+  label?:    string;
+  hint?:     string;
 }
 
 type BackendKind =
@@ -1507,7 +1559,8 @@ type BackendKind =
   | 'dom-mirror'
   | 'same-origin-window'
   | 'synthetic-mutation'
-  | 'synthetic-poll';
+  | 'synthetic-poll'
+  | 'emitter-listen';     /* v2.6 */
 ```
 
 Manifests are pure JSON (no JS callbacks). Forge, Sumi, and any
@@ -1518,24 +1571,56 @@ Verbs and events have **exactly one** binding. State has an
 **ordered array** of bindings: the runtime walks the chain in
 order, returning the first source that successfully resolved.
 
+Every field marked `v2.6` is OPTIONAL: a manifest written against
+v2.5 stays valid without changes. What is not optional is being
+well-formed WHEN declared -- a `label` that is not a string, or a
+`params` entry of a type outside the vocabulary above, is rejected at
+register time with `invalid` (sec 15.11).
+
 ### 15.4 Backend vocabulary
 
 | Kind | Used for | Required fields |
 |------|----------|-----------------|
 | `postmessage` | Verb: post a message to an iframe via `postMessage`. | `target` (CSS selector of the iframe to send to), `message` (MessageId string), `values` (object literal interpolated with args), `values_from_args` (optional array of arg keys to forward verbatim) |
 | `postmessage-listen` | Event: listen for a specific incoming `MessageId` on `window.message`. | `source` (CSS selector of the iframe to filter origin by; if omitted, accept any source), `message` (MessageId to match), `extract` (extractor DSL into the message data) |
-| `sdk-call` | Verb: call a globally-exposed JS function (e.g. Figma plugin, Excalidraw API). | `path` (dotted path into `window`, e.g. `figma.currentPage.selection`), `mode` (`assign` to set the path to the args value, `invoke` to call it as a function with the args object) |
+| `sdk-call` | Verb or state: call or read a JS function / property exposed on `window` or on a registered API handle (Figma plugin, Excalidraw API, a map instance). | `path` (dotted path, e.g. `figma.currentPage.selection`), `mode` (`assign` to set the path to the args value, `invoke` to call it as a function, `read` to return the value at the path), and from v2.6: `handle` (optional -- the name of an object registered with `NAC.registerApiHandle`; the `path` is walked against THAT object instead of the global one, which is how an API that never lands on `window` is reached), `args_order` (optional -- an array of arg names spelling out the POSITIONAL argument list, so `map.setView(center, zoom)` is expressible; without it the args object travels as a single argument, which is what every v2.5 manifest does) |
 | `script-bridge` | Verb or state: invoke an app's scripting bridge (Collabora's `CallPythonScript`, LibreOffice UNO bridge, Google Apps Script). | `bridge` (a backend-specific identifier like `collabora.python`), `script` (script identifier), `function` (function name to run), `args` (object literal interpolated with the call args), `response_match` (for state: the response MessageId to wait on), `timeout_ms` (optional, default 5000) |
 | `dom-mirror` | State: read from a DOM element whose attribute / class / text mirrors a canvas-internal state (e.g. a toolbar button highlighted when its formatting is active on the current selection). | `selector` (CSS selector to query), `extract` (extractor DSL, see 15.5) |
 | `same-origin-window` | State: read from `iframe.contentWindow.<path>` when the iframe is same-origin. The runtime detects cross-origin and falls through. | `target` (CSS selector of the iframe), `path` (dotted path into `contentWindow`) |
-| `synthetic-mutation` | Event: synthesise an event by observing DOM mutations on one or more state sources and re-emitting when the observed value changes. | `observe` (array of state paths to watch; the runtime calls `read` on each and diffs across mutations), `throttle_ms` (optional, default 100) |
+| `synthetic-mutation` | Event: synthesise an event by observing DOM mutations on one or more state sources and re-emitting when the observed value changes. | `observe` (array of state paths to watch; the runtime calls `read` on each and diffs across mutations), `throttle_ms` (optional, default 100), `root` (optional, v2.6 -- a CSS selector for a container to observe instead of the mirror nodes themselves; see the fail-closed rule below) |
 | `synthetic-poll` | Event: synthesise an event by polling state sources. | `observe` (array of state paths), `interval_ms` (default 250) |
+| `emitter-listen` | Event (v2.6): listen to a REAL event source that is not postMessage -- a JS event emitter exposed by a library (`map.on('moveend')`, `video.addEventListener('timeupdate')`, pdf.js `pagechanging`, a recogniser's `onresult`). | `event` (required -- the library's event name), `handle` (optional -- a registered API handle to listen on), `path` (optional -- dotted path to the emitter; resolved against the handle when one is declared, against the global object otherwise; omitted means the handle itself is the emitter), `method` / `off_method` (optional -- the subscribe / unsubscribe method names; when omitted the runtime detects `on`/`off`, `addEventListener`/`removeEventListener` or `addListener`/`removeListener`, in that order), `extract` (optional extractor DSL over the payload the library hands the listener), `observe` (optional array of state paths: instead of the raw payload, the runtime re-reads those states at event time and the callback receives that snapshot -- the useful shape for a continuous surface, where the event says "it moved" and the state says where to) |
 
 Each backend MUST be implemented by the runtime as a self-contained
 dispatcher (`dispatch(binding, args, context) -> Promise<value>`).
 Adding a new backend type to the spec requires bumping the spec
 version; runtimes ignoring unknown backends MUST reject manifests
-that declare them (no silent skip).
+that declare them (no silent skip). `emitter-listen` is the reason
+this document is 2.6 and not 2.5.3.
+
+**Fail-closed rule for an observer with nothing to observe (v2.6).**
+`synthetic-mutation` resolves every observed state path to the DOM
+element its primary `dom-mirror` binding selects. When a selector
+matches no element, `subscribe` MUST reject with
+`backend_target_missing`, naming the state paths and selectors that
+did not resolve. It MUST NOT return a handle: a subscription that
+observes nothing resolves successfully and then never fires, which is
+precisely the silent damage this protocol exists to remove -- and
+until 2.5.2 that is what the reference runtime did.
+
+A manifest whose observed node legitimately comes and goes -- the row
+of a virtualised grid, which exists only while it is scrolled into
+view -- declares `root`: a container that OUTLIVES the node. The
+runtime then observes the container with `subtree: true` and
+re-resolves the selectors on every mutation, so a subscription taken
+while the node was absent fires when the node mounts. `root` itself
+must resolve, for the same reason. When a subscription starts with
+nothing readable and the observed state later becomes readable, that
+transition is itself an emit: the move from unknown to known is the
+change the caller is waiting for. While an observed state is
+unreadable no event is emitted, so a manifest for which ABSENCE is
+meaningful declares it as data -- a `present` extractor, or a
+fallback binding in the chain.
 
 ### 15.5 Extractor mini-DSL
 
@@ -1684,6 +1769,152 @@ is one of:
   `timeout_ms` (default 5000 for verbs, 1000 for state reads).
 - `invalid` -- argument shape is wrong (bad slug, malformed
   manifest at register time, etc).
+
+**The plugin code space (v2.6).** The ten codes above are the whole
+contract vocabulary, and they are deliberately about ROUTING: they say
+the protocol could not get there, never why the application said no. A
+plugin that needs a code of its own -- `row_not_materialized` as
+something distinguishable from "that row does not exist", a document
+that is locked, an export still rendering -- raises it under the
+reserved prefix `plugin.`:
+
+```js
+const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;                       /* inside the backend the manifest routes to */
+```
+
+`NAC.call` and `NAC.subscribe` surface such a code verbatim on
+`err.code`. A code that is NEITHER one of the ten NOR under the
+`plugin.` prefix is refused as `invalid`, with the refused string
+preserved on `err.offending_code`: an undeclared code that travelled
+anyway is how a vocabulary stops being a vocabulary. The prefix is
+reserved -- the ten contract codes will never take it, so a plugin
+code can never collide with a future one.
+
+### 15.10 Discovery of the registry (v2.6)
+
+Sections 15.2 to 15.9 all require the caller to already know the slug
+and the path. Until 2.5.2 that was the ONLY way in: the registry was
+readable by exactly three functions (`call`, `read`, `subscribe`), so
+an agent that did not register the plugin itself could not learn it
+exists. It read the DOM manifest (section 5), found the chrome, and
+the canvas surface was invisible. For a surface that declares no DOM
+at all -- a voice-only plugin -- there was nothing to find whatsoever.
+
+```ts
+NAC.plugins(): PluginDescriptor[]          /* ordered by slug */
+NAC.describePlugin(slug: string): PluginDescriptor
+
+interface PluginDescriptor {
+  slug:   string;
+  label:  string | null;
+  hint:   string | null;
+  verbs:  { verb_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            params: ParamDecl[] | null; handle?: string }[];
+  state:  { state_path: string; backends: (string | null)[];
+            label: string | null; hint: string | null;
+            unit: string | null }[];
+  events: { event_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            observe: string[] | null; event?: string }[];
+}
+```
+
+Rules:
+
+1. Both are SYNCHRONOUS. They read a local object; nothing is
+   dispatched to any surface, so there is no reason for an agent to
+   await a round trip to find out what is there.
+2. The descriptor is a **copy**. A caller MUST NOT be able to reach
+   the live registry through it and rewrite another plugin's routing.
+3. Verbs, state paths and events come back sorted by path, so two
+   reads of the same registry are byte-comparable.
+4. An undeclared `label` / `hint` / `params` reads as `null`, never as
+   a missing key: a reader does not have to tell "absent" from
+   "not declared".
+5. `describePlugin` on an unregistered slug rejects with
+   `plugin_not_registered` (sec 15.9).
+
+Discovery is deliberately a read of what the manifest DECLARES, not a
+probe of the surface. It tells an agent what exists and how to name
+it; whether the surface answers today is what `call` and `read` are
+for.
+
+### 15.11 Self-description (v2.6)
+
+The DOM half of this protocol has carried a human name and a typed
+field list since v1 (`data-nac-label`, `data-nac-hint`, `fields[]`
+with a type, section 6). The plugin half carried none: a manifest
+declared WHERE a verb routes and nothing about what it is called or
+what it takes. On a continuous surface the actionable thing IS the
+argument -- a coordinate and a zoom, an instant on a timeline, a page
+and a form field, a pose in three dimensions -- and nothing declared
+its shape, its unit or its range. A voice runner could not even name
+the verb out loud.
+
+`label`, `hint`, `params` (verbs), `label` / `hint` / `unit` (state
+and events) close that. All optional; all read back through 15.10.
+
+```json
+{
+  "slug":  "acme.map",
+  "label": "Acme map",
+  "verbs": {
+    "view.set": {
+      "backend": "sdk-call",
+      "handle":  "acme.map",
+      "path":    "setView",
+      "mode":    "invoke",
+      "args_order": ["center", "zoom"],
+      "label":   "Move the map",
+      "hint":    "Centres the map on a coordinate at a zoom level",
+      "params": [
+        { "name": "center", "type": "array",  "required": true,
+          "unit": "degrees", "label": "Centre", "hint": "[lat, lng]" },
+        { "name": "zoom",   "type": "number", "required": false,
+          "unit": "zoom level", "min": 0, "max": 22 }
+      ]
+    }
+  },
+  "state": {
+    "view.center": [
+      { "backend": "sdk-call", "handle": "acme.map", "path": "getCenter",
+        "mode": "invoke", "label": "Centre of the view", "unit": "degrees" }
+    ]
+  },
+  "events": {
+    "view.moved": {
+      "backend": "emitter-listen", "handle": "acme.map",
+      "event": "moveend", "observe": ["view.center"],
+      "label": "The map stopped moving"
+    }
+  }
+}
+```
+
+Rules:
+
+1. A `label`, `hint` or `unit` that is declared MUST be a non-empty
+   string; otherwise the manifest is rejected at register time with
+   `invalid`.
+2. `params` MUST be an array. Each entry MUST carry a `name` (unique
+   within the verb) and a `type` from
+   `string | number | boolean | object | array`. `required`, `unit`,
+   `min`, `max`, `enum`, `label` and `hint` are optional, and are
+   type-checked when present. Anything else is `invalid`.
+3. The label of a state PATH is the first one its chain declares. A
+   state path is one value with an ordered list of sources (sec 15.6),
+   so it is named once, by whichever source names it.
+4. `params` declares the shape of the `args` object `NAC.call`
+   receives. The runtime does NOT validate args against it: the
+   declaration exists so an agent can compose a call and a voice
+   runner can speak it, and a surface that needs its arguments
+   enforced enforces them where they land.
+5. Nothing here is translated by the runtime. A label is authored in
+   the language of the app; a host that speaks another one localises
+   at its own layer (section 4.3).
 
 ---
 

@@ -1,7 +1,7 @@
 <!-- nac3-translation-store
 locale: fr
 source: SPEC.md
-source_version: 2.5.2
+source_version: 2.6.0
 pass_date: 2026-10-27
 engine: anthropic/claude-opus-5 (Yujin Forge)
 -->
@@ -9,8 +9,8 @@ engine: anthropic/claude-opus-5 (Yujin Forge)
 <!-- u 5e3e86e7f989 | 1 NAC3 -- Native Agent Contract | heading -->
 # NAC3 -- Native Agent Contract
 
-<!-- u 0e5eb9779108 | 1 NAC3 -- Native Agent Contract | prose -->
-**Version :** 2.5.2 (stable -- la surface v2.5 complète : narrate, context+tree, expect+diff)
+<!-- u 2f33f4f4ea95 | 1 NAC3 -- Native Agent Contract | prose -->
+**Version :** 2.6.0 (stable -- la surface v2.5 plus les points d'accroche d'extension de plugin de la v2.6 : découverte, auto-description, emitter-listen)
 **Statut :** Version stable. Le dist-tag npm `latest` pointe ici ; la section 9.1 énonce ce que cela garantit et ce qu'une préversion ne garantit pas. Ce document énonce sa version en exactement un endroit, la ligne ci-dessus. Les RFC publiés et leurs preuves de Couche 2 + Couche 3 sont listés dans `README.md` et `runtime/CHANGELOG.md`.
 **Licence :** Apache-2.0
 **Éditeur :** Yujin (yujin.app)
@@ -1363,8 +1363,8 @@ D'autres implémentations sont bienvenues (Python pour des exécuteurs
 d'automatisation natifs, Rust pour des agents embarqués, etc).
 L'autorité, c'est la spécification, pas le code JS.
 
-<!-- u 4dc85a8e4ab3 | 71 15. Plugin extension contract -- canvas + API surfaces  | heading -->
-## 15. Contrat d'extension de plugin -- surfaces canvas + API (v2.5)
+<!-- u dd63cad87d7d | 71 15. Plugin extension contract -- canvas + API surfaces  | heading -->
+## 15. Contrat d'extension de plugin -- surfaces canvas + API (v2.5, étendu en v2.6)
 
 <!-- u 7d116da9b14a | 71 15. Plugin extension contract -- canvas + API surfaces  | prose -->
 Les sections 1-14 supposent que la surface pertinente pour l'agent est
@@ -1389,6 +1389,19 @@ surfaces. Le runtime reste agnostique de toute application
 particulière : il apprend à parler à l'une d'elles uniquement en lisant
 le manifeste du plugin.
 
+<!-- u a0c38306ba57 | 71 15. Plugin extension contract -- canvas + API surfaces  | prose -->
+La v2.6 n'ajoute aucune nouvelle façon d'ATTEINDRE une application :
+les backends de 15.4 couvrent déjà celles qui existent. Ce qu'elle
+ajoute, c'est la moitié qui manquait pour qu'un plugin vive dans son
+propre dépôt -- comment un agent TROUVE un plugin qu'il n'a pas
+enregistré (15.10) et COMPREND ce que ses verbes prennent (15.11), une
+source d'événements réelle qui n'est pas postMessage
+(`emitter-listen`, 15.4), les deux portées qui manquaient à `sdk-call`
+(un objet d'API hors de `window`, et des arguments positionnels), une
+règle d'échec fermé pour un observateur qui n'a rien à observer, et un
+espace de codes déclaré pour les erreurs propres à un plugin (15.9). Un
+manifeste écrit contre la v2.5 n'a besoin d'aucune modification.
+
 <!-- u 6d9a90384f28 | 72 15.1 Why a new primitive set | heading -->
 ### 15.1 Pourquoi un nouvel ensemble de primitives
 
@@ -1410,10 +1423,10 @@ de détection de backend. Le correctif est d'ajouter un verbe explicite
 et agnostique qui prend un slug de plugin et un chemin de verbe, et qui
 laisse le manifeste du plugin déclarer comment ce verbe est routé.
 
-<!-- u 641333576b18 | 73 15.2 The three primitives | heading -->
-### 15.2 Les trois primitives
+<!-- u d450f22a1934 | 73 15.2 The primitives | heading -->
+### 15.2 Les primitives
 
-<!-- u 2eeaa810cab5 | 73 15.2 The three primitives | prose -->
+<!-- u 2eeaa810cab5 | 73 15.2 The primitives | prose -->
 - `registerPlugin(slug, manifest)` enregistre un plugin v2.5. Un même
   `slug` PEUT apparaître à la fois dans le registre des manifestes du
   DOM (section 5) et dans le registre des extensions v2.5 ; les deux
@@ -1433,9 +1446,22 @@ laisse le manifeste du plugin déclarer comment ce verbe est routé.
   amont ou synthétisés par interrogation périodique /
   MutationObserver -- le manifeste déclare lequel.
 
-<!-- u da60503266ab | 73 15.2 The three primitives | prose -->
-Les quatre fonctions sont asynchrones (elles renvoient une Promise)
-sauf `unsubscribe`, qui est synchrone et idempotente.
+<!-- u 7772ddc10dc0 | 73 15.2 The primitives | prose -->
+- `plugins()` renvoie un descripteur pour chaque plugin v2.5 enregistré,
+  triés par slug ; `describePlugin(slug)` en renvoie un. Les deux sont
+  en lecture seule : le descripteur est une COPIE, de sorte qu'un
+  appelant ne peut pas atteindre le registre vivant à travers lui
+  (sec. 15.10).
+- `registerApiHandle(name, obj)` publie un objet d'API sous un nom
+  qu'un manifeste peut référencer avec `handle`. L'objet lui-même
+  n'entre jamais dans le manifeste -- les manifestes restent du JSON
+  pur.
+
+<!-- u 17248fa09724 | 73 15.2 The primitives | prose -->
+`call`, `read` et `subscribe` atteignent une surface et sont donc
+asynchrones (elles renvoient une Promise). `unsubscribe`, `plugins`,
+`describePlugin` et le registre de handles ne touchent que de l'état
+local et sont synchrones ; `unsubscribe` est de plus idempotente.
 
 <!-- u 3a61a03890f1 | 74 15.3 Plugin manifest shape | heading -->
 ### 15.3 Forme du manifeste de plugin
@@ -1450,28 +1476,67 @@ Les verbes et les événements ont **exactement une** liaison. L'état a
 un **tableau ordonné** de liaisons : le runtime parcourt la chaîne dans
 l'ordre et renvoie la première source qui s'est résolue avec succès.
 
+<!-- u 7144328b4a20 | 74 15.3 Plugin manifest shape | prose -->
+Tout champ marqué `v2.6` est OPTIONNEL : un manifeste écrit contre la
+v2.5 reste valide sans modification. Ce qui n'est pas optionnel, c'est
+d'être bien formé QUAND il est déclaré -- un `label` qui n'est pas une
+chaîne, ou une entrée de `params` d'un type hors du vocabulaire
+ci-dessus, est rejeté au moment de l'enregistrement avec `invalid`
+(sec. 15.11).
+
 <!-- u 673180462720 | 75 15.4 Backend vocabulary | heading -->
 ### 15.4 Vocabulaire des backends
 
-<!-- u 1e544939bf9c | 75 15.4 Backend vocabulary | prose -->
+<!-- u 0adb57d301bd | 75 15.4 Backend vocabulary | prose -->
 | Type | Utilisé pour | Champs obligatoires |
 |------|----------|-----------------|
 | `postmessage` | Verbe : poster un message vers une iframe via `postMessage`. | `target` (sélecteur CSS de l'iframe destinataire), `message` (la chaîne MessageId), `values` (objet littéral interpolé avec les arguments), `values_from_args` (tableau facultatif de clés d'argument transmises telles quelles) |
 | `postmessage-listen` | Événement : écouter un `MessageId` entrant précis sur `window.message`. | `source` (sélecteur CSS de l'iframe servant à filtrer l'origine ; si omis, toute origine est acceptée), `message` (le MessageId à faire correspondre), `extract` (le DSL d'extraction sur les données du message) |
-| `sdk-call` | Verbe : appeler une fonction JS exposée globalement (par exemple un plugin Figma, l'API Excalidraw). | `path` (chemin pointé dans `window`, par exemple `figma.currentPage.selection`), `mode` (`assign` pour affecter la valeur des arguments au chemin, `invoke` pour l'appeler comme fonction avec l'objet d'arguments) |
+| `sdk-call` | Verbe ou état : appeler ou lire une fonction / propriété JS exposée sur `window` ou sur un handle d'API enregistré (un plugin Figma, l'API d'Excalidraw, une instance de carte). | `path` (chemin pointé, par exemple `figma.currentPage.selection`), `mode` (`assign` pour fixer le chemin à la valeur des arguments, `invoke` pour l'appeler comme fonction, `read` pour renvoyer la valeur qui se trouve au chemin) et, à partir de la v2.6 : `handle` (optionnel -- le nom d'un objet enregistré avec `NAC.registerApiHandle` ; le `path` est parcouru contre CET objet au lieu de l'objet global, c'est ainsi qu'on atteint une API qui n'atterrit jamais sur `window`), `args_order` (optionnel -- un tableau de noms d'arguments qui épelle la liste des arguments POSITIONNELS, de sorte qu'une signature comme `map.setView(center, zoom)` devienne exprimable ; sans lui, l'objet d'arguments voyage comme un argument unique, ce que fait tout manifeste de la v2.5) |
 | `script-bridge` | Verbe ou état : invoquer le pont de script d'une application (le `CallPythonScript` de Collabora, le pont UNO de LibreOffice, Google Apps Script). | `bridge` (un identifiant propre au backend, comme `collabora.python`), `script` (identifiant du script), `function` (nom de la fonction à exécuter), `args` (objet littéral interpolé avec les arguments de l'appel), `response_match` (pour un état : le MessageId de réponse à attendre), `timeout_ms` (facultatif, 5000 par défaut) |
 | `dom-mirror` | État : lire depuis un élément du DOM dont l'attribut / la classe / le texte reflète un état interne du canvas (par exemple un bouton de barre d'outils mis en évidence quand sa mise en forme est active sur la sélection courante). | `selector` (sélecteur CSS à interroger), `extract` (le DSL d'extraction, voir 15.5) |
 | `same-origin-window` | État : lire depuis `iframe.contentWindow.<path>` quand l'iframe est de même origine. Le runtime détecte l'origine croisée et passe au repli suivant. | `target` (sélecteur CSS de l'iframe), `path` (chemin pointé dans `contentWindow`) |
-| `synthetic-mutation` | Événement : synthétiser un événement en observant les mutations du DOM sur une ou plusieurs sources d'état et en réémettant quand la valeur observée change. | `observe` (tableau de chemins d'état à surveiller ; le runtime appelle `read` sur chacun et les compare entre deux mutations), `throttle_ms` (facultatif, 100 par défaut) |
+| `synthetic-mutation` | Événement : synthétiser un événement en observant les mutations du DOM sur une ou plusieurs sources d'état et en réémettant quand la valeur observée change. | `observe` (tableau de chemins d'état à surveiller ; le runtime appelle `read` sur chacun et les compare entre les mutations), `throttle_ms` (optionnel, 100 par défaut), `root` (optionnel, v2.6 -- un sélecteur CSS d'un conteneur à observer à la place des nœuds miroirs eux-mêmes ; voir la règle d'échec fermé ci-dessous) |
 | `synthetic-poll` | Événement : synthétiser un événement en interrogeant périodiquement les sources d'état. | `observe` (tableau de chemins d'état), `interval_ms` (250 par défaut) |
+| `emitter-listen` | Événement (v2.6) : écouter une source d'événements RÉELLE qui n'est pas postMessage -- un émetteur d'événements JS exposé par une bibliothèque (`map.on('moveend')`, `video.addEventListener('timeupdate')`, le `pagechanging` de pdf.js, le `onresult` d'un moteur de reconnaissance). | `event` (obligatoire -- le nom de l'événement de la bibliothèque), `handle` (optionnel -- un handle d'API enregistré sur lequel écouter), `path` (optionnel -- chemin pointé jusqu'à l'émetteur ; résolu contre le handle quand il y en a un de déclaré, contre l'objet global sinon ; l'omettre signifie que le handle lui-même est l'émetteur), `method` / `off_method` (optionnel -- les noms des méthodes d'abonnement / désabonnement ; quand ils sont omis, le runtime détecte `on`/`off`, `addEventListener`/`removeEventListener` ou `addListener`/`removeListener`, dans cet ordre), `extract` (DSL d'extraction optionnel sur la charge que la bibliothèque remet à l'écouteur), `observe` (tableau optionnel de chemins d'état : au lieu de la charge brute, le runtime relit ces états au moment de l'événement et le callback reçoit cet instantané -- la forme utile pour une surface continue, où l'événement dit « ça a bougé » et l'état dit vers où) |
 
-<!-- u b3fb5326727c | 75 15.4 Backend vocabulary | prose -->
+<!-- u c1e508051c97 | 75 15.4 Backend vocabulary | prose -->
 Chaque backend DOIT être implémenté par le runtime comme un dispatcheur
 autonome (`dispatch(binding, args, context) -> Promise<value>`).
 Ajouter un nouveau type de backend à la spécification exige d'incrémenter
 la version de la spécification ; les runtimes qui ignorent les backends
 inconnus DOIVENT rejeter les manifestes qui les déclarent (pas de saut
 silencieux).
+`emitter-listen` est la raison pour laquelle ce document est en 2.6 et
+non en 2.5.3.
+
+<!-- u 2e84755a3d23 | 75 15.4 Backend vocabulary | prose -->
+**Règle d'échec fermé pour un observateur qui n'a rien à observer (v2.6).**
+`synthetic-mutation` résout chaque chemin d'état observé vers
+l'élément du DOM que sélectionne sa liaison primaire `dom-mirror`.
+Quand un sélecteur ne correspond à aucun élément, `subscribe` DOIT
+rejeter avec `backend_target_missing`, en nommant les chemins d'état et
+les sélecteurs qui n'ont pas résolu. Il NE DOIT PAS renvoyer de handle :
+un abonnement qui n'observe rien se résout avec succès puis ne se
+déclenche jamais, ce qui est précisément le dommage silencieux que ce
+protocole existe pour supprimer -- et jusqu'à la 2.5.2 c'est ce que
+faisait le runtime de référence.
+
+<!-- u dd34fa1bbdf2 | 75 15.4 Backend vocabulary | prose -->
+Un manifeste dont le nœud observé apparaît et disparaît légitimement --
+la ligne d'une grille virtualisée, qui n'existe que tant qu'elle est
+défilée dans la vue -- déclare `root` : un conteneur qui SURVIT au
+nœud. Le runtime observe alors ce conteneur avec `subtree: true` et
+re-résout les sélecteurs à chaque mutation, de sorte qu'un abonnement
+pris pendant que le nœud était absent se déclenche quand le nœud se
+monte. `root` lui-même doit résoudre, pour la même raison. Quand un
+abonnement démarre sans rien de lisible et que l'état observé devient
+lisible par la suite, cette transition est elle-même une émission : le
+passage d'inconnu à connu est le changement que l'appelant attend. Tant
+qu'un état observé n'est pas lisible, aucun événement n'est émis ; un
+manifeste pour lequel l'ABSENCE est significative la déclare donc comme
+une donnée -- un extracteur `present`, ou une liaison de repli dans la
+chaîne.
 
 <!-- u 269f89fd3507 | 76 15.5 Extractor mini-DSL | heading -->
 ### 15.5 Mini-DSL d'extraction
@@ -1581,25 +1646,123 @@ répondu.
 - `invalid` -- la forme de l'argument est incorrecte (slug invalide,
   manifeste malformé au moment de l'enregistrement, etc).
 
-<!-- u f92a4c02f492 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | heading -->
+<!-- u d1f341d487a7 | 80 15.9 Errors | prose -->
+**L'espace de codes de plugin (v2.6).** Les dix codes ci-dessus sont
+tout le vocabulaire du contrat, et ils portent délibérément sur le
+ROUTAGE : ils disent que le protocole n'a pas pu arriver, jamais
+pourquoi l'application a dit non. Un plugin qui a besoin d'un code à
+lui -- `row_not_materialized` comme quelque chose de distinguable de
+« cette ligne n'existe pas », un document verrouillé, un export encore
+en cours de rendu -- le lève sous le préfixe réservé `plugin.` :
+
+<!-- u 7c2f41ae66c6 | 80 15.9 Errors | prose -->
+`NAC.call` et `NAC.subscribe` exposent un tel code tel quel sur
+`err.code`. Un code qui n'est NI l'un des dix NI sous le préfixe
+`plugin.` est refusé comme `invalid`, la chaîne refusée étant
+conservée sur `err.offending_code` : un code non déclaré qui a voyagé
+quand même, c'est exactement ainsi qu'un vocabulaire cesse d'être un
+vocabulaire. Le préfixe est réservé -- les dix codes du contrat ne le
+prendront jamais, de sorte qu'un code de plugin ne peut jamais entrer
+en collision avec un code futur.
+
+<!-- u 15fbbc821ab2 | 81 15.10 Discovery of the registry (v2.6) | heading -->
+### 15.10 Découverte du registre (v2.6)
+
+<!-- u a097aa2c62cf | 81 15.10 Discovery of the registry (v2.6) | prose -->
+Les sections 15.2 à 15.9 exigent toutes que l'appelant connaisse déjà
+le slug et le chemin. Jusqu'à la 2.5.2 c'était la SEULE porte : le
+registre n'était lisible que par exactement trois fonctions (`call`,
+`read`, `subscribe`), de sorte qu'un agent qui n'avait pas enregistré
+le plugin lui-même ne pouvait pas apprendre qu'il existe. Il lisait le
+manifeste du DOM (section 5), trouvait le chrome, et la surface canvas
+était invisible. Pour une surface qui ne déclare aucun DOM -- un plugin
+uniquement vocal -- il n'y avait absolument rien à trouver.
+
+<!-- u 09e09762d2d1 | 81 15.10 Discovery of the registry (v2.6) | prose -->
+Règles :
+
+<!-- u 63aa5ffa5e9c | 81 15.10 Discovery of the registry (v2.6) | prose -->
+1. Les deux sont SYNCHRONES. Elles lisent un objet local ; rien n'est
+   dépêché vers une surface, il n'y a donc aucune raison pour qu'un
+   agent attende un aller-retour pour savoir ce qu'il y a.
+2. Le descripteur est une **copie**. Un appelant NE DOIT PAS pouvoir
+   atteindre le registre vivant à travers lui et réécrire le routage
+   d'un autre plugin.
+3. Les verbes, les chemins d'état et les événements reviennent triés
+   par chemin, de sorte que deux lectures du même registre sont
+   comparables octet par octet.
+4. Un `label` / `hint` / `params` non déclaré se lit comme `null`,
+   jamais comme une clé manquante : un lecteur n'a pas à distinguer
+   « absent » de « non déclaré ».
+5. `describePlugin` sur un slug non enregistré rejette avec
+   `plugin_not_registered` (sec. 15.9).
+
+<!-- u b5e736795954 | 81 15.10 Discovery of the registry (v2.6) | prose -->
+La découverte est délibérément une lecture de ce que le manifeste
+DÉCLARE, et non un sondage de la surface. Elle dit à un agent ce qui
+existe et comment le nommer ; savoir si la surface répond aujourd'hui,
+c'est à cela que servent `call` et `read`.
+
+<!-- u b84b352e07b2 | 82 15.11 Self-description (v2.6) | heading -->
+### 15.11 Auto-description (v2.6)
+
+<!-- u 0a930197c2e8 | 82 15.11 Self-description (v2.6) | prose -->
+La moitié DOM de ce protocole porte un nom humain et une liste de
+champs typée depuis la v1 (`data-nac-label`, `data-nac-hint`,
+`fields[]` avec un type, section 6). La moitié plugin n'en portait
+aucun : un manifeste déclarait OÙ un verbe est routé et rien sur
+comment il s'appelle ni sur ce qu'il prend. Sur une surface continue,
+l'actionnable EST l'argument -- une coordonnée et un zoom, un instant
+sur une frise, une page et un champ de formulaire, une pose en trois
+dimensions -- et rien ne déclarait sa forme, son unité ni sa plage. Un
+exécuteur vocal ne pouvait même pas nommer le verbe à voix haute.
+
+<!-- u 522e41246c77 | 82 15.11 Self-description (v2.6) | prose -->
+`label`, `hint`, `params` (verbes), `label` / `hint` / `unit` (état et
+événements) comblent cela. Tous optionnels ; tous relus via 15.10.
+
+<!-- u 2f2e60b59631 | 82 15.11 Self-description (v2.6) | prose -->
+1. Un `label`, un `hint` ou une `unit` déclaré DOIT être une chaîne non
+   vide ; sinon le manifeste est rejeté au moment de l'enregistrement
+   avec `invalid`.
+2. `params` DOIT être un tableau. Chaque entrée DOIT porter un `name`
+   (unique au sein du verbe) et un `type` parmi
+   `string | number | boolean | object | array`. `required`, `unit`,
+   `min`, `max`, `enum`, `label` et `hint` sont optionnels, et leur
+   type est vérifié quand ils sont présents. Tout le reste est
+   `invalid`.
+3. L'étiquette d'un CHEMIN d'état est la première que sa chaîne
+   déclare. Un chemin d'état est une valeur avec une liste ordonnée de
+   sources (sec. 15.6), il est donc nommé une seule fois, par celle des
+   sources qui le nomme.
+4. `params` déclare la forme de l'objet `args` que `NAC.call` reçoit.
+   Le runtime ne valide PAS les arguments contre lui : la déclaration
+   existe pour qu'un agent puisse composer un appel et qu'un exécuteur
+   vocal puisse l'énoncer, et une surface qui a besoin que ses
+   arguments soient contraints les contraint là où ils atterrissent.
+5. Rien de tout cela n'est traduit par le runtime. Une étiquette est
+   écrite dans la langue de l'application ; un hôte qui en parle une
+   autre localise à sa propre couche (section 4.3).
+
+<!-- u f92a4c02f492 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | heading -->
 ## 16. Navigation en arbre (v2.5 -- LIVRÉ en 2.5.0-alpha.5 / RFC V25-02)
 
-<!-- u 7a50acadcc20 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u 7a50acadcc20 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 Primitives de navigation hiérarchique des commandes, pour les parcours
 d'assistance et les exécuteurs vocaux qui ont besoin de décrire ce
 qu'ils peuvent faire depuis le focus courant.
 
-<!-- u 726350183f41 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u 726350183f41 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 **Surface d'API :**
 
-<!-- u c57b2345c081 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u c57b2345c081 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 - `NAC.context(plugin) -> { breadcrumb: [{nac_id, label}, ...] }`
   Remonte depuis `document.activeElement` à travers les éléments
   ancêtres qui portent `data-nac-id`, en s'arrêtant à la racine du
   plugin. Renvoie un fil d'Ariane vide si rien n'a le focus dans le
   plugin. Le `label` de chaque maillon vient de `narrate` (section 17).
 
-<!-- u 9345bb2ecfe1 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u 9345bb2ecfe1 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 - `NAC.tree(plugin, rootId?) -> [{nac_id, label, opens?, leaf?}, ...]`
   Énumère les enfants adressables IMMÉDIATS de `rootId` (ou de la
   racine du plugin si omis). « Immédiat » signifie qu'aucun autre
@@ -1609,35 +1772,35 @@ qu'ils peuvent faire depuis le focus courant.
   - `opens` reflète l'attribut `data-nac-opens` quand il est présent
   - `leaf` vaut `true` quand `data-nac-leaf` est présent
 
-<!-- u b19ace6221f6 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u b19ace6221f6 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 **Attributs pour l'auteur :**
 
-<!-- u 8c4475faabe9 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u 8c4475faabe9 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 - `data-nac-opens="<target-nac-id>"` : déclare que ce nœud ouvre /
   descend vers l'élément identifié par l'id cible. Permet aux agents de
   suivre la chaîne de navigation sans deviner de noms.
 - `data-nac-leaf` : marqueur terminal explicite ; les agents en aval
   savent qu'aucune descente supplémentaire n'est possible.
 
-<!-- u 6a2e330ae9a8 | 81 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
+<!-- u 6a2e330ae9a8 | 83 16. Tree navigation (v2.5 -- SHIPPED in 2.5.0-alpha.5 / | prose -->
 **Erreurs :** `tree` renvoie `[]` pour un rootId inconnu (vide
 silencieux, pas une erreur). `context` renvoie toujours
 `{ breadcrumb: [] }` pour les plugins inconnus.
 
-<!-- u 7a9670811789 | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | heading -->
+<!-- u 7a9670811789 | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | heading -->
 ## 17. Libellés d'assistance (v2.5 -- LIVRÉ en 2.5.0-alpha.5 / RFC V25-03)
 
-<!-- u e6e2f1eecf4e | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u e6e2f1eecf4e | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 Résolution canonique des libellés lisibles par un humain. Une seule
 fonction pour les lecteurs d'écran, la synthèse vocale, les parcours
 vocaux, les journaux d'audit, les surfaces d'assistance mobiles.
 
-<!-- u 2ee6d3c1ba46 | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 2ee6d3c1ba46 | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 - `NAC.narrate(plugin, nac_id) -> string | null`
   Renvoie `null` si le plugin ou le nac_id est introuvable. Sinon, le
   libellé suivant cet ordre de priorité strict :
 
-<!-- u d1332c239eaf | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u d1332c239eaf | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
   1. **`aria-label`** -- l'accessibilité d'abord ; respecté sauf s'il
      n'est que des espaces.
   2. **le texte visible** -- le `textContent` de l'élément, en
@@ -1650,58 +1813,58 @@ vocaux, les journaux d'audit, les surfaces d'assistance mobiles.
   4. **le `nac_id` en dernier recours** -- le pire cas ; il signale
      « aucun libellé n'a été écrit ».
 
-<!-- u ca12e3704975 | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u ca12e3704975 | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
   Les valeurs qui ne sont que des espaces, à n'importe quel niveau,
   retombent au niveau suivant.
 
-<!-- u 05527df57e48 | 82 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 05527df57e48 | 84 17. Assistive labels (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 **Validation :** `validate_global()` peut émettre des avertissements
 dans le groupe `plugin_instance_violations` pour les nac_id de forme
 ordinale (`btn-1`, `btn-2`, ...) auxquels manque l'un quelconque des
 libellés des niveaux supérieurs.
 
-<!-- u 8352032c85cd | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | heading -->
+<!-- u 8352032c85cd | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | heading -->
 ## 18. Détection de l'effet (v2.5 -- LIVRÉ en 2.5.0-alpha.5 / RFC V25-04)
 
-<!-- u 229a636ff25c | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 229a636ff25c | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 Comble le manque du « dommage silencieux » : un agent confirme l'EFFET
 d'une action, pas seulement que la commande a été émise. Les deux
 primitives se composent avec `NAC.read()`, donc n'importe quel backend
 de V25-01 fonctionne (postmessage, sdk-call, dom-mirror, ...).
 
-<!-- u fbede61e05ec | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u fbede61e05ec | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 - `NAC.expect(plugin, statePath, value, opts?) -> Promise<value>`
   Interroge `NAC.read(plugin, statePath)` jusqu'à ce que le
   comparateur renvoie une valeur vraie ou que l'échéance tombe. Se
   résout avec la valeur résolue ; rejette avec
   `NacError('timeout', ...)` à l'échéance.
 
-<!-- u 2f8b051e6a19 | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 2f8b051e6a19 | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
   Les échecs de lecture pendant l'interrogation sont réessayés jusqu'à
   l'échéance (traités comme « pas encore observable », pas comme une
   erreur dure).
 
-<!-- u 31222acebd2a | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 31222acebd2a | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
   Options :
   - `timeout_ms` (`5000` par défaut)
   - `poll_ms` (`100` par défaut)
   - `comparator` (`(cur, want) => cur === want` par défaut)
     Reçoit `(current, expected)` et renvoie un booléen.
 
-<!-- u bfe42d1abbb0 | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u bfe42d1abbb0 | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 - `NAC.diff(plugin, statePath, actionFn) -> Promise<{before, after, changed}>`
   Lit l'état, attend `actionFn()`, relit l'état. Renvoie les deux
   instantanés et un booléen `changed` calculé par comparaison
   JSON-stringify (donc `undefined` face à une valeur est aussi signalé
   comme changé). Les échecs de lecture se replient sur `undefined`.
 
-<!-- u 261f5079717f | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 261f5079717f | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 **Notes de composition :** `diff` ne capture que l'instantané de DÉBUT
 et celui de FIN ; il n'observe PAS les états intermédiaires à
 l'intérieur de l'action. Utilisez `expect` si votre souci est « l'état
 passe par telle valeur précise à un moment donné ».
 
-<!-- u 3c1090ef8c62 | 83 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
+<!-- u 3c1090ef8c62 | 85 18. Effect detection (v2.5 -- SHIPPED in 2.5.0-alpha.5  | prose -->
 *Ce document est la spécification canonique de NAC3 v2.5. Les sections
 0-14 sont inchangées par rapport à la v2.4 stable. Les sections 15-18
 sont livrées en v2.5. Les modifications de ce fichier constituent des

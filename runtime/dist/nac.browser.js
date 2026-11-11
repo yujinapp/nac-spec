@@ -6,7 +6,7 @@
    =====================================================================
 
    AUTHORITATIVE VERSION CONSTANT: see the global.NAC export at the
-   bottom of this file. `version: '2.5.2', spec_version: '2.5'`
+   bottom of this file. `version: '2.6.0', spec_version: '2.6'`
    is the normative declaration. The dated changelog sections below are
    historical notes; if they ever drift from the export, the export
    wins.
@@ -6930,8 +6930,13 @@
 
   const _v25_plugins = Object.create(null);
 
-  /* The 8 backend names from SPEC.md sec 15.4. Any other name in a
-     manifest is a hard reject at register time. */
+  /* The 9 backend names from SPEC.md sec 15.4. Any other name in a
+     manifest is a hard reject at register time. `emitter-listen` is
+     the v2.6 addition (RFC V26-01 hook E-3): the only real event
+     source before it was postMessage, so a plugin wrapping a library
+     that emits its own events (map.on('moveend'),
+     video.addEventListener('timeupdate'), pdf.js 'pagechanging')
+     had to fall back to polling or to a hand-written mirror node. */
   const _V25_VALID_BACKENDS = {
     'postmessage':         true,
     'postmessage-listen':  true,
@@ -6941,7 +6946,95 @@
     'same-origin-window':  true,
     'synthetic-mutation':  true,
     'synthetic-poll':      true,
+    'emitter-listen':      true,
   };
+
+  /* The closed list of NacError codes the plugin contract raises
+     (SPEC.md sec 15.9), plus the namespace a plugin uses for a code
+     of its own (v2.6, RFC V26-01 hook E-6). Before this, `call` lifted
+     ANY string a backend put on err._code, so a plugin-specific code
+     worked by accident of implementation rather than by contract --
+     and a future runtime honouring the closed list could have killed
+     it without breaking anything written down. */
+  const _V25_ERROR_CODES = {
+    'plugin_not_registered':  true,
+    'verb_not_declared':      true,
+    'state_not_declared':     true,
+    'event_not_declared':     true,
+    'backend_unknown':        true,
+    'backend_target_missing': true,
+    'cross_origin_blocked':   true,
+    'state_unreadable':       true,
+    'timeout':                true,
+    'invalid':                true,
+  };
+  const _V25_PLUGIN_CODE_PREFIX = 'plugin.';
+
+  /* Is `code` a code this contract lets a backend raise? Either one of
+     the ten above, or a plugin-owned code under the reserved prefix.
+     Anything else is `invalid` -- fail closed, and name what was
+     refused on err.offending_code so the author can see it. */
+  function _v25_isDeclaredCode(code) {
+    if (typeof code !== 'string' || !code) return false;
+    if (_V25_ERROR_CODES[code]) return true;
+    return code.indexOf(_V25_PLUGIN_CODE_PREFIX) === 0 &&
+           code.length > _V25_PLUGIN_CODE_PREFIX.length;
+  }
+
+  /* ---------- 15.10 API handle registry (v2.6, hook E-4) ----------
+
+     sdk-call used to resolve its `path` against the global object and
+     nothing else, so an API object that never lands on `window` -- a
+     React ref, a viewer handle held in a closure, a Leaflet map
+     instance -- was unreachable. SPEC 15.1 names exactly that case
+     ("invoke excalidrawAPI.setElements(...) on a React ref") as a
+     motivation, and the backend could not do it.
+
+     The host registers the object once under a name; manifests stay
+     pure JSON and reference it by `handle`. */
+
+  const _v25_api_handles = Object.create(null);
+
+  function registerApiHandle(name, obj) {
+    if (typeof name !== 'string' || !name) {
+      const e = new Error('registerApiHandle: name must be a non-empty string');
+      e.code = 'invalid'; throw e;
+    }
+    if (obj == null) {
+      const e = new Error('registerApiHandle: handle "' + name + '" cannot be null or undefined');
+      e.code = 'invalid'; throw e;
+    }
+    _v25_api_handles[name] = obj;
+  }
+
+  function unregisterApiHandle(name) {
+    if (typeof name !== 'string' || !name) return false;
+    if (!Object.prototype.hasOwnProperty.call(_v25_api_handles, name)) return false;
+    delete _v25_api_handles[name];
+    return true;
+  }
+
+  function apiHandles() {
+    return Object.keys(_v25_api_handles).sort();
+  }
+
+  /* Resolve the root a binding's `path` is walked against: a registered
+     handle when the binding declares one, the global object otherwise.
+     An undeclared handle is backend_target_missing, not a silent fall
+     back to `window` -- the whole point is that the two are different
+     places and a manifest naming the wrong one must say so. */
+  function _v25_bindingRoot(binding) {
+    if (binding.handle == null) return { root: global, label: 'window' };
+    if (typeof binding.handle !== 'string' || !binding.handle) {
+      const e = new Error('`handle` must be a non-empty string');
+      e._code = 'invalid'; throw e;
+    }
+    if (!Object.prototype.hasOwnProperty.call(_v25_api_handles, binding.handle)) {
+      const e = new Error('API handle "' + binding.handle + '" is not registered (NAC.registerApiHandle)');
+      e._code = 'backend_target_missing'; throw e;
+    }
+    return { root: _v25_api_handles[binding.handle], label: 'handle:' + binding.handle };
+  }
 
   /* Counter for the request_id baked into every provenance event. */
   let _v25_req_counter = 0;
@@ -7027,29 +7120,52 @@
     if (!path || typeof path !== 'string') {
       return Promise.reject(new Error('sdk-call requires `path` string'));
     }
-    const resolved = _v25_resolvePath(global, path);
+    let base;
+    try { base = _v25_bindingRoot(binding); }
+    catch (e) { return Promise.reject(e); }
+    const resolved = _v25_resolvePath(base.root, path);
     if (mode === 'read') {
       if (resolved.parent == null) {
-        return Promise.reject(new Error('sdk-call read: path not resolvable: ' + path));
+        return Promise.reject(new Error('sdk-call read: path not resolvable: ' + base.label + '.' + path));
       }
       if (resolved.value === undefined) {
-        return Promise.reject(new Error('sdk-call read: path resolves to undefined: ' + path));
+        return Promise.reject(new Error('sdk-call read: path resolves to undefined: ' + base.label + '.' + path));
       }
       return Promise.resolve(resolved.value);
     }
     if (mode === 'assign') {
       if (resolved.parent == null) {
-        return Promise.reject(new Error('sdk-call assign: path parent not resolvable: ' + path));
+        return Promise.reject(new Error('sdk-call assign: path parent not resolvable: ' + base.label + '.' + path));
       }
       resolved.parent[resolved.key] = args;
       return Promise.resolve({ ok: true });
     }
     if (mode === 'invoke') {
       if (resolved.parent == null || typeof resolved.value !== 'function') {
-        return Promise.reject(new Error('sdk-call invoke: path is not a function: ' + path));
+        return Promise.reject(new Error('sdk-call invoke: path is not a function: ' + base.label + '.' + path));
+      }
+      /* v2.6 (hook E-4): `args_order` spells out the POSITIONAL
+         argument list, so a library signature like
+         map.setView(center, zoom) is expressible. Without it the
+         backend passes the args object as a single argument, which is
+         what every published manifest does and keeps doing. */
+      let list = null;
+      if (binding.args_order != null) {
+        if (!Array.isArray(binding.args_order)) {
+          const e = new Error('sdk-call: `args_order` must be an array of arg names');
+          e._code = 'invalid'; return Promise.reject(e);
+        }
+        const bag = (args && typeof args === 'object') ? args : {};
+        list = [];
+        for (let i = 0; i < binding.args_order.length; i++) {
+          const k = binding.args_order[i];
+          list.push(Object.prototype.hasOwnProperty.call(bag, k) ? bag[k] : undefined);
+        }
       }
       try {
-        const ret = resolved.value.call(resolved.parent, args);
+        const ret = list
+          ? resolved.value.apply(resolved.parent, list)
+          : resolved.value.call(resolved.parent, args);
         return Promise.resolve(ret);
       } catch (e) {
         return Promise.reject(e);
@@ -7292,6 +7408,7 @@
        whole subscription if any observed path's primary binding is
        not dom-mirror -- spec contract, no silent degradation. */
     const elements = [];
+    const unresolved = [];
     const manifest = _v25_plugins[plugin];
     for (let i = 0; i < paths.length; i++) {
       const stateChain = manifest.state[paths[i]];
@@ -7307,9 +7424,47 @@
       }
       const el = document.querySelector(first.selector);
       if (el) elements.push(el);
+      else unresolved.push(paths[i] + ' (' + first.selector + ')');
+    }
+    /* v2.6 (hook E-5). Until 2.5.2 an unresolved selector was dropped
+       here with `if (el) elements.push(el)`, so a subscription whose
+       mirror nodes were all absent observed NOTHING: subscribe()
+       returned a valid handle and the callback never fired. Success
+       and silence -- the silent damage this protocol exists to remove,
+       inside the protocol.
+
+       Two ways out, and the manifest chooses:
+         - no `root`: fail closed. An absent mirror node is
+           backend_target_missing at subscribe time, named selector by
+           selector.
+         - `root` declared: observe that container with subtree:true
+           and re-read on every mutation. A node that comes and goes
+           (the row of a virtualised grid) is then observed by the
+           container that outlives it, so the subscription survives
+           the remount. The root itself must resolve -- otherwise we
+           would be back to observing nothing. */
+    let rootEl = null;
+    if (binding.root != null) {
+      if (typeof binding.root !== 'string' || !binding.root) {
+        const e = new Error('synthetic-mutation: `root` must be a non-empty CSS selector');
+        e._code = 'invalid'; throw e;
+      }
+      rootEl = document.querySelector(binding.root);
+      if (!rootEl) {
+        const e = new Error('synthetic-mutation: `root` selector matched no element: ' + binding.root +
+          ' -- an observer with no root would never fire');
+        e._code = 'backend_target_missing'; throw e;
+      }
+    }
+    if (!rootEl && unresolved.length) {
+      const e = new Error('synthetic-mutation: no element for observed state ' + unresolved.join(', ') +
+        ' -- a subscription with nothing to observe would never fire; declare `root` to observe a' +
+        ' container that outlives the node and re-resolve on mutation');
+      e._code = 'backend_target_missing'; throw e;
     }
     let cached = null;
     let pending = null;
+    let primed = false;   /* has this subscription ever held a readable snapshot? */
     function snapshot() {
       const out = {};
       let allOk = true;
@@ -7333,35 +7488,165 @@
       }
       return false;
     }
+    function emit(snap) {
+      try { cb(snap); }
+      finally {
+        _v25_emitProvenance('event', plugin, event_path, 'synthetic-mutation',
+          _v25_nextRequestId('pe'), true, null, 0);
+      }
+    }
     function tick() {
       pending = null;
       snapshot().then(function (snap) {
         if (snap == null) return;
-        if (cached == null) { cached = snap; return; }
+        if (cached == null) {
+          cached = snap;
+          /* v2.6 (hook E-5): the subscription started with NOTHING
+             readable -- the observed node was not painted when
+             subscribe() was called, which under `root` is a legal and
+             expected state. The move from unreadable to readable IS
+             the change the caller is waiting for; adopting it as a
+             silent baseline is how a row that remounts goes unnoticed.
+             When the first snapshot DID resolve, this branch never
+             runs and the baseline behaviour of 2.5 is untouched. */
+          if (!primed) { primed = true; emit(snap); }
+          return;
+        }
         if (diffsFromCached(snap)) {
           cached = snap;
-          try { cb(snap); }
-          finally {
-            _v25_emitProvenance('event', plugin, event_path, 'synthetic-mutation',
-              _v25_nextRequestId('pe'), true, null, 0);
-          }
+          emit(snap);
         }
       });
     }
-    /* Prime cache from first snapshot. */
-    snapshot().then(function (first) { if (first != null) cached = first; });
+    /* Prime cache from first snapshot. A tick that got there first
+       keeps its snapshot: the fresher read wins. */
+    snapshot().then(function (first) {
+      if (first != null && cached == null) { cached = first; primed = true; }
+    });
     const observer = new MutationObserver(function () {
       if (pending != null) return; /* already throttled */
       pending = setTimeout(tick, throttle);
     });
-    for (let i = 0; i < elements.length; i++) {
-      observer.observe(elements[i], {
+    const watched = rootEl ? [rootEl] : elements;
+    for (let i = 0; i < watched.length; i++) {
+      observer.observe(watched[i], {
         attributes: true, childList: true, characterData: true, subtree: true,
       });
     }
     return function teardown() {
       observer.disconnect();
       if (pending != null) { clearTimeout(pending); pending = null; }
+    };
+  }
+
+  /* emitter-listen (event, v2.6 -- hook E-3): subscribe to a real
+     event source that is NOT postMessage. The emitter is the global
+     object, a dotted path into it, or a registered API handle; the
+     subscribe / unsubscribe method pair is detected from the three
+     shapes libraries actually ship (on/off, addEventListener/
+     removeEventListener, addListener/removeListener) or declared
+     outright.
+
+     Fail closed in both directions: no subscribe method is
+     backend_target_missing, and NO REMOVAL METHOD is too -- a
+     subscription that cannot be torn down is a leak dressed as a
+     success, and unsubscribe() is part of the published contract.
+
+     Payload: `extract` plucks a field out of the event object the
+     library hands us. `observe` instead re-reads declared state paths
+     and fires the callback with that snapshot -- the useful shape for
+     a continuous surface, where the event only says "it moved" and
+     the state says where it moved to. */
+  const _V25_LISTEN_PAIRS = {
+    'on':               'off',
+    'addEventListener': 'removeEventListener',
+    'addListener':      'removeListener',
+  };
+
+  function _v25_subscribe_emitter_listen(plugin, event_path, binding, cb) {
+    const eventName = binding.event;
+    if (!eventName || typeof eventName !== 'string') {
+      const e = new Error('emitter-listen requires `event` (the library event name)');
+      e._code = 'invalid'; throw e;
+    }
+    const base = _v25_bindingRoot(binding);      /* throws with _code */
+    let target = base.root;
+    if (binding.path != null) {
+      if (typeof binding.path !== 'string' || !binding.path) {
+        const e = new Error('emitter-listen: `path` must be a non-empty dotted path');
+        e._code = 'invalid'; throw e;
+      }
+      target = _v25_resolvePath(base.root, binding.path).value;
+    }
+    if (target == null) {
+      const e = new Error('emitter-listen: emitter not resolvable at ' + base.label +
+        (binding.path ? '.' + binding.path : ''));
+      e._code = 'backend_target_missing'; throw e;
+    }
+    let onName = binding.method;
+    if (onName != null) {
+      if (typeof onName !== 'string' || typeof target[onName] !== 'function') {
+        const e = new Error('emitter-listen: declared `method` "' + onName + '" is not a function on the emitter');
+        e._code = 'backend_target_missing'; throw e;
+      }
+    } else {
+      onName = null;
+      for (const cand in _V25_LISTEN_PAIRS) {
+        if (typeof target[cand] === 'function') { onName = cand; break; }
+      }
+      if (!onName) {
+        const e = new Error('emitter-listen: emitter exposes none of on / addEventListener / addListener');
+        e._code = 'backend_target_missing'; throw e;
+      }
+    }
+    const offName = binding.off_method || _V25_LISTEN_PAIRS[onName] || null;
+    if (!offName || typeof target[offName] !== 'function') {
+      const e = new Error('emitter-listen: emitter has no removal method (' +
+        (offName || 'none derivable from "' + onName + '"') +
+        ') -- a subscription that cannot be torn down is refused');
+      e._code = 'backend_target_missing'; throw e;
+    }
+    const observed = Array.isArray(binding.observe) ? binding.observe.slice() : null;
+    if (observed) {
+      for (let i = 0; i < observed.length; i++) {
+        if (!_v25_plugins[plugin].state[observed[i]]) {
+          const e = new Error('emitter-listen: observed state "' + observed[i] + '" not declared');
+          e._code = 'invalid'; throw e;
+        }
+      }
+    }
+    function fire(value, ok, errMsg) {
+      try { if (ok) cb(value); }
+      finally {
+        _v25_emitProvenance('event', plugin, event_path, 'emitter-listen',
+          _v25_nextRequestId('pe'), !!ok, errMsg || null, 0);
+      }
+    }
+    function handler(payload) {
+      if (observed) {
+        const out = {};
+        let allOk = true;
+        Promise.all(observed.map(function (p) {
+          return read(plugin, p).then(function (v) { out[p] = v; },
+                                      function () { allOk = false; });
+        })).then(function () {
+          if (allOk) fire(out, true, null);
+          else fire(null, false, 'observed state unreadable at event time');
+        });
+        return;
+      }
+      let value;
+      try {
+        value = binding.extract ? _v25_extract(payload, binding.extract, false) : payload;
+      } catch (e) {
+        fire(null, false, e.message);
+        return;
+      }
+      fire(value, true, null);
+    }
+    target[onName](eventName, handler);
+    return function teardown() {
+      try { target[offName](eventName, handler); } catch (_) { /* idempotent */ }
     };
   }
 
@@ -7416,9 +7701,89 @@
     'postmessage-listen':  _v25_subscribe_postmessage_listen,
     'synthetic-poll':      _v25_subscribe_synthetic_poll,
     'synthetic-mutation':  _v25_subscribe_synthetic_mutation,
+    'emitter-listen':      _v25_subscribe_emitter_listen,
   };
 
   /* ---------- 15.2 / 15.3 public surface ---------- */
+
+  /* ---------- 15.11 self-description (v2.6, hook E-2) ----------
+
+     A manifest used to declare only WHERE a verb routes, never what it
+     is called or what it takes. The DOM half of the protocol has had
+     that since v1 (a label, a hint, `fields[]` with a type); the
+     plugin half had nothing, so on a continuous surface -- where the
+     actionable thing IS the argument: a coordinate and a zoom, an
+     instant, a page, a pose -- nothing declared the shape, the unit or
+     the range of what travels in `args`, and a voice runner could not
+     even name the verb out loud.
+
+     All of it is OPTIONAL: every manifest published against 2.5 stays
+     valid. What is NOT optional is being well-formed when declared --
+     a label that is not a string, or a param of a type the vocabulary
+     does not have, is `invalid` at register time rather than a
+     surprise at the moment an agent reads it. */
+
+  const _V25_PARAM_TYPES = {
+    'string': true, 'number': true, 'boolean': true, 'object': true, 'array': true,
+  };
+
+  function _v25_validateText(value, where, field) {
+    if (value == null) return;
+    if (typeof value !== 'string' || !value.trim()) {
+      const e = new Error(where + ': `' + field + '` must be a non-empty string when declared');
+      e.code = 'invalid'; throw e;
+    }
+  }
+
+  function _v25_validateParams(params, where) {
+    if (params == null) return;
+    if (!Array.isArray(params)) {
+      const e = new Error(where + ': `params` must be an array of parameter declarations');
+      e.code = 'invalid'; throw e;
+    }
+    const seen = Object.create(null);
+    for (let i = 0; i < params.length; i++) {
+      const p = params[i];
+      const at = where + ' params[' + i + ']';
+      if (!p || typeof p !== 'object' || Array.isArray(p)) {
+        const e = new Error(at + ': must be an object');
+        e.code = 'invalid'; throw e;
+      }
+      if (typeof p.name !== 'string' || !p.name.trim()) {
+        const e = new Error(at + ': `name` is required and must be a non-empty string');
+        e.code = 'invalid'; throw e;
+      }
+      if (seen[p.name]) {
+        const e = new Error(at + ': duplicate parameter name "' + p.name + '"');
+        e.code = 'invalid'; throw e;
+      }
+      seen[p.name] = true;
+      if (typeof p.type !== 'string' || !_V25_PARAM_TYPES[p.type]) {
+        const e = new Error(at + ': `type` must be one of string, number, boolean, object, array (got ' +
+          JSON.stringify(p.type) + ')');
+        e.code = 'invalid'; throw e;
+      }
+      if (p.required != null && typeof p.required !== 'boolean') {
+        const e = new Error(at + ': `required` must be a boolean when declared');
+        e.code = 'invalid'; throw e;
+      }
+      _v25_validateText(p.label, at, 'label');
+      _v25_validateText(p.hint,  at, 'hint');
+      _v25_validateText(p.unit,  at, 'unit');
+      if (p.min != null && typeof p.min !== 'number') {
+        const e = new Error(at + ': `min` must be a number when declared');
+        e.code = 'invalid'; throw e;
+      }
+      if (p.max != null && typeof p.max !== 'number') {
+        const e = new Error(at + ': `max` must be a number when declared');
+        e.code = 'invalid'; throw e;
+      }
+      if (p.enum != null && (!Array.isArray(p.enum) || p.enum.length === 0)) {
+        const e = new Error(at + ': `enum` must be a non-empty array when declared');
+        e.code = 'invalid'; throw e;
+      }
+    }
+  }
 
   function _v25_validateManifest(slug, manifest) {
     if (typeof slug !== 'string' || !slug) {
@@ -7432,6 +7797,8 @@
     const verbs  = manifest.verbs  || {};
     const states = manifest.state  || {};
     const events = manifest.events || {};
+    _v25_validateText(manifest.label, 'manifest "' + slug + '"', 'label');
+    _v25_validateText(manifest.hint,  'manifest "' + slug + '"', 'hint');
     /* Verbs: single binding each, backend in vocabulary. */
     for (const vp in verbs) {
       const b = verbs[vp];
@@ -7443,6 +7810,9 @@
         const e = new Error('verb "' + vp + '" declares unknown backend: ' + b.backend);
         e.code = 'backend_unknown'; throw e;
       }
+      _v25_validateText(b.label, 'verb "' + vp + '"', 'label');
+      _v25_validateText(b.hint,  'verb "' + vp + '"', 'hint');
+      _v25_validateParams(b.params, 'verb "' + vp + '"');
     }
     /* State: array of bindings each. */
     for (const sp in states) {
@@ -7461,6 +7831,9 @@
           const e = new Error('state "' + sp + '" binding[' + i + '] unknown backend: ' + b.backend);
           e.code = 'backend_unknown'; throw e;
         }
+        _v25_validateText(b.label, 'state "' + sp + '" binding[' + i + ']', 'label');
+        _v25_validateText(b.hint,  'state "' + sp + '" binding[' + i + ']', 'hint');
+        _v25_validateText(b.unit,  'state "' + sp + '" binding[' + i + ']', 'unit');
       }
     }
     /* Events: single binding each. */
@@ -7474,6 +7847,16 @@
         const e = new Error('event "' + ep + '" unknown backend: ' + b.backend);
         e.code = 'backend_unknown'; throw e;
       }
+      _v25_validateText(b.label, 'event "' + ep + '"', 'label');
+      _v25_validateText(b.hint,  'event "' + ep + '"', 'hint');
+      /* emitter-listen carries the one field the runtime cannot guess
+         (v2.6): which event of the library to listen for. Caught here
+         instead of at subscribe time so a manifest that can never work
+         is refused when it is registered. */
+      if (b.backend === 'emitter-listen' && (typeof b.event !== 'string' || !b.event)) {
+        const e = new Error('event "' + ep + '": emitter-listen requires `event` (the library event name)');
+        e.code = 'invalid'; throw e;
+      }
     }
   }
 
@@ -7482,10 +7865,119 @@
     /* Re-register replaces -- idempotent for live-reload scenarios. */
     _v25_plugins[slug] = {
       slug:     slug,
+      label:    manifest.label != null ? manifest.label : null,
+      hint:     manifest.hint  != null ? manifest.hint  : null,
       verbs:    manifest.verbs  || {},
       state:    manifest.state  || {},
       events:   manifest.events || {},
     };
+  }
+
+  /* ---------- 15.10 discovery (v2.6, hook E-1) ----------
+
+     Until 2.5.2 the registry was readable by exactly three functions
+     -- call, read and subscribe -- and all three require the caller to
+     already know the slug and the path. An agent that did not register
+     the plugin itself had no way to learn it exists: it read the DOM
+     manifest (section 5), found the chrome, and the canvas surface was
+     INVISIBLE. For a plugin that declares no DOM at all there was
+     nothing to find whatsoever.
+
+     plugins() and describePlugin() are the read-only answer. They are
+     SYNCHRONOUS on purpose -- unlike call / read / subscribe, which
+     reach a surface and therefore have to be async, these only read a
+     local object. And they hand back a COPY: a caller cannot reach the
+     live registry through the descriptor and rewrite another plugin's
+     routing. */
+
+  function _v25_copy(value) {
+    if (value == null || typeof value !== 'object') return value;
+    try { return JSON.parse(JSON.stringify(value)); }
+    catch (_) { return undefined; }   /* not representable as data */
+  }
+
+  function _v25_describeEntry(entry) {
+    const out = {
+      slug:   entry.slug,
+      label:  entry.label != null ? entry.label : null,
+      hint:   entry.hint  != null ? entry.hint  : null,
+      verbs:  [],
+      state:  [],
+      events: [],
+    };
+    const verbPaths = Object.keys(entry.verbs).sort();
+    for (let i = 0; i < verbPaths.length; i++) {
+      const vp = verbPaths[i];
+      const b  = entry.verbs[vp] || {};
+      const row = {
+        verb_path: vp,
+        backend:   b.backend || null,
+        label:     b.label != null ? b.label : null,
+        hint:      b.hint  != null ? b.hint  : null,
+        params:    Array.isArray(b.params) ? _v25_copy(b.params) : null,
+      };
+      if (b.handle != null) row.handle = b.handle;
+      out.verbs.push(row);
+    }
+    const statePaths = Object.keys(entry.state).sort();
+    for (let i = 0; i < statePaths.length; i++) {
+      const sp    = statePaths[i];
+      const chain = entry.state[sp] || [];
+      /* The label of a state PATH is the first one its chain declares:
+         the chain is an ordered preference of sources for one value,
+         so the value is named once, by whichever source names it. */
+      let label = null; let hint = null; let unit = null;
+      const backends = [];
+      for (let j = 0; j < chain.length; j++) {
+        const b = chain[j] || {};
+        if (label == null && b.label != null) label = b.label;
+        if (hint  == null && b.hint  != null) hint  = b.hint;
+        if (unit  == null && b.unit  != null) unit  = b.unit;
+        backends.push(b.backend || null);
+      }
+      out.state.push({
+        state_path: sp,
+        backends:   backends,
+        label:      label,
+        hint:       hint,
+        unit:       unit,
+      });
+    }
+    const eventPaths = Object.keys(entry.events).sort();
+    for (let i = 0; i < eventPaths.length; i++) {
+      const ep = eventPaths[i];
+      const b  = entry.events[ep] || {};
+      const row = {
+        event_path: ep,
+        backend:    b.backend || null,
+        label:      b.label != null ? b.label : null,
+        hint:       b.hint  != null ? b.hint  : null,
+        observe:    Array.isArray(b.observe) ? b.observe.slice() : null,
+      };
+      if (b.event != null) row.event = b.event;
+      out.events.push(row);
+    }
+    return out;
+  }
+
+  function plugins() {
+    const slugs = Object.keys(_v25_plugins).sort();
+    const out = [];
+    for (let i = 0; i < slugs.length; i++) {
+      out.push(_v25_describeEntry(_v25_plugins[slugs[i]]));
+    }
+    return out;
+  }
+
+  function describePlugin(slug) {
+    if (typeof slug !== 'string' || !slug) {
+      throw _v25_buildNacError('invalid', 'NAC.describePlugin: slug must be a non-empty string');
+    }
+    if (!_v25_plugins[slug]) {
+      throw _v25_buildNacError('plugin_not_registered',
+        'NAC.describePlugin: plugin "' + slug + '" not registered');
+    }
+    return _v25_describeEntry(_v25_plugins[slug]);
   }
 
   /* Provenance emit helper -- the kind is one of 'invoked', 'read',
@@ -7556,7 +8048,19 @@
       const msg = (err && err.message) || String(err);
       _v25_emitProvenance('invoked', plugin, verb_path, binding.backend, request_id, false, msg, Date.now() - t0);
       if (err && err._code) {
-        throw _v25_buildNacError(err._code, msg);
+        /* v2.6 (hook E-6): the code has to be one the contract
+           declares -- one of the ten of 15.9, or a plugin-owned code
+           under the `plugin.` prefix. Anything else is `invalid` and
+           names what it refused, instead of inventing a code the
+           published list does not have. */
+        if (_v25_isDeclaredCode(err._code)) {
+          throw _v25_buildNacError(err._code, msg);
+        }
+        throw _v25_buildNacError('invalid',
+          'NAC.call: backend raised the undeclared error code "' + err._code +
+          '" (SPEC 15.9: one of the ten contract codes, or a plugin code under the "' +
+          _V25_PLUGIN_CODE_PREFIX + '" prefix): ' + msg,
+          { offending_code: err._code });
       }
       throw err;
     });
@@ -7653,7 +8157,12 @@
     let teardown;
     try { teardown = subscriber(plugin, event_path, binding, cb); }
     catch (e) {
-      if (e && e._code) throw _v25_buildNacError(e._code, e.message);
+      if (e && e._code) {
+        if (_v25_isDeclaredCode(e._code)) throw _v25_buildNacError(e._code, e.message);
+        throw _v25_buildNacError('invalid',
+          'NAC.subscribe: backend raised the undeclared error code "' + e._code +
+          '" (SPEC 15.9): ' + e.message, { offending_code: e._code });
+      }
       throw e;
     }
     _v25_sub_counter += 1;
@@ -7921,8 +8430,8 @@
 
   global.NAC = {
     __nac_v1_installed: true,
-    version:      '2.5.2',
-    spec_version: '2.5',
+    version:      '2.6.0',
+    spec_version: '2.6',
     /* v2.2.0 (V22-01) -- strict validation toggle. When true,
        NAC.register throws on findings (manifest_role_unknown,
        tab_id_manifest_role_drift, manifest_dom_role_mismatch).
@@ -8172,6 +8681,17 @@
     read:            read,
     subscribe:       subscribe,
     unsubscribe:     unsubscribe,
+    /* v2.6 -- the six hooks of RFC V26-01 (SPEC.md sec 15.10 / 15.11).
+       plugins() + describePlugin() make the registry discoverable, so
+       a plugin living in another repository under another licence can
+       be FOUND by an agent that did not register it; registerApiHandle
+       lets a manifest route to an API object that never lands on
+       window (a React ref, a library instance held in a closure). */
+    plugins:            plugins,
+    describePlugin:     describePlugin,
+    registerApiHandle:  registerApiHandle,
+    unregisterApiHandle: unregisterApiHandle,
+    apiHandles:         apiHandles,
     /* v2.5 Block C -- assistive labels (SPEC.md sec 17 / RFC V25-03).
        Canonical human-readable label resolution for screen readers,
        TTS, voice flows, audit logs. Priority order: aria-label >

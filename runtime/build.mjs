@@ -213,6 +213,50 @@ export interface ValidateGlobalReport {
   timestamp: number;
 }
 
+/** A verb argument as the manifest declares it (V26-01, SPEC 15.11). */
+export interface ParamDecl {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?: string;
+  min?: number;
+  max?: number;
+  enum?: unknown[];
+  label?: string;
+  hint?: string;
+}
+
+/** What NAC.plugins() / NAC.describePlugin() hand back (V26-01, SPEC 15.10).
+    It is a COPY: mutating it cannot reach the live registry. */
+export interface PluginDescriptor {
+  slug: string;
+  label: string | null;
+  hint: string | null;
+  verbs: Array<{
+    verb_path: string;
+    backend: string | null;
+    label: string | null;
+    hint: string | null;
+    params: ParamDecl[] | null;
+    handle?: string;
+  }>;
+  state: Array<{
+    state_path: string;
+    backends: Array<string | null>;
+    label: string | null;
+    hint: string | null;
+    unit: string | null;
+  }>;
+  events: Array<{
+    event_path: string;
+    backend: string | null;
+    label: string | null;
+    hint: string | null;
+    observe: string[] | null;
+    event?: string;
+  }>;
+}
+
 /** Subscription handle returned by NAC.subscribe (V25-01). */
 export interface SubscriptionHandle {
   __v25_sub: true;
@@ -291,11 +335,20 @@ export interface NACRuntime {
   revoke_authority(scope: string): void;
 
   /* v2.5 V25-01 Block A -- plugin extension contract (canvas + API) */
-  registerPlugin(slug: string, manifest: { verbs?: object; state?: object; events?: object }): void;
+  registerPlugin(slug: string, manifest: { label?: string; hint?: string; verbs?: object; state?: object; events?: object }): void;
   call(plugin: string, verb_path: string, args?: unknown): Promise<unknown>;
   read(plugin: string, state_path: string): Promise<unknown>;
   subscribe(plugin: string, event_path: string, cb: (...args: unknown[]) => void): SubscriptionHandle;
   unsubscribe(handle: SubscriptionHandle): void;
+
+  /* v2.6 V26-01 -- discovery (SPEC 15.10) + self-description (15.11) +
+     API handles for an object that never lands on window (15.4). The
+     first two are SYNCHRONOUS: they read a local object. */
+  plugins(): PluginDescriptor[];
+  describePlugin(slug: string): PluginDescriptor;
+  registerApiHandle(name: string, obj: object): void;
+  unregisterApiHandle(name: string): boolean;
+  apiHandles(): string[];
 
   /* v2.5 V25-03 Block C -- asistive labels */
   narrate(plugin: string | null, nac_id: string): string | null;

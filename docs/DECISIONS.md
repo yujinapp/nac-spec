@@ -499,6 +499,66 @@ comprador que lo descubra solo deja de creer el resto.
 
 ---
 
+## D-09 -- Publicar los seis enganches del contrato de extensión antes de firmar
+
+**Traída al dueño:** 2026-11-11, con la medición de lectura superficie por
+superficie (`docs/internal/CANVAS_HOOKS_AUDIT_2026-11-11.md`, **PND-109** y
+**PND-110**) y la pregunta de calendario: lo que entre al repositorio público
+durante el término del contrato de Alignerr es de titularidad discutible, así
+que los enganches se publican antes de firmar o no se publican.
+
+**Decisión del dueño, 2026-11-11, textual:**
+
+> Hazlo todo sin frenar, commit, push y publish haciendo prueba contra app real.
+
+**Qué eligió:** los seis enganches se construyen y se publican, los seis, en una
+sola versión, con el recibo contra una aplicación real que **PND-095** pedía
+desde que la sección 15 existe. No eligió entre las dos salidas que la medición
+ofrecía para E-3 (declarar el patrón del nodo espejo, que no toca código, o
+agregar el noveno backend, que obliga a subir la versión de la especificación):
+dijo *todo*, y el agente ejecutó la segunda, que es la que hace falta para que
+el evento de una librería real -- el `moveend` de Leaflet -- entre al protocolo
+sin pegamento escrito a mano. Por eso esta versión es **2.6.0** y la
+especificación pasa a **2.6**: lo exige la propia 15.4.
+
+**Consecuencia -- lo que se publicó** (RFC V26-01, `rfcs/README.md`):
+
+* `NAC.plugins()` / `NAC.describePlugin(slug)` (15.10), `label` / `hint` /
+  `params` tipados en el manifiesto (15.11), el backend `emitter-listen` (15.4),
+  `NAC.registerApiHandle` + `args_order` para `sdk-call` (15.4), el espacio de
+  códigos `plugin.` (15.9) y el arreglo de falla cerrada de
+  `synthetic-mutation` (15.4, el defecto de **PND-110**).
+* Recibos: `runtime/test/stage13-plugin-hooks.mjs` (67 verificaciones, con su
+  rojo contra los bytes de 2.5.2) y `demos/v26-leaflet-plugin/` manejado por
+  `scripts/run-demo-v26-leaflet-plugin.mjs` (37 verificaciones contra un Leaflet
+  1.9.4 real, cada efecto comprobado dos veces: por el protocolo y por la API de
+  la propia librería).
+
+**Consecuencia -- tres discrepancias quedan cerradas por esta decisión, y hay
+que decirlo porque la regla 10 las reservaba para el dueño.** Decidir *hacer
+E-4* y *hacer E-6* es decidir **D-12** (el espacio de códigos de error de
+plugin) y **D-13** (la referencia de React que la motivación de 15.1 nombraba y
+el backend no alcanzaba). Y al reescribir la fila de `sdk-call` de la tabla 15.4
+-- que E-4 obliga a reescribir -- el modo `read` quedó **declarado**, que es
+exactamente lo que pedía **D-10**. Las tres se cierran en
+`docs/DISCREPANCIES.md` citando esta entrada. **D-09** (el `NAC.set_source` que
+15.7 cita y no existe) y **D-11** (el timeout de lectura declarado en 1000 ms
+contra los 5000 del código) **no se tocaron** y siguen esperando al dueño.
+
+**Abierto -- lo que esta decisión NO resolvió.**
+
+* El reparto de las siete superficies (**PND-096**) sigue sin decidir. Lo que
+  esta versión hace es **abaratarlas**: las horas de "puerta (b)" que cada ficha
+  contaba por separado ya están pagadas una sola vez.
+* La capa 3 (un agente Pilot real manejando el demo) **no se corrió** para
+  V26-01. Está escrito así en el índice de RFCs, no insinuado.
+* El calendario que motivó la pregunta sigue en pie: si el dueño firma, a partir
+  de la fecha efectiva **no entra un commit más a nac-spec**, y lo nuevo vive en
+  otro repositorio enganchado por este contrato -- que es, exactamente, lo que
+  esta versión vuelve mecánicamente posible.
+
+---
+
 ---
 
 *Producido en la estación N2 de la escalera Urazuke. Una entrada de este archivo

@@ -133,18 +133,18 @@ una comparacion que da verde contra el valor equivocado.
 |---|---|
 | key_id | nac3-contract-2026 |
 | key_fingerprint_sha384 | sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft |
-| chain_head | sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk |
-| index_sha384 | sha384-yLBEnyjdB9DIDgDLHhk+Gddzni/Y8rA1uhVD2CjNjPHq2/Dm3oRPYBl3Y6Xtoz/A |
-| entry_count | 4 |
-| versions | 2.5.0-alpha.5 2.5.0 2.5.1 2.5.2 |
-| signed_at | 2026-10-27T15:29:54Z |
+| chain_head | sha384-Zy0OWn+JJPSfJVsTKTfkWz3lrwGQQy8+ZcXUcCbrrooJHJQ/GL3Zc5xrUBv1dRAu |
+| index_sha384 | sha384-7pV77Xg0Pf2fz1XVyUh67Hj/sgtfcEZv/4KI5Alq29vtOezIMJ+dRflYMH2S46Lh |
+| entry_count | 5 |
+| versions | 2.5.0-alpha.5 2.5.0 2.5.1 2.5.2 2.6.0 |
+| signed_at | 2026-11-11T20:28:20Z |
 
 Comando listo para pegar, para un tercero que no confia en el servidor
 ni en este repositorio:
 
 ```
 node scripts/verify-contract-api.mjs --base https://yujin.app/nac-spec/ \
-  --expect-head sha384-mzie2uMo7z01FLUHuazrTGn1Dzkk+5hYse4hMOkMe0hiPumb8p7s7452Lxu3Xkvk \
+  --expect-head sha384-Zy0OWn+JJPSfJVsTKTfkWz3lrwGQQy8+ZcXUcCbrrooJHJQ/GL3Zc5xrUBv1dRAu \
   --expect-key  sha384-joOCEsjN728DRxS8WI/xBGVTkWN7LsK/xQWhQM8mf561GUu84rzItUxh7rliE4ft
 ```
 <!-- NAC3-WITNESS-END -->

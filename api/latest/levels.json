@@ -171,7 +171,7 @@
     "note": "A validator MAY report a level only when every machine_checkable requirement of that level and of every lower level passes. Requirements with machine_checkable=false cannot be decided by a tool and MUST be reported as unverified rather than assumed.",
     "reference_validator": "npx nac3 validate <url>  (add --drive to decide the behavioural requirements)"
   },
-  "spec_version": "2.5",
+  "spec_version": "2.6",
   "surface": "levels",
-  "version": "2.5.2"
+  "version": "2.6.0"
 }

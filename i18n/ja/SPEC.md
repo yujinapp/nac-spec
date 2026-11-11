@@ -1,5 +1,5 @@
 ---
-translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
+translation_source_hash: caf3443bf87e4d47dd62a446f575298f876f691d6e52da165cb547b064536267
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: ja
 translation_source: SPEC.md
-translation_source_version: 2.5.2
+translation_source_version: 2.6.0
 translation_source_date: 2026-10-27
-translation_sections: 83
-translation_sections_canonical: 83
-translation_units: 283
-translation_units_canonical: 283
+translation_sections: 85
+translation_sections_canonical: 85
+translation_units: 299
+translation_units_canonical: 299
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **機械翻訳であり、規範ではありません。** 2026-10-27 時点の英語版 (NAC3 v2.5.2) を翻訳したもので、現在の原文の 83 / 83 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。
+> **機械翻訳であり、規範ではありません。** 2026-10-27 時点の英語版 (NAC3 v2.6.0) を翻訳したもので、現在の原文の 85 / 85 節を収録しています。規範となる本文は英語版です。本翻訳と英語版が食い違う場合は英語版が優先します。
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**バージョン:** 2.5.2 (安定版 -- v2.5 の全面: narrate、context+tree、expect+diff)
+**バージョン:** 2.6.0 (安定版 -- v2.5 の表面に加えて v2.6 のプラグイン拡張フック: 発見、自己記述、emitter-listen)
 **状態:** 安定リリース。npm の dist-tag `latest` はここを指します。それが何を保証し、プレリリースが何を保証しないかは 9.1 節に書いてあります。この文書は自身のバージョンをちょうど一箇所、すぐ上の行だけに書きます。公開済みの RFC とその第 2 層 + 第 3 層の証跡は `README.md` と `runtime/CHANGELOG.md` に一覧があります。
 **ライセンス:** Apache-2.0
 **編集者:** Yujin (yujin.app)
@@ -1390,7 +1390,7 @@ NAC3 は今のところ Yujin が世話をしています。仕様、文書、�
 
 ---
 
-## 15. プラグイン拡張の契約 -- canvas と API の面 (v2.5)
+## 15. プラグイン拡張コントラクト -- canvas + API の表面 (v2.5、v2.6 で拡張)
 
 1-14 節は、エージェントに関わる面が **DOM** であることを前提に
 しています。番地を持つすべての要素は `data-nac-id` の属性を持ち、
@@ -1410,6 +1410,17 @@ v2.5 は、NAC3 のプラグインがそうした面への振り分けの契約�
 アプリについて何も知らないままです。あるアプリとの話し方は、プラグイン
 のマニフェストを読むことだけで覚えます。
 
+v2.6 はアプリケーションに到達する新しい手段を一切追加しない。15.4 の
+バックエンドで既存のものはすでに網羅されている。追加されるのは、
+プラグインがそれ自身のリポジトリで生きるために欠けていたもう半分である
+-- エージェントが自分で登録していないプラグインをどう見つけるか
+(15.10)、その動詞が何を受け取るかをどう理解するか (15.11)、postMessage
+ではない本物のイベント源 (`emitter-listen`、15.4)、`sdk-call` に欠けて
+いた二つの到達範囲 (`window` の外にある API オブジェクトと、位置指定の
+引数)、観測対象を何も持たない観測者に対するフェイルクローズの規則、
+そしてプラグイン自身のエラーのために宣言されたコード空間 (15.9)。v2.5
+に対して書かれたマニフェストは変更を必要としない。
+
 ### 15.1 なぜ新しい原語の組が必要か
 
 DOM しか知らない `NAC.click(id)` にできないこと:
@@ -1427,7 +1438,7 @@ DOM しか知らない `NAC.click(id)` にできないこと:
 された中立な動詞を足し、その動詞がどう振り分けられるかをプラグインの
 マニフェストに宣言させることです。
 
-### 15.2 三つの原語
+### 15.2 プリミティブ
 
 ```ts
 NAC.registerPlugin(slug: string, manifest: PluginManifest): void
@@ -1436,6 +1447,15 @@ NAC.read(plugin: string, state_path: string): Promise<any>
 NAC.subscribe(plugin: string, event_path: string,
               cb: (data: any) => void): SubscriptionHandle
 NAC.unsubscribe(handle: SubscriptionHandle): void
+
+/* v2.6 -- discovery (sec 15.10) */
+NAC.plugins(): PluginDescriptor[]
+NAC.describePlugin(slug: string): PluginDescriptor
+
+/* v2.6 -- API handles for objects that never land on `window` (15.4) */
+NAC.registerApiHandle(name: string, obj: object): void
+NAC.unregisterApiHandle(name: string): boolean
+NAC.apiHandles(): string[]
 ```
 
 - `registerPlugin(slug, manifest)` は v2.5 のプラグインを登録します。
@@ -1455,14 +1475,27 @@ NAC.unsubscribe(handle: SubscriptionHandle): void
   問い合わせ / MutationObserver で合成されていてもよいです。どちらかは
   マニフェストが宣言します。
 
-四つの関数はすべて非同期です (Promise を返します)。ただし
-`unsubscribe` は同期で、何度呼んでも同じです。
+- `plugins()` は登録されている v2.5 プラグインごとにディスクリプタを
+  返し、slug 順に並ぶ。`describePlugin(slug)` は一つを返す。どちらも
+  読み取り専用であり、ディスクリプタはコピーなので、呼び出し側がそれ
+  を通じて生きたレジストリに手を伸ばすことはできない (15.10 節)。
+- `registerApiHandle(name, obj)` は API オブジェクトを名前のもとに公開
+  し、マニフェストは `handle` でそれを参照できる。オブジェクトそのもの
+  がマニフェストに入ることは決してない -- マニフェストは純粋な JSON の
+  ままである。
+
+`call`、`read`、`subscribe` は表面に到達するため非同期である (Promise
+を返す)。`unsubscribe`、`plugins`、`describePlugin` とハンドルの
+レジストリはローカルな状態にしか触れないので同期的であり、
+`unsubscribe` はさらに冪等である。
 
 ### 15.3 プラグインのマニフェストの形
 
 ```ts
 interface PluginManifest {
   slug: string;
+  label?: string;          /* v2.6 -- human name of the surface */
+  hint?:  string;          /* v2.6 -- one line on what it is for */
   verbs:  { [verb_path: string]: VerbBinding };
   state:  { [state_path: string]: StateBinding[] };
   events: { [event_path: string]: EventBinding };
@@ -1470,12 +1503,18 @@ interface PluginManifest {
 
 interface VerbBinding {
   backend:       BackendKind;
+  label?:        string;       /* v2.6 -- see 15.11 */
+  hint?:         string;       /* v2.6 */
+  params?:       ParamDecl[];  /* v2.6 -- what the verb takes */
   /* backend-specific fields (see 15.4) */
   [k: string]: any;
 }
 
 interface StateBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 -- names the state PATH (see 15.11) */
+  hint?:         string;   /* v2.6 */
+  unit?:         string;   /* v2.6 -- 'degrees', 'seconds', 'page' */
   /* backend-specific fields (see 15.4) */
   extract?:      string;   /* extractor DSL string (see 15.5) */
   [k: string]: any;
@@ -1483,8 +1522,22 @@ interface StateBinding {
 
 interface EventBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 */
+  hint?:         string;   /* v2.6 */
   /* backend-specific fields */
   [k: string]: any;
+}
+
+interface ParamDecl {             /* v2.6 -- see 15.11 */
+  name:      string;
+  type:      'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?:     string;
+  min?:      number;
+  max?:      number;
+  enum?:     any[];
+  label?:    string;
+  hint?:     string;
 }
 
 type BackendKind =
@@ -1495,7 +1548,8 @@ type BackendKind =
   | 'dom-mirror'
   | 'same-origin-window'
   | 'synthetic-mutation'
-  | 'synthetic-poll';
+  | 'synthetic-poll'
+  | 'emitter-listen';     /* v2.6 */
 ```
 
 マニフェストは純粋な JSON です (JS の callback はありません)。Forge、
@@ -1506,18 +1560,25 @@ Sumi、そして将来のどの道具も、これらをデータとして生み�
 **順序のある配列**を持ちます。ランタイムは鎖を順にたどり、うまく
 解決した最初の出どころを返します。
 
+`v2.6` と記された項目はすべて任意である。v2.5 に対して書かれた
+マニフェストは変更なしで有効なままである。任意でないのは、宣言された
+ときに正しい形であることだ -- 文字列ではない `label` や、上記の語彙に
+ない型の `params` の項目は、登録時に `invalid` で拒否される
+(15.11 節)。
+
 ### 15.4 backend の語彙
 
 | 種類 | 用途 | 必須の項目 |
 |------|----------|-----------------|
 | `postmessage` | 動詞: `postMessage` で iframe へメッセージを送る。 | `target` (送り先の iframe の CSS セレクタ)、`message` (MessageId の文字列)、`values` (引数で埋めるオブジェクトのリテラル)、`values_from_args` (そのまま転送する引数の鍵の配列、任意) |
 | `postmessage-listen` | イベント: `window.message` に来る特定の `MessageId` を聞く。 | `source` (出どころを絞るための iframe の CSS セレクタ。省くとどの出どころも受け入れる)、`message` (合わせる MessageId)、`extract` (メッセージのデータに対する取り出しの DSL) |
-| `sdk-call` | 動詞: 全域に出してある JS の関数を呼ぶ (たとえば Figma のプラグイン、Excalidraw の API)。 | `path` (`window` の中の点で区切った経路。たとえば `figma.currentPage.selection`)、`mode` (`assign` はその経路に引数の値を代入、`invoke` は引数のオブジェクトを渡して関数として呼ぶ) |
+| `sdk-call` | 動詞または状態: `window` 上、または登録された API ハンドル上に公開された JS の関数 / プロパティを呼ぶか読む (Figma のプラグイン、Excalidraw の API、地図のインスタンスなど)。 | `path` (ドット区切りのパス。たとえば `figma.currentPage.selection`)、`mode` (`assign` はパスを引数の値に設定し、`invoke` は関数として呼び出し、`read` はパスにある値を返す)。さらに v2.6 からは `handle` (任意 -- `NAC.registerApiHandle` で登録されたオブジェクトの名前。`path` はグローバルなオブジェクトではなくそのオブジェクトに対してたどられる。`window` に決して載らない API はこうして到達される)、`args_order` (任意 -- 位置指定の引数リストを綴る引数名の配列。これにより `map.setView(center, zoom)` のようなシグネチャが表現できる。これがなければ引数オブジェクトは単一の引数として渡され、v2.5 のすべてのマニフェストはそうしている) |
 | `script-bridge` | 動詞か状態: アプリのスクリプトの橋を呼ぶ (Collabora の `CallPythonScript`、LibreOffice の UNO の橋、Google Apps Script)。 | `bridge` (backend 固有の識別子。`collabora.python` など)、`script` (スクリプトの識別子)、`function` (走らせる関数の名前)、`args` (呼び出しの引数で埋めるオブジェクトのリテラル)、`response_match` (状態の場合: 待つ応答の MessageId)、`timeout_ms` (任意、既定は 5000) |
 | `dom-mirror` | 状態: 属性 / クラス / 文字列が canvas の内部の状態を映している DOM 要素から読む (たとえば、今の選択でその書式が有効なときに強調されるツールバーのボタン)。 | `selector` (問い合わせる CSS セレクタ)、`extract` (取り出しの DSL。15.5 を参照) |
 | `same-origin-window` | 状態: iframe が同一の出どころのとき、`iframe.contentWindow.<path>` から読む。ランタイムは出どころが違うことを見分け、次の代替へ落ちます。 | `target` (iframe の CSS セレクタ)、`path` (`contentWindow` の中の点で区切った経路) |
-| `synthetic-mutation` | イベント: 一つ以上の状態の出どころについて DOM の変化を見張り、見ている値が変わったら出し直すことでイベントを合成する。 | `observe` (見張る状態の経路の配列。ランタイムはそれぞれに `read` を呼び、変化のあいだで比べます)、`throttle_ms` (任意、既定は 100) |
+| `synthetic-mutation` | イベント: 一つ以上の状態ソース上の DOM の変化を観測し、観測された値が変わったときに再送出することでイベントを合成する。 | `observe` (監視する状態パスの配列。ランタイムはそれぞれに `read` を呼び、変化のたびに差分を取る)、`throttle_ms` (任意、既定は 100)、`root` (任意、v2.6 -- 鏡ノードそのものの代わりに観測するコンテナの CSS セレクタ。下のフェイルクローズの規則を参照) |
 | `synthetic-poll` | イベント: 状態の出どころを定期的に問い合わせてイベントを合成する。 | `observe` (状態の経路の配列)、`interval_ms` (既定は 250) |
+| `emitter-listen` | イベント (v2.6): postMessage ではない本物のイベント源を聴く -- ライブラリが公開する JS のイベントエミッタ (`map.on('moveend')`、`video.addEventListener('timeupdate')`、pdf.js の `pagechanging`、音声認識の `onresult` など)。 | `event` (必須 -- ライブラリ側のイベント名)、`handle` (任意 -- 聴く対象の登録済み API ハンドル)、`path` (任意 -- エミッタまでのドット区切りのパス。ハンドルが宣言されていればそれに対して、なければグローバルなオブジェクトに対して解決される。省略するとハンドル自身がエミッタであることを意味する)、`method` / `off_method` (任意 -- 購読 / 解除のメソッド名。省略された場合、ランタイムは `on`/`off`、`addEventListener`/`removeEventListener`、`addListener`/`removeListener` の順に検出する)、`extract` (ライブラリがリスナーに渡すペイロードに対する任意の抽出 DSL)、`observe` (任意の状態パスの配列。生のペイロードの代わりに、ランタイムはイベントの時点でそれらの状態を読み直し、コールバックはそのスナップショットを受け取る -- 連続的な表面に有用な形であり、イベントが「動いた」と言い、状態がどこへ動いたかを言う) |
 
 どの backend も、ランタイムによって自己完結した送り手
 (`dispatch(binding, args, context) -> Promise<value>`) として実装され
@@ -1525,6 +1586,31 @@ Sumi、そして将来のどの道具も、これらをデータとして生み�
 バージョンを繰り上げる必要があります。未知の backend を無視する
 ランタイムは、それを宣言したマニフェストを拒否しなければなりません
 (黙って飛ばしてはいけません)。
+`emitter-listen` こそが、この文書が 2.5.3 ではなく 2.6 である理由で
+ある。
+
+**観測対象を何も持たない観測者に対するフェイルクローズの規則 (v2.6)。**
+`synthetic-mutation` は観測される各状態パスを、その主たる
+`dom-mirror` のバインディングが選ぶ DOM 要素へと解決する。セレクタが
+どの要素にも一致しないとき、`subscribe` は `backend_target_missing`
+で拒否しなければならず、解決しなかった状態パスとセレクタを名指し
+しなければならない。ハンドルを返してはならない。何も観測しない購読は
+成功として解決し、その後まったく発火しない。それはこのプロトコルが
+取り除くために存在する、まさにその静かな損害である -- そして 2.5.2
+までは参照ランタイムがそうしていた。
+
+観測されるノードが正当に現れたり消えたりするマニフェスト -- 仮想化
+された表の行は、画面内にスクロールされている間だけ存在する -- は
+`root` を宣言する。すなわちノードより長く生き残るコンテナである。
+ランタイムはそのコンテナを `subtree: true` で観測し、変化のたびに
+セレクタを解決し直すので、ノードが存在しない間に取られた購読も、
+ノードがマウントされたときに発火する。同じ理由で `root` 自身は解決
+しなければならない。購読が読めるものを何も持たない状態で始まり、
+観測される状態が後から読めるようになったとき、その遷移そのものが
+送出である。未知から既知への移行こそ、呼び出し側が待っている変化で
+ある。観測される状態が読めない間はイベントは送出されないので、
+不在に意味があるマニフェストはそれをデータとして宣言する -- `present`
+の抽出子か、連鎖の中の代替バインディングである。
 
 ### 15.5 取り出しの小さな DSL
 
@@ -1673,6 +1759,154 @@ Python のスクリプトの橋に落ちます。エージェントは、どの�
   (既定は動詞で 5000、状態の読み取りで 1000)。
 - `invalid` -- 引数の形が違う (不正な slug、登録の時点で形の崩れた
   マニフェストなど)。
+
+**プラグインのコード空間 (v2.6)。** 上記の十個のコードがコントラクトの
+語彙のすべてであり、それらは意図的にルーティングについてのものである。
+つまりプロトコルがそこへ到達できなかったと言うだけで、アプリケーション
+がなぜ拒んだのかは決して言わない。独自のコードを必要とする
+プラグインは -- 「その行は存在しない」と区別できるものとしての
+`row_not_materialized`、ロックされた文書、まだ描画中の書き出しなど --
+予約された接頭辞 `plugin.` のもとでそれを投げる:
+
+```js
+const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;                       /* inside the backend the manifest routes to */
+```
+
+`NAC.call` と `NAC.subscribe` はそのようなコードを `err.code` にその
+まま載せる。十個のいずれでもなく、`plugin.` の接頭辞のもとでもない
+コードは `invalid` として拒否され、拒否された文字列は
+`err.offending_code` に保存される。宣言されていないコードがそれでも
+通ってしまうことこそ、語彙が語彙でなくなる道筋である。接頭辞は予約
+されており、コントラクトの十個のコードがそれを取ることは決してない
+ので、プラグインのコードが将来のコードと衝突することはありえない。
+
+### 15.10 レジストリの発見 (v2.6)
+
+15.2 から 15.9 までの節はいずれも、呼び出し側が slug とパスをすでに
+知っていることを前提とする。2.5.2 まではそれが唯一の入口だった。
+レジストリを読めるのはちょうど三つの関数 (`call`、`read`、
+`subscribe`) だけで、プラグインを自分で登録していないエージェントは
+それが存在することを知るすべがなかった。DOM のマニフェスト (5 節) を
+読み、クロームを見つけ、canvas の表面は見えないままだった。DOM を
+まったく宣言しない表面 -- 音声だけのプラグイン -- については、見つける
+ものが何一つ存在しなかった。
+
+```ts
+NAC.plugins(): PluginDescriptor[]          /* ordered by slug */
+NAC.describePlugin(slug: string): PluginDescriptor
+
+interface PluginDescriptor {
+  slug:   string;
+  label:  string | null;
+  hint:   string | null;
+  verbs:  { verb_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            params: ParamDecl[] | null; handle?: string }[];
+  state:  { state_path: string; backends: (string | null)[];
+            label: string | null; hint: string | null;
+            unit: string | null }[];
+  events: { event_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            observe: string[] | null; event?: string }[];
+}
+```
+
+規則:
+
+1. どちらも同期的である。ローカルなオブジェクトを読むだけで、どの表面
+   にも何も送られない。したがってエージェントが、そこに何があるかを
+   知るために往復を待つ理由はない。
+2. ディスクリプタは**コピー**である。呼び出し側がそれを通じて生きた
+   レジストリに手を伸ばし、別のプラグインのルーティングを書き換える
+   ことができてはならない。
+3. 動詞、状態パス、イベントはパス順に並んで返るので、同じレジストリ
+   の二度の読み取りはバイト単位で比較できる。
+4. 宣言されていない `label` / `hint` / `params` は `null` として読め、
+   欠けたキーとしては決して読めない。読む側が「不在」と「未宣言」を
+   区別する必要はない。
+5. 登録されていない slug に対する `describePlugin` は
+   `plugin_not_registered` で拒否する (15.9 節)。
+
+発見は意図的に、マニフェストが宣言しているものの読み取りであって、
+表面の探査ではない。何が存在し、それをどう名指すかをエージェントに
+告げる。表面が今日答えるかどうかは `call` と `read` の役目である。
+
+### 15.11 自己記述 (v2.6)
+
+このプロトコルの DOM 側の半分は、v1 のときから人間向けの名前と型付き
+の項目リストを持っていた (`data-nac-label`、`data-nac-hint`、型を持つ
+`fields[]`、6 節)。プラグイン側の半分はどちらも持っていなかった。
+マニフェストは動詞がどこへルーティングされるかを宣言するだけで、それ
+が何と呼ばれるかも、何を受け取るかも述べていなかった。連続的な表面で
+は、操作できるものは引数そのものである -- 座標とズーム、時間軸上の
+一瞬、ページとフォームの項目、三次元の姿勢 -- にもかかわらず、その
+形も、単位も、範囲も、何も宣言していなかった。音声の実行器は動詞を
+声に出して名指すことすらできなかった。
+
+`label`、`hint`、`params` (動詞)、`label` / `hint` / `unit` (状態と
+イベント) がそれを埋める。すべて任意であり、すべて 15.10 を通じて
+読み返せる。
+
+```json
+{
+  "slug":  "acme.map",
+  "label": "Acme map",
+  "verbs": {
+    "view.set": {
+      "backend": "sdk-call",
+      "handle":  "acme.map",
+      "path":    "setView",
+      "mode":    "invoke",
+      "args_order": ["center", "zoom"],
+      "label":   "Move the map",
+      "hint":    "Centres the map on a coordinate at a zoom level",
+      "params": [
+        { "name": "center", "type": "array",  "required": true,
+          "unit": "degrees", "label": "Centre", "hint": "[lat, lng]" },
+        { "name": "zoom",   "type": "number", "required": false,
+          "unit": "zoom level", "min": 0, "max": 22 }
+      ]
+    }
+  },
+  "state": {
+    "view.center": [
+      { "backend": "sdk-call", "handle": "acme.map", "path": "getCenter",
+        "mode": "invoke", "label": "Centre of the view", "unit": "degrees" }
+    ]
+  },
+  "events": {
+    "view.moved": {
+      "backend": "emitter-listen", "handle": "acme.map",
+      "event": "moveend", "observe": ["view.center"],
+      "label": "The map stopped moving"
+    }
+  }
+}
+```
+
+規則:
+
+1. 宣言された `label`、`hint`、`unit` は空でない文字列でなければ
+   ならない。さもなければマニフェストは登録時に `invalid` で拒否
+   される。
+2. `params` は配列でなければならない。各項目は `name` (動詞の中で
+   一意) と、`string | number | boolean | object | array` のいずれか
+   の `type` を持たなければならない。`required`、`unit`、`min`、
+   `max`、`enum`、`label`、`hint` は任意であり、存在する場合は型が
+   検査される。それ以外のものは `invalid` である。
+3. 状態パスのラベルは、その連鎖が最初に宣言するものである。状態パス
+   は順序づけられたソースのリストを持つ一つの値であり (15.6 節)、
+   名前を与えるソースによって一度だけ名指される。
+4. `params` は `NAC.call` が受け取る `args` オブジェクトの形を宣言
+   する。ランタイムは引数をそれに対して検証しない。この宣言は、
+   エージェントが呼び出しを組み立て、音声の実行器がそれを言える
+   ようにするために存在する。引数の強制が必要な表面は、引数が
+   着地する場所でそれを強制する。
+5. ここにあるものをランタイムが翻訳することはない。ラベルは
+   アプリケーションの言語で書かれる。別の言語を話すホストは自分の
+   層で地域化する (4.3 節)。
 
 ---
 

@@ -42,7 +42,7 @@ NAC3 es un **protocolo** y su **presentación web**. No es un proyecto nuevo: ya
 publicado, ya tiene adoptantes, y cada cambio sale a producción.
 
 * **La versión se declara una sola vez:** la constante `version:` del export `NAC` al final
-  de `js/nac.js` (hoy `2.5.2`). Todo lo demás la **deriva** o la **declara**, y un gate
+  de `js/nac.js` (hoy `2.6.0`, especificación `2.6`). Todo lo demás la **deriva** o la **declara**, y un gate
   rechaza el build si alguien discrepa (`npm run check:version`). Subir la versión = editar
   ese archivo y correr los generadores; nunca escribirla a mano en otro lado.
 * **El inglés manda.** `SPEC.md` es el texto normativo. Las nueve traducciones viven en
@@ -69,7 +69,7 @@ publicado, ya tiene adoptantes, y cada cambio sale a producción.
 
 Un cambio **no está entregado** hasta que las dos puertas coinciden con el árbol:
 
-* **Paquete:** `npm install @nac3/runtime` — se publica desde `runtime/` (hoy `2.5.2`,
+* **Paquete:** `npm install @nac3/runtime` — se publica desde `runtime/` (hoy `2.6.0`,
   Apache-2.0). Candado: `scripts/verify-npm-publication.mjs` **trae de vuelta el tarball
   publicado** desde el registro, verifica sus bytes contra el hash que el registro declara,
   lo desempaqueta y compara todos los archivos en las dos direcciones contra el árbol de

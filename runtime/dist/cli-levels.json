@@ -1,8 +1,8 @@
 {
   "generated_by": "runtime/build.mjs from SPEC.md section 8 via scripts/spec-levels.mjs",
   "note": "Build input for the CLI validator. The published, signed copy of the same facts is api/v/<version>/levels.json.",
-  "version": "2.5.2",
-  "spec_version": "2.5",
+  "version": "2.6.0",
+  "spec_version": "2.6",
   "locales_required": [
     "es",
     "en",

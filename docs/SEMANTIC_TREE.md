@@ -1,7 +1,8 @@
 # SEMANTIC TREE -- nac-spec (NAC3)
 
 Station: **N2 -- the reading of the system** (Urazuke, legacy entry).
-Date: **2026-10-30**. Author: Forge (agent). Owner: Pablo Kuschnirof.
+Date: **2026-10-30**, section 5 refreshed **2026-11-11** for the 2.6.0 release.
+Author: Forge (agent). Owner: Pablo Kuschnirof.
 Read together with: `CLAUDE.md` (session bootstrap), `docs/WORKING_AGREEMENT.md`
 (the contract), `docs/STATUS.md` (living state), `docs/DISCREPANCIES.md` (what
 does not agree and is waiting for the owner), `docs/DECISIONS.md` (what the owner
@@ -271,7 +272,7 @@ listed are the ones the code enforces or the normative text requires.
 |---|---|---|
 | Landing | 1 (`index.html`) | 16 named sections, a chat panel, and a language selector built **only** from catalogues that declare themselves complete `[code]` |
 | PHP reference demos | 13 `[measured]` | the canonical one claims 27 widgets; the data-table demo is the one wired to the live chat backend |
-| Capability demos | 8 under `demos/`, plus React and Angular | one per shipped v2.4 / v2.5 block, each with a Playwright runner and a Pilot runner under `scripts/` |
+| Capability demos | 9 under `demos/`, plus React and Angular `[measured 2026-11-11]` | one per shipped v2.4 / v2.5 block, each with a Playwright runner and a Pilot runner under `scripts/`; the ninth is `v26-leaflet-plugin/` (RFC V26-01), the only one that drives a library this project does not control -- a real Leaflet 1.9.4 -- and the only one whose runner serves the repository itself instead of expecting a server to be up |
 | Rendered documents | 308 HTML tracked, **236 of them localised copies** under `i18n/` `[measured]` | spec, guides, checklists, reports |
 | Evidence surfaces | `benchmark/`, `migration/`, `conduit/`, `ads-demo/`, `videos/` | the material behind the commercial claims |
 

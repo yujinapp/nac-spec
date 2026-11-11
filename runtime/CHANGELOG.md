@@ -1,5 +1,106 @@
 # Changelog
 
+## 2.6.0 -- 2026-11-11
+
+A MINOR release: the plugin extension contract of section 15 grows the
+six hooks a canvas or API surface needed in order to live in a
+repository of its own and still be operable through this runtime
+(RFC V26-01). Nothing in the v2.5 surface changed shape -- a manifest
+written against 2.5.2 registers and runs unmodified -- and one defect
+of 2.5.2 is fixed, which is the only behaviour an existing manifest can
+notice.
+
+The spec version moves to **2.6** because 15.4 says it must: this
+release adds a backend to the vocabulary, and a runtime that does not
+implement `emitter-listen` MUST refuse a manifest declaring it rather
+than skip it silently.
+
+### Added
+
+- **Discovery (SPEC 15.10)** -- `NAC.plugins()` and
+  `NAC.describePlugin(slug)`. Until now the registry was readable only
+  by `call`, `read` and `subscribe`, all three of which require the
+  caller to already know the slug and the path: an agent that did not
+  register the plugin itself could not learn it exists. It read the DOM
+  manifest, found the chrome, and the canvas surface was invisible --
+  and for a plugin that declares no DOM at all there was nothing to
+  find. Both functions are synchronous (they read a local object) and
+  hand back a COPY, so a reader cannot reach the live registry and
+  rewrite another plugin's routing.
+
+- **Self-description (SPEC 15.11)** -- optional `label`, `hint` and
+  typed `params` on a verb; `label`, `hint`, `unit` on state and
+  events. The DOM half of the protocol has had a name and a typed field
+  list since v1; the plugin half had neither, so on a surface where the
+  actionable thing IS the argument -- a coordinate and a zoom, an
+  instant, a page, a pose -- nothing declared its shape, its unit or
+  its range, and a voice runner could not name the verb out loud.
+  Optional everywhere; rejected at register time with `invalid` when
+  declared and malformed.
+
+- **`emitter-listen` backend (SPEC 15.4)** -- the ninth backend, and
+  the first real event source that is not postMessage. A plugin
+  wrapping a library that emits its own events (`map.on('moveend')`,
+  `video.addEventListener('timeupdate')`, pdf.js `pagechanging`) had to
+  poll or hand-write a mirror node; now it declares the emitter, the
+  event name and, optionally, the state paths to re-read at event time.
+  The subscribe / unsubscribe method pair is detected from the three
+  shapes libraries ship, or declared outright. An emitter with no
+  removal method is REFUSED: a subscription that cannot be torn down is
+  a leak dressed as a success.
+
+- **`sdk-call` reaches an object outside `window`, and positionally**
+  (SPEC 15.4) -- `handle` resolves the path against an object
+  registered with the new `NAC.registerApiHandle(name, obj)` instead of
+  the global one, which is what SPEC 15.1 always named as a motivating
+  case ("invoke `excalidrawAPI.setElements(...)` on a React ref") and
+  the backend could not do. `args_order` spells out the positional
+  argument list, so a library signature like `map.setView(center,
+  zoom)` is expressible. Both optional: without them the backend
+  behaves exactly as in 2.5.
+
+- **A declared code space for a plugin's own errors (SPEC 15.9)** --
+  codes under the reserved `plugin.` prefix travel verbatim on
+  `err.code`, which is how "this row is not materialised" becomes
+  distinguishable from "that row does not exist". Until now that worked
+  by accident of implementation: `call` lifted ANY string a backend put
+  on `err._code`, against a published list of exactly ten codes. A code
+  that is neither one of the ten nor under the prefix is now refused as
+  `invalid`, with the refused string preserved on `err.offending_code`.
+
+### Fixed
+
+- **`synthetic-mutation` no longer returns a subscription that can
+  never fire** (SPEC 15.4). When an observed state's mirror node was
+  absent, the runtime dropped it (`if (el) elements.push(el)`); with
+  nothing left to observe, `subscribe` returned a valid handle and the
+  callback was never called. Success and silence -- the silent damage
+  this protocol exists to remove, inside the protocol. It now rejects
+  with `backend_target_missing`, naming the state paths and selectors
+  that did not resolve. A manifest whose node legitimately comes and
+  goes -- the row of a virtualised grid -- declares the new optional
+  `root`: a container that outlives the node, observed with
+  `subtree: true` and re-resolved on every mutation, so a subscription
+  taken while the node was absent fires when it mounts. The move from
+  unreadable to readable is itself an emit.
+
+### Evidence
+
+- Layer 1 (unit): `runtime/test/stage13-plugin-hooks.mjs`, 67
+  assertions, wired into `npm test`. It carries its own red proof: run
+  it against the 2.5.2 bytes
+  (`NAC3_RUNTIME_PATH=... node runtime/test/stage13-plugin-hooks.mjs`)
+  and 15 assertions fail, four of them the silent-subscription defect.
+- Layer 2 (browser, against a library we do not control):
+  `demos/v26-leaflet-plugin/` driven by
+  `scripts/run-demo-v26-leaflet-plugin.mjs` -- a real Leaflet 1.9.4
+  loaded from unpkg with a pinned SRI hash, a plugin file that uses
+  nothing but the published runtime surface, 37 assertions, each effect
+  checked twice: once through the protocol and once against Leaflet's
+  own API. Evidence in `evidence/v26-leaflet-plugin/<run-date>/`.
+  This closes the gap registered as "the contract was never exercised
+  against a real app".
+
 ## 2.5.2 -- 2026-10-27
 
 A patch release with no runtime behaviour change. Like 2.5.1 it exists

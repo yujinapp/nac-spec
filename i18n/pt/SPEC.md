@@ -1,5 +1,5 @@
 ---
-translation_source_hash: abf83a2435d03edd99061463e66e25982e426a41f93a8a1bf4a0c0720500553c
+translation_source_hash: caf3443bf87e4d47dd62a446f575298f876f691d6e52da165cb547b064536267
 translation_quality: machine_v1
 translation_date: 2026-10-27
 translation_engine: anthropic/claude-opus-5 (Yujin Forge)
@@ -7,18 +7,18 @@ translation_normative: false
 translation_status: complete
 translation_lang: pt
 translation_source: SPEC.md
-translation_source_version: 2.5.2
+translation_source_version: 2.6.0
 translation_source_date: 2026-10-27
-translation_sections: 83
-translation_sections_canonical: 83
-translation_units: 283
-translation_units_canonical: 283
+translation_sections: 85
+translation_sections_canonical: 85
+translation_units: 299
+translation_units_canonical: 299
 translation_canonical_url: /nac-spec/SPEC.html
 ---
 
 <!-- translation-banner: produced by scripts/build-translation-banners.mjs -->
 
-> **Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em 2026-10-27 (NAC3 v2.5.2) e cobre 83 das 83 seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.
+> **Tradução automática, não normativa.** Traduz a versão em inglês tal como estava em 2026-10-27 (NAC3 v2.6.0) e cobre 85 das 85 seções do original de hoje. O texto normativo é o inglês: se esta tradução e o inglês divergirem, vale o inglês.
 >
 > *Non-normative machine translation. The normative text of NAC3 is the English one.*
 >
@@ -28,7 +28,7 @@ translation_canonical_url: /nac-spec/SPEC.html
 
 # NAC3 -- Native Agent Contract
 
-**Versão:** 2.5.2 (estável -- a superfície v2.5 completa: narrate, context+tree, expect+diff)
+**Versão:** 2.6.0 (estável -- a superfície v2.5 mais os ganchos de extensão de plugin da v2.6: descoberta, autodescrição, emitter-listen)
 **Status:** Versão estável. A dist-tag `latest` do npm aponta para cá; a seção 9.1 diz o que isso garante e o que uma pré-versão não garante. Este documento declara sua versão em exatamente um lugar, a linha acima. Os RFCs publicados e suas evidências de Camada 2 + Camada 3 estão listados em `README.md` e `runtime/CHANGELOG.md`.
 **Licença:** Apache-2.0
 **Editor:** Yujin (yujin.app)
@@ -1431,7 +1431,7 @@ especificação, não o código JS.
 
 ---
 
-## 15. Contrato de extensão de plugin -- superfícies de canvas + API (v2.5)
+## 15. Contrato de extensão de plugin -- superfícies de canvas + API (v2.5, estendido na v2.6)
 
 As seções 1-14 supõem que a superfície relevante para o agente é o
 **DOM**. Todo elemento endereçável tem um atributo `data-nac-id`, todo
@@ -1453,6 +1453,18 @@ superfícies. O runtime permanece agnóstico de qualquer aplicativo
 específico: ele aprende a falar com um apenas lendo o manifesto do
 plugin.
 
+A v2.6 não acrescenta nenhuma forma nova de CHEGAR a uma aplicação: os
+backends de 15.4 já cobrem as que existem. O que ela acrescenta é a
+metade que faltava para um plugin viver num repositório próprio -- como
+um agente ENCONTRA um plugin que não registrou (15.10) e ENTENDE o que
+os verbos dele recebem (15.11), uma fonte de eventos real que não é
+postMessage (`emitter-listen`, 15.4), os dois alcances que faltavam ao
+`sdk-call` (um objeto de API fora de `window`, e argumentos
+posicionais), uma regra de falha fechada para um observador que não tem
+nada a observar, e um espaço de códigos declarado para os erros
+próprios de um plugin (15.9). Um manifesto escrito contra a v2.5 não
+precisa de mudanças.
+
 ### 15.1 Por que um conjunto novo de primitivas
 
 O `NAC.click(id)` que só conhece DOM não consegue:
@@ -1470,7 +1482,7 @@ de backend. A correção é acrescentar um verbo explícito e agnóstico que
 tome um slug de plugin e um caminho de verbo, e que deixe o manifesto
 do plugin declarar como esse verbo é roteado.
 
-### 15.2 As três primitivas
+### 15.2 As primitivas
 
 ```ts
 NAC.registerPlugin(slug: string, manifest: PluginManifest): void
@@ -1479,6 +1491,15 @@ NAC.read(plugin: string, state_path: string): Promise<any>
 NAC.subscribe(plugin: string, event_path: string,
               cb: (data: any) => void): SubscriptionHandle
 NAC.unsubscribe(handle: SubscriptionHandle): void
+
+/* v2.6 -- discovery (sec 15.10) */
+NAC.plugins(): PluginDescriptor[]
+NAC.describePlugin(slug: string): PluginDescriptor
+
+/* v2.6 -- API handles for objects that never land on `window` (15.4) */
+NAC.registerApiHandle(name: string, obj: object): void
+NAC.unregisterApiHandle(name: string): boolean
+NAC.apiHandles(): string[]
 ```
 
 - `registerPlugin(slug, manifest)` registra um plugin v2.5. Um mesmo
@@ -1500,14 +1521,26 @@ NAC.unsubscribe(handle: SubscriptionHandle): void
   montante ou sintetizados por polling / MutationObserver -- o
   manifesto declara qual.
 
-As quatro funções são assíncronas (devolvem Promise), exceto
-`unsubscribe`, que é síncrona e idempotente.
+- `plugins()` devolve um descritor para cada plugin v2.5 registrado,
+  ordenados por slug; `describePlugin(slug)` devolve um. As duas são de
+  somente leitura: o descritor é uma CÓPIA, de modo que quem chama não
+  consegue alcançar o registro vivo através dele (sec. 15.10).
+- `registerApiHandle(name, obj)` publica um objeto de API sob um nome
+  que um manifesto pode referenciar com `handle`. O objeto em si nunca
+  entra no manifesto -- os manifestos continuam sendo JSON puro.
+
+`call`, `read` e `subscribe` chegam a uma superfície e por isso são
+assíncronas (devolvem uma Promise). `unsubscribe`, `plugins`,
+`describePlugin` e o registro de handles só tocam estado local e são
+síncronas; `unsubscribe` também é idempotente.
 
 ### 15.3 Forma do manifesto de plugin
 
 ```ts
 interface PluginManifest {
   slug: string;
+  label?: string;          /* v2.6 -- human name of the surface */
+  hint?:  string;          /* v2.6 -- one line on what it is for */
   verbs:  { [verb_path: string]: VerbBinding };
   state:  { [state_path: string]: StateBinding[] };
   events: { [event_path: string]: EventBinding };
@@ -1515,12 +1548,18 @@ interface PluginManifest {
 
 interface VerbBinding {
   backend:       BackendKind;
+  label?:        string;       /* v2.6 -- see 15.11 */
+  hint?:         string;       /* v2.6 */
+  params?:       ParamDecl[];  /* v2.6 -- what the verb takes */
   /* backend-specific fields (see 15.4) */
   [k: string]: any;
 }
 
 interface StateBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 -- names the state PATH (see 15.11) */
+  hint?:         string;   /* v2.6 */
+  unit?:         string;   /* v2.6 -- 'degrees', 'seconds', 'page' */
   /* backend-specific fields (see 15.4) */
   extract?:      string;   /* extractor DSL string (see 15.5) */
   [k: string]: any;
@@ -1528,8 +1567,22 @@ interface StateBinding {
 
 interface EventBinding {
   backend:       BackendKind;
+  label?:        string;   /* v2.6 */
+  hint?:         string;   /* v2.6 */
   /* backend-specific fields */
   [k: string]: any;
+}
+
+interface ParamDecl {             /* v2.6 -- see 15.11 */
+  name:      string;
+  type:      'string' | 'number' | 'boolean' | 'object' | 'array';
+  required?: boolean;
+  unit?:     string;
+  min?:      number;
+  max?:      number;
+  enum?:     any[];
+  label?:    string;
+  hint?:     string;
 }
 
 type BackendKind =
@@ -1540,7 +1593,8 @@ type BackendKind =
   | 'dom-mirror'
   | 'same-origin-window'
   | 'synthetic-mutation'
-  | 'synthetic-poll';
+  | 'synthetic-poll'
+  | 'emitter-listen';     /* v2.6 */
 ```
 
 Os manifestos são JSON puro (sem callbacks de JS). Forge, Sumi e
@@ -1551,24 +1605,57 @@ Verbos e eventos têm **exatamente uma** ligação. O estado tem um
 **array ordenado** de ligações: o runtime percorre a cadeia em ordem e
 devolve a primeira fonte que resolveu com sucesso.
 
+Todo campo marcado como `v2.6` é OPCIONAL: um manifesto escrito contra
+a v2.5 continua válido sem mudanças. O que não é opcional é estar bem
+formado QUANDO declarado -- uma `label` que não é uma cadeia, ou uma
+entrada de `params` de um tipo fora do vocabulário acima, é rejeitada
+no momento do registro com `invalid` (sec. 15.11).
+
 ### 15.4 Vocabulário de backends
 
 | Tipo | Usado para | Campos obrigatórios |
 |------|----------|-----------------|
 | `postmessage` | Verbo: postar uma mensagem num iframe via `postMessage`. | `target` (seletor CSS do iframe para onde enviar), `message` (a string MessageId), `values` (objeto literal interpolado com os argumentos), `values_from_args` (array opcional de chaves de argumento repassadas tal e qual) |
 | `postmessage-listen` | Evento: escutar um `MessageId` entrante específico em `window.message`. | `source` (seletor CSS do iframe por onde filtrar a origem; se omitido, aceita qualquer origem), `message` (o MessageId a casar), `extract` (o DSL de extração sobre os dados da mensagem) |
-| `sdk-call` | Verbo: chamar uma função JS exposta globalmente (por exemplo um plugin do Figma, a API do Excalidraw). | `path` (caminho pontilhado dentro de `window`, por exemplo `figma.currentPage.selection`), `mode` (`assign` para definir o caminho com o valor dos argumentos, `invoke` para chamá-lo como função com o objeto de argumentos) |
+| `sdk-call` | Verbo ou estado: chamar ou ler uma função / propriedade JS exposta em `window` ou num handle de API registrado (um plugin do Figma, a API do Excalidraw, uma instância de mapa). | `path` (caminho com pontos, por exemplo `figma.currentPage.selection`), `mode` (`assign` para fixar o caminho no valor dos argumentos, `invoke` para chamá-lo como função, `read` para devolver o valor que está no caminho) e, a partir da v2.6: `handle` (opcional -- o nome de um objeto registrado com `NAC.registerApiHandle`; o `path` é percorrido contra ESSE objeto em vez do objeto global, que é como se alcança uma API que nunca aterrissa em `window`), `args_order` (opcional -- um arranjo de nomes de argumento que soletra a lista de argumentos POSICIONAIS, de modo que uma assinatura como `map.setView(center, zoom)` possa ser expressa; sem ele, o objeto de argumentos viaja como um único argumento, que é o que todo manifesto da v2.5 faz) |
 | `script-bridge` | Verbo ou estado: invocar a ponte de script de um aplicativo (o `CallPythonScript` do Collabora, a ponte UNO do LibreOffice, o Google Apps Script). | `bridge` (um identificador específico do backend, como `collabora.python`), `script` (identificador do script), `function` (nome da função a rodar), `args` (objeto literal interpolado com os argumentos da chamada), `response_match` (para estado: o MessageId de resposta a esperar), `timeout_ms` (opcional, padrão 5000) |
 | `dom-mirror` | Estado: ler de um elemento do DOM cujo atributo / classe / texto espelha um estado interno do canvas (por exemplo um botão da barra de ferramentas realçado quando a sua formatação está ativa na seleção atual). | `selector` (seletor CSS a consultar), `extract` (o DSL de extração, veja 15.5) |
 | `same-origin-window` | Estado: ler de `iframe.contentWindow.<path>` quando o iframe é da mesma origem. O runtime detecta a origem cruzada e segue para a alternativa seguinte. | `target` (seletor CSS do iframe), `path` (caminho pontilhado dentro de `contentWindow`) |
-| `synthetic-mutation` | Evento: sintetizar um evento observando mutações do DOM sobre uma ou mais fontes de estado e reemitindo quando o valor observado muda. | `observe` (array de caminhos de estado a vigiar; o runtime chama `read` em cada um e os compara entre mutações), `throttle_ms` (opcional, padrão 100) |
+| `synthetic-mutation` | Evento: sintetizar um evento observando mutações do DOM sobre uma ou mais fontes de estado e reemitindo quando o valor observado muda. | `observe` (arranjo de caminhos de estado a vigiar; o runtime chama `read` sobre cada um e os compara entre mutações), `throttle_ms` (opcional, por omissão 100), `root` (opcional, v2.6 -- um seletor CSS de um contêiner a observar em vez dos próprios nós espelho; ver a regra de falha fechada mais abaixo) |
 | `synthetic-poll` | Evento: sintetizar um evento fazendo polling das fontes de estado. | `observe` (array de caminhos de estado), `interval_ms` (padrão 250) |
+| `emitter-listen` | Evento (v2.6): escutar uma fonte de eventos REAL que não é postMessage -- um emissor de eventos JS exposto por uma biblioteca (`map.on('moveend')`, `video.addEventListener('timeupdate')`, o `pagechanging` do pdf.js, o `onresult` de um reconhecedor). | `event` (obrigatório -- o nome do evento da biblioteca), `handle` (opcional -- um handle de API registrado no qual escutar), `path` (opcional -- caminho com pontos até o emissor; resolvido contra o handle quando há um declarado, e contra o objeto global quando não há; omiti-lo significa que o próprio handle é o emissor), `method` / `off_method` (opcional -- os nomes dos métodos de inscrição / cancelamento; quando omitidos, o runtime detecta `on`/`off`, `addEventListener`/`removeEventListener` ou `addListener`/`removeListener`, nessa ordem), `extract` (DSL de extração opcional sobre a carga que a biblioteca entrega ao ouvinte), `observe` (arranjo opcional de caminhos de estado: em vez da carga crua, o runtime relê esses estados no momento do evento e o callback recebe esse retrato -- a forma útil para uma superfície contínua, onde o evento diz "mexeu" e o estado diz para onde) |
 
 Cada backend DEVE ser implementado pelo runtime como um despachante
 autocontido (`dispatch(binding, args, context) -> Promise<value>`).
 Acrescentar um tipo de backend novo à especificação exige saltar a
 versão da especificação; runtimes que ignoram backends desconhecidos
 DEVEM recusar manifestos que os declaram (sem pulo silencioso).
+`emitter-listen` é a razão pela qual este documento é 2.6 e não 2.5.3.
+
+**Regra de falha fechada para um observador que não tem nada a observar (v2.6).**
+`synthetic-mutation` resolve cada caminho de estado observado para o
+elemento do DOM que o seu binding primário `dom-mirror` seleciona.
+Quando um seletor não casa com nenhum elemento, `subscribe` DEVE
+rejeitar com `backend_target_missing`, nomeando os caminhos de estado e
+os seletores que não resolveram. NÃO DEVE devolver um handle: uma
+inscrição que não observa nada se resolve com sucesso e depois nunca
+dispara, que é exatamente o dano silencioso que este protocolo existe
+para eliminar -- e até a 2.5.2 era isso que o runtime de referência
+fazia.
+
+Um manifesto cujo nó observado aparece e desaparece legitimamente -- a
+linha de uma grade virtualizada, que existe só enquanto está rolada
+para dentro da vista -- declara `root`: um contêiner que SOBREVIVE ao
+nó. O runtime então observa esse contêiner com `subtree: true` e volta
+a resolver os seletores a cada mutação, de modo que uma inscrição feita
+enquanto o nó estava ausente dispara quando o nó monta. O próprio
+`root` precisa resolver, pela mesma razão. Quando uma inscrição começa
+sem nada legível e o estado observado depois passa a ser legível, essa
+transição é em si mesma uma emissão: a passagem de desconhecido a
+conhecido é a mudança que quem chama está esperando. Enquanto um estado
+observado não pode ser lido nenhum evento é emitido, de modo que um
+manifesto para o qual a AUSÊNCIA é significativa a declara como dado --
+um extrator `present`, ou um binding de reserva na cadeia.
 
 ### 15.5 Mini-DSL de extração
 
@@ -1718,6 +1805,156 @@ respondeu.
   declarado (padrão 5000 para verbos, 1000 para leituras de estado).
 - `invalid` -- a forma do argumento está errada (slug inválido,
   manifesto malformado no momento do registro, etc).
+
+**O espaço de códigos de plugin (v2.6).** Os dez códigos acima são todo
+o vocabulário do contrato, e são deliberadamente sobre o ROTEAMENTO:
+dizem que o protocolo não conseguiu chegar, nunca por que a aplicação
+disse não. Um plugin que precisa de um código próprio --
+`row_not_materialized` como algo distinguível de "essa linha não
+existe", um documento bloqueado, uma exportação ainda renderizando --
+o levanta sob o prefixo reservado `plugin.`:
+
+```js
+const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;                       /* inside the backend the manifest routes to */
+```
+
+`NAC.call` e `NAC.subscribe` expõem esse código tal e qual em
+`err.code`. Um código que NÃO é nenhum dos dez NEM está sob o prefixo
+`plugin.` é recusado como `invalid`, com a cadeia recusada preservada
+em `err.offending_code`: um código não declarado que viajou assim mesmo
+é justamente como um vocabulário deixa de ser um vocabulário. O prefixo
+é reservado -- os dez códigos do contrato nunca vão tomá-lo, de modo
+que um código de plugin nunca pode colidir com um futuro.
+
+### 15.10 Descoberta do registro (v2.6)
+
+As seções 15.2 a 15.9 exigem todas que quem chama já conheça o slug e o
+caminho. Até a 2.5.2 essa era a ÚNICA porta: o registro podia ser lido
+por exatamente três funções (`call`, `read`, `subscribe`), de modo que
+um agente que não tinha registrado o plugin ele mesmo não conseguia
+saber que ele existe. Lia o manifesto do DOM (seção 5), encontrava o
+chrome, e a superfície de canvas era invisível. Para uma superfície que
+não declara DOM nenhum -- um plugin só de voz -- não havia
+absolutamente nada a encontrar.
+
+```ts
+NAC.plugins(): PluginDescriptor[]          /* ordered by slug */
+NAC.describePlugin(slug: string): PluginDescriptor
+
+interface PluginDescriptor {
+  slug:   string;
+  label:  string | null;
+  hint:   string | null;
+  verbs:  { verb_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            params: ParamDecl[] | null; handle?: string }[];
+  state:  { state_path: string; backends: (string | null)[];
+            label: string | null; hint: string | null;
+            unit: string | null }[];
+  events: { event_path: string; backend: string | null;
+            label: string | null; hint: string | null;
+            observe: string[] | null; event?: string }[];
+}
+```
+
+Regras:
+
+1. As duas são SÍNCRONAS. Leem um objeto local; nada é despachado para
+   superfície alguma, de modo que não há razão para um agente esperar
+   uma ida e volta para saber o que há ali.
+2. O descritor é uma **cópia**. Quem chama NÃO DEVE conseguir alcançar
+   o registro vivo através dele e reescrever o roteamento de outro
+   plugin.
+3. Os verbos, os caminhos de estado e os eventos voltam ordenados por
+   caminho, de modo que duas leituras do mesmo registro podem ser
+   comparadas byte a byte.
+4. Um `label` / `hint` / `params` não declarado é lido como `null`,
+   nunca como uma chave faltante: quem lê não precisa distinguir
+   "ausente" de "não declarado".
+5. `describePlugin` sobre um slug não registrado rejeita com
+   `plugin_not_registered` (sec. 15.9).
+
+A descoberta é deliberadamente uma leitura do que o manifesto DECLARA,
+não uma sondagem da superfície. Ela diz a um agente o que existe e como
+nomeá-lo; se a superfície responde hoje é para isso que existem `call`
+e `read`.
+
+### 15.11 Autodescrição (v2.6)
+
+A metade DOM deste protocolo carrega um nome humano e uma lista de
+campos tipada desde a v1 (`data-nac-label`, `data-nac-hint`,
+`fields[]` com um tipo, seção 6). A metade de plugin não carregava
+nenhum: um manifesto declarava ONDE um verbo roteia e nada sobre como
+ele se chama nem o que recebe. Numa superfície contínua o acionável É o
+argumento -- uma coordenada e um zoom, um instante numa linha do tempo,
+uma página e um campo de formulário, uma pose em três dimensões -- e
+nada declarava a sua forma, a sua unidade nem o seu intervalo. Um
+executor de voz não conseguia sequer nomear o verbo em voz alta.
+
+`label`, `hint`, `params` (verbos), `label` / `hint` / `unit` (estado e
+eventos) fecham isso. Todos opcionais; todos lidos de volta por 15.10.
+
+```json
+{
+  "slug":  "acme.map",
+  "label": "Acme map",
+  "verbs": {
+    "view.set": {
+      "backend": "sdk-call",
+      "handle":  "acme.map",
+      "path":    "setView",
+      "mode":    "invoke",
+      "args_order": ["center", "zoom"],
+      "label":   "Move the map",
+      "hint":    "Centres the map on a coordinate at a zoom level",
+      "params": [
+        { "name": "center", "type": "array",  "required": true,
+          "unit": "degrees", "label": "Centre", "hint": "[lat, lng]" },
+        { "name": "zoom",   "type": "number", "required": false,
+          "unit": "zoom level", "min": 0, "max": 22 }
+      ]
+    }
+  },
+  "state": {
+    "view.center": [
+      { "backend": "sdk-call", "handle": "acme.map", "path": "getCenter",
+        "mode": "invoke", "label": "Centre of the view", "unit": "degrees" }
+    ]
+  },
+  "events": {
+    "view.moved": {
+      "backend": "emitter-listen", "handle": "acme.map",
+      "event": "moveend", "observe": ["view.center"],
+      "label": "The map stopped moving"
+    }
+  }
+}
+```
+
+Regras:
+
+1. Um `label`, `hint` ou `unit` declarado DEVE ser uma cadeia não
+   vazia; caso contrário o manifesto é rejeitado no momento do registro
+   com `invalid`.
+2. `params` DEVE ser um arranjo. Cada entrada DEVE carregar um `name`
+   (único dentro do verbo) e um `type` de
+   `string | number | boolean | object | array`. `required`, `unit`,
+   `min`, `max`, `enum`, `label` e `hint` são opcionais, e têm o tipo
+   verificado quando presentes. Qualquer outra coisa é `invalid`.
+3. O rótulo de um CAMINHO de estado é o primeiro que a sua cadeia
+   declara. Um caminho de estado é um valor com uma lista ordenada de
+   fontes (sec. 15.6), de modo que é nomeado uma única vez, pela fonte
+   que o nomear.
+4. `params` declara a forma do objeto `args` que `NAC.call` recebe. O
+   runtime NÃO valida os argumentos contra ele: a declaração existe
+   para que um agente possa compor uma chamada e um executor de voz
+   possa dizê-la, e uma superfície que precisa que os seus argumentos
+   sejam exigidos os exige onde eles aterrissam.
+5. Nada disto é traduzido pelo runtime. Um rótulo é escrito no idioma
+   da aplicação; um host que fala outro localiza na sua própria camada
+   (seção 4.3).
 
 ---
 

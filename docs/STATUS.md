@@ -1,6 +1,7 @@
 # STATUS -- nac-spec (NAC3), living state
 
-**Refreshed: 2026-10-30** by Forge, at station N2 of the Urazuke ladder.
+**Refreshed: 2026-11-11** by Forge (sections 1 and 2 only -- the 2.6.0 release;
+every other section still carries its own measurement date).
 Map: `docs/SEMANTIC_TREE.md` · Discrepancies: `docs/DISCREPANCIES.md` ·
 Owner's decisions: `docs/DECISIONS.md` ·
 Contract: `docs/WORKING_AGREEMENT.md` · Session bootstrap: `CLAUDE.md`.
@@ -15,12 +16,12 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 
 | Thing | Value | How it was checked |
 |---|---|---|
-| Authoritative version | **2.5.2** | the `version:` constant of the `NAC` export at the end of `js/nac.js` |
-| Spec version | **2.5** (normative text declares 2.5.2) | `SPEC.md` line 3 |
-| npm package | `@nac3/runtime@2.5.2`, Apache-2.0, channel `latest` | `npm run check:npm` -- 22 of 22 files identical to the tree of that version, 0 differing lines |
+| Authoritative version | **2.6.0** (2026-11-11) | the `version:` constant of the `NAC` export at the end of `js/nac.js` |
+| Spec version | **2.6** (normative text declares 2.6.0) -- moved by RFC V26-01: 15.4 requires a spec bump for a new backend, and `emitter-listen` is one | `SPEC.md` line 3 |
+| npm package | `@nac3/runtime@2.6.0`, Apache-2.0, channel `latest` | `npm run check:npm` at release, then `npm run verify:npm` in `postpublish` -- the published tarball fetched back and compared file by file against the tree of that version |
 | Site | `https://yujin.app/nac-spec/` serving this tree, **under the mount `/nac-spec/`, which is now a written rule** (owner decision D-02) | post-deploy smoke check inside CI run 41061305762 |
-| Contract API | `api/latest/` mirrors 2.5.2 (stable); prerelease head 2.5.0-alpha.5 | `api/latest.json`, `npm run verify:contract` |
-| Pinned runtime copies | `js/2.5.0`, `js/2.5.0-alpha.5`, `js/2.5.1`, `js/2.5.2`, each with its SRI hash | `js/integrity.json`, `npm run check:integrity` |
+| Contract API | `api/latest/` mirrors 2.6.0 (stable), 5 entries in the chain, signed by the owner key `nac3-contract-2026` on 2026-11-11 | `api/latest.json`, `node scripts/build-contract-api.mjs` |
+| Pinned runtime copies | `js/2.5.0`, `js/2.5.0-alpha.5`, `js/2.5.1`, `js/2.5.2`, `js/2.6.0`, each with its SRI hash | `js/integrity.json`, `npm run check:integrity` |
 | Last commit on `main` | `d045a67` (2026-10-30) | `git log` |
 | Last CI run | **41061305762 -- success**, 46 s, on `d045a67` | `gh run list` |
 
@@ -30,10 +31,10 @@ and no date does not belong in this file (working agreement rules 5 and 14).
 
 | Gate | Command | Last result |
 |---|---|---|
-| Full pre-push gate | `npm run check:release` | **green** 2026-10-30, 14 scripts |
-| Runtime suites | `cd runtime && npm test` | **green** 2026-10-30 -- 14 suites, **386 PASS, 0 FAIL** |
+| Full pre-push gate | `npm run check:release` | **green** 2026-11-11, 14 scripts |
+| Runtime suites | `cd runtime && npm test` | **green** 2026-11-11 -- 15 suites, **453 PASS, 0 FAIL** (the 15th is `stage13-plugin-hooks.mjs`, 67 of them, which also carries its red proof against the 2.5.2 bytes) |
 | Published-package lock | `npm run check:npm` | **green** 2026-11-07 -- 22 of 22 files identical, and its red proof `npm run test:npm-gate` passes **42 of 42** checks (13 cases; 12 and 13 were added 2026-11-07 with the fix to how the red counts lines and names its witness) |
-| Spec translations | `npm run stats:translations` | **green** -- canonical 283 units / 83 sections; all nine locales 283/283, 83/83, no orphans |
+| Spec translations | `npm run stats:translations` | **green** 2026-11-11 -- canonical 299 units / 85 sections; all nine locales 299/299, 85/85, no orphans |
 | Integrity, stylesheets, mount path, version coherence, contract API, landing i18n, translation banners | each in `check:release`, each with its own red proof | **green** |
 | Mount path lock | `npm run check:mount` | **green** 2026-10-30 -- 321 pages, 812 references under the mount, 57 relative `<script>` srcs resolved, 10 of 10 declaration sites agreeing; its red proof `npm run test:mount-gate` passes **21 of 21** cases |
 | In-tree link lock | `npm run check:tree-links` | **57 references across 21 missing targets** 2026-11-07 -- all in the May-era translated companion docs and guides (27 of one shape: `i18n/<loc>/{CONTRIBUTING,README_DEMOS,SECURITY}.html` linking `../SPEC.md`, which from two levels down names `i18n/SPEC.md`). **Deliberately NOT in `check:release`** until it is green, because several missing targets are documents whose existence is an owner decision; its red proof `npm run test:tree-links` passes **10 of 10** assertions, rebuilding the two defects it was written for |
@@ -46,9 +47,14 @@ tested":
 * Five suites exist under `runtime/test/` and are **not** in `npm test`:
   `stage1-audio`, `stage3-backend`, `stage4-calls`, `stage6-ack`,
   `stage6b-longtail` (finding F-4; waiting for a decision as D-03).
-* The Playwright demo runners and the Pilot runners (16 scripts under `scripts/`)
+* The Playwright demo runners and the Pilot runners (17 scripts under `scripts/`)
   are never called by CI; what exists is dated evidence under `evidence/`
-  (waiting for a decision as D-07).
+  (waiting for a decision as D-07). The newest one,
+  `run-demo-v26-leaflet-plugin.mjs`, is the only one that serves the repository
+  itself and needs nothing started first -- and the only one that drives a
+  third-party library (Leaflet 1.9.4 from unpkg), so it needs network and says
+  so instead of reporting a green it did not measure. Last run 2026-11-11:
+  **37 of 37**, evidence in `evidence/v26-leaflet-plugin/2026-11-11/`.
 
 ---
 

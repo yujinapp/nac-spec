@@ -66,8 +66,17 @@ function green(name, en, tr) {
 ok('every line of SPEC.md lands in exactly one block (round trip)',
   BLOCKS.map((b) => b.text).join('\n') === ENGLISH);
 
-ok('the canonical spec splits into the 83 sections every other gate counts',
-  U.coverage(BLOCKS, new Map()).sectionsTotal === 83,
+/* The section count of the canonical English, written down rather than
+   derived: a derived number agrees with itself no matter what the
+   document does, which is the one thing this case must not do. It is a
+   measurement with a date, and a release that grows the spec edits it
+   DELIBERATELY -- which is the point, because the edit is where someone
+   has to look at the nine stores and decide whether they follow.
+     83  2026-10-27  the v2.5 document (2.5.2)
+     85  2026-11-11  2.6.0 added 15.10 Discovery and 15.11 Self-description */
+const CANONICAL_SECTIONS = 85;
+ok('the canonical spec splits into the ' + CANONICAL_SECTIONS + ' sections every other gate counts',
+  U.coverage(BLOCKS, new Map()).sectionsTotal === CANONICAL_SECTIONS,
   'got ' + U.coverage(BLOCKS, new Map()).sectionsTotal);
 
 ok('fenced code blocks are verbatim, never units',

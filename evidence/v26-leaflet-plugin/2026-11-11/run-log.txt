@@ -1,0 +1,44 @@
+20:28:35.656 V26-01 Layer 2 demo runner -- NAC3 v2.6 hooks against real Leaflet 1.9.4
+20:28:35.656   repo root   C:\yujin-nac-spec
+20:28:35.657   evidence    C:\yujin-nac-spec\evidence\v26-leaflet-plugin\2026-11-11
+20:28:35.672   serving     http://127.0.0.1:8866
+20:28:40.343 PASS the real Leaflet loaded (version from the library itself)
+20:28:40.352 PASS the page is running the 2.6 runtime
+20:28:41.767 PASS plugins() finds the plugin without the agent registering anything
+20:28:41.767 PASS the descriptor carries the surface label
+20:28:41.767 PASS every verb the plugin declares is listed, sorted
+20:28:41.768 PASS the state paths are listed with their fallback chains
+20:28:41.768 PASS the events are listed with the LIBRARY event name they listen to
+20:28:41.773 PASS the descriptor is a copy: a reader cannot rewrite the live registry
+20:28:41.774 PASS the verb has a human label an agent can say out loud
+20:28:41.774 PASS the verb declares its arguments: a coordinate and a zoom
+20:28:41.774 PASS the argument declares its UNIT and its range -- the thing a map needs
+20:28:41.774 PASS a closed set of values travels as an enum
+20:28:41.774 PASS a state path is named and carries its unit
+20:28:41.963 PASS map.setView(center, zoom) really moved the real map (library API says so)
+20:28:41.966 PASS and the protocol reads the same values back
+20:28:41.981 PASS one positional argument given, the other left out: centre moved, zoom kept
+20:28:41.997 PASS a verb routed to the plugin own facade (a second handle) also lands
+20:28:43.935 PASS a real Leaflet moveend reaches the protocol through emitter-listen
+20:28:43.935 PASS the subscription handle names the backend that served it
+20:28:43.935 PASS the callback receives the observed state, re-read at event time
+20:28:43.935 PASS after unsubscribe the library stops delivering to us
+20:28:44.046 PASS NAC.expect confirms the EFFECT on the real map, by tolerance
+20:28:44.904 PASS the row for a city outside the viewport is not painted
+20:28:44.911 PASS subscribing to the unpainted row is REFUSED, not answered with a dead handle
+20:28:44.912 PASS and the refusal names what did not resolve
+20:28:47.342 PASS with a root declared, the subscription on an unpainted row is accepted
+20:28:47.343 PASS the row remounts and the subscription taken BEFORE it existed fires
+20:28:47.343 PASS and keeps firing as the mounted row changes value
+20:28:47.343 PASS the value delivered is the row state, read through the chain
+20:28:47.489 PASS an application failure comes back in the plugin code space
+20:28:47.489 PASS and it is distinguishable from a routing failure of the protocol
+20:28:47.489 PASS a wrong ARGUMENT still comes back as the contract code `invalid`
+20:28:47.489 PASS an undeclared verb is still verb_not_declared
+20:28:47.492 PASS provenance recorded the sdk-call dispatches
+20:28:47.493 PASS provenance recorded the emitter-listen events
+20:28:47.493 PASS provenance recorded the synthetic-mutation events
+20:28:47.493 PASS zero console errors from the page or the contract
+20:28:47.493 NOTE  17 external resource failure(s) (tiles / CDN), not asserted: ["requestfailed https://tile.openstreetmap.org/12/1383/2468.png","requestfailed https://tile.openstreetmap.org/12/1383/2467.png","requestfailed https://tile.openstreetmap.org/12/1382/2468.png"]
+20:28:47.759 
+20:28:47.759 V26-01 DEMO PASS (37/37 assertions)

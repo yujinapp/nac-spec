@@ -1,0 +1,407 @@
+{
+  "runner": "run-demo-v26-leaflet-plugin.mjs",
+  "rfc": "V26-01",
+  "run_at": "2026-11-11T20:28:47.755Z",
+  "runtime_version": "2.6.0",
+  "spec_version": "2.6",
+  "third_party": {
+    "library": "leaflet",
+    "version": "1.9.4",
+    "source": "unpkg (pinned SRI)"
+  },
+  "url": "http://127.0.0.1:8866/demos/v26-leaflet-plugin/index.html",
+  "assertions": [
+    {
+      "name": "the real Leaflet loaded (version from the library itself)",
+      "ok": true,
+      "detail": "1.9.4"
+    },
+    {
+      "name": "the page is running the 2.6 runtime",
+      "ok": true,
+      "detail": {
+        "v": "2.6.0",
+        "s": "2.6"
+      }
+    },
+    {
+      "name": "plugins() finds the plugin without the agent registering anything",
+      "ok": true,
+      "detail": [
+        "leaflet.map"
+      ]
+    },
+    {
+      "name": "the descriptor carries the surface label",
+      "ok": true,
+      "detail": "Leaflet map"
+    },
+    {
+      "name": "every verb the plugin declares is listed, sorted",
+      "ok": true,
+      "detail": [
+        "overlay.require",
+        "view.fit_all",
+        "view.set",
+        "view.zoom_in",
+        "view.zoom_out"
+      ]
+    },
+    {
+      "name": "the state paths are listed with their fallback chains",
+      "ok": true,
+      "detail": {
+        "state_path": "view.zoom",
+        "backends": [
+          "sdk-call",
+          "dom-mirror"
+        ],
+        "label": "Zoom level",
+        "hint": null,
+        "unit": "zoom level"
+      }
+    },
+    {
+      "name": "the events are listed with the LIBRARY event name they listen to",
+      "ok": true,
+      "detail": {
+        "event_path": "view.moved",
+        "backend": "emitter-listen",
+        "label": "The map stopped moving",
+        "hint": null,
+        "observe": [
+          "view.center.lat",
+          "view.center.lng",
+          "view.zoom"
+        ],
+        "event": "moveend"
+      }
+    },
+    {
+      "name": "the descriptor is a copy: a reader cannot rewrite the live registry",
+      "ok": true,
+      "detail": {
+        "slug": "leaflet.map",
+        "backend": "sdk-call"
+      }
+    },
+    {
+      "name": "the verb has a human label an agent can say out loud",
+      "ok": true,
+      "detail": "Move the view"
+    },
+    {
+      "name": "the verb declares its arguments: a coordinate and a zoom",
+      "ok": true,
+      "detail": [
+        {
+          "name": "center",
+          "type": "array",
+          "required": true,
+          "unit": "degrees",
+          "label": "Centre",
+          "hint": "Two numbers: [latitude, longitude]"
+        },
+        {
+          "name": "zoom",
+          "type": "number",
+          "required": false,
+          "unit": "zoom level",
+          "min": 0,
+          "max": 19,
+          "label": "Zoom",
+          "hint": "0 is the whole world, 19 is a building"
+        }
+      ]
+    },
+    {
+      "name": "the argument declares its UNIT and its range -- the thing a map needs",
+      "ok": true,
+      "detail": [
+        {
+          "name": "center",
+          "type": "array",
+          "required": true,
+          "unit": "degrees",
+          "label": "Centre",
+          "hint": "Two numbers: [latitude, longitude]"
+        },
+        {
+          "name": "zoom",
+          "type": "number",
+          "required": false,
+          "unit": "zoom level",
+          "min": 0,
+          "max": 19,
+          "label": "Zoom",
+          "hint": "0 is the whole world, 19 is a building"
+        }
+      ]
+    },
+    {
+      "name": "a closed set of values travels as an enum",
+      "ok": true,
+      "detail": {
+        "name": "city",
+        "type": "string",
+        "required": true,
+        "enum": [
+          "bue",
+          "mvd",
+          "scl"
+        ],
+        "label": "City",
+        "hint": "bue Buenos Aires, mvd Montevideo, scl Santiago"
+      }
+    },
+    {
+      "name": "a state path is named and carries its unit",
+      "ok": true,
+      "detail": {
+        "state_path": "view.zoom",
+        "backends": [
+          "sdk-call",
+          "dom-mirror"
+        ],
+        "label": "Zoom level",
+        "hint": null,
+        "unit": "zoom level"
+      }
+    },
+    {
+      "name": "map.setView(center, zoom) really moved the real map (library API says so)",
+      "ok": true,
+      "detail": {
+        "lat": -34.6037,
+        "lng": -58.3816,
+        "zoom": 12
+      }
+    },
+    {
+      "name": "and the protocol reads the same values back",
+      "ok": true,
+      "detail": {
+        "lat": -34.6037,
+        "zoom": 12
+      }
+    },
+    {
+      "name": "one positional argument given, the other left out: centre moved, zoom kept",
+      "ok": true,
+      "detail": {
+        "lat": -34.9011,
+        "zoom": 12
+      }
+    },
+    {
+      "name": "a verb routed to the plugin own facade (a second handle) also lands",
+      "ok": true,
+      "detail": {
+        "r": {
+          "ok": true,
+          "city": "scl"
+        },
+        "zoom": 9,
+        "lat": -33.45
+      }
+    },
+    {
+      "name": "a real Leaflet moveend reaches the protocol through emitter-listen",
+      "ok": true,
+      "detail": {
+        "afterSub": 1,
+        "afterUnsub": 1,
+        "first": {
+          "view.center.lat": -33.65578083204094,
+          "view.center.lng": -70.23010253906251,
+          "view.zoom": 9
+        },
+        "handleBackend": "emitter-listen"
+      }
+    },
+    {
+      "name": "the subscription handle names the backend that served it",
+      "ok": true,
+      "detail": "emitter-listen"
+    },
+    {
+      "name": "the callback receives the observed state, re-read at event time",
+      "ok": true,
+      "detail": {
+        "view.center.lat": -33.65578083204094,
+        "view.center.lng": -70.23010253906251,
+        "view.zoom": 9
+      }
+    },
+    {
+      "name": "after unsubscribe the library stops delivering to us",
+      "ok": true,
+      "detail": {
+        "afterSub": 1,
+        "afterUnsub": 1,
+        "first": {
+          "view.center.lat": -33.65578083204094,
+          "view.center.lng": -70.23010253906251,
+          "view.zoom": 9
+        },
+        "handleBackend": "emitter-listen"
+      }
+    },
+    {
+      "name": "NAC.expect confirms the EFFECT on the real map, by tolerance",
+      "ok": true,
+      "detail": {
+        "before": 9,
+        "got": 10
+      }
+    },
+    {
+      "name": "the row for a city outside the viewport is not painted",
+      "ok": true,
+      "detail": {
+        "painted": false,
+        "rows": 1
+      }
+    },
+    {
+      "name": "subscribing to the unpainted row is REFUSED, not answered with a dead handle",
+      "ok": true,
+      "detail": {
+        "threw": true,
+        "code": "backend_target_missing",
+        "message": "synthetic-mutation: no element for observed state markers.row.scl ([data-marker-row=\"scl\"]) -- a subscription with nothing to observe would never fire; declare `root` to observe a container that outlives the node and re-resolve on mutation"
+      }
+    },
+    {
+      "name": "and the refusal names what did not resolve",
+      "ok": true,
+      "detail": "synthetic-mutation: no element for observed state markers.row.scl ([data-marker-row=\"scl\"]) -- a subscription with nothing to observe would never fire; declare `root` to observe a container that outlives the node and re-resolve on mutation"
+    },
+    {
+      "name": "with a root declared, the subscription on an unpainted row is accepted",
+      "ok": true,
+      "detail": {
+        "subscribed": true,
+        "afterMount": 1,
+        "total": 2,
+        "last": {
+          "markers.row.scl": "342"
+        },
+        "painted": true
+      }
+    },
+    {
+      "name": "the row remounts and the subscription taken BEFORE it existed fires",
+      "ok": true,
+      "detail": {
+        "subscribed": true,
+        "afterMount": 1,
+        "total": 2,
+        "last": {
+          "markers.row.scl": "342"
+        },
+        "painted": true
+      }
+    },
+    {
+      "name": "and keeps firing as the mounted row changes value",
+      "ok": true,
+      "detail": {
+        "subscribed": true,
+        "afterMount": 1,
+        "total": 2,
+        "last": {
+          "markers.row.scl": "342"
+        },
+        "painted": true
+      }
+    },
+    {
+      "name": "the value delivered is the row state, read through the chain",
+      "ok": true,
+      "detail": {
+        "markers.row.scl": "342"
+      }
+    },
+    {
+      "name": "an application failure comes back in the plugin code space",
+      "ok": true,
+      "detail": {
+        "code": "plugin.overlay_not_attached",
+        "message": "overlay \"heatmap\" is not attached to this map"
+      }
+    },
+    {
+      "name": "and it is distinguishable from a routing failure of the protocol",
+      "ok": true,
+      "detail": {
+        "code": "plugin.overlay_not_attached",
+        "message": "overlay \"heatmap\" is not attached to this map"
+      }
+    },
+    {
+      "name": "a wrong ARGUMENT still comes back as the contract code `invalid`",
+      "ok": true,
+      "detail": {
+        "code": "invalid"
+      }
+    },
+    {
+      "name": "an undeclared verb is still verb_not_declared",
+      "ok": true,
+      "detail": {
+        "code": "verb_not_declared"
+      }
+    },
+    {
+      "name": "provenance recorded the sdk-call dispatches",
+      "ok": true,
+      "detail": 20
+    },
+    {
+      "name": "provenance recorded the emitter-listen events",
+      "ok": true,
+      "detail": 1
+    },
+    {
+      "name": "provenance recorded the synthetic-mutation events",
+      "ok": true,
+      "detail": 2
+    },
+    {
+      "name": "zero console errors from the page or the contract",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "passed": 37,
+  "failed": 0,
+  "console_errors": [],
+  "external_resource_failures": [
+    "requestfailed https://tile.openstreetmap.org/12/1383/2468.png",
+    "requestfailed https://tile.openstreetmap.org/12/1383/2467.png",
+    "requestfailed https://tile.openstreetmap.org/12/1382/2468.png",
+    "requestfailed https://tile.openstreetmap.org/12/1384/2468.png",
+    "requestfailed https://tile.openstreetmap.org/12/1382/2467.png",
+    "requestfailed https://tile.openstreetmap.org/12/1384/2467.png",
+    "requestfailed https://tile.openstreetmap.org/12/1382/2469.png",
+    "requestfailed https://tile.openstreetmap.org/12/1384/2469.png",
+    "requestfailed https://tile.openstreetmap.org/12/1408/2472.png",
+    "requestfailed https://tile.openstreetmap.org/12/1408/2471.png",
+    "requestfailed https://tile.openstreetmap.org/12/1407/2472.png",
+    "requestfailed https://tile.openstreetmap.org/12/1409/2472.png",
+    "requestfailed https://tile.openstreetmap.org/12/1408/2473.png",
+    "requestfailed https://tile.openstreetmap.org/12/1407/2471.png",
+    "requestfailed https://tile.openstreetmap.org/12/1409/2471.png",
+    "requestfailed https://tile.openstreetmap.org/12/1407/2473.png",
+    "requestfailed https://tile.openstreetmap.org/12/1409/2473.png"
+  ],
+  "screenshots": [
+    "01-initial.png",
+    "02-discovered.png",
+    "03-after-calls.png",
+    "04-events-and-expect.png",
+    "05-rooted-row.png",
+    "06-final.png"
+  ]
+}

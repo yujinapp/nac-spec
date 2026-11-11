@@ -138,7 +138,10 @@
     {
       "code": "invalid",
       "emitted_by": [
-        "_v25_validateManifest"
+        "_v25_validateManifest",
+        "_v25_validateParams",
+        "_v25_validateText",
+        "registerApiHandle"
       ],
       "fix": "Read the message on the error; it names the argument and what it expected.",
       "severity": "error",
@@ -409,7 +412,7 @@
     "note": "validate_global() reports findings as named buckets of objects, not as a flat array. Since 2.5.0 every item of every bucket carries code + severity, so section 12 promise 4 covers a real set. The code and the severity below are READ off items a fixture provokes on purpose (scripts/fixture-dom.mjs), not written here: the previous version of this generator wrote them by hand and published a null for a bucket that had carried a code since 2.5.0 (audit N-14)."
   },
   "protocol": "NAC3",
-  "spec_version": "2.5",
+  "spec_version": "2.6",
   "stability": {
     "codes_are_append_only": true,
     "note": "SPEC.md section 12 promise 4: finding codes are not reused for a different condition across minor versions. This catalogue is the artefact that promise is checked against: compare two published versions and a reused code is visible.",
@@ -420,5 +423,5 @@
     "buckets": [],
     "note": "Kept for schema compatibility with 2.5.0-alpha.5 and earlier, where validate_global attached no code to any bucket. Empty since 2.5.0: every bucket is coded, and the codes are in global_buckets above (audit N-14, closed)."
   },
-  "version": "2.5.2"
+  "version": "2.6.0"
 }

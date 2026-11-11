@@ -18,6 +18,10 @@
         "name": "add_tag"
       },
       {
+        "arity": 0,
+        "name": "apiHandles"
+      },
+      {
         "arity": 3,
         "name": "assert_event_count"
       },
@@ -124,6 +128,10 @@
       {
         "arity": 0,
         "name": "describe"
+      },
+      {
+        "arity": 1,
+        "name": "describePlugin"
       },
       {
         "arity": 3,
@@ -290,6 +298,10 @@
         "name": "perf_probe"
       },
       {
+        "arity": 0,
+        "name": "plugins"
+      },
+      {
         "arity": 2,
         "name": "read"
       },
@@ -304,6 +316,10 @@
       {
         "arity": 2,
         "name": "register"
+      },
+      {
+        "arity": 2,
+        "name": "registerApiHandle"
       },
       {
         "arity": 2,
@@ -496,6 +512,10 @@
       {
         "arity": 1,
         "name": "unregister"
+      },
+      {
+        "arity": 1,
+        "name": "unregisterApiHandle"
       },
       {
         "arity": 1,
@@ -773,11 +793,11 @@
   ],
   "generated_by": "scripts/build-contract-api.mjs",
   "generated_from": {
-    "runtime_bytes": 349103,
+    "runtime_bytes": 372398,
     "runtime_path": "js/nac.js",
-    "runtime_sha384": "sha384-p/YMdtVCHBybg8MB5eTPL8LWaVQWLXARVsZtNp8eJ5Jeute2zIrmItiIDKfed/CE",
+    "runtime_sha384": "sha384-1+SNyUd5pZUlD+RMSaFhRQMfi1bkPX/G1KMAhKh+/CVf3v1lew4Pif7y7mSpP6LF",
     "spec_path": "SPEC.md",
-    "spec_sha384": "sha384-5LzdfeVBmtV1qEisjJakagOauZamTSw0LsCzJ1r31nYPaSeCRWUOQJEcNzv9DKQD"
+    "spec_sha384": "sha384-N1kxiNymGV5JizlqEAnnQfRk5UA5KktJt8PtYkk5edynMZZ/ETzIQM3zsJ+AgUot"
   },
   "locales": {
     "note": "Every label_i18n MUST cover all 10 locales (SPEC.md section 4.3). This is a requirement on the adopter manifest, not on the language of the specification.",
@@ -922,7 +942,7 @@
       "role": "button"
     }
   ],
-  "spec_version": "2.5",
+  "spec_version": "2.6",
   "surface": "contract",
-  "version": "2.5.2"
+  "version": "2.6.0"
 }

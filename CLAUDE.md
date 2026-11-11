@@ -179,13 +179,29 @@ lo que parezca urgente en la conversación. Dos reglas que ya costaron tiempo:
 * Lo que aparece de paso —un secreto en el código, un camino muerto, una regla duplicada,
   una consulta sin índice— **se registra con su evidencia**, no se arregla en el momento.
 
-## 6. El método: Urazuke -- **suspendido desde el 2026-11-07**
+## 6. El método: Urazuke -- **reactivado por decisión del 2026-11-11, interruptor todavía apagado**
 
-**Decisión del dueño, 2026-11-07** (*"Apaga el método urazuke, no le des bolilla por
+**Decisión del dueño, 2026-11-11** (*"Justamente me interesa prender la escalera urazuke.
+Es el mayor jugo que le puede servir a alignerr para entrenar sus modelos para hacer
+software."*, `docs/DECISIONS.md` **D-08**): la escalera **vuelve a estar vigente**, y el
+motivo es externo al proyecto --- el recorrido mismo, con su veredicto de máquina por
+peldaño, es lo que un entrenador de modelos puede usar.
+
+**Pero el estado del sistema todavía es el de abajo, y por eso se lee igual.** Lo que se
+apagó el 7-nov fue el interruptor de la configuración de Forge, y **sólo lo prende el
+dueño** en *Ajustes > Urazuke*. Sondeado el 2026-11-11, `yujin.urazuke.status` seguía
+contestando *"Urazuke is disabled for this Forge"*. Mientras siga así rige todo lo que
+sigue: no hay recibos y los cierres van con la salida escrita. **No se asuma el estado
+por haber leído la decisión: se sondea.** El plan recalculado con la escalera adentro
+---~135 h de modelo, ~164 h del dueño, calibradas contra la corrida medida de
+`C:/urazuke-exp`--- está en `docs/internal/AI_HANDOFF_REPORT_2026-11-11.md`, sección 2.4.
+
+**Decisión anterior, 2026-11-07** (*"Apaga el método urazuke, no le des bolilla por
 ahora. Ya lo apagué del config."*, `docs/DECISIONS.md` D-06): el método está **apagado
-en la configuración de Forge**. Suspendido *"por ahora"*, no derogado. No se lo invoque
-ni se lo cite como vigente: `yujin.urazuke.*` y **`yujin.evidence.run`** contestan
-*"Urazuke is disabled for this Forge"*.
+en la configuración de Forge**. Suspendido *"por ahora"*, no derogado --- y **D-08
+terminó ese *por ahora***. Mientras el interruptor siga apagado, `yujin.urazuke.*` y
+**`yujin.evidence.run`** contestan *"Urazuke is disabled for this Forge"*, así que no se
+los invoque esperando que respondan.
 
 Lo que eso obliga, y hay que saberlo antes de cerrar algo: **el proyecto no puede
 producir recibos de evidencia**, y el registro de pendientes exige la terna (prueba en

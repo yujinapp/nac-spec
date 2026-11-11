@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Horas IA invertidas y horas IA pendientes</title><style>body{font-family:Georgia,"Times New Roman",serif;max-width:760px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}h1,h2,h3{font-weight:600;color:#2e3a5e}table{border-collapse:collapse}td,th{border:1px solid #b8ad95;padding:6px 10px}code,pre{font-family:Consolas,monospace;background:#f5f0e6}</style></head><body>
+<h1>nac-spec: horas de IA invertidas y horas de IA pendientes</h1>
+<p><em>Medido el 2026-11-11. Cada numero de la primera parte dice de donde sale. La segunda parte es estimacion y esta marcada como tal.</em></p>
+
+<p style="border:2px solid #8b2e2e;background:#fdf6f3;padding:10px 14px"><strong>SUPERADO el mismo dia.</strong> El dueno aporto la ubicacion del desarrollo previo (<code>C:/RPAForce/nac-spec_OBSOLETO</code>) y de la obra NAC que vivio en el monorepo <code>C:/RPAForce</code>. Recalculado sobre las tres fuentes, el total pasa de ~36 h a <strong>~76 h</strong>. La cuenta corregida, el metodo y su calibracion estan en <code>docs/internal/AI_HANDOFF_REPORT_2026-11-11.md</code>. Las horas de la seccion 1 de este documento quedan historicas: estaban medidas bien sobre las fuentes que se podian ver, y dos de tres no se veian.</p>
+<h2>1. Lo invertido: ~36 horas de IA contables</h2>
+
+<table>
+<tr><th>Tramo</th><th>Herramienta</th><th>Horas IA</th><th>Como se obtuvo</th></tr>
+<tr><td>24/10/2026 al 11/11/2026</td><td>Forge</td><td><strong>21,2 h</strong> (banda 19,3 a 23,0)</td><td><strong>Medido.</strong> 56 sesiones guardadas, 15.234 mensajes con hora. Se suma el reloj entre mensaje y mensaje descartando los huecos de mas de 10 minutos; la banda sale de cambiar ese corte a 5 y a 20 minutos.</td></tr>
+<tr><td>11/05/2026 al 28/06/2026</td><td>Claude Code</td><td><strong>~15 h</strong> (banda 12 a 19)</td><td><strong>Estimado.</strong> No quedan transcripciones de ese tramo. Se agrupan los commits en sesiones y se calibra con el factor que el mismo metodo da contra el tramo medido (21,2 reales sobre 26,8 estimados = 0,79).</td></tr>
+<tr><td colspan="2"><strong>Total contable</strong></td><td><strong>~36 h</strong> (banda 31 a 42)</td><td>Suma de los dos tramos.</td></tr>
+</table>
+
+<h3>El dia a dia del tramo medido</h3>
+<p>24/10: 3,2 h &middot; 25/10: 0,3 h &middot; 26/10: 6,3 h &middot; 27/10: 5,6 h &middot; 28/10: 0,9 h &middot; 30/10: 1,6 h &middot; 07/11: 3,4 h &middot; 11/11: hoy. Dos dias concentran 12 de las 21 horas.</p>
+
+<h3>Otra forma de ver el mismo esfuerzo (medido)</h3>
+<ul>
+<li><strong>3.868</strong> turnos tuyos y <strong>6.761</strong> respuestas del modelo.</li>
+<li><strong>1.161 millones</strong> de tokens procesados (1.133 M leidos de cache, 7,4 M escritos como respuesta).</li>
+<li><strong>135</strong> commits en <strong>17</strong> dias distintos; 401.744 lineas agregadas y 18.308 borradas; 1.049 archivos hoy.</li>
+</ul>
+
+<h3>El punto ciego, dicho de frente</h3>
+<p>El primer commit de este repositorio ya traia <strong>642 archivos y 190.980 lineas</strong>, y se llama <em>"NAC3 v2.2"</em>. Todo el desarrollo de la version 1.0 a la 2.2 ocurrio <strong>antes</strong> de que existiera este repositorio y no dejo rastro local: <strong>no esta en ninguna de estas cuentas</strong>. Las 36 horas cubren de la 2.2 a la 2.5.2, no el protocolo entero.</p>
+<p>Segundo limite: "hora activa" es el reloj con la sesion viva. No separa el tiempo en que el modelo trabajo del tiempo en que vos leias lo que devolvio.</p>
+
+<h2>2. Lo pendiente: 60 items abiertos</h2>
+<p>Dos de ellos los acabo de registrar a tu pedido, y estan sumados abajo.</p>
+
+<table>
+<tr><th>Grupo</th><th>Items</th><th>Horas IA</th><th>Que hay adentro</th></tr>
+<tr><td><strong>A. Escalera Urazuke</strong><br><em>suspendida por tu decision del 07/11</em></td><td>25</td><td><strong>60 a 100 h</strong><br>(centro 75)</td><td>Las tareas N2 a 23: lectura del sistema, auditoria de deuda, candados, dimensionamiento, tests en rojo, observabilidad, rendimiento, vulnerabilidades, retrospectiva. <strong>No cuentan hasta que reactives el metodo.</strong></td></tr>
+<tr><td><strong>B. Huecos normativos y de runtime</strong></td><td>11</td><td><strong>~20 h</strong></td><td>Lo que dejo la auditoria de octubre: la opcion <em>probe</em> que el runtime nunca lee, los manifests firmados que no sabe firmar (el mas caro: 4 a 8 h solo), la forma del manifest de nivel 2, el evento de completitud de nivel 1, la portada que pinta 116 nombres y declara 50, seis acciones que nunca confirman, 57 referencias internas muertas, el boton Audio que no lleva a ningun lado.</td></tr>
+<tr><td><strong>C. Canal de publicacion y vidriera</strong></td><td>6</td><td><strong>~12 h</strong></td><td>Publicar a npm desde la cadena en vez de a mano, el NAC v1.0 viejo que se lleva el 76% de los evaluadores, las palabras clave de npm, y tres fichas de Forge que mandan a un 404.</td></tr>
+<tr><td><strong>D. Infraestructura y frontera publico/interno</strong></td><td>9</td><td><strong>~14 h</strong></td><td>Los dos candados que necesitan navegador y no corren en la cadena, que se publica y que no de los documentos de proceso, las tipografias pedidas a Google en cada visita, el formulario del tester apuntando al sandbox, la clave de firma sin passphrase, una rama muerta y dos paginas que viajan al servidor sin ser producto.</td></tr>
+<tr><td><strong>E. Medicion, licencias e investigacion</strong></td><td>6</td><td><strong>~8 h</strong></td><td>Re-medir el benchmark de 600 corridas contra la 2.5.0, dejar de contar robots como adoptantes, investigar aocr.org, el reparto de licencias, y un defecto de Forge. Incluye la sombrilla de la auditoria, que no suma horas propias.</td></tr>
+<tr><td><strong>F. Los dos nuevos</strong></td><td>2</td><td><strong>~14 h</strong></td><td><strong>PND-095 canvas:</strong> 6 a 10 h. <strong>PND-096 superficies:</strong> 2 h de inventario + 3 a 5 h despues de tu decision.</td></tr>
+<tr><td><strong>Total sin la escalera</strong></td><td><strong>35</strong></td><td><strong>~68 h</strong><br>(banda 50 a 90)</td><td>Es lo que hay por delante hoy, con Urazuke apagado.</td></tr>
+<tr><td><strong>Total con la escalera reactivada</strong></td><td><strong>60</strong></td><td><strong>~143 h</strong><br>(banda 110 a 190)</td><td>Casi cuatro veces lo invertido hasta hoy.</td></tr>
+</table>
+
+<h3>Dos cosas que esta estimacion no te puede esconder</h3>
+<ul>
+<li><strong>El ritmo medido no se sostiene.</strong> Se cerraron 36 items en 21,2 horas, es decir 0,6 h por item. Mi estimacion promedia 2 h por item: tres veces mas lento. La razon es que los baratos ya se cerraron, y lo que queda incluye criptografia en el runtime, cadena de integracion y decisiones tuyas. Si el ritmo medido se mantuviera, el pendiente sin escalera seria de 21 horas. <strong>No lo creo, y por eso no es el numero que te doy.</strong></li>
+<li><strong>16 de los 35 items (46%) no esperan horas de IA: esperan una decision tuya.</strong> Guardar o no el token de npm, la custodia de la clave de firma, que documentos son publicos, hasta donde llega el cambio de nombre, y ahora el reparto de las superficies. Esas horas no empiezan a correr hasta que decidas.</li>
+</ul>
+
+<h2>3. Los dos pendientes nuevos, y por que no existian</h2>
+
+<h3>PND-095 &mdash; Canvas (registrado, prioridad 17)</h3>
+<p><strong>Canvas no estaba sin cubrir: estaba cubierto a medias y eso no se veia.</strong> Lo que hay hoy, medido: la seccion 15 del texto normativo define el contrato de extension por plugin (registrar plugin, llamar un verbo, leer un estado, y un espejo en el DOM para leer lo que el lienzo esconde), la portada declara el limite de frente en los diez idiomas, y hay un demo que lo ejercita en un navegador sin ventana.</p>
+<p><strong>El hueco real:</strong> ese demo es un blanco que escribimos nosotros. Collabora, Figma y Excalidraw se nombran solo en la prosa del texto normativo y sus nueve traducciones; <strong>no hay un plugin de referencia en el arbol</strong>. Un adoptante con una app de lienzo real no tiene ni un ejemplo que copiar ni un recibo de que el contrato aguanta una superficie que no controlamos. La frase honesta de la vidriera &mdash;<em>"alguien todavia tiene que escribirlo"</em>&mdash; es, al mismo tiempo, la razon por la que nadie adopta NAC3 para lienzos.</p>
+
+<h3>PND-096 &mdash; Superficies no contempladas (registrado, prioridad 18, esperando tu decision)</h3>
+<p>La portada declara ocho limites y, de superficies, nombra cuatro: lienzo y WebGL, raices cerradas, marcos de otro origen, y lo-que-no-es-web. <strong>Estas siete no aparecen ni como cubiertas ni como excluidas:</strong></p>
+<ol>
+<li>Realidad extendida y 3D.</li>
+<li>Reproductores de video y audio como superficie accionable.</li>
+<li>Visores de PDF embebidos.</li>
+<li>Lienzos de mapa: mitad nodos, mitad imagenes.</li>
+<li><strong>Grillas virtualizadas</strong> que solo pintan las filas visibles. El nombre existe para la fila en pantalla y desaparece al desplazar. Es el caso mas frecuente en aplicaciones de negocio y el mas silencioso: el protocolo parece funcionar y deja de funcionar al scrollear, que es exactamente el dano silencioso que NAC3 promete eliminar.</li>
+<li>Interfaces de solo voz, sin nodos.</li>
+<li><strong>Agentes que operan por captura de pantalla.</strong> Es la alternativa directa al protocolo y la vidriera no la nombra ni para compararse.</li>
+</ol>
+<p><strong>Lo que necesito de vos:</strong> repartir esas siete entre tres puertas &mdash; entra con primitivos propios, entra por el contrato de plugin, o se declara fuera de alcance como ya se hizo con el lienzo. Hasta que eso se decida, el item no se ejecuta.</p>
+
+<h2>Como leer este documento</h2>
+<p><strong>Verificado:</strong> las 21,2 horas del tramo con Forge, los 15.234 mensajes, los 1.161 millones de tokens, los 135 commits, el tamano del primer commit, el estado de canvas en el texto normativo y en la portada, y los 60 items abiertos del registro.<br>
+<strong>Creido:</strong> las ~15 horas del tramo con Claude Code (calibradas, no medidas) y todas las horas de la seccion 2, que son estimacion de esfuerzo.<br>
+<strong>Punto ciego:</strong> el desarrollo previo a la 2.2, que no dejo rastro en este repositorio, y el reparto entre tiempo de modelo y tiempo de lectura tuyo dentro de cada hora activa.</p>
+</body></html>

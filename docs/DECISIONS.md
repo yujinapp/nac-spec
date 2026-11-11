@@ -442,6 +442,65 @@ que se vuelven cuatro --- es independiente del tráfico. La medición está en
 
 ---
 
+## D-08 -- La escalera Urazuke se vuelve a encender, y la razón es externa al proyecto
+
+**Traída al dueño:** no se trajo. El dueño lo decidió por su cuenta en la sesión
+del 2026-11-11, mientras se recalculaba el pendiente para la postulación a
+Alignerr. **Revierte D-06** --- que había suspendido el método *"por ahora"* el
+2026-11-07 --- sin contradecirla: D-06 decía *por ahora*, y acá se terminó el
+*por ahora*.
+
+**Decisión del dueño, 2026-11-11, textual:**
+
+> Justamente me interesa prender la escalera urazuke. Es el mayor jugo que le
+> puede servir a alignerr para entrenar sus modelos para hacer software.
+> Recalcula.
+
+**Qué eligió, y lo que lo hace distinto de D-06.** La escalera vuelve a estar
+vigente en este proyecto, y el motivo **no es** que el método mejore el software
+de nac-spec: es que **el recorrido de la escalera es el producto**. Lo que un
+entrenador de modelos puede usar no es el árbol terminado, es la traza: 25
+peldaños, cada uno con su consigna, sus artefactos en rutas declaradas, y un
+**veredicto de máquina** --- verde o rojo --- que no sale del resumen del agente.
+Eso convierte a este proyecto en un generador de trayectorias etiquetadas, y es
+la razón por la que se paga el costo del método en vez de ahorrarlo.
+
+**Consecuencia inmediata, y hay que decirla porque todavía no está hecha.** Lo
+que el dueño apagó el 2026-11-07 fue el **interruptor de la configuración de
+Forge**, no una regla escrita. Sondeado el 2026-11-11 a las 17:5x UTC,
+`yujin.urazuke.status` seguía contestando *"Urazuke is disabled for this Forge
+(Settings > Urazuke)"*. **La decisión está tomada y el interruptor sigue
+apagado**: lo prende el dueño en *Ajustes > Urazuke*, igual que lo apagó. Hasta
+que lo prenda, `yujin.urazuke.*` y `yujin.evidence.run` siguen negándose y los
+cierres siguen usando la salida escrita (`sin_recibos_porque`), contados como
+excepción. Esta entrada queda escrita **antes** de que el interruptor cambie,
+para que una sesión futura no lea la decisión y suponga el estado.
+
+**Consecuencia sobre el plan, medida y no supuesta.** El reporte de handoff
+declaraba la escalera como una banda **adivinada** de 60 a 100 horas de modelo.
+En el mismo turno el dueño aportó el insumo que faltaba --- `C:/urazuke-exp`, el
+experimento donde un sistema mucho más chico recorrió la escalera entera --- y
+con eso la banda se reemplazó por una estimación calibrada contra una corrida
+medida: el brazo C1 cerró **los 24 peldaños en 44 turnos y 2.790 minutos de
+reloj** (46,5 h), partiendo de 36 archivos y 5.920 líneas y terminando en 550
+archivos, 66.342 líneas y **101 candados**. Escalado a nac-spec --- 85.076 líneas
+de código único, 48 scripts, 273 páginas generadas y diez idiomas --- la escalera
+pasa a **~135 horas de modelo** y **~164 horas del dueño**, y el pendiente
+completo pasa de ~230 a **~400 horas del dueño**. El detalle, peldaño por
+peldaño, está en `docs/internal/AI_HANDOFF_REPORT_2026-11-11.md`, sección 2.4.
+
+**Lo que esta decisión NO decide.** No decide el reparto de las siete superficies
+(**PND-096**), que sigue siendo la pregunta que mueve el total entre 320 y 510
+horas. No decide si nac-spec se postula efectivamente a Alignerr. Y no promete
+que el método mejore el resultado: el experimento que lo mide **falsó su propia
+hipótesis central** --- los dos brazos comparados satisficieron 27 de 27
+criterios de aceptación, idéntico --- y eso viaja escrito en el reporte, porque un
+comprador que lo descubra solo deja de creer el resto.
+
+---
+
+---
+
 *Producido en la estación N2 de la escalera Urazuke. Una entrada de este archivo
 no se edita después de escrita: si el dueño cambia de opinión, se agrega una
 entrada nueva con la fecha nueva y la anterior queda como historia.*

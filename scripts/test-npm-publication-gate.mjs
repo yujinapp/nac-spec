@@ -329,26 +329,47 @@ async function main() {
     resolved.out);
 
   /* To prove the content really comes from the ref we need a ref where
-     a published file is KNOWN to differ from today's tree, and we must
-     not hardcode a commit: the suite would then rot the next time
-     history moves. The parent of the last commit that changed
-     runtime/package.json differs in that file by definition of
-     "changed". The tarball above is built from the working tree, so a
-     gate honouring the ref must report package.json -- and one quietly
-     reading the working tree cannot. */
+     a published file is KNOWN to differ from today's tree, and whose
+     runtime/package.json declares the SAME version -- otherwise the
+     gate refuses for the version instead of the file and this case
+     measures nothing.
+     This used to be mined from history (the parent of the last commit
+     that touched runtime/package.json). That rots on exactly one day:
+     the day of a release. After a version bump, every ancestor
+     declares a DIFFERENT version and the only ref declaring this one is
+     HEAD, which is byte-identical to the tree -- so the case went red
+     over a correct release, which is the failure mode this whole suite
+     exists to refuse. Measured 2026-11-11 on the 2.6.0 cut.
+     So the witness is BUILT instead: a commit object written with
+     plumbing, off to one side, whose runtime/package.json differs from
+     the tree by one added line and whose version is the tree's. It
+     touches no branch, no index and no working file, and it cannot
+     rot, because nothing about it depends on what history happens to
+     hold today. */
   let olderRef = null;
   try {
-    const last = execFileSync('git', ['log', '-1', '--format=%H', '--', 'runtime/package.json'],
-      { cwd: ROOT, encoding: 'utf8' }).trim();
-    const parent = execFileSync('git', ['rev-parse', last + '^'], { cwd: ROOT, encoding: 'utf8' }).trim();
-    execFileSync('git', ['cat-file', '-e', parent + ':runtime/package.json'], { cwd: ROOT });
-    olderRef = parent;
+    const idx = join(ROOT, '.tmp', 'npm-gate-witness-index');
+    const env = { ...process.env, GIT_INDEX_FILE: idx };
+    const git = (args, opts = {}) =>
+      execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', env, ...opts }).trim();
+    git(['read-tree', 'HEAD']);
+    const pkg = execFileSync('git', ['show', 'HEAD:runtime/package.json'],
+      { cwd: ROOT, encoding: 'utf8' });
+    /* One added line, inside the JSON object, that is not the version:
+       enough for a byte comparison to report package.json and nothing
+       else. */
+    const altered = pkg.replace('\n  "name"', '\n  "_witness_only": "built by test-npm-publication-gate.mjs",\n  "name"');
+    if (altered === pkg) throw new Error('could not alter runtime/package.json for the witness');
+    const blob = git(['hash-object', '-w', '--stdin'], { input: altered });
+    git(['update-index', '--add', '--cacheinfo', '100644,' + blob + ',runtime/package.json']);
+    const tree = git(['write-tree']);
+    olderRef = git(['commit-tree', tree, '-p', 'HEAD', '-m', 'synthetic witness for test-npm-publication-gate.mjs']);
   } catch (e) {
     olderRef = null;
   }
   assert(!!olderRef,
-    'a ref whose runtime/package.json differs from the tree can be resolved from history',
-    'without one this case cannot distinguish the ref from the working tree; is this a shallow clone?');
+    'a witness ref whose runtime/package.json differs from the tree can be built',
+    'without one this case cannot distinguish the ref from the working tree');
   if (olderRef) {
     const atOlder = await runGate(['--witness-ref', olderRef]);
     assert(atOlder.code !== 0 && atOlder.out.indexOf('package.json differs') >= 0,

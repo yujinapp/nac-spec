@@ -233,6 +233,19 @@ async function main() {
     ['declares "CHANGELOG.md" as published and the tarball does not contain it'],
   );
 
+  /* ---- 5b. the attribution file, specifically ----
+     Same code path as case 5, given its own red on purpose: the NOTICE
+     is the only vehicle by which Apache-2.0 section 4(d) carries the
+     author's name into a derivative's documentation or screen, and a
+     publication that silently drops it strips the attribution from
+     every adopter downstream. A generic "a declared file is missing"
+     red proves the mechanism; this one proves THIS file is under it. */
+  await expectRed(
+    '5b. RED -- the package does not ship the NOTICE (the attribution of 4(d))',
+    (e) => e.filter((x) => x.name !== 'package/NOTICE'),
+    ['declares "NOTICE" as published and the tarball does not contain it'],
+  );
+
   /* ---- 6. a shipped file nobody declared ----
      This is the direction a file-list comparison usually forgets, and
      it is the shape of an accident: a stray build artefact, an

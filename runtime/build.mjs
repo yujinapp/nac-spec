@@ -772,12 +772,16 @@ function main() {
   try { fs.chmodSync(path.join(DIST_DIR, 'cli.js'), 0o755); } catch (_) {}
   console.log('built: cli.js + cli-url.mjs + cli-lint.mjs + cli-levels.json');
 
-  // Copy SPEC.md + LICENSE for npm publish (files: dist/ + tracked).
+  // Copy SPEC.md + LICENSE + NOTICE for npm publish (files: dist/ + tracked).
+  // The root copy is the only producer: a NOTICE maintained twice by hand
+  // is the attribution drifting between the site and the package.
   const specSrc = path.resolve(__dirname, '..', 'SPEC.md');
   const licSrc  = path.resolve(__dirname, '..', 'LICENSE');
+  const notSrc  = path.resolve(__dirname, '..', 'NOTICE');
   if (fs.existsSync(specSrc))  write(path.join(__dirname, 'SPEC.md'),  read(specSrc));
   if (fs.existsSync(licSrc))   write(path.join(__dirname, 'LICENSE'),  read(licSrc));
-  console.log('synced: SPEC.md + LICENSE');
+  if (fs.existsSync(notSrc))   write(path.join(__dirname, 'NOTICE'),   read(notSrc));
+  console.log('synced: SPEC.md + LICENSE + NOTICE');
 
   console.log('');
   console.log('build complete. Try: node test/smoke.mjs');

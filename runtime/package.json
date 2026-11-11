@@ -60,6 +60,7 @@
     "dist/",
     "README.md",
     "LICENSE",
+    "NOTICE",
     "SPEC.md",
     "CHANGELOG.md",
     "contract-head.json"

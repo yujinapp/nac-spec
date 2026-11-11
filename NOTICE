@@ -1,0 +1,15 @@
+NAC3 -- Native Agent Contract
+nac-spec: protocol specification and reference runtime
+https://yujin.app/nac-spec/
+
+Copyright 2026 Pablo Kuschniroff <pablo.kuschnirof@gmail.com>
+Published under the name Yujin (rpaforce.com).
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file in
+this distribution, or http://www.apache.org/licenses/LICENSE-2.0
+
+This product includes software developed by Pablo Kuschniroff.
+
+Section 4(d) of the License requires a Derivative Work to reproduce the
+attribution above in its own NOTICE file, in its documentation, or
+within a display it generates.

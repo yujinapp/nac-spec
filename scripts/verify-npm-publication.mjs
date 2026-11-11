@@ -243,7 +243,8 @@ for (const pattern of [...(manifest.files || []), ...ALWAYS]) {
  * ---------------------------------------------------------------- */
 
 const TEXT = /\.(js|mjs|cjs|json|md|ts|txt|map|yml|yaml)$/i;
-const isText = (rel) => TEXT.test(rel) || rel === 'LICENSE' || rel.endsWith('/LICENSE');
+const isText = (rel) => TEXT.test(rel) || rel === 'LICENSE' || rel.endsWith('/LICENSE')
+  || rel === 'NOTICE' || rel.endsWith('/NOTICE');
 
 const lf = (buf) => buf.toString('utf8').split('\r\n').join('\n');
 

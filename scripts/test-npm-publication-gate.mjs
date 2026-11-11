@@ -347,6 +347,7 @@ async function main() {
      rot, because nothing about it depends on what history happens to
      hold today. */
   let olderRef = null;
+  let witnessError = null;
   try {
     const idx = join(ROOT, '.tmp', 'npm-gate-witness-index');
     /* .tmp/ is gitignored, so it exists on a worked-in checkout and
@@ -356,7 +357,20 @@ async function main() {
        passing on the machine that wrote it. Measured 2026-11-11, run
        43118999733. */
     mkdirSync(dirname(idx), { recursive: true });
-    const env = { ...process.env, GIT_INDEX_FILE: idx };
+    /* The identity is declared here, not read from the host. A runner
+       has no user.name/user.email, so commit-tree refused with "empty
+       ident name" and the witness could not be built -- again green on
+       the author's machine and red on CI. Measured 2026-11-11, run
+       43119426033. Declaring it also makes the synthetic commit
+       independent of whoever runs the suite. */
+    const env = {
+      ...process.env,
+      GIT_INDEX_FILE: idx,
+      GIT_AUTHOR_NAME: 'npm-gate-witness',
+      GIT_AUTHOR_EMAIL: 'npm-gate-witness@localhost',
+      GIT_COMMITTER_NAME: 'npm-gate-witness',
+      GIT_COMMITTER_EMAIL: 'npm-gate-witness@localhost',
+    };
     const git = (args, opts = {}) =>
       execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', env, ...opts }).trim();
     git(['read-tree', 'HEAD']);
@@ -373,10 +387,15 @@ async function main() {
     olderRef = git(['commit-tree', tree, '-p', 'HEAD', '-m', 'synthetic witness for test-npm-publication-gate.mjs']);
   } catch (e) {
     olderRef = null;
+    /* Why it could not be built is the whole diagnosis. Swallowed, the
+       failure says only "without one this case cannot distinguish",
+       which cost two CI rounds on 2026-11-11. */
+    witnessError = (e && (e.stderr || e.message) || String(e)).toString().trim();
   }
   assert(!!olderRef,
     'a witness ref whose runtime/package.json differs from the tree can be built',
-    'without one this case cannot distinguish the ref from the working tree');
+    'without one this case cannot distinguish the ref from the working tree'
+      + (witnessError ? '\n        git refused: ' + witnessError : ''));
   if (olderRef) {
     const atOlder = await runGate(['--witness-ref', olderRef]);
     assert(atOlder.code !== 0 && atOlder.out.indexOf('package.json differs') >= 0,

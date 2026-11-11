@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Enganches que faltan -- 7 superficies</title><style>body{font-family:Georgia,"Times New Roman",serif;max-width:760px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.6}h1,h2,h3{font-weight:600;color:#2e3a5e}table{border-collapse:collapse}td,th{border:1px solid #b8ad95;padding:6px 10px}code,pre{font-family:Consolas,monospace;background:#f5f0e6}</style></head><body>
+<h1>Los enganches que faltan</h1>
+<p><strong>Medición del 11 de noviembre de 2026.</strong> Pregunta: ¿las siete superficies nuevas se pueden construir enteras sobre el contrato de extensión de la sección 15, sin tocar el núcleo público, para que vivan en otro repositorio con otra licencia?</p>
+
+<blockquote><p><strong>Respuesta corta: casi.</strong> Ninguna de las siete necesita un mecanismo de ruteo nuevo — los ocho backends publicados alcanzan para <em>llegar</em> a la aplicación en los siete casos. Lo que falta no es cómo hablarle a la app: es <strong>cómo el agente encuentra y entiende</strong> lo que el plugin declara. Son <strong>seis enganches compartidos</strong> por las siete superficies, no uno por superficie.</p></blockquote>
+
+<h2>Lo que ya funciona (verificado, no de palabra)</h2>
+<ul>
+<li>Las cinco primitivas están exportadas en la 2.5.2: registrar, invocar, leer, suscribir, desuscribir. Un repositorio aparte engancha <strong>sin tocar un byte del núcleo</strong>.</li>
+<li>La batería del contrato corre en verde: <strong>STAGE-8 PASS</strong>, con los ocho backends ejercitados.</li>
+<li>La <strong>confirmación del efecto</strong> ya sirve para una superficie de lienzo: <code>expect</code> y <code>diff</code> funcionan sobre estado de plugin, y <code>expect</code> acepta un comparador propio — así que un estado continuo (posición de un video, centro de un mapa) se confirma por tolerancia y no por igualdad. Era la duda más grande y está resuelta.</li>
+<li><strong>Sin DOM también funciona</strong>: registrar + invocar por API + sondeo no tocan el documento en ningún punto. Una superficie sin un solo nodo es mecánicamente operable hoy.</li>
+<li>La cadena entera quedó en verde después de escribir esto: <code>check:release</code>, salida 0.</li>
+</ul>
+
+<h2>Los seis enganches, en orden de peso</h2>
+<table>
+<thead><tr><th>#</th><th>Qué falta</th><th>Por qué importa</th><th>Horas de modelo</th></tr></thead>
+<tbody>
+<tr><td><strong>E-1</strong></td><td>El registro de plugins <strong>no se puede enumerar</strong>: lo leen sólo las tres funciones que lo usan. No hay forma de preguntarle al runtime qué plugins hay.</td><td><strong>Bloqueante número uno del plan modular.</strong> El agente llega a la página, lee lo que el DOM declara, y la superficie de lienzo queda <strong>invisible</strong>. El plugin existe y nadie lo encuentra.</td><td>5 a 8</td></tr>
+<tr><td><strong>E-2</strong></td><td>El manifest de plugin <strong>no se describe a sí mismo</strong>: sin etiqueta humana, sin pista y <strong>sin declaración de los argumentos</strong>. Y las tres piezas de voz y navegación de la 2.5 resuelven sólo contra el DOM.</td><td>En <strong>cuatro</strong> de las siete superficies lo accionable <strong>es el argumento</strong>: una coordenada y un zoom, un instante, una página, una pose. Hoy nada declara su forma ni sus unidades. Un proyecto voice-first no puede nombrar en voz alta un verbo sin etiqueta.</td><td>6 a 10</td></tr>
+<tr><td><strong>E-3</strong></td><td>No hay backend para una <strong>fuente de eventos real</strong> que no sea un marco embebido. Un emisor de librería (el mapa que terminó de moverse, el video que avanzó) sólo entra por sondeo cada 250 ms.</td><td>Toca seis de las siete. Hay salida sin tocar el núcleo — un nodo espejo oculto que el adoptante actualiza — pero es pegamento a mano que el texto no nombra.</td><td>2 a 3 (declarar el patrón) ó 5 a 8 (backend nuevo, y <strong>obliga a subir la especificación a 2.6</strong>)</td></tr>
+<tr><td><strong>E-4</strong></td><td>La llamada por API llega <strong>sólo a lo que está colgado del navegador</strong> y pasa <strong>un solo argumento</strong>: sin orden posicional.</td><td>Media API de librería con dos argumentos no se puede expresar, y un objeto interno de React no se puede alcanzar — un caso que la <em>propia motivación</em> de la sección 15 dice cubrir.</td><td>4 a 6</td></tr>
+<tr><td><strong>E-5</strong></td><td><strong>Defecto, no decisión.</strong> La suscripción por mutación devuelve un handle válido y <strong>nunca dispara</strong> cuando su nodo espejo no está en pantalla.</td><td>Es el ciclo de vida exacto de una fila virtualizada: éxito y silencio. <strong>El daño silencioso que el protocolo existe para eliminar, adentro del protocolo.</strong> Registrado como PND-110.</td><td>2 a 4</td></tr>
+<tr><td><strong>E-6</strong></td><td>Un plugin <strong>no tiene código de error propio declarado</strong>. Mecánicamente funciona; el texto presenta una lista cerrada que no lo nombra.</td><td>Es el único mecanismo por el que una grilla puede distinguir «esa fila no está montada» de «esa fila no existe» — justo lo que su propia aceptación exige. Hoy funciona <em>por accidente</em>.</td><td>1 a 2</td></tr>
+<tr><td></td><td colspan="2"><strong>Total</strong></td><td><strong>20 a 38 h</strong></td></tr>
+</tbody>
+</table>
+
+<h2>Superficie por superficie</h2>
+<table>
+<thead><tr><th>Superficie</th><th>¿Alcanza la sección 15?</th></tr></thead>
+<tbody>
+<tr><td><strong>SUP-1</strong> grillas virtualizadas</td><td>Alcanza <strong>con E-5 y E-6</strong>. Sin ellos repite el daño silencioso.</td></tr>
+<tr><td><strong>SUP-2</strong> computer use</td><td><strong>No es una superficie</strong>: es una comparación medida. Cero enganches.</td></tr>
+<tr><td><strong>SUP-3</strong> mapas</td><td>Alcanza. Leaflet y Mapbox tienen API pública y estable. Necesita E-2 y E-4.</td></tr>
+<tr><td><strong>SUP-4</strong> reproductores</td><td>Alcanza, y la confirmación del instante ya está resuelta por el comparador de tolerancia.</td></tr>
+<tr><td><strong>SUP-5</strong> PDF</td><td>Alcanza <strong>para un visor basado en DOM</strong>. El visor nativo del navegador no lo arregla ningún enganche: no expone nada.</td></tr>
+<tr><td><strong>SUP-6</strong> voz sin nodos</td><td>Mecánicamente <strong>ya funciona hoy</strong> sin DOM. Pero <strong>E-1 y E-2 son la superficie entera</strong>: sin DOM que leer, el manifest es todo lo que hay.</td></tr>
+<tr><td><strong>SUP-7</strong> XR y 3D</td><td>Alcanza sin enganches nuevos. El costo está en el plugin, no en el núcleo.</td></tr>
+</tbody>
+</table>
+
+<h2>Cinco discrepancias que aparecieron de paso, y no se tocaron</h2>
+<p>Van al registro como <strong>D-09 a D-13</strong>, porque una diferencia entre el código y el texto normativo <strong>la decide el dueño</strong>, no se arregla en silencio. Dos no son decoración: una es justo el modo de lectura que hace falta para leer el estado de una librería (está implementado y no declarado), y la otra es el mecanismo del error distinguible de las grillas.</p>
+
+<h2>El calendario, que es lo que cambia la decisión</h2>
+<p>Por el razonamiento de la sección 10 de la lectura del contrato — lo que entre al repositorio público <em>durante</em> el término es de titularidad discutible —, estos enganches <strong>se publican antes de firmar</strong>, y después no entra un solo commit a nac-spec. Orden: E-1, E-2, E-5, E-6, E-4, y E-3 al final porque es el único que puede obligar a subir la versión de la especificación.</p>
+<p><strong>Cómo se leen esas 20 a 38 horas:</strong> no se suman a las ~400 del pendiente. Hoy están escondidas adentro del costo «puerta de plugin» de cada una de las siete fichas; sacarlas afuera las cobra <strong>una sola vez</strong> y baja el costo de cada superficie. Lo que cambia es que tienen que pasar <strong>primero</strong>: no es firmar y empezar, es alrededor de una semana de modelo de publicación previa.</p>
+
+<h2>El punto ciego, dicho de frente</h2>
+<p>Esta medición es <strong>de lectura</strong>. Leí la sección 15 entera, la implementación entera y corrí su batería, pero <strong>no construí</strong> un plugin de mapa, de video ni de grilla. Eso es PND-095, que sigue abierto: el contrato nunca se ejercitó contra una app real, sólo contra un blanco sintético que escribimos nosotros. El recibo de que el camino cierra de verdad es un plugin de referencia — un mapa de Leaflet es el blanco más barato y sirve para dos cosas a la vez.</p>
+
+</body></html>

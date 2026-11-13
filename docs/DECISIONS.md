@@ -487,7 +487,8 @@ archivos, 66.342 líneas y **101 candados**. Escalado a nac-spec --- 85.076 lín
 de código único, 48 scripts, 273 páginas generadas y diez idiomas --- la escalera
 pasa a **~135 horas de modelo** y **~164 horas del dueño**, y el pendiente
 completo pasa de ~230 a **~400 horas del dueño**. El detalle, peldaño por
-peldaño, está en `docs/internal/AI_HANDOFF_REPORT_2026-11-11.md`, sección 2.4.
+peldaño, vivía en el reporte de traspaso del 11-nov, dado de baja del árbol el
+2026-11-13; queda en la historia de git.
 
 **Lo que esta decisión NO decide.** No decide el reparto de las siete superficies
 (**PND-096**), que sigue siendo la pregunta que mueve el total entre 320 y 510

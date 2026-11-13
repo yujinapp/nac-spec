@@ -7,7 +7,7 @@ que una superficie nueva viva en **otro repositorio, con otro nombre y otra
 licencia**, enganchada al NAC3 Apache por el contrato de la seccion 15.
 
 Documentos relacionados:
-`docs/internal/ALIGNERR_CONTRATO_CONSECUENCIAS_2026-11-11.md` (secciones 10 y 11) · `docs/DISCREPANCIES.md` D-09 a D-13 y H-7 / H-8 · PND-096
+`docs/DISCREPANCIES.md` D-09 a D-13 y H-7 / H-8 · PND-096
 (la compuerta de las siete superficies) · PND-095 (el contrato nunca se ejercito
 contra una app real).
 

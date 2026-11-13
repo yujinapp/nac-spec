@@ -198,7 +198,8 @@ contestando *"Urazuke is disabled for this Forge"*. Mientras siga así rige todo
 sigue: no hay recibos y los cierres van con la salida escrita. **No se asuma el estado
 por haber leído la decisión: se sondea.** El plan recalculado con la escalera adentro
 ---~135 h de modelo, ~164 h del dueño, calibradas contra la corrida medida de
-`C:/urazuke-exp`--- está en `docs/internal/AI_HANDOFF_REPORT_2026-11-11.md`, sección 2.4.
+`C:/urazuke-exp`--- vivía en el reporte de traspaso del 11-nov, dado de baja del
+árbol el 2026-11-13; el detalle queda en la historia de git.
 
 **Decisión anterior, 2026-11-07** (*"Apaga el método urazuke, no le des bolilla por
 ahora. Ya lo apagué del config."*, `docs/DECISIONS.md` D-06): el método está **apagado

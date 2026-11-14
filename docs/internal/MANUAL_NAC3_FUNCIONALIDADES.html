@@ -1,0 +1,3306 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual operativo de NAC3 — funcionalidad por funcionalidad</title>
+<meta name="nac3-doc-slug" content="manual-funcionalidades-es">
+<meta name="nac3-spec-version" content="2.6">
+<style>
+:root{
+  --cp:#F7F4EC; --cs:#FFFFFF; --csu:#EFE9DC; --cm:#EAE6DA;
+  --cbs:#E4DCCB; --cb:#DDD4C2; --cbst:#C8C0AC;
+  --ct:#1C1A17; --ct2:#5A554B; --ct3:#847D6F; --ctd:#A8A092;
+  --ci:#B7410E; --ci50:#F7ECE4; --ci100:#E7C6B4; --cim:#C8643B; --cid:#7D2C09;
+  --ctl:#0F6E66; --ctl50:#E2F5F3;
+  --ca:#9A7B3F; --ca50:#F6EEDD; --ca400:#B8923D;
+  --ccr:#943020; --ccr50:#FCEEE9;
+  --font-sans:"DM Sans",system-ui,-apple-system,"Segoe UI",Helvetica,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-jp:"Noto Serif JP","Yu Mincho",serif;
+  --font-mono:"JetBrains Mono",Consolas,"Courier New",monospace;
+  --rmd:8px; --rlg:12px; --rxl:16px;
+  --shsm:0 1px 2px rgba(26,24,21,.05);
+  --shmd:0 4px 16px rgba(26,24,21,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cp);color:var(--ct);font-family:var(--font-sans);
+     font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-left:clamp(1rem,4vw,3rem);padding-right:clamp(1rem,4vw,3rem)}
+h1,h2,h3,h4{font-family:var(--font-serif);font-weight:600;line-height:1.18;letter-spacing:-.01em;margin:0}
+code{font-family:var(--font-mono);font-size:.87em;background:var(--csu);padding:.12em .36em;border-radius:4px}
+pre{font-family:var(--font-mono);font-size:12.6px;line-height:1.6;background:#211F1B;color:#EDE7DA;
+    padding:14px 16px;border-radius:var(--rmd);overflow-x:auto;margin:0;border:1px solid #38342C}
+pre code{background:transparent;padding:0;font-size:inherit;color:inherit}
+a{color:var(--ci);text-decoration:none;border-bottom:1px solid var(--ci100)}
+a:hover{border-bottom-color:var(--ci)}
+hr{border:0;border-top:1px solid var(--cbs);margin:2.6rem 0}
+
+.top{border-bottom:1px solid var(--cbs);background:rgba(247,244,236,.94);
+     position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.top .wrap{display:flex;align-items:center;gap:.9rem;padding-top:.65rem;padding-bottom:.65rem;flex-wrap:wrap}
+.top .yujin{font-family:var(--font-jp);font-size:1.2rem;font-weight:300;letter-spacing:.03em}
+.top .nac{font-size:.9rem;font-weight:500;color:var(--ci)}
+.top .sp{flex:1}
+.top nav a{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+           color:var(--ct2);border:0;margin-left:.9rem}
+.top nav a:hover{color:var(--ci)}
+
+.hero{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--cbs)}
+.kanji-big{font-family:var(--font-jp);font-weight:300;color:var(--ca);
+           font-size:clamp(2.4rem,5.5vw,3.8rem);line-height:1;letter-spacing:.09em;margin-bottom:.5rem}
+.eyebrow{font-family:var(--font-mono);font-size:.71rem;letter-spacing:.15em;text-transform:uppercase;
+         color:var(--ci);margin:0 0 .9rem}
+.hero h1{font-size:clamp(1.9rem,4.2vw,2.9rem);max-width:24ch}
+.hero .lede{font-family:var(--font-serif);font-size:clamp(1.02rem,2vw,1.2rem);color:var(--ct2);
+            max-width:64ch;margin:1.1rem 0 1.3rem}
+.vbadge{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.74rem;
+        background:var(--ctl50);color:var(--ctl);border:.5px solid rgba(15,110,102,.25);
+        border-radius:999px;padding:.24rem .72rem;margin:0 .4rem .5rem 0}
+.vbadge.gold{background:var(--ca50);color:var(--cid);border-color:rgba(154,123,63,.3)}
+
+.box{border-radius:var(--rmd);padding:.95rem 1.15rem;margin:1.4rem 0;font-size:14.4px}
+.box p{margin:.45rem 0}
+.box p:first-child{margin-top:0}
+.box p:last-child{margin-bottom:0}
+.box ul{margin:.5rem 0;padding-left:1.3rem}
+.box .lbl{display:block;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;
+          text-transform:uppercase;margin-bottom:.4rem}
+.box-r{background:var(--ci50);border-left:3px solid var(--ci)}
+.box-r .lbl{color:var(--cid)}
+.box-t{background:var(--ctl50);border-left:3px solid var(--ctl)}
+.box-t .lbl{color:var(--ctl)}
+.box-g{background:var(--ca50);border-left:3px solid var(--ca400)}
+.box-g .lbl{color:var(--cid)}
+.box-c{background:var(--ccr50);border-left:3px solid var(--ccr)}
+.box-c .lbl{color:var(--ccr)}
+.box-n{background:var(--cs);border:1px solid var(--cbs)}
+.box-n .lbl{color:var(--ct3)}
+
+table{border-collapse:collapse;width:100%;margin:1.3rem 0;font-size:13.6px;background:var(--cs);
+      border:1px solid var(--cbs);border-radius:var(--rmd);overflow:hidden}
+th{background:var(--csu);font-family:var(--font-sans);font-weight:600;font-size:.76rem;
+   letter-spacing:.04em;text-transform:uppercase;color:var(--ct2);text-align:left}
+th,td{padding:.55rem .72rem;border-bottom:1px solid var(--cm);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td code{font-size:.86em}
+.tw{overflow-x:auto;margin:1.3rem 0}
+.tw table{margin:0}
+
+section.part{padding:2.6rem 0 .4rem}
+.part-h{display:flex;align-items:baseline;gap:.85rem;margin-bottom:.3rem;flex-wrap:wrap}
+.part-n{font-family:var(--font-mono);font-size:.78rem;color:var(--ca);letter-spacing:.1em}
+.part-h h2{font-size:clamp(1.4rem,3vw,1.95rem)}
+.part>p.intro{color:var(--ct2);max-width:72ch;margin:.7rem 0 1.5rem}
+h3.grp{font-size:1.15rem;margin:2.2rem 0 .2rem;color:var(--cid)}
+h3.grp+p{color:var(--ct2);max-width:72ch;margin:.4rem 0 0;font-size:14.4px}
+
+.fn{background:var(--cs);border:1px solid var(--cbs);border-radius:var(--rlg);
+    padding:1.25rem 1.35rem 1.35rem;margin:1.5rem 0;box-shadow:var(--shsm)}
+.fn-h{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:.6rem}
+.fn-n{font-family:var(--font-mono);font-size:.72rem;font-weight:500;color:var(--cs);
+      background:var(--ci);border-radius:4px;padding:.18rem .42rem;letter-spacing:.04em}
+.fn-h h3{font-size:1.1rem;flex:1;min-width:16ch}
+.cov{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.07em;text-transform:uppercase;
+     padding:.2rem .5rem;border-radius:999px;white-space:nowrap}
+.cov-in{background:var(--ctl50);color:var(--ctl);border:.5px solid rgba(15,110,102,.3)}
+.cov-out{background:var(--ca50);color:var(--cid);border:.5px solid rgba(154,123,63,.35)}
+.cov-no{background:var(--ccr50);color:var(--ccr);border:.5px solid rgba(148,48,32,.3)}
+.sig{background:var(--csu);border:1px solid var(--cbs);border-left:3px solid var(--ca400);
+     border-radius:var(--rmd);padding:.6rem .8rem;margin:.85rem 0;font-family:var(--font-mono);
+     font-size:12.5px;line-height:1.8;overflow-x:auto;white-space:pre}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin:1rem 0}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.pane h4{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+         color:var(--ct3);margin-bottom:.4rem;font-weight:500}
+.pane h4 b{color:var(--ci);font-weight:500}
+.pane h4 i{color:var(--ctl);font-style:normal}
+.cmd{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;background:var(--ctl50);
+     border-left:3px solid var(--ctl);border-radius:var(--rmd);padding:.55rem .8rem;margin:.9rem 0 0}
+.cmd .cl{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;
+         color:var(--ctl);font-weight:500}
+.cmd code{background:rgba(255,255,255,.75);border:1px solid rgba(15,110,102,.18);font-size:12.4px;
+          padding:.22rem .45rem}
+.cmd .cr{font-family:var(--font-mono);font-size:.68rem;color:var(--ct3);margin-left:auto}
+.cmd.warn{background:var(--ca50);border-left-color:var(--ca400)}
+.cmd.warn .cl{color:var(--cid)}
+.cmd.warn code{border-color:rgba(154,123,63,.25)}
+.fn p{margin:.7rem 0}
+.fn p:last-child{margin-bottom:0}
+.fn ul,.fn ol{margin:.7rem 0;padding-left:1.4rem}
+.fn li{margin:.28rem 0}
+.fn .box{margin:.9rem 0 0}
+
+.toc{background:var(--cs);border:1px solid var(--cbs);border-radius:var(--rlg);padding:1.1rem 1.3rem;margin:1.6rem 0}
+.toc ol{columns:2;column-gap:2.2rem;margin:.5rem 0 0;padding-left:1.3rem;font-size:13.8px}
+@media(max-width:760px){.toc ol{columns:1}}
+.toc li{margin:.18rem 0;break-inside:avoid}
+.toc a{border:0;color:var(--ct)}
+.toc a:hover{color:var(--ci)}
+.toc .h{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ca)}
+
+footer{border-top:1px solid var(--cbs);margin-top:3rem;padding:2.2rem 0 3rem;color:var(--ct2);font-size:14px}
+footer .wrap>p{max-width:76ch}
+.divider{display:flex;align-items:center;justify-content:center;margin:2.4rem 0}
+.divider .kanji{font-family:var(--font-jp);color:var(--ca);font-size:1.3rem;font-weight:300;opacity:.8;margin:0 1.2rem}
+.divider .ln{flex:1;height:1px;background:var(--cbs)}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <span class="yujin">結</span><span class="nac">nac-spec</span>
+  <span class="sp"></span>
+  <nav>
+    <a href="#p1">Modelo</a><a href="#p2">Vocabulario</a><a href="#p3">Funciones</a>
+    <a href="#p4">Batería</a><a href="#p5">Cobertura</a>
+  </nav>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <div class="kanji-big">契約</div>
+  <p class="eyebrow">Manual operativo · interno · castellano</p>
+  <h1>NAC3, funcionalidad por funcionalidad</h1>
+  <p class="lede">Qué hace cada pieza del protocolo, cómo se escribe del lado del adoptante (React),
+  cómo se consume del lado del agente (Python), y el comando exacto que la prueba.
+  Escrito para trabajar sin consultarle nada a nadie.</p>
+  <span class="vbadge">runtime 2.6.0 · especificación 2.6</span>
+  <span class="vbadge gold">medido el 2026-11-14</span>
+</div></header>
+
+<main class="wrap">
+
+<div class="box box-r">
+  <span class="lbl">Cómo leer este manual</span>
+  <p><strong>Verificado</strong> es lo que se corrió en esta máquina el 2026-11-14 y volvió con su
+  salida: la batería del runtime (453 PASS, 0 FAIL, 15 suites), la compuerta completa
+  <code>npm run check:release</code> (salida 0, 14 scripts), los cinco candados que necesitan
+  navegador, el ejecutor del demo de Leaflet (37 de 37) y las suites huérfanas que sí corren.
+  Cada ficha lleva el conteo que devolvió su suite ese día.</p>
+  <p><strong>Creído</strong> son los ejemplos de <strong>Python</strong>: los escribí para este manual,
+  <em>no</em> viven en el repositorio y <em>ninguna</em> prueba de este árbol los ejercita. No hay un
+  solo archivo <code>.py</code> en el repositorio — lo verifiqué. Son la forma correcta según el
+  contrato, no código con recibo. Lo mismo vale para los fragmentos de React que no salen textuales
+  de <code>packages/nac-react-demo/</code>.</p>
+  <p><strong>Punto ciego</strong>: el cuerpo de las funciones de resolución de <code>js/nac.js</code>
+  (8.740 líneas) no se leyó línea por línea; lo que este manual afirma sobre ellas se apoya en el
+  texto normativo y en la suite que las ejercita. Y nada de acá mide el comportamiento <em>en el
+  servidor</em>: el único recibo desde afuera es la verificación posterior al despliegue.</p>
+</div>
+
+<div class="toc">
+  <span class="h">Las cinco partes</span>
+  <ol>
+    <li><a href="#p1">El modelo mental y los dos lados</a></li>
+    <li><a href="#p2">El vocabulario: roles, atributos, eventos, idiomas</a></li>
+    <li><a href="#p3">Las funcionalidades, una por una (F01 a F34)</a></li>
+    <li><a href="#p4">La batería total, con su resultado medido</a></li>
+    <li><a href="#p5">Mapa de cobertura y puntos ciegos</a></li>
+  </ol>
+</div>
+
+<!-- ============================= PARTE 1 ============================= -->
+<section class="part" id="p1">
+<div class="part-h"><span class="part-n">PARTE 1</span><h2>El modelo mental y los dos lados</h2></div>
+<p class="intro">NAC3 es un contrato entre una interfaz web y los agentes que la manejan: corredores
+de voz, intermediarios con modelo de lenguaje, robots de automatización, herramientas de
+accesibilidad y suites de pruebas de punta a punta. No reemplaza a ARIA ni a React: se apoya
+encima de lo que ya renderizás.</p>
+
+<h3 class="grp">Las cuatro cosas que el contrato especifica</h3>
+<div class="tw"><table>
+<tr><th style="width:17%">Pieza</th><th>Qué resuelve</th><th style="width:34%">Cómo se ve</th></tr>
+<tr><td><strong>Nombres</strong></td><td>Que un agente pueda pedir «hacé clic en guardar» y eso
+resuelva a <em>un solo</em> nodo del DOM.</td><td><code>data-nac-id="invoice.save"</code> — ruta con
+puntos, única dentro del plugin, estable entre renders y entre rediseños.</td></tr>
+<tr><td><strong>Verbos</strong></td><td>Que el agente llame <code>NAC.click(id)</code> sin pegamento
+por aplicación.</td><td><code>data-nac-action="save"</code> + los verbos imperativos del runtime.</td></tr>
+<tr><td><strong>Acuse</strong></td><td>Que el agente sepa cuándo <em>terminó el efecto</em>, no cuándo
+empezó el clic.</td><td><code>nac:action:succeeded</code> y su familia determinista por rol.</td></tr>
+<tr><td><strong>Procedencia</strong></td><td>Que un sistema aguas abajo distinga un clic humano de uno
+sintetizado.</td><td><code>is_trusted</code> en el detalle del evento, y HMAC sobre el manifiesto.</td></tr>
+</table></div>
+
+<h3 class="grp">Los dos lados, y por qué este manual los separa siempre</h3>
+<p>Toda funcionalidad de NAC3 se usa desde uno de dos lugares, y confundirlos es el error más caro
+que se puede cometer leyendo la especificación.</p>
+
+<div class="two">
+  <div class="pane">
+    <h4><b>Lado A — el adoptante</b> · React, Angular, PHP, lo que sea</h4>
+    <div class="box box-r" style="margin-top:0">
+      <p>Es quien <strong>declara</strong>: pinta los cinco atributos en su propio DOM, registra un
+      manifiesto, y <strong>emite el evento de acuse</strong> cuando su efecto terminó.</p>
+      <p>Si el adoptante no emite el acuse, el agente se come el tiempo de espera y la acción queda
+      reportada como falla. Es el error de principiante número uno.</p>
+      <p>En este manual, los ejemplos de este lado van en <strong>React</strong>.</p>
+    </div>
+  </div>
+  <div class="pane">
+    <h4><i>Lado B — el agente</i> · Python, Node, un modelo, un robot</h4>
+    <div class="box box-t" style="margin-top:0">
+      <p>Es quien <strong>consume</strong>: lee el catálogo publicado (<code>NAC.describe()</code>
+      dentro de la página, o <code>api/latest/contract.json</code> desde afuera), decide, y despacha
+      <em>una</em> acción estructurada.</p>
+      <p>Nunca inventa un identificador. Si no encuentra el nombre en el árbol que le dieron,
+      pregunta en vez de adivinar.</p>
+      <p>En este manual, los ejemplos de este lado van en <strong>Python</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="box box-g">
+  <span class="lbl">El andamio de Python que usan todos los ejemplos</span>
+  <p>El runtime es JavaScript de navegador. Un agente de Python lo maneja desde afuera por una de
+  dos puertas, y las dos aparecen a lo largo del manual:</p>
+  <ul>
+    <li><strong>Puerta 1 — adentro de la página</strong>, con Playwright para Python:
+    <code>page.evaluate()</code> corre <code>window.NAC.*</code> en el contexto de la página y
+    devuelve el resultado. Es la puerta que usan las pruebas y los robots.</li>
+    <li><strong>Puerta 2 — sin navegador</strong>: el catálogo del contrato se publica como datos en
+    <code>api/latest/contract.json</code> y <code>api/latest.json</code>. Un agente que sólo necesita
+    saber <em>qué existe y cómo se llama</em> no necesita abrir un navegador.</li>
+  </ul>
+  <p>Instalación del lado de Python: <code>pip install playwright &amp;&amp; playwright install
+  chromium</code>. Este repositorio no la declara como dependencia: no hay Python acá.</p>
+</div>
+
+<p>El andamio, una sola vez. Todos los ejemplos de Python de la parte 3 asumen que esta clase está
+importada:</p>
+
+<pre><code>#!/usr/bin/env python3
+# nac_agent.py -- andamio del lado agente. NO vive en el repositorio:
+# es el codigo que este manual propone para consumir el contrato desde Python.
+import json, urllib.request
+from playwright.sync_api import sync_playwright
+
+class NacPage:
+    """Un agente que maneja una pagina NAC3 desde Python."""
+
+    def __init__(self, page):
+        self.page = page
+        self.page.wait_for_function("() => window.NAC && window.NAC.describe")
+
+    # --- lectura -------------------------------------------------------
+    def version(self):
+        return self.page.evaluate("() => [NAC.version, NAC.spec_version]")
+
+    def describe(self):
+        """El arbol: lo unico que el agente sabe de la pantalla."""
+        return self.page.evaluate("() => NAC.describe()")
+
+    def manifest(self, slug):
+        return self.page.evaluate("s => NAC.manifest(s)", slug)
+
+    # --- escritura -----------------------------------------------------
+    def call(self, verb, *args):
+        """Despacha un verbo del runtime y devuelve {ok} o {error, code}.
+           Toda falla del contrato llega como NacError; la convertimos en
+           datos para no perder el codigo, que es lo accionable."""
+        return self.page.evaluate(
+            """async ([v, a]) => {
+                 try { return { ok: true, value: await window.NAC[v](...a) }; }
+                 catch (e) { return { ok: false, code: e.code || null,
+                                      message: String(e && e.message),
+                                      candidates: e.candidates || null }; }
+               }""",
+            [verb, list(args)])
+
+    # --- acuses --------------------------------------------------------
+    def listen(self, *event_names):
+        """Arma un buzon en la pagina ANTES de actuar. El acuse es un
+           evento: si lo escuchas despues de disparar, lo perdiste."""
+        self.page.evaluate(
+            """names => {
+                 window.__bus = window.__bus || [];
+                 for (const n of names)
+                   document.addEventListener(n, e =>
+                     window.__bus.push({ type: n, detail: e.detail }));
+               }""",
+            list(event_names))
+
+    def inbox(self):
+        return self.page.evaluate("() => window.__bus || []")
+
+
+# --- Puerta 2: el catalogo, sin navegador -----------------------------
+def contract(base="https://yujin.app/nac-spec/"):
+    with urllib.request.urlopen(base + "api/latest/contract.json") as r:
+        return json.load(r)
+
+
+if __name__ == "__main__":
+    c = contract()
+    print(c["protocol"], c["version"], "spec", c["spec_version"])
+    print(len(c["roles"]), "roles,", len(c["attributes"]), "atributos,",
+          len(c["events"]), "eventos")
+    # medido el 2026-11-14 contra api/latest/contract.json del arbol:
+    #   NAC3 2.6.0 spec 2.6 / 20 roles, 48 atributos, 89 eventos</code></pre>
+
+<div class="box box-n">
+  <span class="lbl">Instalación del lado del adoptante</span>
+  <p><strong>Por paquete:</strong> <code>npm install @nac3/runtime</code>. Dos importaciones, en este
+  orden: <code>import '@nac3/runtime'</code> y después <code>import
+  '@nac3/runtime/extensions'</code>. El orden no es decorativo — el módulo de extensiones se niega a
+  instalarse y escribe un error si el núcleo no se cargó primero.</p>
+  <p><strong>Por etiqueta:</strong> <code>&lt;script src="https://yujin.app/nac-spec/js/nac.js"&gt;</code>
+  y después <code>nac-v2-extensions.js</code>.</p>
+  <p><strong>Qué trae cada uno.</strong> El núcleo trae todo lo imperativo, la introspección, las
+  capacidades, la autoridad, el versionado de instantánea, el contrato de extensión de plugin y los
+  bloques 2.5. Las extensiones traen los primitivos de migración progresiva, el HMAC, el catálogo de
+  idiomas del runtime y <strong>toda</strong> la familia de tablas de datos
+  (<code>dt_*</code>). Llamar a <code>dt_add_row</code> sin las extensiones cargadas no falla con un
+  error del contrato: es <code>undefined</code>.</p>
+</div>
+
+<div class="divider"><span class="ln"></span><span class="kanji">門</span><span class="ln"></span></div>
+</section>
+
+<!-- ============================= PARTE 2 ============================= -->
+<section class="part" id="p2">
+<div class="part-h"><span class="part-n">PARTE 2</span><h2>El vocabulario</h2></div>
+<p class="intro">Cuatro listas cerradas. Las cuatro se publican como datos en
+<code>api/latest/contract.json</code>, así que un agente no necesita leer prosa para saber qué
+existe. Los números de abajo los leí de ese archivo el 2026-11-14: <strong>20 roles, 48 atributos,
+89 eventos, 10 idiomas</strong>, versión 2.6.0, canal <code>stable</code>.</p>
+
+<h3 class="grp">Los 20 roles canónicos</h3>
+<p>Van en <code>data-nac-role</code>. Un rol fuera de esta lista hace que
+<code>NAC.register()</code> <strong>lance</strong>, porque <code>STRICT_VALIDATION</code> vale
+<code>true</code> por omisión desde la 2.3.</p>
+<div class="tw"><table>
+<tr><th style="width:17%">Rol</th><th>Qué es</th><th style="width:30%">Nota que cuesta caro no saber</th></tr>
+<tr><td><code>plugin</code></td><td>Un módulo de interfaz autocontenido: una pantalla, un panel, un
+conjunto de widgets.</td><td>Se declara con <code>data-nac-plugin="slug"</code>, no con
+<code>data-nac-role</code>.</td></tr>
+<tr><td><code>section</code></td><td>Un hito dentro del plugin: cabecera, cuerpo, pie, barra lateral.</td><td></td></tr>
+<tr><td><code>region</code></td><td>Un área nombrable dentro de una sección: un grupo de tarjetas,
+una lista de resultados.</td><td></td></tr>
+<tr><td><code>action</code></td><td>Un widget clicable que dispara un verbo.</td><td>Es el único rol
+que lleva <code>data-nac-action</code>.</td></tr>
+<tr><td><code>field</code></td><td>Una entrada que el usuario escribe o conmuta: texto, número,
+casilla, radio, fecha, archivo.</td><td></td></tr>
+<tr><td><code>option</code></td><td>Una opción seleccionable dentro de un campo.</td><td></td></tr>
+<tr><td><code>tab</code></td><td>Un selector de panel conmutable.</td><td><strong>Obligatorio</strong>
+cuando el <code>data-nac-id</code> empieza con <code>tab.</code>. Si no, salta
+<code>tab_id_manifest_role_drift</code> y el registro lanza.</td></tr>
+<tr><td><code>navigation</code></td><td>Una región de navegación.</td><td><strong>No es una pestaña</strong>,
+y está decidido que nunca lo será (sección 13 del texto normativo).</td></tr>
+<tr><td><code>breadcrumb-item</code></td><td>Un salto de la miga de pan.</td><td></td></tr>
+<tr><td><code>accordion-toggle</code></td><td>Un control de expandir/colapsar.</td><td></td></tr>
+<tr><td><code>step</code></td><td>Un indicador de paso de un asistente.</td><td></td></tr>
+<tr><td><code>pagination-item</code></td><td>Un control de salto de página.</td><td></td></tr>
+<tr><td><code>confirm-button</code></td><td>Un botón de confirmar o cancelar dentro de un diálogo.</td><td></td></tr>
+<tr><td><code>confirm-dialog</code></td><td>El modal de una confirmación.</td><td></td></tr>
+<tr><td><code>sort-control</code></td><td>Un encabezado de columna que ordena.</td><td></td></tr>
+<tr><td><code>filter-control</code></td><td>Un disparador de filtro de columna.</td><td></td></tr>
+<tr><td><code>data-table</code></td><td>El anfitrión de una tabla de datos (desde la 2.1).</td><td></td></tr>
+<tr><td><code>draggable</code></td><td>Un elemento que se puede levantar y mover.</td><td></td></tr>
+<tr><td><code>drop-target</code></td><td>Un lugar donde se puede soltar un <code>draggable</code>.</td><td></td></tr>
+<tr><td><code>button</code></td><td><strong>Tolerado, no recomendado.</strong> Un botón heredado que
+sólo necesita ser clicable.</td><td>El runtime lo trata como <code>action</code>. Preferí
+<code>action</code> con su verbo explícito.</td></tr>
+</table></div>
+
+<h3 class="grp">Los 48 atributos</h3>
+<p>Lista completa, leída de <code>api/latest/contract.json</code>. Los <strong>identificadores no se
+traducen</strong>: son idénticos letra por letra en los diez idiomas. Nota que se llaman
+<code>nac</code>, <strong>no</strong> <code>nac3</code>.</p>
+<div class="box box-n">
+<p style="font-family:var(--font-mono);font-size:12.3px;line-height:1.9">
+<code>data-nac-a11y-hint</code> <code>data-nac-a11y-hint-span-id</code> <code>data-nac-action</code>
+<code>data-nac-braille-label</code> <code>data-nac-cell</code> <code>data-nac-confirmation-message</code>
+<code>data-nac-date</code> <code>data-nac-default-hidden</code> <code>data-nac-default-state</code>
+<code>data-nac-default-value</code> <code>data-nac-drag-accept</code> <code>data-nac-drag-type</code>
+<code>data-nac-end</code> <code>data-nac-error</code> <code>data-nac-field-type</code>
+<code>data-nac-focus-pulse</code> <code>data-nac-id</code> <code>data-nac-label</code>
+<code>data-nac-lat</code> <code>data-nac-leaf</code> <code>data-nac-level</code>
+<code>data-nac-lng</code> <code>data-nac-opens</code> <code>data-nac-ordering</code>
+<code>data-nac-peek-pct</code> <code>data-nac-plugin</code> <code>data-nac-plugin-bus</code>
+<code>data-nac-plugin-id</code> <code>data-nac-plugin-state</code> <code>data-nac-position</code>
+<code>data-nac-role</code> <code>data-nac-section-visited</code> <code>data-nac-severity</code>
+<code>data-nac-shadow</code> <code>data-nac-skip-reason</code> <code>data-nac-soft</code>
+<code>data-nac-start</code> <code>data-nac-state</code> <code>data-nac-tab</code>
+<code>data-nac-ts</code> <code>data-nac-validate</code> <code>data-nac-value</code>
+<code>data-nac-verb</code> <code>data-nac-view</code> <code>data-nac-was-expanded</code>
+<code>data-nac-x</code> <code>data-nac-y</code> <code>data-nac-zoom</code>
+</p>
+</div>
+<p>De los 48, <strong>cinco son los que hay que saber de memoria</strong> porque son el mínimo de una
+adopción: <code>data-nac-plugin</code>, <code>data-nac-id</code>, <code>data-nac-role</code>,
+<code>data-nac-action</code> y <code>data-nac-label</code>. El resto son específicos de una familia
+de widget (mapa, calendario, arrastre, cajón, acordeón) o de accesibilidad.</p>
+
+<h3 class="grp">La familia de eventos por rol</h3>
+<p>Esto es lo que vuelve determinista al protocolo: cada rol tiene <em>su</em> evento de terminación,
+y <code>NAC.click()</code> espera exactamente ese. Son 89 tipos declarados en total; estos once son
+los del contrato básico.</p>
+<div class="tw"><table>
+<tr><th>Rol</th><th>Evento de éxito</th><th>Evento de falla</th></tr>
+<tr><td><code>action</code></td><td><code>nac:action:succeeded</code></td><td><code>nac:action:failed</code></td></tr>
+<tr><td><code>field</code> / <code>option</code></td><td><code>nac:field:changed</code></td><td>—</td></tr>
+<tr><td><code>tab</code></td><td><code>nac:tab:activated</code></td><td>—</td></tr>
+<tr><td><code>breadcrumb-item</code></td><td><code>nac:breadcrumb:navigated</code></td><td>—</td></tr>
+<tr><td><code>accordion-toggle</code></td><td><code>nac:accordion:expanded</code> / <code>:collapsed</code></td><td>—</td></tr>
+<tr><td><code>step</code></td><td><code>nac:step:advanced</code></td><td>—</td></tr>
+<tr><td><code>pagination-item</code></td><td><code>nac:table:page_changed</code></td><td>—</td></tr>
+<tr><td><code>confirm-button</code></td><td><code>nac:confirm:resolved</code> / <code>:cancelled</code></td><td>—</td></tr>
+<tr><td><code>sort-control</code></td><td><code>nac:table:sort_changed</code></td><td>—</td></tr>
+<tr><td><code>filter-control</code></td><td><code>nac:table:filter_changed</code></td><td>—</td></tr>
+</table></div>
+<div class="box box-c">
+  <span class="lbl">La trampa de la sección 6.3</span>
+  <p>El evento <code>click</code> del DOM dispara <strong>antes</strong> de que corra el manejador.
+  El contrato necesita saber cuándo <em>terminó el efecto</em>, no cuándo empezó el clic. De ahí
+  que exista una familia aparte. Si tu manejador es asíncrono, el acuse se emite
+  <strong>después</strong> de resolver, no antes.</p>
+</div>
+
+<h3 class="grp">Los diez idiomas y el único que manda</h3>
+<p>Todo <code>label_i18n</code> debe cubrir los diez: <code>es en pt fr ja zh hi ar de it</code>.
+Durante una migración progresiva, <code>i18n_strict: 'permissive'</code> en
+<code>NAC.autoRegister.watch()</code> acepta cobertura parcial; en producción van los diez.</p>
+<div class="box box-g">
+  <span class="lbl">Dos cosas distintas que se confunden siempre</span>
+  <p><strong>Los diez idiomas del manifiesto</strong> son un requisito sobre el adoptante: son las
+  etiquetas con las que un agente nombra un elemento en el idioma del usuario.</p>
+  <p><strong>Los diez idiomas del documento normativo</strong> son otra cosa: el inglés es el
+  normativo, las nueve traducciones son automáticas, parciales y <strong>no normativas</strong>, cada
+  una declara en un cartel qué revisión del inglés cubre, y donde difieran <strong>gana el
+  inglés</strong>. Una traducción atrasada <strong>nunca</strong> bloquea la publicación del inglés.</p>
+  <p>Medido el 2026-11-14 con <code>npm run stats:translations</code>: canónico 299 unidades / 85
+  secciones, y los nueve idiomas en 299/299 y 85/85, sin huérfanos.</p>
+</div>
+
+<h3 class="grp">Los códigos de error, que son la mitad del contrato</h3>
+<p>Todo método asíncrono rechaza con un <code>NacError</code> cuyo <code>code</code> es accionable.
+Un agente bien escrito ramifica sobre el código, nunca sobre el mensaje — la redacción de los
+mensajes es lo único que la especificación declara explícitamente <em>no</em> prometido.</p>
+<div class="tw"><table>
+<tr><th style="width:22%">Código</th><th>Qué pasó</th><th style="width:30%">Qué hace el agente</th></tr>
+<tr><td><code>not_found</code></td><td>El nombre no está en el DOM.</td><td>Volver a leer el árbol; no reintentar igual.</td></tr>
+<tr><td><code>invalid</code></td><td>La forma del argumento está mal.</td><td>Es un error del agente, no de la página.</td></tr>
+<tr><td><code>disabled</code></td><td>El elemento está deshabilitado. <strong>Sólo en
+<code>click</code></strong>: <code>invoke</code> no mira el estado deshabilitado.</td><td>Buscar qué
+habilita el control antes de insistir.</td></tr>
+<tr><td><code>hidden</code></td><td>Está fuera de pantalla, con <code>aria-hidden</code>, o sin
+dimensiones.</td><td>Abrir la pestaña o el acordeón que lo contiene.</td></tr>
+<tr><td><code>capability_required</code></td><td>El manifiesto exige una capacidad que el conjunto
+actual no satisface.</td><td>Pedir elevación, o decirle al usuario cuál es el límite.</td></tr>
+<tr><td><code>timeout</code></td><td>El efecto se despachó y el acuse no llegó: 5 s para
+<code>click</code>, 30 s para <code>invoke</code>.</td><td><strong>Es una falla real.</strong> La
+especificación lo dice en mayúsculas: tratarlo como falla salvo que tengas prueba del efecto por
+otro canal.</td></tr>
+<tr><td><code>no_matching_instance</code></td><td>Cero elementos coinciden con el calificador o el
+identificador.</td><td>Leer <code>err.candidates</code>.</td></tr>
+<tr><td><code>ambiguous_qualifier</code> · <code>ambiguous_tab</code> · <code>ambiguous_label</code></td>
+<td>Más de uno coincide. El runtime <strong>se niega</strong> en vez de elegir.</td><td>Elegir de
+<code>err.candidates</code> y volver a despachar con el identificador completo.</td></tr>
+<tr><td><code>snapshot_stale</code> · <code>version_required</code></td><td>La instantánea que traías
+quedó vieja, o no mandaste ninguna.</td><td>Volver a describir y rearmar la intención.</td></tr>
+<tr><td><code>strict_validation</code></td><td>El manifiesto tiene deriva contra el DOM.</td><td>Es
+del adoptante: leer <code>err.findings</code>.</td></tr>
+</table></div>
+<p>El contrato de extensión de plugin (parte 3, F26) agrega <strong>diez códigos propios</strong> y
+<strong>un espacio reservado</strong> para los códigos de la aplicación, con el prefijo
+<code>plugin.</code>. Están en su ficha.</p>
+
+<div class="divider"><span class="ln"></span><span class="kanji">語</span><span class="ln"></span></div>
+</section>
+
+<!-- ============================= PARTE 3 ============================= -->
+<section class="part" id="p3">
+<div class="part-h"><span class="part-n">PARTE 3</span><h2>Las funcionalidades, una por una</h2></div>
+<p class="intro">Treinta y cuatro fichas. Cada una trae: qué hace, la firma, un ejemplo de React del
+lado del adoptante, un ejemplo de Python del lado del agente, el comando exacto que la prueba, y una
+etiqueta de cobertura. Las etiquetas significan esto, y conviene mirarlas antes de confiar:</p>
+<p>
+<span class="cov cov-in">en la batería</span> &nbsp;la prueba corre con <code>cd runtime &amp;&amp;
+npm test</code> o con <code>npm run check:release</code>.<br>
+<span class="cov cov-out">fuera de la batería</span> &nbsp;la prueba existe y pasa, pero
+<strong>nadie la corre automáticamente</strong>: es una suite huérfana, o necesita navegador.<br>
+<span class="cov cov-no">sin prueba propia</span> &nbsp;ninguna prueba de este árbol la ejercita de
+forma directa.
+</p>
+<div class="box box-c">
+  <span class="lbl">Lo primero que hay que saber de la cobertura</span>
+  <p><strong>La cadena de publicación nunca corre la batería del runtime.</strong> Verificado el
+  2026-11-14 leyendo <code>.github/workflows/deploy.yml</code>: sus 24 pasos corren candados de
+  integridad, versión, contrato publicado, traducciones, hojas de estilo y punto de montaje — y
+  <strong>ninguno</strong> ejecuta <code>cd runtime &amp;&amp; npm test</code>. Las 15 suites y sus
+  453 afirmaciones corren sólo en <code>prepublishOnly</code>, es decir en el momento de publicar a
+  npm a mano, y cuando alguien las corre.</p>
+  <p>Consecuencia práctica: «la cadena está verde» <strong>no</strong> significa «el comportamiento
+  del runtime se probó en este push». La batería del runtime se corre a mano, y por eso es el primer
+  comando de la parte 4.</p>
+</div>
+
+<h3 class="grp">A · Declarar: el manifiesto y sus candados</h3>
+<p>Nada funciona antes de esto. El manifiesto es la fuente de verdad que mira el agente.</p>
+
+<section class="fn" id="f01">
+<div class="fn-h"><span class="fn-n">F01</span><h3>register · unregister · manifest · syncPlugin · list_registered_plugins</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Registra el catálogo de un plugin. <code>register</code> <strong>agrega</strong> si el slug ya
+existe; <code>syncPlugin</code> <strong>reemplaza</strong>. Esa diferencia es toda la ficha: en un
+anfitrión de página única, donde un componente se vuelve a montar, <code>register</code> dos veces
+acumula entradas duplicadas y <code>syncPlugin</code> no.</p>
+<div class="sig">NAC.register(manifest)                  → void (lanza bajo validación estricta)
+NAC.syncPlugin(manifest)                → void   /* idempotente: reemplaza */
+NAC.unregister(plugin_slug)             → void
+NAC.manifest(plugin_slug)               → Manifest | null
+NAC.list_registered_plugins()           → string[]</div>
+<p><strong>Campos obligatorios:</strong> <code>plugin_slug</code> (tiene que coincidir con el
+<code>data-nac-plugin</code> del elemento anfitrión) y <code>nac_version</code> (el runtime rechaza
+un manifiesto que declare una versión mayor que la suya). Opcionales:
+<code>elements[]</code>, <code>tabs[]</code>, <code>fields[]</code>, <code>actions[]</code>,
+<code>kpis[]</code>, <code>data_tables[]</code>. Cada entrada de <code>elements[]</code> necesita
+<code>id</code> y <code>role</code>.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — el manifiesto es un objeto estático, fuera del render</h4>
+<pre><code>// manifest.ts -- textual del patron de
+// packages/nac-react-demo/src/manifest.ts
+const li = (es,en,pt,fr,it,de,ja,zh,hi,ar) =&gt;
+  ({ es, en, pt, fr, it, de, ja, zh, hi, ar });
+
+export const TODOS_MANIFEST = {
+  plugin_slug: 'todos',
+  version:     '1.1.0',
+  nac_version: '2.3',
+  elements: [
+    { id: 'todos.input', role: 'field',
+      label_i18n: li('Texto de la tarea','Task text',
+        'Texto da tarefa','Texte de la tache',
+        'Testo attivita','Aufgabentext','タスク内容',
+        '任务内容','task ka text','نص المهمة') },
+    { id: 'todos.add', role: 'action',
+      actions: [{ verb: 'add_todo',
+        label_i18n: li('Agregar tarea','Add task',
+          'Adicionar','Ajouter','Aggiungi',
+          'Hinzufuegen','追加','添加','jodo','أضف') }],
+      label_i18n: li('Agregar','Add','Adicionar',
+        'Ajouter','Aggiungi','Hinzufuegen',
+        '追加','添加','jodo','أضف') }
+  ]
+};
+
+// useNAC.ts
+export function useNACManifest(manifest) {
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    // syncPlugin, no register: el modo estricto de React
+    // invoca el efecto dos veces en desarrollo.
+    window.NAC.syncPlugin(manifest);
+  }, [manifest.plugin_slug]);
+}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el agente lee el manifiesto, nunca lo escribe</h4>
+<pre><code>from nac_agent import NacPage
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    b = p.chromium.launch()
+    page = b.new_page()
+    page.goto("https://yujin.app/nac-spec/demos/react/")
+    nac = NacPage(page)
+
+    print(nac.version())          # ['2.6.0', '2.6']
+    slugs = page.evaluate("() =&gt; NAC.list_registered_plugins()")
+    print(slugs)                  # ['todos', 'chat', ...]
+
+    m = nac.manifest("todos")
+    # Lo UNICO que el agente debe mirar para decidir:
+    for el in m.get("elements", []):
+        verbos = [a["verb"] for a in el.get("actions", [])]
+        print(el["id"], el["role"], verbos,
+              el.get("label_i18n", {}).get("es"))
+
+    # Regla de oro: si el id que pensabas usar no esta en
+    # esta lista, NO lo despaches. Pregunta.
+    b.close()</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage9-sync-plugin.mjs</code><span class="cr">21 PASS · medido 2026-11-14</span></div>
+<div class="cmd"><span class="cl">Atajo</span><code>cd runtime &amp;&amp; npm run test:stage9</code><span class="cr">el mismo</span></div>
+</section>
+
+<section class="fn" id="f02">
+<div class="fn-h"><span class="fn-n">F02</span><h3>STRICT_VALIDATION — el registro lanza en vez de avisar</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Con <code>true</code> (el valor por omisión desde la 2.3) <code>NAC.register()</code> lanza un
+<code>Error</code> con <code>code='strict_validation'</code> y un arreglo <code>findings</code> ante
+cualquiera de estos tres hallazgos:</p>
+<ul>
+<li><code>manifest_role_unknown</code> — el rol de la entrada está fuera de los 20 canónicos.</li>
+<li><code>tab_id_manifest_role_drift</code> — el id empieza con <code>tab.</code> y el rol no es
+<code>tab</code>.</li>
+<li><code>manifest_dom_role_mismatch</code> — el <code>data-nac-role</code> del elemento montado
+difiere del rol que declara el manifiesto.</li>
+</ul>
+<div class="sig">NAC.STRICT_VALIDATION = true   /* 2.2: false (sólo avisa) · 2.3+: true (lanza) · 3.0: el interruptor desaparece */</div>
+<p>Para salir durante una migración hay que ponerlo en <code>false</code>
+<strong>antes</strong> de la primera llamada a <code>register()</code>. Después no sirve.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — la ventana de migración, y cómo cerrarla</h4>
+<pre><code>// main.tsx -- ANTES de montar la app
+import '@nac3/runtime';
+import '@nac3/runtime/extensions';
+
+// Brownfield: una sola ventana, con fecha de cierre.
+if (import.meta.env.DEV) {
+  window.NAC.STRICT_VALIDATION = false;
+}
+
+// Y en la prueba de CI, al reves: que el manifiesto
+// drift-eado rompa el build en vez de rodar a produccion.
+try {
+  window.NAC.register(LEGACY_MANIFEST);
+} catch (e) {
+  if (e.code === 'strict_validation') {
+    console.table(e.findings);  // id, rol declarado, rol del DOM
+  }
+  throw e;
+}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el agente detecta un anfitrión mal declarado</h4>
+<pre><code># Un agente no arregla el manifiesto del adoptante, pero
+# si puede DECIR que la pagina no cumple, y eso vale oro
+# en un reporte de conformidad.
+r = nac.call("register", {"plugin_slug": "roto",
+                          "nac_version": "2.6",
+                          "elements": [{"id": "x.y",
+                                        "role": "boton"}]})
+assert r["ok"] is False
+print(r["code"])      # 'strict_validation'
+print(r["message"])   # nombra manifest_role_unknown
+
+# El mismo chequeo, sin escribir nada, con el validador:
+rep = page.evaluate("() =&gt; NAC.validate_global({probe:false})")
+print(rep["ok"], rep["has_errors"])</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v22.mjs</code><span class="cr">20 PASS · medido 2026-11-14</span></div>
+</section>
+
+<section class="fn" id="f03">
+<div class="fn-h"><span class="fn-n">F03</span><h3>HARD_DEDUP — un slug, un plugin</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Con <code>true</code> (por omisión) <code>register</code> lanza ante la primera violación de
+unicidad de slug, y una pasada en el arranque pinta un cartel rojo en la página y despacha
+<code>nac:fatal</code>. El interruptor desaparece en la 2.6: la exigencia pasa a ser
+incondicional.</p>
+<div class="sig">NAC.HARD_DEDUP = true   /* poner en false ANTES de cualquier register(), una sola ventana */</div>
+<p>El hallazgo que esto produce en el validador es
+<code>duplicate_plugin_no_instance_id</code>, de severidad <code>error</code>. Dos instancias del
+mismo plugin en una página necesitan <code>data-nac-plugin-id</code> para distinguirse.</p>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage11-plugin-id-dedup.mjs</code><span class="cr">14 PASS · medido 2026-11-14</span></div>
+</section>
+
+<h3 class="grp">B · Actuar: los verbos imperativos</h3>
+<p>Los ocho verbos que escriben. Todos devuelven una promesa, todos rechazan con
+<code>NacError</code>, y todos emiten procedencia incluso cuando fallan.</p>
+
+<section class="fn" id="f04">
+<div class="fn-h"><span class="fn-n">F04</span><h3>click — disparar una acción y esperar el acuse</h3>
+<span class="cov cov-in">en la batería</span> <span class="cov cov-out">suite dedicada, huérfana</span></div>
+<p>Resuelve el par <code>(plugin, nac_id)</code> contra el registro y el DOM, chequea la compuerta de
+capacidad y la de instantánea, despacha el clic, <strong>espera el evento del contrato</strong> y
+recién entonces resuelve la promesa. El tiempo de espera por omisión es
+<code>config.default_timeout_ms</code>, que vale <strong>5000</strong>.</p>
+<div class="sig">NAC.click(nac_id, opts?)   → Promise&lt;{ok:true}&gt;
+   opts: { plugin?, expected_plugin_version?, expected_tree_version?, expected_element_state_hash? }
+   rechaza: not_found · invalid · disabled · hidden · capability_required · timeout · snapshot_stale · version_required</div>
+<div class="box box-c">
+  <span class="lbl">La falla número uno de toda adopción</span>
+  <p>Si el manejador del adoptante no emite <code>nac:action:succeeded</code>, el agente espera cinco
+  segundos y recibe <code>timeout</code>. <strong>Y la acción ocurrió.</strong> La especificación
+  obliga a tratar el tiempo de espera como falla real, así que el agente reporta una falla de algo que
+  funcionó. El arreglo es <code>NAC.bindAction</code> (F11), no subir el tiempo de espera.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — el acuse emitido a mano, y el momento exacto</h4>
+<pre><code>async function onSave() {
+  await api.saveInvoice(draft);     // el efecto REAL
+  // Recien ahora. Antes de esto, el acuse miente.
+  document.dispatchEvent(
+    new CustomEvent('nac:action:succeeded', {
+      bubbles: true, composed: true,
+      detail: { plugin: 'invoice',
+                action_id: 'invoice.save' }
+    }));
+}
+
+function onSaveFailed(err) {
+  document.dispatchEvent(
+    new CustomEvent('nac:action:failed', {
+      bubbles: true, composed: true,
+      detail: { plugin: 'invoice',
+                action_id: 'invoice.save',
+                error: err.code }
+    }));
+}
+
+&lt;button data-nac-id="invoice.save"
+        data-nac-role="action"
+        data-nac-action="save"
+        onClick={onSave}&gt;Guardar&lt;/button&gt;</code></pre>
+<p style="font-size:13.4px;color:var(--ct2);margin-top:.6rem"><code>composed:true</code> no es
+opcional si el botón vive dentro de una raíz oscura: sin eso el evento se detiene en el borde y la
+correlación del runtime nunca lo ve.</p>
+</div>
+<div class="pane"><h4><i>Python</i> — el buzón se arma antes de actuar</h4>
+<pre><code>nac.listen("nac:action:succeeded", "nac:action:failed")
+
+r = nac.call("click", "invoice.save")
+
+if r["ok"]:
+    print("acuse:", nac.inbox()[-1]["detail"])
+else:
+    # Ramificar por CODIGO, nunca por mensaje: la
+    # redaccion es lo unico que la spec NO promete.
+    c = r["code"]
+    if c == "timeout":
+        # Falla real. Puede que el efecto haya ocurrido
+        # y el anfitrion no emita el acuse: verificar
+        # por otro canal antes de reintentar.
+        raise RuntimeError("sin acuse en 5 s")
+    elif c == "hidden":
+        nac.call("tab", "invoice", "tab.lines")   # abrirlo
+    elif c == "capability_required":
+        print("falta permiso, no insistir")
+    elif c == "not_found":
+        print(nac.describe())                     # releer</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">En la batería</span><code>cd runtime &amp;&amp; node ./test/v23-shadow.mjs</code><span class="cr">11 PASS · resuelve y clica a través de raíces oscuras</span></div>
+<div class="cmd warn"><span class="cl">Acuse, dedicada</span><code>cd runtime &amp;&amp; node ./test/stage6-ack.mjs</code><span class="cr">16 PASS · <strong>huérfana</strong>: no está en <code>npm test</code></span></div>
+</section>
+
+<section class="fn" id="f05">
+<div class="fn-h"><span class="fn-n">F05</span><h3>click_by_verb — por verbo, y el calificador estricto</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Resuelve el verbo al único <code>action</code> de ese plugin y lo clica. Es el verbo que usa un
+intermediario con modelo de lenguaje: el modelo no sabe el identificador local del inquilino, sabe
+que el usuario dijo «guardar» y que el manifiesto declara el verbo <code>save</code>.</p>
+<div class="sig">NAC.click_by_verb(plugin|null, verb, opts?) → Promise&lt;...&gt;
+   opts.qualifier         : string  /* id === qualifier  ||  id.endsWith('__' + qualifier) */
+   opts.qualifier_ordinal : number  /* selección posicional en orden del DOM */</div>
+<p><strong>No hay respaldo por subcadena.</strong> Desde la 2.4 un calificador que es sólo una
+subcadena del identificador —ni igual, ni sufijo anclado con <code>__</code>— <strong>no
+coincide</strong>. Cero coincidencias lanza <code>no_matching_instance</code>; más de una lanza
+<code>ambiguous_qualifier</code>. El antiguo respaldo tolerante que resolvía a la primera
+coincidencia parecida fue <strong>eliminado</strong>, a propósito.</p>
+<div class="box box-t">
+  <span class="lbl">Por qué importa tanto</span>
+  <p>Es el invariante de <em>daño silencioso cero</em>. Para un lector de pantalla o un agente, un
+  despacho silencioso al elemento equivocado sin camino de recuperación es un bloqueante de
+  seguridad. Dos actas duplicadas con un botón «borrar» cada una: el runtime se niega y te da la
+  lista, en vez de borrar una al azar.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — múltiples instancias, con sufijo anclado</h4>
+<pre><code>{rows.map(row =&gt; (
+  &lt;button key={row.id}
+     /* el sufijo despues de __ es lo que el
+        calificador puede anclar */
+     data-nac-id={`invoice.row.delete__${row.id}`}
+     data-nac-role="action"
+     data-nac-action="delete"
+     onClick={() =&gt; remove(row.id)}&gt;
+    borrar
+  &lt;/button&gt;
+))}
+
+/* Un agente puede ahora:
+   click_by_verb('invoice','delete',{qualifier:'INV-7'})
+   y eso resuelve a invoice.row.delete__INV-7.
+   Con solo 'INV' no resuelve nada: es subcadena. */</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el ciclo de desambiguación completo</h4>
+<pre><code>r = nac.call("click_by_verb", "invoice", "delete")
+
+if not r["ok"] and r["code"] == "ambiguous_qualifier":
+    # err.candidates es la lista REAL, validada contra
+    # el DOM: cada entrada es {nac_id, label}.
+    for c in r["candidates"]:
+        print(c["nac_id"], "—", c["label"])
+
+    # Camino canonico de recuperacion: el id completo.
+    elegido = elegir_con_el_usuario(r["candidates"])
+    nac.call("click", elegido["nac_id"])
+
+# Variante por sufijo anclado:
+nac.call("click_by_verb", "invoice", "delete",
+         {"qualifier": "INV-7"})
+
+# Variante posicional (orden del DOM), cuando no hay
+# sufijo que anclar:
+nac.call("click_by_verb", "invoice", "delete",
+         {"qualifier_ordinal": 0})</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage7-strict-resolution.mjs</code><span class="cr">15 PASS · medido 2026-11-14</span></div>
+</section>
+
+<section class="fn" id="f06">
+<div class="fn-h"><span class="fn-n">F06</span><h3>fill — escribir en un campo sin romper el framework</h3>
+<span class="cov cov-in">en la batería</span> <span class="cov cov-out">su prueba dedicada necesita navegador</span></div>
+<p>Pone un valor en un campo y emite <code>nac:field:changed</code>. El detalle no es el valor: es
+que <code>fill</code> pasa por el <strong>setter nativo</strong> de la propiedad
+<code>value</code> antes de despachar <code>input</code> y <code>change</code>. Si escribiera
+<code>el.value = x</code> a secas, React no se enteraría nunca — su valor controlado volvería a
+pisar el cambio en el siguiente render.</p>
+<div class="sig">NAC.fill(nac_id, value: string|number|boolean) → Promise&lt;...&gt;
+   emite: nac:field:changed { plugin, field_id, value }</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — un campo controlado que el agente puede llenar</h4>
+<pre><code>const [input, setInput] = useState('');
+// Espejo en una ref: cuando el modelo manda
+// fill + click_by_verb en la MISMA rafaga, el
+// manejador del clic corre antes de que React
+// vuelva a renderizar. Sin la ref lees el valor
+// viejo. (Esta correccion esta en el demo real.)
+const inputRef = useRef(input);
+useEffect(() =&gt; { inputRef.current = input; }, [input]);
+
+&lt;input value={input}
+   onChange={e =&gt; { setInput(e.target.value);
+                    inputRef.current = e.target.value; }}
+   data-nac-id="todos.input"
+   data-nac-role="field" /&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — llenar y confirmar por el evento</h4>
+<pre><code>nac.listen("nac:field:changed")
+
+nac.call("fill", "todos.input", "tomar agua")
+
+ev = nac.inbox()[-1]["detail"]
+assert ev["field_id"] == "todos.input"
+assert ev["value"] == "tomar agua"
+
+# El par clasico: llenar y despachar el verbo.
+nac.call("click_by_verb", "todos", "add_todo")
+
+# Mejor aun, si el anfitrion lo soporta: una sola
+# vuelta con carga util (F10), sin la danza de dos
+# pasos y sin carrera de render.
+nac.call("utter", "todos.add_quick",
+         {"text": "tomar agua", "lang": "es"})</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">En la batería</span><code>cd runtime &amp;&amp; node ./test/v23-interop.mjs</code><span class="cr">29 PASS · ejercita <code>fill</code> entre árboles</span></div>
+<div class="cmd warn"><span class="cl">Setter nativo</span><code>npm run test:fill-setter</code><span class="cr">GREEN · navegador real · <strong>no corre en CI</strong></span></div>
+</section>
+
+<section class="fn" id="f07">
+<div class="fn-h"><span class="fn-n">F07</span><h3>select — elegir una opción, y los resolvedores de opciones</h3>
+<span class="cov cov-no">sin prueba en la batería</span></div>
+<p>Elige un valor en un campo con opciones. Alrededor vive una familia para listas que no están todas
+en el DOM: un combo con diez mil clientes no pinta diez mil nodos.</p>
+<div class="sig">NAC.select(nac_id, value)                    → Promise&lt;...&gt;
+NAC.options(nac_id)                          → opciones conocidas
+NAC.search_options(nac_id, query)            → búsqueda remota
+NAC.invalidate_options(nac_id)               → tirar la caché
+NAC.set_options_resolver(nac_id, fn)         → el anfitrión provee la fuente
+   errores propios: RemoteSourceRequiresSearch · OptionsUnavailable</div>
+<div class="box box-c">
+  <span class="lbl">Hueco de cobertura, medido</span>
+  <p><code>select</code> aparece en <strong>una sola</strong> suite de este árbol,
+  <code>runtime/test/stage4-calls.mjs</code>, y esa suite <strong>no está en
+  <code>npm test</code></strong>. Corre y pasa (33 PASS el 2026-11-14), pero nada la ejecuta sola.
+  La familia <code>options</code> / <code>search_options</code> /
+  <code>set_options_resolver</code> no la ejercita ninguna suite de Node.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — resolvedor remoto con búsqueda obligatoria</h4>
+<pre><code>useEffect(() =&gt; {
+  window.NAC.set_options_resolver('inv.client', {
+    // Lista remota: el runtime NO puede enumerarla.
+    // Pedir options() sin query devuelve el error
+    // RemoteSourceRequiresSearch, a proposito.
+    remote: true,
+    search: async (q) =&gt; {
+      const r = await fetch(`/api/clients?q=${q}`);
+      const rows = await r.json();
+      return rows.map(c =&gt; ({ value: c.id,
+                              label: c.name }));
+    }
+  });
+}, []);
+
+&lt;select data-nac-id="inv.client"
+        data-nac-role="field"&gt;…&lt;/select&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — buscar antes de elegir</h4>
+<pre><code>r = nac.call("options", "inv.client")
+if not r["ok"] and "RemoteSource" in (r["message"] or ""):
+    # Fuente remota: hay que buscar primero.
+    hits = nac.call("search_options", "inv.client", "acme")
+    for o in hits["value"]:
+        print(o["value"], o["label"])
+    nac.call("select", "inv.client", hits["value"][0]["value"])
+else:
+    nac.call("select", "inv.client", "C-100")</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Única prueba</span><code>cd runtime &amp;&amp; node ./test/stage4-calls.mjs</code><span class="cr">33 PASS · <strong>huérfana</strong></span></div>
+</section>
+
+<section class="fn" id="f08">
+<div class="fn-h"><span class="fn-n">F08</span><h3>tab · tab_by_label — cambiar de panel, y las cuatro capas de la etiqueta</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Dos formas de llegar a la misma pestaña. <code>tab(plugin, id)</code> va por identificador;
+<code>tab_by_label(plugin, label)</code> va por etiqueta humana, que es lo que tiene un agente de voz
+cuando el usuario dice «andá a permisos».</p>
+<div class="sig">NAC.tab(plugin, tab_key)        → Promise&lt;...&gt;   /* exacto; si no, instancias id + "__" */
+NAC.tab_by_label(plugin, label) → Promise&lt;...&gt;   /* 4 capas, en este orden */
+   1 etiqueta exacta del manifiesto  2 difusa del manifiesto
+   3 texto exacto del DOM            4 texto difuso del DOM</div>
+<p>Si <strong>cualquiera</strong> de las cuatro capas devuelve más de una coincidencia, lanza
+<code>ambiguous_label</code>, y el campo <code>reason</code> del evento dice <em>qué capa</em> quedó
+ambigua: <code>ambiguous_label_exact</code>, <code>ambiguous_label_fuzzy</code>,
+<code>ambiguous_label_exact_dom</code>, <code>ambiguous_label_fuzzy_dom</code>. Si ninguna coincide,
+<code>not_found</code> con <code>reason: no_matching_label</code>.</p>
+<p><code>tab_by_label</code> resuelve pestañas <strong>sólo</strong> desde
+<code>m.tabs[]</code> y desde <code>elements[role=='tab']</code>. Una región con rol
+<code>navigation</code> nunca es una pestaña: está decidido y exigido.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — la regla del prefijo <code>tab.</code></h4>
+<pre><code>// El id empieza con tab. =&gt; el rol TIENE que ser 'tab'.
+// Si no, tab_id_manifest_role_drift y register lanza.
+&lt;button data-nac-id="tab.lines"
+        data-nac-role="tab"
+        onClick={() =&gt; { setTab('lines');
+          document.dispatchEvent(new CustomEvent(
+            'nac:tab:activated', { bubbles:true,
+              detail:{ plugin:'invoice',
+                       tab_id:'tab.lines' }}));
+        }}&gt;Líneas&lt;/button&gt;
+
+// En el manifiesto, el arreglo dedicado:
+tabs: [
+  { nac_id: 'tab.lines',
+    label_i18n: li('Líneas','Lines','Linhas','Lignes',
+      'Righe','Zeilen','明細','行','lines','سطور') }
+]</code></pre></div>
+<div class="pane"><h4><i>Python</i> — por etiqueta, con la ambigüedad resuelta</h4>
+<pre><code>nac.listen("nac:tab:activated",
+           "nac:disambiguation_requested")
+
+r = nac.call("tab_by_label", "invoice", "Líneas")
+
+if not r["ok"] and r["code"] == "ambiguous_label":
+    # El evento dice QUE CAPA quedo ambigua: eso le
+    # dice al agente si el problema es la etiqueta del
+    # manifiesto o el texto visible del DOM.
+    ev = [e for e in nac.inbox()
+          if e["type"] == "nac:disambiguation_requested"][-1]
+    print(ev["detail"]["reason"])
+    print(ev["detail"]["candidates"])
+    # Recuperacion: el id completo, por la via exacta.
+    nac.call("tab", "invoice", "tab.lines")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage2-disambiguation.mjs</code><span class="cr">35 PASS · medido 2026-11-14</span></div>
+<div class="cmd"><span class="cl">También</span><code>cd runtime &amp;&amp; node ./test/stage7-strict-resolution.mjs</code><span class="cr">15 PASS</span></div>
+</section>
+
+<section class="fn" id="f09">
+<div class="fn-h"><span class="fn-n">F09</span><h3>go_to_section · list_sections — moverse por hitos</h3>
+<span class="cov cov-no">sin prueba en la batería</span></div>
+<p>Enumera los hitos de la página y lleva el foco a uno. Es el verbo que un lector de pantalla usa
+para saltar, y el que un agente usa antes de clicar algo que puede estar fuera de pantalla — un
+elemento con <code>hidden</code> no se clica, y moverse a su sección es el arreglo.</p>
+<div class="sig">NAC.list_sections()        → secciones del plugin activo
+NAC.go_to_section(nac_id)  → Promise&lt;...&gt;
+   atributo relacionado: data-nac-section-visited</div>
+<div class="cmd warn"><span class="cl">Única prueba</span><code>cd runtime &amp;&amp; node ./test/stage4-calls.mjs</code><span class="cr">33 PASS · <strong>huérfana</strong></span></div>
+</section>
+
+<section class="fn" id="f10">
+<div class="fn-h"><span class="fn-n">F10</span><h3>invoke · utter — acciones que llevan datos</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Hasta la 2.2 toda acción era clic y listo: el agente dispara, el anfitrión hace lo que hace. Eso
+funciona para <code>save</code> o <code>cancel</code> y se derrumba cuando la acción necesita
+<strong>datos</strong> del agente: <code>search(query)</code>, <code>upload(file)</code>,
+<code>schedule(date)</code>, <code>utter(text)</code>. Un clic sintético no tiene por dónde llevar
+una carga útil.</p>
+<div class="sig">NAC.invoke(action_id, payload, opts?) → Promise&lt;{ok, request_id, ack}&gt;
+NAC.utter(action_id, {text, lang?, voice?, metadata?}) → Promise&lt;...&gt;
+   /* utter ≡ invoke(id, {verb:'utter', text, lang}) */
+   tiempo de espera por omisión: 30 000 ms  (contra 5 000 de click)</div>
+<p>El runtime despacha <code>nac:action:requested</code> sobre el elemento anfitrión, con
+<code>{action_id, verb, payload, plugin, request_id, ts}</code>. El anfitrión procesa y emite
+<code>nac:action:succeeded</code> —o <code>:failed</code>— <strong>con el mismo
+<code>request_id</code></strong>. El runtime correlaciona por ese identificador y resuelve la promesa
+del agente.</p>
+<div class="box box-g">
+  <span class="lbl">Cuatro obligaciones del anfitrión, y una prohibición</span>
+  <ol>
+    <li>Declarar <code>actions[].payload_schema</code> en la entrada del manifiesto.</li>
+    <li>Escuchar <code>nac:action:requested</code>.</li>
+    <li>Emitir <code>:succeeded</code> con el <code>request_id</code> devuelto, o <code>:failed</code>
+    con su <code>error</code>.</li>
+    <li><strong>Nunca</strong> emitir un <code>:succeeded</code> con un <code>request_id</code> que no
+    recibió. Eso es lo que evita el cruce entre invocaciones concurrentes.</li>
+  </ol>
+</div>
+<div class="box box-c">
+  <span class="lbl">Y lo que hay que saber antes de confiar en el esquema</span>
+  <p><code>payload_schema</code> es <strong>informativo</strong>. El runtime de referencia
+  <strong>no lo lee en absoluto</strong>: lo acepta en el manifiesto, lo acarrea en
+  <code>NAC.manifest()</code> y nunca valida contra él. <code>STRICT_VALIDATION</code> cubre
+  hallazgos de rol entre manifiesto y DOM; nunca cubrió cargas útiles. Un agente
+  <strong>no debe suponer</strong> que su carga fue validada porque había un esquema declarado: hoy
+  la única validación que ocurre es la que el agente hace antes de mandar. Queda como pregunta
+  abierta y sin fecha en la sección 13 del texto normativo.</p>
+  <p>Segunda trampa: <code>invoke</code> <strong>no</strong> rechaza cuando el elemento tiene
+  <code>disabled</code> o <code>aria-disabled</code>. El atributo deshabilitado es una guarda de
+  clic, e <code>invoke</code> es un pedido lógico, no un clic sintético. Un anfitrión que necesite
+  negarse por estado de interfaz tiene que hacerlo en su escucha de
+  <code>nac:action:requested</code>. <code>click</code>, en cambio, sí sigue rechazando.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — el anfitrión completo, con eco del identificador</h4>
+<pre><code>// Patron textual del demo de React del repositorio.
+useEffect(() =&gt; {
+  const onRequested = (ev) =&gt; {
+    const d = ev.detail || {};
+    if (d.action_id !== 'todos.add_quick') return;
+
+    const fail = (code, msg) =&gt; document.dispatchEvent(
+      new CustomEvent('nac:action:failed', {
+        bubbles:true, composed:true,
+        detail:{ plugin:'todos', action_id:d.action_id,
+                 request_id:d.request_id,   // el ECO
+                 error:code, message:msg }}));
+
+    if (d.verb !== 'utter')
+      return fail('verb_not_supported', d.verb);
+
+    const text = ((d.payload &amp;&amp; d.payload.text) || '').trim();
+    if (!text) return fail('empty_payload', 'texto vacío');
+
+    const id = 't' + Date.now();
+    addTodo(text);
+
+    document.dispatchEvent(new CustomEvent(
+      'nac:action:succeeded', { bubbles:true, composed:true,
+      detail:{ plugin:'todos', action_id:d.action_id,
+               request_id:d.request_id, verb:'utter',
+               ack:{ todo_id:id, text } }}));
+  };
+  document.addEventListener('nac:action:requested', onRequested);
+  return () =&gt; document.removeEventListener(
+                 'nac:action:requested', onRequested);
+}, []);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — una sola vuelta, con acuse de vuelta</h4>
+<pre><code># El agente valida la carga util EL MISMO, porque el
+# runtime no lo hace. Leer el esquema declarado sirve
+# para saber que mandar, no para confiar en que se
+# chequeo.
+m = nac.manifest("todos")
+entrada = next(e for e in m["elements"]
+               if e["id"] == "todos.add_quick")
+esquema = next(a for a in entrada["actions"]
+               if a["verb"] == "utter")["payload_schema"]
+print(esquema)   # {'text': {...'max': 200}, 'lang': {...}}
+
+texto = "tomar agua"
+assert len(texto) &lt;= esquema["text"]["max"]
+assert "es" in esquema["lang"]["enum"]
+
+r = nac.call("utter", "todos.add_quick",
+             {"text": texto, "lang": "es"})
+
+if r["ok"]:
+    # El ack es lo que el anfitrion decidio devolver:
+    # aca, el id de la tarea que acaba de crear.
+    print(r["value"]["request_id"], r["value"]["ack"])
+elif r["code"] == "timeout":
+    # 30 s, no 5. Y sigue siendo falla real.
+    print("el anfitrion no acuso en 30 s")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v23-invoke.mjs</code><span class="cr">27 PASS · incluye T7/T8/T9, el estado deshabilitado</span></div>
+</section>
+
+<section class="fn" id="f11">
+<div class="fn-h"><span class="fn-n">F11</span><h3>bindAction · bindTab — el acuse automático</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>La forma conforme de cablear un manejador. Envuelve <code>addEventListener</code> y emite
+<code>nac:action:succeeded</code> —o <code>:failed</code>— después de que el manejador corra, sea
+sincrónico, lance, o devuelva una promesa. Devuelve una función para desatar.</p>
+<div class="sig">NAC.bindAction(el, handler, { plugin, action_id }) → () =&gt; void
+NAC.bindTab(el, handler, { plugin, tab_id })       → () =&gt; void</div>
+<p>Esta es la respuesta a la trampa de F04. El código heredado puede seguir emitiendo el evento a
+mano; el código nuevo no debería. Si <code>NAC.click()</code> se come un tiempo de espera y la acción
+ocurrió, la causa es casi siempre un manejador que se olvidó de emitir, y el arreglo es éste.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — el gancho que lo envuelve</h4>
+<pre><code>export function useNACAction(plugin, actionId, handler) {
+  const ref = useRef(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el || !window.NAC?.bindAction) return;
+    // Un solo lugar emite el acuse, y emite tambien
+    // el :failed si el manejador lanza.
+    return window.NAC.bindAction(el, handler,
+             { plugin, action_id: actionId });
+  }, [plugin, actionId, handler]);
+  return ref;
+}
+
+function SaveButton({ onSave }) {
+  const ref = useNACAction('invoice', 'invoice.save', onSave);
+  return &lt;button ref={ref} data-nac-id="invoice.save"
+            data-nac-role="action"
+            data-nac-action="save"&gt;Guardar&lt;/button&gt;;
+}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — cómo se detecta un anfitrión que no acusa</h4>
+<pre><code># Esta es la auditoria que vale la pena correr contra
+# cualquier pagina antes de prometer que un agente la
+# puede manejar: clicar todo lo declarado y contar
+# cuantos se comen el tiempo de espera.
+arbol = nac.describe()
+mudos = []
+for pl in arbol["plugins"]:
+    for el in pl.get("elements", []):
+        if el.get("role") != "action":
+            continue
+        r = nac.call("click", el["id"])
+        if not r["ok"] and r["code"] == "timeout":
+            mudos.append(el["id"])
+
+print(len(mudos), "acciones declaradas que no confirman")
+# Cada una le cuesta 5 segundos a cada agente que la
+# llame, y se reporta como falla de algo que funciono.</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v22.mjs</code><span class="cr">20 PASS · medido 2026-11-14</span></div>
+</section>
+
+<div class="divider"><span class="ln"></span><span class="kanji">動</span><span class="ln"></span></div>
+
+<h3 class="grp">C · Mirar: introspección y validación</h3>
+<p>Lo único que un agente sabe de la pantalla es lo que estas funciones le devuelven.</p>
+
+<section class="fn" id="f12">
+<div class="fn-h"><span class="fn-n">F12</span><h3>describe · describe_v2 · list · find · snapshot_state</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p><code>describe()</code> es la instantánea del árbol: el plugin activo y, por cada plugin, sus
+elementos y su manifiesto. Es la entrada del intermediario con modelo de lenguaje y la única vista
+que el modelo tiene del estado de la página.</p>
+<div class="sig">NAC.describe()      → { active: string|null, plugins: PluginSnap[] }
+NAC.describe_v2()   → { v2_scope_entries: [...], sitemap: ..., data_tables: [...] }   /* en las extensiones */
+NAC.list() · NAC.find() · NAC.snapshot_state() · NAC.read_feedback()</div>
+<p><code>describe()</code> publica además las tres piezas del versionado de instantánea:
+<code>plugin_version</code>, <code>tree_version</code> y <code>element_state_hash</code> (ver F18).
+Un agente que va a escribir tiene que leerlas acá y devolverlas.</p>
+<div class="box box-c">
+  <span class="lbl">Hueco medido</span>
+  <p><code>describe_v2</code> vive en el módulo de extensiones y <strong>ninguna suite de
+  <code>runtime/test/</code> lo menciona</strong> — verificado el 2026-11-14 buscando el nombre en
+  las 20 suites. Es, sin embargo, parte del paquete que el cliente de chat manda al intermediario.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — un panel que se introspecciona</h4>
+<pre><code>export function useNACDescribe(ms = 1000) {
+  const [snap, setSnap] = useState(null);
+  useEffect(() =&gt; {
+    if (!window.NAC) return;
+    const leer = () =&gt; setSnap(window.NAC.describe());
+    leer();
+    const t = setInterval(leer, ms);
+    return () =&gt; clearInterval(t);
+  }, [ms]);
+  return snap;
+}
+
+// Util de verdad en desarrollo: muestra lo que un
+// agente VE, que casi nunca es lo que creias pintar.
+function DebugTree() {
+  const s = useNACDescribe();
+  if (!s) return null;
+  return &lt;pre&gt;{JSON.stringify(s, null, 2)}&lt;/pre&gt;;
+}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el paquete que se le manda al modelo</h4>
+<pre><code># La forma EXACTA que espera el intermediario de
+# referencia (guides/LLM_WIRING.md seccion 1.1).
+cuerpo = {
+    "session_id": "sess_abc123",
+    "prompt":     "andá a permisos",
+    "lang":       "es",
+    "history":    [],
+    "nac_tree":   page.evaluate("""() =&gt; {
+        const a = NAC.describe();
+        const b = (typeof NAC.describe_v2 === 'function')
+                  ? NAC.describe_v2() : {};
+        return Object.assign({}, a, b);
+      }"""),
+}
+
+# Y la forma EXACTA que tiene que devolver:
+#   { "ok": true,
+#     "message": "Abriendo la pestaña Permisos.",
+#     "actions": [ {"kind":"tab", "plugin":"...",
+#                   "tab_key":"tab.permissions"} ] }
+#
+# El cliente valida cada accion contra la instantanea
+# QUE MANDO antes de despacharla: existe el nac_id?
+# el tab_key es una pestaña conocida? Si no, no se
+# despacha. El modelo no es la autoridad.</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage12-snapshot-versioning.mjs</code><span class="cr">37 PASS · <code>describe</code> y sus versiones</span></div>
+<div class="cmd"><span class="cl">También</span><code>cd runtime &amp;&amp; node ./test/v23-interop.mjs</code><span class="cr">29 PASS</span></div>
+</section>
+
+<section class="fn" id="f13">
+<div class="fn-h"><span class="fn-n">F13</span><h3>validate_global · validate · el CLI</h3>
+<span class="cov cov-in">en la batería</span> <span class="cov cov-out">el CLI necesita navegador</span></div>
+<p>Recorre el DOM vivo más los manifiestos registrados y devuelve un <strong>objeto de cubetas con
+nombre</strong>, una por condición. Desde la 2.5 <strong>cada hallazgo de cada cubeta lleva
+<code>code</code> y <code>severity</code></strong>, así que una integración de CI puede trabar sobre
+un código sin leer mensajes.</p>
+<div class="sig">NAC.validate_global(opts?: { probe?: boolean }) → GlobalReport
+   { ok, has_errors, duplicates[], orphans[], unmounted[],
+     convention_violations[], plugin_instance_violations[],
+     tolerated[], plugin_count, total_ids, timestamp }</div>
+<div class="tw"><table>
+<tr><th style="width:38%">Código</th><th style="width:12%">Severidad</th><th>Qué encontró</th></tr>
+<tr><td><code>nac_id_duplicate_across_plugins</code></td><td><strong>error</strong></td><td>El mismo
+identificador en dos plugins distintos.</td></tr>
+<tr><td><code>duplicate_plugin_no_instance_id</code></td><td><strong>error</strong></td><td>Dos
+instancias del mismo slug sin <code>data-nac-plugin-id</code>.</td></tr>
+<tr><td><code>nac_id_orphan_in_dom</code></td><td>warn</td><td>Pintado en el DOM, no declarado en
+ningún manifiesto.</td></tr>
+<tr><td><code>nac_id_declared_not_mounted</code></td><td>warn</td><td>Declarado en el manifiesto, no
+pintado.</td></tr>
+<tr><td><code>nac_id_missing_plugin_prefix</code></td><td>warn</td><td>El identificador no empieza con
+el slug de su plugin.</td></tr>
+</table></div>
+<p>Los cinco códigos, con su severidad y qué hacer con cada uno, se publican como datos en
+<code>api/latest/findings.json</code>, bajo <code>global_buckets</code>. Son estables entre parches:
+un código nunca se reutiliza para otra condición.</p>
+<div class="box box-g">
+  <span class="lbl">Cambio de comportamiento en la 2.5.0, y por qué te puede romper el CI</span>
+  <p>Antes de la 2.5.0 el recolector leía <strong>sólo</strong> los grupos heredados del manifiesto
+  (<code>actions</code>, <code>fields</code>, <code>tabs</code>, <code>kpis</code>,
+  <code>charts</code>, indexados por <code>nac_id</code>) y <strong>nunca</strong> la forma canónica
+  <code>elements: [{ id }]</code> que documenta la sección 4. Contra un manifiesto escrito de la
+  manera documentada reportaba <code>total_ids: 0</code>, listaba cada elemento declarado como
+  huérfano, no podía reportar un duplicado, y aun así contestaba <code>ok: true</code>.</p>
+  <p>Las dos formas se leen desde la 2.5.0. Un anfitrión que trababa su CI sobre
+  <code>has_errors</code> puede ver su primera falla al actualizar: <strong>es un verdadero positivo
+  que siempre estuvo ahí</strong>, no una regla nueva.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — trabar el CI sobre códigos, no sobre mensajes</h4>
+<pre><code>// nac.spec.ts (Playwright + React build)
+test('la pagina no tiene hallazgos de severidad error', async ({ page }) =&gt; {
+  await page.goto('/');
+  await page.waitForFunction(() =&gt; window.NAC?.describe);
+
+  const rep = await page.evaluate(
+    () =&gt; window.NAC.validate_global({ probe: false }));
+
+  // Trabar por codigo: la redaccion del mensaje es lo
+  // unico que la spec declara NO prometido.
+  const errores = [
+    ...rep.duplicates,
+    ...rep.plugin_instance_violations,
+  ].filter(f =&gt; f.severity === 'error');
+
+  expect(errores, JSON.stringify(errores, null, 2))
+    .toHaveLength(0);
+
+  // Los warn se miden, no se traban, mientras se migra:
+  console.log('huerfanos', rep.orphans.length,
+              'sin montar', rep.unmounted.length,
+              'de', rep.total_ids, 'ids');
+});</code></pre></div>
+<div class="pane"><h4><i>Python</i> — un reporte de conformidad desde afuera</h4>
+<pre><code>rep = page.evaluate("() =&gt; NAC.validate_global({probe:false})")
+
+print(f"{rep['plugin_count']} plugins, "
+      f"{rep['total_ids']} ids declarados")
+
+cubetas = ("duplicates", "orphans", "unmounted",
+           "convention_violations",
+           "plugin_instance_violations")
+for b in cubetas:
+    for f in rep[b]:
+        print(f"[{f['severity']:5}] {f['code']}  "
+              f"{f.get('nac_id') or f.get('slug')}")
+
+# La brecha que mas duele y que esto mide: cuantos
+# nombres hay pintados contra cuantos declarados.
+# Un agente solo puede usar los DECLARADOS.
+pintados = page.evaluate(
+    "() =&gt; document.querySelectorAll('[data-nac-id]').length")
+print(pintados, "pintados /", rep["total_ids"], "declarados")
+
+assert not rep["has_errors"], "hallazgos de severidad error"</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">En la batería</span><code>cd runtime &amp;&amp; node ./test/stage11-plugin-id-dedup.mjs</code><span class="cr">14 PASS</span></div>
+<div class="cmd warn"><span class="cl">Candado del validador</span><code>npm run test:validate-global</code><span class="cr">33 PASS · corre en CI, <strong>no</strong> en <code>check:release</code></span></div>
+<div class="cmd warn"><span class="cl">CLI</span><code>npx nac3 validate &lt;url|dir&gt; --severity=error</code><span class="cr">salidas: 0 sin hallazgos · 1 con hallazgos · 2 el destino no cargó</span></div>
+<p style="font-size:13.6px;color:var(--ct2)">El CLI en modo URL necesita Playwright, que
+<strong>no</strong> es dependencia del paquete: <code>npm i -D playwright &amp;&amp; npx playwright
+install chromium</code>. En modo directorio hace un análisis estático y <strong>no puede decidir un
+nivel</strong>, y lo dice en vez de inventarlo. El paquete expone dos nombres de binario,
+<code>nac3</code> y <code>nac</code>.</p>
+</section>
+
+<section class="fn" id="f14">
+<div class="fn-h"><span class="fn-n">F14</span><h3>Emisión de eventos: emit_dual y las utilidades de forma canónica</h3>
+<span class="cov cov-no">sin prueba propia</span></div>
+<p>Durante una ventana de transición el runtime emite <strong>en doble</strong>: el evento canónico y
+el heredado. Estas funciones son las que un anfitrión usa para emitir con la forma correcta en vez de
+armar el <code>CustomEvent</code> a mano.</p>
+<div class="sig">NAC.emit_dual(canonical, legacy, detail)   → emite los dos durante la transición
+NAC.command_rejected(...) · NAC.command_failed(...)
+NAC.check_canonical_shape(type, detail)    → ¿el detalle tiene el campo de id que le toca?
+NAC.validate_event_conformance(...)        → auditoría de conformidad de eventos</div>
+<p>Cada familia de widget tiene <strong>su propio campo de identificador</strong> en el detalle:
+<code>action_id</code> para acciones, <code>tab_id</code> para pestañas, <code>field_id</code> para
+campos. Mandar <code>nac_id</code> genérico en lugar del campo específico es un error silencioso: el
+evento se emite y la correlación no lo reconoce.</p>
+<div class="box box-c">
+  <span class="lbl">Cobertura</span>
+  <p>Verificado el 2026-11-14: ninguna de las 20 suites de <code>runtime/test/</code> menciona
+  <code>emit_dual</code>, <code>check_canonical_shape</code> ni
+  <code>validate_event_conformance</code>. Son utilidades de conformidad sin prueba de conformidad.</p>
+</div>
+</section>
+
+<section class="fn" id="f15">
+<div class="fn-h"><span class="fn-n">F15</span><h3>nac:disambiguation_requested — el runtime se niega y te da la lista</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Cada vez que una llamada de resolución estricta falla —cero coincidencias o demasiadas— el runtime
+despacha este evento sobre <code>document</code> <strong>además</strong> de lanzar. La emisión es de
+mejor esfuerzo: si el despacho falla, el runtime lanza igual.</p>
+<div class="sig">document.addEventListener('nac:disambiguation_requested', e =&gt; e.detail)
+   detail: { method: 'click_by_verb'|'tab'|'tab_by_label',
+             plugin, query: {verb?,qualifier?,label?,id?},
+             reason, candidates: [{ nac_id, label }] }</div>
+<p><code>label</code> se resuelve prefiriendo <code>aria-label</code>, después
+<code>textContent</code> recortado a 120 caracteres, y por último el propio
+<code>data-nac-id</code>. La lista está <strong>validada contra el DOM</strong>: nombra elementos
+reales que el llamador puede elegir. <code>NacError</code> fusiona <code>candidates</code> sobre el
+<code>Error</code> lanzado, así que <code>err.code</code>, <code>err.message</code> y
+<code>err.candidates</code> llegan los tres.</p>
+<p><strong>Tres caminos de recuperación</strong>, en orden de preferencia: el <code>nac_id</code>
+completo del candidato (el canónico), el sufijo anclado como calificador, o
+<code>qualifier_ordinal</code> posicional.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — una interfaz que le pregunta al usuario</h4>
+<pre><code>useEffect(() =&gt; {
+  const onAmbiguo = (e) =&gt; {
+    // Esto es lo que convierte una falla en una
+    // conversacion: el usuario elige, nadie adivina.
+    setOpciones(e.detail.candidates);
+    setMotivo(e.detail.reason);
+  };
+  document.addEventListener(
+    'nac:disambiguation_requested', onAmbiguo);
+  return () =&gt; document.removeEventListener(
+    'nac:disambiguation_requested', onAmbiguo);
+}, []);
+
+{opciones &amp;&amp; (
+  &lt;dialog open data-nac-id="disamb.dialog"
+          data-nac-role="confirm-dialog"&gt;
+    &lt;p&gt;¿Cuál de estos?&lt;/p&gt;
+    {opciones.map(c =&gt; (
+      &lt;button key={c.nac_id}
+         onClick={() =&gt; window.NAC.click(c.nac_id)}&gt;
+        {c.label}
+      &lt;/button&gt;))}
+  &lt;/dialog&gt;)}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el agente no elige por su cuenta</h4>
+<pre><code>def clic_seguro(nac, plugin, verbo, preguntar):
+    """Despacha un verbo; si es ambiguo, DEVUELVE la
+       decision al humano. Nunca toma la primera."""
+    r = nac.call("click_by_verb", plugin, verbo)
+    if r["ok"]:
+        return r
+
+    if r["code"] in ("ambiguous_qualifier",
+                     "ambiguous_tab",
+                     "ambiguous_label"):
+        elegido = preguntar(r["candidates"])
+        if elegido is None:
+            return {"ok": False, "code": "cancelado"}
+        # Camino canonico: el id completo.
+        return nac.call("click", elegido["nac_id"])
+
+    if r["code"] == "no_matching_instance":
+        # Cero: el arbol cambio. Releer, no reintentar.
+        return {"ok": False, "code": r["code"],
+                "arbol": nac.describe()}
+    return r</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage2-disambiguation.mjs</code><span class="cr">35 PASS · medido 2026-11-14</span></div>
+</section>
+
+<h3 class="grp">D · Permiso y confianza</h3>
+<p>Tres compuertas distintas, que se confunden entre sí. Ninguna de las tres es un sistema de
+permisos.</p>
+
+<section class="fn" id="f16">
+<div class="fn-h"><span class="fn-n">F16</span><h3>Capacidades — rechazo rápido antes de despachar</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>El manifiesto declara qué capacidad exige una acción, y el runtime la chequea
+<strong>antes</strong> de despachar. El agente recibe <code>capability_required</code> en el acto, en
+vez de una vuelta completa que falla con un 403 varios segundos después.</p>
+<div class="sig">NAC.setCapabilities(caps: string|string[]|null)   /* reemplaza todo el conjunto; null lo limpia */
+NAC.grantCapability(cap)  ·  NAC.revokeCapability(cap)   /* incrementales */
+NAC.userCapabilities() → string[]                        /* instantánea */
+
+/* en el manifiesto: */
+requires_capability: 'finance.delete_invoice'            /* a nivel de elemento */
+requires_capability: ['finance.approve','finance.admin'] /* arreglo = O lógico */</div>
+<p>El nivel de verbo gana sobre el nivel de elemento si están los dos. Para «Y lógico» hay que
+declarar acciones separadas o componerlo en el anfitrión. En <code>click</code> la compuerta corre
+<strong>después</strong> de <code>not_found</code>, <code>disabled</code> y <code>hidden</code>, para
+que aflore la falla más específica; en <code>invoke</code> corre <strong>antes</strong> de que se
+dispare el evento de pedido, así que el anfitrión nunca ve un intento no autorizado.</p>
+<div class="box box-c">
+  <span class="lbl">Lo que esto NO es, dicho por la propia portada</span>
+  <p>La compuerta de capacidad es una <strong>optimización de experiencia de uso y una señal de
+  intención: no es un límite de seguridad</strong>. El servidor del adoptante tiene que seguir
+  autorizando cada llamada. Un agente malicioso que corre con el acceso del usuario puede hacer todo
+  lo que el usuario puede hacer, y NAC3 no protege contra eso. Está escrito en la portada, en la
+  sección «lo que no cubre», y en la especificación.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — el conjunto se sincroniza con la sesión</h4>
+<pre><code>const { user } = useAuth();
+
+useEffect(() =&gt; {
+  if (!window.NAC) return;
+  // Reemplaza el conjunto entero: esto es lo correcto
+  // en un login o en un refresh de sesion.
+  window.NAC.setCapabilities(user?.capabilities ?? null);
+}, [user]);
+
+// Y el manifiesto declara la exigencia:
+const FIN_MANIFEST = {
+  plugin_slug: 'fin', nac_version: '2.6',
+  elements: [
+    { id: 'fin.invoice.delete', role: 'action',
+      requires_capability: 'finance.delete_invoice',
+      actions: [{ verb: 'delete' }] },
+    { id: 'fin.invoice.edit', role: 'action',
+      actions: [
+        { verb: 'edit',
+          requires_capability: 'finance.edit_invoice' },
+        { verb: 'view' }   // sin exigencia: siempre
+      ] }
+  ]
+};</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el agente aprende el límite y lo dice</h4>
+<pre><code>print(page.evaluate("() =&gt; NAC.userCapabilities()"))
+
+r = nac.call("click", "fin.invoice.delete")
+if not r["ok"] and r["code"] == "capability_required":
+    # Sincrono. El agente puede ofrecer otro camino
+    # o pedir elevacion (F17), sin esperar 5 s ni
+    # pegarle al servidor para que lo rechace.
+    print("no autorizado: no insisto, ofrezco otra via")
+
+# Un mapa de lo que el usuario actual PUEDE hacer,
+# util para que el modelo no proponga imposibles:
+permitidos, negados = [], []
+for el in nac.manifest("fin")["elements"]:
+    req = el.get("requires_capability")
+    caps = page.evaluate("() =&gt; NAC.userCapabilities()")
+    reqs = [req] if isinstance(req, str) else (req or [])
+    if not reqs or any(c in caps for c in reqs):
+        permitidos.append(el["id"])
+    else:
+        negados.append(el["id"])</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v23-capabilities.mjs</code><span class="cr">17 PASS · medido 2026-11-14</span></div>
+</section>
+
+<section class="fn" id="f17">
+<div class="fn-h"><span class="fn-n">F17</span><h3>Autoridad y elevación temporal (sudo)</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>El anfitrión interpone <strong>su propia</strong> interfaz de confirmación entre el despacho del
+agente y el efecto. El usuario puede además otorgar una elevación <strong>acotada en el
+tiempo</strong> que saltea la confirmación para un ámbito hasta que expire.</p>
+<div class="sig">NAC.set_confirm_handler(fn)                  → el anfitrión pone su propia interfaz
+NAC.confirm_action(...)                     → pide confirmación para una acción
+NAC.request_authority(scope, ttl_ms)        → pide elevación acotada
+NAC.has_authority(scope) → boolean          → ¿sigue vigente?
+NAC.revoke_authority(scope)                 → cortarla antes del vencimiento</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — la confirmación es del anfitrión, no del runtime</h4>
+<pre><code>useEffect(() =&gt; {
+  window.NAC.set_confirm_handler(async (req) =&gt; {
+    // req trae que accion, de que plugin, y de donde
+    // vino. El anfitrion decide como preguntar: un
+    // modal propio, biometria, un segundo factor.
+    if (window.NAC.has_authority('finance.bulk')) {
+      return true;          // sudo vigente: no molesta
+    }
+    return await abrirModalDeConfirmacion(req);
+  });
+}, []);
+
+// El usuario concede quince minutos para un lote:
+&lt;button onClick={() =&gt;
+  window.NAC.request_authority('finance.bulk', 15*60*1000)}
+  data-nac-id="fin.sudo" data-nac-role="action"
+  data-nac-action="elevate"&gt;
+  Permitir 15 minutos
+&lt;/button&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — un lote que pide elevación una vez</h4>
+<pre><code>vigente = page.evaluate(
+    "() =&gt; NAC.has_authority('finance.bulk')")
+
+if not vigente:
+    # El agente PIDE; el anfitrion y el usuario
+    # conceden. El agente no se eleva solo.
+    page.evaluate("() =&gt; NAC.request_authority("
+                  "'finance.bulk', 15*60*1000)")
+
+for factura in lote:
+    r = nac.call("click_by_verb", "fin", "approve",
+                 {"qualifier": factura})
+    if not r["ok"]:
+        print(factura, "->", r["code"])
+        break
+
+# Buena ciudadania: devolver el permiso al terminar.
+page.evaluate("() =&gt; NAC.revoke_authority('finance.bulk')")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage10-authority-sudo.mjs</code><span class="cr">37 PASS · medido 2026-11-14</span></div>
+<div class="cmd warn"><span class="cl">En navegador</span><code>node scripts/run-demo-v24-05-authority-sudo.mjs</code><span class="cr">Playwright · <strong>CI nunca lo llama</strong></span></div>
+</section>
+
+<section class="fn" id="f18">
+<div class="fn-h"><span class="fn-n">F18</span><h3>Versionado de instantánea — concurrencia optimista</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>El problema que resuelve: un agente lee la pantalla, piensa dos segundos, y escribe sobre un árbol
+que ya cambió. <code>describe()</code> publica tres números; el agente los devuelve en la llamada de
+escritura; si quedaron viejos, el runtime <strong>rechaza nombrando qué cambió</strong>.</p>
+<div class="sig">describe() publica: plugin_version · tree_version · element_state_hash
+cualquier verbo mutante acepta: expected_plugin_version · expected_tree_version · expected_element_state_hash
+   rechazo: NacError('snapshot_stale')   /* instantánea vieja */
+            NacError('version_required') /* no mandaste ninguna, y STRICT_VERSIONING es true */
+
+NAC.STRICT_VERSIONING = true    /* por omisión desde 2.5.0-alpha.4; desaparece en 2.6 */
+NAC.eager_hashing = false
+NAC.markHydrationComplete()     /* SSR: el árbol terminó de hidratarse */
+NAC.versionHistory()            /* las transiciones */</div>
+<div class="box box-r">
+  <span class="lbl">Esto rompe a los agentes ingenuos, a propósito</span>
+  <p>Con <code>STRICT_VERSIONING</code> en <code>true</code>, un llamador que
+  <strong>no</strong> manda ningún <code>expected_*</code> es rechazado con
+  <code>version_required</code>. No es un error: es el contrato. Un agente que escribe sin decir
+  sobre qué estado creía estar escribiendo no puede garantizar nada.</p>
+  <p>Las versiones se incrementan con <code>register</code>, con <code>syncPlugin</code> y al
+  completarse la hidratación.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — hidratación en renderizado del servidor</h4>
+<pre><code>// Next.js / SSR: entre el HTML del servidor y la
+// hidratacion del cliente, el arbol no es el final.
+// Un agente que escriba en esa ventana escribe sobre
+// una pantalla que todavia se esta armando.
+useEffect(() =&gt; {
+  // Un solo aviso, despues del primer render completo.
+  window.NAC?.markHydrationComplete?.();
+}, []);
+
+// Si tu anfitrion re-renderiza listas grandes seguido,
+// el hash de estado se recalcula bajo demanda. Con
+// eager_hashing = true se calcula siempre: mas caro,
+// mas preciso para agentes que leen muy seguido.
+window.NAC.eager_hashing = false;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — leer, pensar, escribir contra lo leído</h4>
+<pre><code>snap = nac.describe()
+pl = next(p for p in snap["plugins"]
+          if p["plugin"] == "invoice")
+
+# ... el modelo decide, pasan dos segundos ...
+
+r = nac.call("click", "invoice.save", {
+    "expected_plugin_version":    pl["plugin_version"],
+    "expected_tree_version":      snap["tree_version"],
+    "expected_element_state_hash": pl["element_state_hash"],
+})
+
+if not r["ok"] and r["code"] == "snapshot_stale":
+    # El mensaje NOMBRA que cambio. Releer y rearmar
+    # la intencion: nunca reintentar la misma escritura
+    # a ciegas sobre un arbol distinto.
+    print("la pantalla cambio:", r["message"])
+    snap = nac.describe()
+elif not r["ok"] and r["code"] == "version_required":
+    # Error del agente: no mando ninguna expectativa.
+    raise AssertionError("mandar al menos un expected_*")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage12-snapshot-versioning.mjs</code><span class="cr">37 PASS · el camino viejo y el camino sin expectativa</span></div>
+</section>
+
+<section class="fn" id="f21">
+<div class="fn-h"><span class="fn-n">F21</span><h3>Procedencia: isTrusted y manifiestos firmados</h3>
+<span class="cov cov-no">sin prueba propia</span></div>
+<p>Dos mecanismos independientes. El primero distingue un clic humano de uno sintetizado; el segundo
+autentica el <strong>manifiesto</strong>, no al usuario.</p>
+<div class="sig">/* 1 — el clic */
+event.isTrusted → true sólo en interacción real (ratón, teclado, activación por lector de pantalla)
+el runtime lo expone en  event.detail.is_trusted
+
+/* 2 — el manifiesto */
+NAC.set_provenance_secret(secreto)
+NAC.sign_provenance(...)  ·  NAC.verify_provenance(...)
+manifest.provenance = { signed_at, signed_by, signature }   /* HMAC-SHA256 del cuerpo */
+
+/* 3 — bloque de procedencia que acompaña a TODO despacho */
+{ plugin, source: 'type|id|tool', trusted, duration_ms, ok, error }
+NAC.set_source(...) · NAC.attestUserGesture(...) · NAC.setMobileWebViewAttestation(...)</div>
+<p>El bloque de procedencia se emite en <strong>cada</strong> despacho, incluidos los caminos de
+falla, y <strong>suprimirlo está prohibido</strong>. Un anfitrión que toma acciones sensibles —pago,
+borrado— puede exigir <code>is_trusted === true</code> y rechazar clics sintéticos.</p>
+<div class="box box-c">
+  <span class="lbl">Dos límites y un hueco, los tres medidos</span>
+  <p><strong>Límite 1:</strong> NAC3 no autentica al <strong>usuario</strong>: eso es de tu capa de
+  autenticación. Autentica al manifiesto.</p>
+  <p><strong>Límite 2:</strong> no protege contra un agente malicioso con acceso de usuario.</p>
+  <p><strong>Hueco de cobertura:</strong> verificado el 2026-11-14, ninguna suite de
+  <code>runtime/test/</code> menciona <code>sign_provenance</code>,
+  <code>verify_provenance</code>, <code>set_provenance_secret</code> ni
+  <code>attestUserGesture</code>. El HMAC del nivel 3 de conformidad no tiene prueba en este árbol.
+  La distinción de <code>isTrusted</code> se demuestra en una página de demostración
+  (<code>example-v20-full.php</code>, el par <code>v20_panel.istrusted_real</code> /
+  <code>istrusted_fake</code>), no en una suite.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — exigir confianza para un verbo sensible</h4>
+<pre><code>// El secreto viene de codigo AUTENTICADO del servidor.
+// Nunca de un bundle del cliente.
+useEffect(() =&gt; {
+  (async () =&gt; {
+    const { secret } = await fetch('/api/nac-secret',
+      { credentials: 'include' }).then(r =&gt; r.json());
+    window.NAC.set_provenance_secret(secret);
+  })();
+}, []);
+
+// Y el anfitrion se niega ante un clic sintetizado:
+useEffect(() =&gt; {
+  const onOk = (e) =&gt; {
+    if (e.detail.action_id !== 'fin.pay') return;
+    if (e.detail.is_trusted !== true) {
+      console.warn('clic sintetico rechazado para pago');
+      return;                      // no ejecuta el cobro
+    }
+    cobrar();
+  };
+  document.addEventListener('nac:action:succeeded', onOk);
+  return () =&gt; document.removeEventListener(
+    'nac:action:succeeded', onOk);
+}, []);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — leer la procedencia que el agente generó</h4>
+<pre><code>nac.listen("nac:action:succeeded", "nac:plugin:invoked")
+
+nac.call("click", "invoice.save")
+
+for e in nac.inbox():
+    d = e["detail"]
+    print(e["type"],
+          "trusted =", d.get("trusted", d.get("is_trusted")),
+          "source =",  d.get("source"),
+          "ms =",      d.get("duration_ms"),
+          "ok =",      d.get("ok"))
+
+# Un agente honesto NO intenta falsear esto. is_trusted
+# sera False para todo lo que despache por codigo, y
+# eso es correcto: es la senal que el anfitrion usa
+# para decidir si un cobro se ejecuta o no.</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Demostración</span><code>php -S localhost:8000</code> y abrir <code>example-v20-full.php</code><span class="cr">sin prueba automatizada</span></div>
+</section>
+
+<div class="divider"><span class="ln"></span><span class="kanji">信</span><span class="ln"></span></div>
+
+<h3 class="grp">E · Superficies difíciles: lo que no es un nodo del DOM</h3>
+<p>Las secciones 1 a 14 del texto normativo suponen que la superficie accionable es DOM. Estas cuatro
+fichas son lo que pasa cuando no lo es.</p>
+
+<section class="fn" id="f19">
+<div class="fn-h"><span class="fn-n">F19</span><h3>Shadow DOM: raíces abiertas automáticas, cerradas por invitación</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p><strong>Raíces abiertas:</strong> el runtime resuelve a través de ellas de forma recursiva y
+automática. No hace falta ni una pista en el manifiesto ni una opción.</p>
+<div class="sig">/* algoritmo, para un selector S contra una raíz R */
+1. R.querySelector(S) → si no es null, devolver ya
+2. por cada descendiente el de R:
+      si el.shadowRoot no es null  → recursión con R := el.shadowRoot, profundidad +1
+      si no, si el.nac3 es objeto con query() → delegar (raíz cerrada)
+3. tope de profundidad: 10 niveles. Más abajo → not_found
+4. recorrido en orden del DOM: hermanos antes que sombras anidadas. Gana el primero
+
+/* internos de referencia */ _deepQuery(selector, root) · _deepQueryAll(selector, root)</div>
+<p><strong>Raíces cerradas:</strong> son un límite del navegador, no una decisión de NAC3. El runtime
+no puede entrar salvo que el autor del componente exponga una superficie, voluntariamente.</p>
+<div class="sig">interface NAC3HostInterface {
+  query(selector): Element | null;     /* OBLIGATORIO */
+  queryAll(selector): Element[];       /* recomendado */
+  describe?(): Array&lt;{id, role, action?, label?}&gt;;   /* opcional */
+}
+/* eventos de diagnóstico, deduplicados por anfitrión con un WeakSet, UNA vez por carga */
+nac:shadow_blocked              { host, reason: 'exposure_threw'|'not_exposed', ts }
+nac:shadow_protocol_violation   { host, message, value_snapshot, ts }</div>
+<div class="box box-g">
+  <span class="lbl">Tres obligaciones del autor del componente</span>
+  <ol>
+    <li>Poner <code>data-nac-id</code>, <code>data-nac-role</code> y <code>data-nac-action</code> en
+    los elementos operables de adentro de la sombra.</li>
+    <li>Poner <code>composed: true</code> en <strong>todo</strong> evento
+    <code>nac:*</code> que emita a mano. Sin eso el evento se detiene en el borde y la maquinaria de
+    correlación del runtime nunca lo ve. Los eventos propios del runtime ya salen con
+    <code>composed:true</code>.</li>
+    <li>Evitar <code>&lt;slot&gt;</code> para lo que tiene que quedar aislado: los nodos ranurados
+    viven en el DOM claro y se resuelven ahí.</li>
+  </ol>
+  <p>El beneficio de la exposición voluntaria: un agente conforme funciona contra sistemas de diseño
+  con componentes de sombra cerrada —Salesforce Lightning, parte de GitHub Primer, widgets sensibles
+  a seguridad— sin un adaptador por componente. El costo es la adhesión, componente por componente.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — un componente web con sombra cerrada que se deja manejar</h4>
+<pre><code>class TarjetaCerrada extends HTMLElement {
+  #raiz;
+  constructor() {
+    super();
+    this.#raiz = this.attachShadow({ mode: 'closed' });
+    this.#raiz.innerHTML = `
+      &lt;button data-nac-id="card.ok"
+              data-nac-role="action"
+              data-nac-action="accept"&gt;Aceptar&lt;/button&gt;`;
+    this.#raiz.querySelector('button')
+      .addEventListener('click', () =&gt; {
+        this.dispatchEvent(new CustomEvent(
+          'nac:action:succeeded', {
+            bubbles: true,
+            composed: true,   // sin esto NO sale
+            detail: { plugin: 'cards',
+                      action_id: 'card.ok' }}));
+      });
+  }
+  // La invitacion. Sin este getter, NAC3 no entra, y
+  // eso es lo que el navegador pretende.
+  get nac3() {
+    return {
+      query:    (s) =&gt; this.#raiz.querySelector(s),
+      queryAll: (s) =&gt; [...this.#raiz.querySelectorAll(s)],
+      describe: () =&gt; [{ id: 'card.ok', role: 'action',
+                         action: 'accept',
+                         label: 'Aceptar' }],
+    };
+  }
+}
+customElements.define('tarjeta-cerrada', TarjetaCerrada);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — diagnosticar una sombra que no se deja</h4>
+<pre><code>nac.listen("nac:shadow_blocked",
+           "nac:shadow_protocol_violation")
+
+r = nac.call("click", "card.ok")
+
+for e in nac.inbox():
+    if e["type"] == "nac:shadow_blocked":
+        # 'not_exposed'   -> el autor no puso el getter
+        # 'exposure_threw'-> lo puso y lanzo
+        print("sombra cerrada:", e["detail"]["reason"])
+    if e["type"] == "nac:shadow_protocol_violation":
+        print("devolvio algo que no es Element:",
+              e["detail"]["value_snapshot"])
+
+# Se emite UNA sola vez por anfitrion y por carga de
+# pagina: si esperabas uno por intento, no los cuentes.
+
+if not r["ok"] and r["code"] == "not_found":
+    # Tambien puede ser el tope de 10 niveles. En la
+    # practica ninguna base de codigo real pasa de 3 o 4.
+    print("no alcanzable: sombra cerrada sin exponer, "
+          "o mas de 10 niveles de profundidad")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v23-shadow.mjs</code><span class="cr">11 PASS · T1-T3 y T10 abiertas con tope, T4-T9 cerradas y deduplicación</span></div>
+<div class="cmd warn"><span class="cl">Demostración</span><code>example-v23-shadow-open.php</code> y <code>example-v23-shadow-closed.php</code><span class="cr">la cerrada trae el caso positivo y el ciego, lado a lado</span></div>
+</section>
+
+<section class="fn" id="f20">
+<div class="fn-h"><span class="fn-n">F20</span><h3>edit_field — el editor de campo, manejable como cualquier plugin</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Abre un modal que deja editar cualquier campo de texto con herramientas tipo procesador de texto.
+Lo interesante de diseño: el modal <strong>se registra a sí mismo</strong> bajo
+<code>plugin_slug='nac_editor'</code>, con sus etiquetas en los diez idiomas, así que un agente lo
+maneja igual que a cualquier otro plugin.</p>
+<div class="sig">NAC.edit_field(nac_id) → Promise&lt;{ok:true}&gt;
+/* verbos del plugin 'nac_editor', todos invocables por NAC3: */
+select_word · select_sentence · select_all · replace · delete_selection
+ai_correct_syntax · save · cancel
+/* teclas: Esc cancela · Ctrl/Cmd+Enter guarda · clic en el fondo cancela */</div>
+<p><code>save</code> escribe de vuelta en el campo de origen, despacha <code>input</code> y
+<code>change</code>, y cierra. <code>ai_correct_syntax</code> manda el valor actual al intermediario
+con el mensaje de sistema «corregí gramática y ortografía, devolvé sólo el texto corregido» y
+reemplaza el valor con la respuesta — <strong>depende del intermediario externo</strong>, que no
+tiene sustituto local en este repositorio.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — abrirlo sobre un campo propio</h4>
+<pre><code>&lt;input data-nac-id="invoice.notes"
+       data-nac-role="field"
+       value={notes}
+       onChange={e =&gt; setNotes(e.target.value)} /&gt;
+
+&lt;button onClick={() =&gt;
+          window.NAC.edit_field('invoice.notes')}
+        data-nac-id="invoice.notes.edit"
+        data-nac-role="action"
+        data-nac-action="edit_field"&gt;
+  Editar en grande
+&lt;/button&gt;
+
+/* El modal despacha input + change al guardar, asi que
+   tu estado controlado se actualiza solo. No hace falta
+   cablear nada mas. */</code></pre></div>
+<div class="pane"><h4><i>Python</i> — manejar el editor desde afuera</h4>
+<pre><code>nac.call("edit_field", "invoice.notes")
+
+# El modal se registro: ahora existe como plugin.
+print(page.evaluate("() =&gt; NAC.list_registered_plugins()"))
+# [... , 'nac_editor']
+
+ed = nac.manifest("nac_editor")
+print([a["verb"] for e in ed["elements"]
+                 for a in e.get("actions", [])])
+
+nac.call("click_by_verb", "nac_editor", "select_all")
+nac.call("click_by_verb", "nac_editor", "replace",
+         {"nac_id": "invoice.notes", "text": "Texto nuevo"})
+nac.call("click_by_verb", "nac_editor", "save")
+
+# ai_correct_syntax NO se puede ejercitar aca: depende
+# del intermediario externo, que no tiene sustituto
+# local en este repositorio.</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v23-editor.mjs</code><span class="cr">9 PASS · medido 2026-11-14</span></div>
+</section>
+
+<section class="fn" id="f26">
+<div class="fn-h"><span class="fn-n">F26</span><h3>Contrato de extensión de plugin — lienzo, iframes y APIs propias</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>La ficha más grande del manual, y la que resuelve lo que <code>NAC.click</code> no puede: mandar
+un <code>Send_UNO_Command</code> a un iframe de Collabora, llamar
+<code>figma.currentPage.selection = [...]</code>, invocar <code>excalidrawAPI.setElements(...)</code>
+sobre una referencia de React, o leer si «negrita» está activo en la selección actual, que la barra
+de herramientas refleja y el lienzo esconde.</p>
+<p>La solución <strong>no</strong> fue extender <code>NAC.click</code> con heurísticas de detección.
+Fue agregar un verbo explícito y agnóstico que toma un slug y una ruta de verbo, y <strong>deja que
+el manifiesto del plugin declare cómo se enruta</strong>. El runtime no sabe nada de ninguna
+aplicación: aprende a hablarle leyendo el manifiesto.</p>
+<div class="sig">NAC.registerPlugin(slug, manifest)            → void    /* manifiesto JSON puro, sin callbacks */
+NAC.call(plugin, verb_path, args?)            → Promise&lt;any&gt;
+NAC.read(plugin, state_path)                  → Promise&lt;any&gt;
+NAC.subscribe(plugin, event_path, cb)         → SubscriptionHandle
+NAC.unsubscribe(handle)                       → void    /* sincrónico e idempotente */</div>
+<p><strong>Verbos y eventos tienen exactamente una ligadura. El estado tiene un arreglo
+ordenado.</strong> <code>read</code> recorre la cadena en orden y devuelve la primera fuente que
+resolvió; si <em>todas</em> fallan, rechaza con <code>state_unreadable</code> y
+<code>err.attempts</code> trae una entrada por intento con <code>{backend, reason}</code>. La cadena
+codifica la preferencia del autor: la fuente más rápida, barata y fresca va primera.</p>
+
+<h4 style="font-family:var(--font-serif);font-size:1rem;margin:1.2rem 0 .4rem">Los nueve enrutadores</h4>
+<div class="tw"><table>
+<tr><th style="width:19%">Enrutador</th><th style="width:13%">Sirve para</th><th>Campos obligatorios</th></tr>
+<tr><td><code>postmessage</code></td><td>Verbo</td><td><code>target</code> (selector del iframe),
+<code>message</code>, <code>values</code>, <code>values_from_args</code> (opcional)</td></tr>
+<tr><td><code>postmessage-listen</code></td><td>Evento</td><td><code>source</code>,
+<code>message</code>, <code>extract</code></td></tr>
+<tr><td><code>sdk-call</code></td><td>Verbo o estado</td><td><code>path</code>, <code>mode</code>
+(<code>assign</code>/<code>invoke</code>/<code>read</code>); desde 2.6 <code>handle</code> y
+<code>args_order</code></td></tr>
+<tr><td><code>script-bridge</code></td><td>Verbo o estado</td><td><code>bridge</code>,
+<code>script</code>, <code>function</code>, <code>args</code>, <code>response_match</code>,
+<code>timeout_ms</code> (5000)</td></tr>
+<tr><td><code>dom-mirror</code></td><td>Estado</td><td><code>selector</code>, <code>extract</code>
+— leer del nodo del DOM que <em>refleja</em> un estado interno del lienzo</td></tr>
+<tr><td><code>same-origin-window</code></td><td>Estado</td><td><code>target</code>,
+<code>path</code> — el runtime detecta otro origen y sigue a la ligadura siguiente</td></tr>
+<tr><td><code>synthetic-mutation</code></td><td>Evento</td><td><code>observe</code>,
+<code>throttle_ms</code> (100), <code>root</code> (opcional, 2.6)</td></tr>
+<tr><td><code>synthetic-poll</code></td><td>Evento</td><td><code>observe</code>,
+<code>interval_ms</code> (250)</td></tr>
+<tr><td><code>emitter-listen</code> <em>(2.6)</em></td><td>Evento</td><td><code>event</code>;
+opcionales <code>handle</code>, <code>path</code>, <code>method</code>/<code>off_method</code>,
+<code>extract</code>, <code>observe</code></td></tr>
+</table></div>
+<p>Agregar un enrutador nuevo <strong>exige subir la versión de la especificación</strong>, y un
+runtime que no conoce un enrutador tiene que <strong>rechazar</strong> el manifiesto, nunca saltearlo
+en silencio. <code>emitter-listen</code> es la razón por la que este documento es 2.6 y no 2.5.3.</p>
+
+<h4 style="font-family:var(--font-serif);font-size:1rem;margin:1.2rem 0 .4rem">El mini lenguaje de extracción</h4>
+<p>Seis formas, y <strong>no se componen</strong>: un extractor es exactamente una de estas filas. Un
+manifiesto que necesite transformar de verdad declara un <code>script-bridge</code>.</p>
+<div class="tw"><table>
+<tr><th style="width:26%">Sintaxis</th><th>Qué hace</th><th style="width:30%">Ejemplo</th></tr>
+<tr><td><code>campo.ruta.al.valor</code></td><td>Recorrido por puntos.</td><td><code>{a:{b:1}}</code>
+con <code>a.b</code> → <code>1</code></td></tr>
+<tr><td><code>attribute:NOMBRE</code></td><td>Sólo DOM: <code>getAttribute</code>.</td><td><code>&lt;i
+data-x="hi"&gt;</code> → <code>'hi'</code></td></tr>
+<tr><td><code>text</code></td><td>Sólo DOM: <code>textContent</code>.</td><td><code>&lt;span&gt;hi&lt;/span&gt;</code>
+→ <code>'hi'</code></td></tr>
+<tr><td><code>classList.contains:CLASE</code></td><td>Sólo DOM: booleano.</td><td><code>class="active"</code>
+→ <code>true</code></td></tr>
+<tr><td><code>value</code></td><td>Sólo DOM: <code>el.value</code>.</td><td><code>&lt;input value="x"&gt;</code>
+→ <code>'x'</code></td></tr>
+<tr><td><code>present</code></td><td>Sólo DOM: <code>true</code> si el selector resolvió algo.</td>
+<td>Es la forma de declarar que <em>la ausencia significa algo</em>.</td></tr>
+</table></div>
+
+<h4 style="font-family:var(--font-serif);font-size:1rem;margin:1.2rem 0 .4rem">Los diez códigos, y el espacio reservado del plugin</h4>
+<div class="tw"><table>
+<tr><th style="width:30%">Código</th><th>Qué pasó</th></tr>
+<tr><td><code>plugin_not_registered</code></td><td>El slug no tiene manifiesto de extensión.</td></tr>
+<tr><td><code>verb_not_declared</code> · <code>state_not_declared</code> · <code>event_not_declared</code></td>
+<td>La ruta no está en el manifiesto.</td></tr>
+<tr><td><code>backend_unknown</code></td><td>El manifiesto declara un enrutador que el runtime no
+implementa. Tiene que rechazarse al registrar.</td></tr>
+<tr><td><code>backend_target_missing</code></td><td>El iframe, la ruta de JS o el selector no se
+encuentra.</td></tr>
+<tr><td><code>cross_origin_blocked</code></td><td><code>same-origin-window</code> contra un iframe de
+otro origen.</td></tr>
+<tr><td><code>state_unreadable</code></td><td>Todas las ligaduras de la cadena fallaron; mirá
+<code>err.attempts</code>.</td></tr>
+<tr><td><code>timeout</code></td><td>5000 ms para verbos, 1000 ms para lecturas de estado.</td></tr>
+<tr><td><code>invalid</code></td><td>Forma de argumento mal, o manifiesto mal formado al
+registrar.</td></tr>
+</table></div>
+<div class="box box-t">
+  <span class="lbl">Los diez son sobre ENRUTAMIENTO, nunca sobre la aplicación</span>
+  <p>Dicen que el protocolo no pudo llegar, nunca por qué la aplicación dijo no. Un plugin que
+  necesita un código propio —una fila que no está materializada, un documento bloqueado, una
+  exportación todavía renderizando— lo levanta bajo el prefijo reservado
+  <strong><code>plugin.</code></strong>:</p>
+  <pre style="margin-top:.6rem"><code>const e = new Error('row 42 is not materialised');
+e._code = 'plugin.row_not_materialized';
+throw e;   /* adentro del enrutador al que el manifiesto dirige */</code></pre>
+  <p style="margin-top:.6rem"><code>call</code> y <code>subscribe</code> lo afloran textual en
+  <code>err.code</code>. Un código que <strong>no</strong> es uno de los diez <strong>ni</strong>
+  está bajo <code>plugin.</code> se rechaza como <code>invalid</code>, conservando la cadena
+  rechazada en <code>err.offending_code</code>: un código no declarado que viajó igual es cómo un
+  vocabulario deja de ser un vocabulario.</p>
+</div>
+<div class="box box-r">
+  <span class="lbl">La regla de fallo cerrado de la 2.6, y el defecto que la produjo</span>
+  <p><code>synthetic-mutation</code> resuelve cada ruta de estado observada al elemento que selecciona
+  su ligadura primaria de <code>dom-mirror</code>. Cuando un selector no encuentra nada,
+  <code>subscribe</code> <strong>tiene que rechazar</strong> con
+  <code>backend_target_missing</code>, nombrando las rutas y los selectores que no resolvieron, y
+  <strong>no devolver un asa</strong>.</p>
+  <p>Por qué: una suscripción que no observa nada resuelve bien y después nunca dispara — que es
+  exactamente el daño silencioso que este protocolo existe para eliminar. <strong>Y hasta la 2.5.2
+  eso es lo que el runtime de referencia hacía.</strong></p>
+  <p>Un manifiesto cuyo nodo observado legítimamente aparece y desaparece —la fila de una grilla
+  virtualizada, que existe sólo mientras está en pantalla— declara <code>root</code>: un contenedor
+  que <strong>sobrevive</strong> al nodo. El runtime observa el contenedor con
+  <code>subtree: true</code> y vuelve a resolver los selectores en cada mutación, así que una
+  suscripción tomada mientras el nodo estaba ausente dispara cuando el nodo se monta. Pasar de
+  desconocido a conocido <strong>es</strong> el cambio que el llamador espera, así que esa transición
+  también emite.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — un lienzo con una API que nunca llega a <code>window</code></h4>
+<pre><code>function Editor() {
+  const apiRef = useRef(null);
+
+  useEffect(() =&gt; {
+    if (!apiRef.current) return;
+    // 2.6: la API vive en una ref, no en window.
+    // registerApiHandle es como el manifiesto la alcanza
+    // sin dejar de ser JSON puro.
+    window.NAC.registerApiHandle('acme.canvas',
+                                 apiRef.current);
+
+    window.NAC.registerPlugin('acme.canvas', {
+      slug:  'acme.canvas',
+      label: 'Lienzo Acme',
+      hint:  'El editor de figuras',
+      verbs: {
+        'view.set': {
+          backend: 'sdk-call',
+          handle:  'acme.canvas',
+          path:    'setView',
+          mode:    'invoke',
+          // args_order deletrea la lista POSICIONAL:
+          // setView(center, zoom). Sin esto el objeto
+          // args viaja como un unico argumento.
+          args_order: ['center', 'zoom'],
+          label: 'Mover la vista',
+          params: [
+            { name:'center', type:'array', required:true,
+              unit:'degrees', hint:'[lat, lng]' },
+            { name:'zoom', type:'number', min:0, max:22 }
+          ]
+        }
+      },
+      state: {
+        'view.center': [
+          { backend:'sdk-call', handle:'acme.canvas',
+            path:'getCenter', mode:'invoke',
+            label:'Centro de la vista', unit:'degrees' },
+          // Respaldo: el espejo del DOM, mas barato
+          // pero menos fresco.
+          { backend:'dom-mirror',
+            selector:'[data-nac-id="canvas.center"]',
+            extract:'attribute:data-nac-value' }
+        ]
+      },
+      events: {
+        'view.moved': {
+          backend:'emitter-listen', handle:'acme.canvas',
+          event:'moveend', observe:['view.center'],
+          label:'La vista dejó de moverse' }
+      }
+    });
+
+    return () =&gt; window.NAC.unregisterApiHandle('acme.canvas');
+  }, []);
+
+  return &lt;div ref={el =&gt; { apiRef.current = montar(el); }}
+              data-nac-plugin="acme.canvas" /&gt;;
+}</code></pre></div>
+<div class="pane"><h4><i>Python</i> — llamar, leer con cadena, suscribirse</h4>
+<pre><code># Llamar un verbo enrutado. El agente no sabe ni le
+# importa si eso fue un postMessage o una llamada al SDK.
+r = nac.call("call", "acme.canvas", "view.set",
+             {"center": [-34.6, -58.4], "zoom": 13})
+
+# Leer con cadena de respaldo. Si la primera fuente no
+# resuelve, el runtime pasa a la siguiente, callado.
+v = nac.call("read", "acme.canvas", "view.center")
+if not v["ok"] and v["code"] == "state_unreadable":
+    # attempts trae UNA entrada por enrutador intentado.
+    for a in v.get("attempts", []):
+        print(a["backend"], "->", a["reason"])
+
+# Suscribirse a un evento real de la biblioteca.
+page.evaluate("""() =&gt; {
+  window.__ev = [];
+  window.__asa = NAC.subscribe('acme.canvas',
+    'view.moved', d =&gt; window.__ev.push(d));
+}""")
+
+nac.call("call", "acme.canvas", "view.set",
+         {"center": [40.4, -3.7], "zoom": 10})
+page.wait_for_function("() =&gt; window.__ev.length &gt; 0")
+print(page.evaluate("() =&gt; window.__ev"))
+
+page.evaluate("() =&gt; NAC.unsubscribe(window.__asa)")
+
+# Codigo de la aplicacion, distinguible del protocolo:
+r = nac.call("call", "acme.canvas", "row.open",
+             {"row": 42})
+if not r["ok"]:
+    if r["code"].startswith("plugin."):
+        print("la aplicacion dijo no:", r["code"])
+    else:
+        print("el protocolo no llego:", r["code"])</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage8-plugin-extension.mjs</code><span class="cr">75 PASS · la suite más grande del árbol</span></div>
+<div class="cmd warn"><span class="cl">En navegador</span><code>npm run demo:v25-canvas-api</code><span class="cr">Playwright · <strong>CI nunca lo llama</strong></span></div>
+</section>
+
+<section class="fn" id="f27">
+<div class="fn-h"><span class="fn-n">F27</span><h3>Los seis ganchos de la 2.6: descubrimiento y autodescripción</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Hasta la 2.5.2 el registro de extensión era legible por exactamente tres funciones
+(<code>call</code>, <code>read</code>, <code>subscribe</code>), así que un agente que
+<strong>no</strong> registró el plugin él mismo <strong>no podía enterarse de que existe</strong>.
+Leía el manifiesto del DOM, encontraba la cáscara, y la superficie del lienzo era invisible. Para una
+superficie que no declara DOM en absoluto —un plugin sólo de voz— no había nada que encontrar.</p>
+<div class="sig">/* descubrimiento */
+NAC.plugins()              → PluginDescriptor[]   /* ordenado por slug */
+NAC.describePlugin(slug)   → PluginDescriptor
+
+/* asas de API, para objetos que nunca llegan a window */
+NAC.registerApiHandle(name, obj)   ·   NAC.unregisterApiHandle(name) → boolean
+NAC.apiHandles() → string[]
+
+/* autodescripción, todo opcional */
+verbo:  label · hint · params[]       params: {name, type, required?, unit?, min?, max?, enum?, label?, hint?}
+estado: label · hint · unit            evento: label · hint</div>
+<div class="box box-g">
+  <span class="lbl">Las cinco reglas del descubrimiento, y por qué cada una</span>
+  <ol>
+    <li><strong>Las dos son SINCRÓNICAS.</strong> Leen un objeto local; nada se despacha a ninguna
+    superficie, así que no hay motivo para que un agente espere una vuelta sólo para saber qué
+    hay.</li>
+    <li><strong>El descriptor es una COPIA.</strong> Un llamador no debe poder alcanzar el registro
+    vivo a través de él y reescribir el enrutamiento de otro plugin.</li>
+    <li><strong>Vuelve ordenado por ruta</strong>, así que dos lecturas del mismo registro son
+    comparables byte a byte.</li>
+    <li><strong>Un <code>label</code>, <code>hint</code> o <code>params</code> no declarado se lee
+    como <code>null</code>, nunca como clave ausente</strong>: el lector no tiene que distinguir
+    «ausente» de «no declarado».</li>
+    <li><code>describePlugin</code> sobre un slug no registrado rechaza con
+    <code>plugin_not_registered</code>.</li>
+  </ol>
+  <p>El descubrimiento es deliberadamente una lectura de lo que el manifiesto
+  <strong>declara</strong>, no un sondeo de la superficie. Dice qué existe y cómo nombrarlo; si la
+  superficie contesta hoy es lo que <code>call</code> y <code>read</code> están para averiguar.</p>
+</div>
+<p>Y lo que cierra la autodescripción: en una superficie continua <strong>lo accionable
+<em>es</em> el argumento</strong> —una coordenada y un zoom, un instante de una línea de tiempo, una
+página y un campo de formulario, una pose en tres dimensiones— y hasta la 2.5 nada declaraba su
+forma, su unidad ni su rango. Un corredor de voz no podía ni <em>nombrar</em> el verbo en voz alta.</p>
+<div class="box box-c">
+  <span class="lbl">Y un límite explícito</span>
+  <p><code>params</code> declara la forma del objeto <code>args</code> que recibe
+  <code>NAC.call</code>. <strong>El runtime NO valida los argumentos contra él.</strong> La
+  declaración existe para que un agente pueda componer una llamada y un corredor de voz pueda
+  pronunciarla; una superficie que necesita sus argumentos exigidos los exige donde aterrizan.</p>
+  <p>Y nada de esto lo traduce el runtime: una etiqueta se escribe en el idioma de la aplicación, y
+  un anfitrión que habla otro localiza en su propia capa.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — declarar para que un agente ajeno entienda</h4>
+<pre><code>// Lo que hace que un plugin pueda vivir en OTRO
+// repositorio, bajo OTRA licencia, y ser usable por
+// un agente que no lo registro: que se describa.
+window.NAC.registerPlugin('acme.map', {
+  slug:  'acme.map',
+  label: 'Mapa Acme',
+  hint:  'Para ubicar y encuadrar',
+  verbs: {
+    'view.set': {
+      backend:'sdk-call', handle:'acme.map',
+      path:'setView', mode:'invoke',
+      args_order:['center','zoom'],
+      label:'Mover el mapa',
+      hint:'Centra el mapa en una coordenada a un zoom',
+      params:[
+        { name:'center', type:'array', required:true,
+          unit:'degrees', label:'Centro',
+          hint:'[lat, lng]' },
+        { name:'zoom', type:'number', required:false,
+          unit:'nivel de zoom', min:0, max:22 }
+      ]
+    }
+  },
+  state: { 'view.center': [
+    { backend:'sdk-call', handle:'acme.map',
+      path:'getCenter', mode:'invoke',
+      label:'Centro de la vista', unit:'degrees' }]},
+  events: { 'view.moved': {
+    backend:'emitter-listen', handle:'acme.map',
+    event:'moveend', observe:['view.center'],
+    label:'El mapa dejó de moverse' }}
+});
+
+/* Un label que no es string, o un param de un tipo
+   fuera del vocabulario, se RECHAZA al registrar con
+   'invalid'. Opcional no quiere decir laxo. */</code></pre></div>
+<div class="pane"><h4><i>Python</i> — un agente que descubre una superficie que no registró</h4>
+<pre><code># Sincrono: ni await ni espera.
+for d in page.evaluate("() =&gt; NAC.plugins()"):
+    print(f"\n== {d['slug']}  ({d['label'] or 'sin nombre'})")
+    print("  ", d["hint"] or "—")
+
+    for v in d["verbs"]:
+        firma = []
+        for p in (v["params"] or []):
+            t = p["type"]
+            if p.get("unit"):  t += f" en {p['unit']}"
+            if p.get("min") is not None:
+                t += f" [{p['min']}..{p['max']}]"
+            firma.append(f"{p['name']}: {t}"
+                         + ("" if p.get("required") else "?"))
+        print(f"   verbo {v['verb_path']}({', '.join(firma)})")
+        print(f"         via {v['backend']} — {v['label']}")
+
+    for s in d["state"]:
+        print(f"   estado {s['state_path']} "
+              f"({'/'.join(str(b) for b in s['backends'])})"
+              f" {s['unit'] or ''}")
+    for e in d["events"]:
+        print(f"   evento {e['event_path']} "
+              f"observa {e['observe']}")
+
+# Esto es lo que un corredor de voz necesita para decir
+# "puedo mover el mapa a una coordenada y un zoom de 0
+#  a 22" sin que nadie se lo haya cableado.
+
+# Las asas registradas, por si falta una:
+print(page.evaluate("() =&gt; NAC.apiHandles()"))</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/stage13-plugin-hooks.mjs</code><span class="cr">67 PASS · medido 2026-11-14</span></div>
+<div class="cmd warn"><span class="cl">Contra una biblioteca real</span><code>node scripts/run-demo-v26-leaflet-plugin.mjs</code><span class="cr">37/37 · medido 2026-11-14 · <strong>necesita red</strong> (Leaflet 1.9.4) · CI no lo llama</span></div>
+<p style="font-size:13.6px;color:var(--ct2)">Ese último es el único ejecutor que
+<strong>sirve el repositorio él mismo</strong> y no necesita que nadie levante un servidor antes, y el
+único que maneja una biblioteca de terceros que este proyecto no controla. Por eso declara que
+necesita red en vez de reportar un verde que no midió.</p>
+</section>
+
+<div class="divider"><span class="ln"></span><span class="kanji">面</span><span class="ln"></span></div>
+
+<h3 class="grp">F · Los cuatro bloques de la 2.5: lo que pidió la accesibilidad</h3>
+<p>Navegación por árbol, etiquetas, detección de efecto. Los tres salieron de RFCs de accesibilidad y
+los tres tienen el mismo problema de cobertura: <strong>ninguno tiene suite de Node</strong>.</p>
+
+<section class="fn" id="f28">
+<div class="fn-h"><span class="fn-n">F28</span><h3>context · tree — navegación jerárquica de comandos</h3>
+<span class="cov cov-out">sólo ejecutores de navegador, fuera de CI</span></div>
+<p>Para un flujo asistivo o un corredor de voz que necesita decir <em>qué puede hacer desde
+acá</em>.</p>
+<div class="sig">NAC.context(plugin)         → { breadcrumb: [{nac_id, label}, ...] }
+NAC.tree(plugin, rootId?)   → [{nac_id, label, opens?, leaf?}, ...]
+
+/* atributos de autoría */
+data-nac-opens="&lt;id-destino&gt;"   declara que este nodo abre o entra en ese otro
+data-nac-leaf                     marcador terminal explícito: no se puede bajar más</div>
+<p><code>context</code> sube desde <code>document.activeElement</code> por los ancestros que llevan
+<code>data-nac-id</code>, y se detiene en la raíz del plugin. <code>tree</code> enumera los hijos
+direccionables <strong>inmediatos</strong>: «inmediato» quiere decir que no hay otro elemento con
+<code>data-nac-id</code> entre el punto de partida y el hijo. Las etiquetas de los dos salen de
+<code>narrate</code> (F29).</p>
+<p><strong>Errores, y es a propósito:</strong> <code>tree</code> devuelve <code>[]</code> ante un
+<code>rootId</code> desconocido —vacío silencioso, no un error— y <code>context</code> devuelve
+siempre <code>{ breadcrumb: [] }</code> para un plugin desconocido.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — declarar la cadena de navegación</h4>
+<pre><code>&lt;nav data-nac-id="menu" data-nac-role="navigation"&gt;
+  &lt;button data-nac-id="menu.facturas"
+          data-nac-role="action"
+          data-nac-action="open"
+          /* el agente puede SEGUIR la cadena sin
+             adivinar nombres */
+          data-nac-opens="facturas.panel"&gt;
+    Facturas
+  &lt;/button&gt;
+
+  &lt;button data-nac-id="menu.salir"
+          data-nac-role="action"
+          data-nac-action="logout"
+          /* terminal explicito: no hay mas abajo */
+          data-nac-leaf&gt;
+    Salir
+  &lt;/button&gt;
+&lt;/nav&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — un recorrido guiado, sin saber la pantalla</h4>
+<pre><code>def recorrer(nac, plugin, root=None, prof=0):
+    hijos = page.evaluate(
+        "([p, r]) =&gt; NAC.tree(p, r)", [plugin, root])
+    for h in hijos:
+        print("  " * prof, h["label"],
+              "→" + h["opens"] if h.get("opens") else "",
+              "(hoja)" if h.get("leaf") else "")
+        # data-nac-opens es lo que permite BAJAR sin
+        # adivinar: el autor declaro el destino.
+        if h.get("opens"):
+            recorrer(nac, plugin, h["opens"], prof + 1)
+        elif not h.get("leaf"):
+            recorrer(nac, plugin, h["nac_id"], prof + 1)
+
+recorrer(nac, "facturas")
+
+# Donde estoy ahora, para anunciarlo en voz alta:
+ctx = page.evaluate("p =&gt; NAC.context(p)", "facturas")
+print(" › ".join(c["label"] for c in ctx["breadcrumb"]))</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Prueba</span><code>node scripts/run-demo-v25-02-tree-nav.mjs</code><span class="cr">Playwright · <strong>fuera de CI</strong></span></div>
+<div class="cmd warn"><span class="cl">Y</span><code>node scripts/run-pilot-v25-02-tree-nav.mjs</code><span class="cr">el ejecutor de Pilot, también fuera de CI</span></div>
+<div class="box box-c"><span class="lbl">Cobertura, medida</span>
+<p>Verificado el 2026-11-14 buscando <code>narrate</code>, <code>context</code> y
+<code>tree</code> como funciones en las 20 suites de <code>runtime/test/</code>:
+<strong>ninguna los ejercita</strong>. Las coincidencias de «tree» que aparecen son
+<code>tree_version</code>, otra cosa.</p></div>
+</section>
+
+<section class="fn" id="f29">
+<div class="fn-h"><span class="fn-n">F29</span><h3>narrate — una etiqueta, cuatro capas, orden estricto</h3>
+<span class="cov cov-out">sólo ejecutores de navegador, fuera de CI</span></div>
+<p>Una sola función para lectores de pantalla, voz sintetizada, flujos de voz, registros de auditoría
+y superficies asistivas móviles. Devuelve <code>null</code> si no encuentra el plugin o el
+identificador.</p>
+<div class="sig">NAC.narrate(plugin, nac_id) → string | null
+   1. aria-label          — primero la accesibilidad; se respeta salvo que sea sólo espacios
+   2. texto visible       — textContent EXCLUYENDO los subárboles con data-nac-id propio
+   3. data-nac-label      — anulación explícita del autor
+   4. el propio nac_id    — el peor caso; es la señal de "nadie escribió una etiqueta"
+   /* un valor de sólo espacios en cualquier capa colapsa a la siguiente */</div>
+<p>La exclusión de la capa 2 es la parte fina: un subárbol con su propio <code>data-nac-id</code>
+tiene su propia resolución, y se lo saca para que lo que se pronuncia quede acotado. Si no, una
+tarjeta leería en voz alta el contenido de todos sus botones.</p>
+<p><code>validate_global()</code> puede emitir avisos en la cubeta
+<code>plugin_instance_violations</code> para identificadores con forma ordinal
+(<code>btn-1</code>, <code>btn-2</code>…) que no tienen ninguna de las capas de arriba — es decir,
+los que caerían a la capa 4.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — las cuatro capas, en un caso real</h4>
+<pre><code>{/* Capa 1: aria-label gana sobre todo. Es lo correcto
+    cuando el texto visible es un glifo. */}
+&lt;button aria-label="Borrar la factura INV-7"
+        data-nac-id="inv.del__INV-7"
+        data-nac-role="action"
+        data-nac-action="delete"&gt;🗑&lt;/button&gt;
+
+{/* Capa 2: texto visible. El span de adentro NO tiene
+    data-nac-id propio, asi que SI entra. */}
+&lt;button data-nac-id="inv.save" data-nac-role="action"
+        data-nac-action="save"&gt;
+  Guardar &lt;span className="hint"&gt;(Ctrl+S)&lt;/span&gt;
+&lt;/button&gt;
+
+{/* Capa 3: data-nac-label, cuando el texto visible es
+    una clave de i18n o un icono. */}
+&lt;button data-nac-label="Exportar a planilla"
+        data-nac-id="inv.export" data-nac-role="action"
+        data-nac-action="download"&gt;
+  {t('inv.export')}
+&lt;/button&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — auditar qué pronunciaría un lector de pantalla</h4>
+<pre><code># Los ids que caen a la capa 4 son los que un usuario
+# de lector de pantalla escucha como basura.
+sin_etiqueta = []
+for pl in nac.describe()["plugins"]:
+    slug = pl["plugin"]
+    for el in pl.get("elements", []):
+        etq = page.evaluate("([p,i]) =&gt; NAC.narrate(p,i)",
+                            [slug, el["id"]])
+        if etq is None or etq == el["id"]:
+            sin_etiqueta.append((slug, el["id"]))
+        else:
+            print(f"{el['id']:36} → {etq!r}")
+
+print(len(sin_etiqueta), "elementos sin etiqueta real")
+for s, i in sin_etiqueta:
+    print("  ", s, i)</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Prueba</span><code>node scripts/run-demo-v25-03-narrate.mjs</code><span class="cr">Playwright · <strong>fuera de CI</strong></span></div>
+</section>
+
+<section class="fn" id="f30">
+<div class="fn-h"><span class="fn-n">F30</span><h3>expect · diff — confirmar el efecto, no el comando</h3>
+<span class="cov cov-out">sólo ejecutores de navegador, fuera de CI</span></div>
+<p>Cierra el hueco del daño silencioso: el agente confirma el <strong>efecto</strong> de una acción,
+no que el comando salió. Los dos se componen con <code>NAC.read()</code>, así que funcionan contra
+cualquiera de los nueve enrutadores de F26.</p>
+<div class="sig">NAC.expect(plugin, statePath, value, opts?) → Promise&lt;value&gt;
+   opts: { timeout_ms = 5000, poll_ms = 100,
+           comparator = (actual, esperado) =&gt; actual === esperado }
+   /* una lectura que falla durante el sondeo se REINTENTA hasta el vencimiento:
+      se trata como "todavía no observable", no como error duro */
+   rechaza: NacError('timeout')
+
+NAC.diff(plugin, statePath, actionFn) → Promise&lt;{before, after, changed}&gt;
+   /* lee, espera actionFn(), vuelve a leer. changed se calcula comparando
+      con JSON.stringify, así que undefined-contra-valor también marca cambio.
+      Una lectura que falla colapsa a undefined. */</div>
+<div class="box box-g">
+  <span class="lbl">Cuál de los dos, y por qué</span>
+  <p><code>diff</code> captura <strong>sólo</strong> la foto del principio y la del final: no observa
+  los estados intermedios de la acción. Si tu preocupación es «el estado pasa por tal valor en algún
+  momento», eso es <code>expect</code>, no <code>diff</code>.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — declarar el estado que confirma el efecto</h4>
+<pre><code>// Para que un agente pueda confirmar, el anfitrion
+// tiene que declarar un estado LEGIBLE. Un espejo del
+// DOM es la forma mas barata.
+&lt;span data-nac-id="inv.status"
+      data-nac-value={estado}
+      hidden /&gt;
+
+window.NAC.registerPlugin('inv', {
+  slug: 'inv',
+  verbs: {},
+  state: {
+    'invoice.status': [
+      { backend:'dom-mirror',
+        selector:'[data-nac-id="inv.status"]',
+        extract:'attribute:data-nac-value',
+        label:'Estado de la factura' }
+    ]
+  },
+  events: {}
+});</code></pre></div>
+<div class="pane"><h4><i>Python</i> — los dos patrones, completos</h4>
+<pre><code># Patron 1: actuar y confirmar que el estado LLEGO.
+nac.call("click_by_verb", "inv", "approve")
+r = nac.call("expect", "inv", "invoice.status", "approved",
+             {"timeout_ms": 8000, "poll_ms": 150})
+if not r["ok"] and r["code"] == "timeout":
+    # El comando salio y el efecto NO se observo. Esto
+    # es exactamente lo que un acuse no te dice.
+    print("sin efecto observable en 8 s")
+
+# Patron 2: envolver la accion y mirar el antes/despues.
+d = page.evaluate("""async () =&gt; {
+  return await NAC.diff('inv', 'invoice.status',
+    async () =&gt; { await NAC.click_by_verb('inv','approve'); });
+}""")
+print(d["before"], "→", d["after"], "cambió:", d["changed"])
+
+# Comparador propio, cuando la igualdad estricta no sirve
+# (un numero con tolerancia, una lista sin orden):
+page.evaluate("""() =&gt; NAC.expect('acme.map',
+  'view.center', [-34.6, -58.4], {
+    comparator: (a, b) =&gt;
+      Math.abs(a[0]-b[0]) &lt; 0.01 &amp;&amp;
+      Math.abs(a[1]-b[1]) &lt; 0.01 })""")</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Prueba</span><code>node scripts/run-pilot-v25-04-expect-diff.mjs</code><span class="cr">Playwright · <strong>fuera de CI</strong></span></div>
+<div class="cmd warn"><span class="cl">Y <code>expect</code> también en</span><code>node scripts/run-demo-v26-leaflet-plugin.mjs</code><span class="cr">37/37 · medido 2026-11-14</span></div>
+</section>
+
+<h3 class="grp">G · Datos, migración progresiva e interoperación</h3>
+
+<section class="fn" id="f22">
+<div class="fn-h"><span class="fn-n">F22</span><h3>Tablas de datos: registerDataTable y la familia dt_*</h3>
+<span class="cov cov-out">su única prueba es una suite huérfana</span></div>
+<p><strong>No están en el núcleo.</strong> Viven en el módulo de extensiones y se enganchan sobre el
+mismo <code>window.NAC</code> después de cargarlo. Llamarlas sobre un runtime sin extensiones no da
+un error del contrato: da <code>undefined</code>.</p>
+<div class="sig">NAC.registerDataTable(spec)                      → table_id
+NAC.dt_add_row(table_id, values)                 → {ok, row_id}
+NAC.dt_remove_row(table_id, row_id)              → {ok}
+NAC.dt_edit_cell(table_id, row_id, column, value)→ {ok} | {ok:false, error}
+NAC.dt_set_cell(table_id, row, col, value)       ·  NAC.dt_get_cell(...)
+NAC.dt_select(table_id, target)                  → {ok}
+NAC.dt_commit(table_id)                          → {ok, final_state} | {ok:false, errors:[...]}
+NAC.dt_discard(table_id)                         → {ok}
+NAC.dt_state(table_id)                           → TableState
+NAC.dt_validate(table_id)                        ·  NAC.dt_read_aggregate(table_id, agg_key, column)
+NAC.registerDataTableComputed(table_id, column, fn)
+NAC.unregisterDataTable(table_id)</div>
+<p><strong>Tres subtipos:</strong> <code>collection</code> (filas ordenadas con confirmación
+transaccional opcional — líneas de factura, ítems de carrito, entradas de registro),
+<code>matrix</code> (rejilla fila × columna donde cada celda lleva valor — matrices de permisos,
+grillas de horario) y <code>matrix-singletree</code> (matriz donde cada fila colapsa en un árbol;
+raro).</p>
+<p><strong>El modelo es transaccional</strong>: se edita, y <code>dt_commit</code> confirma todo
+junto o devuelve <code>{ok:false, errors:[...]}</code>; <code>dt_discard</code> tira los cambios.
+Nada de esto persiste del lado del servidor — este sistema no tiene datos propios, y el demo confirma
+sólo en memoria.</p>
+<div class="box box-c">
+  <span class="lbl">Hueco de cobertura, medido</span>
+  <p>La familia entera aparece en <strong>una sola</strong> suite,
+  <code>runtime/test/stage4-calls.mjs</code>, que <strong>no está en <code>npm test</code></strong>
+  (pasa: 33 PASS el 2026-11-14). Fuera de ahí, sólo
+  <code>e2e/n0-eligibility-v21.mjs</code>, que <strong>no está declarado en ningún script de
+  npm</strong> y se corre a mano. Es decir: la superficie de 14 funciones con la que un agente edita
+  datos no tiene ninguna prueba que alguien ejecute automáticamente.</p>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — una tabla de líneas con columna calculada</h4>
+<pre><code>const tableId = useRef(null);
+
+useEffect(() =&gt; {
+  if (!window.NAC?.registerDataTable) return;   // sin extensiones
+  tableId.current = window.NAC.registerDataTable({
+    nac_id:  'inv.lines',
+    subkind: 'collection',
+    columns: [
+      { key:'desc',  type:'text',   required:true },
+      { key:'qty',   type:'number', required:true, min:1 },
+      { key:'price', type:'number', required:true },
+      { key:'total', type:'number', computed:true }
+    ],
+    aggregates: { sum_total: { column:'total', op:'sum' } }
+  });
+
+  window.NAC.registerDataTableComputed(
+    tableId.current, 'total',
+    (fila) =&gt; Number(fila.qty) * Number(fila.price));
+}, []);
+
+&lt;table data-nac-id="inv.lines"
+       data-nac-role="data-table"&gt;…&lt;/table&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — el ciclo transaccional completo</h4>
+<pre><code>tid = "inv.lines"
+
+r = nac.call("dt_add_row", tid,
+             {"desc": "Servicio", "qty": 2, "price": 150})
+row = r["value"]["row_id"]
+
+nac.call("dt_edit_cell", tid, row, "qty", 3)
+
+# El agregado se lee, no se calcula del lado del agente.
+tot = nac.call("dt_read_aggregate", tid, "sum_total", "total")
+print("total:", tot["value"])        # 450
+
+est = nac.call("dt_state", tid)
+print(len(est["value"]["rows"]), "filas pendientes")
+
+c = nac.call("dt_commit", tid)
+if c["value"]["ok"]:
+    print("confirmado:", c["value"]["final_state"])
+else:
+    # errors[] trae fila y columna de cada rechazo.
+    for e in c["value"]["errors"]:
+        print("rechazo:", e)
+    nac.call("dt_discard", tid)</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Única prueba</span><code>cd runtime &amp;&amp; node ./test/stage4-calls.mjs</code><span class="cr">33 PASS · <strong>huérfana</strong></span></div>
+<div class="cmd warn"><span class="cl">En navegador, a mano</span><code>node e2e/n0-eligibility-v21.mjs</code><span class="cr">no está en ningún script de npm</span></div>
+</section>
+
+<section class="fn" id="f23">
+<div class="fn-h"><span class="fn-n">F23</span><h3>Migración progresiva: scope, autoRegister, adopt, captura efímera</h3>
+<span class="cov cov-no">sin prueba propia</span></div>
+<p>Los primitivos de la 2.0, para meter NAC3 en una aplicación que ya existe sin reescribirla. Todos
+viven en el módulo de extensiones.</p>
+<div class="sig">NAC.scope(...)                      → el árbol de ámbitos de la página
+NAC.autoRegister.watch(root, opts)  → recorre el DOM y registra lo que tenga id + rol
+   opts: { i18n_strict: 'permissive'|'strict', throttleMs }
+NAC.adopt(...)                      → adoptar un subárbol existente
+NAC.bridgeShadowRoot(root)          ·  NAC.bridgeIframe(iframe)
+NAC.declareVirtual(...)             → declarar un nodo que no existe en el DOM
+NAC.captureEphemeral(...)           → capturar un widget que vive y muere (un menú, un tooltip)
+NAC.setTenantPrefix(p) · NAC.getTenantPrefix()
+NAC.gcIntermediateScopes()          ·  NAC.declareSitemap(...) · NAC.getSitemap()</div>
+<div class="box box-g">
+  <span class="lbl">El orden de ataque recomendado, del documento de adopción</span>
+  <ol>
+    <li><strong>El envoltorio de más arriba primero.</strong> <code>data-nac-plugin="&lt;slug&gt;"</code>
+    en tu <code>&lt;div&gt;</code> o <code>&lt;main&gt;</code> raíz.</li>
+    <li><strong>Los botones más usados después.</strong> Guardar, cancelar, enviar, borrar de tus
+    pantallas más cargadas. <em>Todavía sin manifiesto.</em></li>
+    <li><strong>Verificá que el runtime los vea.</strong> <code>NAC.describe()</code> en la consola.</li>
+    <li><strong>Un manifiesto mínimo.</strong> Sólo los botones del paso 2, con sus verbos. Ahí
+    empieza a funcionar <code>click_by_verb</code>.</li>
+    <li><strong>Los campos.</strong></li>
+    <li><strong>Las pestañas.</strong> Y acá, la regla que no se puede saltear: un id que empieza con
+    <code>tab.</code> <strong>tiene</strong> que llevar rol <code>tab</code>.</li>
+  </ol>
+</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — y el caso de la biblioteca que se come los <code>data-*</code></h4>
+<pre><code>// Patron A: la mayoria de las bibliotecas bien hechas
+// reenvia props desconocidas al DOM. Con eso alcanza.
+&lt;Button data-nac-id="inv.save" data-nac-role="action"
+        data-nac-action="save" onClick={onSave}&gt;
+  Guardar
+&lt;/Button&gt;
+
+// Patron B: si tu biblioteca las descarta, un envoltorio.
+export function NACButton({ nacId, verb, ...rest }) {
+  const ref = useRef(null);
+  useEffect(() =&gt; {
+    const el = ref.current;
+    if (!el) return;
+    el.setAttribute('data-nac-id', nacId);
+    el.setAttribute('data-nac-role', 'action');
+    el.setAttribute('data-nac-action', verb);
+  }, [nacId, verb]);
+  return &lt;MuiButton ref={ref} {...rest} /&gt;;
+}
+
+// Y el registro automatico, para no escribir el
+// manifiesto a mano mientras migras:
+useEffect(() =&gt; {
+  const root = document.querySelector('[data-nac-plugin]');
+  if (!root || !window.NAC?.autoRegister) return;
+  root.setAttribute('data-nac-watch', '1');
+  window.NAC.autoRegister.watch(root, {
+    // 'permissive' acepta cobertura parcial de los diez
+    // idiomas. En produccion va 'strict'.
+    i18n_strict: 'permissive',
+    throttleMs: 100
+  });
+}, []);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — medir el avance de la migración</h4>
+<pre><code># La metrica que importa durante una migracion: cuanto
+# de lo que se pinta esta DECLARADO. Un agente solo
+# puede usar lo declarado.
+pintados = page.evaluate(
+    "() =&gt; [...document.querySelectorAll('[data-nac-id]')]"
+    ".map(e =&gt; e.getAttribute('data-nac-id'))")
+
+rep = page.evaluate("() =&gt; NAC.validate_global({probe:false})")
+
+print(f"{len(set(pintados))} pintados / "
+      f"{rep['total_ids']} declarados")
+print(f"{len(rep['orphans'])} huerfanos "
+      f"(pintados y no declarados)")
+print(f"{len(rep['unmounted'])} declarados y no pintados")
+
+# Y el arbol de ambitos de la 2.0, si las extensiones
+# estan cargadas:
+v2 = page.evaluate(
+    "() =&gt; typeof NAC.describe_v2 === 'function'"
+    " ? NAC.describe_v2() : null")
+if v2:
+    print(len(v2.get("v2_scope_entries", [])), "ambitos")</code></pre></div>
+</div>
+<div class="box box-c"><span class="lbl">Cobertura, medida</span>
+<p>Verificado el 2026-11-14: ninguna suite de <code>runtime/test/</code> menciona
+<code>autoRegister</code>, <code>captureEphemeral</code> ni <code>setTenantPrefix</code>. Los
+primitivos con los que un adoptante entra al protocolo no tienen prueba en este árbol.</p></div>
+</section>
+
+<section class="fn" id="f24">
+<div class="fn-h"><span class="fn-n">F24</span><h3>El catálogo de idiomas del runtime, y RTL</h3>
+<span class="cov cov-no">sin prueba propia</span></div>
+<p>No confundir con los <code>label_i18n</code> del manifiesto: esto es el catálogo de cadenas del
+<em>propio runtime</em> (sus mensajes, los textos del editor de campo), en el módulo de
+extensiones.</p>
+<div class="sig">NAC.t(clave, vars?)             → la cadena traducida
+NAC.registerCatalog(locale, obj) → agregar o reemplazar un catálogo
+NAC.locale(l?)                   → leer o fijar el idioma actual
+NAC.setSupportedLocales([...])   ·  NAC.setRTLLocales([...])  ·  NAC.setAutoRTL(bool)
+NAC.set_a11y_hint_localizer(fn)  → cómo se localiza data-nac-a11y-hint
+NAC.sort_hints_by_priority(...)  ·  NAC.set_hint_priority(...)</div>
+<p>De los diez idiomas, uno es de escritura derecha a izquierda: el árabe.
+<code>setAutoRTL(true)</code> hace que el runtime ponga la dirección sola cuando el idioma activo es
+RTL.</p>
+<div class="cmd warn"><span class="cl">Lo más cercano</span><code>npm run test:landing-i18n</code><span class="cr">10 catálogos · valida los de la portada, <strong>no</strong> esta API</span></div>
+</section>
+
+<section class="fn" id="f25">
+<div class="fn-h"><span class="fn-n">F25</span><h3>Interoperación entre aplicaciones: el prefijo remote:</h3>
+<span class="cov cov-in">en la batería</span></div>
+<p>Una aplicación puede importar el árbol de otra y despachar hacia adentro, con el prefijo
+<code>remote:&lt;namespace&gt;:</code>. Vive en <code>js/nac-mcp-interop.js</code>, que avisa y se
+saltea si el núcleo no se cargó primero.</p>
+<div class="sig">NAC.export_tree()                                    → el árbol propio, para que otro lo importe
+NAC.import_remote_tree({ url, bearer, namespace })    → traer el de otra aplicación
+NAC.list_remote_apps()                                → [{ namespace, ... }]
+NAC.disconnect_remote(namespace)
+/* y después: */ NAC.click('remote:b:invoice.save')</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — exponer el árbol propio a un par</h4>
+<pre><code>// Del lado que EXPONE: un endpoint que devuelve el
+// arbol. La autorizacion es tuya, no de NAC3.
+app.get('/nac/export', requireBearer, (req, res) =&gt; {
+  res.json(treeSnapshotDelCliente);
+});
+
+// Del lado que IMPORTA:
+useEffect(() =&gt; {
+  window.NAC.import_remote_tree({
+    url: 'https://app-b.example.com/nac/export',
+    bearer: tokenDeSesion,
+    namespace: 'b'
+  });
+  return () =&gt; window.NAC.disconnect_remote('b');
+}, [tokenDeSesion]);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — manejar dos aplicaciones como una</h4>
+<pre><code>page.evaluate("""t =&gt; NAC.import_remote_tree({
+  url: 'https://app-b.example.com/nac/export',
+  bearer: t, namespace: 'b' })""", token)
+
+remotos = page.evaluate("() =&gt; NAC.list_remote_apps()")
+assert any(r["namespace"] == "b" for r in remotos)
+
+# El prefijo enruta por la capa de interoperacion.
+nac.call("click", "remote:b:invoice.save")
+
+# Si falla el preflight de CORS, el par tiene que
+# permitir tu Origin: no es un problema del protocolo.</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba</span><code>cd runtime &amp;&amp; node ./test/v23-interop.mjs</code><span class="cr">29 PASS · medido 2026-11-14</span></div>
+</section>
+
+<section class="fn" id="f31">
+<div class="fn-h"><span class="fn-n">F31</span><h3>drag_drop · reorder — arrastrar entre listas y dentro de una</h3>
+<span class="cov cov-out">su única prueba es una suite huérfana</span></div>
+<p><code>reorder</code> mueve dentro de una lista; <code>drag_drop</code> cruza de una lista a otra.
+Los roles son <code>draggable</code> y <code>drop-target</code>, y los atributos que declaran la
+compatibilidad son <code>data-nac-drag-type</code> y <code>data-nac-drag-accept</code>.</p>
+<div class="sig">NAC.drag_drop(source_id, target_id, opts?: { to_index?: number }) → Promise&lt;...&gt;
+NAC.reorder(...)   → movimiento dentro de la misma lista</div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — declarar qué acepta qué</h4>
+<pre><code>&lt;ul data-nac-id="tablero.pendiente"
+    data-nac-role="drop-target"
+    data-nac-drag-accept="tarjeta"&gt;
+  {items.map((it, i) =&gt; (
+    &lt;li key={it.id}
+        data-nac-id={`tarjeta.${it.id}`}
+        data-nac-role="draggable"
+        data-nac-drag-type="tarjeta"
+        data-nac-position={i}&gt;
+      {it.titulo}
+    &lt;/li&gt;))}
+&lt;/ul&gt;
+
+&lt;ul data-nac-id="tablero.hecho"
+    data-nac-role="drop-target"
+    data-nac-drag-accept="tarjeta"&gt;…&lt;/ul&gt;</code></pre></div>
+<div class="pane"><h4><i>Python</i> — mover una tarjeta a una posición exacta</h4>
+<pre><code>r = nac.call("drag_drop", "tarjeta.42",
+             "tablero.hecho", {"to_index": 0})
+
+if not r["ok"]:
+    print(r["code"])
+    # Causas tipicas: el destino no declara
+    # data-nac-drag-accept compatible con el
+    # data-nac-drag-type del origen, o uno de los dos
+    # no esta montado.</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Única prueba</span><code>cd runtime &amp;&amp; node ./test/stage6b-longtail.mjs</code><span class="cr">14 PASS · <strong>huérfana</strong></span></div>
+</section>
+
+<div class="divider"><span class="ln"></span><span class="kanji">移</span><span class="ln"></span></div>
+
+<h3 class="grp">H · La cola larga, el arranque y los niveles</h3>
+
+<section class="fn" id="f32">
+<div class="fn-h"><span class="fn-n">F32</span><h3>La cola larga de las familias 1.2 a 1.4 — quince familias de widget</h3>
+<span class="cov cov-no">sin prueba propia, con una excepción</span></div>
+<p>Setenta y pico de funciones que cubren widgets que ya existían en las aplicaciones de negocio
+cuando el protocolo llegó. Están en el núcleo, forman parte del export y <strong>casi ninguna tiene
+prueba</strong>. Las agrupo por familia porque así se usan.</p>
+<div class="tw"><table>
+<tr><th style="width:15%">Familia</th><th style="width:44%">Funciones</th><th>Para qué, y su atributo propio si tiene</th></tr>
+<tr><td><strong>Avisos</strong></td><td><code>toast</code> <code>list_toasts</code>
+<code>dismiss_toast</code> <code>list_banners</code> <code>dismiss_banner</code></td><td>Un agente
+tiene que poder <em>leer</em> el aviso que la aplicación acaba de mostrar, y descartarlo.</td></tr>
+<tr><td><strong>Confirmación</strong></td><td><code>confirm</code>
+<code>list_pending_confirms</code></td><td>Diálogos pendientes.
+<code>data-nac-confirmation-message</code>. Es el modelo de la 1.9, subconjunto estricto del de
+autoridad (F17).</td></tr>
+<tr><td><strong>Asistente</strong></td><td><code>step_next</code> <code>step_back</code>
+<code>step_to</code> <code>step_state</code></td><td>Flujos por pasos. Rol <code>step</code>, evento
+<code>nac:step:advanced</code>.</td></tr>
+<tr><td><strong>Árbol</strong></td><td><code>tree_expand</code> <code>tree_collapse</code>
+<code>tree_select</code> <code>tree_path</code></td><td>Árboles de carpetas y jerarquías. No
+confundir con <code>NAC.tree</code> de F28, que es otra cosa.</td></tr>
+<tr><td><strong>Etiquetas</strong></td><td><code>add_tag</code> <code>remove_tag</code>
+<code>list_tags</code></td><td>Entradas de múltiples valores.</td></tr>
+<tr><td><strong>Cajón</strong></td><td><code>open_drawer</code> <code>close_drawer</code>
+<code>peek_drawer</code></td><td>Paneles laterales y hojas inferiores.
+<code>data-nac-peek-pct</code>.</td></tr>
+<tr><td><strong>Calendario</strong></td><td><code>calendar_view</code> <code>calendar_go_to</code>
+<code>calendar_select_event</code> <code>calendar_list_events</code></td><td><code>data-nac-view</code>,
+<code>data-nac-date</code>, <code>data-nac-start</code>, <code>data-nac-end</code>.</td></tr>
+<tr><td><strong>Gráfico</strong></td><td><code>chart_data</code> <code>chart_toggle_series</code>
+<code>chart_filter</code></td><td>Leer los datos detrás del dibujo es la única forma de que un agente
+«vea» un gráfico.</td></tr>
+<tr><td><strong>Mapa</strong></td><td><code>map_focus</code> <code>map_select_marker</code>
+<code>map_toggle_layer</code> <code>list_markers</code></td><td><code>data-nac-lat</code>,
+<code>data-nac-lng</code>, <code>data-nac-zoom</code>. La versión DOM de lo que F26 hace por
+enrutador.</td></tr>
+<tr><td><strong>Texto rico</strong></td><td><code>richtext_format</code>
+<code>richtext_insert_link</code> <code>richtext_insert_mention</code></td><td>Editores. El caso de
+«negrita está activo» que motivó <code>dom-mirror</code>.</td></tr>
+<tr><td><strong>Miga de pan</strong></td><td><code>list_breadcrumbs</code>
+<code>navigate_breadcrumb</code></td><td>Rol <code>breadcrumb-item</code>, evento
+<code>nac:breadcrumb:navigated</code>.</td></tr>
+<tr><td><strong>Carrusel</strong></td><td><code>list_carousels</code> <code>carousel_state</code>
+<code>carousel_advance</code> <code>carousel_to</code> <code>carousel_autoplay</code></td><td>Y el
+autoplay, que un agente debería poder apagar.</td></tr>
+<tr><td><strong>Línea de tiempo</strong></td><td><code>list_timelines</code>
+<code>timeline_state</code> <code>timeline_load_older</code>
+<code>timeline_load_newer</code></td><td>Listas con paginación infinita en las dos direcciones.</td></tr>
+<tr><td><strong>Ventana</strong></td><td><code>set_mode</code> <code>minimize</code>
+<code>maximize</code> <code>restore</code> <code>fullscreen</code></td><td><code>set_mode</code>
+acepta <code>'modal'</code>, <code>'maximized'</code>, <code>'new_tab'</code>,
+<code>'new_window'</code>.</td></tr>
+<tr><td><strong>Descubrimiento</strong></td><td><code>system_map</code> <code>capabilities</code>
+<code>system_map_layers</code> <code>set_system_map_provider</code>
+<code>set_capabilities_provider</code></td><td>El anfitrión declara su mapa de sistema. Errores
+propios: <code>SystemMapNotProvided</code>, <code>CapabilitiesNotProvided</code>.</td></tr>
+<tr><td><strong>Varios</strong></td><td><code>is_blocked</code> <code>wait_for</code>
+<code>screenshot</code> <code>reset</code> <code>set_reset_provider</code>
+<code>action_undoable</code> <code>action_undo_window_ms</code>
+<code>recommended_remediation</code> <code>set_validation_tolerance</code>
+<code>set_perf_tolerance</code></td><td><code>is_blocked</code> es la sonda canónica de «¿la interfaz
+está bloqueada?». <code>screenshot</code> devuelve un data URL. La tolerancia sirve para retirar
+hallazgos históricos sin apagar el validador.</td></tr>
+</table></div>
+<div class="box box-c">
+  <span class="lbl">La excepción, y el tamaño del hueco</span>
+  <p>De todas estas, <code>screenshot</code>, <code>set_mode</code>,
+  <code>registerDataTable</code> y la familia <code>dt_*</code> aparecen en
+  <code>stage4-calls.mjs</code> —huérfana— y <code>drag_drop</code> en
+  <code>stage6b-longtail.mjs</code> —también huérfana—. Verificado el 2026-11-14, <strong>ninguna de
+  las 20 suites menciona</strong> <code>toast</code>, <code>step_next</code>,
+  <code>calendar_view</code>, <code>chart_data</code>, <code>map_focus</code>,
+  <code>richtext_format</code>, <code>add_tag</code>, <code>open_drawer</code>,
+  <code>carousel_advance</code>, <code>timeline_state</code>, <code>system_map</code>,
+  <code>list_breadcrumbs</code> ni <code>is_blocked</code>.</p>
+  <p>Dicho sin vueltas: el núcleo exporta unas 143 claves y la batería ejercita una fracción. Eso no
+  es una acusación — es exactamente el dato que hace falta para elegir qué prueba escribir primero.</p>
+</div>
+</section>
+
+<section class="fn" id="f33">
+<div class="fn-h"><span class="fn-n">F33</span><h3>Arranque, reproducción diferida y el arnés de pruebas</h3>
+<span class="cov cov-in">el arranque, en la batería</span> <span class="cov cov-no">el arnés, sin prueba</span></div>
+<p>Cuando el módulo se instala hace cinco cosas, en este orden, y conviene conocerlas porque explican
+casi todos los problemas de arranque:</p>
+<ol>
+<li>Instala <code>global.NAC</code> con sus claves exportadas.</li>
+<li><strong>Se protege de una doble instalación</strong> con la bandera
+<code>__nac_v1_installed</code>.</li>
+<li>Despacha <code>nac:installed</code> llevando <code>{ version, spec }</code>.</li>
+<li>Monta el puente de ARIA, para que <code>data-nac-a11y-hint</code> llegue de verdad a un lector de
+pantalla. Corre <em>después</em> de instalar, y <strong>agrega</strong> a los
+<code>aria-describedby</code> existentes en vez de pisarlos.</li>
+<li><strong>Reproduce <code>window.__NAC_PENDING__</code></strong>, el buffer que el anfitrión apiló
+antes de que el runtime existiera, y después lo limpia para que una recarga en caliente no lo
+reproduzca dos veces.</li>
+</ol>
+<div class="sig">/* el buffer de arranque: el anfitrión apila {event, detail} ANTES de que el runtime cargue */
+window.__NAC_PENDING__ = [{ event: 'nac:action:succeeded', detail: {...} }, ...];
+NAC.replay_pending(buffer)      /* reproducir a mano, si el automático no alcanza */
+
+/* arnés: el runtime se puede probar a sí mismo */
+NAC.assert_event_fired(tipo, opts?)   ·   NAC.assert_event_count(tipo, n)
+NAC.perf_probe(...)                   ·   NAC.set_perf_tolerance(...)</div>
+<p><strong>La inicialización de navegador está protegida</strong>: el módulo es importable en Node,
+en renderizado del servidor y en la suite de pruebas sin que explote. Eso es precisamente lo que
+permite que las 15 suites corran en Node sin un navegador.</p>
+<div class="two">
+<div class="pane"><h4><b>React</b> — eventos que ocurren antes de que el runtime cargue</h4>
+<pre><code>&lt;!-- En el HTML, ANTES de cualquier script de NAC: --&gt;
+&lt;script&gt;
+  // Si tu aplicacion ya acuso algo mientras el runtime
+  // todavia descargaba, apilalo. Se reproduce solo.
+  window.__NAC_PENDING__ = window.__NAC_PENDING__ || [];
+&lt;/script&gt;
+
+&lt;script src="/nac-spec/js/nac.js"&gt;&lt;/script&gt;
+&lt;script src="/nac-spec/js/nac-v2-extensions.js"&gt;&lt;/script&gt;
+
+// Y en React, esperar la instalacion en vez de suponerla:
+useEffect(() =&gt; {
+  if (window.NAC?.__nac_v1_installed) { setListo(true); return; }
+  const on = (e) =&gt; setListo(true);
+  document.addEventListener('nac:installed', on, { once:true });
+  return () =&gt; document.removeEventListener('nac:installed', on);
+}, []);</code></pre></div>
+<div class="pane"><h4><i>Python</i> — esperar bien, y no antes</h4>
+<pre><code># Mal: correr apenas carga la pagina. El runtime puede
+# no estar instalado todavia.
+# Bien: esperar la bandera, o el evento.
+page.goto(url)
+page.wait_for_function(
+    "() =&gt; window.NAC && window.NAC.__nac_v1_installed")
+
+v, spec = page.evaluate(
+    "() =&gt; [NAC.version, NAC.spec_version]")
+print(v, spec)     # 2.6.0 2.6
+
+# Y si te importa el evento de instalacion, el buzon se
+# arma por adelantado con add_init_script, que corre
+# ANTES de todo script de la pagina:
+page.add_init_script("""
+  window.__inst = null;
+  document.addEventListener('nac:installed',
+    e =&gt; { window.__inst = e.detail; });
+""")</code></pre></div>
+</div>
+<div class="cmd"><span class="cl">Prueba del arranque</span><code>cd runtime &amp;&amp; node ./test/smoke.mjs</code><span class="cr">39 PASS · artefactos del build, parseo y CLI</span></div>
+<div class="cmd warn"><span class="cl">El arnés</span><code>—</code><span class="cr">verificado: ninguna suite menciona <code>assert_event_fired</code>, <code>perf_probe</code> ni <code>replay_pending</code></span></div>
+</section>
+
+<section class="fn" id="f34">
+<div class="fn-h"><span class="fn-n">F34</span><h3>Los tres niveles de conformidad</h3>
+<span class="cov cov-out">su candado necesita navegador, fuera de CI</span></div>
+<p>Un nivel se escribe <strong>NAC3 Conformance Level 1, 2 o 3</strong>. Una afirmación de
+conformidad <strong>tiene que citar el identificador</strong> publicado en
+<code>api/latest/levels.json</code> —<code>nac3-conformance-level-&lt;1|2|3&gt;</code>— y nunca un
+nombre para mostrar.</p>
+<div class="box box-g">
+  <span class="lbl">Por qué se renombraron en la 2.5</span>
+  <p>Antes se escribían <code>NAC-1</code>, <code>NAC-2</code> y <code>NAC-3</code>. Eso está a un
+  guion del nombre del protocolo: «esta página es NAC-3 conforme» no se podía distinguir de «esta
+  página implementa NAC3», y un agente al que le pedían reportar un nivel no tenía una cadena sin
+  ambigüedad para reportar. Los nombres viejos siguen legibles como alias históricos
+  (<code>legacy_display_name</code> al lado de su nivel) pero <strong>no son normativos</strong>.</p>
+</div>
+<div class="tw"><table>
+<tr><th style="width:9%">Nivel</th><th>Lo que exige, además de todo lo del nivel anterior</th></tr>
+<tr><td><strong>1</strong></td><td>Todo widget clicable que un agente deba poder operar lleva
+<code>data-nac-id</code> y <code>data-nac-role</code> · todo <code>action</code> dispara
+<code>nac:action:succeeded</code> después de su efecto · la página registra al menos un manifiesto ·
+<code>NAC.click(id)</code> funciona para cada id anunciado.</td></tr>
+<tr><td><strong>2</strong></td><td>Declara <code>tabs[]</code>, <code>fields[]</code> y
+<code>actions[]</code> explícitos en el manifiesto, <strong>no inferidos del DOM</strong> ·
+<code>label_i18n</code> con los diez idiomas para toda etiqueta de cara al usuario · implementa los
+primitivos de migración de la 2.0 · pasa <code>validate_global({probe:false})</code> con
+<strong>cero</strong> hallazgos de severidad <code>error</code>.</td></tr>
+<tr><td><strong>3</strong></td><td>Manifiestos firmados con HMAC · distingue <code>isTrusted</code>
+para verbos sensibles · pasa <code>validate_global({probe:true})</code> con <strong>cero</strong>
+hallazgos, de cualquier severidad.</td></tr>
+</table></div>
+<div class="two">
+<div class="pane"><h4><b>React</b> — llegar a nivel 2 en el CI</h4>
+<pre><code>// El nivel 2 es el objetivo realista de una aplicacion
+// de produccion. Las tres cosas que lo traban:
+//
+// 1. El manifiesto EXPLICITO, no inferido:
+tabs:    [ /* ... */ ],
+fields:  [ /* ... */ ],
+actions: [ /* ... */ ],
+//
+// 2. Los diez idiomas, con el candado puesto:
+window.NAC.autoRegister.watch(root,
+  { i18n_strict: 'strict' });   // ya no 'permissive'
+//
+// 3. Cero hallazgos de severidad error:
+test('nivel 2', async ({ page }) =&gt; {
+  const r = await page.evaluate(
+    () =&gt; window.NAC.validate_global({ probe:false }));
+  expect(r.has_errors).toBe(false);
+});</code></pre></div>
+<div class="pane"><h4><i>Python</i> — pedir el nivel desde afuera</h4>
+<pre><code>import json, subprocess
+
+# El CLI decide el nivel. --drive CLICA los controles
+# anunciados, que es la unica forma de medir los dos
+# requisitos de COMPORTAMIENTO del nivel 1.
+# NO es de solo lectura: nunca contra produccion.
+out = subprocess.run(
+    ["npx", "nac3", "validate", "http://localhost:8855/",
+     "--drive", "--drive-limit=50", "--json"],
+    capture_output=True, text=True)
+
+rep = json.loads(out.stdout)
+print(rep)          # nivel alcanzado + por que no el siguiente
+print(out.returncode)   # 0 sin hallazgos · 1 con · 2 no cargo
+
+# Modo directorio: analisis estatico. NO puede decidir
+# un nivel, y lo dice en vez de inventarlo.
+subprocess.run(["npx", "nac3", "validate", "./dist",
+                "--severity=error"])
+
+# El catalogo de niveles, como datos:
+niveles = contract_json("api/latest/levels.json")
+for n in niveles["levels"]:
+    print(n["id"], n.get("legacy_display_name"))</code></pre></div>
+</div>
+<div class="cmd warn"><span class="cl">Candado</span><code>npm run test:cli-levels</code><span class="cr">29 PASS · medido 2026-11-14 · necesita navegador, <strong>no corre en CI</strong></span></div>
+<p style="font-size:13.6px;color:var(--ct2)">Ese candado prueba tres cosas y lo dice en su propia
+salida: que el validador <em>reporta</em> un nivel, que <em>se niega</em> a dar uno por un motivo
+nombrado, y que <strong>no puede afirmar un requisito que no midió</strong>. Lo último es la parte
+importante: sin <code>--drive</code> no se puede decidir el nivel 1, porque sus dos requisitos son
+sobre lo que la página <em>hace</em>.</p>
+</section>
+
+<div class="divider"><span class="ln"></span><span class="kanji">級</span><span class="ln"></span></div>
+</section>
+
+<!-- ============================= PARTE 4 ============================= -->
+<section class="part" id="p4">
+<div class="part-h"><span class="part-n">PARTE 4</span><h2>La batería total</h2></div>
+<p class="intro">Todos los comandos, con el resultado que devolvieron el <strong>2026-11-14</strong> en
+esta máquina. Si un número te vuelve distinto, no es un error de este documento: es el estado nuevo,
+y este documento quedó viejo.</p>
+
+<div class="box box-t">
+  <span class="lbl">Los tres comandos que hay que saber de memoria</span>
+  <pre><code>cd runtime &amp;&amp; npm test     # el comportamiento del runtime: 15 suites, 453 PASS, 0 FAIL
+npm run check:release        # la compuerta antes de empujar: 14 scripts, salida 0
+npm run check:npm            # el paquete publicado contra el árbol de su versión</code></pre>
+  <p style="margin-top:.7rem">Y el que no hay que olvidar: <strong>los tres son distintos y ninguno
+  incluye a los otros dos.</strong></p>
+</div>
+
+<h3 class="grp">4.1 · El comportamiento del runtime — 15 suites, 453 afirmaciones</h3>
+<p>Comando entero: <code>cd runtime &amp;&amp; npm test</code>. Suite por suite, para cuando estás
+trabajando sobre una sola:</p>
+<div class="tw"><table>
+<tr><th style="width:36%">Comando</th><th style="width:9%">PASS</th><th>Qué contrata</th></tr>
+<tr><td><code>node ./test/smoke.mjs</code></td><td>39</td><td>Los 14 artefactos del build existen, se
+parsean, y el CLI anuncia la versión que el paquete declara (sin literales).</td></tr>
+<tr><td><code>node ./test/v22.mjs</code></td><td>20</td><td><code>bindAction</code>,
+<code>bindTab</code>, <code>STRICT_VALIDATION</code>.</td></tr>
+<tr><td><code>node ./test/v23-invoke.mjs</code></td><td>27</td><td><code>invoke</code>,
+<code>utter</code>, correlación por <code>request_id</code>, y el estado deshabilitado (T7/T8/T9).</td></tr>
+<tr><td><code>node ./test/v23-shadow.mjs</code></td><td>11</td><td>Sombra abierta con tope de 10
+(T1-T3, T10) y cerrada con sus eventos y deduplicación (T4-T9).</td></tr>
+<tr><td><code>node ./test/v23-capabilities.mjs</code></td><td>17</td><td>Fijar, otorgar, revocar; las
+compuertas de <code>click</code> y de <code>invoke</code>; nivel de verbo contra nivel de elemento;
+O lógico; limpiar con <code>null</code>.</td></tr>
+<tr><td><code>node ./test/v23-editor.mjs</code></td><td>9</td><td><code>edit_field</code> y el plugin
+<code>nac_editor</code>.</td></tr>
+<tr><td><code>node ./test/v23-interop.mjs</code></td><td>29</td><td>Exportar e importar árboles, el
+prefijo <code>remote:</code>, <code>fill</code> y <code>click</code> a través de él.</td></tr>
+<tr><td><code>node ./test/stage2-disambiguation.mjs</code></td><td>35</td><td>Las cuatro capas de
+<code>tab_by_label</code> y el evento de desambiguación.</td></tr>
+<tr><td><code>node ./test/stage7-strict-resolution.mjs</code></td><td>15</td><td>El calificador
+estricto, sin respaldo por subcadena.</td></tr>
+<tr><td><code>node ./test/stage8-plugin-extension.mjs</code></td><td><strong>75</strong></td><td>Los
+nueve enrutadores, el lenguaje de extracción, la cadena de respaldo, los diez códigos. La suite más
+grande.</td></tr>
+<tr><td><code>node ./test/stage9-sync-plugin.mjs</code></td><td>21</td><td><code>syncPlugin</code>
+reemplaza en vez de acumular.</td></tr>
+<tr><td><code>node ./test/stage10-authority-sudo.mjs</code></td><td>37</td><td>Confirmación
+interpuesta y elevación con vencimiento.</td></tr>
+<tr><td><code>node ./test/stage11-plugin-id-dedup.mjs</code></td><td>14</td><td>Unicidad de slug y
+<code>validate_global</code>.</td></tr>
+<tr><td><code>node ./test/stage12-snapshot-versioning.mjs</code></td><td>37</td><td>Instantánea
+vieja, expectativa faltante, hidratación, historia de versiones.</td></tr>
+<tr><td><code>node ./test/stage13-plugin-hooks.mjs</code></td><td>67</td><td>Los seis ganchos de la
+2.6, <code>emitter-listen</code>, la regla de fallo cerrado, el espacio
+<code>plugin.</code>.</td></tr>
+<tr><td colspan="2"><strong>Total</strong></td><td><strong>453 PASS, 0 FAIL</strong> · medido
+2026-11-14</td></tr>
+</table></div>
+<div class="box box-c">
+  <span class="lbl">Las cinco suites huérfanas, medidas una por una</span>
+  <p>Existen bajo <code>runtime/test/</code> y <strong>no están en <code>npm test</code></strong>.
+  Corridas de a una el 2026-11-14:</p>
+  <div class="tw"><table>
+  <tr><th style="width:36%">Comando</th><th style="width:16%">Resultado hoy</th><th>Nota</th></tr>
+  <tr><td><code>node ./test/stage1-audio.mjs</code></td><td>33 PASS, salida 0</td><td>Pasa. Nada la
+  corre.</td></tr>
+  <tr><td><code>node ./test/stage3-backend.mjs</code></td><td><strong>salida 2, no corre</strong></td>
+  <td>Se cae leyendo <code>C:\crm_desa\config\config.json</code> — una ruta que
+  <strong>sólo existe en la máquina del autor</strong>. Ni pasa ni falla: no arranca.</td></tr>
+  <tr><td><code>node ./test/stage4-calls.mjs</code></td><td>33 PASS, salida 0</td><td>Es la
+  <strong>única</strong> prueba de <code>select</code>, <code>go_to_section</code>,
+  <code>screenshot</code>, <code>set_mode</code> y toda la familia <code>dt_*</code>.</td></tr>
+  <tr><td><code>node ./test/stage6-ack.mjs</code></td><td>16 PASS, salida 0</td><td>La prueba
+  dedicada del acuse, que es la falla número uno de toda adopción.</td></tr>
+  <tr><td><code>node ./test/stage6b-longtail.mjs</code></td><td>14 PASS, salida 0</td><td>Es la única
+  prueba de <code>drag_drop</code>.</td></tr>
+  </table></div>
+  <p>Cuatro de las cinco pasan y nadie las corre. Agregarlas al comando
+  <code>test</code> es una decisión del dueño que está registrada y abierta.</p>
+</div>
+
+<h3 class="grp">4.2 · La compuerta antes de empujar — 14 scripts</h3>
+<p>Comando entero: <code>npm run check:release</code>. <strong>Salida 0 el 2026-11-14.</strong> Y
+cada candado con su prueba en rojo al lado, porque un candado que nunca se vio fallar no es un
+candado: es una creencia.</p>
+<div class="tw"><table>
+<tr><th style="width:27%">Candado</th><th style="width:27%">Su prueba en rojo</th><th>Lo medido el 2026-11-14</th></tr>
+<tr><td><code>npm run check:integrity</code></td><td><code>npm run test:integrity-gate</code><br>
+<code>npm run test:integrity</code></td><td>PASSED · 21 y 0 fallas · un hash SRI por copia fijada de
+runtime (<code>js/2.5.0</code>, <code>2.5.0-alpha.5</code>, <code>2.5.1</code>, <code>2.5.2</code>,
+<code>2.6.0</code>)</td></tr>
+<tr><td><code>npm run check:version</code></td><td><code>npm run test:version-gate</code></td>
+<td><strong>Los 23 huecos de versión coinciden en 2.6.0</strong> · 35 y 0 fallas</td></tr>
+<tr><td><code>npm run check:contract</code></td><td><code>npm run test:contract</code><br>
+<code>npm run test:contract-http</code></td><td>Coherente · 36 y 0 · 8 y 0</td></tr>
+<tr><td><code>npm run check:stylesheets</code></td><td><code>npm run test:stylesheets</code></td>
+<td>Toda hoja de estilo local que una página enlaza resuelve · 12 y 0</td></tr>
+<tr><td><code>npm run check:mount</code></td><td><code>npm run test:mount-gate</code></td><td>Cada
+página y cada declaración coinciden en que el montaje es <code>/nac-spec/</code> · 21 y 0</td></tr>
+<tr><td><code>npm run check:translations</code></td><td><code>npm run test:spec-translations</code><br>
+<code>npm run test:translations-gate</code></td><td>2691 unidades publicadas pasan · 34 y 0 · 27 y 0 ·
+producir dos veces da byte idéntico</td></tr>
+<tr><td><code>npm run test:landing-i18n</code></td><td>es ella misma el candado</td><td>10 catálogos ·
+264 claves cada uno, paridad con el inglés, marcado intacto</td></tr>
+<tr><td><code>npm run check:npm</code></td><td><code>npm run test:npm-gate</code></td><td><strong>23
+de 23 archivos publicados idénticos, 0 líneas distintas</strong>; tarball de 469 006 bytes; el
+testigo resuelto fue el commit de release <code>be7329a</code> · 44 chequeos, 0 fallas</td></tr>
+<tr><td><code>npm run test:smoke-live</code></td><td>autoprueba del candado vivo</td><td>10 y 0</td></tr>
+<tr><td><code>npm run verify:contract</code></td><td>—</td><td>«The published contract API
+verifies» · <strong>pega contra el sitio vivo</strong></td></tr>
+<tr><td><code>npm run smoke:live</code></td><td>—</td><td>Se corre después del despliegue, contra
+<code>https://yujin.app/nac-spec/</code></td></tr>
+<tr><td><code>npm run stats:translations</code></td><td>—</td><td>Canónico 299 unidades / 85
+secciones; los nueve idiomas en 299/299 y 85/85, sin huérfanos</td></tr>
+</table></div>
+<div class="box box-g">
+  <span class="lbl">El candado que está rojo a propósito</span>
+  <p><code>npm run check:tree-links</code> devuelve <strong>salida 1</strong>: 57 referencias nombran
+  21 archivos que este árbol no contiene. El más grande es <code>i18n/SPEC.md</code> con
+  <strong>27 referencias</strong> — páginas en <code>i18n/&lt;loc&gt;/</code> que enlazan
+  <code>../SPEC.md</code>, lo que desde dos niveles abajo nombra <code>i18n/SPEC.md</code> en vez de
+  la raíz.</p>
+  <p><strong>Está deliberadamente fuera de <code>check:release</code></strong> hasta que esté verde,
+  porque varios de los destinos faltantes son documentos cuya existencia es una decisión del dueño.
+  Su prueba en rojo, <code>npm run test:tree-links</code>, pasa 10 de 10 reconstruyendo los dos
+  defectos para los que se escribió.</p>
+</div>
+
+<h3 class="grp">4.3 · Los cinco que necesitan navegador — y no corren en CI</h3>
+<p>Los cinco pasaron el 2026-11-14 en esta máquina, con Playwright instalado. <strong>CI no los
+ejecuta</strong>, y eso está registrado como pendiente.</p>
+<div class="tw"><table>
+<tr><th style="width:32%">Comando</th><th style="width:16%">Hoy</th><th>Qué mide</th></tr>
+<tr><td><code>npm run test:limits</code></td><td>GREEN</td><td>La sección de límites de la portada
+está publicada, declarada y es direccionable; cero errores de consola en el otro idioma.</td></tr>
+<tr><td><code>npm run test:cli-levels</code></td><td>29 PASS</td><td>El validador reporta un nivel, se
+niega a uno por un motivo nombrado, y no afirma un requisito que no midió.</td></tr>
+<tr><td><code>npm run test:snippet</code></td><td>GREEN</td><td>El fragmento publicado funciona: el
+hash anunciado coincide con el archivo anunciado.</td></tr>
+<tr><td><code>npm run test:fill-setter</code></td><td>GREEN</td><td>El navegador sigue pasando por el
+setter nativo en <code>fill</code>.</td></tr>
+<tr><td><code>npm run test:translations</code></td><td>GREEN</td><td>Las nueve traducciones declaran
+qué son y la portada las enlaza; sin errores de consola ni 404 inesperados.</td></tr>
+</table></div>
+
+<h3 class="grp">4.4 · Los ejecutores de demostración y de Pilot — 17 scripts que CI nunca llama</h3>
+<p>Son las pruebas de los bloques de la 2.4, 2.5 y 2.6 contra un navegador real. Lo que existe es
+evidencia fechada bajo <code>evidence/</code>; su ejecución es manual.</p>
+<div class="tw"><table>
+<tr><th style="width:44%">Comando</th><th>Qué ejercita</th></tr>
+<tr><td><code>node scripts/run-demo-v26-leaflet-plugin.mjs</code></td><td><strong>37 de 37, medido
+2026-11-14.</strong> El único que <strong>sirve el repositorio él mismo</strong> y no necesita que
+levantes nada antes, y el único que maneja una biblioteca de terceros real (Leaflet 1.9.4).
+<strong>Necesita red</strong>, y lo declara en vez de reportar un verde que no midió.</td></tr>
+<tr><td><code>npm run demo:v25-canvas-api</code></td><td>El contrato de extensión de plugin (F26) en
+navegador.</td></tr>
+<tr><td><code>node scripts/run-demo-v25-02-tree-nav.mjs</code><br>
+<code>node scripts/run-pilot-v25-02-tree-nav.mjs</code></td><td><code>context</code> y
+<code>tree</code> (F28) — su <strong>única</strong> cobertura.</td></tr>
+<tr><td><code>node scripts/run-demo-v25-03-narrate.mjs</code><br>
+<code>node scripts/run-pilot-v25-03-narrate.mjs</code></td><td><code>narrate</code> (F29) — su
+<strong>única</strong> cobertura.</td></tr>
+<tr><td><code>node scripts/run-demo-v25-04-expect-diff.mjs</code><br>
+<code>node scripts/run-pilot-v25-04-expect-diff.mjs</code></td><td><code>expect</code> y
+<code>diff</code> (F30) — su <strong>única</strong> cobertura.</td></tr>
+<tr><td><code>node scripts/run-demo-v24-01…</code> · <code>-02…</code> · <code>-04…</code> ·
+<code>-05…</code><br>y sus cuatro <code>run-pilot-v24-*</code></td><td>Unicidad de slug,
+<code>syncPlugin</code>, versionado de instantánea, autoridad y sudo. Todos tienen además suite de
+Node.</td></tr>
+</table></div>
+
+<h3 class="grp">4.5 · Levantar el árbol para mirarlo con los ojos</h3>
+<pre><code>npm run serve          # python -m http.server 8855 en la raíz del repositorio
+                       # y después: http://localhost:8855/
+
+php -S localhost:8000  # para los 13 demos PHP (example*.php)</code></pre>
+<div class="box box-r">
+  <span class="lbl">Y acá la regla que hay que respetar al levantarlo</span>
+  <p><strong>Este sistema se sirve bajo <code>/nac-spec/</code> y no se soporta en otra raíz.</strong>
+  Es una decisión del dueño, escrita y con candado. 273 páginas generadas cargan el runtime por ruta
+  absoluta porque <strong>un solo productor</strong> emite un prefijo para páginas que viven a seis
+  profundidades distintas. Las 14 páginas escritas a mano lo cargan relativo y <em>sí</em> abren en
+  cualquier raíz.</p>
+  <p>Un árbol levantado en otra dirección <strong>no es una instalación degradada</strong>: es una
+  configuración que este proyecto no promete. Servido desde otra raíz, la mayoría de las páginas
+  carga sin ningún runtime: dos 404 y una página que se ve bien.</p>
+</div>
+
+<div class="divider"><span class="ln"></span><span class="kanji">証</span><span class="ln"></span></div>
+</section>
+
+<!-- ============================= PARTE 5 ============================= -->
+<section class="part" id="p5">
+<div class="part-h"><span class="part-n">PARTE 5</span><h2>Mapa de cobertura y puntos ciegos</h2></div>
+<p class="intro">Esta parte existe para que nadie lea «la cadena está verde» como «todo lo que hay
+está probado». Todo lo de abajo se midió el 2026-11-14 leyendo los archivos y corriendo los
+comandos.</p>
+
+<h3 class="grp">5.1 · Las tres baterías no coinciden entre sí</h3>
+<p>Hay tres conjuntos de scripts que uno tiende a pensar como «la batería», y los tres son
+distintos. Lo verifiqué comparando <code>.github/workflows/deploy.yml</code> contra el script
+<code>check:release</code> de <code>package.json</code>.</p>
+<div class="tw"><table>
+<tr><th style="width:32%">Corre en</th><th>Qué contiene</th></tr>
+<tr><td><strong>CI, en cada push a <code>main</code></strong></td><td>19 scripts. Integridad,
+validador global, coherencia de versión, contrato (y su rojo, y el rojo del verificador de
+consumidor), paquete publicado, i18n de portada, carteles de traducción, hojas de estilo, punto de
+montaje — cada candado seguido <em>inmediatamente</em> por el paso que prueba que se pone rojo — y
+después del despliegue, la verificación en vivo desde afuera.</td></tr>
+<tr><td><strong><code>npm run check:release</code></strong></td><td>14 scripts.</td></tr>
+<tr><td><strong><code>cd runtime &amp;&amp; npm test</code></strong></td><td>15 suites, 453
+afirmaciones. <strong>No está en ninguno de los dos anteriores.</strong></td></tr>
+</table></div>
+<div class="box box-c">
+  <span class="lbl">La asimetría exacta, medida</span>
+  <p><strong>Siete scripts corren en CI y no en <code>check:release</code>:</strong>
+  <code>test-integrity-gate</code>, <code>test-validate-global</code>, <code>test-contract-api</code>,
+  <code>test-contract-api-http</code>, <code>test-stylesheet-links</code>,
+  <code>test-translations-gate</code> y <code>verify-contract-api</code>. Los seis primeros son
+  pruebas en rojo: alguien que corre la compuerta local antes de empujar <strong>no</strong> verifica
+  que esos seis candados sigan sabiendo ponerse rojos. (El séptimo es legítimamente de CI: verifica
+  el contrato <em>desde afuera</em>, después del despliegue.)</p>
+  <p><strong>Dos scripts corren en <code>check:release</code> y no en CI:</strong>
+  <code>build-spec-translations</code> y <code>test-spec-translations</code> — el productor y el
+  candado de las nueve traducciones. Un push que hiciera derivar el almacén de traducciones
+  <strong>no lo atraparía CI</strong>: lo atrapa sólo alguien que corrió la compuerta local primero.</p>
+  <p><strong>Y ninguno de los dos corre la batería del runtime.</strong></p>
+</div>
+
+<h3 class="grp">5.2 · Qué función prueba qué suite</h3>
+<div class="tw"><table>
+<tr><th style="width:30%">Superficie</th><th style="width:30%">Su prueba</th><th>Estado</th></tr>
+<tr><td>registro, <code>syncPlugin</code>, validación estricta, unicidad de slug</td>
+<td>stage9, v22, stage11</td><td><span class="cov cov-in">en la batería</span></td></tr>
+<tr><td><code>click_by_verb</code>, <code>tab</code>, <code>tab_by_label</code>, desambiguación</td>
+<td>stage2, stage7</td><td><span class="cov cov-in">en la batería</span></td></tr>
+<tr><td><code>invoke</code>, <code>utter</code>, capacidades, autoridad, versionado de instantánea,
+sombra, editor, interoperación</td><td>v23-invoke, v23-capabilities, stage10, stage12, v23-shadow,
+v23-editor, v23-interop</td><td><span class="cov cov-in">en la batería</span></td></tr>
+<tr><td>contrato de extensión de plugin y los seis ganchos de la 2.6</td><td>stage8 (75), stage13
+(67)</td><td><span class="cov cov-in">en la batería</span></td></tr>
+<tr><td><code>select</code>, <code>go_to_section</code>, <code>screenshot</code>,
+<code>set_mode</code>, <code>registerDataTable</code>, familia <code>dt_*</code></td>
+<td>stage4-calls (33 PASS)</td><td><span class="cov cov-out">huérfana</span></td></tr>
+<tr><td>acuse de <code>click</code> y <code>fill</code> (su prueba dedicada)</td><td>stage6-ack (16
+PASS)</td><td><span class="cov cov-out">huérfana</span></td></tr>
+<tr><td><code>drag_drop</code></td><td>stage6b-longtail (14 PASS)</td><td><span class="cov cov-out">huérfana</span></td></tr>
+<tr><td><code>context</code>, <code>tree</code>, <code>narrate</code>, <code>expect</code>,
+<code>diff</code></td><td>ejecutores de demo y de Pilot (Playwright)</td><td><span class="cov cov-out">fuera de CI</span></td></tr>
+<tr><td>niveles de conformidad y el CLI en modo URL</td><td><code>test:cli-levels</code> (29
+PASS)</td><td><span class="cov cov-out">necesita navegador, fuera de CI</span></td></tr>
+<tr><td><code>describe_v2</code>, HMAC de procedencia (<code>sign_provenance</code>,
+<code>verify_provenance</code>, <code>set_provenance_secret</code>),
+<code>attestUserGesture</code></td><td>ninguna</td><td><span class="cov cov-no">sin prueba</span></td></tr>
+<tr><td>migración progresiva: <code>autoRegister</code>, <code>captureEphemeral</code>,
+<code>setTenantPrefix</code>, <code>adopt</code>, puentes</td><td>ninguna</td>
+<td><span class="cov cov-no">sin prueba</span></td></tr>
+<tr><td>catálogo de idiomas del runtime: <code>t</code>, <code>registerCatalog</code>,
+<code>locale</code>, RTL</td><td>ninguna</td><td><span class="cov cov-no">sin prueba</span></td></tr>
+<tr><td>utilidades de forma de evento: <code>emit_dual</code>, <code>check_canonical_shape</code>,
+<code>validate_event_conformance</code></td><td>ninguna</td><td><span class="cov cov-no">sin prueba</span></td></tr>
+<tr><td>arnés propio: <code>assert_event_fired</code>, <code>assert_event_count</code>,
+<code>perf_probe</code>, <code>replay_pending</code></td><td>ninguna</td>
+<td><span class="cov cov-no">sin prueba</span></td></tr>
+<tr><td>quince familias de widget de la 1.2 a la 1.4 (avisos, pasos, árbol, etiquetas, cajón,
+calendario, gráfico, mapa, texto rico, miga, carrusel, línea de tiempo, ventana, descubrimiento)</td>
+<td>ninguna</td><td><span class="cov cov-no">sin prueba</span></td></tr>
+</table></div>
+
+<h3 class="grp">5.3 · Los seis puntos ciegos declarados</h3>
+<div class="box box-n">
+  <span class="lbl">Lo que este manual no puede ver desde donde mira</span>
+  <ol>
+    <li><strong>Los internos de resolución del runtime.</strong> <code>js/nac.js</code> tiene 8.740
+    líneas. Leí el export, el bloque de instalación, la constante de versión y el encabezado. Los
+    cuerpos de <code>click</code>, <code>fill</code>, <code>select</code> y del emparejador de eventos
+    <strong>no</strong> se leyeron línea por línea: lo que este manual afirma sobre ellos se apoya en
+    el texto normativo o en la suite que los ejercita.</li>
+    <li><strong>Los ejemplos de Python no tienen recibo.</strong> No hay un solo archivo
+    <code>.py</code> en el repositorio — lo verifiqué con <code>git ls-files</code>. Los escribí
+    contra el contrato, y el contrato lo leí; pero nadie los corrió.</li>
+    <li><strong>El intermediario de chat es externo y no tiene sustituto local.</strong> Sin él, todo
+    el camino de voz y de modelo de lenguaje <em>no se puede ejercitar en absoluto</em>. Eso incluye
+    <code>ai_correct_syntax</code> del editor de campo.</li>
+    <li><strong>Los registros del servidor y la configuración del anfitrión no son alcanzables desde
+    acá.</strong> El alojamiento es estático y este proyecto no lo instrumenta. La única señal de
+    comportamiento desde afuera es la verificación posterior al despliegue. <strong>Es un hueco, no
+    un hallazgo</strong>: leer más código no lo cierra.</li>
+    <li><strong><code>e2e/n0-eligibility-v21.mjs</code> y <code>e2e/n0-screen-sweep.mjs</code> no
+    están declarados en ningún script de npm</strong>, así que no aparecen en ninguna de las tres
+    baterías y hay que saber que existen para correrlos.</li>
+    <li><strong>El estado del registro de pendientes no se consultó.</strong> Los identificadores
+    PND que aparecen en la documentación de proceso de este repositorio vienen de documentos con su
+    fecha, no del registro vivo, que no es alcanzable desde esta sesión. Un pendiente dice la verdad
+    del día en que se escribió.</li>
+  </ol>
+</div>
+
+<div class="divider"><span class="ln"></span><span class="kanji">盲</span><span class="ln"></span></div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <p style="font-family:var(--font-serif);font-size:1.05rem;color:var(--ct);margin-bottom:1rem">
+  Cómo leer este manual, otra vez, porque es lo único que lo hace confiable.</p>
+  <p><strong>Verificado</strong> — corrido en esta máquina el 2026-11-14, con su salida: la batería
+  del runtime (15 suites, 453 PASS, 0 FAIL) y cada suite de a una con su conteo; las cinco suites
+  huérfanas (cuatro pasan, <code>stage3-backend</code> no arranca por una ruta que sólo existe en la
+  máquina del autor); <code>npm run check:release</code> con salida 0; los veintitrés scripts de
+  candado de a uno; los cinco candados de navegador; el ejecutor de Leaflet con 37 de 37; los 20
+  roles, 48 atributos y 89 eventos leídos de <code>api/latest/contract.json</code>; los 23 huecos de
+  versión coincidiendo en 2.6.0; las 299 unidades y 85 secciones en los nueve idiomas; los 23 de 23
+  archivos publicados idénticos al árbol; las 57 referencias a 21 destinos faltantes del candado de
+  enlaces; la asimetría exacta entre CI y <code>check:release</code>; y la ausencia de cada nombre
+  que esta página marca como «sin prueba».</p>
+  <p><strong>Creído</strong> — los ejemplos de Python, enteros. Los fragmentos de React que no salen
+  textuales de <code>packages/nac-react-demo/</code> ni de la guía de adopción. Y toda descripción de
+  <em>por qué</em> una pieza fue diseñada así, que viene del texto normativo y no de haber visto la
+  decisión tomarse.</p>
+  <p><strong>Punto ciego</strong> — los seis de la sección 5.3.</p>
+  <p style="margin-top:1.4rem;font-size:13px;color:var(--ct3)">
+  Documento interno. Vive en <code>docs/internal/</code>, que el despliegue excluye por directorio,
+  así que no se publica en el sitio. El texto normativo es <code>SPEC.md</code> en inglés; esto es un
+  manual de trabajo y <strong>no es normativo</strong>. Donde este manual y
+  <code>SPEC.md</code> difieran, gana <code>SPEC.md</code>; y donde difiera del código, gana el
+  código.</p>
+</div></footer>
+
+</body></html>

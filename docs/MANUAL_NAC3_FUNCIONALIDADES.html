@@ -158,7 +158,7 @@ footer .wrap>p{max-width:76ch}
 
 <header class="hero"><div class="wrap">
   <div class="kanji-big">契約</div>
-  <p class="eyebrow">Manual operativo · interno · castellano</p>
+  <p class="eyebrow">Manual operativo · no normativo · castellano</p>
   <h1>NAC3, funcionalidad por funcionalidad</h1>
   <p class="lede">Qué hace cada pieza del protocolo, cómo se escribe del lado del adoptante (React),
   cómo se consume del lado del agente (Python), y el comando exacto que la prueba.
@@ -3042,8 +3042,9 @@ vieja, expectativa faltante, hidratación, historia de versiones.</td></tr>
   <tr><td><code>node ./test/stage1-audio.mjs</code></td><td>33 PASS, salida 0</td><td>Pasa. Nada la
   corre.</td></tr>
   <tr><td><code>node ./test/stage3-backend.mjs</code></td><td><strong>salida 2, no corre</strong></td>
-  <td>Se cae leyendo <code>C:\crm_desa\config\config.json</code> — una ruta que
-  <strong>sólo existe en la máquina del autor</strong>. Ni pasa ni falla: no arranca.</td></tr>
+  <td>Se cae leyendo un archivo de configuración por <strong>ruta absoluta</strong>, en una
+  ubicación que <strong>sólo existe en la máquina del autor</strong> y que está fuera del
+  repositorio. Ni pasa ni falla: no arranca.</td></tr>
   <tr><td><code>node ./test/stage4-calls.mjs</code></td><td>33 PASS, salida 0</td><td>Es la
   <strong>única</strong> prueba de <code>select</code>, <code>go_to_section</code>,
   <code>screenshot</code>, <code>set_mode</code> y toda la familia <code>dt_*</code>.</td></tr>
@@ -3053,7 +3054,7 @@ vieja, expectativa faltante, hidratación, historia de versiones.</td></tr>
   prueba de <code>drag_drop</code>.</td></tr>
   </table></div>
   <p>Cuatro de las cinco pasan y nadie las corre. Agregarlas al comando
-  <code>test</code> es una decisión del dueño que está registrada y abierta.</p>
+  <code>test</code> es una decisión del proyecto, registrada y todavía abierta.</p>
 </div>
 
 <h3 class="grp">4.2 · La compuerta antes de empujar — 14 scripts</h3>
@@ -3098,7 +3099,7 @@ secciones; los nueve idiomas en 299/299 y 85/85, sin huérfanos</td></tr>
   <code>../SPEC.md</code>, lo que desde dos niveles abajo nombra <code>i18n/SPEC.md</code> en vez de
   la raíz.</p>
   <p><strong>Está deliberadamente fuera de <code>check:release</code></strong> hasta que esté verde,
-  porque varios de los destinos faltantes son documentos cuya existencia es una decisión del dueño.
+  porque varios de los destinos faltantes son documentos cuya existencia es una decisión del proyecto todavía abierta.
   Su prueba en rojo, <code>npm run test:tree-links</code>, pasa 10 de 10 reconstruyendo los dos
   defectos para los que se escribió.</p>
 </div>
@@ -3154,7 +3155,7 @@ php -S localhost:8000  # para los 13 demos PHP (example*.php)</code></pre>
 <div class="box box-r">
   <span class="lbl">Y acá la regla que hay que respetar al levantarlo</span>
   <p><strong>Este sistema se sirve bajo <code>/nac-spec/</code> y no se soporta en otra raíz.</strong>
-  Es una decisión del dueño, escrita y con candado. 273 páginas generadas cargan el runtime por ruta
+  Es una decisión del proyecto, escrita y con candado. 273 páginas generadas cargan el runtime por ruta
   absoluta porque <strong>un solo productor</strong> emite un prefijo para páginas que viven a seis
   profundidades distintas. Las 14 páginas escritas a mano lo cargan relativo y <em>sí</em> abren en
   cualquier raíz.</p>
@@ -3296,11 +3297,16 @@ calendario, gráfico, mapa, texto rico, miga, carrusel, línea de tiempo, ventan
   decisión tomarse.</p>
   <p><strong>Punto ciego</strong> — los seis de la sección 5.3.</p>
   <p style="margin-top:1.4rem;font-size:13px;color:var(--ct3)">
-  Documento interno. Vive en <code>docs/internal/</code>, que el despliegue excluye por directorio,
-  así que no se publica en el sitio. El texto normativo es <code>SPEC.md</code> en inglés; esto es un
-  manual de trabajo y <strong>no es normativo</strong>. Donde este manual y
-  <code>SPEC.md</code> difieran, gana <code>SPEC.md</code>; y donde difiera del código, gana el
-  código.</p>
+  <strong>Este manual no es normativo.</strong> El texto normativo de NAC3 es
+  <code>SPEC.md</code>, en inglés, publicado en
+  <code>https://yujin.app/nac-spec/SPEC.html</code>. Esto es un manual de trabajo en castellano:
+  donde difiera de <code>SPEC.md</code>, gana <code>SPEC.md</code>; y donde difiera del código, gana
+  el código. Una afirmación de conformidad es una afirmación contra el texto en inglés, nunca contra
+  esta página.</p>
+  <p style="font-size:13px;color:var(--ct3)">
+  Apache-2.0, como el resto de la especificación y del runtime. Los números que trae están fechados a
+  propósito: un valor que vuelva distinto al medirlo de nuevo no es un error de esta página, es el
+  estado nuevo — y esta página quedó vieja.</p>
 </div></footer>
 
 </body></html>

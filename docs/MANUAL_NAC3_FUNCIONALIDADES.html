@@ -130,6 +130,18 @@ h3.grp+p{color:var(--ct2);max-width:72ch;margin:.4rem 0 0;font-size:14.4px}
 .fn li{margin:.28rem 0}
 .fn .box{margin:.9rem 0 0}
 
+/* glosario */
+.glo td:first-child{font-weight:600;white-space:nowrap}
+.glo td:nth-child(2){font-family:var(--font-mono);font-size:.87em;color:var(--cid);white-space:nowrap}
+.glo tr.sec td{background:var(--csu);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;
+               text-transform:uppercase;color:var(--ca);font-weight:500;white-space:normal}
+/* selector de idioma */
+.lang{display:inline-flex;gap:.3rem;align-items:center;font-family:var(--font-mono);font-size:.7rem;
+      letter-spacing:.06em;text-transform:uppercase}
+.lang a,.lang span{border:.5px solid var(--cbs);border-radius:5px;padding:.18rem .45rem;
+      background:var(--cs);color:var(--ct2);text-decoration:none}
+.lang a:hover{border-color:var(--ci);color:var(--ci)}
+.lang span[aria-current]{background:var(--ci);border-color:var(--ci);color:#fff}
 .toc{background:var(--cs);border:1px solid var(--cbs);border-radius:var(--rlg);padding:1.1rem 1.3rem;margin:1.6rem 0}
 .toc ol{columns:2;column-gap:2.2rem;margin:.5rem 0 0;padding-left:1.3rem;font-size:13.8px}
 @media(max-width:760px){.toc ol{columns:1}}
@@ -150,6 +162,7 @@ footer .wrap>p{max-width:76ch}
 <div class="top"><div class="wrap">
   <span class="yujin">結</span><span class="nac">nac-spec</span>
   <span class="sp"></span>
+  <span class="lang"><span aria-current="page">es</span><a href="MANUAL_NAC3_FEATURES.html" hreflang="en">en</a></span>
   <nav>
     <a href="#p1">Modelo</a><a href="#p2">Vocabulario</a><a href="#p3">Funciones</a>
     <a href="#p4">Batería</a><a href="#p5">Cobertura</a>
@@ -503,6 +516,122 @@ del adoptante: leer <code>err.findings</code>.</td></tr>
 <p>El contrato de extensión de plugin (parte 3, F26) agrega <strong>diez códigos propios</strong> y
 <strong>un espacio reservado</strong> para los códigos de la aplicación, con el prefijo
 <code>plugin.</code>. Están en su ficha.</p>
+
+<h3 class="grp">Glosario — del castellano de este manual al inglés del código</h3>
+<p>Este manual está en castellano. El texto normativo, los identificadores, los mensajes del runtime
+y la salida de cada comando están en <strong>inglés</strong>. Esta tabla es el puente: a la izquierda
+la palabra que uso acá, a la derecha la que vas a encontrar en el código y en
+<code>SPEC.md</code>.</p>
+<div class="box box-c">
+  <span class="lbl">La única traducción que puede hacerte perder tiempo</span>
+  <p>Donde este manual dice <strong>«enrutador»</strong>, el texto normativo dice
+  <strong><code>backend</code></strong> (el tipo <code>BackendKind</code>:
+  <code>postmessage</code>, <code>sdk-call</code>, <code>dom-mirror</code>,
+  <code>emitter-listen</code>…). Uso «enrutador» en castellano para que no se confunda con
+  «servidor», pero en el código y en toda búsqueda la palabra es <code>backend</code>.</p>
+</div>
+<div class="tw"><table class="glo">
+<tr><th style="width:22%">En este manual</th><th style="width:26%">En el código / en inglés</th><th>Qué es</th></tr>
+
+<tr class="sec"><td colspan="3">El contrato</td></tr>
+<tr><td>acuse</td><td><strong>ack</strong> · acknowledgement</td><td>El evento que declara que el
+<em>efecto</em> terminó, no que el clic empezó: <code>nac:action:succeeded</code>.</td></tr>
+<tr><td>despachar</td><td>to dispatch</td><td>Emitir la acción hacia la página.</td></tr>
+<tr><td>verbo</td><td>verb</td><td><code>save</code>, <code>cancel</code>, <code>delete</code>… lo que
+declara <code>data-nac-action</code>.</td></tr>
+<tr><td>carga útil</td><td><strong>payload</strong></td><td>Los datos que un agente manda con
+<code>invoke</code> o <code>utter</code>.</td></tr>
+<tr><td>instantánea</td><td><strong>snapshot</strong></td><td><code>plugin_version</code>,
+<code>tree_version</code> y <code>element_state_hash</code>: la foto del árbol contra la que un
+agente escribe.</td></tr>
+<tr><td>desambiguación</td><td>disambiguation</td><td>Cuando algo resuelve a más de un elemento y el
+runtime <strong>se niega</strong> en vez de elegir.</td></tr>
+<tr><td>calificador</td><td><strong>qualifier</strong></td><td><code>opts.qualifier</code>, para
+elegir entre instancias que comparten un verbo.</td></tr>
+<tr><td>sufijo anclado</td><td>anchored suffix</td><td>La parte que va después de <code>__</code> en
+un identificador.</td></tr>
+<tr><td>cadena de respaldo</td><td><strong>fallback chain</strong></td><td>El arreglo
+<em>ordenado</em> de fuentes de un estado: gana la primera que resuelve.</td></tr>
+<tr><td>enrutador</td><td><strong><code>backend</code></strong></td><td>Ver el aviso de arriba. Son
+los nueve de la sección 15.4.</td></tr>
+<tr><td>asa</td><td><strong>handle</strong></td><td><code>SubscriptionHandle</code>, y también
+<code>registerApiHandle</code>.</td></tr>
+<tr><td>espejo del DOM</td><td><code>dom-mirror</code></td><td>Leer de un nodo que refleja un estado
+que el lienzo esconde.</td></tr>
+<tr><td>lienzo</td><td><strong>canvas</strong></td><td>La superficie accionable que no es DOM.</td></tr>
+<tr><td>raíz oscura · sombra</td><td><strong>shadow root</strong></td><td>Abierta = <em>open</em>;
+cerrada = <em>closed</em>.</td></tr>
+<tr><td>ranurado</td><td>slotted</td><td>Los nodos de <code>&lt;slot&gt;</code>, que viven en el DOM
+claro (<em>light DOM</em>) y se resuelven ahí.</td></tr>
+<tr><td>tope de profundidad</td><td>depth cap</td><td>Los diez niveles de la resolución a través de
+sombras anidadas.</td></tr>
+<tr><td>fallo cerrado</td><td><strong>fail-closed</strong></td><td>Negarse, en vez de devolver algo
+que parece servir y no sirve.</td></tr>
+<tr><td>daño silencioso</td><td><strong>silent damage</strong></td><td>Que algo parezca haber
+funcionado y no haya funcionado. Es lo que este protocolo existe para eliminar.</td></tr>
+<tr><td>capacidad</td><td><strong>capability</strong></td><td><code>requires_capability</code> y la
+compuerta que lo chequea antes de despachar.</td></tr>
+<tr><td>elevación temporal</td><td>time-bounded elevation · sudo</td><td><code>request_authority</code>
+con su vencimiento (<em>TTL</em>).</td></tr>
+<tr><td>procedencia</td><td><strong>provenance</strong></td><td>De dónde vino la acción, y si el clic
+fue humano (<code>isTrusted</code>).</td></tr>
+<tr><td>interruptor</td><td><strong>flag</strong> · toggle</td><td><code>STRICT_VALIDATION</code>,
+<code>HARD_DEDUP</code>, <code>STRICT_VERSIONING</code>.</td></tr>
+<tr><td>valor por omisión</td><td><strong>default</strong></td><td>Y en este runtime, un valor por
+omisión <em>es</em> contrato.</td></tr>
+<tr><td>hallazgo</td><td><strong>finding</strong></td><td>Lo que devuelve
+<code>validate_global()</code>, con su <code>code</code> y su <code>severity</code>.</td></tr>
+<tr><td>migración progresiva</td><td><strong>brownfield</strong> migration</td><td>Meter el protocolo
+en una aplicación que ya existe. Lo opuesto es <em>greenfield</em>.</td></tr>
+<tr><td>confirmar / descartar</td><td><code>commit</code> / <code>discard</code></td><td>En las tablas
+de datos: <code>dt_commit</code> y <code>dt_discard</code>.</td></tr>
+<tr><td>columna calculada</td><td>computed column</td><td><code>registerDataTableComputed</code>.</td></tr>
+<tr><td>agregado</td><td>aggregate</td><td><code>dt_read_aggregate</code>.</td></tr>
+<tr><td>miga de pan</td><td><strong>breadcrumb</strong></td><td>Rol
+<code>breadcrumb-item</code>.</td></tr>
+<tr><td>cajón</td><td>drawer</td><td>Panel lateral u hoja inferior.</td></tr>
+<tr><td>tiempo de espera</td><td><strong>timeout</strong></td><td>5000 ms para <code>click</code>,
+30 000 para <code>invoke</code>. Y significa <strong>falla real</strong>.</td></tr>
+<tr><td>sondeo</td><td>polling · probe</td><td><code>poll_ms</code>, y la opción
+<code>probe</code> del validador.</td></tr>
+
+<tr class="sec"><td colspan="3">Verificación</td></tr>
+<tr><td>candado</td><td>gate · lock</td><td>Un control automático que <strong>rechaza</strong> si algo
+no cumple. Los archivos se llaman <code>check-*.mjs</code>.</td></tr>
+<tr><td>prueba en rojo · el rojo</td><td>red proof · negative test</td><td>La prueba que rompe el
+candado <strong>a propósito</strong> y verifica que rechaza <em>y que nombra qué rechazó</em>. Los
+archivos se llaman <code>test-*.mjs</code>.</td></tr>
+<tr><td>ponerse rojo</td><td>to go red · to fail</td><td>Que el candado rechace.</td></tr>
+<tr><td>compuerta</td><td>gate</td><td>Lo mismo que candado; lo uso para el conjunto
+<code>check:release</code>.</td></tr>
+<tr><td>batería (de caracterización)</td><td>battery · characterization suite</td><td>El conjunto de
+pruebas que fija el comportamiento actual antes de tocarlo.</td></tr>
+<tr><td>suite huérfana</td><td>orphan suite</td><td>Una suite que existe y que
+<strong>ningún comando ejecuta</strong>.</td></tr>
+<tr><td>afirmación</td><td>assertion</td><td>Cada línea <code>PASS</code> de una suite.</td></tr>
+<tr><td>salida (de un comando)</td><td>exit code</td><td><code>0</code> verde; cualquier otra cosa,
+rojo.</td></tr>
+<tr><td>hueco</td><td>gap</td><td>Algo que falta, y está <em>declarado</em> que falta.</td></tr>
+<tr><td>punto ciego</td><td>blind spot</td><td>Lo que este trabajo no puede ver desde donde
+mira.</td></tr>
+<tr><td>verificado / creído</td><td>verified / believed</td><td>Cómo se parte todo reporte en este
+proyecto, junto con el punto ciego.</td></tr>
+<tr><td>recibo</td><td>receipt · evidence</td><td>La salida pegada que respalda un «hecho».</td></tr>
+
+<tr class="sec"><td colspan="3">El sitio y la entrega</td></tr>
+<tr><td>el árbol</td><td>the tree · working tree</td><td>El conjunto de archivos del
+repositorio.</td></tr>
+<tr><td>punto de montaje · montaje</td><td>mount · mount path</td><td>El prefijo de URL bajo el que se
+sirve este sistema: <code>/nac-spec/</code>.</td></tr>
+<tr><td>cadena (de publicación)</td><td>the chain · the pipeline</td><td>Los 24 pasos del flujo de
+despliegue.</td></tr>
+<tr><td>texto normativo</td><td>normative text</td><td><code>SPEC.md</code>, en inglés. Todo lo demás
+es <em>non-normative</em>, incluido este manual.</td></tr>
+<tr><td>traducción atrasada</td><td>stale translation</td><td>Se reporta por unidad y
+<strong>nunca</strong> bloquea la publicación del inglés.</td></tr>
+<tr><td>cartel</td><td>banner</td><td>El aviso que cada traducción está obligada a llevar.</td></tr>
+<tr><td>adoptante</td><td>adopter</td><td>Quien usa el protocolo en su propia aplicación.</td></tr>
+</table></div>
 
 <div class="divider"><span class="ln"></span><span class="kanji">語</span><span class="ln"></span></div>
 </section>
